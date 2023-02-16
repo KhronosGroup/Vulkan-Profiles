@@ -18,7 +18,7 @@
  */
 
 #pragma once
-#include "vk_layer_settings.h"
+#include "../layer-utils/vk_layer_settings.h"
 
 enum SimulateCapabilityFlag {
     SIMULATE_API_VERSION_BIT = 1 << 0,
