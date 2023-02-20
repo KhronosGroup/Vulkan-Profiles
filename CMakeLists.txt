@@ -105,7 +105,18 @@ endif()
 
 find_package(VulkanHeaders REQUIRED CONFIG QUIET)
 
-include_directories(${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/include/vulkan)
+set(VULKAN_VALIDATIONLAYERS_INSTALL_DIR "VALIDATIONLAYERS-NOTFOUND" CACHE PATH "Absolute path to Vulkan-ValidationLayers directory")
+
+# Cmake command line option overrides environment variable
+if(NOT VULKAN_VALIDATIONLAYERS_INSTALL_DIR)
+    set(VULKAN_VALIDATIONLAYERS_INSTALL_DIR $ENV{VULKAN_VALIDATIONLAYERS_INSTALL_DIR})
+endif()
+message(STATUS "Using Vulkan-ValidationLayers install located at ${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}")
+
+file(TO_CMAKE_PATH "${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}" VULKAN_VALIDATIONLAYERS_INSTALL_DIR)
+set(Vulkan-ValidationLayers_INCLUDE_DIR "${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/include/vulkan")
+set(Vulkan-ValidationLayers_LIBRARY_DIR "${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/lib")
+find_library(VkLayer_utils_LIBRARY VkLayer_utils HINTS ${Vulkan-ValidationLayers_LIBRARY_DIR})
 
 find_package(valijson REQUIRED CONFIG)
 
@@ -212,13 +223,15 @@ if (WIN32)
         set_target_properties(VkLayer_copy-${target}-def-file PROPERTIES FOLDER "Profiles layer")
 
         add_library(VkLayer_${target} SHARED ${ARGN} VkLayer_${target}.def)
-        target_link_Libraries(VkLayer_${target} vku Vulkan::Headers jsoncpp_static valijson vku)
+        target_link_Libraries(VkLayer_${target} ${VkLayer_utils_LIBRARY} vku Vulkan::Headers jsoncpp_static valijson vku)
+        target_include_directories(VkLayer_${target} PUBLIC ${Vulkan-ValidationLayers_INCLUDE_DIR})
         set_target_properties(VkLayer_${target} PROPERTIES FOLDER "Profiles layer")
     endmacro()
 else()
     macro(add_vk_layer target)
         add_library(VkLayer_${target} SHARED ${ARGN})
-        target_link_Libraries(VkLayer_${target} vku Vulkan::Headers jsoncpp_static valijson vku)
+        target_include_directories(VkLayer_${target} PUBLIC ${Vulkan-ValidationLayers_INCLUDE_DIR})
+        target_link_Libraries(VkLayer_${target} ${VkLayer_utils_LIBRARY} vku Vulkan::Headers jsoncpp_static valijson vku)
         if(ANDROID)
             # Android needs -llog for __android_print_log()
             target_link_Libraries(VkLayer_${target} log)
