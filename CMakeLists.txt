@@ -5,7 +5,7 @@ enable_testing()
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
 
-project(VULKAN_PROFILES LANGUAGES CXX C)
+project(VULKAN_PROFILES LANGUAGES CXX)
 
 # Regenerating profiles requires Python 3.7.2 or better (for typing.OrderedDict).
 # Regeneration jsoncpp requires Python 3.
