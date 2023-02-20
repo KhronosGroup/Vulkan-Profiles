@@ -154,8 +154,6 @@ endif()
 
 # Enable GUI folders
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-# "Helper" targets that don't have interesting source code should set their FOLDER property to this
-set(LAYERS_HELPER_FOLDER "Helper Targets")
 
 # NOTE: The idiom for open source projects is to not enable warnings as errors.
 # This reduces problems for users who simply want to build the repository.
