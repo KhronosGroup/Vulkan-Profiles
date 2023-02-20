@@ -140,8 +140,6 @@ include(GNUInstallDirs)
 
 # Enable GUI folders
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-# "Helper" targets that don't have interesting source code should set their FOLDER property to this
-set(LAYERS_HELPER_FOLDER "Helper Targets")
 
 # NOTE: The idiom for open source projects is to not enable warnings as errors.
 # This reduces problems for users who simply want to build the repository.
@@ -151,29 +149,24 @@ if (BUILD_WERROR)
 endif()
 
 # Platform-specific compiler switches
-if(${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
-    add_compile_options(-Werror)
-endif()
-if(${CMAKE_C_COMPILER_ID} MATCHES "(GNU|Clang)")
-    add_compile_options(-Werror)
-elseif(MSVC)
-        add_compile_options(/W4 /WX)
-        add_link_options(/WX)
-        # Ignore some warnings that we know we'll generate.  In the future the
-        # code that generates these warnings should be fixed properly.
-        # vk_layer_logging.h provokes:
-        #    warning C4100: 'default_flag_is_spec': unreferenced formal parameter
-        # vk_loader_platform.h provokes:
-        #    warning C4505: unreferenced local function has been removed
-        # jsoncpp.cpp provokes:
-        #    warning C4702: unreachable code
-        # gtest.h provokes:
-        #    warning C4389: '==': signed/unsigned mismatch
-        #    warning C4018: '>=': signed/unsigned mismatch
+if(MSVC)
+    add_compile_options(/W4 /WX)
+    add_link_options(/WX)
+    # Ignore some warnings that we know we'll generate.  In the future the
+    # code that generates these warnings should be fixed properly.
+    # vk_layer_logging.h provokes:
+    #    warning C4100: 'default_flag_is_spec': unreferenced formal parameter
+    # vk_loader_platform.h provokes:
+    #    warning C4505: unreferenced local function has been removed
+    # jsoncpp.cpp provokes:
+    #    warning C4702: unreachable code
+    # gtest.h provokes:
+    #    warning C4389: '==': signed/unsigned mismatch
+    #    warning C4018: '>=': signed/unsigned mismatch
     # vulkan_profiles.hpp provokes: 
     #    warning C4245: '=': conversion from 'int' to 'uint64_t', signed/unsigned mismatch
     #    warning C4305: '=': truncation from 'double' to 'float'
-        add_compile_options(/wd4100 /wd4505 /wd4702 /wd4389 /wd4245 /wd4305 /wd4018)
+    add_compile_options(/wd4100 /wd4505 /wd4702 /wd4389 /wd4245 /wd4305 /wd4018)
 endif()
 
 # Vulkan-ValidationLayers settings
