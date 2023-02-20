@@ -3,8 +3,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 enable_testing()
 
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
-
 project(VULKAN_PROFILES LANGUAGES CXX C)
 
 # Regenerating profiles requires Python 3.7.2 or better (for typing.OrderedDict).
@@ -48,7 +46,7 @@ if (UPDATE_DEPS)
     message("********************************************************************************")
 
     set(optional_args)
-    if (NOT BUILD_TESTS)
+    if (NOT PROFILES_BUILD_TESTS)
         set(optional_args "--optional=tests")
     endif()
 
