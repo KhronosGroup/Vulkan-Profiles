@@ -102,21 +102,18 @@ endif()
 if (VULKAN_HEADERS_INSTALL_DIR)
     list(APPEND CMAKE_PREFIX_PATH ${VULKAN_HEADERS_INSTALL_DIR})
 endif()
+if (VULKAN_VALIDATIONLAYERS_INSTALL_DIR)
+    list(APPEND CMAKE_INCLUDE_PATH ${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/include/vulkan)
+endif()
 
 find_package(VulkanHeaders REQUIRED CONFIG QUIET)
 
-set(VULKAN_VALIDATIONLAYERS_INSTALL_DIR "VALIDATIONLAYERS-NOTFOUND" CACHE PATH "Absolute path to Vulkan-ValidationLayers directory")
+find_file(VVL_INCLUDE_DIR vk_dispatch_table_helper.h REQUIRED CMAKE_FIND_ROOT_PATH_BOTH)
+get_filename_component(VVL_INCLUDE_DIR ${VVL_INCLUDE_DIR} DIRECTORY)
 
-# Cmake command line option overrides environment variable
-if(NOT VULKAN_VALIDATIONLAYERS_INSTALL_DIR)
-    set(VULKAN_VALIDATIONLAYERS_INSTALL_DIR $ENV{VULKAN_VALIDATIONLAYERS_INSTALL_DIR})
-endif()
-message(STATUS "Using Vulkan-ValidationLayers install located at ${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}")
-
-file(TO_CMAKE_PATH "${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}" VULKAN_VALIDATIONLAYERS_INSTALL_DIR)
-set(Vulkan-ValidationLayers_INCLUDE_DIR "${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/include/vulkan")
-set(Vulkan-ValidationLayers_LIBRARY_DIR "${VULKAN_VALIDATIONLAYERS_INSTALL_DIR}/lib")
-find_library(VkLayer_utils_LIBRARY VkLayer_utils HINTS ${Vulkan-ValidationLayers_LIBRARY_DIR})
+# Effectively the header files installed by VVL are part of Vulkan::Headers
+# This reflects the current structure of the VulkanSDK.
+target_include_directories(Vulkan::Headers INTERFACE ${VVL_INCLUDE_DIR})
 
 find_package(valijson REQUIRED CONFIG)
 
@@ -193,12 +190,6 @@ elseif(MSVC)
         add_compile_options(/wd4100 /wd4505 /wd4702 /wd4389 /wd4245 /wd4305 /wd4018)
 endif()
 
-# Vulkan-ValidationLayers settings
-set(UPDATE_DEPS ON)
-set(BUILD_TESTS OFF)
-set(_build_type ${CMAKE_BUILD_TYPE})
-set(VVL_CPP_STANDARD 11)
-set(_build_type ${CMAKE_BUILD_TYPE})
 set(PROFILES_SCHEMA_FILENAME "profiles-0.8-latest.json")
 
 set(API_NAME "Vulkan" CACHE STRING "API name to use when building")
@@ -224,13 +215,11 @@ if (WIN32)
 
         add_library(VkLayer_${target} SHARED ${ARGN} VkLayer_${target}.def)
         target_link_Libraries(VkLayer_${target} vku Vulkan::Headers jsoncpp_static valijson vku)
-        target_include_directories(VkLayer_${target} PUBLIC ${Vulkan-ValidationLayers_INCLUDE_DIR})
         set_target_properties(VkLayer_${target} PROPERTIES FOLDER "Profiles layer")
     endmacro()
 else()
     macro(add_vk_layer target)
         add_library(VkLayer_${target} SHARED ${ARGN})
-        target_include_directories(VkLayer_${target} PUBLIC ${Vulkan-ValidationLayers_INCLUDE_DIR})
         target_link_Libraries(VkLayer_${target} vku Vulkan::Headers jsoncpp_static valijson vku)
         if(ANDROID)
             # Android needs -llog for __android_print_log()

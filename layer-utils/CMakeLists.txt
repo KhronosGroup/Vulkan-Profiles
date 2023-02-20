@@ -15,13 +15,12 @@
 # limitations under the License.
 #
 
-file(GLOB FILES_SOURCE ./*.cpp)
-file(GLOB FILES_HEADER ./*.h)
-
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-add_library(vku STATIC ${FILES_SOURCE} ${FILES_HEADER})
-target_link_Libraries(vku Vulkan::Headers)
+add_library(vku STATIC)
+target_sources(vku PRIVATE
+   vk_layer_settings.cpp
+   vk_layer_settings.h
+)
+target_link_Libraries(vku PRIVATE Vulkan::Headers)
 
 if(WIN32)
    target_compile_definitions(vku PUBLIC _CRT_SECURE_NO_WARNINGS)
