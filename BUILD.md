@@ -147,7 +147,7 @@ On OSX:
     mkdir build
     cd build
     python ../scripts/update_deps.py --dir ../external --arch x64 --config debug
-    cmake -A x64 -C ../external/helper.cmake -DCMAKE_BUILD_TYPE=Debug ..
+    cmake -A x64 -C ../external/helper.cmake -DCMAKE_BUILD_TYPE=Debug -DUPDATE_DEPS=ON ..
     cmake --build . --parallel --config Debug
 ```
 
