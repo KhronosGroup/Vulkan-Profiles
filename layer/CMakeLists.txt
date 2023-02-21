@@ -1,7 +1,3 @@
-if(PROFILES_BUILD_TESTS)
-    add_subdirectory(tests)
-endif()
-
 execute_process(COMMAND ${CMAKE_COMMAND} -E touch  ${CMAKE_SOURCE_DIR}/layer/profiles.cpp)
 execute_process(COMMAND ${CMAKE_COMMAND} -E touch  ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp)
 

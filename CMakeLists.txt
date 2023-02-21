@@ -1,15 +1,6 @@
 cmake_minimum_required(VERSION 3.14.0)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
-enable_testing()
 
 project(VULKAN_PROFILES LANGUAGES CXX C)
-
-# Regenerating profiles requires Python 3.7.2 or better (for typing.OrderedDict).
-# Regeneration jsoncpp requires Python 3.
-# Otherwise Python is not required, as checked-in generated code and
-# headers will be used.
-option(PROFILES_BUILD_TESTS "Build profile tests" ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH "Archive output dir.")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH "Library output dir.")
@@ -21,6 +12,8 @@ set(CMAKE_CXX_VISIBILITY_PRESET "hidden")
 set(CMAKE_C_VISIBILITY_PRESET "hidden")
 set(CMAKE_VISIBILITY_INLINES_HIDDEN "YES")
 
+# Regenerating profiles requires Python 3.7.2 or better (for typing.OrderedDict). Regeneration jsoncpp requires Python 3.
+# Otherwise Python is not required, as checked-in generated code and headers will be used.
 find_package(PythonInterp 3.7.2 REQUIRED)
 
 if (UPDATE_DEPS)
@@ -116,10 +109,6 @@ target_include_directories(Vulkan::Headers INTERFACE ${VVL_INCLUDE_DIR})
 find_package(valijson REQUIRED CONFIG)
 
 find_package(jsoncpp REQUIRED CONFIG)
-
-if(PROFILES_BUILD_TESTS)
-    find_package(GTest REQUIRED CONFIG)
-endif()
 
 if (NOT ANDROID)
     # The vulkan loader search is:
@@ -226,8 +215,13 @@ else()
 endif()
 add_subdirectory(layer)
 
-if (PROFILES_BUILD_TESTS AND NOT ANDROID)
-    add_subdirectory(profiles/test)
+option(PROFILES_BUILD_TESTS "Build profile tests")
+if (PROFILES_BUILD_TESTS)
+    enable_testing()
+    find_package(GTest REQUIRED CONFIG)
+    add_subdirectory(layer/tests)
+    add_subdirectory(library/test)
+    if (NOT ANDROID)
+        add_subdirectory(profiles/test)
+    endif()
 endif()
-
-
