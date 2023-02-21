@@ -142,36 +142,31 @@ On OSX:
 
 ### 64-bit Windows Build 
 ```
-    git clone git@github.com:KhronosGroup/Vulkan-Profiles.git
-    cd Vulkan-Profiles
-    mkdir build
-    cd build
-    python ../scripts/update_deps.py --dir ../external --arch x64 --config debug
-    cmake -A x64 -C ../external/helper.cmake -DCMAKE_BUILD_TYPE=Debug -DUPDATE_DEPS=ON ..
-    cmake --build . --parallel --config Debug
+git clone git@github.com:KhronosGroup/Vulkan-Profiles.git
+cd Vulkan-Profiles
+cmake -S . -B build/ -D CMAKE_BUILD_TYPE=Debug -D UPDATE_DEPS=ON -A x64
+cmake --build . --config Debug
 ```
 
 ### Windows Unit Tests
 
 ```
+cd build/
 ctest -C Debug --output-on-failure --parallel 16
 ```
 
 ### Linux and macOS Build
 ```
-    git clone git@github.com:KhronosGroup/Vulkan-Profiles.git
-    cd Vulkan-Profiles
-    mkdir build
-    cd build
-    python ../scripts/update_deps.py --dir ../external
-    cmake -C ../external/helper.cmake ..
-    cmake ..
-    cmake --build . --parallel
+git clone git@github.com:KhronosGroup/Vulkan-Profiles.git
+cd Vulkan-Profiles
+cmake -S . -B build/ -D CMAKE_BUILD_TYPE=Debug -D UPDATE_DEPS=ON
+cmake --build .
 ```
 
 ### Linux and macOS Unit Tests
 
 ```
+cd build/
 ctest --parallel 8 --output-on-failure
 ```
 
