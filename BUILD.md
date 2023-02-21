@@ -8,9 +8,7 @@ supplementing the loader and validation layer core components found at https://g
 
 ### Windows System Requirements
 
-Windows 7+ with additional required software packages:
-
-- Microsoft Visual Studio 2015 Professional or 2017 Professional.  Note: it is possible that lesser/older versions may work, but not guaranteed.
+- Microsoft Visual Studio 2019 or higher
 - [CMake 3.14.0](https://github.com/Kitware/CMake/releases/download/v3.14.0/cmake-3.14.0-win64-x64.zip) is recommended.
   - Tell the installer to "Add CMake to the system `PATH`" environment variable.
 - Python 3.7.2 or later (from https://www.python.org/downloads).  Notes:
@@ -74,7 +72,7 @@ Optional software packages:
 
 ### macOS System Requirements
 
-macOS 10.11.4 have been tested with this repo.
+MacOS 10.15 have been tested with this repo.
 
 - [CMake 3.14.0](https://github.com/Kitware/CMake/releases/download/v3.14.0/cmake-3.14.0-Darwin-x86_64.tar.gz) is recommended.
 
