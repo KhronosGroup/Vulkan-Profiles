@@ -2791,7 +2791,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
     uint32_t pCount_copy = *pCount;
 
     PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
-    const uint32_t src_count = pdd ? static_cast<uint32_t>(pdd->simulation_extensions_.size()) : 0;
+    //const uint32_t src_count = pdd ? static_cast<uint32_t>(pdd->simulation_extensions_.size()) : 0;
     if (pLayerName) {
         if (strcmp(pLayerName, kOurLayerName) == 0)
             result = EnumerateProperties(kDeviceExtensionPropertiesCount, kDeviceExtensionProperties.data(), pCount, pProperties);
@@ -3312,34 +3312,42 @@ VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL GetInstanceProcAddr(VkInstance instance
 '''
 
 EXPORT_FUNCTIONS = '''
-// Function symbols statically exported by this layer's library //////////////////////////////////////////////////////////////////
-// Keep synchronized with VisualStudio's VkLayer_khronos_profiles.def
+// Function symbols exported by this layer's library //////////////////////////////////////////////////////////////////
 
-VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetInstanceProcAddr(VkInstance instance, const char *pName) {
+#if defined(__GNUC__) && __GNUC__ >= 4
+#define PROFILES_EXPORT __attribute__((visibility("default")))
+#else
+#define PROFILES_EXPORT
+#endif
+
+// Keep synchronized with VisualStudio's VkLayer_khronos_profiles.def
+extern "C" {
+
+PROFILES_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetInstanceProcAddr(VkInstance instance, const char *pName) {
     return GetInstanceProcAddr(instance, pName);
 }
 
-VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL vkCreateInstance(const VkInstanceCreateInfo *pCreateInfo,
+PROFILES_EXPORT VKAPI_ATTR VkResult VKAPI_CALL vkCreateInstance(const VkInstanceCreateInfo *pCreateInfo,
                                                                 const VkAllocationCallbacks *pAllocator, VkInstance *pInstance) {
     return CreateInstance(pCreateInfo, pAllocator, pInstance);
 }
 
-VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL vkEnumerateInstanceLayerProperties(uint32_t *pCount,
+PROFILES_EXPORT VKAPI_ATTR VkResult VKAPI_CALL vkEnumerateInstanceLayerProperties(uint32_t *pCount,
                                                                                   VkLayerProperties *pProperties) {
     return EnumerateInstanceLayerProperties(pCount, pProperties);
 }
 
-VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL vkEnumerateInstanceExtensionProperties(const char *pLayerName, uint32_t *pCount,
+PROFILES_EXPORT VKAPI_ATTR VkResult VKAPI_CALL vkEnumerateInstanceExtensionProperties(const char *pLayerName, uint32_t *pCount,
                                                                                       VkExtensionProperties *pProperties) {
     return EnumerateInstanceExtensionProperties(pLayerName, pCount, pProperties);
 }
 
-VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL vkEnumeratePhysicalDevices(VkInstance instance, uint32_t *pPhysicalDeviceCount,
+PROFILES_EXPORT VKAPI_ATTR VkResult VKAPI_CALL vkEnumeratePhysicalDevices(VkInstance instance, uint32_t *pPhysicalDeviceCount,
                                                                           VkPhysicalDevice *pPhysicalDevices) {
     return EnumeratePhysicalDevices(instance, pPhysicalDeviceCount, pPhysicalDevices);
 }
 
-VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL vkNegotiateLoaderLayerInterfaceVersion(VkNegotiateLayerInterface *pVersionStruct) {
+PROFILES_EXPORT VKAPI_ATTR VkResult VKAPI_CALL vkNegotiateLoaderLayerInterfaceVersion(VkNegotiateLayerInterface *pVersionStruct) {
     assert(pVersionStruct != NULL);
     assert(pVersionStruct->sType == LAYER_NEGOTIATE_INTERFACE_STRUCT);
 
@@ -3359,6 +3367,8 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL vkNegotiateLoaderLayerInterfaceVe
 
     return VK_SUCCESS;
 }
+
+}  // extern "C"
 
 // vim: set sw=4 ts=8 et ic ai:
 '''
@@ -4249,6 +4259,7 @@ class VulkanProfilesLayerGenerator():
 
     def create_var_name(self, struct):
         nv = struct.endswith("NV")
+        arm = struct.endswith("ARM")
         var_name = ''
         while struct[-1].isupper():
             struct = struct[:-1]
@@ -4273,6 +4284,8 @@ class VulkanProfilesLayerGenerator():
             var_name = 'arrayof_queue_family_properties_[i].' + var_name.replace('queue_family_', '')
         if (var_name == 'physical_device_mesh_shader_features_' or var_name == 'physical_device_mesh_shader_properties_') and nv:
             var_name += 'nv_'
+        if (var_name == 'physical_device_shader_core_properties_' and arm):
+            var_name += 'arm_'
         return var_name
     
     def get_non_aliased_list(self, list, aliases):
@@ -4394,7 +4407,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    registryPath  = './build/_deps/vulkan-headers-src/registry/vk.xml'
+    registryPath  = './external/Vulkan-Headers/build/install/share/vulkan/registry/vk.xml'
     if args.registry is not None:
         registryPath = args.registry
 
