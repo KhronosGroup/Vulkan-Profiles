@@ -5,6 +5,8 @@ enable_testing()
 
 project(VULKAN_PROFILES LANGUAGES CXX C)
 
+include(GNUInstallDirs)
+
 # Regenerating profiles requires Python 3.7.2 or better (for typing.OrderedDict).
 # Regeneration jsoncpp requires Python 3.
 # Otherwise Python is not required, as checked-in generated code and
@@ -141,9 +143,6 @@ set(PROFILES_CPP_STANDARD 17 CACHE STRING "Set the C++ standard to build against
 set(CMAKE_CXX_STANDARD ${PROFILES_CPP_STANDARD})
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
-# Define GNU standard installation directories.
-include(GNUInstallDirs)
 
 if(WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     # Windows: if install locations not set by user, set install prefix to "<build_dir>\install".
