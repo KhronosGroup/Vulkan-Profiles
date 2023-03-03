@@ -3320,7 +3320,7 @@ EXPORT_FUNCTIONS = '''
 #define PROFILES_EXPORT
 #endif
 
-// Keep synchronized with VisualStudio's VkLayer_khronos_profiles.def
+// Keep synchronized with VkLayer_khronos_profiles.def / VkLayer_khronos_profiles.map
 extern "C" {
 
 PROFILES_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetInstanceProcAddr(VkInstance instance, const char *pName) {
