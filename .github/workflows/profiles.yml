@@ -51,6 +51,31 @@ jobs:
       - name: Install
         run: cmake --install build --prefix build/install --config ${{matrix.config}}
 
+  ubuntu-latest:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+      - name: Install jsonschema
+        run: python3 -m pip install jsonschema
+      - name: Install Dependencies
+        run: sudo apt update && sudo apt install --yes --no-install-recommends libwayland-dev libxrandr-dev
+      - uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: 3.17.2
+      - name: Configure/Generate
+        run: cmake -S. -B build -D PROFILES_BUILD_TESTS=OFF -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -G "Ninja"
+      - name: Build
+        run: cmake --build build --config ${{matrix.config}}
+      - name: Install
+        run: cmake --install build --prefix build/install --config ${{matrix.config}}
+
   windows-latest:
     runs-on: windows-latest
     strategy:
