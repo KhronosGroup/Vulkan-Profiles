@@ -9,7 +9,7 @@ supplementing the loader and validation layer core components found at https://g
 ### Windows System Requirements
 
 - Microsoft Visual Studio 2019 or higher
-- [CMake 3.14.0](https://github.com/Kitware/CMake/releases/download/v3.14.0/cmake-3.14.0-win64-x64.zip) is recommended.
+- [CMake 3.17.2](https://github.com/Kitware/CMake/releases/download/v3.17.2/cmake-3.17.2-win64-x64.zip) is recommended.
   - Tell the installer to "Add CMake to the system `PATH`" environment variable.
 - Python 3.7.2 or later (from https://www.python.org/downloads).  Notes:
   - Select to install the optional sub-package to add Python to the system `PATH` environment variable.
@@ -31,7 +31,7 @@ Optional software packages:
 
 Ubuntu 18.04 LTS and 20.04 have been tested with this repo.
 
-[CMake 3.14.0](https://github.com/Kitware/CMake/releases/download/v3.14.0/cmake-3.14.0-Linux-x86_64.tar.gz) is recommended.
+[CMake 3.17.2](https://github.com/Kitware/CMake/releases/download/v3.17.2/cmake-3.17.2-Linux-x86_64.tar.gz) is recommended.
 
 ```
 # Dependencies from included submodule components
@@ -52,7 +52,7 @@ pip3 install jsonschema
 
 Fedora Core 28 and 29 were tested with this repo.
 
-[CMake 3.14.0](https://github.com/Kitware/CMake/releases/download/v3.14.0/cmake-3.14.0-Linux-x86_64.tar.gz) is recommended.
+[CMake 3.17.2](https://github.com/Kitware/CMake/releases/download/v3.17.2/cmake-3.17.2-Linux-x86_64.tar.gz) is recommended.
 
 Additional package dependencies include:
 
@@ -74,7 +74,7 @@ Optional software packages:
 
 MacOS 10.15 have been tested with this repo.
 
-- [CMake 3.14.0](https://github.com/Kitware/CMake/releases/download/v3.14.0/cmake-3.14.0-Darwin-x86_64.tar.gz) is recommended.
+- [CMake 3.17.2](https://github.com/Kitware/CMake/releases/download/v3.17.2/cmake-3.17.2-Darwin-x86_64.tar.gz) is recommended.
 
 Setup Homebrew and components
 
