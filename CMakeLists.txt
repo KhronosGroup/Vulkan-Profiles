@@ -182,16 +182,11 @@ endif()
 
 set(PROFILES_SCHEMA_FILENAME "profiles-0.8-latest.json")
 
-# The scripts directory regenerates the Profiles source and headers.
-add_subdirectory(scripts)
+# The profiles directory regenerates the Profiles source and headers.
+add_subdirectory(profiles)
 
 add_subdirectory(library)
 
 add_subdirectory(layer-utils)
 
 add_subdirectory(layer)
-
-if (PROFILES_BUILD_TESTS AND NOT ANDROID)
-    add_subdirectory(profiles/test)
-endif()
-
