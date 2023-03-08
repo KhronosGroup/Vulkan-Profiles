@@ -58,20 +58,13 @@ function(LayerTest NAME)
     target_link_libraries(${TEST_NAME} Vulkan::Headers Vulkan::Vulkan GTest::gtest GTest::gtest_main)
     target_compile_definitions(${TEST_NAME} PUBLIC JSON_TEST_FILES_PATH="${CMAKE_SOURCE_DIR}/profiles/test/data/")
 
-    target_compile_definitions(${TEST_NAME} PUBLIC TEST_BINARY_PATH="${CMAKE_BINARY_DIR}/")
+    target_compile_definitions(${TEST_NAME} PUBLIC TEST_BINARY_PATH="$<TARGET_FILE_DIR:VkLayer_khronos_profiles>")
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
-    if(WIN32)
-        string(REPLACE ";" "\\;" path "$ENV{PATH}")
-        string(REPLACE "/" "\\" binary_dir "${CMAKE_BINARY_DIR}\\bin")
-        set(run_environment "VK_LAYER_PATH=${binary_dir}" "PATH=${binary_dir}\;${path}")
-    elseif(UNIX)
-        set(run_environment "VK_LAYER_PATH=${CMAKE_BINARY_DIR}/lib" "LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib:$ENV{LD_LIBRARY_PATH}")
-    else()
-        message(FATAL_ERROR "Unsupported Platform ${CMAKE_SYSTEM_NAME}")
-    endif()
+    set_tests_properties(${TEST_NAME} PROPERTIES ENVIRONMENT
+        "VK_LAYER_PATH=$<TARGET_FILE_DIR:VkLayer_khronos_profiles>"
+    )
 
-    set_tests_properties(${TEST_NAME} PROPERTIES ENVIRONMENT "${run_environment}")
     set_target_properties(${TEST_NAME} PROPERTIES FOLDER "Profiles layer/Tests")
 endfunction(LayerTest)
 
@@ -122,7 +115,7 @@ function(LayerTestAndroid NAME)
     set(_app_glue_dir ${ANDROID_NDK_HOME}/sources/android/native_app_glue)
     target_compile_definitions(${ANDROID_APK_NAME} PUBLIC
                                JSON_TEST_FILES_PATH="/sdcard/Android/data/com.example.VulkanProfilesLayerTests/files/"
-                               TEST_BINARY_PATH="${CMAKE_BINARY_DIR}/"
+                               TEST_BINARY_PATH="$<TARGET_FILE_DIR:VkLayer_khronos_profiles>"
                                PROFILES_LAYER_APK VK_PROTOTYPES
                                )
     target_include_directories(${ANDROID_APK_NAME} PUBLIC
@@ -140,14 +133,14 @@ function(LayerTestAndroid NAME)
     set(_aapt ${ANDROID_SDK_HOME}/build-tools/${ANDROID_BUILD_TOOLS}/aapt)
     set(_zipalign ${ANDROID_SDK_HOME}/build-tools/${ANDROID_BUILD_TOOLS}/zipalign)
     add_custom_command(TARGET ${ANDROID_APK_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/apk/assets
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${TEST_FILES_JSON} ${CMAKE_BINARY_DIR}/apk/assets
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/apk/out
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${ANDROID_APK_NAME}> ${CMAKE_BINARY_DIR}/apk/out/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:${ANDROID_APK_NAME}>
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:VkLayer_khronos_profiles> ${CMAKE_BINARY_DIR}/apk/out/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:VkLayer_khronos_profiles>
-        COMMAND ${_aapt} package -f -M ${CMAKE_CURRENT_SOURCE_DIR}/platforms/android/AndroidManifest.xml -I ${_android_jar} -A ${CMAKE_BINARY_DIR}/apk/assets -F ${CMAKE_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}-unaligned.apk ${CMAKE_BINARY_DIR}/apk/out
-        COMMAND jarsigner -verbose -keystore $ENV{HOME}/.android/debug.keystore -storepass android -keypass android ${CMAKE_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}-unaligned.apk androiddebugkey
-        COMMAND ${_zipalign} -f 4 ${CMAKE_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}-unaligned.apk ${CMAKE_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}.apk
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/apk/assets
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${TEST_FILES_JSON} ${PROJECT_BINARY_DIR}/apk/assets
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/apk/out
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${ANDROID_APK_NAME}> ${PROJECT_BINARY_DIR}/apk/out/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:${ANDROID_APK_NAME}>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:VkLayer_khronos_profiles> ${PROJECT_BINARY_DIR}/apk/out/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:VkLayer_khronos_profiles>
+        COMMAND ${_aapt} package -f -M ${CMAKE_CURRENT_SOURCE_DIR}/platforms/android/AndroidManifest.xml -I ${_android_jar} -A ${PROJECT_BINARY_DIR}/apk/assets -F ${PROJECT_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}-unaligned.apk ${PROJECT_BINARY_DIR}/apk/out
+        COMMAND jarsigner -verbose -keystore $ENV{HOME}/.android/debug.keystore -storepass android -keypass android ${PROJECT_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}-unaligned.apk androiddebugkey
+        COMMAND ${_zipalign} -f 4 ${PROJECT_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}-unaligned.apk ${PROJECT_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}.apk
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
     set_tests_properties(${TEST_NAME} PROPERTIES ENVIRONMENT "${run_environment}")
