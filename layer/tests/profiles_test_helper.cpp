@@ -31,16 +31,6 @@
 
 #include "profiles_test_helper.h"
 
-#ifdef _WIN32
-#ifdef _DEBUG
-static const char* CONFIG_PATH = "bin/Debug";
-#else
-static const char* CONFIG_PATH = "bin/Release";
-#endif
-#else
-static const char* CONFIG_PATH = "lib";
-#endif
-
 // On Android, VK_MAKE_API_VERSION doesn't yet exist.
 #ifndef VK_MAKE_API_VERSION
 #define VK_MAKE_API_VERSION(variant, major, minor, patch) VK_MAKE_VERSION(major, minor, patch)
@@ -145,7 +135,7 @@ VkResult profiles_test::VulkanInstanceBuilder::getPhysicalDevice(Mode mode, VkPh
 VkResult profiles_test::VulkanInstanceBuilder::init(uint32_t apiVersion, void* pNext) {
     _layer_names.push_back("VK_LAYER_KHRONOS_profiles");
 
-    const std::string layer_path = std::string(TEST_BINARY_PATH) + CONFIG_PATH;
+    const std::string layer_path = std::string(TEST_BINARY_PATH);
     profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
 
     VkApplicationInfo app_info{GetDefaultApplicationInfo()};

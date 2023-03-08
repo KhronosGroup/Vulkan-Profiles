@@ -80,12 +80,12 @@ function (create_android_package NAME)
     set(_aapt ${ANDROID_SDK_HOME}/build-tools/${ANDROID_BUILD_TOOLS}/aapt)
     set(_zipalign ${ANDROID_SDK_HOME}/build-tools/${ANDROID_BUILD_TOOLS}/zipalign)
     add_custom_command(TARGET ${apk_test_target} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/apk/out
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${apk_test_target}> ${CMAKE_BINARY_DIR}/apk/out/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:${apk_test_target}>
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${NAME}> ${CMAKE_BINARY_DIR}/apk/out/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:${NAME}>
-        COMMAND ${_aapt} package -f -M ${CMAKE_CURRENT_SOURCE_DIR}/platforms/android/AndroidManifest.xml -I ${_android_jar} -F ${CMAKE_BINARY_DIR}/apk/out/${apk_test_target}-unaligned.apk ${CMAKE_BINARY_DIR}/apk/out
-        COMMAND jarsigner -verbose -keystore $ENV{HOME}/.android/debug.keystore -storepass android -keypass android ${CMAKE_BINARY_DIR}/apk/out/${apk_test_target}-unaligned.apk androiddebugkey
-        COMMAND ${_zipalign} -f 4 ${CMAKE_BINARY_DIR}/apk/out/${apk_test_target}-unaligned.apk ${CMAKE_BINARY_DIR}/apk/out/${apk_test_target}.apk
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/apk/out
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${apk_test_target}> ${PROJECT_BINARY_DIR}/apk/out/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:${apk_test_target}>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${NAME}> ${PROJECT_BINARY_DIR}/apk/out/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:${NAME}>
+        COMMAND ${_aapt} package -f -M ${CMAKE_CURRENT_SOURCE_DIR}/platforms/android/AndroidManifest.xml -I ${_android_jar} -F ${PROJECT_BINARY_DIR}/apk/out/${apk_test_target}-unaligned.apk ${PROJECT_BINARY_DIR}/apk/out
+        COMMAND jarsigner -verbose -keystore $ENV{HOME}/.android/debug.keystore -storepass android -keypass android ${PROJECT_BINARY_DIR}/apk/out/${apk_test_target}-unaligned.apk androiddebugkey
+        COMMAND ${_zipalign} -f 4 ${PROJECT_BINARY_DIR}/apk/out/${apk_test_target}-unaligned.apk ${PROJECT_BINARY_DIR}/apk/out/${apk_test_target}.apk
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/..)
 endfunction(create_android_package)
 
