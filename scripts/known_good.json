@@ -9,30 +9,6 @@
             "commit": "v1.3.241"
         },
         {
-            "name": "Vulkan-Loader",
-            "url": "https://github.com/KhronosGroup/Vulkan-Loader.git",
-            "sub_dir": "Vulkan-Loader",
-            "build_dir": "Vulkan-Loader/build",
-            "install_dir": "Vulkan-Loader/build/install",
-            "commit": "v1.3.241",
-            "deps": [
-                {
-                    "var_name": "VULKAN_HEADERS_INSTALL_DIR",
-                    "repo_name": "Vulkan-Headers"
-                }
-            ],
-            "cmake_options": [
-                "-DBUILD_TESTS=OFF"
-            ],
-            "build_platforms": [
-                "linux",
-                "darwin"
-            ],
-            "optional": [
-                "tests"
-            ]
-        },
-        {
             "name": "Vulkan-ValidationLayers",
             "url": "https://github.com/KhronosGroup/Vulkan-ValidationLayers.git",
             "sub_dir": "Vulkan-ValidationLayers",
@@ -91,6 +67,30 @@
                 "-DBUILD_SHARED_LIBS=OFF"
             ],
             "commit": "v1.12.0",
+            "optional": [
+                "tests"
+            ]
+        },
+        {
+            "name": "Vulkan-Loader",
+            "url": "https://github.com/KhronosGroup/Vulkan-Loader.git",
+            "sub_dir": "Vulkan-Loader",
+            "build_dir": "Vulkan-Loader/build",
+            "install_dir": "Vulkan-Loader/build/install",
+            "commit": "v1.3.241",
+            "deps": [
+                {
+                    "var_name": "VULKAN_HEADERS_INSTALL_DIR",
+                    "repo_name": "Vulkan-Headers"
+                }
+            ],
+            "cmake_options": [
+                "-DBUILD_TESTS=OFF"
+            ],
+            "build_platforms": [
+                "linux",
+                "darwin"
+            ],
             "optional": [
                 "tests"
             ]
