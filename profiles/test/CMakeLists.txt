@@ -1,5 +1,3 @@
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
 set(TEST_FILE test_validate.cpp)
 set(TEST_NAME VpProfile_test_schema_validation)
 
