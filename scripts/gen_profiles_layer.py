@@ -362,14 +362,14 @@ static std::string StringAPIVersion(uint32_t version) {
 ENUMERATE_ALL = '''
 // Get all elements from a vkEnumerate*() lambda into a std::vector.
 template <typename T>
-VkResult EnumerateAll(std::vector<T> *vect, std::function<VkResult(uint32_t *, T *)> func) {
+VkResult EnumerateAll(std::vector<T> &vect, std::function<VkResult(uint32_t *, T *)> func) {
     VkResult result = VK_INCOMPLETE;
     do {
         uint32_t count = 0;
         result = func(&count, nullptr);
         assert(result == VK_SUCCESS);
-        vect->resize(count);
-        result = func(&count, vect->data());
+        vect.resize(count);
+        result = func(&count, vect.data());
     } while (result == VK_INCOMPLETE);
     return result;
 }
@@ -2662,7 +2662,7 @@ VKAPI_ATTR void VKAPI_CALL DestroyInstance(VkInstance instance, const VkAllocati
             const auto dt = instance_dispatch_table(instance);
 
             std::vector<VkPhysicalDevice> physical_devices;
-            VkResult err = EnumerateAll<VkPhysicalDevice>(&physical_devices, [&](uint32_t *count, VkPhysicalDevice *results) {
+            VkResult err = EnumerateAll<VkPhysicalDevice>(physical_devices, [&](uint32_t *count, VkPhysicalDevice *results) {
                 return dt->EnumeratePhysicalDevices(instance, count, results);
             });
             assert(!err);
@@ -3171,7 +3171,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
     // profiles" use case*
     if (pPhysicalDevices && (VK_SUCCESS == result)) {
         std::vector<VkPhysicalDevice> physical_devices;
-        result = EnumerateAll<VkPhysicalDevice>(&physical_devices, [&](uint32_t *count, VkPhysicalDevice *results) {
+        result = EnumerateAll<VkPhysicalDevice>(physical_devices, [&](uint32_t *count, VkPhysicalDevice *results) {
             return dt->EnumeratePhysicalDevices(instance, count, results);
         });
         if (result != VK_SUCCESS) {
@@ -3185,8 +3185,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             }
 
             PhysicalDeviceData &pdd = PhysicalDeviceData::Create(physical_device, instance);
-
-            EnumerateAll<VkExtensionProperties>(&(pdd.device_extensions_), [&](uint32_t *count, VkExtensionProperties *results) {
+            EnumerateAll<VkExtensionProperties>(pdd.device_extensions_, [&](uint32_t *count, VkExtensionProperties *results) {
                 return dt->EnumerateDeviceExtensionProperties(physical_device, nullptr, count, results);
             });
 
