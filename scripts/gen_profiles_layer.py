@@ -382,10 +382,11 @@ std::recursive_mutex global_lock;  // Enforce thread-safety for this layer.
 
 uint32_t loader_layer_iface_version = CURRENT_LOADER_LAYER_INTERFACE_VERSION;
 
-typedef std::unordered_map<uint32_t /*VkFormat*/, VkFormatProperties> ArrayOfVkFormatProperties;
-typedef std::unordered_map<uint32_t /*VkFormat*/, VkFormatProperties3> ArrayOfVkFormatProperties3;
-typedef std::unordered_map<uint32_t /*VkFormat*/, VkDrmFormatModifierPropertiesList2EXT> ArrayOfVkDrmFormatModifierProperties;
+typedef std::unordered_map<uint32_t /*VkFormat*/, VkFormatProperties> MapOfVkFormatProperties;
+typedef std::unordered_map<uint32_t /*VkFormat*/, VkFormatProperties3> MapOfVkFormatProperties3;
+typedef std::unordered_map<uint32_t /*VkFormat*/, VkDrmFormatModifierPropertiesList2EXT> MapOfVkDrmFormatModifierProperties;
 typedef std::vector<VkExtensionProperties> ArrayOfVkExtensionProperties;
+typedef std::unordered_map<std::string, VkExtensionProperties> MapOfVkExtensionProperties;
 
 struct QueueFamilyProperties {
     VkQueueFamilyProperties2 properties_2 = {};
@@ -450,12 +451,7 @@ class PhysicalDeviceData {
     }
 
     static bool HasExtension(PhysicalDeviceData *pdd, const char *extension_name) {
-        for (const auto &ext_prop : pdd->device_extensions_) {
-            if (strncmp(extension_name, ext_prop.extensionName, VK_MAX_EXTENSION_NAME_SIZE) == 0) {
-                return true;
-            }
-        }
-        return false;
+        return pdd->device_extensions_.count(extension_name) > 0;
     }
 
     static bool HasSimulatedExtension(VkPhysicalDevice pd, const char *extension_name) {
@@ -463,12 +459,7 @@ class PhysicalDeviceData {
     }
 
     static bool HasSimulatedExtension(PhysicalDeviceData *pdd, const char *extension_name) {
-        for (const auto &ext_prop : pdd->simulation_extensions_) {
-            if (strncmp(extension_name, ext_prop.extensionName, VK_MAX_EXTENSION_NAME_SIZE) == 0) {
-                return true;
-            }
-        }
-        return false;
+        return pdd->simulation_extensions_.count(extension_name) > 0;
     }
 
     static bool HasSimulatedOrRealExtension(VkPhysicalDevice pd, const char *extension_name) {
@@ -486,19 +477,19 @@ class PhysicalDeviceData {
 
     VkInstance instance() const { return instance_; }
 
-    ArrayOfVkExtensionProperties device_extensions_;
-    ArrayOfVkFormatProperties device_formats_;
-    ArrayOfVkFormatProperties3 device_formats_3_;
+    MapOfVkExtensionProperties device_extensions_;
+    MapOfVkFormatProperties device_formats_;
+    MapOfVkFormatProperties3 device_formats_3_;
     ArrayOfVkQueueFamilyProperties device_queue_family_properties_;
-    ArrayOfVkExtensionProperties simulation_extensions_;
+    MapOfVkExtensionProperties simulation_extensions_;
     VkPhysicalDeviceProperties physical_device_properties_;
     VkPhysicalDeviceFeatures physical_device_features_;
     VkPhysicalDeviceMemoryProperties physical_device_memory_properties_;
     VkPhysicalDeviceToolProperties physical_device_tool_properties_;
     VkSurfaceCapabilitiesKHR surface_capabilities_;
-    ArrayOfVkFormatProperties arrayof_format_properties_;
-    ArrayOfVkFormatProperties3 arrayof_format_properties_3_;
-    ArrayOfVkExtensionProperties arrayof_extension_properties_;
+    MapOfVkFormatProperties map_of_format_properties_;
+    MapOfVkFormatProperties3 map_of_format_properties_3_;
+    MapOfVkExtensionProperties map_of_extension_properties_;
     ArrayOfVkQueueFamilyProperties arrayof_queue_family_properties_;
 
     bool vulkan_1_1_properties_written_;
@@ -624,8 +615,8 @@ class JsonLoader {
     bool WarnDuplicatedProperty(const Json::Value &parent);
     bool GetFeature(const Json::Value &features, const std::string &name);
     bool GetProperty(const Json::Value &props, const std::string &name);
-    bool GetFormat(const Json::Value &formats, const std::string &format_name, ArrayOfVkFormatProperties *dest,
-                   ArrayOfVkFormatProperties3 *dest3);
+    bool GetFormat(const Json::Value &formats, const std::string &format_name, MapOfVkFormatProperties *dest,
+                   MapOfVkFormatProperties3 *dest3);
     bool CheckVersionSupport(uint32_t version, const std::string &name);
     ExtensionSupport CheckExtensionSupport(const char *extension, const std::string &name);
     bool valid(ExtensionSupport support);
@@ -1267,8 +1258,8 @@ bool WarnDuplicated(const Json::Value &parent, const std::vector<std::string> &m
 '''
 
 JSON_LOADER_NON_GENERATED = '''
-bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format_name, ArrayOfVkFormatProperties *dest,
-                           ArrayOfVkFormatProperties3 *dest3) {
+bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format_name, MapOfVkFormatProperties *dest,
+                           MapOfVkFormatProperties3 *dest3) {
     VkFormat format = StringToFormat(format_name);
     VkFormatProperties profile_properties = {};
     VkFormatProperties3 profile_properties_3 = {VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3};
@@ -1831,18 +1822,13 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
         if (layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
             const auto &extensions = c["extensions"];
 
-            pdd_->arrayof_extension_properties_.reserve(extensions.size());
+            pdd_->map_of_extension_properties_.reserve(extensions.size());
             for (const auto &e : extensions.getMemberNames()) {
                 VkExtensionProperties extension;
                 strcpy(extension.extensionName, e.c_str());
                 extension.specVersion = extensions[e].asInt();
-                bool found = false;
-                for (const auto &ext : pdd_->arrayof_extension_properties_) {
-                    if (strcmp(ext.extensionName, extension.extensionName) == 0) {
-                        found = true;
-                        break;
-                    }
-                }
+
+                bool found = pdd_->map_of_extension_properties_.count(e) > 0;
 
                 if (IsInstanceExtension(e.c_str())) {
                     LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
@@ -1850,19 +1836,14 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
                 }
 
                 if (!found) {
-                    bool supported_on_device = false;
-                    for (const auto &device_extension : pdd_->device_extensions_) {
-                        if (strcmp(device_extension.extensionName, extension.extensionName) == 0) {
-                            supported_on_device = true;
-                            break;
-                        }
-                    }
+                    bool supported_on_device = pdd_->device_extensions_.count(e) > 0;
+
                     if (!supported_on_device) {
                         failed = true;
                     }
-                    pdd_->arrayof_extension_properties_.push_back(extension);
+                    pdd_->map_of_extension_properties_.insert({e, extension});
                     if (!PhysicalDeviceData::HasSimulatedExtension(pdd_, extension.extensionName)) {
-                        pdd_->simulation_extensions_.push_back(extension);
+                        pdd_->simulation_extensions_.insert({e, extension});
                     }
                 }
             }
@@ -1920,7 +1901,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::
             const auto &formats = c["formats"];
 
             for (const auto &format : formats.getMemberNames()) {
-                bool success = GetFormat(formats, format, &pdd_->arrayof_format_properties_, &pdd_->arrayof_format_properties_3_);
+                bool success = GetFormat(formats, format, &pdd_->map_of_format_properties_, &pdd_->map_of_format_properties_3_);
                 if (!success) {
                     failed = true;
                 }
@@ -2041,13 +2022,11 @@ void JsonLoader::ReadProfileApiVersion() {
         }
     }
 
-    for (std::size_t j = 0, m = layer_settings->exclude_device_extensions.size(); j < m; ++j) {
-        const auto &extension = layer_settings->exclude_device_extensions[j];
+    for (const auto& extension : layer_settings->exclude_device_extensions) {
         if (extension.empty()) continue;
         excluded_extensions_.push_back(extension);
     }
-    for (std::size_t j = 0, m = layer_settings->exclude_formats.size(); j < m; ++j) {
-        const auto &format = layer_settings->exclude_formats[j];
+    for (const auto& format : layer_settings->exclude_formats) {
         if (format.empty()) continue;
         excluded_formats_.push_back(format);
     }
@@ -2697,10 +2676,10 @@ void FillFormatPropertiesPNextChain(PhysicalDeviceData *physicalDeviceData, void
 
         switch (structure->sType) {
             case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3: {
-                if (!physicalDeviceData->arrayof_format_properties_3_.empty()) {
+                if (!physicalDeviceData->map_of_format_properties_3_.empty()) {
                     VkFormatProperties3 *sp = (VkFormatProperties3 *)place;
                     void *pNext = sp->pNext;
-                    *sp = physicalDeviceData->arrayof_format_properties_3_[format];
+                    *sp = physicalDeviceData->map_of_format_properties_3_[format];
                     sp->pNext = pNext;
                 }
             } break;
@@ -2793,6 +2772,27 @@ VkResult EnumerateProperties(uint32_t src_count, const T *src_props, uint32_t *d
     return (copy_count == src_count) ? VK_SUCCESS : VK_INCOMPLETE;
 }
 
+VkResult EnumerateExtensions(const MapOfVkExtensionProperties& source, uint32_t *dst_count, VkExtensionProperties *dst_props){
+    assert(dst_count);
+    if (!dst_props) {
+        *dst_count = static_cast<uint32_t>(source.size());
+        return VK_SUCCESS;
+    }
+    uint32_t count_written = 0;
+    uint32_t src_count = static_cast<uint32_t>(source.size());
+    const uint32_t copy_count = (*dst_count < src_count) ? *dst_count : src_count;
+    *dst_count = copy_count;
+    for(const auto &[ext_name, ext]: source) {
+        dst_props[count_written] = ext;
+        count_written++;
+
+        if (count_written == *dst_count){
+            break;
+        }
+    }
+    return (copy_count == src_count) ? VK_SUCCESS : VK_INCOMPLETE;
+}
+
 VKAPI_ATTR VkResult VKAPI_CALL EnumerateInstanceLayerProperties(uint32_t *pCount, VkLayerProperties *pProperties) {
     LogMessage(DEBUG_REPORT_DEBUG_BIT, "vkEnumerateInstanceLayerProperties %s \\n", pProperties ? "VALUES" : "COUNT");
     LogFlush();
@@ -2838,7 +2838,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
                                   layer_settings->exclude_device_extensions.empty())) {
         result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
     } else {
-        result = EnumerateProperties(static_cast<uint32_t>(pdd->simulation_extensions_.size()), pdd->simulation_extensions_.data(), pCount, pProperties);
+        result = EnumerateExtensions(pdd->simulation_extensions_, pCount, pProperties);
     }
 
     if (result == VK_SUCCESS && !pLayerName && layer_settings->emulate_portability &&
@@ -2943,21 +2943,21 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice ph
 
     // Are there JSON overrides, or should we call down to return the original values?
     PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
-    const uint32_t src_count = (pdd) ? static_cast<uint32_t>(pdd->arrayof_format_properties_.size()) : 0;
+    const uint32_t src_count = (pdd) ? static_cast<uint32_t>(pdd->map_of_format_properties_.size()) : 0;
     if (src_count == 0) {
         dt->GetPhysicalDeviceFormatProperties(physicalDevice, format, pFormatProperties);
     } else {
         VkFormatProperties device_format = {};
         dt->GetPhysicalDeviceFormatProperties(physicalDevice, format, &device_format);
-        const auto iter = pdd->arrayof_format_properties_.find(format);
+        const auto iter = pdd->map_of_format_properties_.find(format);
 
         if ((layer_settings->simulate_capabilities & SIMULATE_FORMATS_BIT)) {
-            *pFormatProperties = (iter != pdd->arrayof_format_properties_.end()) ? iter->second : VkFormatProperties{};
+            *pFormatProperties = (iter != pdd->map_of_format_properties_.end()) ? iter->second : VkFormatProperties{};
         } else {
             *pFormatProperties = device_format;
         }
 
-        if (IsFormatSupported(*pFormatProperties) && iter != pdd->arrayof_format_properties_.end()) {
+        if (IsFormatSupported(*pFormatProperties) && iter != pdd->map_of_format_properties_.end()) {
             if ((layer_settings->simulate_capabilities & SIMULATE_FORMATS_BIT)) {
                 *pFormatProperties = iter->second;
             } else {
@@ -3185,9 +3185,15 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             }
 
             PhysicalDeviceData &pdd = PhysicalDeviceData::Create(physical_device, instance);
-            EnumerateAll<VkExtensionProperties>(pdd.device_extensions_, [&](uint32_t *count, VkExtensionProperties *results) {
+            ArrayOfVkExtensionProperties local_device_extensions;
+            EnumerateAll<VkExtensionProperties>(local_device_extensions, [&](uint32_t *count, VkExtensionProperties *results) {
                 return dt->EnumerateDeviceExtensionProperties(physical_device, nullptr, count, results);
             });
+
+            pdd.device_extensions_.reserve(local_device_extensions.size());
+            for(const auto& ext: local_device_extensions) {
+                pdd.device_extensions_.insert({&(ext.extensionName[0]), ext});
+            }
 
             pdd.simulation_extensions_ = pdd.device_extensions_;
 
@@ -3279,21 +3285,13 @@ ENUMERATE_PHYSICAL_DEVICES_MIDDLE = '''
 
 ENUMERATE_PHYSICAL_DEVICES_END = '''
             if (layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
-                pdd.simulation_extensions_ = pdd.arrayof_extension_properties_;
+                pdd.simulation_extensions_ = pdd.map_of_extension_properties_;
             } else {
                 pdd.simulation_extensions_ = pdd.device_extensions_;
             }
 
             for (std::size_t j = 0, m = layer_settings->exclude_device_extensions.size(); j < m; ++j) {
-                const std::string &extension = layer_settings->exclude_device_extensions[j];
-                if (extension.empty()) continue;
-
-                for (size_t i = 0; i < pdd.simulation_extensions_.size(); ++i) {
-                    if (extension == pdd.simulation_extensions_[i].extensionName) {
-                        pdd.simulation_extensions_.erase(pdd.simulation_extensions_.begin() + i);
-                        break;
-                    }
-                }
+                pdd.simulation_extensions_.erase(layer_settings->exclude_device_extensions[j].c_str());
             }
         }
     }
@@ -3815,9 +3813,9 @@ class VulkanProfilesLayerGenerator():
                 gen += '            strcpy(extension.extensionName, ext);\n'
                 gen += '            extension.specVersion = 1;\n'
                 gen += '            if (!PhysicalDeviceData::HasSimulatedExtension(pdd_, ext)) {\n'
-                gen += '                pdd_->simulation_extensions_.push_back(extension);\n'
+                gen += '                pdd_->simulation_extensions_.insert({ext, extension});\n'
                 gen += '            }\n'
-                gen += '            pdd_->arrayof_extension_properties_.push_back(extension);\n'
+                gen += '            pdd_->map_of_extension_properties_.insert({ext, extension});\n'
                 gen += '        }\n'
                 gen += '    }\n'
         gen += '}\n'
@@ -3965,8 +3963,8 @@ class VulkanProfilesLayerGenerator():
         return gen
 
     def generate_load_device_formats(self):
-        gen = '\nvoid LoadDeviceFormats(VkInstance instance, PhysicalDeviceData *pdd, VkPhysicalDevice pd, ArrayOfVkFormatProperties *dest,\n'
-        gen += '                       ArrayOfVkFormatProperties3 *dest3) {\n'
+        gen = '\nvoid LoadDeviceFormats(VkInstance instance, PhysicalDeviceData *pdd, VkPhysicalDevice pd, MapOfVkFormatProperties *dest,\n'
+        gen += '                       MapOfVkFormatProperties3 *dest3) {\n'
         gen += '    std::vector<VkFormat> formats = {\n'
         a = registry.enums['VkFormat']
         for format in registry.enums['VkFormat'].values:
