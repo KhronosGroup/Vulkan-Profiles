@@ -431,7 +431,7 @@ class PhysicalDeviceData {
 
         LogMessage(DEBUG_REPORT_DEBUG_BIT, \"PhysicalDeviceData::Create()\\n\");
 
-        const auto result = map_.emplace(pd, PhysicalDeviceData(instance));
+        const auto result = map().emplace(pd, PhysicalDeviceData(instance));
         assert(result.second);  // true=insertion, false=replacement
         auto iter = result.first;
         PhysicalDeviceData *pdd = &iter->second;
@@ -441,13 +441,13 @@ class PhysicalDeviceData {
 
     static void Destroy(const VkPhysicalDevice pd) {
         LogMessage(DEBUG_REPORT_DEBUG_BIT, \"PhysicalDeviceData::Destroy()\\n\");
-        map_.erase(pd);
+        map().erase(pd);
     }
 
     // Find a PDD from our map, or nullptr if doesn't exist.
     static PhysicalDeviceData *Find(VkPhysicalDevice pd) {
-        const auto iter = map_.find(pd);
-        return (iter != map_.end()) ? &iter->second : nullptr;
+        const auto iter = map().find(pd);
+        return (iter != map().end()) ? &iter->second : nullptr;
     }
 
     static bool HasExtension(PhysicalDeviceData *pdd, const char *extension_name) {
@@ -525,10 +525,12 @@ PHYSICAL_DEVICE_DATA_END = '''    }
     const VkInstance instance_;
 
     typedef std::unordered_map<VkPhysicalDevice, PhysicalDeviceData> Map;
-    static Map map_;
+    static Map& map() {
+        static Map map_;
+        return map_;
+    }
 };
 
-PhysicalDeviceData::Map PhysicalDeviceData::map_;
 '''
 
 JSON_LOADER_BEGIN = '''
@@ -562,7 +564,7 @@ class JsonLoader {
         LogMessage(DEBUG_REPORT_DEBUG_BIT, "JsonLoader::Create()\\n");
 
         VkInstance temporary = VK_NULL_HANDLE;
-        const auto result = profile_map_.emplace(std::piecewise_construct, std::make_tuple(temporary), std::make_tuple());
+        const auto result = profile_map().emplace(std::piecewise_construct, std::make_tuple(temporary), std::make_tuple());
         assert(result.second);  // true=insertion, false=replacement
         auto iter = result.first;
         JsonLoader *profile = &iter->second;
@@ -570,18 +572,18 @@ class JsonLoader {
     }
 
     static void Store(VkInstance instance) {
-        profile_map_[instance] = profile_map_[VK_NULL_HANDLE];
-        profile_map_.erase(VK_NULL_HANDLE);
+        profile_map()[instance] = profile_map()[VK_NULL_HANDLE];
+        profile_map().erase(VK_NULL_HANDLE);
     }
 
     static JsonLoader *Find(VkInstance instance) {
-        const auto iter = profile_map_.find(instance);
-        return (iter != profile_map_.end()) ? &iter->second : nullptr;
+        const auto iter = profile_map().find(instance);
+        return (iter != profile_map().end()) ? &iter->second : nullptr;
     }
 
     static void Destroy(VkInstance instance) {
         LogMessage(DEBUG_REPORT_DEBUG_BIT, "JsonLoader::Destroy()\\n");
-        profile_map_.erase(instance);
+        profile_map().erase(instance);
     }
 
     VkResult LoadFile(std::string filename);
@@ -627,10 +629,11 @@ class JsonLoader {
 
 JSON_LOADER_END = '''
     typedef std::unordered_map<VkInstance, JsonLoader> ProfileMap;
-    static ProfileMap profile_map_;
+    static ProfileMap& profile_map() {
+        static ProfileMap profile_map_;
+        return profile_map_;
+    }
 };
-
-JsonLoader::ProfileMap JsonLoader::profile_map_;
 '''
 
 WARN_FUNCTIONS = '''
