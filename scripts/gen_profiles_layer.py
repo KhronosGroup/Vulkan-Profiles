@@ -431,7 +431,7 @@ class PhysicalDeviceData {
 
         LogMessage(DEBUG_REPORT_DEBUG_BIT, \"PhysicalDeviceData::Create()\\n\");
 
-        const auto result = map().emplace(pd, PhysicalDeviceData(instance));
+        const auto result = map().emplace(pd, instance);
         assert(result.second);  // true=insertion, false=replacement
         auto iter = result.first;
         PhysicalDeviceData *pdd = &iter->second;
@@ -502,9 +502,6 @@ class PhysicalDeviceData {
 '''
 
 PHYSICAL_DEVICE_DATA_CONSTRUCTOR_BEGIN = '''
-  private:
-    PhysicalDeviceData() = delete;
-    PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
     PhysicalDeviceData(VkInstance instance) : instance_(instance) {
         physical_device_properties_ = {};
         physical_device_features_ = {};
@@ -521,6 +518,9 @@ PHYSICAL_DEVICE_DATA_CONSTRUCTOR_BEGIN = '''
 '''
 
 PHYSICAL_DEVICE_DATA_END = '''    }
+    PhysicalDeviceData(const PhysicalDeviceData &) = delete;
+    PhysicalDeviceData &operator=(const PhysicalDeviceData &) = delete;
+  private:
 
     const VkInstance instance_;
 
