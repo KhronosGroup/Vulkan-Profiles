@@ -546,19 +546,7 @@ class JsonLoader {
           excluded_extensions_(),
           excluded_formats_() {}
     JsonLoader(const JsonLoader &) = delete;
-    JsonLoader &operator=(const JsonLoader &rhs) {
-        if (this == &rhs) {
-            return *this;
-        }
-        pdd_ = rhs.pdd_;
-        profile_filename_ = rhs.profile_filename_;
-        root_ = rhs.root_;
-        profile_api_version_ = rhs.profile_api_version_;
-        excluded_extensions_ = rhs.excluded_extensions_;
-        excluded_formats_ = rhs.excluded_formats_;
-
-        return *this;
-    }
+    JsonLoader &operator=(const JsonLoader &rhs) = delete;
 
     static JsonLoader &Create() {
         LogMessage(DEBUG_REPORT_DEBUG_BIT, "JsonLoader::Create()\\n");
@@ -572,8 +560,9 @@ class JsonLoader {
     }
 
     static void Store(VkInstance instance) {
-        profile_map()[instance] = profile_map()[VK_NULL_HANDLE];
-        profile_map().erase(VK_NULL_HANDLE);
+        auto nh = profile_map().extract(VK_NULL_HANDLE);
+        nh.key() = instance;
+        profile_map().insert(std::move(nh));
     }
 
     static JsonLoader *Find(VkInstance instance) {
