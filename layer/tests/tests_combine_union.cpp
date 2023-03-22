@@ -31,7 +31,7 @@ class TestsUnion : public VkTestFramework {
     TestsUnion(){};
     ~TestsUnion(){};
 
-    static void SetUpTestSuite(){
+    static void SetUpTestSuite() {
         VkResult err = VK_SUCCESS;
 
         VkProfileLayerSettingsEXT settings;
@@ -52,9 +52,7 @@ class TestsUnion : public VkTestFramework {
         ASSERT_EQ(err, VK_SUCCESS);
     }
 
-    static void TearDownTestSuite(){ 
-        inst_builder.reset();
-    };
+    static void TearDownTestSuite() { inst_builder.reset(); };
 };
 
 TEST_F(TestsUnion, Extension) {
@@ -62,15 +60,21 @@ TEST_F(TestsUnion, Extension) {
     vkEnumerateDeviceExtensionProperties(gpu_profile, nullptr, &count, nullptr);
     std::vector<VkExtensionProperties> device_extensions(count);
     vkEnumerateDeviceExtensionProperties(gpu_profile, nullptr, &count, device_extensions.data());
-
-    ASSERT_STREQ("VK_AMD_device_coherent_memory", device_extensions[0].extensionName);
-    ASSERT_STREQ("VK_EXT_extended_dynamic_state", device_extensions[1].extensionName);
-    ASSERT_STREQ("VK_EXT_shader_demote_to_helper_invocation", device_extensions[2].extensionName);
-    ASSERT_STREQ("VK_KHR_maintenance1", device_extensions[3].extensionName);
-    ASSERT_STREQ("VK_KHR_maintenance2", device_extensions[4].extensionName);
-    ASSERT_STREQ("VK_KHR_maintenance3", device_extensions[5].extensionName);
-    ASSERT_STREQ("VK_KHR_variable_pointers", device_extensions[6].extensionName);
-    ASSERT_STREQ("VK_KHR_portability_subset", device_extensions[7].extensionName);
+    ASSERT_EQ(device_extensions.size(), count);
+    std::array<const char*, 8> expected_extensions = {
+        "VK_AMD_device_coherent_memory", "VK_EXT_extended_dynamic_state", "VK_EXT_shader_demote_to_helper_invocation",
+        "VK_KHR_maintenance1",           "VK_KHR_maintenance2",           "VK_KHR_maintenance3",
+        "VK_KHR_variable_pointers",      "VK_KHR_portability_subset"};
+    for (const auto& extension : device_extensions) {
+        bool found = false;
+        for (const auto& expected : expected_extensions) {
+            if (strcmp(expected, extension.extensionName) == 0) {
+                ASSERT_FALSE(found);  // make sure there are no duplicates
+                found = true;
+            }
+        }
+        ASSERT_TRUE(found);
+    }
 }
 
 TEST_F(TestsUnion, Feature) {
@@ -160,7 +164,8 @@ TEST_F(TestsUnion, Format_Properties) {
 
     const VkFormatFeatureFlags linear_tiling_features = static_cast<VkFormatFeatureFlags>(0);
     const VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT;
-    const VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
+    const VkFormatFeatureFlags buffer_features =
+        VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT | VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT;
 
     EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
     EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);

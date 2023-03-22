@@ -26,11 +26,11 @@
 #include "profiles_test_helper.h"
 
 class TestsMechanism : public VkTestFramework {
-  public:
-   TestsMechanism(){};
-   ~TestsMechanism(){};
+   public:
+    TestsMechanism(){};
+    ~TestsMechanism(){};
 
-    static void SetUpTestSuite(){}
+    static void SetUpTestSuite() {}
     static void TearDownTestSuite(){};
 };
 
@@ -181,30 +181,40 @@ TEST_F(TestsMechanism, api_versions) {
         std::vector<VkExtensionProperties> ext(extCount);
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
         ASSERT_EQ(err, VK_SUCCESS);
-
-        EXPECT_STREQ(VK_KHR_MULTIVIEW_EXTENSION_NAME, ext[0].extensionName);
-        EXPECT_STREQ(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, ext[1].extensionName);
-        EXPECT_STREQ(VK_KHR_DEVICE_GROUP_EXTENSION_NAME, ext[2].extensionName);
-        EXPECT_STREQ(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME, ext[3].extensionName);
-        EXPECT_STREQ(VK_KHR_MAINTENANCE_1_EXTENSION_NAME, ext[4].extensionName);
-        EXPECT_STREQ(VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME, ext[5].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME, ext[6].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME, ext[7].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME, ext[8].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME, ext[9].extensionName);
-        EXPECT_STREQ(VK_KHR_16BIT_STORAGE_EXTENSION_NAME, ext[10].extensionName);
-        EXPECT_STREQ(VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME, ext[11].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME, ext[12].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME, ext[13].extensionName);
-        EXPECT_STREQ(VK_KHR_MAINTENANCE_2_EXTENSION_NAME, ext[14].extensionName);
-        EXPECT_STREQ(VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME, ext[15].extensionName);
-        EXPECT_STREQ(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME, ext[16].extensionName);
-        EXPECT_STREQ(VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME, ext[17].extensionName);
-        EXPECT_STREQ(VK_KHR_RELAXED_BLOCK_LAYOUT_EXTENSION_NAME, ext[18].extensionName);
-        EXPECT_STREQ(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME, ext[19].extensionName);
-        EXPECT_STREQ(VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME, ext[20].extensionName);
-        EXPECT_STREQ(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME, ext[21].extensionName);
-        EXPECT_STREQ(VK_KHR_MAINTENANCE_3_EXTENSION_NAME, ext[22].extensionName);
+        ASSERT_EQ(ext.size(), extCount);
+        std::array expected_extensions = {VK_KHR_MULTIVIEW_EXTENSION_NAME,
+                                          VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
+                                          VK_KHR_DEVICE_GROUP_EXTENSION_NAME,
+                                          VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME,
+                                          VK_KHR_MAINTENANCE_1_EXTENSION_NAME,
+                                          VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME,
+                                          VK_KHR_16BIT_STORAGE_EXTENSION_NAME,
+                                          VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME,
+                                          VK_KHR_MAINTENANCE_2_EXTENSION_NAME,
+                                          VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME,
+                                          VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME,
+                                          VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME,
+                                          VK_KHR_RELAXED_BLOCK_LAYOUT_EXTENSION_NAME,
+                                          VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME,
+                                          VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME,
+                                          VK_KHR_BIND_MEMORY_2_EXTENSION_NAME,
+                                          VK_KHR_MAINTENANCE_3_EXTENSION_NAME};
+        for (const auto& extension : ext) {
+            bool found = false;
+            for (const auto& expected : expected_extensions) {
+                if (strcmp(expected, extension.extensionName) == 0) {
+                    ASSERT_FALSE(found);  // make sure there are no duplicates
+                    found = true;
+                }
+            }
+            ASSERT_TRUE(found);
+        }
 
         inst_builder.reset();
     }
@@ -240,35 +250,45 @@ TEST_F(TestsMechanism, api_versions) {
         std::vector<VkExtensionProperties> ext(extCount);
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
         ASSERT_EQ(err, VK_SUCCESS);
-
-        EXPECT_STREQ(VK_KHR_MULTIVIEW_EXTENSION_NAME, ext[0].extensionName);
-        EXPECT_STREQ(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, ext[1].extensionName);
-        EXPECT_STREQ(VK_KHR_DEVICE_GROUP_EXTENSION_NAME, ext[2].extensionName);
-        EXPECT_STREQ(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME, ext[3].extensionName);
-        EXPECT_STREQ(VK_KHR_MAINTENANCE_1_EXTENSION_NAME, ext[4].extensionName);
-        EXPECT_STREQ(VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME, ext[5].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME, ext[6].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME, ext[7].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME, ext[8].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME, ext[9].extensionName);
-        EXPECT_STREQ(VK_KHR_16BIT_STORAGE_EXTENSION_NAME, ext[10].extensionName);
-        EXPECT_STREQ(VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME, ext[11].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME, ext[12].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME, ext[13].extensionName);
-        EXPECT_STREQ(VK_KHR_MAINTENANCE_2_EXTENSION_NAME, ext[14].extensionName);
-        EXPECT_STREQ(VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME, ext[15].extensionName);
-        EXPECT_STREQ(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME, ext[16].extensionName);
-        EXPECT_STREQ(VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME, ext[17].extensionName);
-        EXPECT_STREQ(VK_KHR_RELAXED_BLOCK_LAYOUT_EXTENSION_NAME, ext[18].extensionName);
-        EXPECT_STREQ(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME, ext[19].extensionName);
-        EXPECT_STREQ(VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME, ext[20].extensionName);
-        EXPECT_STREQ(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME, ext[21].extensionName);
-        EXPECT_STREQ(VK_KHR_MAINTENANCE_3_EXTENSION_NAME, ext[22].extensionName);
-        EXPECT_STREQ(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, ext[23].extensionName);
+        ASSERT_EQ(ext.size(), extCount);
+        std::array expected_extensions = {VK_KHR_MULTIVIEW_EXTENSION_NAME,
+                                          VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
+                                          VK_KHR_DEVICE_GROUP_EXTENSION_NAME,
+                                          VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME,
+                                          VK_KHR_MAINTENANCE_1_EXTENSION_NAME,
+                                          VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME,
+                                          VK_KHR_16BIT_STORAGE_EXTENSION_NAME,
+                                          VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME,
+                                          VK_KHR_MAINTENANCE_2_EXTENSION_NAME,
+                                          VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME,
+                                          VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME,
+                                          VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME,
+                                          VK_KHR_RELAXED_BLOCK_LAYOUT_EXTENSION_NAME,
+                                          VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME,
+                                          VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME,
+                                          VK_KHR_BIND_MEMORY_2_EXTENSION_NAME,
+                                          VK_KHR_MAINTENANCE_3_EXTENSION_NAME,
+                                          VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME};
+        for (const auto& extension : ext) {
+            bool found = false;
+            for (const auto& expected : expected_extensions) {
+                if (strcmp(expected, extension.extensionName) == 0) {
+                    ASSERT_FALSE(found);  // make sure there are no duplicates
+                    found = true;
+                }
+            }
+            ASSERT_TRUE(found);
+        }
 
         inst_builder.reset();
     }
-    
+
     // Vulkan 1.2
     {
         VkProfileLayerSettingsEXT settings;
@@ -300,54 +320,64 @@ TEST_F(TestsMechanism, api_versions) {
         std::vector<VkExtensionProperties> ext(extCount);
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
         ASSERT_EQ(err, VK_SUCCESS);
-
-        EXPECT_STREQ(VK_KHR_MULTIVIEW_EXTENSION_NAME, ext[0].extensionName);
-        EXPECT_STREQ(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, ext[1].extensionName);
-        EXPECT_STREQ(VK_KHR_DEVICE_GROUP_EXTENSION_NAME, ext[2].extensionName);
-        EXPECT_STREQ(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME, ext[3].extensionName);
-        EXPECT_STREQ(VK_KHR_MAINTENANCE_1_EXTENSION_NAME, ext[4].extensionName);
-        EXPECT_STREQ(VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME, ext[5].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME, ext[6].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME, ext[7].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME, ext[8].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME, ext[9].extensionName);
-        EXPECT_STREQ(VK_KHR_16BIT_STORAGE_EXTENSION_NAME, ext[10].extensionName);
-        EXPECT_STREQ(VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME, ext[11].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME, ext[12].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME, ext[13].extensionName);
-        EXPECT_STREQ(VK_KHR_MAINTENANCE_2_EXTENSION_NAME, ext[14].extensionName);
-        EXPECT_STREQ(VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME, ext[15].extensionName);
-        EXPECT_STREQ(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME, ext[16].extensionName);
-        EXPECT_STREQ(VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME, ext[17].extensionName);
-        EXPECT_STREQ(VK_KHR_RELAXED_BLOCK_LAYOUT_EXTENSION_NAME, ext[18].extensionName);
-        EXPECT_STREQ(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME, ext[19].extensionName);
-        EXPECT_STREQ(VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME, ext[20].extensionName);
-        EXPECT_STREQ(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME, ext[21].extensionName);
-        EXPECT_STREQ(VK_KHR_MAINTENANCE_3_EXTENSION_NAME, ext[22].extensionName);
-        EXPECT_STREQ(VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME, ext[23].extensionName);
-        EXPECT_STREQ(VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME, ext[24].extensionName);
-        EXPECT_STREQ(VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME, ext[25].extensionName);
-        EXPECT_STREQ(VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, ext[26].extensionName);
-        EXPECT_STREQ(VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME, ext[27].extensionName);
-        EXPECT_STREQ(VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME, ext[28].extensionName);
-        EXPECT_STREQ(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, ext[29].extensionName);
-        EXPECT_STREQ(VK_EXT_SHADER_VIEWPORT_INDEX_LAYER_EXTENSION_NAME, ext[30].extensionName);
-        EXPECT_STREQ(VK_KHR_DRAW_INDIRECT_COUNT_EXTENSION_NAME, ext[31].extensionName);
-        EXPECT_STREQ(VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME, ext[32].extensionName);
-        EXPECT_STREQ(VK_KHR_8BIT_STORAGE_EXTENSION_NAME, ext[33].extensionName);
-        EXPECT_STREQ(VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME, ext[34].extensionName);
-        EXPECT_STREQ(VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME, ext[35].extensionName);
-        EXPECT_STREQ(VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME, ext[36].extensionName);
-        EXPECT_STREQ(VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, ext[37].extensionName);
-        EXPECT_STREQ(VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME, ext[38].extensionName);
-        EXPECT_STREQ(VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME, ext[39].extensionName);
-        EXPECT_STREQ(VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME, ext[40].extensionName);
-        EXPECT_STREQ(VK_KHR_SPIRV_1_4_EXTENSION_NAME, ext[41].extensionName);
-        EXPECT_STREQ(VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME, ext[42].extensionName);
-        EXPECT_STREQ(VK_EXT_SEPARATE_STENCIL_USAGE_EXTENSION_NAME, ext[43].extensionName);
-        EXPECT_STREQ(VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME, ext[44].extensionName);
-        EXPECT_STREQ(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME, ext[45].extensionName);
-        EXPECT_STREQ(VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, ext[46].extensionName);
+        ASSERT_EQ(ext.size(), extCount);
+        std::array expected_extensions = {VK_KHR_MULTIVIEW_EXTENSION_NAME,
+                                          VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
+                                          VK_KHR_DEVICE_GROUP_EXTENSION_NAME,
+                                          VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME,
+                                          VK_KHR_MAINTENANCE_1_EXTENSION_NAME,
+                                          VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME,
+                                          VK_KHR_16BIT_STORAGE_EXTENSION_NAME,
+                                          VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME,
+                                          VK_KHR_MAINTENANCE_2_EXTENSION_NAME,
+                                          VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME,
+                                          VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME,
+                                          VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME,
+                                          VK_KHR_RELAXED_BLOCK_LAYOUT_EXTENSION_NAME,
+                                          VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME,
+                                          VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME,
+                                          VK_KHR_BIND_MEMORY_2_EXTENSION_NAME,
+                                          VK_KHR_MAINTENANCE_3_EXTENSION_NAME,
+                                          VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME,
+                                          VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME,
+                                          VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME,
+                                          VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME,
+                                          VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME,
+                                          VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME,
+                                          VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
+                                          VK_EXT_SHADER_VIEWPORT_INDEX_LAYER_EXTENSION_NAME,
+                                          VK_KHR_DRAW_INDIRECT_COUNT_EXTENSION_NAME,
+                                          VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME,
+                                          VK_KHR_8BIT_STORAGE_EXTENSION_NAME,
+                                          VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME,
+                                          VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME,
+                                          VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME,
+                                          VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME,
+                                          VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
+                                          VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME,
+                                          VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME,
+                                          VK_KHR_SPIRV_1_4_EXTENSION_NAME,
+                                          VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME,
+                                          VK_EXT_SEPARATE_STENCIL_USAGE_EXTENSION_NAME,
+                                          VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME,
+                                          VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
+                                          VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME};
+        for (const auto& extension : ext) {
+            bool found = false;
+            for (const auto& expected : expected_extensions) {
+                if (strcmp(expected, extension.extensionName) == 0) {
+                    ASSERT_FALSE(found);  // make sure there are no duplicates
+                    found = true;
+                }
+            }
+            ASSERT_TRUE(found);
+        }
 
         inst_builder.reset();
     }
@@ -383,77 +413,87 @@ TEST_F(TestsMechanism, api_versions) {
         std::vector<VkExtensionProperties> ext(extCount);
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
         ASSERT_EQ(err, VK_SUCCESS);
-
-        EXPECT_STREQ(VK_KHR_MULTIVIEW_EXTENSION_NAME, ext[0].extensionName);
-        EXPECT_STREQ(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, ext[1].extensionName);
-        EXPECT_STREQ(VK_KHR_DEVICE_GROUP_EXTENSION_NAME, ext[2].extensionName);
-        EXPECT_STREQ(VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME, ext[3].extensionName);
-        EXPECT_STREQ(VK_KHR_MAINTENANCE_1_EXTENSION_NAME, ext[4].extensionName);
-        EXPECT_STREQ(VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME, ext[5].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME, ext[6].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME, ext[7].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME, ext[8].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME, ext[9].extensionName);
-        EXPECT_STREQ(VK_KHR_16BIT_STORAGE_EXTENSION_NAME, ext[10].extensionName);
-        EXPECT_STREQ(VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME, ext[11].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME, ext[12].extensionName);
-        EXPECT_STREQ(VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME, ext[13].extensionName);
-        EXPECT_STREQ(VK_KHR_MAINTENANCE_2_EXTENSION_NAME, ext[14].extensionName);
-        EXPECT_STREQ(VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME, ext[15].extensionName);
-        EXPECT_STREQ(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME, ext[16].extensionName);
-        EXPECT_STREQ(VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME, ext[17].extensionName);
-        EXPECT_STREQ(VK_KHR_RELAXED_BLOCK_LAYOUT_EXTENSION_NAME, ext[18].extensionName);
-        EXPECT_STREQ(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME, ext[19].extensionName);
-        EXPECT_STREQ(VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME, ext[20].extensionName);
-        EXPECT_STREQ(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME, ext[21].extensionName);
-        EXPECT_STREQ(VK_KHR_MAINTENANCE_3_EXTENSION_NAME, ext[22].extensionName);
-        EXPECT_STREQ(VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME, ext[23].extensionName);
-        EXPECT_STREQ(VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME, ext[24].extensionName);
-        EXPECT_STREQ(VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME, ext[25].extensionName);
-        EXPECT_STREQ(VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME, ext[26].extensionName);
-        EXPECT_STREQ(VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME, ext[27].extensionName);
-        EXPECT_STREQ(VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME, ext[28].extensionName);
-        EXPECT_STREQ(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, ext[29].extensionName);
-        EXPECT_STREQ(VK_EXT_SHADER_VIEWPORT_INDEX_LAYER_EXTENSION_NAME, ext[30].extensionName);
-        EXPECT_STREQ(VK_KHR_DRAW_INDIRECT_COUNT_EXTENSION_NAME, ext[31].extensionName);
-        EXPECT_STREQ(VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME, ext[32].extensionName);
-        EXPECT_STREQ(VK_KHR_8BIT_STORAGE_EXTENSION_NAME, ext[33].extensionName);
-        EXPECT_STREQ(VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME, ext[34].extensionName);
-        EXPECT_STREQ(VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME, ext[35].extensionName);
-        EXPECT_STREQ(VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME, ext[36].extensionName);
-        EXPECT_STREQ(VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, ext[37].extensionName);
-        EXPECT_STREQ(VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME, ext[38].extensionName);
-        EXPECT_STREQ(VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME, ext[39].extensionName);
-        EXPECT_STREQ(VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME, ext[40].extensionName);
-        EXPECT_STREQ(VK_KHR_SPIRV_1_4_EXTENSION_NAME, ext[41].extensionName);
-        EXPECT_STREQ(VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME, ext[42].extensionName);
-        EXPECT_STREQ(VK_EXT_SEPARATE_STENCIL_USAGE_EXTENSION_NAME, ext[43].extensionName);
-        EXPECT_STREQ(VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME, ext[44].extensionName);
-        EXPECT_STREQ(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME, ext[45].extensionName);
-        EXPECT_STREQ(VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, ext[46].extensionName);
-        EXPECT_STREQ(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME, ext[47].extensionName);
-        EXPECT_STREQ(VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME, ext[48].extensionName);
-        EXPECT_STREQ(VK_EXT_PIPELINE_CREATION_FEEDBACK_EXTENSION_NAME, ext[49].extensionName);
-        EXPECT_STREQ(VK_EXT_TOOLING_INFO_EXTENSION_NAME, ext[50].extensionName);
-        EXPECT_STREQ(VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME, ext[51].extensionName);
-        EXPECT_STREQ(VK_KHR_SHADER_NON_SEMANTIC_INFO_EXTENSION_NAME, ext[52].extensionName);
-        EXPECT_STREQ(VK_EXT_PRIVATE_DATA_EXTENSION_NAME, ext[53].extensionName);
-        EXPECT_STREQ(VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME, ext[54].extensionName);
-        EXPECT_STREQ(VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME, ext[55].extensionName);
-        EXPECT_STREQ(VK_KHR_FORMAT_FEATURE_FLAGS_2_EXTENSION_NAME, ext[56].extensionName);
-        EXPECT_STREQ(VK_KHR_MAINTENANCE_4_EXTENSION_NAME, ext[57].extensionName);
-        EXPECT_STREQ(VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME, ext[58].extensionName);
-        EXPECT_STREQ(VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME, ext[59].extensionName);
-        EXPECT_STREQ(VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME, ext[60].extensionName);
-        EXPECT_STREQ(VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME, ext[61].extensionName);
-        EXPECT_STREQ(VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME, ext[62].extensionName);
-        EXPECT_STREQ(VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME, ext[63].extensionName);
-        EXPECT_STREQ(VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME, ext[64].extensionName);
-        EXPECT_STREQ(VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME, ext[65].extensionName);
-        EXPECT_STREQ(VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME, ext[66].extensionName);
-        EXPECT_STREQ(VK_KHR_COPY_COMMANDS_2_EXTENSION_NAME, ext[67].extensionName);
-        EXPECT_STREQ(VK_EXT_4444_FORMATS_EXTENSION_NAME, ext[68].extensionName);
-        EXPECT_STREQ(VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME, ext[69].extensionName);
+        ASSERT_EQ(ext.size(), extCount);
+        std::array expected_extensions = {VK_KHR_MULTIVIEW_EXTENSION_NAME,
+                                          VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
+                                          VK_KHR_DEVICE_GROUP_EXTENSION_NAME,
+                                          VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME,
+                                          VK_KHR_MAINTENANCE_1_EXTENSION_NAME,
+                                          VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME,
+                                          VK_KHR_16BIT_STORAGE_EXTENSION_NAME,
+                                          VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME,
+                                          VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME,
+                                          VK_KHR_MAINTENANCE_2_EXTENSION_NAME,
+                                          VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME,
+                                          VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME,
+                                          VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME,
+                                          VK_KHR_RELAXED_BLOCK_LAYOUT_EXTENSION_NAME,
+                                          VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME,
+                                          VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME,
+                                          VK_KHR_BIND_MEMORY_2_EXTENSION_NAME,
+                                          VK_KHR_MAINTENANCE_3_EXTENSION_NAME,
+                                          VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME,
+                                          VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME,
+                                          VK_KHR_IMAGELESS_FRAMEBUFFER_EXTENSION_NAME,
+                                          VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME,
+                                          VK_EXT_SAMPLER_FILTER_MINMAX_EXTENSION_NAME,
+                                          VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME,
+                                          VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
+                                          VK_EXT_SHADER_VIEWPORT_INDEX_LAYER_EXTENSION_NAME,
+                                          VK_KHR_DRAW_INDIRECT_COUNT_EXTENSION_NAME,
+                                          VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME,
+                                          VK_KHR_8BIT_STORAGE_EXTENSION_NAME,
+                                          VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME,
+                                          VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME,
+                                          VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME,
+                                          VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME,
+                                          VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
+                                          VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME,
+                                          VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME,
+                                          VK_KHR_SPIRV_1_4_EXTENSION_NAME,
+                                          VK_KHR_SEPARATE_DEPTH_STENCIL_LAYOUTS_EXTENSION_NAME,
+                                          VK_EXT_SEPARATE_STENCIL_USAGE_EXTENSION_NAME,
+                                          VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME,
+                                          VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
+                                          VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME,
+                                          VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
+                                          VK_EXT_INLINE_UNIFORM_BLOCK_EXTENSION_NAME,
+                                          VK_EXT_PIPELINE_CREATION_FEEDBACK_EXTENSION_NAME,
+                                          VK_EXT_TOOLING_INFO_EXTENSION_NAME,
+                                          VK_KHR_SHADER_INTEGER_DOT_PRODUCT_EXTENSION_NAME,
+                                          VK_KHR_SHADER_NON_SEMANTIC_INFO_EXTENSION_NAME,
+                                          VK_EXT_PRIVATE_DATA_EXTENSION_NAME,
+                                          VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME,
+                                          VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME,
+                                          VK_KHR_FORMAT_FEATURE_FLAGS_2_EXTENSION_NAME,
+                                          VK_KHR_MAINTENANCE_4_EXTENSION_NAME,
+                                          VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME,
+                                          VK_KHR_SHADER_TERMINATE_INVOCATION_EXTENSION_NAME,
+                                          VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME,
+                                          VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME,
+                                          VK_EXT_SHADER_DEMOTE_TO_HELPER_INVOCATION_EXTENSION_NAME,
+                                          VK_EXT_TEXEL_BUFFER_ALIGNMENT_EXTENSION_NAME,
+                                          VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
+                                          VK_EXT_YCBCR_2PLANE_444_FORMATS_EXTENSION_NAME,
+                                          VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME,
+                                          VK_KHR_COPY_COMMANDS_2_EXTENSION_NAME,
+                                          VK_EXT_4444_FORMATS_EXTENSION_NAME,
+                                          VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME};
+        for (const auto& extension : ext) {
+            bool found = false;
+            for (const auto& expected : expected_extensions) {
+                if (strcmp(expected, extension.extensionName) == 0) {
+                    ASSERT_FALSE(found);  // make sure there are no duplicates
+                    found = true;
+                }
+            }
+            ASSERT_TRUE(found);
+        }
 
         inst_builder.reset();
     }
@@ -466,38 +506,39 @@ TEST_F(TestsMechanism, selecting_profile) {
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
-    { /*
-        VkProfileLayerSettingsEXT settings;
-        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_instance_extensions.json";
-        settings.emulate_portability = false;
-        settings.profile_name = "VP_LUNARG_test_instance_extensions";
-        settings.simulate_capabilities = SIMULATE_EXTENSIONS_BIT;
+    {
+        /*
+          VkProfileLayerSettingsEXT settings;
+          settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_instance_extensions.json";
+          settings.emulate_portability = false;
+          settings.profile_name = "VP_LUNARG_test_instance_extensions";
+          settings.simulate_capabilities = SIMULATE_EXTENSIONS_BIT;
 
-        err = inst_builder.init(&settings);
-        ASSERT_EQ(err, VK_SUCCESS);
+          err = inst_builder.init(&settings);
+          ASSERT_EQ(err, VK_SUCCESS);
 
-        VkPhysicalDevice gpu;
-        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
-        if (err != VK_SUCCESS) {
-            printf("Profile not supported on device, skipping test.\n");
-            inst_builder.reset();
-            return;
-        }
+          VkPhysicalDevice gpu;
+          err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+          if (err != VK_SUCCESS) {
+              printf("Profile not supported on device, skipping test.\n");
+              inst_builder.reset();
+              return;
+          }
 
-        VkResult result = VK_SUCCESS;
+          VkResult result = VK_SUCCESS;
 
-        uint32_t extCount = 0;
-        result = vkEnumerateInstanceExtensionProperties(nullptr, &extCount, nullptr);
-        ASSERT_EQ(err, VK_SUCCESS);
+          uint32_t extCount = 0;
+          result = vkEnumerateInstanceExtensionProperties(nullptr, &extCount, nullptr);
+          ASSERT_EQ(err, VK_SUCCESS);
 
-        std::vector<VkExtensionProperties> ext(extCount);
-        result = vkEnumerateInstanceExtensionProperties(nullptr, &extCount, ext.data());
-        ASSERT_EQ(err, VK_SUCCESS);
+          std::vector<VkExtensionProperties> ext(extCount);
+          result = vkEnumerateInstanceExtensionProperties(nullptr, &extCount, ext.data());
+          ASSERT_EQ(err, VK_SUCCESS);
 
-        EXPECT_STREQ("VK_KHR_get_physical_device_properties2", ext[0].extensionName);
+          EXPECT_STREQ("VK_KHR_get_physical_device_properties2", ext[0].extensionName);
 
-        inst_builder.reset();
-        */
+          inst_builder.reset();
+          */
     }
 
     // Only override extensions
@@ -686,7 +727,8 @@ TEST_F(TestsMechanism, reading_flags) {
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props);
 
     // These values can't be overridden
-    EXPECT_EQ(float_control_properties_profile.denormBehaviorIndependence, float_control_properties_native.denormBehaviorIndependence);
+    EXPECT_EQ(float_control_properties_profile.denormBehaviorIndependence,
+              float_control_properties_native.denormBehaviorIndependence);
     EXPECT_EQ(float_control_properties_profile.roundingModeIndependence, float_control_properties_native.roundingModeIndependence);
 
     // These values are overridden
