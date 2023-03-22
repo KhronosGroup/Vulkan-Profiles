@@ -578,7 +578,7 @@ class JsonLoader {
     VkResult LoadFile(std::string filename);
     void ReadProfileApiVersion();
     VkResult LoadDevice(PhysicalDeviceData *pdd);
-    VkResult ReadProfile(const Json::Value root, const std::vector<std::string> &capabilities);
+    VkResult ReadProfile(const Json::Value& root, const std::vector<std::string> &capabilities);
     uint32_t GetProfileApiVersion() const { return profile_api_version_; }
 
    private:
@@ -1774,7 +1774,7 @@ struct JsonValidator {
 '''
 
 READ_PROFILE = '''
-VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::string> &capabilities) {
+VkResult JsonLoader::ReadProfile(const Json::Value& root, const std::vector<std::string> &capabilities) {
     bool failed = false;
 
     uint32_t properties_api_version = 0;
