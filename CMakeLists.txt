@@ -29,7 +29,7 @@ find_package(VulkanHeaders REQUIRED CONFIG QUIET)
 
 find_package(VulkanUtilityLibraries REQUIRED CONFIG QUIET)
 
-find_file(VVL_INCLUDE_DIR vk_dispatch_table_helper.h REQUIRED CMAKE_FIND_ROOT_PATH_BOTH)
+find_file(VVL_INCLUDE_DIR vk_layer_config.h REQUIRED CMAKE_FIND_ROOT_PATH_BOTH)
 get_filename_component(VVL_INCLUDE_DIR ${VVL_INCLUDE_DIR} DIRECTORY)
 
 # Effectively the header files installed by VVL are part of Vulkan::Headers
