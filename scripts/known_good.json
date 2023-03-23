@@ -9,6 +9,23 @@
             "commit": "v1.3.244"
         },
         {
+            "name": "Vulkan-Utility-Libraries",
+            "url": "https://github.com/KhronosGroup/Vulkan-Utility-Libraries.git",
+            "sub_dir": "Vulkan-Utility-Libraries",
+            "build_dir": "Vulkan-Utility-Libraries/build",
+            "install_dir": "Vulkan-Utility-Libraries/build/install",
+            "commit": "main",
+            "deps": [
+                {
+                    "var_name": "VULKAN_HEADERS_INSTALL_DIR",
+                    "repo_name": "Vulkan-Headers"
+                }
+            ],
+            "cmake_options": [
+                "-UTILITY_LIBRARIES_BUILD_TESTS=FALSE"
+            ]
+        },
+        {
             "name": "Vulkan-ValidationLayers",
             "url": "https://github.com/KhronosGroup/Vulkan-ValidationLayers.git",
             "sub_dir": "Vulkan-ValidationLayers",
@@ -98,6 +115,7 @@
     ],
     "install_names": {
         "Vulkan-Headers": "VULKAN_HEADERS_INSTALL_DIR",
+        "Vulkan-Utility-Libraries": "VULKAN_UTILITY_LIBRARIES_INSTALL_DIR",
         "Vulkan-Loader": "VULKAN_LOADER_INSTALL_DIR",
         "Vulkan-ValidationLayers": "VULKAN_VALIDATIONLAYERS_INSTALL_DIR",
         "jsoncpp": "JSONCPP_INSTALL_DIR",

@@ -34,6 +34,8 @@ get_filename_component(VVL_INCLUDE_DIR ${VVL_INCLUDE_DIR} DIRECTORY)
 # This reflects the current structure of the VulkanSDK.
 target_include_directories(Vulkan::Headers INTERFACE ${VVL_INCLUDE_DIR})
 
+find_package(VulkanLayerUtils REQUIRED CONFIG)
+
 find_package(valijson REQUIRED CONFIG)
 
 find_package(jsoncpp REQUIRED CONFIG)
@@ -100,7 +102,5 @@ set(PROFILES_SCHEMA_FILENAME "profiles-0.8-latest.json")
 add_subdirectory(profiles)
 
 add_subdirectory(library)
-
-add_subdirectory(layer-utils)
 
 add_subdirectory(layer)
