@@ -95,7 +95,7 @@ INCLUDES_HEADER = '''
 #include "vulkan/vk_layer.h"
 #include "vulkan/vulkan_beta.h"
 #include "vk_layer_table.h"
-#include "vk_enum_string_helper.h"
+#include "generated/vk_enum_string_helper.h"
 #include <vulkan/layer/vk_layer_settings.h>
 #include "profiles.h"
 
