@@ -622,7 +622,7 @@ WARN_FUNCTIONS = '''
         if (std::abs(new_value - old_value) > 0.0001f) {
             if (not_modifiable) {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                    "'%s' is not modifiable but the profile value (%3.2f) which different from the device value (%3.2f).\\n", name, new_value, old_value));
+                    "'%s' is not modifiable but the profile value (%3.2f) is different from the device value (%3.2f).\\n", name, new_value, old_value));
             } else {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                     "'%s' profile value (%3.2f) is different from the device supported value (%3.2f).\\n", name, new_value, old_value));
@@ -636,7 +636,7 @@ WARN_FUNCTIONS = '''
         if (new_value != old_value) {
             if (not_modifiable) {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                    "'%s' is not modifiable but the profile value (%s) which different from the device value (%s)\\n", name, new_value ? "true" : "false", old_value ? "true" : "false"));
+                    "'%s' is not modifiable but the profile value (%s) is different from the device value (%s)\\n", name, new_value ? "true" : "false", old_value ? "true" : "false"));
             } else {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                     "'%s' profile value is enabled in the profile, but the device does not support it.\\n", name));
@@ -650,7 +650,7 @@ WARN_FUNCTIONS = '''
         if (new_value != old_value) {
             if (not_modifiable) {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                    "'%s' is not modifiable but the profile value (%" PRIu32 ") which different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
+                    "'%s' is not modifiable but the profile value (%" PRIu32 ") is different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
             } else {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                     "'%s' profile value (%" PRIu32 ") is different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
@@ -664,7 +664,7 @@ WARN_FUNCTIONS = '''
         if (new_value != old_value) {
             if (not_modifiable) {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                    "'%s' is not modifiable but the profile value (%" PRIu32 ") which different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
+                    "'%s' is not modifiable but the profile value (%" PRIu32 ") is different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
             } else {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                     "'%s' profile value (%" PRIu32 ") is different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
@@ -678,7 +678,7 @@ WARN_FUNCTIONS = '''
         if (new_value != old_value) {
             if (not_modifiable) {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                    "'%s' is not modifiable but the profile value (%" PRIu32 ") which different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
+                    "'%s' is not modifiable but the profile value (%" PRIu32 ") is different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
             } else {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                     "'%s' profile value (%" PRIu32 ") is different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
@@ -692,7 +692,7 @@ WARN_FUNCTIONS = '''
         if (new_value != old_value) {
             if (not_modifiable) {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                    "'%s' is not modifiable but the profile value (%" PRIi32 ") which different from the device value (%" PRIi32 ").\\n", name, new_value, old_value));
+                    "'%s' is not modifiable but the profile value (%" PRIi32 ") is different from the device value (%" PRIi32 ").\\n", name, new_value, old_value));
             } else {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                     "'%s' profile value (%" PRIi32 ") is different from the device value (%" PRIi32 ").\\n", name, new_value, old_value));
@@ -706,7 +706,7 @@ WARN_FUNCTIONS = '''
         if (new_value != old_value) {
             if (not_modifiable) {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                    "'%s' is not modifiable but the profile value (%" PRIu64 ") which different from the device value (%" PRIu64 ").\\n", name, new_value, old_value));
+                    "'%s' is not modifiable but the profile value (%" PRIu64 ") is different from the device value (%" PRIu64 ").\\n", name, new_value, old_value));
             } else {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                     "'%s' profile value (%" PRIu64 ") is different from the device value (%" PRIu64 ").\\n", name, new_value, old_value));
@@ -720,7 +720,7 @@ WARN_FUNCTIONS = '''
         if (new_value != old_value) {
             if (not_modifiable) {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                    "'%s' is not modifiable but the profile value (%" PRIi64 ") which different from the device value (%" PRIi64 ").\\n", name, new_value, old_value));
+                    "'%s' is not modifiable but the profile value (%" PRIi64 ") is different from the device value (%" PRIi64 ").\\n", name, new_value, old_value));
             } else {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                     "'%s' profile value (%" PRIi64 ") is different from the device value (%" PRIi64 ").\\n", name, new_value, old_value));
@@ -734,7 +734,7 @@ WARN_FUNCTIONS = '''
         if (new_value != old_value) {
             if (not_modifiable) {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                    "'%s' is not modifiable but the profile value (%" PRIuLEAST64 ") which different from the device value (%" PRIuLEAST64 ").\\n", name, new_value, old_value));
+                    "'%s' is not modifiable but the profile value (%" PRIuLEAST64 ") is different from the device value (%" PRIuLEAST64 ").\\n", name, new_value, old_value));
             } else {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                     "'%s' profile value (%" PRIuLEAST64 ") is different from the device value (%" PRIuLEAST64 ").\\n", name, new_value, old_value));
@@ -748,7 +748,7 @@ WARN_FUNCTIONS = '''
         if ((old_value | new_value) != old_value) {
             if (not_modifiable) {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                    "'%s' is not modifiable but the profile value (%" PRIu32 ") which different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
+                    "'%s' is not modifiable but the profile value (%" PRIu32 ") is different from the device value (%" PRIu32 ").\\n", name, new_value, old_value));
             } else {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                     "'%s' profile value (%" PRIu32 ") has bits set that the device value (%" PRIu32 ") does not.\\n", name, new_value, old_value));
