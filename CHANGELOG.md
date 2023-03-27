@@ -11,11 +11,12 @@
 
 # Release Notes
 
-## [Vulkan Profiles Toolset 1.3.XXX](https://github.com/LunarG/VulkanProfiles/tree/main) - April 2023
+## [Vulkan Profiles Toolset 1.3.243](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.243.0) - April 2023
 
 ### Features:
 - Add LunarG Desktop Baseline 2023 profile (Vulkan 1.2)
-- 
+- Update LunarG Desktop Baseline 2022 profile (Vulkan 1.1) to match updated MoltenVK support.
+
 ## [Vulkan Profiles Toolset 1.3.239](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.239.0) - February 2023
 
 ### Features:
