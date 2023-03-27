@@ -358,7 +358,6 @@
                         "storageImageSampleCounts": [
                             "VK_SAMPLE_COUNT_1_BIT"
                         ],
-                        "strictLines": false,
                         "subPixelInterpolationOffsetBits": 4,
                         "subPixelPrecisionBits": 4,
                         "subTexelPrecisionBits": 4,
@@ -441,13 +440,10 @@
                     "maxPerStageDescriptorUpdateAfterBindUniformBuffers": 31,
                     "maxPerStageUpdateAfterBindResources": 159,
                     "maxUpdateAfterBindDescriptorsInAllPools": 1073741824,
-                    "quadDivergentImplicitLod": true,
                     "robustBufferAccessUpdateAfterBind": true,
                     "shaderInputAttachmentArrayNonUniformIndexingNative": true,
                     "shaderSampledImageArrayNonUniformIndexingNative": true,
-                    "shaderStorageBufferArrayNonUniformIndexingNative": true,
-                    "shaderStorageImageArrayNonUniformIndexingNative": true,
-                    "shaderUniformBufferArrayNonUniformIndexingNative": true
+                    "shaderStorageImageArrayNonUniformIndexingNative": true
                 },
                 "VkPhysicalDeviceMaintenance3PropertiesKHR": {
                     "maxMemoryAllocationSize": "8589934592",
