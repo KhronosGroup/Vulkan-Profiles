@@ -475,7 +475,6 @@
                             "VK_SAMPLE_COUNT_4_BIT",
                             "VK_SAMPLE_COUNT_8_BIT"
                         ],
-                        "strictLines": false,
                         "subPixelInterpolationOffsetBits": 8,
                         "subPixelPrecisionBits": 8,
                         "subTexelPrecisionBits": 8,
