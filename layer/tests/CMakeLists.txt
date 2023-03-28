@@ -52,6 +52,7 @@ function(LayerTest NAME)
         )
     target_link_libraries(${TEST_NAME} Vulkan::Headers Vulkan::Vulkan GTest::gtest GTest::gtest_main)
     target_compile_definitions(${TEST_NAME} PUBLIC JSON_TEST_FILES_PATH="${CMAKE_SOURCE_DIR}/profiles/test/data/")
+    target_compile_definitions(${TEST_NAME} PUBLIC JSON_PROFILES_PATH="${CMAKE_SOURCE_DIR}/profiles/")
 
     target_compile_definitions(${TEST_NAME} PUBLIC TEST_BINARY_PATH="$<TARGET_FILE_DIR:VkLayer_khronos_profiles>")
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
@@ -110,6 +111,7 @@ function(LayerTestAndroid NAME)
     set(_app_glue_dir ${ANDROID_NDK_HOME}/sources/android/native_app_glue)
     target_compile_definitions(${ANDROID_APK_NAME} PUBLIC
                                JSON_TEST_FILES_PATH="/sdcard/Android/data/com.example.VulkanProfilesLayerTests/files/"
+                               JSON_PROFILES_PATH="/sdcard/Android/data/com.example.VulkanProfilesLayerTests/files/"
                                TEST_BINARY_PATH="$<TARGET_FILE_DIR:VkLayer_khronos_profiles>"
                                PROFILES_LAYER_APK VK_PROTOTYPES
                                )
