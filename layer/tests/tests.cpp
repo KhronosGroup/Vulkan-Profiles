@@ -35,6 +35,30 @@ class LayerTests : public VkTestFramework {
     static void TearDownTestSuite(){};
 };
 
+TEST_F(LayerTests, TestDesktop2023) {
+    TEST_DESCRIPTION("Test specifying device extensions to be excluded from being reported by the device");
+
+    VkResult err = VK_SUCCESS;
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    VkProfileLayerSettingsEXT settings;
+    settings.profile_file = JSON_PROFILES_PATH "VP_LUNARG_desktop_baseline_2023.json";
+    settings.profile_name = "VP_LUNARG_desktop_baseline_2023";
+    settings.emulate_portability = true;
+    settings.debug_fail_on_error = false;
+
+    err = inst_builder.init(&settings);
+    ASSERT_EQ(err, VK_SUCCESS);
+
+    VkPhysicalDevice gpu;
+    err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+    if (err != VK_SUCCESS) {
+        printf("Profile not supported on device, skipping test.\n");
+        return;
+    }
+}
+
 TEST_F(LayerTests, TestSetCombinationMode) {
     TEST_DESCRIPTION("Test different profile capabilities settings");
 
@@ -218,7 +242,7 @@ TEST_F(LayerTests, TestExcludingDeviceExtensions) {
     profiles_test::VulkanInstanceBuilder inst_builder;
 
     VkProfileLayerSettingsEXT settings;
-    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_desktop_baseline_2022.json";
+    settings.profile_file = JSON_PROFILES_PATH "VP_LUNARG_desktop_baseline_2022.json";
     settings.profile_name = "VP_LUNARG_desktop_baseline_2022";
     settings.emulate_portability = true;
     settings.debug_fail_on_error = false;
@@ -277,7 +301,7 @@ TEST_F(LayerTests, TestExcludingFormats) {
     profiles_test::VulkanInstanceBuilder inst_builder;
 
     VkProfileLayerSettingsEXT settings;
-    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_desktop_baseline_2022.json";
+    settings.profile_file = JSON_PROFILES_PATH "VP_LUNARG_desktop_baseline_2022.json";
     settings.emulate_portability = true;
     settings.debug_fail_on_error = false;
     settings.exclude_formats = {"VK_FORMAT_R8G8B8A8_UNORM"};
