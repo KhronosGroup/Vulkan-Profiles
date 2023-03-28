@@ -519,8 +519,7 @@
                         "VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT",
                         "VK_SHADER_STAGE_FRAGMENT_BIT",
                         "VK_SHADER_STAGE_COMPUTE_BIT",
-                        "VK_SHADER_STAGE_ALL_GRAPHICS",
-                        "VK_SHADER_STAGE_ALL"
+                        "VK_SHADER_STAGE_ALL_GRAPHICS"
                     ],
                     "subgroupSupportedOperations": [
                         "VK_SUBGROUP_FEATURE_BASIC_BIT"
