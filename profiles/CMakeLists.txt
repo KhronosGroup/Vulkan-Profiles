@@ -169,7 +169,7 @@ install(
         VP_LUNARG_desktop_baseline_2023.json
         VP_LUNARG_desktop_portability_2022.json
     DESTINATION
-        "${CMAKE_INSTALL_DATADIR}/vulkan/config/VK_LAYER_KHRONOS_profiles"
+		"Config/VK_LAYER_KHRONOS_profiles"
 )
 
 install(
