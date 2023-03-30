@@ -1246,7 +1246,7 @@ bool JsonLoader::GetFormat(const Json::Value &formats, const std::string &format
                            ArrayOfVkFormatProperties3 *dest3) {
     VkFormat format = StringToFormat(format_name);
     VkFormatProperties profile_properties = {};
-    VkFormatProperties3 profile_properties_3 = {};
+    VkFormatProperties3 profile_properties_3 = {VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3};
     const auto &member = formats[format_name];
     for (const auto &name : member.getMemberNames()) {
         const auto &props = member[name];
