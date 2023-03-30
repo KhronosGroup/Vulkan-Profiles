@@ -51,6 +51,7 @@ else()
 endif()
 
 add_library(VkLayer_khronos_profiles SHARED)
+target_include_directories(VkLayer_khronos_profiles PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../external/Vulkan-Utility-Libraries/layer_utils/)
 
 if (MSVC)
     target_link_options(VkLayer_khronos_profiles PRIVATE /DEF:${CMAKE_CURRENT_SOURCE_DIR}/VkLayer_khronos_profiles.def)

@@ -34,7 +34,9 @@ get_filename_component(VVL_INCLUDE_DIR ${VVL_INCLUDE_DIR} DIRECTORY)
 # This reflects the current structure of the VulkanSDK.
 target_include_directories(Vulkan::Headers INTERFACE ${VVL_INCLUDE_DIR})
 
-find_package(VulkanLayerUtils REQUIRED CONFIG)
+#Until VulkanLayerUtils repository get find_package support
+#find_package(VulkanLayerUtils REQUIRED CONFIG)
+add_subdirectory(external/Vulkan-Utility-Libraries)
 
 find_package(valijson REQUIRED CONFIG)
 
