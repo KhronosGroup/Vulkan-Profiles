@@ -510,7 +510,30 @@
                         {
                             "key": "SIMULATE_FEATURES_BIT",
                             "label": "Features",
-                            "description": "The Vulkan device will report the features from the selected Profile."
+                            "description": "The Vulkan device will report the features from the selected Profile.",
+                            "settings": [
+                                {
+                                    "key": "default_feature_values",
+                                    "env": "VK_KHRONOS_PROFILES_DEFAULT_FEATURE_VALUES",
+                                    "label": "Unspecified Features",
+                                    "description": "Feature values when not specified in the select Vulkan profiles.",
+                                    "status": "STABLE",
+                                    "type": "ENUM",
+                                    "default": "DEFAULT_FEATURE_VALUES_DEVICE",
+                                    "flags": [
+                                        {
+                                            "key": "DEFAULT_FEATURE_VALUES_DEVICE",
+                                            "label": "Use Device Values",
+                                            "description": "When a feature is not mentionned in the select Vulkan profiles, set is to the physical device value."
+                                        },
+                                        {
+                                            "key": "DEFAULT_FEATURE_VALUES_FALSE",
+                                            "label": "Use False",
+                                            "description": "When a feature is not mentionned in the select Vulkan profiles, set it to false."
+                                        }
+                                    ]
+                                }
+                            ]
                         },
                         {
                             "key": "SIMULATE_PROPERTIES_BIT",

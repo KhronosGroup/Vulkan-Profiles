@@ -195,6 +195,7 @@ const char *const kLayerSettingsDebugFailOnError = "debug_fail_on_error";
 const char *const kLayerSettingsDebugReports = "debug_reports";
 const char *const kLayerSettingsExcludeDeviceExtensions = "exclude_device_extensions";
 const char *const kLayerSettingsExcludeFormats = "exclude_formats";
+const char *const kLayerSettingsDefaultFeatureValues = "default_feature_values";
 '''
 
 UTILITY_FUNCTIONS = '''
@@ -238,6 +239,16 @@ void AndroidPrintf(DebugReport level, const std::string &message) {
     }
 }
 #endif
+
+static DefaultFeatureValues GetDefaultFeatureValues(const std::string &value) {
+    if (value == "DEFAULT_FEATURE_VALUES_FALSE") {
+        return DEFAULT_FEATURE_VALUES_FALSE;
+    } else if (value == "DEFAULT_FEATURE_VALUES_DEVICE") {
+        return DEFAULT_FEATURE_VALUES_DEVICE;
+    }
+
+    return DEFAULT_FEATURE_VALUES_DEVICE;
+}
 
 const char *GetLogPrefix(DebugReport report) {
     static const char *table[] = {"PROFILES NOTIFICATION: ", "PROFILES WARNING: ", "PROFILES ERROR: ", "PROFILES DEBUG: "};
@@ -2339,6 +2350,11 @@ static void InitSettings(const void *pnext) {
                 GetSimulateCapabilityFlags(vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsSimulateCapabilities));
         }
 
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDefaultFeatureValues)) {
+            layer_settings->default_feature_values =
+                GetDefaultFeatureValues(vku::GetLayerSettingString(kOurLayerName, kLayerSettingsDefaultFeatureValues));
+        }
+
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugFailOnError)) {
             layer_settings->debug_fail_on_error = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsDebugFailOnError);
         }
@@ -2732,10 +2748,15 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFeatures(VkPhysicalDevice physicalDe
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFeatures2(VkPhysicalDevice physicalDevice, VkPhysicalDeviceFeatures2KHR *pFeatures) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
-    dt->GetPhysicalDeviceFeatures2(physicalDevice, pFeatures);
-    GetPhysicalDeviceFeatures(physicalDevice, &pFeatures->features);
+
     PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
-    FillPNextChain(pdd, pFeatures->pNext);
+    if (pdd) {
+        FillPNextChain(pdd, pFeatures->pNext);
+    } else {
+        dt->GetPhysicalDeviceFeatures2(physicalDevice, pFeatures);
+    }
+
+    GetPhysicalDeviceFeatures(physicalDevice, &pFeatures->features);
 }
 
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFeatures2KHR(VkPhysicalDevice physicalDevice, VkPhysicalDeviceFeatures2KHR *pFeatures) {
@@ -3202,11 +3223,15 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
 ENUMERATE_PHYSICAL_DEVICES_MIDDLE = '''
                 if (VK_API_VERSION_MINOR(pdd.GetEffectiveVersion())) {
                     dt->GetPhysicalDeviceProperties2(physical_device, &property_chain);
-                    dt->GetPhysicalDeviceFeatures2(physical_device, &feature_chain);
+                    if (layer_settings->default_feature_values == DEFAULT_FEATURE_VALUES_DEVICE) {
+                        dt->GetPhysicalDeviceFeatures2(physical_device, &feature_chain);
+                    }
                     dt->GetPhysicalDeviceMemoryProperties2(physical_device, &memory_chain);
                 } else {
                     dt->GetPhysicalDeviceProperties2KHR(physical_device, &property_chain);
-                    dt->GetPhysicalDeviceFeatures2KHR(physical_device, &feature_chain);
+                    if (layer_settings->default_feature_values == DEFAULT_FEATURE_VALUES_DEVICE) {
+                        dt->GetPhysicalDeviceFeatures2KHR(physical_device, &feature_chain);
+                    }
                     dt->GetPhysicalDeviceMemoryProperties2KHR(physical_device, &memory_chain);
                 }
 
@@ -4019,7 +4044,6 @@ class VulkanProfilesLayerGenerator():
             name = self.create_var_name(property_name)
             gen += '                    pdd.' + name + '.pNext = property_chain.pNext;\n\n'
             gen += '                    property_chain.pNext = &(pdd.' + name + ');\n'
-            gen += '\n'
         for feature_name in feature_names:
             name = self.create_var_name(feature_name)
             gen += '                    pdd.' + name + '.pNext = feature_chain.pNext;\n\n'
