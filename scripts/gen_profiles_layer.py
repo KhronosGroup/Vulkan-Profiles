@@ -637,7 +637,7 @@ WARN_FUNCTIONS = '''
             if (not_modifiable) {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                     "'%s' is not modifiable but the profile value (%s) is different from the device value (%s)\\n", name, new_value ? "true" : "false", old_value ? "true" : "false"));
-            } else {
+            } else if (old_value == false && new_value == true) {
                 LogMessage(DEBUG_REPORT_WARNING_BIT, format(
                     "'%s' profile value is enabled in the profile, but the device does not support it.\\n", name));
             }
