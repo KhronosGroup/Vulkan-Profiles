@@ -571,7 +571,7 @@ class JsonLoader {
     VkResult LoadFile(std::string filename);
     void ReadProfileApiVersion();
     VkResult LoadDevice(PhysicalDeviceData *pdd);
-    VkResult ReadProfile(const Json::Value root, const std::vector<std::string> &capabilities);
+    VkResult ReadProfile(const Json::Value root, const std::vector<std::vector<std::string>> &capabilities);
     uint32_t GetProfileApiVersion() const { return profile_api_version_; }
 
    private:
@@ -1766,160 +1766,171 @@ struct JsonValidator {
 '''
 
 READ_PROFILE = '''
-VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::string> &capabilities) {
+VkResult JsonLoader::ReadProfile(const Json::Value root, const std::vector<std::vector<std::string>> &capabilities) {
     bool failed = false;
 
     uint32_t properties_api_version = 0;
     uint32_t simulated_version = 0;
 
     const auto &caps = root["capabilities"];
-    for (const auto &capability : capabilities) {
-        const auto &c = caps[capability];
+    for (const auto &cap_list : capabilities) {
+        for (const auto &capability : cap_list) {
+            const auto &c = caps[capability];
 
-        const auto &properties = c["properties"];
-        if (properties.isMember("VkPhysicalDeviceProperties") && properties["VkPhysicalDeviceProperties"].isMember("apiVersion")) {
-            properties_api_version = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
-            simulated_version = properties_api_version;
-        } else if (layer_settings->simulate_capabilities & SIMULATE_API_VERSION_BIT) {
-            simulated_version = profile_api_version_;
+            const auto &properties = c["properties"];
+            if (properties.isMember("VkPhysicalDeviceProperties") && properties["VkPhysicalDeviceProperties"].isMember("apiVersion")) {
+                properties_api_version = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
+                simulated_version = properties_api_version;
+                break;
+            } else if (layer_settings->simulate_capabilities & SIMULATE_API_VERSION_BIT) {
+                simulated_version = profile_api_version_;
+                break;
+            }
         }
     }
     if (simulated_version != 0) {
         AddPromotedExtensions(simulated_version);
     }
 
-    for (const auto &capability : capabilities) {
-        const auto &c = caps[capability];
-        const auto &properties = c["properties"];
+    for (const auto &cap_list : capabilities) {
+        bool cap_found = false;
+        for (const auto &capability : cap_list) {
+            const auto &c = caps[capability];
+            const auto &properties = c["properties"];
 
-        if (VK_API_VERSION_PATCH(this->profile_api_version_) > VK_API_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion)) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT, format(
-                "Profile apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ") is greater than the device apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ").\\n",
-                    VK_API_VERSION_MAJOR(this->profile_api_version_), VK_API_VERSION_MINOR(this->profile_api_version_),
-                    VK_API_VERSION_PATCH(this->profile_api_version_),
-                    VK_API_VERSION_MAJOR(pdd_->physical_device_properties_.apiVersion),
-                    VK_API_VERSION_MINOR(pdd_->physical_device_properties_.apiVersion),
-                    VK_API_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion)));
-            failed = true;
-        }
+            if (VK_API_VERSION_PATCH(this->profile_api_version_) > VK_API_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion)) {
+                LogMessage(DEBUG_REPORT_WARNING_BIT, format(
+                    "Profile apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ") is greater than the device apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ").\\n",
+                        VK_API_VERSION_MAJOR(this->profile_api_version_), VK_API_VERSION_MINOR(this->profile_api_version_),
+                        VK_API_VERSION_PATCH(this->profile_api_version_),
+                        VK_API_VERSION_MAJOR(pdd_->physical_device_properties_.apiVersion),
+                        VK_API_VERSION_MINOR(pdd_->physical_device_properties_.apiVersion),
+                        VK_API_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion)));
+                continue;
+            }
 
-        if (layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
-            const auto &extensions = c["extensions"];
+            if (layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
+                const auto &extensions = c["extensions"];
 
-            pdd_->arrayof_extension_properties_.reserve(extensions.size());
-            for (const auto &e : extensions.getMemberNames()) {
-                VkExtensionProperties extension;
-                strcpy(extension.extensionName, e.c_str());
-                extension.specVersion = extensions[e].asInt();
-                bool found = false;
-                for (const auto &ext : pdd_->arrayof_extension_properties_) {
-                    if (strcmp(ext.extensionName, extension.extensionName) == 0) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (IsInstanceExtension(e.c_str())) {
-                    LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, 
-                        format("Required %s extension is an instance extension. The Profiles layer can't override instance extension, the extension is ignored.\\n", e.c_str()).c_str());
-                }
-
-                if (!found) {
-                    bool supported_on_device = false;
-                    for (const auto &device_extension : pdd_->device_extensions_) {
-                        if (strcmp(device_extension.extensionName, extension.extensionName) == 0) {
-                            supported_on_device = true;
+                pdd_->arrayof_extension_properties_.reserve(extensions.size());
+                for (const auto &e : extensions.getMemberNames()) {
+                    VkExtensionProperties extension;
+                    strcpy(extension.extensionName, e.c_str());
+                    extension.specVersion = extensions[e].asInt();
+                    bool found = false;
+                    for (const auto &ext : pdd_->arrayof_extension_properties_) {
+                        if (strcmp(ext.extensionName, extension.extensionName) == 0) {
+                            found = true;
                             break;
                         }
                     }
-                    if (!supported_on_device) {
-                        failed = true;
+
+                    if (IsInstanceExtension(e.c_str())) {
+                        LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+                            format("Required %s extension is an instance extension. The Profiles layer can't override instance extension, the extension is ignored.\\n", e.c_str()).c_str());
                     }
-                    pdd_->arrayof_extension_properties_.push_back(extension);
-                    if (!PhysicalDeviceData::HasSimulatedExtension(pdd_, extension.extensionName)) {
-                        pdd_->simulation_extensions_.push_back(extension);
+
+                    if (!found) {
+                        bool supported_on_device = false;
+                        for (const auto &device_extension : pdd_->device_extensions_) {
+                            if (strcmp(device_extension.extensionName, extension.extensionName) == 0) {
+                                supported_on_device = true;
+                                break;
+                            }
+                        }
+                        if (!supported_on_device) {
+                            continue;
+                        }
+                        pdd_->arrayof_extension_properties_.push_back(extension);
+                        if (!PhysicalDeviceData::HasSimulatedExtension(pdd_, extension.extensionName)) {
+                            pdd_->simulation_extensions_.push_back(extension);
+                        }
                     }
                 }
             }
+
+            if (layer_settings->simulate_capabilities & SIMULATE_FEATURES_BIT) {
+                const auto &features = c["features"];
+
+                bool duplicated = !WarnDuplicatedFeature(features);
+                if (duplicated) {
+                    failed = true;
+                }
+
+                for (const auto &feature : features.getMemberNames()) {
+                    if (features.isMember("VkPhysicalDeviceVulkan11Features")) {
+                        pdd_->vulkan_1_1_features_written_ = true;
+                    }
+                    if (features.isMember("VkPhysicalDeviceVulkan12Features")) {
+                        pdd_->vulkan_1_2_features_written_ = true;
+                    }
+                    if (features.isMember("VkPhysicalDeviceVulkan13Features")) {
+                        pdd_->vulkan_1_3_features_written_ = true;
+                    }
+                    bool success = GetFeature(features, feature);
+                    if (!success) {
+                        continue;
+                    }
+                }
+            }
+
+            if (layer_settings->simulate_capabilities & SIMULATE_PROPERTIES_BIT) {
+                bool duplicated = !WarnDuplicatedProperty(properties);
+                if (duplicated) {
+                    failed = true;
+                }
+
+                if (properties.isMember("VkPhysicalDeviceVulkan11Properties")) {
+                    pdd_->vulkan_1_1_properties_written_ = true;
+                }
+                if (properties.isMember("VkPhysicalDeviceVulkan12Properties")) {
+                    pdd_->vulkan_1_2_properties_written_ = true;
+                }
+                if (properties.isMember("VkPhysicalDeviceVulkan13Properties")) {
+                    pdd_->vulkan_1_3_properties_written_ = true;
+                }
+                for (const auto &prop : properties.getMemberNames()) {
+                    bool success = GetProperty(properties, prop);
+                    if (!success) {
+                        continue;
+                    }
+                }
+            }
+
+            if (layer_settings->simulate_capabilities & SIMULATE_FORMATS_BIT) {
+                const auto &formats = c["formats"];
+
+                for (const auto &format : formats.getMemberNames()) {
+                    bool success = GetFormat(formats, format, &pdd_->arrayof_format_properties_, &pdd_->arrayof_format_properties_3_);
+                    if (!success) {
+                        continue;
+                    }
+                }
+            }
+
+            if (layer_settings->simulate_capabilities & SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT) {
+                const auto &qf_props = c["queueFamiliesProperties"];
+
+                bool queue_families_supported = true;
+                for (const auto &qfp : qf_props) {
+                    pdd_->arrayof_queue_family_properties_.emplace_back();
+                    bool success = GetQueueFamilyProperties(qfp, &pdd_->arrayof_queue_family_properties_.back());
+                    if (!success) {
+                        queue_families_supported = false;
+                        continue;
+                    }
+                }
+                if (queue_families_supported) {
+                    bool success = OrderQueueFamilyProperties(&pdd_->arrayof_queue_family_properties_);
+                    if (!success) {
+                        continue;
+                    }
+                }
+            }
+            cap_found = true;
         }
-
-        if (layer_settings->simulate_capabilities & SIMULATE_FEATURES_BIT) {
-            const auto &features = c["features"];
-
-            bool duplicated = !WarnDuplicatedFeature(features);
-            if (duplicated) {
-                failed = true;
-            }
-
-            for (const auto &feature : features.getMemberNames()) {
-                if (features.isMember("VkPhysicalDeviceVulkan11Features")) {
-                    pdd_->vulkan_1_1_features_written_ = true;
-                }
-                if (features.isMember("VkPhysicalDeviceVulkan12Features")) {
-                    pdd_->vulkan_1_2_features_written_ = true;
-                }
-                if (features.isMember("VkPhysicalDeviceVulkan13Features")) {
-                    pdd_->vulkan_1_3_features_written_ = true;
-                }
-                bool success = GetFeature(features, feature);
-                if (!success) {
-                    failed = true;
-                }
-            }
-        }
-
-        if (layer_settings->simulate_capabilities & SIMULATE_PROPERTIES_BIT) {
-            bool duplicated = !WarnDuplicatedProperty(properties);
-            if (duplicated) {
-                failed = true;
-            }
-
-            if (properties.isMember("VkPhysicalDeviceVulkan11Properties")) {
-                pdd_->vulkan_1_1_properties_written_ = true;
-            }
-            if (properties.isMember("VkPhysicalDeviceVulkan12Properties")) {
-                pdd_->vulkan_1_2_properties_written_ = true;
-            }
-            if (properties.isMember("VkPhysicalDeviceVulkan13Properties")) {
-                pdd_->vulkan_1_3_properties_written_ = true;
-            }
-            for (const auto &prop : properties.getMemberNames()) {
-                bool success = GetProperty(properties, prop);
-                if (!success) {
-                    failed = true;
-                }
-            }
-        }
-
-        if (layer_settings->simulate_capabilities & SIMULATE_FORMATS_BIT) {
-            const auto &formats = c["formats"];
-
-            for (const auto &format : formats.getMemberNames()) {
-                bool success = GetFormat(formats, format, &pdd_->arrayof_format_properties_, &pdd_->arrayof_format_properties_3_);
-                if (!success) {
-                    failed = true;
-                }
-            }
-        }
-
-        if (layer_settings->simulate_capabilities & SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT) {
-            const auto &qf_props = c["queueFamiliesProperties"];
-
-            bool queue_families_supported = true;
-            for (const auto &qfp : qf_props) {
-                pdd_->arrayof_queue_family_properties_.emplace_back();
-                bool success = GetQueueFamilyProperties(qfp, &pdd_->arrayof_queue_family_properties_.back());
-                if (!success) {
-                    queue_families_supported = false;
-                    failed = true;
-                }
-            }
-            if (queue_families_supported) {
-                bool success = OrderQueueFamilyProperties(&pdd_->arrayof_queue_family_properties_);
-                if (!success) {
-                    failed = true;
-                }
-            }
+        if (!cap_found) {
+            failed = true;
         }
     }
 
@@ -2033,7 +2044,7 @@ VkResult JsonLoader::LoadDevice(PhysicalDeviceData *pdd) {
 
     const std::string &profile_name = layer_settings->profile_name;
     const Json::Value &profiles = root_["profiles"];
-    std::vector<std::string> capabilities;
+    std::vector<std::vector<std::string>> capabilities;
 
     bool found_profile = false;
     for (const auto &profile : profiles.getMemberNames()) {
@@ -2041,7 +2052,14 @@ VkResult JsonLoader::LoadDevice(PhysicalDeviceData *pdd) {
             const auto &caps = profiles[profile]["capabilities"];
 
             for (const auto &cap : caps) {
-                capabilities.push_back(cap.asString());
+                std::vector<std::string> cap_list;
+                if (cap.isArray()) {
+                    for (const auto &e : cap) {
+                        cap_list.push_back(e.asString());
+                    }
+                } else
+                    cap_list.push_back(cap.asString());
+                capabilities.push_back(cap_list);
             }
 
             found_profile = true;
@@ -2054,7 +2072,14 @@ VkResult JsonLoader::LoadDevice(PhysicalDeviceData *pdd) {
             const auto &caps = profiles[profile]["capabilities"];
 
             for (const auto &cap : caps) {
-                capabilities.push_back(cap.asString());
+                std::vector<std::string> cap_list;
+                if (cap.isArray()) {
+                    for (const auto &e : cap) {
+                        cap_list.push_back(e.asString());
+                    }
+                } else
+                    cap_list.push_back(cap.asString());
+                capabilities.push_back(cap_list);
             }
 
             LogMessage(DEBUG_REPORT_WARNING_BIT,
