@@ -34,6 +34,49 @@ class TestsMechanism : public VkTestFramework {
     static void TearDownTestSuite(){};
 };
 
+TEST_F(TestsMechanism, default_feature_values) {
+    VkResult err = VK_SUCCESS;
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    // Vulkan 1.0
+    {
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_0.json";
+        settings.emulate_portability = false;
+        settings.profile_name = "VP_LUNARG_test_api_1_0";
+        settings.simulate_capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_EXTENSIONS_BIT;
+        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
+        settings.default_feature_values = DEFAULT_FEATURE_VALUES_FALSE;
+
+        err = inst_builder.init(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            inst_builder.reset();
+            return;
+        }
+
+        VkPhysicalDeviceFeatures gpu_features{};
+        vkGetPhysicalDeviceFeatures(gpu, &gpu_features);
+
+        EXPECT_EQ(gpu_features.independentBlend, VK_FALSE);
+
+        VkPhysicalDevice16BitStorageFeaturesKHR gpu_features_16bits_storage{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES_KHR};
+        VkPhysicalDeviceFeatures2 gpu_features2{};
+        gpu_features2.pNext = &gpu_features_16bits_storage;
+        vkGetPhysicalDeviceFeatures2(gpu, &gpu_features2);
+
+        EXPECT_EQ(gpu_features2.features.independentBlend, VK_FALSE);
+        EXPECT_EQ(gpu_features_16bits_storage.storageBuffer16BitAccess, VK_FALSE);
+
+        inst_builder.reset();
+    }
+}
+
 TEST_F(TestsMechanism, api_versions) {
     VkResult err = VK_SUCCESS;
 

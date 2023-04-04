@@ -49,6 +49,12 @@ enum DebugReport {
 };
 typedef int DebugReportFlags;
 
+enum DefaultFeatureValues
+{
+    DEFAULT_FEATURE_VALUES_FALSE = 0,
+    DEFAULT_FEATURE_VALUES_DEVICE
+};
+
 static const VkStructureType VK_STRUCTURE_TYPE_PROFILES_LAYER_SETTINGS_EXT = static_cast<VkStructureType>(3000300005);
 
 typedef struct VkProfileLayerSettingsEXT {
@@ -85,4 +91,5 @@ typedef struct VkProfileLayerSettingsEXT {
     bool debug_fail_on_error{false};
     vku::Strings exclude_device_extensions;
     vku::Strings exclude_formats;
+    DefaultFeatureValues default_feature_values{DEFAULT_FEATURE_VALUES_DEVICE};
 } VkProfileLayerSettingsEXT;
