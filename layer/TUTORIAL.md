@@ -89,7 +89,7 @@ If you find issues, please report to [Khronos' Vulkan-Profiles GitHub repository
 ### Profiles Layer operation and profiles file
 At application startup, during `vkEnumeratePhysicalDevices()`, the *Profiles layer* initializes its internal tables from the actual physical device in the system, then loads the profiles file, which specifies override values to apply to those internal tables.
 
-JSON file formats consumed by the Profiles layer are specified by the following JSON schema https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/schema/profile_schema.json
+JSON file formats consumed by the Profiles layer are specified by the following [JSON schemas](https://schema.khronos.org/vulkan/).
 
 The schema permits additional top-level sections to be optionally included in profiles files;
 any additional top-level sections will be ignored by the *Profiles layer*.
