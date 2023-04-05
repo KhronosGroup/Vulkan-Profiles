@@ -936,3 +936,66 @@ TEST_F(TestsMechanism, TestParsingAllFormatProperties) {
     }
 #endif
 }
+
+TEST_F(TestsMechanism, profile_variants_all) {
+    VkResult err = VK_SUCCESS;
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    {
+        VkProfileLayerSettingsEXT settings;
+        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_variants.json";
+        settings.emulate_portability = false;
+        settings.profile_name = "VP_LUNARG_test_variants";
+        settings.simulate_capabilities =
+            SIMULATE_API_VERSION_BIT | SIMULATE_FEATURES_BIT | SIMULATE_PROPERTIES_BIT | SIMULATE_EXTENSIONS_BIT;
+        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
+
+        err = inst_builder.init(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            inst_builder.reset();
+            return;
+        }
+
+        VkPhysicalDeviceProperties gpu_props{};
+        vkGetPhysicalDeviceProperties(gpu, &gpu_props);
+
+        EXPECT_EQ(2048, gpu_props.limits.maxImageDimension1D);
+        EXPECT_EQ(1024, gpu_props.limits.maxImageDimension2D);
+
+        VkPhysicalDeviceInlineUniformBlockPropertiesEXT inline_uniform_block_prop{};
+        inline_uniform_block_prop.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_PROPERTIES;
+
+        VkPhysicalDeviceProperties2 gpu_props2{};
+        gpu_props2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+        gpu_props2.pNext = &inline_uniform_block_prop;
+        vkGetPhysicalDeviceProperties2(gpu, &gpu_props2);
+
+        EXPECT_EQ(4, inline_uniform_block_prop.maxDescriptorSetInlineUniformBlocks);
+
+        VkPhysicalDevice16BitStorageFeaturesKHR storage_16bit{};
+        storage_16bit.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES_KHR;
+
+        VkPhysicalDeviceFeatures2KHR features{};
+        features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR;
+        features.pNext = &storage_16bit;
+
+        vkGetPhysicalDeviceFeatures2(gpu, &features);
+
+        EXPECT_EQ(VK_FALSE, features.features.depthClamp);
+        EXPECT_EQ(VK_TRUE, features.features.depthBiasClamp);
+        EXPECT_EQ(VK_FALSE, features.features.drawIndirectFirstInstance);
+        EXPECT_EQ(VK_TRUE, features.features.imageCubeArray);
+        EXPECT_EQ(VK_TRUE, storage_16bit.storageBuffer16BitAccess);
+        EXPECT_EQ(VK_FALSE, storage_16bit.uniformAndStorageBuffer16BitAccess);
+        EXPECT_EQ(VK_TRUE, storage_16bit.storagePushConstant16);
+        EXPECT_EQ(VK_FALSE, storage_16bit.storageInputOutput16);
+
+        inst_builder.reset();
+    }
+}
