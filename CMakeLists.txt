@@ -27,6 +27,8 @@ add_subdirectory(scripts)
 
 find_package(VulkanHeaders REQUIRED CONFIG QUIET)
 
+find_package(VulkanUtilityLibraries REQUIRED CONFIG QUIET)
+
 find_file(VVL_INCLUDE_DIR vk_dispatch_table_helper.h REQUIRED CMAKE_FIND_ROOT_PATH_BOTH)
 get_filename_component(VVL_INCLUDE_DIR ${VVL_INCLUDE_DIR} DIRECTORY)
 
@@ -100,7 +102,5 @@ set(PROFILES_SCHEMA_FILENAME "profiles-0.8-latest.json")
 add_subdirectory(profiles)
 
 add_subdirectory(library)
-
-add_subdirectory(layer-utils)
 
 add_subdirectory(layer)

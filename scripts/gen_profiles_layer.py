@@ -96,7 +96,7 @@ INCLUDES_HEADER = '''
 #include "vulkan/vulkan_beta.h"
 #include "vk_layer_table.h"
 #include "vk_enum_string_helper.h"
-#include "../layer-utils/vk_layer_settings.h"
+#include <vulkan/layer/vk_layer_settings.h>
 #include "profiles.h"
 
 using valijson::Schema;

@@ -66,7 +66,7 @@ target_sources(VkLayer_khronos_profiles PRIVATE
 )
 
 target_link_libraries(VkLayer_khronos_profiles PRIVATE
-    vku
+    Vulkan::LayerUtils
     Vulkan::Headers
     jsoncpp_static
     valijson
