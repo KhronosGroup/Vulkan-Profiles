@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Author: Mark Lobodzinski <mark@lunarg.com>
+ * Author: Christophe Riccio <mark@lunarg.com>
  */
 
 #pragma once
@@ -49,10 +49,14 @@ enum DebugReport {
 };
 typedef int DebugReportFlags;
 
-enum DefaultFeatureValues
-{
+enum DefaultFeatureValues {
     DEFAULT_FEATURE_VALUES_FALSE = 0,
     DEFAULT_FEATURE_VALUES_DEVICE
+};
+
+enum ProfileVariantsMode { 
+    VARIANTS_MODE_ALL = 0,
+    VARIANTS_MODE_FIRST_SUPPORTED
 };
 
 static const VkStructureType VK_STRUCTURE_TYPE_PROFILES_LAYER_SETTINGS_EXT = static_cast<VkStructureType>(3000300005);
@@ -92,4 +96,5 @@ typedef struct VkProfileLayerSettingsEXT {
     vku::Strings exclude_device_extensions;
     vku::Strings exclude_formats;
     DefaultFeatureValues default_feature_values{DEFAULT_FEATURE_VALUES_DEVICE};
+    ProfileVariantsMode profile_variants_mode{VARIANTS_MODE_FIRST_SUPPORTED};
 } VkProfileLayerSettingsEXT;

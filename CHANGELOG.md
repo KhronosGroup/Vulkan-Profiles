@@ -15,6 +15,7 @@
 
 ### Features:
 - Add a setting to control how layer features are initialized when a feature is not specified in a selected profile.
+- Add Profiles layer loading of profiles with multiple variants. All variants are emulated.
 
 ### Bugfixes:
 - Fix invalid message when trying to override a supported capability to unsupported #393

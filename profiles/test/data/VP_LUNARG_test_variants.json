@@ -1,0 +1,84 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+    "capabilities": {
+        "baselineA": {
+            "extensions": {
+                "VK_EXT_inline_uniform_block": 1,
+                "VK_KHR_16bit_storage": 1
+            },
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "depthClamp": false,
+                    "depthBiasClamp": true
+                },
+                "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                    "storageBuffer16BitAccess": true,
+                    "uniformAndStorageBuffer16BitAccess": false
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxImageDimension1D": 2048
+                    }
+                },
+                "VkPhysicalDeviceInlineUniformBlockPropertiesEXT": {
+                    "maxDescriptorSetInlineUniformBlocks": 4
+                }
+            }
+        },
+        "baselineB": {
+            "extensions": {
+                "VK_EXT_inline_uniform_block": 1,
+                "VK_KHR_16bit_storage": 1
+            },
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "drawIndirectFirstInstance": false,
+                    "imageCubeArray": true
+                },
+                "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                    "storagePushConstant16": true,
+                    "storageInputOutput16": false
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxImageDimension2D": 1024
+                    }
+                },
+                "VkPhysicalDeviceInlineUniformBlockPropertiesEXT": {
+                    "maxInlineUniformBlockSize": 2048
+                }
+            }
+        }
+    },
+    "profiles": {
+        "VP_LUNARG_test_variants": {
+            "version": 1,
+            "api-version": "1.0.198",
+            "label": "Test variants",
+            "description": "Unit test file",
+            "contributors": {
+                "Christophe Riccio": {
+                    "company": "LunarG",
+                    "email": "christophe@lunarg.com",
+                    "github": "christophe-lunarg",
+                    "contact": true
+                }
+            },
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2023-04-05",
+                    "author": "Christophe Riccio",
+                    "comment": "Initial revision"
+                }
+            ],
+            "capabilities": [
+                [ "baselineA", "baselineB" ]
+            ]
+        }
+    }
+}
