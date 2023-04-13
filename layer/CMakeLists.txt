@@ -2,7 +2,7 @@ if(PROFILES_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
-execute_process(COMMAND ${CMAKE_COMMAND} -E touch  ${CMAKE_SOURCE_DIR}/layer/profiles.cpp)
+execute_process(COMMAND ${CMAKE_COMMAND} -E touch  ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp)
 execute_process(COMMAND ${CMAKE_COMMAND} -E touch  ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -66,7 +66,16 @@ else()
 endif()
 
 target_sources(VkLayer_khronos_profiles PRIVATE
-    profiles.cpp
+    profiles_interface.cpp
+    profiles_interface.h
+    profiles_settings.cpp
+    profiles_settings.h
+    profiles_json.cpp
+    profiles_json.h
+    profiles_util.cpp
+    profiles_util.h
+    profiles_generated.cpp
+    profiles.h
     vk_layer_table.cpp
 )
 
@@ -88,7 +97,7 @@ source_group("Python Files" FILES ${LAYER_PYTHON_FILES})
 add_custom_target(VpLayer_generate ALL
     COMMAND ${PYTHON_EXECUTABLE} ${LAYER_PYTHON_FILES}
         -registry ${VULKAN_HEADERS_REGISTRY_DIRECTORY}/vk.xml
-        -outLayer ${CMAKE_SOURCE_DIR}/layer/profiles.cpp
+        -outLayer ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp
     VERBATIM
     SOURCES ${LAYER_PYTHON_FILES}
     DEPENDS ${VULKAN_HEADERS_REGISTRY_DIRECTORY}/vk.xml)

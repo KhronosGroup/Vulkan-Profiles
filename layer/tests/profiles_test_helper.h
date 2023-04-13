@@ -36,8 +36,6 @@ void unsetEnvironmentSetting(std::string setting);
 
 std::string getAbsolutePath(std::string filepath);
 
-std::string GetSimulateCapabilitiesLog(SimulateCapabilityFlags flags);
-
 VkApplicationInfo GetDefaultApplicationInfo();
 
 enum Mode {
