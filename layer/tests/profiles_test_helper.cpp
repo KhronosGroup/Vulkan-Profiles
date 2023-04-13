@@ -67,43 +67,6 @@ std::string profiles_test::getAbsolutePath(std::string filepath) {
     return out;
 }
 
-std::string profiles_test::GetSimulateCapabilitiesLog(SimulateCapabilityFlags flags) {
-    std::string result = {};
-    bool need_comma = false;
-
-    if (flags & SIMULATE_API_VERSION_BIT) {
-        result += "SIMULATE_API_VERSION_BIT";
-        need_comma = true;
-    }
-    if (flags & SIMULATE_FEATURES_BIT) {
-        if (need_comma) result += ",";
-        result += "SIMULATE_FEATURES_BIT";
-        need_comma = true;
-    }
-    if (flags & SIMULATE_PROPERTIES_BIT) {
-        if (need_comma) result += ",";
-        result += "SIMULATE_PROPERTIES_BIT";
-        need_comma = true;
-    }
-    if (flags & SIMULATE_EXTENSIONS_BIT) {
-        if (need_comma) result += ",";
-        result += "SIMULATE_EXTENSIONS_BIT";
-        need_comma = true;
-    }
-    if (flags & SIMULATE_FORMATS_BIT) {
-        if (need_comma) result += ",";
-        result += "SIMULATE_FORMATS_BIT";
-        need_comma = true;
-    }
-    if (flags & SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT) {
-        if (need_comma) result += ",";
-        result += "SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT";
-        need_comma = true;
-    }
-
-    return result;
-}
-
 VkApplicationInfo profiles_test::GetDefaultApplicationInfo() {
     VkApplicationInfo out{VK_STRUCTURE_TYPE_APPLICATION_INFO};
     out.apiVersion = VK_API_VERSION_1_3;

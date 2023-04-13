@@ -18,83 +18,25 @@
  */
 
 #pragma once
-#include <vulkan/layer/vk_layer_settings.h>
+#include "profiles_settings.h"
 
-enum SimulateCapabilityFlag {
-    SIMULATE_API_VERSION_BIT = 1 << 0,
-    SIMULATE_FEATURES_BIT = 1 << 1,
-    SIMULATE_PROPERTIES_BIT = 1 << 2,
-    SIMULATE_EXTENSIONS_BIT = 1 << 3,
-    SIMULATE_FORMATS_BIT = 1 << 4,
-    SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT = 1 << 5,
-    SIMULATE_MAX_ENUM = 0x7FFFFFFF
-};
-typedef int SimulateCapabilityFlags;
+VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL GetInstanceProcAddr(VkInstance instance, const char *pName);
+VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
+                                              VkInstance *pInstance);
+VKAPI_ATTR VkResult VKAPI_CALL EnumerateInstanceLayerProperties(uint32_t *pCount, VkLayerProperties *pProperties);
+VKAPI_ATTR VkResult VKAPI_CALL EnumerateInstanceExtensionProperties(const char *pLayerName, uint32_t *pCount,
+                                                                    VkExtensionProperties *pProperties);
+VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uint32_t *pPhysicalDeviceCount,
+                                                        VkPhysicalDevice *pPhysicalDevices);
 
-enum DebugAction {
-    DEBUG_ACTION_FILE_BIT = (1 << 0),
-    DEBUG_ACTION_STDOUT_BIT = (1 << 1),
-    DEBUG_ACTION_OUTPUT_BIT = (1 << 2),
-    DEBUG_ACTION_BREAKPOINT_BIT = (1 << 3),
-    DEBUG_ACTION_MAX_ENUM = 0x7FFFFFFF
-};
-typedef int DebugActionFlags;
+std::string GetFormatFeatureString(VkFormatFeatureFlags flags);
 
-enum DebugReport {
-    DEBUG_REPORT_NOTIFICATION_BIT = (1 << 0),
-    DEBUG_REPORT_WARNING_BIT = (1 << 1),
-    DEBUG_REPORT_ERROR_BIT = (1 << 2),
-    DEBUG_REPORT_DEBUG_BIT = (1 << 3),
-    DEBUG_REPORT_MAX_ENUM = 0x7FFFFFFF
-};
-typedef int DebugReportFlags;
+std::string GetFormatFeature2String(VkFormatFeatureFlags2 flags);
 
-enum DefaultFeatureValues {
-    DEFAULT_FEATURE_VALUES_FALSE = 0,
-    DEFAULT_FEATURE_VALUES_DEVICE
-};
+SimulateCapabilityFlags GetSimulateCapabilityFlags(const vku::Strings &values);
 
-enum ProfileVariantsMode { 
-    VARIANTS_MODE_ALL = 0,
-    VARIANTS_MODE_FIRST_SUPPORTED
-};
+std::string GetSimulateCapabilitiesLog(SimulateCapabilityFlags flags);
 
-static const VkStructureType VK_STRUCTURE_TYPE_PROFILES_LAYER_SETTINGS_EXT = static_cast<VkStructureType>(3000300005);
+std::string GetDebugReportsLog(DebugActionFlags flags);
 
-typedef struct VkProfileLayerSettingsEXT {
-    VkProfileLayerSettingsEXT()
-    : sType(VK_STRUCTURE_TYPE_PROFILES_LAYER_SETTINGS_EXT) {}
-
-    VkStructureType sType;
-    void* pNext{};
-    std::string profile_file{};
-    std::string profile_name{"${VP_DEFAULT}"};
-    bool profile_validation{false};
-    bool emulate_portability{true};
-    bool constantAlphaColorBlendFactors{false};
-    bool events{false};
-    bool imageViewFormatReinterpretation{false};
-    bool imageViewFormatSwizzle{false};
-    bool imageView2DOn3DImage{false};
-    bool multisampleArrayImage{false};
-    bool mutableComparisonSamplers{false};
-    bool pointPolygons{false};
-    bool samplerMipLodBias{false};
-    bool separateStencilMaskRef{false};
-    bool shaderSampleRateInterpolationFunctions{false};
-    bool tessellationIsolines{false};
-    bool tessellationPointMode{false};
-    bool triangleFans{false};
-    bool vertexAttributeAccessBeyondStride{false};
-    uint32_t minVertexInputBindingStrideAlignment{4};
-    SimulateCapabilityFlags simulate_capabilities{SIMULATE_API_VERSION_BIT | SIMULATE_FEATURES_BIT | SIMULATE_PROPERTIES_BIT};
-    DebugActionFlags debug_actions{DEBUG_ACTION_STDOUT_BIT};
-    std::string debug_filename{"profiles_layer_log.txt"};
-    bool debug_file_discard{true};
-    DebugReportFlags debug_reports{DEBUG_REPORT_WARNING_BIT | DEBUG_REPORT_ERROR_BIT};
-    bool debug_fail_on_error{false};
-    vku::Strings exclude_device_extensions;
-    vku::Strings exclude_formats;
-    DefaultFeatureValues default_feature_values{DEFAULT_FEATURE_VALUES_DEVICE};
-    ProfileVariantsMode profile_variants_mode{VARIANTS_MODE_FIRST_SUPPORTED};
-} VkProfileLayerSettingsEXT;
+#define kOurLayerName "VK_LAYER_KHRONOS_profiles"
