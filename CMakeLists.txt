@@ -78,6 +78,14 @@ endif()
 if(${CMAKE_C_COMPILER_ID} MATCHES "(GNU|Clang)")
     add_compile_options(-Werror)
 elseif(MSVC)
+    # PDBs aren't generated on Release builds by default.
+    add_compile_options("$<$<CONFIG:Release>:/Zi>")
+    add_link_options("$<$<CONFIG:Release>:/DEBUG:FULL>")
+    # Remove unreferenced code/data.
+    add_link_options("$<$<CONFIG:Release>:/OPT:REF>")
+    # Merge duplicate data/functions
+    add_link_options("$<$<CONFIG:Release>:/OPT:ICF>")
+
         add_compile_options(/W4 /WX)
         add_link_options(/WX)
         # Ignore some warnings that we know we'll generate.  In the future the
