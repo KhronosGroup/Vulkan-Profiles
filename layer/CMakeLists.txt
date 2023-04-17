@@ -50,7 +50,11 @@ else()
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wpointer-arith")
 endif()
 
+source_group("JSON Manifest" FILES VkLayer_khronos_profiles.json.in)
+source_group("Export Files" FILES VkLayer_khronos_profiles.def VkLayer_khronos_profiles.map)
+
 add_library(VkLayer_khronos_profiles MODULE)
+set_target_properties(VkLayer_khronos_profiles PROPERTIES FOLDER "Profiles layer")
 
 if (MSVC)
     target_link_options(VkLayer_khronos_profiles PRIVATE /DEF:${CMAKE_CURRENT_SOURCE_DIR}/VkLayer_khronos_profiles.def)
@@ -77,6 +81,9 @@ target_sources(VkLayer_khronos_profiles PRIVATE
     profiles_generated.cpp
     profiles.h
     vk_layer_table.cpp
+    VkLayer_khronos_profiles.json.in
+    VkLayer_khronos_profiles.def
+    VkLayer_khronos_profiles.map
 )
 
 target_link_libraries(VkLayer_khronos_profiles PRIVATE
