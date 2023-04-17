@@ -188,6 +188,76 @@
             ],
             "settings": [
                 {
+                    "key": "force_device",
+                    "env": "VK_KHRONOS_PROFILES_FORCE_DEVICE",
+                    "label": "Force Device",
+                    "description": "On system with multiple physical devices, force the use of one specific physical device.",
+                    "status": "BETA",
+                    "type": "ENUM",
+                    "default": "FORCE_DEVICE_OFF",
+                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                    "flags": [
+                        {
+                            "key": "FORCE_DEVICE_OFF",
+                            "label": "Off",
+                            "description": "Let the Vulkan Loader list all the Physical Device."
+                        },
+                        {
+                            "key": "FORCE_DEVICE_WITH_UUID",
+                            "label": "Using Device UUID",
+                            "description": "Force the Physical Device identified by the device UUID.",
+                            "settings": [
+                                {
+                                    "key": "force_device_uuid",
+                                    "env": "VK_KHRONOS_PROFILES_FORCE_DEVICE_UUID",
+                                    "label": "Device UUID",
+                                    "description": "Device UUID of the forced physical devices",
+                                    "status": "STABLE",
+                                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                                    "type": "STRING",
+                                    "default": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                                    "dependence": {
+                                        "mode": "ALL",
+                                        "settings": [
+                                            {
+                                                "key": "force_device",
+                                                "value": "FORCE_DEVICE_WITH_UUID"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "key": "FORCE_DEVICE_WITH_NAME",
+                            "label": "Using Device Name",
+                            "description": "Force the Physical Device identified by the device UUID.",
+                            "settings": [
+                                {
+                                    "key": "force_device_name",
+                                    "env": "VK_KHRONOS_PROFILES_FORCE_DEVICE_NAME",
+                                    "label": "Device Name",
+                                    "description": "Device Name of the forced physical devices",
+                                    "status": "STABLE",
+                                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                                    "type": "ENUM",
+                                    "flags": [],
+                                    "default": "${VP_PHYSICAL_DEVICES}",
+                                    "dependence": {
+                                        "mode": "ALL",
+                                        "settings": [
+                                            {
+                                                "key": "force_device",
+                                                "value": "FORCE_DEVICE_WITH_NAME"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
                     "key": "profile_file",
                     "env": "VK_KHRONOS_PROFILES_PROFILE_FILE",
                     "label": "Profile Selection",
@@ -220,6 +290,66 @@
                             "platforms": [ "WINDOWS", "LINUX", "MACOS" ]
                         }
                     ]
+                },
+                {
+                    "key": "simulate_capabilities",
+                    "env": "VK_KHRONOS_PROFILES_SIMULATE_CAPABILITIES",
+                    "label": "Simulate Profile Capabilities",
+                    "description": "Control of the simulated capabilities of the Vulkan physical device from the selected Vulkan Profile.",
+                    "status": "STABLE",
+                    "type": "FLAGS",
+                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                    "flags": [
+                        {
+                            "key": "SIMULATE_API_VERSION_BIT",
+                            "label": "Version",
+                            "description": "The Vulkan device will report the API version from the selected Profile. It also overrides the `api-version` set in VkPhysicalDeviceProperties."
+                        },
+                        {
+                            "key": "SIMULATE_FEATURES_BIT",
+                            "label": "Features",
+                            "description": "The Vulkan device will report the features from the selected Profile.",
+                            "settings": [
+                                {
+                                    "key": "default_feature_values",
+                                    "env": "VK_KHRONOS_PROFILES_DEFAULT_FEATURE_VALUES",
+                                    "label": "Unspecified Features",
+                                    "description": "Feature values when not specified in the select Vulkan profiles.",
+                                    "status": "STABLE",
+                                    "type": "ENUM",
+                                    "default": "DEFAULT_FEATURE_VALUES_DEVICE",
+                                    "flags": [
+                                        {
+                                            "key": "DEFAULT_FEATURE_VALUES_DEVICE",
+                                            "label": "Use Device Values",
+                                            "description": "When a feature is not mentionned in the select Vulkan profiles, set is to the physical device value."
+                                        },
+                                        {
+                                            "key": "DEFAULT_FEATURE_VALUES_FALSE",
+                                            "label": "Use False",
+                                            "description": "When a feature is not mentionned in the select Vulkan profiles, set it to false."
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "key": "SIMULATE_PROPERTIES_BIT",
+                            "label": "Properties",
+                            "description": "The Vulkan device will report the properties from the selected Profile."
+                        },
+                        {
+                            "key": "SIMULATE_EXTENSIONS_BIT",
+                            "label": "Device Extensions",
+                            "description": "The Vulkan device will report the extensions from the selected Profile."
+                        },
+                        {
+                            "key": "SIMULATE_FORMATS_BIT",
+                            "label": "Formats",
+                            "description": "The Vulkan device will report the formats from the selected Profile."
+                        }
+                    ],
+                    "default": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT" ]
                 },
                 {
                     "key": "emulate_portability",
@@ -492,66 +622,6 @@
                             ]
                         }
                     ]
-                },
-                {
-                    "key": "simulate_capabilities",
-                    "env": "VK_KHRONOS_PROFILES_SIMULATE_CAPABILITIES",
-                    "label": "Simulate Profile Capabilities",
-                    "description": "Control of the simulated capabilities of the Vulkan physical device from the selected Vulkan Profile.",
-                    "status": "STABLE",
-                    "type": "FLAGS",
-                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                    "flags": [
-                        {
-                            "key": "SIMULATE_API_VERSION_BIT",
-                            "label": "Version",
-                            "description": "The Vulkan device will report the API version from the selected Profile. It also overrides the `api-version` set in VkPhysicalDeviceProperties."
-                        },
-                        {
-                            "key": "SIMULATE_FEATURES_BIT",
-                            "label": "Features",
-                            "description": "The Vulkan device will report the features from the selected Profile.",
-                            "settings": [
-                                {
-                                    "key": "default_feature_values",
-                                    "env": "VK_KHRONOS_PROFILES_DEFAULT_FEATURE_VALUES",
-                                    "label": "Unspecified Features",
-                                    "description": "Feature values when not specified in the select Vulkan profiles.",
-                                    "status": "STABLE",
-                                    "type": "ENUM",
-                                    "default": "DEFAULT_FEATURE_VALUES_DEVICE",
-                                    "flags": [
-                                        {
-                                            "key": "DEFAULT_FEATURE_VALUES_DEVICE",
-                                            "label": "Use Device Values",
-                                            "description": "When a feature is not mentionned in the select Vulkan profiles, set is to the physical device value."
-                                        },
-                                        {
-                                            "key": "DEFAULT_FEATURE_VALUES_FALSE",
-                                            "label": "Use False",
-                                            "description": "When a feature is not mentionned in the select Vulkan profiles, set it to false."
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "key": "SIMULATE_PROPERTIES_BIT",
-                            "label": "Properties",
-                            "description": "The Vulkan device will report the properties from the selected Profile."
-                        },
-                        {
-                            "key": "SIMULATE_EXTENSIONS_BIT",
-                            "label": "Device Extensions",
-                            "description": "The Vulkan device will report the extensions from the selected Profile."
-                        },
-                        {
-                            "key": "SIMULATE_FORMATS_BIT",
-                            "label": "Formats",
-                            "description": "The Vulkan device will report the formats from the selected Profile."
-                        }
-                    ],
-                    "default": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT" ]
                 },
                 {
                     "key": "exclude_device_extensions",

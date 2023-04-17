@@ -2402,11 +2402,99 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
 
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(instance);
-    VkResult result = dt->EnumeratePhysicalDevices(instance, pPhysicalDeviceCount, pPhysicalDevices);
+
+    VkResult result = VK_SUCCESS;
+    result = dt->EnumeratePhysicalDevices(instance, pPhysicalDeviceCount, pPhysicalDevices);
 
     // HACK!! epd_count is used to ensure the following code only gets called _after_ vkCreateInstance finishes *in the "vkcube +
     // profiles" use case*
     if (pPhysicalDevices && (VK_SUCCESS == result)) {
+        std::vector<VkPhysicalDevice> physical_devices;
+        if (*pPhysicalDeviceCount > 0) {
+            physical_devices.resize(*pPhysicalDeviceCount);
+            result = dt->EnumeratePhysicalDevices(instance, pPhysicalDeviceCount, &physical_devices[0]);
+        }
+
+        if (result != VK_SUCCESS) {
+            return result;
+        }
+
+        switch (layer_settings->force_device) {
+            default:
+            case FORCE_DEVICE_OFF: {
+                break;
+            }
+            case FORCE_DEVICE_WITH_UUID: {
+                bool found = false;
+                for (std::size_t i = 0, n = physical_devices.size(); i < n; ++i) {
+                    VkPhysicalDeviceIDPropertiesKHR properties_deviceid{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ID_PROPERTIES_KHR};
+                    VkPhysicalDeviceProperties2 properties2{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, &properties_deviceid};
+
+                    dt->GetPhysicalDeviceProperties2(physical_devices[i], &properties2);
+
+                    if (layer_settings->force_device_uuid == GetUUIDString(properties_deviceid.deviceUUID)) {
+                        layer_settings->force_device_name = properties2.properties.deviceName;
+                        *pPhysicalDevices = physical_devices[i];
+                        found = true;
+                        break;
+                    }
+                }
+
+                static bool force_physical_device_log_once = false;
+                if (found) {
+                    *pPhysicalDeviceCount = 1;
+                    if (!force_physical_device_log_once) {
+                        LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+                            "Force physical device by device UUID: '%s'('%s').\\n",
+                            layer_settings->force_device_uuid.c_str(),           
+                            layer_settings->force_device_name.c_str());
+                    }
+                } else {
+                    if (!force_physical_device_log_once) {
+                        LogMessage(DEBUG_REPORT_ERROR_BIT,
+                            "Force physical device by device name is active but the requested physical device '%s'('%s') couldn't be found.\\n",
+                            layer_settings->force_device_uuid.c_str(),
+                            layer_settings->force_device_name.c_str());
+                    }
+                }
+                force_physical_device_log_once = true;
+                break;
+            }
+            case FORCE_DEVICE_WITH_NAME: {
+                bool found = false;
+                for (std::size_t i = 0, n = physical_devices.size(); i < n; ++i) {
+                    VkPhysicalDeviceProperties physical_device_properties;
+                    dt->GetPhysicalDeviceProperties(physical_devices[i], &physical_device_properties);
+
+                    if (layer_settings->force_device_name == physical_device_properties.deviceName) {
+                        *pPhysicalDevices = physical_devices[i];
+                        found = true;
+                        break;
+                    }
+                }
+
+                static bool force_physical_device_log_once = false;
+                if (found) {
+                    *pPhysicalDeviceCount = 1;
+                    if (!force_physical_device_log_once) {
+                        LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+                            "Force physical device by device name: '%s'.\\n",
+                            layer_settings->force_device_name.c_str());
+                    }
+                }
+                else {
+                    if (!force_physical_device_log_once) {
+                        LogMessage(DEBUG_REPORT_ERROR_BIT,
+                            "Force physical device by device name is active but the requested physical device '%s' couldn't be found.\\n",
+                            layer_settings->force_device_name.c_str());
+                    }
+                }
+                force_physical_device_log_once = true;
+                break;
+            }
+        }
+
+/*
         std::vector<VkPhysicalDevice> physical_devices;
         result = EnumerateAll<VkPhysicalDevice>(physical_devices, [&](uint32_t *count, VkPhysicalDevice *results) {
             return dt->EnumeratePhysicalDevices(instance, count, results);
@@ -2414,6 +2502,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
         if (result != VK_SUCCESS) {
             return result;
         }
+*/
 
         // For each physical device, create and populate a PDD instance.
         for (const auto &physical_device : physical_devices) {
