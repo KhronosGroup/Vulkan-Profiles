@@ -50,6 +50,9 @@ const char *const kLayerSettingsExcludeDeviceExtensions = "exclude_device_extens
 const char *const kLayerSettingsExcludeFormats = "exclude_formats";
 const char *const kLayerSettingsDefaultFeatureValues = "default_feature_values";
 const char *const kLayerSettingsProfileVariantsMode = "profile_variants_mode";
+const char *const kLayerSettingsForceDevice = "force_device";
+const char *const kLayerSettingsForceDeviceUUID = "force_device_uuid";
+const char *const kLayerSettingsForceDeviceName = "force_device_name";
 
 VkProfileLayerSettingsEXT *layer_settings = new VkProfileLayerSettingsEXT{};
 FILE *profiles_log_file = nullptr;
@@ -62,6 +65,18 @@ DefaultFeatureValues GetDefaultFeatureValues(const std::string &value) {
     }
 
     return DEFAULT_FEATURE_VALUES_DEVICE;
+}
+
+ForceDevice GetForceDevice(const std::string& value) {
+    if (value == "FORCE_DEVICE_OFF") {
+        return FORCE_DEVICE_OFF;
+    } else if (value == "FORCE_DEVICE_WITH_UUID") {
+        return FORCE_DEVICE_WITH_UUID;
+    } else if (value == "FORCE_DEVICE_WITH_NAME") {
+        return FORCE_DEVICE_WITH_NAME;
+    }
+
+    return FORCE_DEVICE_OFF;
 }
 
 ProfileVariantsMode GetProfileVariantsMode(const std::string &value) {
@@ -340,6 +355,21 @@ void InitSettings(const void *pNext) {
                 GetProfileVariantsMode(vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileVariantsMode));
         }
 
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsForceDevice)) {
+            layer_settings->force_device =
+                GetForceDevice(vku::GetLayerSettingString(kOurLayerName, kLayerSettingsForceDevice));
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsForceDeviceUUID)) {
+            layer_settings->force_device_uuid =
+                vku::GetLayerSettingString(kOurLayerName, kLayerSettingsForceDeviceUUID);
+        }
+
+        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsForceDeviceName)) {
+            layer_settings->force_device_name =
+                vku::GetLayerSettingString(kOurLayerName, kLayerSettingsForceDeviceName);
+        }
+
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDebugFailOnError)) {
             layer_settings->debug_fail_on_error = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsDebugFailOnError);
         }
@@ -377,13 +407,13 @@ void InitSettings(const void *pNext) {
         if (profiles_log_file == nullptr) {
             layer_settings->debug_actions &= ~DEBUG_ACTION_FILE_BIT;
             layer_settings->debug_actions |= DEBUG_ACTION_STDOUT_BIT;
-            LogMessage(DEBUG_REPORT_ERROR_BIT, "Could not open %s, log to file is being overridden by log to stdout.\\n",
+            LogMessage(DEBUG_REPORT_ERROR_BIT, "Could not open %s, log to file is being overridden by log to stdout.\n",
                        layer_settings->debug_filename.c_str());
         } else {
-            LogMessage(DEBUG_REPORT_DEBUG_BIT, "Log file %s opened\\n", layer_settings->debug_filename.c_str());
+            LogMessage(DEBUG_REPORT_DEBUG_BIT, "Log file %s opened\n", layer_settings->debug_filename.c_str());
         }
     } else {
-        LogMessage(DEBUG_REPORT_DEBUG_BIT, "No need to open the log file %s\\n", layer_settings->debug_filename.c_str());
+        LogMessage(DEBUG_REPORT_DEBUG_BIT, "No need to open the log file %s\n", layer_settings->debug_filename.c_str());
     }
 
     const std::string simulation_capabilities_log = GetSimulateCapabilitiesLog(layer_settings->simulate_capabilities);
@@ -394,52 +424,52 @@ void InitSettings(const void *pNext) {
     if (user_settings) {
         settings_log += format(
             "NOTE: Settings originate from a user-supplied settings structure: environment variables and "
-            "layer settings file were ignored.\\n");
+            "layer settings file were ignored.\n");
     }
-    settings_log += format("\\t%s: %s\\n", kLayerSettingsProfileFile, layer_settings->profile_file.c_str());
-    settings_log += format("\\t%s: %s\\n", kLayerSettingsProfileName, layer_settings->profile_name.c_str());
-    settings_log += format("\\t%s: %s\\n", kLayerSettingsProfileValidation, layer_settings->profile_validation ? "true" : "false");
+    settings_log += format("\t%s: %s\n", kLayerSettingsProfileFile, layer_settings->profile_file.c_str());
+    settings_log += format("\t%s: %s\n", kLayerSettingsProfileName, layer_settings->profile_name.c_str());
+    settings_log += format("\t%s: %s\n", kLayerSettingsProfileValidation, layer_settings->profile_validation ? "true" : "false");
     settings_log +=
-        format("\\t%s: %s\\n", kLayerSettingsEmulatePortability, layer_settings->emulate_portability ? "true" : "false");
+        format("\t%s: %s\n", kLayerSettingsEmulatePortability, layer_settings->emulate_portability ? "true" : "false");
     if (layer_settings->emulate_portability) {
-        settings_log += format("\\t\\t%s: %s\\n", kLayerSettings_constantAlphaColorBlendFactors,
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_constantAlphaColorBlendFactors,
                                layer_settings->constantAlphaColorBlendFactors ? "true" : "false");
-        settings_log += format("\\t\\t%s: %s\\n", kLayerSettings_events, layer_settings->events ? "true" : "false");
-        settings_log += format("\\t\\t%s: %s\\n", kLayerSettings_imageViewFormatReinterpretation,
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_events, layer_settings->events ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_imageViewFormatReinterpretation,
                                layer_settings->imageViewFormatReinterpretation ? "true" : "false");
-        settings_log += format("\\t\\t%s: %s\\n", kLayerSettings_imageViewFormatSwizzle,
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_imageViewFormatSwizzle,
                                layer_settings->imageViewFormatSwizzle ? "true" : "false");
         settings_log +=
-            format("\\t\\t%s: %s\\n", kLayerSettings_imageView2DOn3DImage, layer_settings->imageView2DOn3DImage ? "true" : "false");
-        settings_log += format("\\t\\t%s: %s\\n", kLayerSettings_multisampleArrayImage,
+            format("\t\t%s: %s\n", kLayerSettings_imageView2DOn3DImage, layer_settings->imageView2DOn3DImage ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_multisampleArrayImage,
                                layer_settings->multisampleArrayImage ? "true" : "false");
-        settings_log += format("\\t\\t%s: %s\\n", kLayerSettings_mutableComparisonSamplers,
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_mutableComparisonSamplers,
                                layer_settings->mutableComparisonSamplers ? "true" : "false");
-        settings_log += format("\\t\\t%s: %s\\n", kLayerSettings_pointPolygons, layer_settings->pointPolygons ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_pointPolygons, layer_settings->pointPolygons ? "true" : "false");
         settings_log +=
-            format("\\t\\t%s: %s\\n", kLayerSettings_samplerMipLodBias, layer_settings->samplerMipLodBias ? "true" : "false");
-        settings_log += format("\\t\\t%s: %s\\n", kLayerSettings_separateStencilMaskRef,
+            format("\t\t%s: %s\n", kLayerSettings_samplerMipLodBias, layer_settings->samplerMipLodBias ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_separateStencilMaskRef,
                                layer_settings->separateStencilMaskRef ? "true" : "false");
-        settings_log += format("\\t\\t%s: %s\\n", kLayerSettings_shaderSampleRateInterpolationFunctions,
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_shaderSampleRateInterpolationFunctions,
                                layer_settings->shaderSampleRateInterpolationFunctions ? "true" : "false");
         settings_log +=
-            format("\\t\\t%s: %s\\n", kLayerSettings_tessellationIsolines, layer_settings->tessellationIsolines ? "true" : "false");
-        settings_log += format("\\t\\t%s: %s\\n", kLayerSettings_triangleFans, layer_settings->triangleFans ? "true" : "false");
-        settings_log += format("\\t\\t%s: %s\\n", kLayerSettings_vertexAttributeAccessBeyondStride,
+            format("\t\t%s: %s\n", kLayerSettings_tessellationIsolines, layer_settings->tessellationIsolines ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_triangleFans, layer_settings->triangleFans ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_vertexAttributeAccessBeyondStride,
                                layer_settings->vertexAttributeAccessBeyondStride ? "true" : "false");
-        settings_log += format("\\t\\t%s: %d\\n", kLayerSettings_minVertexInputBindingStrideAlignment,
+        settings_log += format("\t\t%s: %d\n", kLayerSettings_minVertexInputBindingStrideAlignment,
                                static_cast<int>(layer_settings->minVertexInputBindingStrideAlignment));
     }
-    settings_log += format("\\t%s: %s\\n", kLayerSettingsSimulateCapabilities, simulation_capabilities_log.c_str());
-    settings_log += format("\\t%s: %s\\n", kLayerSettingsDebugActions, debug_actions_log.c_str());
-    settings_log += format("\\t%s: %s\\n", kLayerSettingsDebugFilename, layer_settings->debug_filename.c_str());
-    settings_log += format("\\t%s: %s\\n", kLayerSettingsDebugFileClear, layer_settings->debug_file_discard ? "true" : "false");
-    settings_log += format("\\t%s: %s\\n", kLayerSettingsDebugFailOnError, layer_settings->debug_fail_on_error ? "true" : "false");
-    settings_log += format("\\t%s: %s\\n", kLayerSettingsDebugReports, debug_reports_log.c_str());
+    settings_log += format("\t%s: %s\n", kLayerSettingsSimulateCapabilities, simulation_capabilities_log.c_str());
+    settings_log += format("\t%s: %s\n", kLayerSettingsDebugActions, debug_actions_log.c_str());
+    settings_log += format("\t%s: %s\n", kLayerSettingsDebugFilename, layer_settings->debug_filename.c_str());
+    settings_log += format("\t%s: %s\n", kLayerSettingsDebugFileClear, layer_settings->debug_file_discard ? "true" : "false");
+    settings_log += format("\t%s: %s\n", kLayerSettingsDebugFailOnError, layer_settings->debug_fail_on_error ? "true" : "false");
+    settings_log += format("\t%s: %s\n", kLayerSettingsDebugReports, debug_reports_log.c_str());
     settings_log +=
-        format("\\t%s: %s\\n", kLayerSettingsExcludeDeviceExtensions, GetString(layer_settings->exclude_device_extensions).c_str());
-    settings_log += format("\\t%s: %s\\n", kLayerSettingsExcludeFormats, GetString(layer_settings->exclude_formats).c_str());
+        format("\t%s: %s\n", kLayerSettingsExcludeDeviceExtensions, GetString(layer_settings->exclude_device_extensions).c_str());
+    settings_log += format("\t%s: %s\n", kLayerSettingsExcludeFormats, GetString(layer_settings->exclude_formats).c_str());
 
-    LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, "Profile Layers Settings: {\\n%s}\\n", settings_log.c_str());
+    LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, "Profile Layers Settings: {\n%s}\n", settings_log.c_str());
 }
 

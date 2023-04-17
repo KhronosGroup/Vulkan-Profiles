@@ -54,6 +54,16 @@ std::string GetString(const vku::Strings &strings) {
     return result;
 }
 
+std::string GetUUIDString(const uint8_t deviceUUID[VK_UUID_SIZE]) {
+    std::string result;
+
+    for (std::size_t i = 0, n = VK_UUID_SIZE; i < n; ++i) {
+        result += format("%02X", deviceUUID[i]);
+    }
+
+    return result;
+}
+
 std::string format_device_support_string(VkFormatFeatureFlags format_features) {
     if (format_features == 0) return std::string("does not support it");
     return ::format("only supports:\n\t\" % s\"", GetFormatFeatureString(format_features).c_str());

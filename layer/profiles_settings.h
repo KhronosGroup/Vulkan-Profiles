@@ -61,6 +61,14 @@ enum DefaultFeatureValues {
 
 DefaultFeatureValues GetDefaultFeatureValues(const std::string &value);
 
+enum ForceDevice {
+    FORCE_DEVICE_OFF = 0,
+    FORCE_DEVICE_WITH_UUID,
+    FORCE_DEVICE_WITH_NAME
+};
+
+ForceDevice GetForceDevice(const std::string &value);
+
 enum ProfileVariantsMode {
     VARIANTS_MODE_ALL = 0,
     VARIANTS_MODE_FIRST_SUPPORTED
@@ -105,6 +113,9 @@ typedef struct VkProfileLayerSettingsEXT {
     vku::Strings exclude_formats;
     DefaultFeatureValues default_feature_values{DEFAULT_FEATURE_VALUES_DEVICE};
     ProfileVariantsMode profile_variants_mode{VARIANTS_MODE_FIRST_SUPPORTED};
+    ForceDevice force_device;
+    std::string force_device_uuid;
+    std::string force_device_name;
 } VkProfileLayerSettingsEXT;
 
 void InitSettings(const void *pNext);

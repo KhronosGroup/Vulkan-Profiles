@@ -47,6 +47,7 @@ std::string format(const char *message, ...);
 
 std::string GetString(const vku::List &list);
 std::string GetString(const vku::Strings &strings);
+std::string GetUUIDString(const uint8_t deviceUUID[VK_UUID_SIZE]);
 
 void WarnMissingFormatFeatures(const std::string &format_name, const std::string &features, VkFormatFeatureFlags profile_features,
                                VkFormatFeatureFlags device_features);

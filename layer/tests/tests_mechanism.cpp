@@ -999,3 +999,29 @@ TEST_F(TestsMechanism, profile_variants_all) {
         inst_builder.reset();
     }
 }
+
+TEST_F(TestsMechanism, force_physical_device) {
+    VkResult err = VK_SUCCESS;
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    {
+        VkProfileLayerSettingsEXT settings;
+        settings.force_device = FORCE_DEVICE_OFF;
+        settings.force_device_name = "NVIDIA";
+        settings.force_device_uuid = "BC4A01B15641805847A8151A395A80C7";
+
+        err = inst_builder.init(&settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            inst_builder.reset();
+            return;
+        }
+
+        inst_builder.reset();
+    }
+}
