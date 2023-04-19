@@ -2597,7 +2597,7 @@ ENUMERATE_PHYSICAL_DEVICES_MIDDLE = '''
             }
 
             LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
-                       "Running on \\"%s\\" with Vulkan %d.%d.%d driver.\\n", pdd.physical_device_properties_.deviceName,
+                       "Found \\"%s\\" with Vulkan %d.%d.%d driver.\\n", pdd.physical_device_properties_.deviceName,
                               VK_API_VERSION_MAJOR(pdd.physical_device_properties_.apiVersion),
                               VK_API_VERSION_MINOR(pdd.physical_device_properties_.apiVersion),
                               VK_API_VERSION_PATCH(pdd.physical_device_properties_.apiVersion));
