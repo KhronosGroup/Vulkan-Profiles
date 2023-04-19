@@ -2410,13 +2410,17 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
     // profiles" use case*
     if (pPhysicalDevices && (VK_SUCCESS == result)) {
         std::vector<VkPhysicalDevice> physical_devices;
-        if (*pPhysicalDeviceCount > 0) {
-            physical_devices.resize(*pPhysicalDeviceCount);
-            result = dt->EnumeratePhysicalDevices(instance, pPhysicalDeviceCount, &physical_devices[0]);
-        }
+        result = EnumerateAll<VkPhysicalDevice>(physical_devices, [&](uint32_t *count, VkPhysicalDevice *results) {
+            return dt->EnumeratePhysicalDevices(instance, count, results);
+        });
 
         if (result != VK_SUCCESS) {
             return result;
+        }
+
+        if (layer_settings->force_device != FORCE_DEVICE_OFF && *pPhysicalDeviceCount == 1) {
+            LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, "Forced physical device is disabled because a single physical device was found.\\n");
+            layer_settings->force_device = FORCE_DEVICE_OFF;
         }
 
         switch (layer_settings->force_device) {
@@ -2493,16 +2497,6 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                 break;
             }
         }
-
-/*
-        std::vector<VkPhysicalDevice> physical_devices;
-        result = EnumerateAll<VkPhysicalDevice>(physical_devices, [&](uint32_t *count, VkPhysicalDevice *results) {
-            return dt->EnumeratePhysicalDevices(instance, count, results);
-        });
-        if (result != VK_SUCCESS) {
-            return result;
-        }
-*/
 
         // For each physical device, create and populate a PDD instance.
         for (const auto &physical_device : physical_devices) {
