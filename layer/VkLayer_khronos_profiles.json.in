@@ -22,11 +22,39 @@
         "features": {
             "presets": [
                 {
+                    "label": "Force Physical Device Only",
+                    "description": "Use the Profiles layer to force a specific physical device",
+                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                    "status": "STABLE",
+                    "settings": [
+                        {
+                            "key": "force_device",
+                            "value": "FORCE_DEVICE_WITH_NAME"
+                        },
+                        {
+                            "key": "profile_file",
+                            "value": ""
+                        },
+                        {
+                            "key": "simulate_capabilities",
+                            "value": []
+                        },
+                        {
+                            "key": "emulate_portability",
+                            "value": false
+                        }
+                    ]
+                },
+                {
                     "label": "LunarG Desktop Portability 2023",
                     "description": "Check the Vulkan 1.2 application will run on Windows, Linux and macOS platforms without exceeding ecosystem effective devices capabilities",
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
                     "status": "STABLE",
                     "settings": [
+                        {
+                            "key": "force_device",
+                            "value": "FORCE_DEVICE_OFF"
+                        },
                         {
                             "key": "profile_file",
                             "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_baseline_2023.json"
@@ -80,6 +108,10 @@
                     "status": "STABLE",
                     "settings": [
                         {
+                            "key": "force_device",
+                            "value": "FORCE_DEVICE_OFF"
+                        },
+                        {
                             "key": "profile_file",
                             "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_baseline_2022.json"
                         },
@@ -132,6 +164,10 @@
                     "status": "STABLE",
                     "settings": [
                         {
+                            "key": "force_device",
+                            "value": "FORCE_DEVICE_OFF"
+                        },
+                        {
                             "key": "emulate_portability",
                             "value": false
                         },
@@ -152,6 +188,10 @@
                     "status": "STABLE",
                     "settings": [
                         {
+                            "key": "force_device",
+                            "value": "FORCE_DEVICE_OFF"
+                        },
+                        {
                             "key": "emulate_portability",
                             "value": false
                         },
@@ -171,6 +211,10 @@
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
                     "status": "STABLE",
                     "settings": [
+                        {
+                            "key": "force_device",
+                            "value": "FORCE_DEVICE_OFF"
+                        },
                         {
                             "key": "emulate_portability",
                             "value": false
