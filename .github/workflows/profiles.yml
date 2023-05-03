@@ -81,7 +81,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config: [Debug, Release]
+        arch: [ x64, Win32 ]
+        config: [ debug, release ]
+        exclude:
+          - arch: Win32
+            config: release
+          - arch: x64
+            config: debug
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -90,8 +96,11 @@ jobs:
       - name: Install jsonschema
         run: python3 -m pip install jsonschema
       - uses: lukka/get-cmake@latest
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
       - name: Configure/Generate
-        run: cmake -S. -B build -D PROFILES_BUILD_TESTS=OFF -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}}
+        run: cmake -S. -B build -D PROFILES_BUILD_TESTS=OFF -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -G "Ninja"
       - name: Build
         run: cmake --build build --config ${{matrix.config}}
       - name: Install
