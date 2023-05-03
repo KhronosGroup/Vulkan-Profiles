@@ -261,12 +261,6 @@ VERBOSE = False
 
 DEVNULL = open(os.devnull, 'wb')
 
-# Spported build platforms.  All are lower-case.
-LINUX = 'linux'
-WINDOWS = 'windows'
-DARWIN = 'darwin'
-ANDROID = 'android'
-PLATFORMS = [LINUX, WINDOWS, DARWIN, ANDROID]
 
 def on_rm_error( func, path, exc_info):
     """Error handler for recursively removing a directory. The
@@ -329,17 +323,18 @@ class GoodRepo(object):
             self.build_dir = os.path.normpath(json['build_dir'])
         if json.get('install_dir'):
             self.install_dir = os.path.normpath(json['install_dir'])
-        self.deps = json.get('deps', [])
-        self.prebuild = json.get('prebuild', [])
-        self.prebuild_linux = json.get('prebuild_linux', [])
-        self.prebuild_windows = json.get('prebuild_windows', [])
-        self.prebuild_darwin = json.get('prebuild_darwin', [])
-        self.prebuild_android = json.get('prebuild_android', [])
-        self.custom_build = json.get('custom_build', [])
-        self.cmake_options = json.get('cmake_options', [])
-        self.ci_only = json.get('ci_only', [])
-        self.build_step = json.get('build_step', 'build')
-        self.build_platforms = json.get('build_platforms', [])
+        self.deps = json['deps'] if ('deps' in json) else []
+        self.prebuild = json['prebuild'] if ('prebuild' in json) else []
+        self.prebuild_linux = json['prebuild_linux'] if (
+            'prebuild_linux' in json) else []
+        self.prebuild_windows = json['prebuild_windows'] if (
+            'prebuild_windows' in json) else []
+        self.custom_build = json['custom_build'] if ('custom_build' in json) else []
+        self.cmake_options = json['cmake_options'] if (
+            'cmake_options' in json) else []
+        self.ci_only = json['ci_only'] if ('ci_only' in json) else []
+        self.build_step = json['build_step'] if ('build_step' in json) else 'build'
+        self.build_platforms = json['build_platforms'] if ('build_platforms' in json) else []
         self.optional = set(json.get('optional', []))
         # Absolute paths for a repo's directories
         dir_top = os.path.abspath(args.dir)
@@ -349,11 +344,9 @@ class GoodRepo(object):
         if self.install_dir:
             self.install_dir = os.path.join(dir_top, self.install_dir)
 	    # Check if platform is one to build on
-        self.platform = args.platform
-        self.on_build_platform = not self.build_platforms or args.platform in self.build_platforms
-
-    def __repr__(self):
-        return '({}({})'.format(self.__class__.__name__, self.name)
+        self.on_build_platform = False
+        if self.build_platforms == [] or platform.system().lower() in self.build_platforms:
+            self.on_build_platform = True
 
     def Clone(self, retries=10, retry_seconds=60):
         print('Cloning {n} into {d}'.format(n=self.name, d=self.repo_dir))
@@ -417,10 +410,12 @@ class GoodRepo(object):
         """Execute any prebuild steps from the repo root"""
         for p in self.prebuild:
             command_output(shlex.split(p), self.repo_dir)
-
-        # If there's a platform-specific entry, use that too.
-        for p in getattr(self, 'prebuild_{}'.format(self.platform), []):
-            command_output(shlex.split(p), self.repo_dir)
+        if platform.system() == 'Linux' or platform.system() == 'Darwin':
+            for p in self.prebuild_linux:
+                command_output(shlex.split(p), self.repo_dir)
+        if platform.system() == 'Windows':
+            for p in self.prebuild_windows:
+                command_output(shlex.split(p), self.repo_dir)
 
     def CustomBuild(self, repo_dict):
         """Execute any custom_build steps from the repo root"""
@@ -441,7 +436,7 @@ class GoodRepo(object):
 
         cmake_cmd = [
             'cmake', self.repo_dir,
-            '-DCMAKE_INSTALL_PREFIX=' + self.install_dir,
+            '-DCMAKE_INSTALL_PREFIX=' + self.install_dir
         ]
 
         # Allow users to pass in arbitrary cache variables
@@ -463,14 +458,12 @@ class GoodRepo(object):
         for option in self.cmake_options:
             cmake_cmd.append(escape(option.format(**self.__dict__)))
 
-        # Set build config for single-configuration generators
-        if self.platform in [LINUX, DARWIN]:
-            cmake_cmd.append('-DCMAKE_BUILD_TYPE={config}'.format(
-                config=CONFIG_MAP[self._args.config]))
+        # Set build config for single-configuration generators (this is a no-op on multi-config generators)
+        cmake_cmd.append(f'-D CMAKE_BUILD_TYPE={CONFIG_MAP[self._args.config]}')
 
         # Use the CMake -A option to select the platform architecture
         # without needing a Visual Studio generator.
-        if self.platform == WINDOWS and self._args.generator != "Ninja":
+        if platform.system() == 'Windows' and self._args.generator != "Ninja":
             if self._args.arch.lower() == '64' or self._args.arch == 'x64' or self._args.arch == 'win64':
                 cmake_cmd.append('-A')
                 cmake_cmd.append('x64')
@@ -493,12 +486,7 @@ class GoodRepo(object):
 
     def CMakeBuild(self):
         """Build CMake command for the build phase and execute it"""
-        cmake_cmd = [
-            'cmake',
-            '--build', self.build_dir,
-            '--target', 'install',
-            '--config', CONFIG_MAP[self._args.config],
-        ]
+        cmake_cmd = ['cmake', '--build', self.build_dir, '--target', 'install', '--config', CONFIG_MAP[self._args.config]]
         if self._args.do_clean:
             cmake_cmd.append('--clean-first')
 
@@ -534,7 +522,8 @@ class GoodRepo(object):
         self.CMakeBuild()
 
     def IsOptional(self, opts):
-        return len(self.optional.intersection(opts)) > 0
+        if len(self.optional.intersection(opts)) > 0: return True
+        else: return False
 
 def GetGoodRepos(args):
     """Returns the latest list of GoodRepo objects.
@@ -652,12 +641,6 @@ def main():
         action='store_true',
         help="Skip build if install directory exists",
         default=False)
-    parser.add_argument(
-        '--platform',
-        dest='platform',
-        type=str.lower,
-        help='Select build platform to use; generally only useful for "android"',
-        default=platform.system().lower())
     parser.add_argument(
         '--arch',
         dest='arch',
