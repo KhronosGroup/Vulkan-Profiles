@@ -27,12 +27,10 @@ on:
             - main
 
 jobs:
-  macos-12:
-    runs-on: macos-12
+  macos:
+    runs-on: macos-latest
     strategy:
       fail-fast: false
-      matrix:
-        config: [Debug, Release]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -41,15 +39,21 @@ jobs:
       - name: Install jsonschema
         run: python3 -m pip install jsonschema
       - uses: lukka/get-cmake@latest
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ runner.os }}-ccache
+      - name: Add ccache to PATH
+        run: echo "/usr/lib/ccache:/usr/local/opt/ccache/libexec" >> $GITHUB_PATH
       - name: Configure/Generate
-        run: cmake -S. -B build -D PROFILES_BUILD_TESTS=OFF -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -G "Ninja"
+        run: cmake -S. -B build -D PROFILES_BUILD_TESTS=OFF -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=Release -G "Ninja"
         env:
           # Ensure we can build against 10.15: https://cmake.org/cmake/help/latest/envvar/MACOSX_DEPLOYMENT_TARGET.html
           MACOSX_DEPLOYMENT_TARGET: 10.15
       - name: Build
-        run: cmake --build build --parallel $(sysctl -n hw.logicalcpu) --config ${{matrix.config}}
+        run: cmake --build build --config Release
       - name: Install
-        run: cmake --install build --prefix build/install --config ${{matrix.config}}
+        run: cmake --install build --prefix build/install --config Release
 
   ubuntu-latest:
     runs-on: ubuntu-latest
@@ -69,6 +73,12 @@ jobs:
       - uses: lukka/get-cmake@latest
         with:
           cmakeVersion: 3.17.2
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ runner.os }}-${{ matrix.config }}
+      - name: Add ccache to PATH
+        run: echo "/usr/lib/ccache" >> $GITHUB_PATH
       - name: Configure/Generate
         run: cmake -S. -B build -D PROFILES_BUILD_TESTS=OFF -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -G "Ninja"
       - name: Build
