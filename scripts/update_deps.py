@@ -642,6 +642,12 @@ def main():
         help="Skip build if install directory exists",
         default=False)
     parser.add_argument(
+        '--platform',
+        dest='platform',
+        type=str.lower,
+        help='Needed for backcompat. Does nothing.',
+        default=platform.system().lower())
+    parser.add_argument(
         '--arch',
         dest='arch',
         choices=['32', '64', 'x86', 'x64', 'win32', 'win64'],
