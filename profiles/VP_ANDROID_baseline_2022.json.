@@ -3,10 +3,10 @@
     "capabilities": {
         "baseline": {
             "extensions": {
-                "VK_KHR_surface": 1,
+                "VK_KHR_surface": 0,
                 "VK_KHR_android_surface": 1,
                 "VK_KHR_swapchain": 1,
-                "VK_KHR_get_physical_device_properties2": 1,
+                "VK_KHR_get_physical_device_properties2": 0,
                 "VK_KHR_maintenance1": 1,
                 "VK_EXT_swapchain_colorspace": 1,
                 "VK_KHR_get_surface_capabilities2": 1,
