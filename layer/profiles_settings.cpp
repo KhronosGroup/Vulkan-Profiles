@@ -256,14 +256,28 @@ void InitSettings(const void *pNext) {
     } else {
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileFile)) {
             layer_settings->profile_file = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileFile);
-        }
+            if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileName)) {
+                layer_settings->profile_name = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileName);
+            }
 
-        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileName)) {
-            layer_settings->profile_name = vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileName);
-        }
+            if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileValidation)) {
+                layer_settings->profile_validation = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsProfileValidation);
+            }
 
-        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileValidation)) {
-            layer_settings->profile_validation = vku::GetLayerSettingBool(kOurLayerName, kLayerSettingsProfileValidation);
+            if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsSimulateCapabilities)) {
+                layer_settings->simulate_capabilities =
+                    GetSimulateCapabilityFlags(vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsSimulateCapabilities));
+            }
+
+            if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDefaultFeatureValues)) {
+                layer_settings->default_feature_values =
+                    GetDefaultFeatureValues(vku::GetLayerSettingString(kOurLayerName, kLayerSettingsDefaultFeatureValues));
+            }
+
+            if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileVariantsMode)) {
+                layer_settings->profile_variants_mode =
+                    GetProfileVariantsMode(vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileVariantsMode));
+            }
         }
 
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsEmulatePortability)) {
@@ -338,21 +352,6 @@ void InitSettings(const void *pNext) {
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettings_minVertexInputBindingStrideAlignment)) {
             layer_settings->minVertexInputBindingStrideAlignment =
                 static_cast<uint32_t>(vku::GetLayerSettingInt(kOurLayerName, kLayerSettings_minVertexInputBindingStrideAlignment));
-        }
-
-        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsSimulateCapabilities)) {
-            layer_settings->simulate_capabilities =
-                GetSimulateCapabilityFlags(vku::GetLayerSettingStrings(kOurLayerName, kLayerSettingsSimulateCapabilities));
-        }
-
-        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsDefaultFeatureValues)) {
-            layer_settings->default_feature_values =
-                GetDefaultFeatureValues(vku::GetLayerSettingString(kOurLayerName, kLayerSettingsDefaultFeatureValues));
-        }
-
-        if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsProfileVariantsMode)) {
-            layer_settings->profile_variants_mode =
-                GetProfileVariantsMode(vku::GetLayerSettingString(kOurLayerName, kLayerSettingsProfileVariantsMode));
         }
 
         if (vku::IsLayerSetting(kOurLayerName, kLayerSettingsForceDevice)) {
