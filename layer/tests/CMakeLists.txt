@@ -46,7 +46,7 @@ function(LayerTest NAME)
                    layer_tests_main.cpp
                    vktestframework.cpp)
     add_dependencies(${TEST_NAME} VkLayer_khronos_profiles ${TEST_JSON_FILES})
-    target_link_libraries(${TEST_NAME} Vulkan::Headers Vulkan::Vulkan GTest::gtest GTest::gtest_main Vulkan::LayerUtils)
+    target_link_libraries(${TEST_NAME} Vulkan::Headers Vulkan::Vulkan GTest::gtest GTest::gtest_main Vulkan::LayerSettings)
     target_compile_definitions(${TEST_NAME} PUBLIC JSON_TEST_FILES_PATH="${CMAKE_SOURCE_DIR}/profiles/test/data/")
     target_compile_definitions(${TEST_NAME} PUBLIC JSON_PROFILES_PATH="${CMAKE_SOURCE_DIR}/profiles/")
 
@@ -118,7 +118,7 @@ function(LayerTestAndroid NAME)
     target_sources(${ANDROID_APK_NAME} PRIVATE ${_app_glue_dir}/android_native_app_glue.c)
     target_link_libraries(${ANDROID_APK_NAME} "-u ANativeActivity_onCreate")
     target_link_libraries(${ANDROID_APK_NAME} log android dl vulkan)
-    target_link_libraries(${ANDROID_APK_NAME} Vulkan::Headers GTest::gtest GTest::gtest_main Vulkan::LayerUtils)
+    target_link_libraries(${ANDROID_APK_NAME} Vulkan::Headers GTest::gtest GTest::gtest_main Vulkan::LayerSettings)
 
     set(_android_jar ${ANDROID_SDK_HOME}/platforms/android-${ANDROID_PLATFORM}/android.jar)
     set(_aapt ${ANDROID_SDK_HOME}/build-tools/${ANDROID_BUILD_TOOLS}/aapt)

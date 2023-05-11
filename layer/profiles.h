@@ -33,7 +33,7 @@ std::string GetFormatFeatureString(VkFormatFeatureFlags flags);
 
 std::string GetFormatFeature2String(VkFormatFeatureFlags2 flags);
 
-SimulateCapabilityFlags GetSimulateCapabilityFlags(const vku::Strings &values);
+SimulateCapabilityFlags GetSimulateCapabilityFlags(const std::vector<std::string> &values);
 
 std::string GetSimulateCapabilitiesLog(SimulateCapabilityFlags flags);
 
