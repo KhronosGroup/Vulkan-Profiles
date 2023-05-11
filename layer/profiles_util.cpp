@@ -20,6 +20,10 @@
 #include "profiles_util.h"
 #include "profiles_settings.h"
 
+void LayerSettingsLog(const char* pSettingName, const char* pMessage) {
+    LogMessage(DEBUG_REPORT_ERROR_BIT, "%s : %s\n", pSettingName, pMessage);
+}
+
 std::string format(const char *message, ...) {
     std::size_t const STRING_BUFFER(4096);
 
@@ -36,7 +40,7 @@ std::string format(const char *message, ...) {
     return buffer;
 }
 
-std::string GetString(const vku::List &list) {
+std::string GetString(const List &list) {
     std::string result;
     for (std::size_t i = 0, n = list.size(); i < n; ++i) {
         result += list[i].first;
@@ -45,7 +49,7 @@ std::string GetString(const vku::List &list) {
     return result;
 }
 
-std::string GetString(const vku::Strings &strings) {
+std::string GetString(const std::vector<std::string> &strings) {
     std::string result;
     for (std::size_t i = 0, n = strings.size(); i < n; ++i) {
         result += strings[i];
