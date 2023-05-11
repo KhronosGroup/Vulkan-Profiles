@@ -36,6 +36,10 @@
                             "value": ""
                         },
                         {
+                            "key": "profile_name",
+                            "value": ""
+                        },
+                        {
                             "key": "simulate_capabilities",
                             "value": []
                         },
@@ -58,6 +62,10 @@
                         {
                             "key": "profile_file",
                             "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_baseline_2023.json"
+                        },
+                        {
+                            "key": "profile_name",
+                            "value": "VP_LUNARG_desktop_baseline_2023"
                         },
                         {
                             "key": "simulate_capabilities",
@@ -114,6 +122,10 @@
                         {
                             "key": "profile_file",
                             "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_baseline_2022.json"
+                        },
+                        {
+                            "key": "profile_name",
+                            "value": "VP_LUNARG_desktop_baseline_2022"
                         },
                         {
                             "key": "simulate_capabilities",
@@ -176,8 +188,40 @@
                             "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_KHR_roadmap_2022.json"
                         },
                         {
+                            "key": "profile_name",
+                            "value": "VP_KHR_roadmap_2022"
+                        },
+                        {
                             "key": "simulate_capabilities",
                             "value": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT" ]
+                        }
+                    ]
+                },
+                {
+                    "label": "Android Baseline 2022",
+                    "description": "Check the Vulkan 1.1 application will run on the Android Baseline 2022 Profile devices",
+                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                    "status": "STABLE",
+                    "settings": [
+                        {
+                            "key": "force_device",
+                            "value": "FORCE_DEVICE_OFF"
+                        },
+                        {
+                            "key": "emulate_portability",
+                            "value": false
+                        },
+                        {
+                            "key": "profile_file",
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_ANDROID_baseline_2022.json"
+                        },
+                        {
+                            "key": "profile_name",
+                            "value": "VP_ANDROID_baseline_2022"
+                        },
+                        {
+                            "key": "simulate_capabilities",
+                            "value": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT", "SIMULATE_FORMATS_BIT" ]
                         }
                     ]
                 },
@@ -200,28 +244,8 @@
                             "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_ANDROID_baseline_2021.json"
                         },
                         {
-                            "key": "simulate_capabilities",
-                            "value": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT", "SIMULATE_FORMATS_BIT" ]
-                        }
-                    ]
-                },
-                {
-                    "label": "Android Baseline 2022",
-                    "description": "Check the Vulkan 1.1 application will run on the Android Baseline 2022 Profile devices",
-                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                    "status": "STABLE",
-                    "settings": [
-                        {
-                            "key": "force_device",
-                            "value": "FORCE_DEVICE_OFF"
-                        },
-                        {
-                            "key": "emulate_portability",
-                            "value": false
-                        },
-                        {
-                            "key": "profile_file",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_ANDROID_baseline_2022.json"
+                            "key": "profile_name",
+                            "value": "VP_ANDROID_baseline_2021"
                         },
                         {
                             "key": "simulate_capabilities",
