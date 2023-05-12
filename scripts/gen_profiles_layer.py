@@ -1070,13 +1070,13 @@ JsonLoader::ExtensionSupport JsonLoader::CheckExtensionSupport(const char *exten
             return JsonLoader::ExtensionSupport::EXCLUDED;
         }
     }
-    if (layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
+    if (layer_settings->simulate.capabilities & SIMULATE_EXTENSIONS_BIT) {
         if (!PhysicalDeviceData::HasSimulatedExtension(pdd_, extension)) {
             LogMessage(
                 DEBUG_REPORT_ERROR_BIT,
                 "Profile requires %s capabilitiess, but %s is not required by the profile, device values are used.\\n",
                          name.c_str(), extension);
-            if (layer_settings->debug_fail_on_error) {
+            if (layer_settings->log.debug_fail_on_error) {
                 return JsonLoader::ExtensionSupport::UNSUPPORTED;
             }
         }
@@ -1344,7 +1344,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value& root, const std::vector<std:
             if (properties.isMember("VkPhysicalDeviceProperties") && properties["VkPhysicalDeviceProperties"].isMember("apiVersion")) {
                 properties_api_version = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
                 simulated_version = properties_api_version;
-            } else if (layer_settings->simulate_capabilities & SIMULATE_API_VERSION_BIT) {
+            } else if (layer_settings->simulate.capabilities & SIMULATE_API_VERSION_BIT) {
                 simulated_version = profile_api_version_;
             }
         }
@@ -1369,7 +1369,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value& root, const std::vector<std:
                 failed = true;
             }
 
-            if (layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
+            if (layer_settings->simulate.capabilities & SIMULATE_EXTENSIONS_BIT) {
                 const auto &extensions = cap_definision["extensions"];
 
                 pdd_->map_of_extension_properties_.reserve(extensions.size());
@@ -1399,7 +1399,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value& root, const std::vector<std:
                 }
             }
 
-            if (layer_settings->simulate_capabilities & SIMULATE_FEATURES_BIT) {
+            if (layer_settings->simulate.capabilities & SIMULATE_FEATURES_BIT) {
                 const auto &features = cap_definision["features"];
 
                 bool duplicated = !WarnDuplicatedFeature(features);
@@ -1424,7 +1424,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value& root, const std::vector<std:
                 }
             }
 
-            if (layer_settings->simulate_capabilities & SIMULATE_PROPERTIES_BIT) {
+            if (layer_settings->simulate.capabilities & SIMULATE_PROPERTIES_BIT) {
                 bool duplicated = !WarnDuplicatedProperty(properties);
                 if (duplicated) {
                     failed = true;
@@ -1447,7 +1447,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value& root, const std::vector<std:
                 }
             }
 
-            if (layer_settings->simulate_capabilities & SIMULATE_FORMATS_BIT) {
+            if (layer_settings->simulate.capabilities & SIMULATE_FORMATS_BIT) {
                 const auto &formats = cap_definision["formats"];
 
                 for (const auto &format : formats.getMemberNames()) {
@@ -1458,7 +1458,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value& root, const std::vector<std:
                 }
             }
 
-            if (layer_settings->simulate_capabilities & SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT) {
+            if (layer_settings->simulate.capabilities & SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT) {
                 const auto &qf_props = cap_definision["queueFamiliesProperties"];
 
                 bool queue_families_supported = true;
@@ -1484,7 +1484,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value& root, const std::vector<std:
         LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
             "VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 ". Using the API version specified by the profile VkPhysicalDeviceProperties structure.\\n",
             VK_API_VERSION_MAJOR(properties_api_version), VK_API_VERSION_MINOR(properties_api_version), VK_API_VERSION_PATCH(properties_api_version));
-    } else if (layer_settings->simulate_capabilities & SIMULATE_API_VERSION_BIT) {
+    } else if (layer_settings->simulate.capabilities & SIMULATE_API_VERSION_BIT) {
         LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
             "VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32". Using the API version specified by the profile.\\n",
             VK_API_VERSION_MAJOR(this->profile_api_version_), VK_API_VERSION_MINOR(this->profile_api_version_), VK_API_VERSION_PATCH(this->profile_api_version_));
@@ -1498,7 +1498,7 @@ VkResult JsonLoader::ReadProfile(const Json::Value& root, const std::vector<std:
                 VK_API_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion));
     }
 
-    if (failed && layer_settings->debug_fail_on_error) {
+    if (failed && layer_settings->log.debug_fail_on_error) {
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
@@ -1510,17 +1510,17 @@ VkResult JsonLoader::LoadFile(std::string filename) {
 
     profile_filename_ = filename;
     if (filename.empty()) {
-        if (!layer_settings->profile_name.empty()) {
+        if (!layer_settings->simulate.profile_name.empty()) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
                 "Profile name is set to \\"%s\\", but profile_file is unset. The profile will not be loaded.\\n",
-                layer_settings->profile_name.c_str());
+                layer_settings->simulate.profile_name.c_str());
         }
         return VK_SUCCESS;
     }
     std::ifstream json_file(filename);
     if (!json_file) {
         LogMessage(DEBUG_REPORT_ERROR_BIT, "Fail to open file \\"%s\\"\\n", filename.c_str());
-        return layer_settings->debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
+        return layer_settings->log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
 
     Json::Value root = Json::nullValue;
@@ -1529,13 +1529,13 @@ VkResult JsonLoader::LoadFile(std::string filename) {
     bool success = Json::parseFromStream(builder, json_file, &root_, &errs);
     if (!success) {
         LogMessage(DEBUG_REPORT_ERROR_BIT, "Fail to parse file \\"%s\\" {\\n%s}\\n", filename.c_str(), errs.c_str());
-        return layer_settings->debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
+        return layer_settings->log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
     json_file.close();
 
     if (root_.type() != Json::objectValue) {
         LogMessage(DEBUG_REPORT_ERROR_BIT, "Json document root is not an object in file \\"%s\\"\\n", filename.c_str());
-        return layer_settings->debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
+        return layer_settings->log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
 
     ReadProfileApiVersion();
@@ -1544,7 +1544,7 @@ VkResult JsonLoader::LoadFile(std::string filename) {
 }
 
 void JsonLoader::ReadProfileApiVersion() {
-    const std::string &profile_name = layer_settings->profile_name;
+    const std::string &profile_name = layer_settings->simulate.profile_name;
     const Json::Value &profiles = root_["profiles"];
     bool found_profile = false;
     for (const auto &profile : profiles.getMemberNames()) {
@@ -1573,11 +1573,11 @@ void JsonLoader::ReadProfileApiVersion() {
         }
     }
 
-    for (const auto& extension : layer_settings->exclude_device_extensions) {
+    for (const auto& extension : layer_settings->simulate.exclude_device_extensions) {
         if (extension.empty()) continue;
         excluded_extensions_.push_back(extension);
     }
-    for (const auto& format : layer_settings->exclude_formats) {
+    for (const auto& format : layer_settings->simulate.exclude_formats) {
         if (format.empty()) continue;
         excluded_formats_.push_back(format);
     }
@@ -1586,7 +1586,7 @@ void JsonLoader::ReadProfileApiVersion() {
 VkResult JsonLoader::LoadDevice(PhysicalDeviceData *pdd) {
     pdd_ = pdd;
 
-    const std::string &profile_name = layer_settings->profile_name;
+    const std::string &profile_name = layer_settings->simulate.profile_name;
     const Json::Value &profiles = root_["profiles"];
     std::vector<std::vector<std::string>> capabilities;
 
@@ -1630,7 +1630,7 @@ VkResult JsonLoader::LoadDevice(PhysicalDeviceData *pdd) {
 
             LogMessage(DEBUG_REPORT_WARNING_BIT,
                 "\\"%s\\" profile could not be found in \\"%s\\" file. Loading the default \\"%s\\" profile of the file.\\n",
-                    layer_settings->profile_name.c_str(), layer_settings->profile_file.c_str(), profile.c_str());
+                    layer_settings->simulate.profile_name.c_str(), layer_settings->simulate.profile_file.c_str(), profile.c_str());
 
             break; // Systematically load the first and default profile
         }
@@ -1643,13 +1643,13 @@ VkResult JsonLoader::LoadDevice(PhysicalDeviceData *pdd) {
     const Json::Value schema_value = root_["$schema"];
     if (!schema_value.isString()) {
         LogMessage(DEBUG_REPORT_ERROR_BIT, "JSON element \\"$schema\\" is not a string\\n");
-        return layer_settings->debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
+        return layer_settings->log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
 
     const std::string schema = schema_value.asCString();
     if (schema.find(SCHEMA_URI_BASE) == std::string::npos) {
         LogMessage(DEBUG_REPORT_ERROR_BIT, "Document schema \\"%s\\" not supported by %s\\n", schema.c_str(), kOurLayerName);
-        return layer_settings->debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
+        return layer_settings->log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
 
     const std::size_t size_schema = schema.size();
@@ -1667,7 +1667,7 @@ VkResult JsonLoader::LoadDevice(PhysicalDeviceData *pdd) {
                           "Header %d.\\n\\t- All newer capabilities in the "
                           "profile will be ignored by the layer.\\n",
                           kOurLayerName, VK_HEADER_VERSION, version_patch);
-    } else if (layer_settings->profile_validation) {
+    } else if (layer_settings->simulate.profile_validation) {
         JsonValidator validator;
         if (!validator.Init()) {
             LogMessage(DEBUG_REPORT_WARNING_BIT,
@@ -1676,7 +1676,7 @@ VkResult JsonLoader::LoadDevice(PhysicalDeviceData *pdd) {
                               kOurLayerName, profile_filename_.c_str());
         } else if (!validator.Check(root_)) {
             LogMessage(DEBUG_REPORT_ERROR_BIT, "%s is not a valid JSON profile file.\\n", profile_filename_.c_str());
-            if (layer_settings->debug_fail_on_error) {
+            if (layer_settings->log.debug_fail_on_error) {
                 return VK_ERROR_INITIALIZATION_FAILED;
             } else {
                 return VK_SUCCESS;
@@ -1685,7 +1685,7 @@ VkResult JsonLoader::LoadDevice(PhysicalDeviceData *pdd) {
     }
 
     VkResult result = VK_SUCCESS;
-    if (layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
+    if (layer_settings->simulate.capabilities & SIMULATE_EXTENSIONS_BIT) {
         pdd_->simulation_extensions_.clear();
     }
 
@@ -1763,7 +1763,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
     InitSettings(pCreateInfo->pNext);
 
     JsonLoader &json_loader = JsonLoader::Create();
-    VkResult result = json_loader.LoadFile(layer_settings->profile_file);
+    VkResult result = json_loader.LoadFile(layer_settings->simulate.profile_file);
     if (result != VK_SUCCESS) {
         return result;
     }
@@ -1776,30 +1776,30 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
                                                     "against %s. Please, update the layer.\\n",
                                                     StringAPIVersion(requested_version).c_str(), kOurLayerName,
                                                     StringAPIVersion(VK_HEADER_VERSION_COMPLETE).c_str());
-        if (layer_settings->debug_fail_on_error) {
+        if (layer_settings->log.debug_fail_on_error) {
             return VK_ERROR_INITIALIZATION_FAILED;
         }
     }
 
     bool changed_version = false;
-    if (!layer_settings->profile_file.empty()) {
+    if (!layer_settings->simulate.profile_file.empty()) {
         const uint32_t profile_api_version = json_loader.GetProfileApiVersion();
         if (VK_API_VERSION_MAJOR(requested_version) < VK_API_VERSION_MAJOR(profile_api_version) ||
             VK_API_VERSION_MINOR(requested_version) < VK_API_VERSION_MINOR(profile_api_version)) {
-            if (layer_settings->simulate_capabilities & SIMULATE_API_VERSION_BIT) {
+            if (layer_settings->simulate.capabilities & SIMULATE_API_VERSION_BIT) {
                 if (layer_settings->profile_name.empty()) {
                     LogMessage(
                         DEBUG_REPORT_NOTIFICATION_BIT,
                         "The Vulkan application requested a Vulkan %s instance but the selected %s file requires %s. The "
                                  "application requested instance version is overridden to %s.\\n",
-                                 StringAPIVersion(requested_version).c_str(), layer_settings->profile_file.c_str(),
+                                 StringAPIVersion(requested_version).c_str(), layer_settings->simulate.profile_file.c_str(),
                                  StringAPIVersion(profile_api_version).c_str(), StringAPIVersion(profile_api_version).c_str());
                 } else {
                     LogMessage(
                         DEBUG_REPORT_NOTIFICATION_BIT,
                         "The Vulkan application requested a Vulkan %s instance but the selected %s profile requires %s. "
                                  "The application requested instance version is overridden to %s.\\n",
-                                 StringAPIVersion(requested_version).c_str(), layer_settings->profile_name.c_str(),
+                                 StringAPIVersion(requested_version).c_str(), layer_settings->simulate.profile_name.c_str(),
                                  StringAPIVersion(profile_api_version).c_str(), StringAPIVersion(profile_api_version).c_str());
                 }
                 requested_version = profile_api_version;
@@ -1810,14 +1810,14 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
                         DEBUG_REPORT_WARNING_BIT,
                         "The Vulkan application requested a Vulkan %s instance but the selected %s file requires %s. The "
                                  "profile may not be initialized correctly which will produce unexpected warning messages.\\n",
-                                 StringAPIVersion(requested_version).c_str(), layer_settings->profile_file.c_str(),
+                                 StringAPIVersion(requested_version).c_str(), layer_settings->simulate.profile_file.c_str(),
                                  StringAPIVersion(profile_api_version).c_str());
                 } else {
                     LogMessage(
                         DEBUG_REPORT_WARNING_BIT,
                         "The Vulkan application requested a Vulkan %s instance but the selected %s profile requires %s. "
                                  "The profile may not be initialized correctly which will produce unexpected warning messages.\\n",
-                                 StringAPIVersion(requested_version).c_str(), layer_settings->profile_name.c_str(),
+                                 StringAPIVersion(requested_version).c_str(), layer_settings->simulate.profile_name.c_str(),
                                  StringAPIVersion(profile_api_version).c_str());
                 }
             }
@@ -2071,16 +2071,16 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
             result = EnumerateProperties(kDeviceExtensionPropertiesCount, kDeviceExtensionProperties.data(), pCount, pProperties);
         else
             result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
-    //} else if (src_count == 0 || (!(layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) &&
+    //} else if (src_count == 0 || (!(layer_settings->simulate.capabilities & SIMULATE_EXTENSIONS_BIT) &&
     //                              layer_settings->exclude_device_extensions.empty())) {
-    } else if (pdd == nullptr || (!(layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) &&
+    } else if (pdd == nullptr || (!(layer_settings->simulate.capabilities & SIMULATE_EXTENSIONS_BIT) &&
                                   layer_settings->exclude_device_extensions.empty())) {
         result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
     } else {
         result = EnumerateExtensions(pdd->simulation_extensions_, pCount, pProperties);
     }
 
-    if (result == VK_SUCCESS && !pLayerName && layer_settings->emulate_portability &&
+    if (result == VK_SUCCESS && !pLayerName && layer_settings->simulate.emulate_portability &&
         !PhysicalDeviceData::HasSimulatedOrRealExtension(physicalDevice, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {
         if (pProperties) {
             if (pCount_copy == *pCount + 1) {
@@ -2190,14 +2190,14 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice ph
         dt->GetPhysicalDeviceFormatProperties(physicalDevice, format, &device_format);
         const auto iter = pdd->map_of_format_properties_.find(format);
 
-        if ((layer_settings->simulate_capabilities & SIMULATE_FORMATS_BIT)) {
+        if ((layer_settings->simulate.capabilities & SIMULATE_FORMATS_BIT)) {
             *pFormatProperties = (iter != pdd->map_of_format_properties_.end()) ? iter->second : VkFormatProperties{};
         } else {
             *pFormatProperties = device_format;
         }
 
         if (IsFormatSupported(*pFormatProperties) && iter != pdd->map_of_format_properties_.end()) {
-            if ((layer_settings->simulate_capabilities & SIMULATE_FORMATS_BIT)) {
+            if ((layer_settings->simulate.capabilities & SIMULATE_FORMATS_BIT)) {
                 *pFormatProperties = iter->second;
             } else {
                 *pFormatProperties = device_format;
@@ -2244,7 +2244,7 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties(VkPhysical
     const auto dt = instance_dispatch_table(physicalDevice);
 
     // Are there JSON overrides, or should we call down to return the original values?
-    if (!(layer_settings->simulate_capabilities & SIMULATE_FORMATS_BIT)) {
+    if (!(layer_settings->simulate.capabilities & SIMULATE_FORMATS_BIT)) {
         return dt->GetPhysicalDeviceImageFormatProperties(physicalDevice, format, type, tiling, usage, flags,
                                                           pImageFormatProperties);
     }
@@ -2537,7 +2537,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {
                     property_chain.pNext = &(pdd.physical_device_portability_subset_properties_);
                     feature_chain.pNext = &(pdd.physical_device_portability_subset_features_);
-                } else if (layer_settings->emulate_portability) {
+                } else if (layer_settings->simulate.emulate_portability) {
                     pdd.physical_device_portability_subset_properties_ = {
                         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR, nullptr, layer_settings->minVertexInputBindingStrideAlignment};
                     pdd.physical_device_portability_subset_features_ = {
@@ -2585,10 +2585,10 @@ ENUMERATE_PHYSICAL_DEVICES_MIDDLE = '''
             ::device_has_bc = pdd.physical_device_features_.textureCompressionBC;
             ::device_has_etc2 = pdd.physical_device_features_.textureCompressionETC2;
 
-            if (layer_settings->simulate_capabilities & SIMULATE_FORMATS_BIT) {
+            if (layer_settings->simulate.capabilities & SIMULATE_FORMATS_BIT) {
                 LoadDeviceFormats(instance, &pdd, physical_device, &pdd.device_formats_, &pdd.device_formats_3_);
             }
-            if (layer_settings->simulate_capabilities & SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT) {
+            if (layer_settings->simulate.capabilities & SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT) {
                 LoadQueueFamilyProperties(instance, physical_device, &pdd);
             }
 
@@ -2606,7 +2606,7 @@ ENUMERATE_PHYSICAL_DEVICES_MIDDLE = '''
 '''
 
 ENUMERATE_PHYSICAL_DEVICES_END = '''
-            if (layer_settings->simulate_capabilities & SIMULATE_EXTENSIONS_BIT) {
+            if (layer_settings->simulate.capabilities & SIMULATE_EXTENSIONS_BIT) {
                 pdd.simulation_extensions_ = pdd.map_of_extension_properties_;
             } else {
                 pdd.simulation_extensions_ = pdd.device_extensions_;
@@ -2705,7 +2705,7 @@ bool JsonLoader::GetStruct(const Json::Value &parent, VkPhysicalDevicePortabilit
     LogMessage(DEBUG_REPORT_DEBUG_BIT, \"\\tJsonLoader::GetStruct(VkPhysicalDevicePortabilitySubsetFeaturesKHR)\\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        if (layer_settings->emulate_portability) {
+        if (layer_settings->simulate.emulate_portability) {
             dest->constantAlphaColorBlendFactors = layer_settings->constantAlphaColorBlendFactors;
             dest->events = layer_settings->events;
             dest->imageViewFormatReinterpretation = layer_settings->imageViewFormatReinterpretation;

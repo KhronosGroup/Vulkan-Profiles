@@ -20,6 +20,7 @@
 #pragma once
 
 #include <vulkan/layer/vk_layer_settings.h>
+#include <memory>
 #include <vector>
 #include <string>
 
@@ -71,58 +72,55 @@ enum ForceDevice {
 
 ForceDevice GetForceDevice(const std::string &value);
 
-enum ProfileVariantsMode {
-    VARIANTS_MODE_ALL = 0,
-    VARIANTS_MODE_FIRST_SUPPORTED
+struct ProfileLayerSettings {
+    struct Simulate {
+        std::string profile_file{};
+        std::string profile_name{"${VP_DEFAULT}"};
+        bool profile_validation{false};
+        SimulateCapabilityFlags capabilities{SIMULATE_API_VERSION_BIT | SIMULATE_FEATURES_BIT | SIMULATE_PROPERTIES_BIT};
+        DefaultFeatureValues default_feature_values{DEFAULT_FEATURE_VALUES_DEVICE};
+        std::vector<std::string> exclude_device_extensions;
+        std::vector<std::string> exclude_formats;
+        bool emulate_portability{true};
+    } simulate;
+
+    struct Portability {
+        bool constantAlphaColorBlendFactors{false};
+        bool events{false};
+        bool imageViewFormatReinterpretation{false};
+        bool imageViewFormatSwizzle{false};
+        bool imageView2DOn3DImage{false};
+        bool multisampleArrayImage{false};
+        bool mutableComparisonSamplers{false};
+        bool pointPolygons{false};
+        bool samplerMipLodBias{false};
+        bool separateStencilMaskRef{false};
+        bool shaderSampleRateInterpolationFunctions{false};
+        bool tessellationIsolines{false};
+        bool tessellationPointMode{false};
+        bool triangleFans{false};
+        bool vertexAttributeAccessBeyondStride{false};
+        uint32_t minVertexInputBindingStrideAlignment{4};
+    } portability;
+
+    struct Log {
+        DebugActionFlags debug_actions{DEBUG_ACTION_STDOUT_BIT};
+        std::string debug_filename{"profiles_layer_log.txt"};
+        bool debug_file_discard{true};
+        DebugReportFlags debug_reports{DEBUG_REPORT_WARNING_BIT | DEBUG_REPORT_ERROR_BIT};
+        bool debug_fail_on_error{false};
+    } log;
+
+    struct Device {
+        ForceDevice force_device;
+        std::string force_device_uuid;
+        std::string force_device_name;
+    } device;
 };
 
-ProfileVariantsMode GetProfileVariantsMode(const std::string &value);
+void InitProfilesLayerSettings();
 
-static const VkStructureType VK_STRUCTURE_TYPE_PROFILES_LAYER_SETTINGS_EXT = static_cast<VkStructureType>(3000300005);
-
-typedef struct VkProfileLayerSettingsEXT {
-    VkProfileLayerSettingsEXT() : sType(VK_STRUCTURE_TYPE_PROFILES_LAYER_SETTINGS_EXT) {}
-
-    VkStructureType sType;
-    void *pNext{};
-    std::string profile_file{};
-    std::string profile_name{"${VP_DEFAULT}"};
-    bool profile_validation{false};
-    bool emulate_portability{true};
-    bool constantAlphaColorBlendFactors{false};
-    bool events{false};
-    bool imageViewFormatReinterpretation{false};
-    bool imageViewFormatSwizzle{false};
-    bool imageView2DOn3DImage{false};
-    bool multisampleArrayImage{false};
-    bool mutableComparisonSamplers{false};
-    bool pointPolygons{false};
-    bool samplerMipLodBias{false};
-    bool separateStencilMaskRef{false};
-    bool shaderSampleRateInterpolationFunctions{false};
-    bool tessellationIsolines{false};
-    bool tessellationPointMode{false};
-    bool triangleFans{false};
-    bool vertexAttributeAccessBeyondStride{false};
-    uint32_t minVertexInputBindingStrideAlignment{4};
-    SimulateCapabilityFlags simulate_capabilities{SIMULATE_API_VERSION_BIT | SIMULATE_FEATURES_BIT | SIMULATE_PROPERTIES_BIT};
-    DebugActionFlags debug_actions{DEBUG_ACTION_STDOUT_BIT};
-    std::string debug_filename{"profiles_layer_log.txt"};
-    bool debug_file_discard{true};
-    DebugReportFlags debug_reports{DEBUG_REPORT_WARNING_BIT | DEBUG_REPORT_ERROR_BIT};
-    bool debug_fail_on_error{false};
-    std::vector<std::string> exclude_device_extensions;
-    std::vector<std::string> exclude_formats;
-    DefaultFeatureValues default_feature_values{DEFAULT_FEATURE_VALUES_DEVICE};
-    ProfileVariantsMode profile_variants_mode{VARIANTS_MODE_FIRST_SUPPORTED};
-    ForceDevice force_device;
-    std::string force_device_uuid;
-    std::string force_device_name;
-} VkProfileLayerSettingsEXT;
-
-void InitSettings(const void *pNext);
-
-extern VkProfileLayerSettingsEXT *layer_settings;
+extern std::unique_ptr<ProfileLayerSettings> layer_settings;
 extern FILE *profiles_log_file;
 
 void LogMessage(DebugReport report, const char *message, ...);

@@ -41,15 +41,72 @@ TEST_F(TestsMechanism, default_feature_values) {
 
     // Vulkan 1.0
     {
-        VkProfileLayerSettingsEXT settings;
-        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_0.json";
-        settings.emulate_portability = false;
-        settings.profile_name = "VP_LUNARG_test_api_1_0";
-        settings.simulate_capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_EXTENSIONS_BIT;
-        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
-        settings.default_feature_values = DEFAULT_FEATURE_VALUES_FALSE;
+/*
+        ProfileLayerSettings settings;
+        settings.simulate.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_0.json";
+        settings.simulate.profile_name = "VP_LUNARG_test_api_1_0";
+        settings.simulate.capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_EXTENSIONS_BIT;
+        settings.simulate.default_feature_values = DEFAULT_FEATURE_VALUES_FALSE;
+        settings.simulate.emulate_portability = false;
+        settings.log.debug_reports = DEBUG_REPORT_MAX_ENUM;
+*/
+        std::vector<VkLayerSettingEXT> settings;
 
-        err = inst_builder.init(&settings);
+        VkLayerSettingEXT setting{VK_EXT_LAYER_SETTINGS_EXTENSION_NAME};
+
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_0.json";
+        setting.pSettingName = "profile_file";
+        setting.type = VK_LAYER_SETTING_TYPE_STRING_EXT;
+        setting.data.asString = &profile_file_data;
+        setting.data.count = 1;
+        settings.push_back(setting);
+
+        const char* profile_name_data = "VP_LUNARG_test_api_1_0";
+        setting.pSettingName = "profile_name";
+        setting.type = VK_LAYER_SETTING_TYPE_STRING_EXT;
+        setting.data.asString = &profile_name_data;
+        setting.data.count = 1;
+        settings.push_back(setting);
+
+        std::vector<const char const*> simulate_capabilities_data;
+        const char* simulate_api_version_bit = "SIMULATE_API_VERSION_BIT";
+        const char* simulate_extensions_bit = "SIMULATE_EXTENSIONS_BIT";
+        simulate_capabilities_data.push_back(simulate_api_version_bit);
+        simulate_capabilities_data.push_back(simulate_extensions_bit);
+        setting.pSettingName = "simulate_capabilities";
+        setting.type = VK_LAYER_SETTING_TYPE_STRING_EXT;
+        setting.data.asString = &simulate_capabilities_data[0];
+        setting.data.count = static_cast<uint32_t>(simulate_capabilities_data.size());
+        settings.push_back(setting);
+
+        const char* default_feature_values_data = "DEFAULT_FEATURE_VALUES_FALSE";
+        setting.pSettingName = "default_feature_values";
+        setting.type = VK_LAYER_SETTING_TYPE_STRING_EXT;
+        setting.data.asString = &default_feature_values_data;
+        setting.data.count = 1;
+        settings.push_back(setting);
+
+        VkBool32 emulate_portability_data = VK_FALSE;
+        setting.pSettingName = "emulate_portability";
+        setting.type = VK_LAYER_SETTING_TYPE_STRING_EXT;
+        setting.data.asBool = &emulate_portability_data;
+        setting.data.count = 1;
+        settings.push_back(setting);
+
+        const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
+        setting.pSettingName = "simulate_capabilities";
+        setting.type = VK_LAYER_SETTING_TYPE_STRING_EXT;
+        setting.data.asString = &debug_reports_data;
+        setting.data.count = 1;
+        settings.push_back(setting);
+
+        VkLayerSettingsCreateInfoEXT create_info;
+        create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_LAYER_SETTINGS_EXT;
+        create_info.pNext = nullptr;
+        create_info.settingCount = static_cast<uint32_t>(settings.size());
+        create_info.pSettings = &settings[0];
+
+        err = inst_builder.init(&create_info);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDevice gpu;

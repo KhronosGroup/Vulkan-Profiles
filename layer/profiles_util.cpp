@@ -80,7 +80,7 @@ std::string format_device_support_string(VkFormatFeatureFlags2 format_features) 
 
 void WarnMissingFormatFeatures(const std::string &format_name, const std::string &features, VkFormatFeatureFlags profile_features,
                                VkFormatFeatureFlags device_features) {
-    if (!(layer_settings->debug_reports & DEBUG_REPORT_WARNING_BIT)) return;
+    if (!(layer_settings->log.debug_reports & DEBUG_REPORT_WARNING_BIT)) return;
     LogMessage(DEBUG_REPORT_WARNING_BIT,
                "For %s `%s`,\nthe Profile requires:\n\t\"%s\"\nbut the Device %s.\nThe "
                "`%s` can't be simulated on this Device.\n",
@@ -90,7 +90,7 @@ void WarnMissingFormatFeatures(const std::string &format_name, const std::string
 
 void WarnMissingFormatFeatures2(const std::string &format_name, const std::string &features, VkFormatFeatureFlags2 profile_features,
                                 VkFormatFeatureFlags2 device_features) {
-    if (!(layer_settings->debug_reports & DEBUG_REPORT_WARNING_BIT)) return;
+    if (!(layer_settings->log.debug_reports & DEBUG_REPORT_WARNING_BIT)) return;
     LogMessage(DEBUG_REPORT_WARNING_BIT,
                "For %s `%s`,\nthe Profile requires:\n\\t\"%s\"\nbut the Device %s.\nThe "
                "`%s` can't be simulated on this Device.\n",

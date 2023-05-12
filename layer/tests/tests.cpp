@@ -42,11 +42,11 @@ TEST_F(LayerTests, TestDesktop2023) {
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
-    VkProfileLayerSettingsEXT settings;
-    settings.profile_file = JSON_PROFILES_PATH "VP_LUNARG_desktop_baseline_2023.json";
-    settings.profile_name = "VP_LUNARG_desktop_baseline_2023";
-    settings.emulate_portability = true;
-    settings.debug_fail_on_error = false;
+    ProfileLayerSettings settings;
+    settings.simulate.profile_file = JSON_PROFILES_PATH "VP_LUNARG_desktop_baseline_2023.json";
+    settings.simulate.profile_name = "VP_LUNARG_desktop_baseline_2023";
+    settings.simulate.emulate_portability = true;
+    settings.log.debug_fail_on_error = false;
 
     err = inst_builder.init(&settings);
     ASSERT_EQ(err, VK_SUCCESS);
