@@ -160,6 +160,11 @@ set_target_properties(VpTestGeneratedName PROPERTIES FOLDER "Profiles generator/
 
 add_dependencies(VpTestGeneratedName VpGenerated)
 
+set(json_install_dir "${CMAKE_INSTALL_DATADIR}/vulkan/config/VK_LAYER_KHRONOS_profiles")
+if (WIN32)
+    set(json_install_dir "Config/VK_LAYER_KHRONOS_profiles")
+endif()
+
 install(
     FILES 
         VP_ANDROID_baseline_2021.json
@@ -169,7 +174,7 @@ install(
         VP_LUNARG_desktop_baseline_2023.json
         VP_LUNARG_desktop_portability_2022.json
     DESTINATION
-		"Config/VK_LAYER_KHRONOS_profiles"
+        ${json_install_dir}
 )
 
 install(
