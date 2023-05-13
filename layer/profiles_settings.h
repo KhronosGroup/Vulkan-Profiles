@@ -62,6 +62,7 @@ enum DefaultFeatureValues {
 };
 
 DefaultFeatureValues GetDefaultFeatureValues(const std::string &value);
+std::string GetDefaultFeatureValuesLog(DefaultFeatureValues value);
 
 enum ForceDevice {
     FORCE_DEVICE_OFF = 0,
