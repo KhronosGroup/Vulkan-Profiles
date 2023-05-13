@@ -1747,8 +1747,6 @@ static VkResult LayerSetupCreateInstance(const VkInstanceCreateInfo *pCreateInfo
 
 VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
                                               VkInstance *pInstance) {
-    vlInitLayerSettings(kOurLayerName, nullptr, nullptr);
-                                              
     // This needs to be created before LogMessage is called, as it is dependent on these settings
     if (layer_settings) {
         delete layer_settings;
@@ -3619,7 +3617,7 @@ class VulkanProfilesLayerGenerator():
         return gen
 
     def generate_string_to_enum(self, enum_name, values):
-        gen = '\n' + enum_name + ' Get' + enum_name + '(const std::vector<std::string> &values) {\n'
+        gen = '\n' + enum_name + ' Get' + enum_name + '(const vku::Strings &values) {\n'
         gen += '    ' + enum_name + ' result = 0;\n\n'
         gen += '    for (std::size_t i = 0, n = values.size(); i < n; ++i) {\n'
         first = True

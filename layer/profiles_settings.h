@@ -20,8 +20,6 @@
 #pragma once
 
 #include <vulkan/layer/vk_layer_settings.h>
-#include <vector>
-#include <string>
 
 enum SimulateCapabilityFlag {
     SIMULATE_API_VERSION_BIT = 1 << 0,
@@ -43,7 +41,7 @@ enum DebugAction {
 };
 typedef int DebugActionFlags;
 
-DebugActionFlags GetDebugActionFlags(const std::vector<std::string> &values);
+DebugActionFlags GetDebugActionFlags(const vku::Strings &values);
 
 enum DebugReport {
     DEBUG_REPORT_NOTIFICATION_BIT = (1 << 0),
@@ -54,7 +52,7 @@ enum DebugReport {
 };
 typedef int DebugReportFlags;
 
-DebugReportFlags GetDebugReportFlags(const std::vector<std::string> &values);
+DebugReportFlags GetDebugReportFlags(const vku::Strings &values);
 
 enum DefaultFeatureValues {
     DEFAULT_FEATURE_VALUES_FALSE = 0,
@@ -112,8 +110,8 @@ typedef struct VkProfileLayerSettingsEXT {
     bool debug_file_discard{true};
     DebugReportFlags debug_reports{DEBUG_REPORT_WARNING_BIT | DEBUG_REPORT_ERROR_BIT};
     bool debug_fail_on_error{false};
-    std::vector<std::string> exclude_device_extensions;
-    std::vector<std::string> exclude_formats;
+    vku::Strings exclude_device_extensions;
+    vku::Strings exclude_formats;
     DefaultFeatureValues default_feature_values{DEFAULT_FEATURE_VALUES_DEVICE};
     ProfileVariantsMode profile_variants_mode{VARIANTS_MODE_FIRST_SUPPORTED};
     ForceDevice force_device;
