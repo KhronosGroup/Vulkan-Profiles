@@ -67,6 +67,16 @@ DefaultFeatureValues GetDefaultFeatureValues(const std::string &value) {
     return DEFAULT_FEATURE_VALUES_DEVICE;
 }
 
+std::string GetDefaultFeatureValuesLog(DefaultFeatureValues value) {
+    if (value == DEFAULT_FEATURE_VALUES_FALSE) {
+        return "DEFAULT_FEATURE_VALUES_FALSE";
+    } else if (value == DEFAULT_FEATURE_VALUES_DEVICE) {
+        return "DEFAULT_FEATURE_VALUES_DEVICE";
+    }
+
+    return "DEFAULT_FEATURE_VALUES_DEVICE";
+}
+
 ForceDevice GetForceDevice(const std::string& value) {
     if (value == "FORCE_DEVICE_OFF") {
         return FORCE_DEVICE_OFF;
@@ -444,6 +454,7 @@ void InitSettings(const void *pNext) {
     }
 
     const std::string simulation_capabilities_log = GetSimulateCapabilitiesLog(layer_settings->simulate_capabilities);
+    const std::string default_feature_values = GetDefaultFeatureValuesLog(layer_settings->default_feature_values);
     const std::string debug_actions_log = GetDebugActionsLog(layer_settings->debug_actions);
     const std::string debug_reports_log = GetDebugReportsLog(layer_settings->debug_reports);
 
@@ -456,6 +467,8 @@ void InitSettings(const void *pNext) {
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileFile, layer_settings->profile_file.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileName, layer_settings->profile_name.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileValidation, layer_settings->profile_validation ? "true" : "false");
+    settings_log += format("\t%s: %s\n", kLayerSettingsSimulateCapabilities, simulation_capabilities_log.c_str());
+    settings_log += format("\t%s: %s\n", kLayerSettingsDefaultFeatureValues, default_feature_values.c_str());
     settings_log +=
         format("\t%s: %s\n", kLayerSettingsEmulatePortability, layer_settings->emulate_portability ? "true" : "false");
     if (layer_settings->emulate_portability) {
@@ -487,7 +500,6 @@ void InitSettings(const void *pNext) {
         settings_log += format("\t\t%s: %d\n", kLayerSettings_minVertexInputBindingStrideAlignment,
                                static_cast<int>(layer_settings->minVertexInputBindingStrideAlignment));
     }
-    settings_log += format("\t%s: %s\n", kLayerSettingsSimulateCapabilities, simulation_capabilities_log.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugActions, debug_actions_log.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugFilename, layer_settings->debug_filename.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugFileClear, layer_settings->debug_file_discard ? "true" : "false");
