@@ -33,10 +33,43 @@ std::string GetFormatFeatureString(VkFormatFeatureFlags flags);
 
 std::string GetFormatFeature2String(VkFormatFeatureFlags2 flags);
 
-SimulateCapabilityFlags GetSimulateCapabilityFlags(const vku::Strings &values);
+SimulateCapabilityFlags GetSimulateCapabilityFlags(const std::vector<std::string> &values);
 
 std::string GetSimulateCapabilitiesLog(SimulateCapabilityFlags flags);
 
 std::string GetDebugReportsLog(DebugActionFlags flags);
 
-#define kOurLayerName "VK_LAYER_KHRONOS_profiles"
+#define kLayerName "VK_LAYER_KHRONOS_profiles"
+#define kLayerSettingsProfileFile "profile_file"
+#define kLayerSettingsProfileName "profile_name"
+#define kLayerSettingsProfileValidation "profile_validation"
+#define kLayerSettingsEmulatePortability "emulate_portability"
+#define kLayerSettings_constantAlphaColorBlendFactors "constantAlphaColorBlendFactors"
+#define kLayerSettings_events "events"
+#define kLayerSettings_imageViewFormatReinterpretation "imageViewFormatReinterpretation"
+#define kLayerSettings_imageViewFormatSwizzle "imageViewFormatSwizzle"
+#define kLayerSettings_imageView2DOn3DImage "imageView2DOn3DImage"
+#define kLayerSettings_multisampleArrayImage "multisampleArrayImage"
+#define kLayerSettings_mutableComparisonSamplers "mutableComparisonSamplers"
+#define kLayerSettings_pointPolygons "pointPolygons"
+#define kLayerSettings_samplerMipLodBias "samplerMipLodBias"
+#define kLayerSettings_separateStencilMaskRef "separateStencilMaskRef"
+#define kLayerSettings_shaderSampleRateInterpolationFunctions "shaderSampleRateInterpolationFunctions"
+#define kLayerSettings_tessellationIsolines "tessellationIsolines"
+#define kLayerSettings_tessellationPointMode "tessellationPointMode"
+#define kLayerSettings_triangleFans "triangleFans"
+#define kLayerSettings_vertexAttributeAccessBeyondStride "vertexAttributeAccessBeyondStride"
+#define kLayerSettings_minVertexInputBindingStrideAlignment "minVertexInputBindingStrideAlignment"
+#define kLayerSettingsSimulateCapabilities "simulate_capabilities"
+#define kLayerSettingsDebugActions "debug_actions"
+#define kLayerSettingsDebugFilename "debug_filename"
+#define kLayerSettingsDebugFileClear "debug_file_clear"
+#define kLayerSettingsDebugFailOnError "debug_fail_on_error"
+#define kLayerSettingsDebugReports "debug_reports"
+#define kLayerSettingsExcludeDeviceExtensions "exclude_device_extensions"
+#define kLayerSettingsExcludeFormats "exclude_formats"
+#define kLayerSettingsDefaultFeatureValues "default_feature_values"
+#define kLayerSettingsForceDevice "force_device"
+#define kLayerSettingsForceDeviceUUID "force_device_uuid"
+#define kLayerSettingsForceDeviceName "force_device_name"
+

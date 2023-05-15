@@ -43,10 +43,14 @@
 
 #include "profiles.h"
 
+typedef std::vector<std::pair<std::string, int>> List;
+
+void LayerSettingsLog(const char *pSettingName, const char *pMessage);
+
 std::string format(const char *message, ...);
 
-std::string GetString(const vku::List &list);
-std::string GetString(const vku::Strings &strings);
+std::string GetString(const List &list);
+std::string GetString(const std::vector<std::string> &strings);
 std::string GetUUIDString(const uint8_t deviceUUID[VK_UUID_SIZE]);
 
 void WarnMissingFormatFeatures(const char* device_name, const std::string &format_name, const std::string &features, VkFormatFeatureFlags profile_features,
@@ -130,3 +134,6 @@ inline bool HasFlags(VkFlags64 deviceFlags, VkFlags64 profileFlags) {
     return (deviceFlags & profileFlags) == profileFlags;
 }
 
+std::string ToLower(const std::string &s);
+
+std::string ToUpper(const std::string &s);

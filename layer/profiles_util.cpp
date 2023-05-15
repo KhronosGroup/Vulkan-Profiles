@@ -20,6 +20,10 @@
 #include "profiles_util.h"
 #include "profiles_settings.h"
 
+void LayerSettingsLog(const char* pSettingName, const char* pMessage) {
+    LogMessage(DEBUG_REPORT_ERROR_BIT, "%s : %s\n", pSettingName, pMessage);
+}
+
 std::string format(const char *message, ...) {
     std::size_t const STRING_BUFFER(4096);
 
@@ -36,7 +40,23 @@ std::string format(const char *message, ...) {
     return buffer;
 }
 
-std::string GetString(const vku::List &list) {
+std::string ToLower(const std::string &s) {
+    std::string result = s;
+    for (auto &c : result) {
+        c = (char)std::tolower(c);
+    }
+    return result;
+}
+
+std::string ToUpper(const std::string &s) {
+    std::string result = s;
+    for (auto &c : result) {
+        c = (char)std::toupper(c);
+    }
+    return result;
+}
+
+std::string GetString(const List &list) {
     std::string result;
     for (std::size_t i = 0, n = list.size(); i < n; ++i) {
         result += list[i].first;
@@ -45,7 +65,7 @@ std::string GetString(const vku::List &list) {
     return result;
 }
 
-std::string GetString(const vku::Strings &strings) {
+std::string GetString(const std::vector<std::string> &strings) {
     std::string result;
     for (std::size_t i = 0, n = strings.size(); i < n; ++i) {
         result += strings[i];
@@ -76,7 +96,7 @@ std::string format_device_support_string(VkFormatFeatureFlags2 format_features) 
 
 void WarnMissingFormatFeatures(const char* device_name, const std::string &format_name, const std::string &features, VkFormatFeatureFlags profile_features,
                                VkFormatFeatureFlags device_features) {
-    if (!(layer_settings->debug_reports & DEBUG_REPORT_WARNING_BIT)) return;
+    if (!(layer_settings->log.debug_reports & DEBUG_REPORT_WARNING_BIT)) return;
     LogMessage(DEBUG_REPORT_WARNING_BIT,
                "For %s `%s`,\nthe Profile requires:\n\t\"%s\"\nbut the Device (%s) %s.\nThe "
                "`%s` can't be simulated on this Device.\n",
@@ -87,7 +107,7 @@ void WarnMissingFormatFeatures(const char* device_name, const std::string &forma
 void WarnMissingFormatFeatures2(const char *device_name, const std::string &format_name, const std::string &features,
                                 VkFormatFeatureFlags2 profile_features,
                                 VkFormatFeatureFlags2 device_features) {
-    if (!(layer_settings->debug_reports & DEBUG_REPORT_WARNING_BIT)) return;
+    if (!(layer_settings->log.debug_reports & DEBUG_REPORT_WARNING_BIT)) return;
     LogMessage(DEBUG_REPORT_WARNING_BIT,
                "For %s `%s`,\nthe Profile requires:\n\\t\"%s\"\nbut the Device (%s) %s.\nThe "
                "`%s` can't be simulated on this Device.\n",

@@ -20,8 +20,11 @@
 #pragma once
 
 #include <vulkan/layer/vk_layer_settings.h>
+#include <memory>
+#include <vector>
+#include <string>
 
-enum SimulateCapabilityFlag {
+enum SimulateCapabilityBits {
     SIMULATE_API_VERSION_BIT = 1 << 0,
     SIMULATE_FEATURES_BIT = 1 << 1,
     SIMULATE_PROPERTIES_BIT = 1 << 2,
@@ -32,7 +35,23 @@ enum SimulateCapabilityFlag {
 };
 typedef int SimulateCapabilityFlags;
 
-enum DebugAction {
+static std::vector<std::string> GetSimulateCapabilityStrings(SimulateCapabilityFlags flags) {
+    static const char *table[] = {
+        "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT",
+        "SIMULATE_EXTENSIONS_BIT",  "SIMULATE_FORMATS_BIT",  "SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT"};
+
+    std::vector<std::string> result;
+
+    for (std::size_t i = 0, n = std::size(table); i < n; ++i) {
+        if (flags & (1 << i)) {
+            result.push_back(table[i]);
+        }
+    }
+
+    return result;
+}
+
+enum DebugActionBits {
     DEBUG_ACTION_FILE_BIT = (1 << 0),
     DEBUG_ACTION_STDOUT_BIT = (1 << 1),
     DEBUG_ACTION_OUTPUT_BIT = (1 << 2),
@@ -41,9 +60,43 @@ enum DebugAction {
 };
 typedef int DebugActionFlags;
 
-DebugActionFlags GetDebugActionFlags(const vku::Strings &values);
+static DebugActionFlags GetDebugActionFlags(const std::vector<std::string> &values) {
+    DebugActionFlags result = 0;
 
-enum DebugReport {
+    for (std::size_t i = 0, n = values.size(); i < n; ++i) {
+        if (values[i] == "DEBUG_ACTION_FILE_BIT") {
+            result |= DEBUG_ACTION_FILE_BIT;
+        } else if (values[i] == "DEBUG_ACTION_STDOUT_BIT") {
+            result |= DEBUG_ACTION_STDOUT_BIT;
+        } else if (values[i] == "DEBUG_ACTION_OUTPUT_BIT") {
+            result |= DEBUG_ACTION_OUTPUT_BIT;
+        } else if (values[i] == "DEBUG_ACTION_BREAKPOINT_BIT") {
+            result |= DEBUG_ACTION_BREAKPOINT_BIT;
+        } else if (values[i] == "DEBUG_ACTION_MAX_ENUM") {
+            result = DEBUG_ACTION_MAX_ENUM;
+        }
+    }
+
+    return result;
+}
+
+static std::vector<std::string> GetDebugActionStrings(DebugActionFlags flags) {
+    static const char *table[] = {
+        "DEBUG_ACTION_FILE_BIT", "DEBUG_ACTION_STDOUT_BIT", "DEBUG_ACTION_OUTPUT_BIT", "DEBUG_ACTION_BREAKPOINT_BIT"};
+
+    std::vector<std::string> result;
+
+    for (std::size_t i = 0, n = std::size(table); i < n; ++i) {
+        if (flags & (1 << i)) {
+            result.push_back(table[i]);
+        }
+    }
+
+    return result;
+}
+std::string GetDebugActionsLog(DebugActionFlags flags);
+
+enum DebugReportBits {
     DEBUG_REPORT_NOTIFICATION_BIT = (1 << 0),
     DEBUG_REPORT_WARNING_BIT = (1 << 1),
     DEBUG_REPORT_ERROR_BIT = (1 << 2),
@@ -52,15 +105,65 @@ enum DebugReport {
 };
 typedef int DebugReportFlags;
 
-DebugReportFlags GetDebugReportFlags(const vku::Strings &values);
+static DebugReportFlags GetDebugReportFlags(const std::vector<std::string> &values) {
+    DebugReportFlags result = 0;
+
+    for (std::size_t i = 0, n = values.size(); i < n; ++i) {
+        if (values[i] == "DEBUG_REPORT_NOTIFICATION_BIT") {
+            result |= DEBUG_REPORT_NOTIFICATION_BIT;
+        } else if (values[i] == "DEBUG_REPORT_WARNING_BIT") {
+            result |= DEBUG_REPORT_WARNING_BIT;
+        } else if (values[i] == "DEBUG_REPORT_ERROR_BIT") {
+            result |= DEBUG_REPORT_ERROR_BIT;
+        } else if (values[i] == "DEBUG_REPORT_DEBUG_BIT") {
+            result |= DEBUG_REPORT_DEBUG_BIT;
+        } else if (values[i] == "DEBUG_REPORT_MAX_ENUM") {
+            result = DEBUG_REPORT_MAX_ENUM;
+        }
+    }
+
+    return result;
+}
+
+static std::vector<std::string> GetDebugReportStrings(DebugReportFlags flags) {
+    static const char *table[] = {
+        "DEBUG_REPORT_NOTIFICATION_BIT", "DEBUG_REPORT_WARNING_BIT", "DEBUG_REPORT_ERROR_BIT", "DEBUG_REPORT_DEBUG_BIT"};
+
+    std::vector<std::string> result;
+
+    for (std::size_t i = 0, n = std::size(table); i < n; ++i) {
+        if (flags & (1 << i)) {
+            result.push_back(table[i]);
+        }
+    }
+
+    return result;
+}
 
 enum DefaultFeatureValues {
     DEFAULT_FEATURE_VALUES_FALSE = 0,
     DEFAULT_FEATURE_VALUES_DEVICE
 };
 
-DefaultFeatureValues GetDefaultFeatureValues(const std::string &value);
-std::string GetDefaultFeatureValuesLog(DefaultFeatureValues value);
+static DefaultFeatureValues GetDefaultFeatureValues(const std::string &value) {
+    if (value == "DEFAULT_FEATURE_VALUES_FALSE") {
+        return DEFAULT_FEATURE_VALUES_FALSE;
+    } else if (value == "DEFAULT_FEATURE_VALUES_DEVICE") {
+        return DEFAULT_FEATURE_VALUES_DEVICE;
+    }
+
+    return DEFAULT_FEATURE_VALUES_DEVICE;
+}
+
+static std::string GetDefaultFeatureValuesString(DefaultFeatureValues value) {
+    if (value == DEFAULT_FEATURE_VALUES_FALSE) {
+        return "DEFAULT_FEATURE_VALUES_FALSE";
+    } else if (value == DEFAULT_FEATURE_VALUES_DEVICE) {
+        return "DEFAULT_FEATURE_VALUES_DEVICE";
+    }
+
+    return "DEFAULT_FEATURE_VALUES_DEVICE";
+}
 
 enum ForceDevice {
     FORCE_DEVICE_OFF = 0,
@@ -68,63 +171,70 @@ enum ForceDevice {
     FORCE_DEVICE_WITH_NAME
 };
 
-ForceDevice GetForceDevice(const std::string &value);
+static ForceDevice GetForceDevice(const std::string &value) {
+    if (value == "FORCE_DEVICE_OFF") {
+        return FORCE_DEVICE_OFF;
+    } else if (value == "FORCE_DEVICE_WITH_UUID") {
+        return FORCE_DEVICE_WITH_UUID;
+    } else if (value == "FORCE_DEVICE_WITH_NAME") {
+        return FORCE_DEVICE_WITH_NAME;
+    }
 
-enum ProfileVariantsMode {
-    VARIANTS_MODE_ALL = 0,
-    VARIANTS_MODE_FIRST_SUPPORTED
+    return FORCE_DEVICE_OFF;
+}
+
+struct ProfileLayerSettings {
+    struct Simulate {
+        std::string profile_file{};
+        std::string profile_name{"${VP_DEFAULT}"};
+        bool profile_validation{false};
+        SimulateCapabilityFlags capabilities{SIMULATE_API_VERSION_BIT | SIMULATE_FEATURES_BIT | SIMULATE_PROPERTIES_BIT};
+        DefaultFeatureValues default_feature_values{DEFAULT_FEATURE_VALUES_DEVICE};
+        std::vector<std::string> exclude_device_extensions;
+        std::vector<std::string> exclude_formats;
+        bool emulate_portability{true};
+    } simulate;
+
+    struct Portability {
+        bool constantAlphaColorBlendFactors{false};
+        bool events{false};
+        bool imageViewFormatReinterpretation{false};
+        bool imageViewFormatSwizzle{false};
+        bool imageView2DOn3DImage{false};
+        bool multisampleArrayImage{false};
+        bool mutableComparisonSamplers{false};
+        bool pointPolygons{false};
+        bool samplerMipLodBias{false};
+        bool separateStencilMaskRef{false};
+        bool shaderSampleRateInterpolationFunctions{false};
+        bool tessellationIsolines{false};
+        bool tessellationPointMode{false};
+        bool triangleFans{false};
+        bool vertexAttributeAccessBeyondStride{false};
+        uint32_t minVertexInputBindingStrideAlignment{4};
+    } portability;
+
+    struct Log {
+        DebugActionFlags debug_actions{DEBUG_ACTION_STDOUT_BIT};
+        std::string debug_filename{"profiles_layer_log.txt"};
+        bool debug_file_discard{true};
+        DebugReportFlags debug_reports{DEBUG_REPORT_WARNING_BIT | DEBUG_REPORT_ERROR_BIT};
+        bool debug_fail_on_error{false};
+    } log;
+
+    struct Device {
+        ForceDevice force_device{FORCE_DEVICE_OFF};
+        std::string force_device_uuid;
+        std::string force_device_name;
+    } device;
 };
 
-ProfileVariantsMode GetProfileVariantsMode(const std::string &value);
+void InitProfilesLayerSettings();
 
-static const VkStructureType VK_STRUCTURE_TYPE_PROFILES_LAYER_SETTINGS_EXT = static_cast<VkStructureType>(3000300005);
-
-typedef struct VkProfileLayerSettingsEXT {
-    VkProfileLayerSettingsEXT() : sType(VK_STRUCTURE_TYPE_PROFILES_LAYER_SETTINGS_EXT) {}
-
-    VkStructureType sType;
-    void *pNext{};
-    std::string profile_file{};
-    std::string profile_name{"${VP_DEFAULT}"};
-    bool profile_validation{false};
-    bool emulate_portability{true};
-    bool constantAlphaColorBlendFactors{false};
-    bool events{false};
-    bool imageViewFormatReinterpretation{false};
-    bool imageViewFormatSwizzle{false};
-    bool imageView2DOn3DImage{false};
-    bool multisampleArrayImage{false};
-    bool mutableComparisonSamplers{false};
-    bool pointPolygons{false};
-    bool samplerMipLodBias{false};
-    bool separateStencilMaskRef{false};
-    bool shaderSampleRateInterpolationFunctions{false};
-    bool tessellationIsolines{false};
-    bool tessellationPointMode{false};
-    bool triangleFans{false};
-    bool vertexAttributeAccessBeyondStride{false};
-    uint32_t minVertexInputBindingStrideAlignment{4};
-    SimulateCapabilityFlags simulate_capabilities{SIMULATE_API_VERSION_BIT | SIMULATE_FEATURES_BIT | SIMULATE_PROPERTIES_BIT};
-    DebugActionFlags debug_actions{DEBUG_ACTION_STDOUT_BIT};
-    std::string debug_filename{"profiles_layer_log.txt"};
-    bool debug_file_discard{true};
-    DebugReportFlags debug_reports{DEBUG_REPORT_WARNING_BIT | DEBUG_REPORT_ERROR_BIT};
-    bool debug_fail_on_error{false};
-    vku::Strings exclude_device_extensions;
-    vku::Strings exclude_formats;
-    DefaultFeatureValues default_feature_values{DEFAULT_FEATURE_VALUES_DEVICE};
-    ProfileVariantsMode profile_variants_mode{VARIANTS_MODE_FIRST_SUPPORTED};
-    ForceDevice force_device;
-    std::string force_device_uuid;
-    std::string force_device_name;
-} VkProfileLayerSettingsEXT;
-
-void InitSettings(const void *pNext);
-
-extern VkProfileLayerSettingsEXT *layer_settings;
+extern std::unique_ptr<ProfileLayerSettings> layer_settings;
 extern FILE *profiles_log_file;
 
-void LogMessage(DebugReport report, const char *message, ...);
+void LogMessage(DebugReportBits report, const char *message, ...);
 
 void LogFlush();
 

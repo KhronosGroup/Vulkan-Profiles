@@ -55,9 +55,9 @@ class VulkanInstanceBuilder {
     void addExtension(const char* extension_name) { _extension_names.push_back(extension_name); }
 
     VkResult init();
-    VkResult init(void* pnext);
+    VkResult init(const std::vector<VkLayerSettingEXT>& settings);
     VkResult init(uint32_t apiVersion);
-    VkResult init(uint32_t apiVersion, void* pnext);
+    VkResult init(uint32_t apiVersion, const std::vector<VkLayerSettingEXT>& settings);
     VkResult getPhysicalDevice(Mode mode, VkPhysicalDevice* phys_dev);
 
     void reset();
