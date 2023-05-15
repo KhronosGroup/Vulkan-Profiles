@@ -1,0 +1,41 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+    "capabilities": {
+        "baseline": {
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxImageDimension1D": 4096
+                    }
+                }
+            }
+        }
+    },
+    "profiles": {
+        "VP_LUNARG_test_api_version": {
+            "version": 1,
+            "api-version": "1.1.142",
+            "label": "LunarG Vulkan Desktop Portability 2021 profile",
+            "description": "Common desktop platforms with drivers supporting Vulkan 1.1 on Windows and Linux.",
+            "contributors": {
+                "Christophe Riccio": {
+                    "company": "LunarG",
+                    "email": "christophe@lunarg.com",
+                    "github": "christophe-lunarg",
+                    "contact": true
+                }
+            },
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2021-12-20",
+                    "author": "Christophe Riccio",
+                    "comment": "Initial revision"
+                }
+            ],
+            "capabilities": [
+                "baseline"
+            ]
+        }
+    }
+}

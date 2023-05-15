@@ -25,6 +25,8 @@
 #include <gtest/gtest.h>
 #include "profiles_test_helper.h"
 
+#include <cstdarg>
+
 class TestsMechanism : public VkTestFramework {
    public:
     TestsMechanism(){};
@@ -34,6 +36,99 @@ class TestsMechanism : public VkTestFramework {
     static void TearDownTestSuite(){};
 };
 
+static std::string format(const char* message, ...) {
+    std::size_t const STRING_BUFFER(4096);
+
+    assert(message != nullptr);
+    assert(strlen(message) >= 0 && strlen(message) < STRING_BUFFER);
+
+    char buffer[STRING_BUFFER];
+    va_list list;
+
+    va_start(list, message);
+    vsnprintf(buffer, STRING_BUFFER, message, list);
+    va_end(list);
+
+    return buffer;
+}
+
+TEST_F(TestsMechanism, api_version_properties) {
+    VkResult err = VK_SUCCESS;
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    {
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_version.json";
+
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, {&profile_file_data}}
+        };
+
+        err = inst_builder.init(settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            inst_builder.reset();
+            return;
+        }
+
+        VkPhysicalDeviceProperties gpu_props{};
+        vkGetPhysicalDeviceProperties(gpu, &gpu_props);
+
+        std::string version = format("%d.%d.%d",
+            VK_API_VERSION_MAJOR(gpu_props.apiVersion),
+            VK_API_VERSION_MINOR(gpu_props.apiVersion),
+            VK_API_VERSION_PATCH(gpu_props.apiVersion));
+
+        EXPECT_STREQ("1.1.128", version.c_str());
+        EXPECT_EQ(4198528, gpu_props.apiVersion);
+        EXPECT_EQ(4096u, gpu_props.limits.maxImageDimension1D);
+
+        inst_builder.reset();
+    }
+}
+
+TEST_F(TestsMechanism, api_version_profile) {
+    VkResult err = VK_SUCCESS;
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    {
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_version_profile.json";
+
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, {&profile_file_data}}};
+
+        err = inst_builder.init(settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            inst_builder.reset();
+            return;
+        }
+
+        VkPhysicalDeviceProperties gpu_props{};
+        vkGetPhysicalDeviceProperties(gpu, &gpu_props);
+
+        std::string version = format("%d.%d.%d",
+            VK_API_VERSION_MAJOR(gpu_props.apiVersion),
+            VK_API_VERSION_MINOR(gpu_props.apiVersion),
+            VK_API_VERSION_PATCH(gpu_props.apiVersion));
+
+        EXPECT_STREQ("1.1.142", version.c_str());
+        EXPECT_EQ(4198542, gpu_props.apiVersion);
+        EXPECT_EQ(4096u, gpu_props.limits.maxImageDimension1D);
+
+        inst_builder.reset();
+    }
+}
+
 TEST_F(TestsMechanism, default_feature_values) {
     VkResult err = VK_SUCCESS;
 
@@ -41,15 +136,22 @@ TEST_F(TestsMechanism, default_feature_values) {
 
     // Vulkan 1.0
     {
-        VkProfileLayerSettingsEXT settings;
-        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_0.json";
-        settings.emulate_portability = false;
-        settings.profile_name = "VP_LUNARG_test_api_1_0";
-        settings.simulate_capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_EXTENSIONS_BIT;
-        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
-        settings.default_feature_values = DEFAULT_FEATURE_VALUES_FALSE;
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_0.json";
+        const char* profile_name_data = "VP_LUNARG_test_api_1_0";
+        VkBool32 emulate_portability_data = VK_FALSE;
+        const std::vector<const char*> simulate_capabilities = {"SIMULATE_API_VERSION_BIT", "SIMULATE_EXTENSIONS_BIT"};
+        const char* default_feature_values_data = "DEFAULT_FEATURE_VALUES_FALSE";
+        const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
-        err = inst_builder.init(&settings);
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, {&profile_file_data}},
+            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, {&profile_name_data}},
+            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data},
+            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), {&simulate_capabilities[0]}},
+            {kLayerName, kLayerSettingsDefaultFeatureValues, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, {&default_feature_values_data}},
+            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, {&debug_reports_data}}};
+
+        err = inst_builder.init(settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDevice gpu;
@@ -84,14 +186,20 @@ TEST_F(TestsMechanism, api_versions) {
 
     // Vulkan 1.0
     {
-        VkProfileLayerSettingsEXT settings;
-        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_0.json";
-        settings.emulate_portability = false;
-        settings.profile_name = "VP_LUNARG_test_api_1_0";
-        settings.simulate_capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_EXTENSIONS_BIT;
-        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_0.json";
+        const char* profile_name_data = "VP_LUNARG_test_api_1_0";
+        VkBool32 emulate_portability_data = VK_FALSE;
+        const std::vector<const char*> simulate_capabilities = {"SIMULATE_API_VERSION_BIT", "SIMULATE_EXTENSIONS_BIT"};
+        const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
-        err = inst_builder.init(&settings);
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data},
+            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
+
+        err = inst_builder.init(settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDevice gpu;
@@ -115,14 +223,20 @@ TEST_F(TestsMechanism, api_versions) {
 
     // Vulkan 1.0 + emulate_portability = true
     {
-        VkProfileLayerSettingsEXT settings;
-        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_0.json";
-        settings.emulate_portability = true;
-        settings.profile_name = "VP_LUNARG_test_api_1_0";
-        settings.simulate_capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_EXTENSIONS_BIT;
-        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_0.json";
+        const char* profile_name_data = "VP_LUNARG_test_api_1_0";
+        VkBool32 emulate_portability_data = VK_TRUE;
+        const std::vector<const char*> simulate_capabilities = {"SIMULATE_API_VERSION_BIT", "SIMULATE_EXTENSIONS_BIT"};
+        const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
-        err = inst_builder.init(&settings);
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data},
+            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
+
+        err = inst_builder.init(settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDevice gpu;
@@ -152,14 +266,20 @@ TEST_F(TestsMechanism, api_versions) {
 
     // Vulkan 1.1
     {
-        VkProfileLayerSettingsEXT settings;
-        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_1.json";
-        settings.emulate_portability = false;
-        settings.profile_name = "VP_LUNARG_test_api_1_1";
-        settings.simulate_capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_EXTENSIONS_BIT;
-        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_1.json";
+        const char* profile_name_data = "VP_LUNARG_test_api_1_1";
+        VkBool32 emulate_portability_data = VK_FALSE;
+        const std::vector<const char*> simulate_capabilities = {"SIMULATE_API_VERSION_BIT", "SIMULATE_EXTENSIONS_BIT"};
+        const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
-        err = inst_builder.init(&settings);
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data},
+            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
+
+        err = inst_builder.init(settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDevice gpu;
@@ -221,14 +341,20 @@ TEST_F(TestsMechanism, api_versions) {
 
     // Vulkan 1.1 + emulate_portability = true
     {
-        VkProfileLayerSettingsEXT settings;
-        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_1.json";
-        settings.emulate_portability = true;
-        settings.profile_name = "VP_LUNARG_test_api_1_1";
-        settings.simulate_capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_EXTENSIONS_BIT;
-        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_1.json";
+        const char* profile_name_data = "VP_LUNARG_test_api_1_1";
+        VkBool32 emulate_portability_data = VK_TRUE;
+        const std::vector<const char*> simulate_capabilities = {"SIMULATE_API_VERSION_BIT", "SIMULATE_EXTENSIONS_BIT"};
+        const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
-        err = inst_builder.init(&settings);
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data},
+            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
+
+        err = inst_builder.init(settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDevice gpu;
@@ -291,14 +417,20 @@ TEST_F(TestsMechanism, api_versions) {
 
     // Vulkan 1.2
     {
-        VkProfileLayerSettingsEXT settings;
-        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_2.json";
-        settings.emulate_portability = false;
-        settings.profile_name = "VP_LUNARG_test_api_1_2";
-        settings.simulate_capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_EXTENSIONS_BIT;
-        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_2.json";
+        const char* profile_name_data = "VP_LUNARG_test_api_1_2";
+        VkBool32 emulate_portability_data = VK_FALSE;
+        const std::vector<const char*> simulate_capabilities = {"SIMULATE_API_VERSION_BIT", "SIMULATE_EXTENSIONS_BIT"};
+        const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
-        err = inst_builder.init(&settings);
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data},
+            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
+
+        err = inst_builder.init(settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDevice gpu;
@@ -384,14 +516,20 @@ TEST_F(TestsMechanism, api_versions) {
 
     // Vulkan 1.3
     {
-        VkProfileLayerSettingsEXT settings;
-        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_3.json";
-        settings.emulate_portability = false;
-        settings.profile_name = "VP_LUNARG_test_api_1_3";
-        settings.simulate_capabilities = SIMULATE_API_VERSION_BIT | SIMULATE_EXTENSIONS_BIT;
-        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_3.json";
+        const char* profile_name_data = "VP_LUNARG_test_api_1_3";
+        VkBool32 emulate_portability_data = VK_FALSE;
+        const std::vector<const char*> simulate_capabilities = {"SIMULATE_API_VERSION_BIT", "SIMULATE_EXTENSIONS_BIT"};
+        const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
-        err = inst_builder.init(&settings);
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data},
+            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
+
+        err = inst_builder.init(settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDevice gpu;
@@ -506,51 +644,22 @@ TEST_F(TestsMechanism, selecting_profile) {
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
-    {
-        /*
-          VkProfileLayerSettingsEXT settings;
-          settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_instance_extensions.json";
-          settings.emulate_portability = false;
-          settings.profile_name = "VP_LUNARG_test_instance_extensions";
-          settings.simulate_capabilities = SIMULATE_EXTENSIONS_BIT;
-
-          err = inst_builder.init(&settings);
-          ASSERT_EQ(err, VK_SUCCESS);
-
-          VkPhysicalDevice gpu;
-          err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
-          if (err != VK_SUCCESS) {
-              printf("Profile not supported on device, skipping test.\n");
-              inst_builder.reset();
-              return;
-          }
-
-          VkResult result = VK_SUCCESS;
-
-          uint32_t extCount = 0;
-          result = vkEnumerateInstanceExtensionProperties(nullptr, &extCount, nullptr);
-          ASSERT_EQ(err, VK_SUCCESS);
-
-          std::vector<VkExtensionProperties> ext(extCount);
-          result = vkEnumerateInstanceExtensionProperties(nullptr, &extCount, ext.data());
-          ASSERT_EQ(err, VK_SUCCESS);
-
-          EXPECT_STREQ("VK_KHR_get_physical_device_properties2", ext[0].extensionName);
-
-          inst_builder.reset();
-          */
-    }
-
     // Only override extensions
     {
-        VkProfileLayerSettingsEXT settings;
-        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_device_extensions.json";
-        settings.emulate_portability = false;
-        settings.profile_name = "VP_LUNARG_test_device_extensions";
-        settings.simulate_capabilities = SIMULATE_EXTENSIONS_BIT;
-        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_device_extensions.json";
+        const char* profile_name_data = "VP_LUNARG_test_device_extensions";
+        VkBool32 emulate_portability_data = VK_FALSE;
+        const std::vector<const char*> simulate_capabilities = {"SIMULATE_EXTENSIONS_BIT"};
+        const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
-        err = inst_builder.init(&settings);
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data},
+            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
+
+        err = inst_builder.init(settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDevice gpu;
@@ -580,14 +689,20 @@ TEST_F(TestsMechanism, selecting_profile) {
 
     // Override everything but the layer only has extensions
     {
-        VkProfileLayerSettingsEXT settings;
-        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_device_extensions.json";
-        settings.emulate_portability = false;
-        settings.profile_name = "VP_LUNARG_test_device_extensions";
-        settings.simulate_capabilities = SIMULATE_MAX_ENUM;
-        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_device_extensions.json";
+        const char* profile_name_data = "VP_LUNARG_test_device_extensions";
+        VkBool32 emulate_portability_data = VK_FALSE;
+        const std::vector<const char*> simulate_capabilities = {"SIMULATE_MAX_ENUM"};
+        const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
-        err = inst_builder.init(&settings);
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data},
+            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
+
+        err = inst_builder.init(settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDevice gpu;
@@ -616,13 +731,19 @@ TEST_F(TestsMechanism, selecting_profile) {
     }
 
     {
-        VkProfileLayerSettingsEXT settings;
-        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_selecting_profile.json";
-        settings.emulate_portability = true;
-        settings.profile_name = "VP_LUNARG_test_selecting_profile";
-        settings.simulate_capabilities = SIMULATE_EXTENSIONS_BIT | SIMULATE_PROPERTIES_BIT;
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_selecting_profile.json";
+        const char* profile_name_data = "VP_LUNARG_test_selecting_profile";
+        VkBool32 emulate_portability_data = VK_TRUE;
+        const std::vector<const char*> simulate_capabilities = {"SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT"};
 
-        err = inst_builder.init(&settings);
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data},
+            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]}
+        };
+
+        err = inst_builder.init(settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDevice gpu;
@@ -642,13 +763,18 @@ TEST_F(TestsMechanism, selecting_profile) {
     }
 
     {
-        VkProfileLayerSettingsEXT settings;
-        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_selecting_profile.json";
-        settings.emulate_portability = true;
-        settings.profile_name = "VP_LUNARG_test_selecting_profile_subset";
-        settings.simulate_capabilities = SIMULATE_EXTENSIONS_BIT | SIMULATE_PROPERTIES_BIT;
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_selecting_profile.json";
+        const char* profile_name_data = "VP_LUNARG_test_selecting_profile_subset";
+        VkBool32 emulate_portability_data = VK_TRUE;
+        const std::vector<const char*> simulate_capabilities = {"SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT"};
 
-        err = inst_builder.init(&settings);
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data},
+            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]}};
+
+        err = inst_builder.init(settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDevice gpu;
@@ -676,13 +802,19 @@ TEST_F(TestsMechanism, reading_flags) {
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
-    VkProfileLayerSettingsEXT settings;
-    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_alternate.json";
-    settings.emulate_portability = true;
-    settings.profile_name = "VP_LUNARG_test_api";
-    settings.simulate_capabilities = SIMULATE_MAX_ENUM;
+    const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_alternate.json";
+    const char* profile_name_data = "VP_LUNARG_test_api";
+    VkBool32 emulate_portability_data = VK_TRUE;
+    const std::vector<const char*> simulate_capabilities = {"SIMULATE_MAX_ENUM"};
 
-    err = inst_builder.init(&settings);
+    std::vector<VkLayerSettingEXT> settings = {
+        {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+        {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data},
+        {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]}
+    };
+
+    err = inst_builder.init(settings);
     ASSERT_EQ(err, VK_SUCCESS);
 
     VkPhysicalDevice gpu_profile = VK_NULL_HANDLE;
@@ -744,14 +876,21 @@ TEST_F(TestsMechanism, reading_duplicated_members) {
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
-    VkProfileLayerSettingsEXT settings;
-    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_duplicated.json";
-    settings.emulate_portability = true;
-    settings.profile_name = "VP_LUNARG_test_duplicated";
-    settings.simulate_capabilities = SIMULATE_MAX_ENUM;
-    settings.debug_fail_on_error = true;
+    const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_duplicated.json";
+    const char* profile_name_data = "VP_LUNARG_test_duplicated";
+    VkBool32 emulate_portability_data = VK_TRUE;
+    const std::vector<const char*> simulate_capabilities = {"SIMULATE_MAX_ENUM"};
+    VkBool32 debug_fail_on_error = VK_TRUE;
 
-    err = inst_builder.init(&settings);
+    std::vector<VkLayerSettingEXT> settings = {
+        {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+        {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data},
+        {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+        {kLayerName, kLayerSettingsDebugFailOnError, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &debug_fail_on_error}
+    };
+
+    err = inst_builder.init(settings);
     ASSERT_EQ(err, VK_SUCCESS);
 
     VkPhysicalDevice physical_device;
@@ -762,18 +901,21 @@ TEST_F(TestsMechanism, reading_duplicated_members) {
 TEST_F(TestsMechanism, capabilities_or) {
     TEST_DESCRIPTION("Test profile using capabilities or");
 
-    VkResult err = VK_SUCCESS;
+    const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_capabilities.json";
+    const char* profile_name_data = "VP_LUNARG_test_capabilities_or";
+    VkBool32 emulate_portability_data = VK_TRUE;
+    const std::vector<const char*> simulate_capabilities = {"SIMULATE_MAX_ENUM"};
+    VkBool32 debug_fail_on_error = VK_TRUE;
+
+    std::vector<VkLayerSettingEXT> settings = {
+        {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+        {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data},
+        {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+        {kLayerName, kLayerSettingsDebugFailOnError, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &debug_fail_on_error}};
 
     profiles_test::VulkanInstanceBuilder inst_builder;
-
-    VkProfileLayerSettingsEXT settings;
-    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_capabilities.json";
-    settings.emulate_portability = true;
-    settings.profile_name = "VP_LUNARG_test_capabilities_or";
-    settings.simulate_capabilities = SIMULATE_MAX_ENUM;
-    settings.debug_fail_on_error = true;
-
-    err = inst_builder.init(&settings);
+    VkResult err = inst_builder.init(settings);
     EXPECT_EQ(err, VK_SUCCESS);
 }
 
@@ -784,13 +926,19 @@ TEST_F(TestsMechanism, TestParsingAllFormatProperties) {
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
-    VkProfileLayerSettingsEXT settings;
-    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_formats.json";
-    settings.emulate_portability = true;
-    settings.profile_name = "VP_LUNARG_test_formats";
-    settings.simulate_capabilities = SIMULATE_MAX_ENUM;
+    const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_formats.json";
+    const char* profile_name_data = "VP_LUNARG_test_formats";
+    VkBool32 emulate_portability_data = VK_TRUE;
+    const std::vector<const char*> simulate_capabilities = {"SIMULATE_MAX_ENUM"};
 
-    err = inst_builder.init(&settings);
+    std::vector<VkLayerSettingEXT> settings = {
+        {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+        {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data},
+        {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]}
+    };
+
+    err = inst_builder.init(settings);
     ASSERT_EQ(err, VK_SUCCESS);
 
     VkPhysicalDevice gpu;
@@ -943,15 +1091,20 @@ TEST_F(TestsMechanism, profile_variants_all) {
     profiles_test::VulkanInstanceBuilder inst_builder;
 
     {
-        VkProfileLayerSettingsEXT settings;
-        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_variants.json";
-        settings.emulate_portability = false;
-        settings.profile_name = "VP_LUNARG_test_variants";
-        settings.simulate_capabilities =
-            SIMULATE_API_VERSION_BIT | SIMULATE_FEATURES_BIT | SIMULATE_PROPERTIES_BIT | SIMULATE_EXTENSIONS_BIT;
-        settings.debug_reports = DEBUG_REPORT_MAX_ENUM;
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_variants.json";
+        const char* profile_name_data = "VP_LUNARG_test_variants";
+        VkBool32 emulate_portability_data = VK_FALSE;
+        const std::vector<const char*> simulate_capabilities = {"SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT"};
+        const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
-        err = inst_builder.init(&settings);
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data},
+            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
+
+        err = inst_builder.init(settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDevice gpu;
@@ -1006,12 +1159,17 @@ TEST_F(TestsMechanism, force_physical_device) {
     profiles_test::VulkanInstanceBuilder inst_builder;
 
     {
-        VkProfileLayerSettingsEXT settings;
-        settings.force_device = FORCE_DEVICE_OFF;
-        settings.force_device_name = "NVIDIA";
-        settings.force_device_uuid = "BC4A01B15641805847A8151A395A80C7";
+        const char* force_device = "FORCE_DEVICE_OFF";
+        const char* force_device_name = "NVIDIA";
+        const char* force_device_uuid = "BC4A01B15641805847A8151A395A80C7";
 
-        err = inst_builder.init(&settings);
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsForceDevice, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &force_device},
+            {kLayerName, kLayerSettingsForceDeviceName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &force_device_name},
+            {kLayerName, kLayerSettingsForceDeviceUUID, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &force_device_uuid}
+        };
+
+        err = inst_builder.init(settings);
         ASSERT_EQ(err, VK_SUCCESS);
 
         VkPhysicalDevice gpu;
@@ -1031,13 +1189,19 @@ TEST_F(TestsMechanism, reading_sparseProperties) {
 
     profiles_test::VulkanInstanceBuilder inst_builder;
 
-    VkProfileLayerSettingsEXT settings;
-    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_device_properties.json";
-    settings.emulate_portability = true;
-    settings.profile_name = "VP_LUNARG_test_device_properties";
-    settings.simulate_capabilities = SIMULATE_MAX_ENUM;
+    const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_device_properties.json";
+    const char* profile_name_data = "VP_LUNARG_test_device_properties";
+    const std::vector<const char*> simulate_capabilities = {"SIMULATE_MAX_ENUM"};
+    VkBool32 emulate_portability_data = VK_TRUE;
 
-    err = inst_builder.init(&settings);
+    std::vector<VkLayerSettingEXT> settings = {
+        {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+        {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+        {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data}
+    };
+
+    err = inst_builder.init(settings);
     ASSERT_EQ(err, VK_SUCCESS);
 
     VkPhysicalDevice gpu_profile = VK_NULL_HANDLE;

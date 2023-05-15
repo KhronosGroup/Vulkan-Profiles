@@ -47,14 +47,17 @@ class TestsPromoted : public VkTestFramework {
     static void SetUpTestSuite() {
         VkResult err = VK_SUCCESS;
 
-        VkProfileLayerSettingsEXT settings;
-        settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_promoted_api.json";
-        settings.profile_name = "VP_LUNARG_test_api";
-        settings.simulate_capabilities = SimulateCapabilityFlag::SIMULATE_EXTENSIONS_BIT |
-                                         SimulateCapabilityFlag::SIMULATE_FEATURES_BIT |
-                                         SimulateCapabilityFlag::SIMULATE_PROPERTIES_BIT;
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_promoted_api.json";
+        const char* profile_name_data = "VP_LUNARG_test_api";
+        const std::vector<const char*> simulate_capabilities = {"SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT",  "SIMULATE_EXTENSIONS_BIT"};
 
-        err = inst_builder.init(&settings);
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]}
+        };
+
+        err = inst_builder.init(settings);
         EXPECT_EQ(VK_SUCCESS, err);
 
         err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu_profile);

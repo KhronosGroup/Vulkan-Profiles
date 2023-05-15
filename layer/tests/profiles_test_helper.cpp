@@ -95,42 +95,48 @@ VkResult profiles_test::VulkanInstanceBuilder::getPhysicalDevice(Mode mode, VkPh
     return res;
 }
 
-VkResult profiles_test::VulkanInstanceBuilder::init(uint32_t apiVersion, void* pNext) {
-    _layer_names.push_back("VK_LAYER_KHRONOS_profiles");
+VkResult profiles_test::VulkanInstanceBuilder::init(uint32_t apiVersion, const std::vector<VkLayerSettingEXT>& settings) {
+    _layer_names.push_back(kLayerName);
 
-    const std::string layer_path = std::string(TEST_BINARY_PATH);
-    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", layer_path.c_str());
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", TEST_BINARY_PATH);
 
     VkApplicationInfo app_info{GetDefaultApplicationInfo()};
     app_info.apiVersion = apiVersion;
 
     VkInstanceCreateInfo inst_create_info = {};
     inst_create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    inst_create_info.pNext = pNext;
     inst_create_info.pApplicationInfo = &app_info;
+    inst_create_info.pNext = nullptr;
     inst_create_info.enabledLayerCount = 0;
     inst_create_info.ppEnabledLayerNames = nullptr;
-    inst_create_info.enabledExtensionCount = static_cast<uint32_t>(_extension_names.size());
-    inst_create_info.ppEnabledExtensionNames = _extension_names.data();
+    inst_create_info.enabledExtensionCount = _extension_names.empty() ? 0 : static_cast<uint32_t>(_extension_names.size());
+    inst_create_info.ppEnabledExtensionNames = _extension_names.empty() ? nullptr : _extension_names.data();
 
     VkResult result = vkCreateInstance(&inst_create_info, nullptr, &_instances[MODE_NATIVE]);
     if (result != VK_SUCCESS) return result;
 
+    VkLayerSettingsCreateInfoEXT layer_settings_create_info{
+        VK_STRUCTURE_TYPE_LAYER_SETTINGS_EXT, nullptr,
+        settings.empty() ? 0 : static_cast<uint32_t>(settings.size()),
+        settings.empty() ? nullptr : &settings[0]};
+
     inst_create_info.enabledLayerCount = static_cast<uint32_t>(_layer_names.size());
     inst_create_info.ppEnabledLayerNames = _layer_names.data();
+    inst_create_info.pNext = settings.empty() ? nullptr : &layer_settings_create_info;
     return vkCreateInstance(&inst_create_info, nullptr, &_instances[MODE_PROFILE]);
 }
 
 VkResult profiles_test::VulkanInstanceBuilder::init(uint32_t apiVersion) { 
-    VkProfileLayerSettingsEXT settings = {};
-    return this->init(apiVersion, &settings);
+    return this->init(apiVersion, std::vector<VkLayerSettingEXT>());
 }
 
-VkResult profiles_test::VulkanInstanceBuilder::init(void* pNext) {
-    return this->init(GetDefaultApplicationInfo().apiVersion, pNext);
+VkResult profiles_test::VulkanInstanceBuilder::init(const std::vector<VkLayerSettingEXT>& settings) {
+    return this->init(GetDefaultApplicationInfo().apiVersion, settings);
 }
 
-VkResult profiles_test::VulkanInstanceBuilder::init() { return this->init(GetDefaultApplicationInfo().apiVersion, nullptr); }
+VkResult profiles_test::VulkanInstanceBuilder::init() {
+    return this->init(GetDefaultApplicationInfo().apiVersion, std::vector<VkLayerSettingEXT>());
+}
 
 void profiles_test::VulkanInstanceBuilder::reset() {
     for (VkInstance& instance : _instances) {
