@@ -74,23 +74,24 @@ std::string format_device_support_string(VkFormatFeatureFlags2 format_features) 
     return ::format("only supports:\n\t\" % s\"", GetFormatFeature2String(format_features).c_str());
 }
 
-void WarnMissingFormatFeatures(const std::string &format_name, const std::string &features, VkFormatFeatureFlags profile_features,
+void WarnMissingFormatFeatures(const char* device_name, const std::string &format_name, const std::string &features, VkFormatFeatureFlags profile_features,
                                VkFormatFeatureFlags device_features) {
     if (!(layer_settings->debug_reports & DEBUG_REPORT_WARNING_BIT)) return;
     LogMessage(DEBUG_REPORT_WARNING_BIT,
-               "For %s `%s`,\nthe Profile requires:\n\t\"%s\"\nbut the Device %s.\nThe "
+               "For %s `%s`,\nthe Profile requires:\n\t\"%s\"\nbut the Device (%s) %s.\nThe "
                "`%s` can't be simulated on this Device.\n",
                format_name.c_str(), features.c_str(), GetFormatFeatureString(profile_features).c_str(),
-               format_device_support_string(device_features).c_str(), features.c_str());
+               device_name, format_device_support_string(device_features).c_str(), features.c_str());
 }
 
-void WarnMissingFormatFeatures2(const std::string &format_name, const std::string &features, VkFormatFeatureFlags2 profile_features,
+void WarnMissingFormatFeatures2(const char *device_name, const std::string &format_name, const std::string &features,
+                                VkFormatFeatureFlags2 profile_features,
                                 VkFormatFeatureFlags2 device_features) {
     if (!(layer_settings->debug_reports & DEBUG_REPORT_WARNING_BIT)) return;
     LogMessage(DEBUG_REPORT_WARNING_BIT,
-               "For %s `%s`,\nthe Profile requires:\n\\t\"%s\"\nbut the Device %s.\nThe "
+               "For %s `%s`,\nthe Profile requires:\n\\t\"%s\"\nbut the Device (%s) %s.\nThe "
                "`%s` can't be simulated on this Device.\n",
-               format_name.c_str(), features.c_str(), GetFormatFeature2String(profile_features).c_str(),
+               format_name.c_str(), features.c_str(), GetFormatFeature2String(profile_features).c_str(), device_name,
                format_device_support_string(device_features).c_str(), features.c_str());
 }
 
