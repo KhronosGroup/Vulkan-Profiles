@@ -49,11 +49,11 @@ std::string GetString(const vku::List &list);
 std::string GetString(const vku::Strings &strings);
 std::string GetUUIDString(const uint8_t deviceUUID[VK_UUID_SIZE]);
 
-void WarnMissingFormatFeatures(const std::string &format_name, const std::string &features, VkFormatFeatureFlags profile_features,
+void WarnMissingFormatFeatures(const char* device_name, const std::string &format_name, const std::string &features, VkFormatFeatureFlags profile_features,
                                VkFormatFeatureFlags device_features);
 
-void WarnMissingFormatFeatures2(const std::string &format_name, const std::string &features, VkFormatFeatureFlags2 profile_features,
-                                VkFormatFeatureFlags2 device_features);
+void WarnMissingFormatFeatures2(const char *device_name, const std::string &format_name, const std::string &features,
+                                VkFormatFeatureFlags2 profile_features, VkFormatFeatureFlags2 device_features);
 
 inline bool IsFormatSupported(const VkFormatProperties &props) {
     // Per [SPEC] section 30.3.2 "Format Properties":
