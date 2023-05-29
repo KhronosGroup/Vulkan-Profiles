@@ -361,6 +361,7 @@
                             "VK_SAMPLE_COUNT_2_BIT",
                             "VK_SAMPLE_COUNT_4_BIT"
                         ],
+                        "lineWidthGranularity": 1.0,
                         "maxBoundDescriptorSets": 8,
                         "maxClipDistances": 8,
                         "maxColorAttachments": 8,
