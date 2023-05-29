@@ -482,6 +482,7 @@
                             -32768,
                             32767
                         ],
+                        "lineWidthGranularity": 1.0,
                         "lineWidthRange": [
                             1,
                             1

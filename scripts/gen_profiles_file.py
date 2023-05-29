@@ -388,7 +388,8 @@ class ProfileMerger():
                 xmlmember = self.registry.structs[property].members[member]
                 if xmlmember.limittype == 'noauto':
                     del merged[member]
-
+                #elif 'mul'  in xmlmember.limittype and xmlmember.type == 'float':
+                #    del merged[member]
         for member in entry:
             if property is None:
                 if self.mode == 'union' or self.first is True:
@@ -433,6 +434,8 @@ class ProfileMerger():
                     # del merged[member]
                     # del entry[member]
                     #print("ERROR: '" + member + " 'values with 'exact' limittype have different values.")
+            #if 'mul'  in xmlmember.limittype and xmlmember.type == 'float':
+            #    del merged[member]
             if 'max' in xmlmember.limittype or xmlmember.limittype == 'bits':
                 if xmlmember.type == 'VkExtent2D':
                     if entry[member]['width'] > merged[member]['width']:
@@ -495,6 +498,8 @@ class ProfileMerger():
                     #del merged[member]
                     #del entry[member]
                     #print("ERROR: '" + member + " 'values with 'exact' limittype have different values.")
+            #if 'mul'  in xmlmember.limittype and xmlmember.type == 'float':
+            #    del merged[member]
             if 'max' in xmlmember.limittype or xmlmember.limittype == 'bits':
                 if xmlmember.type == 'VkExtent2D':
                     if entry[member]['width'] < merged[member]['width']:
