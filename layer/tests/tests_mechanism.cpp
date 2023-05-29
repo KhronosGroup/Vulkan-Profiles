@@ -1025,3 +1025,37 @@ TEST_F(TestsMechanism, force_physical_device) {
         inst_builder.reset();
     }
 }
+
+TEST_F(TestsMechanism, reading_sparseProperties) {
+    VkResult err = VK_SUCCESS;
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    VkProfileLayerSettingsEXT settings;
+    settings.profile_file = JSON_TEST_FILES_PATH "VP_LUNARG_test_device_properties.json";
+    settings.emulate_portability = true;
+    settings.profile_name = "VP_LUNARG_test_device_properties";
+    settings.simulate_capabilities = SIMULATE_MAX_ENUM;
+
+    err = inst_builder.init(&settings);
+    ASSERT_EQ(err, VK_SUCCESS);
+
+    VkPhysicalDevice gpu_profile = VK_NULL_HANDLE;
+    err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu_profile);
+    if (gpu_profile == VK_NULL_HANDLE) return;
+
+    VkPhysicalDeviceProperties2 gpu_props{};
+    gpu_props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props);
+
+    // These values are overridden
+    EXPECT_EQ(gpu_props.properties.limits.maxImageDimension1D, 4096);
+    EXPECT_EQ(gpu_props.properties.limits.maxImageDimension2D, 4096);
+    EXPECT_EQ(gpu_props.properties.limits.maxImageDimension3D, 4096);
+
+    EXPECT_EQ(gpu_props.properties.sparseProperties.residencyStandard2DBlockShape, VK_TRUE);
+    EXPECT_EQ(gpu_props.properties.sparseProperties.residencyStandard2DMultisampleBlockShape, VK_TRUE);
+    EXPECT_EQ(gpu_props.properties.sparseProperties.residencyStandard3DBlockShape, VK_TRUE);
+    EXPECT_EQ(gpu_props.properties.sparseProperties.residencyAlignedMipSize, VK_FALSE);
+    EXPECT_EQ(gpu_props.properties.sparseProperties.residencyNonResidentStrict, VK_FALSE);
+}

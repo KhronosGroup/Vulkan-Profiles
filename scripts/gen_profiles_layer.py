@@ -2684,6 +2684,9 @@ bool JsonLoader::GetStruct(const char* device_name, const Json::Value &parent, V
     if (!GetStruct(device_name, parent["limits"], &dest->limits)) {
         valid = false;
     }
+    if (!GetStruct(device_name, parent["sparseProperties"], &dest->sparseProperties)) {
+        valid = false;
+    }
     for (const auto &prop : parent.getMemberNames()) {
         GET_VALUE(prop, apiVersion, false);
         GET_VALUE(prop, driverVersion, true);
