@@ -66,8 +66,10 @@ def stripNonmatchingAPIs(tree, apiName, actuallyDelete = True):
                 if actuallyDelete:
                     parent.remove(child)
 
-COPYRIGHT_HEADER = '''/**
- * Copyright (c) 2021-2023 LunarG, Inc.
+COPYRIGHT_HEADER = '''
+/*
+ * Copyright (C) 2021-2023 Valve Corporation
+ * Copyright (C) 2021-2023 LunarG, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -81,7 +83,8 @@ COPYRIGHT_HEADER = '''/**
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * DO NOT EDIT: This file is generated.
+ * This file is ***GENERATED***.  Do Not Edit.
+ * See scripts/gen_profiles_solution.py for modifications.
  */
 '''
 
