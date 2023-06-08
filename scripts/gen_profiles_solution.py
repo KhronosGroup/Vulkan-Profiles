@@ -4018,10 +4018,11 @@ class VulkanProfilesDocGenerator():
                 if wrapperStruct in profile.capabilities.properties:
                     propertyStructName = wrapperStruct
                     propertyStruct = profile.capabilities.properties[wrapperStruct]['properties']
-            if propertyStruct != None and memberStruct != 'sparseProperties':
-                limitStruct = propertyStruct[memberStruct]
-                if member in limitStruct:
-                    return self.formatProperty(limitStruct[member], propertyStructName, section)
+            if propertyStruct != None: # and memberStruct != 'sparseProperties':
+                if memberStruct in propertyStruct:
+                    limitStruct = propertyStruct[memberStruct]
+                    if member in limitStruct:
+                        return self.formatProperty(limitStruct[member], propertyStructName, section)
 
         # If the struct has aliases and the limit/property struct member is defined in the profile
         # in one of those then include it
@@ -4067,7 +4068,9 @@ class VulkanProfilesDocGenerator():
                 if propertyStructName == 'VkPhysicalDeviceProperties':
                     for member, struct in { 'limits': 'VkPhysicalDeviceLimits', 'sparseProperties': 'VkPhysicalDeviceSparseProperties' }.items():
                         if member in properties:
-                            definedLimits[struct] = properties[member].keys()
+                            if not struct in definedLimits:
+                                definedLimits[struct] = []
+                            definedLimits[struct].extend(properties[member].keys())
                     continue
 
                 # If this is an alias structure then find the non-alias one and use that
