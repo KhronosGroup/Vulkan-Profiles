@@ -43,21 +43,18 @@
 
 #include "profiles.h"
 
-typedef std::vector<std::pair<std::string, int>> List;
+//typedef std::vector<std::pair<std::string, int>> List;
 
-void LayerSettingsLog(const char *pSettingName, const char *pMessage);
+//void LayerSettingsLog(const char *pSettingName, const char *pMessage);
 
 std::string format(const char *message, ...);
 
-std::string GetString(const List &list);
+//std::string GetString(const List &list);
 std::string GetString(const std::vector<std::string> &strings);
 std::string GetUUIDString(const uint8_t deviceUUID[VK_UUID_SIZE]);
 
-void WarnMissingFormatFeatures(const char* device_name, const std::string &format_name, const std::string &features, VkFormatFeatureFlags profile_features,
-                               VkFormatFeatureFlags device_features);
-
-void WarnMissingFormatFeatures2(const char *device_name, const std::string &format_name, const std::string &features,
-                                VkFormatFeatureFlags2 profile_features, VkFormatFeatureFlags2 device_features);
+std::string format_device_support_string(VkFormatFeatureFlags format_features);
+std::string format_device_support_string(VkFormatFeatureFlags2 format_features);
 
 inline bool IsFormatSupported(const VkFormatProperties &props) {
     // Per [SPEC] section 30.3.2 "Format Properties":

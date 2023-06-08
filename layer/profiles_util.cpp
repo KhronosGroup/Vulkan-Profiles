@@ -20,9 +20,9 @@
 #include "profiles_util.h"
 #include "profiles_settings.h"
 
-void LayerSettingsLog(const char* pSettingName, const char* pMessage) {
-    LogMessage(DEBUG_REPORT_ERROR_BIT, "%s : %s\n", pSettingName, pMessage);
-}
+//void LayerSettingsLog(const char* pSettingName, const char* pMessage) {
+//    LogMessage(DEBUG_REPORT_ERROR_BIT, "%s : %s\n", pSettingName, pMessage);
+//}
 
 std::string format(const char *message, ...) {
     std::size_t const STRING_BUFFER(4096);
@@ -55,7 +55,7 @@ std::string ToUpper(const std::string &s) {
     }
     return result;
 }
-
+/*
 std::string GetString(const List &list) {
     std::string result;
     for (std::size_t i = 0, n = list.size(); i < n; ++i) {
@@ -64,7 +64,7 @@ std::string GetString(const List &list) {
     }
     return result;
 }
-
+*/
 std::string GetString(const std::vector<std::string> &strings) {
     std::string result;
     for (std::size_t i = 0, n = strings.size(); i < n; ++i) {
@@ -92,27 +92,6 @@ std::string format_device_support_string(VkFormatFeatureFlags format_features) {
 std::string format_device_support_string(VkFormatFeatureFlags2 format_features) {
     if (format_features == 0) return std::string("does not support it");
     return ::format("only supports:\n\t\" % s\"", GetFormatFeature2String(format_features).c_str());
-}
-
-void WarnMissingFormatFeatures(const char* device_name, const std::string &format_name, const std::string &features, VkFormatFeatureFlags profile_features,
-                               VkFormatFeatureFlags device_features) {
-    if (!(layer_settings->log.debug_reports & DEBUG_REPORT_WARNING_BIT)) return;
-    LogMessage(DEBUG_REPORT_WARNING_BIT,
-               "For %s `%s`,\nthe Profile requires:\n\t\"%s\"\nbut the Device (%s) %s.\nThe "
-               "`%s` can't be simulated on this Device.\n",
-               format_name.c_str(), features.c_str(), GetFormatFeatureString(profile_features).c_str(),
-               device_name, format_device_support_string(device_features).c_str(), features.c_str());
-}
-
-void WarnMissingFormatFeatures2(const char *device_name, const std::string &format_name, const std::string &features,
-                                VkFormatFeatureFlags2 profile_features,
-                                VkFormatFeatureFlags2 device_features) {
-    if (!(layer_settings->log.debug_reports & DEBUG_REPORT_WARNING_BIT)) return;
-    LogMessage(DEBUG_REPORT_WARNING_BIT,
-               "For %s `%s`,\nthe Profile requires:\n\\t\"%s\"\nbut the Device (%s) %s.\nThe "
-               "`%s` can't be simulated on this Device.\n",
-               format_name.c_str(), features.c_str(), GetFormatFeature2String(profile_features).c_str(), device_name,
-               format_device_support_string(device_features).c_str(), features.c_str());
 }
 
 VkResult EnumerateExtensions(const MapOfVkExtensionProperties &source, uint32_t *dst_count, VkExtensionProperties *dst_props) {
