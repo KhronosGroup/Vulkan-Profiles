@@ -20,12 +20,9 @@ import gen_profiles_solution
 import argparse
 
 COPYRIGHT_HEADER = '''
-// This file is ***GENERATED***.  Do Not Edit.
-// See scripts/gen_layer.py for modifications.
-
 /*
- * Copyright (C) 2015-2022 Valve Corporation
- * Copyright (C) 2015-2022 LunarG, Inc.
+ * Copyright (C) 2015-2023 Valve Corporation
+ * Copyright (C) 2015-2023 LunarG, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +42,9 @@ COPYRIGHT_HEADER = '''
  * Author: Ziga Markus <ziga@lunarg.com>
  * Author: Christophe Riccio <christophe@lunarg.com>
  * Author: Mark Lobodzinski <mark@lunarg.com>
+
+ * This file is ***GENERATED***.  Do Not Edit.
+ * See scripts/gen_profiles_layer.py for modifications.
  */
 '''
 

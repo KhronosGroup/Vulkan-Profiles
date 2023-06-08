@@ -57,9 +57,10 @@ PROFILES = '''
     }
  '''
 
-TESTS_HEADER = '''/*
- * Copyright (C) 2021-2022 Valve Corporation
- * Copyright (C) 2021-2022 LunarG, Inc.
+TESTS_HEADER = '''
+/*
+ * Copyright (C) 2021-2023 Valve Corporation
+ * Copyright (C) 2021-2023 LunarG, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,6 +77,9 @@ TESTS_HEADER = '''/*
  * Author: Ziga Markus <ziga@lunarg.com>
  * Author: Christophe Riccio <christophe@lunarg.com>
  * Author: Mark Lobodzinski <mark@lunarg.com>
+ *
+ * This file is ***GENERATED***.  Do Not Edit.
+ * See scripts/gen_profiles_tests.py for modifications.
  */
 
 #include <vulkan/vulkan_core.h>
