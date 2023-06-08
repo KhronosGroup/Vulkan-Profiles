@@ -31,6 +31,22 @@
 
 namespace profiles_test {
 
+inline std::string format(const char* message, ...) {
+    std::size_t const STRING_BUFFER(4096);
+
+    assert(message != nullptr);
+    assert(strlen(message) >= 0 && strlen(message) < STRING_BUFFER);
+
+    char buffer[STRING_BUFFER];
+    va_list list;
+
+    va_start(list, message);
+    vsnprintf(buffer, STRING_BUFFER, message, list);
+    va_end(list);
+
+    return buffer;
+}
+
 void setEnvironmentSetting(std::string setting, const char* val);
 void unsetEnvironmentSetting(std::string setting);
 
@@ -70,4 +86,5 @@ class VulkanInstanceBuilder {
     std::vector<const char*> _layer_names;
     std::vector<const char*> _extension_names;
 };
+
 }  // namespace profiles_test

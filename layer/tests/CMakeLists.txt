@@ -26,6 +26,10 @@ else()
         tests_promoted
         tests_generated
         tests_mechanism
+        tests_mechanism_format
+        tests_mechanism_api_version
+        tests_mechanism_check_values
+        tests_mechanism_physical_device_selection
         tests_combine_union
         tests_combine_intersection
         tests_util
