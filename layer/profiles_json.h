@@ -22,6 +22,8 @@
 #include <memory>
 #include <string>
 
+#include "profiles_settings.h"
+
 struct JsonValidator {
     JsonValidator(){};
     ~JsonValidator();
@@ -33,4 +35,4 @@ struct JsonValidator {
     std::string message;
 };
 
-bool WarnDuplicated(const Json::Value &parent, const std::vector<std::string> &members);
+bool WarnDuplicated(ProfileLayerSettings *layer_settings, const Json::Value &parent, const std::vector<std::string> &members);

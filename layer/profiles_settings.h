@@ -184,6 +184,13 @@ static ForceDevice GetForceDevice(const std::string &value) {
 }
 
 struct ProfileLayerSettings {
+    ~ProfileLayerSettings() {
+        if (log.profiles_log_file != nullptr) {
+            fclose(log.profiles_log_file);
+            log.profiles_log_file = nullptr;
+        }
+    }
+
     struct Simulate {
         std::string profile_file{};
         std::string profile_name{"${VP_DEFAULT}"};
@@ -220,6 +227,7 @@ struct ProfileLayerSettings {
         bool debug_file_discard{true};
         DebugReportFlags debug_reports{DEBUG_REPORT_WARNING_BIT | DEBUG_REPORT_ERROR_BIT};
         bool debug_fail_on_error{false};
+        FILE *profiles_log_file{nullptr};
     } log;
 
     struct Device {
@@ -229,12 +237,18 @@ struct ProfileLayerSettings {
     } device;
 };
 
-void InitProfilesLayerSettings();
+void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
+                               ProfileLayerSettings *layer_settings);
 
-extern std::unique_ptr<ProfileLayerSettings> layer_settings;
-extern FILE *profiles_log_file;
+void WarnMissingFormatFeatures(ProfileLayerSettings* layer_settings, const char *device_name, const std::string &format_name,
+                               const std::string &features,
+                               VkFormatFeatureFlags profile_features, VkFormatFeatureFlags device_features);
 
-void LogMessage(DebugReportBits report, const char *message, ...);
+void WarnMissingFormatFeatures2(ProfileLayerSettings *layer_settings, const char *device_name, const std::string &format_name,
+                                const std::string &features,
+                                VkFormatFeatureFlags2 profile_features, VkFormatFeatureFlags2 device_features);
 
-void LogFlush();
+void LogMessage(ProfileLayerSettings *layer_settings, DebugReportBits report, const char *message, ...);
+
+void LogFlush(ProfileLayerSettings *layer_settings);
 

@@ -134,8 +134,6 @@ class PhysicalDeviceData {
         assert(instance != VK_NULL_HANDLE);
         assert(!Find(pd));  // Verify this instance does not already exist.
 
-        LogMessage(DEBUG_REPORT_DEBUG_BIT, \"PhysicalDeviceData::Create()\\n\");
-
         const auto result = map().emplace(pd, instance);
         assert(result.second);  // true=insertion, false=replacement
         auto iter = result.first;
@@ -145,7 +143,6 @@ class PhysicalDeviceData {
     }
 
     static void Destroy(const VkPhysicalDevice pd) {
-        LogMessage(DEBUG_REPORT_DEBUG_BIT, \"PhysicalDeviceData::Destroy()\\n\");
         map().erase(pd);
     }
 
@@ -244,18 +241,18 @@ JSON_LOADER_BEGIN = '''
 class JsonLoader {
    public:
     JsonLoader()
-        : pdd_(nullptr),
+        : layer_settings{},
+          pdd_(nullptr),
           profile_filename_(),
           root_(Json::nullValue),
           profile_api_version_(0),
           excluded_extensions_(),
-          excluded_formats_() {}
+          excluded_formats_()
+    {}
     JsonLoader(const JsonLoader &) = delete;
     JsonLoader &operator=(const JsonLoader &rhs) = delete;
 
     static JsonLoader &Create() {
-        LogMessage(DEBUG_REPORT_DEBUG_BIT, "JsonLoader::Create()\\n");
-
         VkInstance temporary = VK_NULL_HANDLE;
         const auto result = profile_map().emplace(std::piecewise_construct, std::make_tuple(temporary), std::make_tuple());
         assert(result.second);  // true=insertion, false=replacement
@@ -276,7 +273,6 @@ class JsonLoader {
     }
 
     static void Destroy(VkInstance instance) {
-        LogMessage(DEBUG_REPORT_DEBUG_BIT, "JsonLoader::Destroy()\\n");
         profile_map().erase(instance);
     }
 
@@ -285,6 +281,8 @@ class JsonLoader {
     VkResult LoadDevice(const char* device_name, PhysicalDeviceData *pdd);
     VkResult ReadProfile(const char* device_name, const Json::Value& root, const std::vector<std::vector<std::string>> &capabilities);
     uint32_t GetProfileApiVersion() const { return profile_api_version_; }
+
+    ProfileLayerSettings layer_settings;
 
    private:
     PhysicalDeviceData *pdd_;
@@ -331,13 +329,13 @@ JSON_LOADER_END = '''
 '''
 
 WARN_FUNCTIONS = '''
-    static bool WarnIfNotEqualFloat(const char* device_name, const char *cap_name, const float new_value, const float old_value, const bool not_modifiable) {
+    static bool WarnIfNotEqualFloat(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const float new_value, const float old_value, const bool not_modifiable) {
         if (std::abs(new_value - old_value) > 0.0001f) {
             if (not_modifiable) {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' is not modifiable but the profile value (%3.2f) is different from the device (%s) value (%3.2f).\\n", cap_name, new_value, device_name, old_value);
             } else {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' profile value (%3.2f) is different from the device (%s) supported value (%3.2f).\\n", cap_name, new_value, device_name, old_value);
             }
             return true;
@@ -345,13 +343,13 @@ WARN_FUNCTIONS = '''
         return false;
     }
 
-    static bool WarnIfNotEqualBool(const char* device_name, const char *cap_name, const bool new_value, const bool old_value, const bool not_modifiable) {
+    static bool WarnIfNotEqualBool(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const bool new_value, const bool old_value, const bool not_modifiable) {
         if (new_value != old_value) {
             if (not_modifiable) {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' is not modifiable but the profile value (%s) is different from the device (%s) value (%s)\\n", cap_name, new_value ? "true" : "false", device_name, old_value ? "true" : "false");
             } else {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' profile value is enabled in the profile, but the device (%s) does not support it.\\n", cap_name, device_name);
             }
             return true;
@@ -359,13 +357,13 @@ WARN_FUNCTIONS = '''
         return false;
     }
 
-    static bool WarnIfNotEqualEnum(const char* device_name, const char *cap_name, const uint32_t new_value, const uint32_t old_value, const bool not_modifiable) {
+    static bool WarnIfNotEqualEnum(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const uint32_t new_value, const uint32_t old_value, const bool not_modifiable) {
         if (new_value != old_value) {
             if (not_modifiable) {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' is not modifiable but the profile value (%" PRIu32 ") is different from the device (%s) value (%" PRIu32 ").\\n", cap_name, new_value, device_name, old_value);
             } else {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' profile value (%" PRIu32 ") is different from the device (%s) value (%" PRIu32 ").\\n", cap_name, new_value, device_name, old_value);
             }
             return true;
@@ -373,13 +371,13 @@ WARN_FUNCTIONS = '''
         return false;
     }
 
-    static bool WarnIfNotEqual(const char* device_name, const char *cap_name, const uint32_t new_value, const uint32_t old_value, const bool not_modifiable) {
+    static bool WarnIfNotEqual(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const uint32_t new_value, const uint32_t old_value, const bool not_modifiable) {
         if (new_value != old_value) {
             if (not_modifiable) {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' is not modifiable but the profile value (%" PRIu32 ") is different from the device (%s) value (%" PRIu32 ").\\n", cap_name, new_value, device_name, old_value);
             } else {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' profile value (%" PRIu32 ") is different from the device (%s) value (%" PRIu32 ").\\n", cap_name, new_value, device_name, old_value);
             }
             return true;
@@ -387,13 +385,13 @@ WARN_FUNCTIONS = '''
         return false;
     }
 
-    static bool WarnIfNotEqual32u(const char* device_name, const char *cap_name, const uint32_t new_value, const uint32_t old_value, const bool not_modifiable) {
+    static bool WarnIfNotEqual32u(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const uint32_t new_value, const uint32_t old_value, const bool not_modifiable) {
         if (new_value != old_value) {
             if (not_modifiable) {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' is not modifiable but the profile value (%" PRIu32 ") is different from the device (%s) value (%" PRIu32 ").\\n", cap_name, new_value, device_name, old_value);
             } else {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' profile value (%" PRIu32 ") is different from the device (%s) value (%" PRIu32 ").\\n", cap_name, new_value, device_name, old_value);
             }
             return true;
@@ -401,13 +399,13 @@ WARN_FUNCTIONS = '''
         return false;
     }
 
-    static bool WarnIfNotEqual(const char* device_name, const char *cap_name, const int32_t new_value, const int32_t old_value, const bool not_modifiable) {
+    static bool WarnIfNotEqual(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const int32_t new_value, const int32_t old_value, const bool not_modifiable) {
         if (new_value != old_value) {
             if (not_modifiable) {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' is not modifiable but the profile value (%" PRIi32 ") is different from the device (%s) value (%" PRIi32 ").\\n", cap_name, new_value, device_name, old_value);
             } else {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' profile value (%" PRIi32 ") is different from the device (%s) value (%" PRIi32 ").\\n", cap_name, new_value, device_name, old_value);
             }
             return true;
@@ -415,13 +413,13 @@ WARN_FUNCTIONS = '''
         return false;
     }
 
-    static bool WarnIfNotEqual64u(const char* device_name, const char *cap_name, const uint64_t new_value, const uint64_t old_value, const bool not_modifiable) {
+    static bool WarnIfNotEqual64u(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const uint64_t new_value, const uint64_t old_value, const bool not_modifiable) {
         if (new_value != old_value) {
             if (not_modifiable) {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' is not modifiable but the profile value (%" PRIu64 ") is different from the device (%s) value (%" PRIu64 ").\\n", cap_name, new_value, device_name, old_value);
             } else {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' profile value (%" PRIu64 ") is different from the device (%s) value (%" PRIu64 ").\\n", cap_name, new_value, device_name, old_value);
             }
             return true;
@@ -429,13 +427,13 @@ WARN_FUNCTIONS = '''
         return false;
     }
 
-    static bool WarnIfNotEquali64(const char* device_name, const char *cap_name, const int64_t new_value, const int64_t old_value, const bool not_modifiable) {
+    static bool WarnIfNotEquali64(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const int64_t new_value, const int64_t old_value, const bool not_modifiable) {
         if (new_value != old_value) {
             if (not_modifiable) {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' is not modifiable but the profile value (%" PRIi64 ") is different from the device (%s) value (%" PRIi64 ").\\n", cap_name, new_value, device_name, old_value);
             } else {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' profile value (%" PRIi64 ") is different from the device (%s) value (%" PRIi64 ").\\n", cap_name, new_value, device_name, old_value);
             }
             return true;
@@ -443,13 +441,13 @@ WARN_FUNCTIONS = '''
         return false;
     }
 
-    static bool WarnIfNotEqualSizet(const char* device_name, const char *cap_name, const size_t new_value, const size_t old_value, const bool not_modifiable) {
+    static bool WarnIfNotEqualSizet(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const size_t new_value, const size_t old_value, const bool not_modifiable) {
         if (new_value != old_value) {
             if (not_modifiable) {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' is not modifiable but the profile value (%" PRIuLEAST64 ") is different from the device (%s) value (%" PRIuLEAST64 ").\\n", cap_name, new_value, device_name, old_value);
             } else {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' profile value (%" PRIuLEAST64 ") is different from the device (%s) value (%" PRIuLEAST64 ").\\n", cap_name, new_value, device_name, old_value);
             }
             return true;
@@ -457,13 +455,13 @@ WARN_FUNCTIONS = '''
         return false;
     }
 
-    static bool WarnIfMissingBit(const char* device_name, const char *cap_name, const uint32_t new_value, const uint32_t old_value, const bool not_modifiable) {
+    static bool WarnIfMissingBit(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const uint32_t new_value, const uint32_t old_value, const bool not_modifiable) {
         if ((old_value | new_value) != old_value) {
             if (not_modifiable) {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' is not modifiable but the profile value (%" PRIu32 ") is different from the device (%s) value (%" PRIu32 ").\\n", cap_name, new_value, device_name, old_value);
             } else {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' profile value (%" PRIu32 ") has bits set that the device (%s) value (%" PRIu32 ") does not.\\n", cap_name, new_value, device_name, old_value);
             }
             return true;
@@ -471,54 +469,54 @@ WARN_FUNCTIONS = '''
         return false;
     }
 
-    static bool WarnIfGreater(const char* device_name, const char *cap_name, const uint64_t new_value, const uint64_t old_value, const bool not_modifiable) {
+    static bool WarnIfGreater(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const uint64_t new_value, const uint64_t old_value, const bool not_modifiable) {
         if (new_value > old_value) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT,
+            LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                 "'%s' profile value (%" PRIu64 ") is greater than device (%s) value (%" PRIu64 ")\\n", cap_name, new_value, device_name, old_value);
             return true;
         }
         return false;
     }
 
-    static bool WarnIfGreaterSizet(const char* device_name, const char *cap_name, const size_t new_value, const size_t old_value, const bool not_modifiable) {
+    static bool WarnIfGreaterSizet(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const size_t new_value, const size_t old_value, const bool not_modifiable) {
         if (new_value > old_value) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT,
+            LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                 "'%s' profile value (%" PRIuLEAST64 ") is greater than device (%s) value (%" PRIuLEAST64 ")\\n", cap_name, new_value, device_name, old_value);
             return true;
         }
         return false;
     }
 
-    static bool WarnIfGreaterFloat(const char* device_name, const char *cap_name, const float new_value, const float old_value, const bool not_modifiable) {
+    static bool WarnIfGreaterFloat(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const float new_value, const float old_value, const bool not_modifiable) {
         if (new_value > old_value) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT,
+            LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                 "'%s' profile value (%3.2f) is greater than device (%s) value (%3.2f)\\n", cap_name, new_value, device_name, old_value);
             return true;
         }
         return false;
     }
 
-    static bool WarnIfLesser(const char* device_name, const char *cap_name, const uint64_t new_value, const uint64_t old_value, const bool not_modifiable) {
+    static bool WarnIfLesser(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const uint64_t new_value, const uint64_t old_value, const bool not_modifiable) {
         if (new_value < old_value) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT,
+            LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                 "'%s' profile value (%" PRIu64 ") is lesser than device (%s) value (%" PRIu64 ")\\n", cap_name, new_value, device_name, old_value);
             return true;
         }
         return false;
     }
 
-    static bool WarnIfLesserSizet(const char* device_name, const char *cap_name, const size_t new_value, const size_t old_value, const bool not_modifiable) {
+    static bool WarnIfLesserSizet(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const size_t new_value, const size_t old_value, const bool not_modifiable) {
         if (new_value < old_value) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT,
+            LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                 "'%s' profile value (%" PRIuLEAST64 ") is lesser than device (%s) value (%" PRIuLEAST64 ")\\n", cap_name, new_value, device_name, old_value);
             return true;
         }
         return false;
     }
 
-    static bool WarnIfLesserFloat(const char* device_name, const char *cap_name, const float new_value, const float old_value, const bool not_modifiable) {
+    static bool WarnIfLesserFloat(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const float new_value, const float old_value, const bool not_modifiable) {
         if (new_value < old_value) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT,
+            LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                 "'%s' profile value (%3.2f) is lesser than device (%s) value (%3.2f)\\n", cap_name, new_value, device_name, old_value);
             return true;
         }
@@ -528,7 +526,7 @@ WARN_FUNCTIONS = '''
 
 GET_VALUE_FUNCTIONS = '''
     bool GetValue(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, float *dest, bool not_modifiable,
-                  std::function<bool(const char *, const char *, float, float, bool)> warn_func = nullptr) {
+                  std::function<bool(ProfileLayerSettings *, const char *, const char *, float, float, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -544,7 +542,7 @@ GET_VALUE_FUNCTIONS = '''
         bool valid = true;
         const float new_value = value.asFloat();
         if (warn_func) {
-            if (warn_func(device_name, name, new_value, *dest, not_modifiable)) {
+            if (warn_func(&layer_settings, device_name, name, new_value, *dest, not_modifiable)) {
                 valid = false;
             }
         }
@@ -556,7 +554,7 @@ GET_VALUE_FUNCTIONS = '''
     }
 
     bool GetValue(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, uint8_t *dest, bool not_modifiable,
-                  std::function<bool(const char *, const char *, uint8_t, uint8_t, bool)> warn_func = nullptr) {
+                  std::function<bool(ProfileLayerSettings *, const char *, const char *, uint8_t, uint8_t, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -570,7 +568,7 @@ GET_VALUE_FUNCTIONS = '''
         if (value.isBool()) {
             const bool new_value = value.asBool();
             if (warn_func) {
-                if (warn_func(device_name, name, new_value, *dest, not_modifiable)) {
+                if (warn_func(&layer_settings, device_name, name, new_value, *dest, not_modifiable)) {
                     valid = false;
                 }
             }
@@ -588,7 +586,7 @@ GET_VALUE_FUNCTIONS = '''
         } else if (value.isUInt()) {
             const uint8_t new_value = static_cast<uint8_t>(value.asUInt());
             if (warn_func) {
-                if (warn_func(device_name, name, new_value, *dest, not_modifiable)) {
+                if (warn_func(&layer_settings, device_name, name, new_value, *dest, not_modifiable)) {
                     valid = false;
                 }
             }
@@ -600,7 +598,7 @@ GET_VALUE_FUNCTIONS = '''
     }
 
     bool GetValue(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, int32_t *dest, bool not_modifiable,
-                  std::function<bool(const char *, const char *, int32_t, int32_t, bool)> warn_func = nullptr) {
+                  std::function<bool(ProfileLayerSettings *, const char *, const char *, int32_t, int32_t, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -616,7 +614,7 @@ GET_VALUE_FUNCTIONS = '''
         bool valid = true;
         const int32_t new_value = value.asInt();
         if (warn_func) {
-            if (warn_func(device_name, name, new_value, *dest, not_modifiable)) {
+            if (warn_func(&layer_settings, device_name, name, new_value, *dest, not_modifiable)) {
                 valid = false;
             }
         }
@@ -628,7 +626,7 @@ GET_VALUE_FUNCTIONS = '''
     }
 
     bool GetValue(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, int64_t *dest, bool not_modifiable,
-                  std::function<bool(const char *, const char *, int64_t, int64_t, bool)> warn_func = nullptr) {
+                  std::function<bool(ProfileLayerSettings *, const char *, const char *, int64_t, int64_t, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -644,7 +642,7 @@ GET_VALUE_FUNCTIONS = '''
         bool valid = true;
         const int64_t new_value = value.asInt64();
         if (warn_func) {
-            if (warn_func(device_name, name, new_value, *dest, not_modifiable)) {
+            if (warn_func(&layer_settings, device_name, name, new_value, *dest, not_modifiable)) {
                 valid = false;
             }
         }
@@ -656,7 +654,7 @@ GET_VALUE_FUNCTIONS = '''
     }
 
     bool GetValue(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, uint32_t *dest, bool not_modifiable,
-                  std::function<bool(const char *, const char *, uint32_t, uint32_t, bool)> warn_func = nullptr) {
+                  std::function<bool(ProfileLayerSettings *, const char *, const char *, uint32_t, uint32_t, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -670,7 +668,7 @@ GET_VALUE_FUNCTIONS = '''
         if (value.isBool()) {
             const bool new_value = value.asBool();
             if (warn_func) {
-                if (warn_func(device_name, name, new_value, *dest, not_modifiable)) {
+                if (warn_func(&layer_settings, device_name, name, new_value, *dest, not_modifiable)) {
                     valid = false;
                 }
             }
@@ -692,7 +690,7 @@ GET_VALUE_FUNCTIONS = '''
         } else if (value.isUInt()) {
             const uint32_t new_value = value.asUInt();
             if (warn_func) {
-                if (warn_func(device_name, name, new_value, *dest, not_modifiable)) {
+                if (warn_func(&layer_settings, device_name, name, new_value, *dest, not_modifiable)) {
                     valid = false;
                 }
             }
@@ -705,7 +703,7 @@ GET_VALUE_FUNCTIONS = '''
     }
 
     bool GetValue(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, uint64_t *dest, bool not_modifiable,
-                  std::function<bool(const char *, const char *, uint64_t, uint64_t, bool)> warn_func = nullptr) {
+                  std::function<bool(ProfileLayerSettings *, const char *, const char *, uint64_t, uint64_t, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -721,7 +719,7 @@ GET_VALUE_FUNCTIONS = '''
         bool valid = true;
         const uint64_t new_value = value.asUInt64();
         if (warn_func) {
-            if (warn_func(device_name, name, new_value, *dest, not_modifiable)) {
+            if (warn_func(&layer_settings, device_name, name, new_value, *dest, not_modifiable)) {
                 valid = false;
             }
         }
@@ -733,7 +731,7 @@ GET_VALUE_FUNCTIONS = '''
     }
 
     bool GetValue(const char* device_name, const Json::Value &pparent, const std::string &member, const char *name, VkExtent2D *dest, bool not_modifiable,
-                  std::function<bool(const char *, const char *, uint32_t, uint32_t, bool)> warn_func = nullptr) {
+                  std::function<bool(ProfileLayerSettings *, const char *, const char *, uint32_t, uint32_t, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -755,7 +753,7 @@ GET_VALUE_FUNCTIONS = '''
     }
 
     bool GetValue(const char* device_name, const Json::Value &pparent, const std::string &member, const char *name, VkExtent3D *dest, bool not_modifiable,
-                  std::function<bool(const char *, const char *, uint32_t, uint32_t, bool)> warn_func = nullptr) {
+                  std::function<bool(ProfileLayerSettings *, const char *, const char *, uint32_t, uint32_t, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -778,7 +776,7 @@ GET_VALUE_FUNCTIONS = '''
     }
 
     bool GetValueSizet(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, size_t *dest, bool not_modifiable,
-                       std::function<bool(const char *, const char *, size_t, size_t, bool)> warn_func = nullptr) {
+                       std::function<bool(ProfileLayerSettings *, const char *, const char *, size_t, size_t, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -792,7 +790,7 @@ GET_VALUE_FUNCTIONS = '''
         if (value.isUInt()) {
             const size_t new_value = value.asUInt();
             if (warn_func) {
-                if (warn_func(device_name, name, new_value, *dest, not_modifiable)) {
+                if (warn_func(&layer_settings, device_name, name, new_value, *dest, not_modifiable)) {
                     valid = false;
                 }
             }
@@ -806,7 +804,7 @@ GET_VALUE_FUNCTIONS = '''
 
     template <typename T>  // for Vulkan enum types
     bool GetValueFlag(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, T *dest, bool not_modifiable,
-                      std::function<bool(const char *, const char *, T, T, bool)> warn_func = nullptr) {
+                      std::function<bool(ProfileLayerSettings *, const char *, const char *, T, T, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -825,7 +823,7 @@ GET_VALUE_FUNCTIONS = '''
                 }
             }
         }
-        if (WarnIfMissingBit(device_name, name, new_value, static_cast<uint32_t>(*dest), not_modifiable)) {
+        if (WarnIfMissingBit(&layer_settings, device_name, name, new_value, static_cast<uint32_t>(*dest), not_modifiable)) {
             valid = false;
         }
 
@@ -837,7 +835,7 @@ GET_VALUE_FUNCTIONS = '''
 
     template <typename T>  // for Vulkan enum types
     bool GetValueEnum(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, T *dest, bool not_modifiable,
-                      std::function<bool(const char *, const char *, uint32_t, uint32_t, bool)> warn_func = nullptr) {
+                      std::function<bool(ProfileLayerSettings *, const char *, const char *, uint32_t, uint32_t, bool)> warn_func = nullptr) {
         if (member != name) {
             return true;
         }
@@ -853,11 +851,11 @@ GET_VALUE_FUNCTIONS = '''
             new_value = static_cast<T>(VkStringToUint(value.asString()));
         }
         if (warn_func) {
-            if (warn_func(device_name, name, new_value, *dest, not_modifiable)) {
+            if (warn_func(&layer_settings, device_name, name, new_value, *dest, not_modifiable)) {
                 valid = false;
             }
         } else {
-            if (WarnIfNotEqualEnum(device_name, name, new_value, *dest, not_modifiable)) {
+            if (WarnIfNotEqualEnum(&layer_settings, device_name, name, new_value, *dest, not_modifiable)) {
                 valid = false;
             }
         }
@@ -1015,34 +1013,34 @@ bool JsonLoader::GetFormat(const char *device_name, const Json::Value &formats, 
 
     const VkFormatProperties &device_properties = pdd_->device_formats_[format];
     if (!HasFlags(device_properties.linearTilingFeatures, profile_properties.linearTilingFeatures)) {
-        WarnMissingFormatFeatures(device_name, format_name, "linearTilingFeatures", profile_properties.linearTilingFeatures,
+        WarnMissingFormatFeatures(&layer_settings, device_name, format_name, "linearTilingFeatures", profile_properties.linearTilingFeatures,
                                   device_properties.linearTilingFeatures);
         valid = false;
     }
     if (!HasFlags(device_properties.optimalTilingFeatures, profile_properties.optimalTilingFeatures)) {
-        WarnMissingFormatFeatures(device_name, format_name, "optimalTilingFeatures", profile_properties.optimalTilingFeatures,
+        WarnMissingFormatFeatures(&layer_settings, device_name, format_name, "optimalTilingFeatures", profile_properties.optimalTilingFeatures,
                                   device_properties.optimalTilingFeatures);
         valid = false;
     }
     if (!HasFlags(device_properties.bufferFeatures, profile_properties.bufferFeatures)) {
-        WarnMissingFormatFeatures(device_name, format_name, "bufferFeatures", profile_properties.bufferFeatures,
+        WarnMissingFormatFeatures(&layer_settings, device_name, format_name, "bufferFeatures", profile_properties.bufferFeatures,
                                   device_properties.bufferFeatures);
         valid = false;
     }
 
     const VkFormatProperties3 &device_properties_3 = pdd_->device_formats_3_[format];
     if (!HasFlags(device_properties_3.linearTilingFeatures, profile_properties_3.linearTilingFeatures)) {
-        WarnMissingFormatFeatures2(device_name, format_name, "linearTilingFeatures", profile_properties_3.linearTilingFeatures,
+        WarnMissingFormatFeatures2(&layer_settings, device_name, format_name, "linearTilingFeatures", profile_properties_3.linearTilingFeatures,
                                    device_properties_3.linearTilingFeatures);
         valid = false;
     }
     if (!HasFlags(device_properties_3.optimalTilingFeatures, profile_properties_3.optimalTilingFeatures)) {
-        WarnMissingFormatFeatures2(device_name, format_name, "optimalTilingFeatures", profile_properties_3.optimalTilingFeatures,
+        WarnMissingFormatFeatures2(&layer_settings, device_name, format_name, "optimalTilingFeatures", profile_properties_3.optimalTilingFeatures,
                                    device_properties_3.optimalTilingFeatures);
         valid = false;
     }
     if (!HasFlags(device_properties_3.bufferFeatures, profile_properties_3.bufferFeatures)) {
-        WarnMissingFormatFeatures2(device_name, format_name, "bufferFeatures", profile_properties_3.bufferFeatures,
+        WarnMissingFormatFeatures2(&layer_settings, device_name, format_name, "bufferFeatures", profile_properties_3.bufferFeatures,
                                    device_properties_3.bufferFeatures);
         valid = false;
     }
@@ -1052,7 +1050,7 @@ bool JsonLoader::GetFormat(const char *device_name, const Json::Value &formats, 
 
 bool JsonLoader::CheckVersionSupport(uint32_t version, const std::string &name) {
     if (pdd_->GetEffectiveVersion() < version) {
-        LogMessage(
+        LogMessage(&layer_settings, 
             DEBUG_REPORT_ERROR_BIT,
             "Profile sets %s which is provided by Vulkan version %s, but the current effective API version is %s.\\n",
                      name.c_str(), StringAPIVersion(version).c_str(), StringAPIVersion(pdd_->GetEffectiveVersion()).c_str());
@@ -1064,25 +1062,24 @@ bool JsonLoader::CheckVersionSupport(uint32_t version, const std::string &name) 
 JsonLoader::ExtensionSupport JsonLoader::CheckExtensionSupport(const char *extension, const std::string &name) {
     for (const auto &ext : excluded_extensions_) {
         if (ext == extension) {
-            LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+            LogMessage(&layer_settings, DEBUG_REPORT_NOTIFICATION_BIT,
                        "Profile requires %s capabilities, but %s is excluded, device values are used.\\n", name.c_str(),
                                 extension);
             return JsonLoader::ExtensionSupport::EXCLUDED;
         }
     }
-    if (layer_settings->simulate.capabilities & SIMULATE_EXTENSIONS_BIT) {
+    if (layer_settings.simulate.capabilities & SIMULATE_EXTENSIONS_BIT) {
         if (!PhysicalDeviceData::HasSimulatedExtension(pdd_, extension)) {
-            LogMessage(
-                DEBUG_REPORT_ERROR_BIT,
+            LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT,
                 "Profile requires %s capabilitiess, but %s is not required by the profile, device values are used.\\n",
                          name.c_str(), extension);
-            if (layer_settings->log.debug_fail_on_error) {
+            if (layer_settings.log.debug_fail_on_error) {
                 return JsonLoader::ExtensionSupport::UNSUPPORTED;
             }
         }
     } else {
         if (!PhysicalDeviceData::HasExtension(pdd_, extension)) {
-            LogMessage(
+            LogMessage(&layer_settings, 
                 DEBUG_REPORT_WARNING_BIT,
                 "Profile requires by %s capabilities, but %s is not supported by the device.\\n", name.c_str(), extension);
         }
@@ -1218,7 +1215,7 @@ bool JsonLoader::GetQueueFamilyProperties(const char* device_name, const Json::V
             message += format(", VkQueueFamilyQueryResultStatusProperties2KHR [queryResultStatusSupport: VK_TRUE]");
         }
         message += ".\\n";
-        LogMessage(DEBUG_REPORT_WARNING_BIT, message.c_str());
+        LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT, message.c_str());
         valid = false;
     }
 
@@ -1322,7 +1319,7 @@ bool JsonLoader::OrderQueueFamilyProperties(ArrayOfVkQueueFamilyProperties *qfp)
             return true;
         }
     } while (std::next_permutation(permutations.begin(), permutations.end()));
-    LogMessage(DEBUG_REPORT_WARNING_BIT,
+    LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
                "Device supports all individual profile queue families, but not all of them simultaneously.\\n");
     return false;
 }
@@ -1344,7 +1341,7 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
             if (properties.isMember("VkPhysicalDeviceProperties") && properties["VkPhysicalDeviceProperties"].isMember("apiVersion")) {
                 properties_api_version = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
                 simulated_version = properties_api_version;
-            } else if (layer_settings->simulate.capabilities & SIMULATE_API_VERSION_BIT) {
+            } else if (layer_settings.simulate.capabilities & SIMULATE_API_VERSION_BIT) {
                 simulated_version = profile_api_version_;
             }
         }
@@ -1359,7 +1356,7 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
             const auto &properties = cap_definision["properties"];
 
             if (VK_API_VERSION_PATCH(this->profile_api_version_) > VK_API_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion)) {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "Profile apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ") is greater than the device apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ").\\n",
                         VK_API_VERSION_MAJOR(this->profile_api_version_), VK_API_VERSION_MINOR(this->profile_api_version_),
                         VK_API_VERSION_PATCH(this->profile_api_version_),
@@ -1369,7 +1366,7 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
                 failed = true;
             }
 
-            if (layer_settings->simulate.capabilities & SIMULATE_EXTENSIONS_BIT) {
+            if (layer_settings.simulate.capabilities & SIMULATE_EXTENSIONS_BIT) {
                 const auto &extensions = cap_definision["extensions"];
 
                 pdd_->map_of_extension_properties_.reserve(extensions.size());
@@ -1381,7 +1378,7 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
                     bool found = pdd_->map_of_extension_properties_.count(e) > 0;
 
                     if (IsInstanceExtension(e.c_str())) {
-                        LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+                        LogMessage(&layer_settings, DEBUG_REPORT_NOTIFICATION_BIT,
                             "Required %s extension is an instance extension. The Profiles layer can't override instance extension, the extension is ignored.\\n", e.c_str());
                     }
 
@@ -1399,7 +1396,7 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
                 }
             }
 
-            if (layer_settings->simulate.capabilities & SIMULATE_FEATURES_BIT) {
+            if (layer_settings.simulate.capabilities & SIMULATE_FEATURES_BIT) {
                 const auto &features = cap_definision["features"];
 
                 bool duplicated = !WarnDuplicatedFeature(features);
@@ -1424,7 +1421,7 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
                 }
             }
 
-            if (layer_settings->simulate.capabilities & SIMULATE_PROPERTIES_BIT) {
+            if (layer_settings.simulate.capabilities & SIMULATE_PROPERTIES_BIT) {
                 bool duplicated = !WarnDuplicatedProperty(properties);
                 if (duplicated) {
                     failed = true;
@@ -1447,7 +1444,7 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
                 }
             }
 
-            if (layer_settings->simulate.capabilities & SIMULATE_FORMATS_BIT) {
+            if (layer_settings.simulate.capabilities & SIMULATE_FORMATS_BIT) {
                 const auto &formats = cap_definision["formats"];
 
                 for (const auto &format : formats.getMemberNames()) {
@@ -1458,7 +1455,7 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
                 }
             }
 
-            if (layer_settings->simulate.capabilities & SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT) {
+            if (layer_settings.simulate.capabilities & SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT) {
                 const auto &qf_props = cap_definision["queueFamiliesProperties"];
 
                 bool queue_families_supported = true;
@@ -1481,24 +1478,24 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
     }
 
     if (properties_api_version != 0) {
-        LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+        LogMessage(&layer_settings, DEBUG_REPORT_NOTIFICATION_BIT,
             "VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 ". Using the API version specified by the profile VkPhysicalDeviceProperties structure.\\n",
             VK_API_VERSION_MAJOR(properties_api_version), VK_API_VERSION_MINOR(properties_api_version), VK_API_VERSION_PATCH(properties_api_version));
-    } else if (layer_settings->simulate.capabilities & SIMULATE_API_VERSION_BIT) {
-        LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+    } else if (layer_settings.simulate.capabilities & SIMULATE_API_VERSION_BIT) {
+        LogMessage(&layer_settings, DEBUG_REPORT_NOTIFICATION_BIT,
             "VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32". Using the API version specified by the profile.\\n",
             VK_API_VERSION_MAJOR(this->profile_api_version_), VK_API_VERSION_MINOR(this->profile_api_version_), VK_API_VERSION_PATCH(this->profile_api_version_));
 
         pdd_->physical_device_properties_.apiVersion = this->profile_api_version_;
     } else {
-        LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+        LogMessage(&layer_settings, DEBUG_REPORT_NOTIFICATION_BIT,
             "VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 ". Using the device version.\\n",
                 VK_API_VERSION_MAJOR(pdd_->physical_device_properties_.apiVersion),
                 VK_API_VERSION_MINOR(pdd_->physical_device_properties_.apiVersion),
                 VK_API_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion));
     }
 
-    if (failed && layer_settings->log.debug_fail_on_error) {
+    if (failed && layer_settings.log.debug_fail_on_error) {
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
@@ -1506,21 +1503,21 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
 }
 
 VkResult JsonLoader::LoadFile(std::string filename) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "JsonLoader::LoadFile(\\"%s\\")\\n", filename.c_str());
+    LogMessage(&layer_settings, DEBUG_REPORT_DEBUG_BIT, "JsonLoader::LoadFile(\\"%s\\")\\n", filename.c_str());
 
     profile_filename_ = filename;
     if (filename.empty()) {
-        if (!layer_settings->simulate.profile_name.empty()) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT,
+        if (!layer_settings.simulate.profile_name.empty()) {
+            LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
                 "Profile name is set to \\"%s\\", but profile_file is unset. The profile will not be loaded.\\n",
-                layer_settings->simulate.profile_name.c_str());
+                layer_settings.simulate.profile_name.c_str());
         }
         return VK_SUCCESS;
     }
     std::ifstream json_file(filename);
     if (!json_file) {
-        LogMessage(DEBUG_REPORT_ERROR_BIT, "Fail to open file \\"%s\\"\\n", filename.c_str());
-        return layer_settings->log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
+        LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "Fail to open file \\"%s\\"\\n", filename.c_str());
+        return layer_settings.log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
 
     Json::Value root = Json::nullValue;
@@ -1528,14 +1525,14 @@ VkResult JsonLoader::LoadFile(std::string filename) {
     std::string errs;
     bool success = Json::parseFromStream(builder, json_file, &root_, &errs);
     if (!success) {
-        LogMessage(DEBUG_REPORT_ERROR_BIT, "Fail to parse file \\"%s\\" {\\n%s}\\n", filename.c_str(), errs.c_str());
-        return layer_settings->log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
+        LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "Fail to parse file \\"%s\\" {\\n%s}\\n", filename.c_str(), errs.c_str());
+        return layer_settings.log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
     json_file.close();
 
     if (root_.type() != Json::objectValue) {
-        LogMessage(DEBUG_REPORT_ERROR_BIT, "Json document root is not an object in file \\"%s\\"\\n", filename.c_str());
-        return layer_settings->log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
+        LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "Json document root is not an object in file \\"%s\\"\\n", filename.c_str());
+        return layer_settings.log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
 
     ReadProfileApiVersion();
@@ -1544,7 +1541,7 @@ VkResult JsonLoader::LoadFile(std::string filename) {
 }
 
 void JsonLoader::ReadProfileApiVersion() {
-    const std::string &profile_name = layer_settings->simulate.profile_name;
+    const std::string &profile_name = layer_settings.simulate.profile_name;
     const Json::Value &profiles = root_["profiles"];
     bool found_profile = false;
     for (const auto &profile : profiles.getMemberNames()) {
@@ -1573,11 +1570,11 @@ void JsonLoader::ReadProfileApiVersion() {
         }
     }
 
-    for (const auto& extension : layer_settings->simulate.exclude_device_extensions) {
+    for (const auto& extension : layer_settings.simulate.exclude_device_extensions) {
         if (extension.empty()) continue;
         excluded_extensions_.push_back(extension);
     }
-    for (const auto& format : layer_settings->simulate.exclude_formats) {
+    for (const auto& format : layer_settings.simulate.exclude_formats) {
         if (format.empty()) continue;
         excluded_formats_.push_back(format);
     }
@@ -1586,7 +1583,7 @@ void JsonLoader::ReadProfileApiVersion() {
 VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd) {
     pdd_ = pdd;
 
-    const std::string &profile_name = layer_settings->simulate.profile_name;
+    const std::string &profile_name = layer_settings.simulate.profile_name;
     const Json::Value &profiles = root_["profiles"];
     std::vector<std::vector<std::string>> capabilities;
 
@@ -1608,7 +1605,7 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
             }
 
             found_profile = true;
-            LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, "Overriding device capabilities with \\"%s\\" profile capabilities.\\n", profile.c_str());
+            LogMessage(&layer_settings, DEBUG_REPORT_NOTIFICATION_BIT, "Overriding device capabilities with \\"%s\\" profile capabilities.\\n", profile.c_str());
             break;  // load a single profile
         }
     }
@@ -1628,9 +1625,9 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
                 capabilities.push_back(cap_variants);
             }
 
-            LogMessage(DEBUG_REPORT_WARNING_BIT,
+            LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
                 "\\"%s\\" profile could not be found in \\"%s\\" file. Loading the default \\"%s\\" profile of the file.\\n",
-                    layer_settings->simulate.profile_name.c_str(), layer_settings->simulate.profile_file.c_str(), profile.c_str());
+                    layer_settings.simulate.profile_name.c_str(), layer_settings.simulate.profile_file.c_str(), profile.c_str());
 
             break; // Systematically load the first and default profile
         }
@@ -1642,14 +1639,14 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
 
     const Json::Value schema_value = root_["$schema"];
     if (!schema_value.isString()) {
-        LogMessage(DEBUG_REPORT_ERROR_BIT, "JSON element \\"$schema\\" is not a string\\n");
-        return layer_settings->log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
+        LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "JSON element \\"$schema\\" is not a string\\n");
+        return layer_settings.log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
 
     const std::string schema = schema_value.asCString();
     if (schema.find(SCHEMA_URI_BASE) == std::string::npos) {
-        LogMessage(DEBUG_REPORT_ERROR_BIT, "Document schema \\"%s\\" not supported by %s\\n", schema.c_str(), kLayerName);
-        return layer_settings->log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
+        LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "Document schema \\"%s\\" not supported by %s\\n", schema.c_str(), kLayerName);
+        return layer_settings.log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
 
     const std::size_t size_schema = schema.size();
@@ -1662,21 +1659,21 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
     uint32_t version_patch = 0;
     std::sscanf(version.c_str(), "%d.%d.%d", &version_major, &version_minor, &version_patch);
     if (VK_HEADER_VERSION < version_patch) {
-        LogMessage(DEBUG_REPORT_WARNING_BIT,
+        LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
                    "%s is built against Vulkan Header %d but the profile is written against Vulkan "
                           "Header %d.\\n\\t- All newer capabilities in the "
                           "profile will be ignored by the layer.\\n",
                           kLayerName, VK_HEADER_VERSION, version_patch);
-    } else if (layer_settings->simulate.profile_validation) {
+    } else if (layer_settings.simulate.profile_validation) {
         JsonValidator validator;
         if (!validator.Init()) {
-            LogMessage(DEBUG_REPORT_WARNING_BIT,
+            LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
                        "%s could not find the profile schema file to validate filename.\\n\\t- This "
                               "operation requires the Vulkan SDK to be installed.\\n\\t- Skipping profile file validation.",
                               kLayerName, profile_filename_.c_str());
         } else if (!validator.Check(root_)) {
-            LogMessage(DEBUG_REPORT_ERROR_BIT, "%s is not a valid JSON profile file.\\n", profile_filename_.c_str());
-            if (layer_settings->log.debug_fail_on_error) {
+            LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "%s is not a valid JSON profile file.\\n", profile_filename_.c_str());
+            if (layer_settings.log.debug_fail_on_error) {
                 return VK_ERROR_INITIALIZATION_FAILED;
             } else {
                 return VK_SUCCESS;
@@ -1685,7 +1682,7 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
     }
 
     VkResult result = VK_SUCCESS;
-    if (layer_settings->simulate.capabilities & SIMULATE_EXTENSIONS_BIT) {
+    if (layer_settings.simulate.capabilities & SIMULATE_EXTENSIONS_BIT) {
         pdd_->simulation_extensions_.clear();
     }
 
@@ -1747,15 +1744,17 @@ static VkResult LayerSetupCreateInstance(const VkInstanceCreateInfo *pCreateInfo
 
 VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
                                               VkInstance *pInstance) {
-    vlInitLayerSettings(kLayerName, pCreateInfo, nullptr);
-    InitProfilesLayerSettings();
+    JsonLoader &json_loader = JsonLoader::Create();
 
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "CreateInstance\\n");
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "JsonCpp version %s\\n", JSONCPP_VERSION_STRING);
-    LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, "%s version %d.%d.%d\\n", kLayerName, kVersionProfilesMajor,
+    ProfileLayerSettings *layer_settings = &json_loader.layer_settings;
+
+    InitProfilesLayerSettings(pCreateInfo, pAllocator, layer_settings);
+
+    LogMessage(layer_settings, DEBUG_REPORT_DEBUG_BIT, "CreateInstance\\n");
+    LogMessage(layer_settings, DEBUG_REPORT_DEBUG_BIT, "JsonCpp version %s\\n", JSONCPP_VERSION_STRING);
+    LogMessage(layer_settings, DEBUG_REPORT_NOTIFICATION_BIT, "%s version %d.%d.%d\\n", kLayerName, kVersionProfilesMajor,
                                                        kVersionProfilesMinor, kVersionProfilesPatch);
 
-    JsonLoader &json_loader = JsonLoader::Create();
     VkResult result = json_loader.LoadFile(layer_settings->simulate.profile_file);
     if (result != VK_SUCCESS) {
         return result;
@@ -1765,7 +1764,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
     requested_version = (app_info && app_info->apiVersion) ? app_info->apiVersion : VK_API_VERSION_1_0;
     if (VK_API_VERSION_MAJOR(requested_version) > VK_API_VERSION_MAJOR(VK_HEADER_VERSION_COMPLETE) ||
         VK_API_VERSION_MINOR(requested_version) > VK_API_VERSION_MINOR(VK_HEADER_VERSION_COMPLETE)) {
-        LogMessage(DEBUG_REPORT_ERROR_BIT, "The Vulkan application requested a Vulkan %s instance but the %s was build "
+        LogMessage(layer_settings, DEBUG_REPORT_ERROR_BIT, "The Vulkan application requested a Vulkan %s instance but the %s was build "
                                                     "against %s. Please, update the layer.\\n",
                                                     StringAPIVersion(requested_version).c_str(), kLayerName,
                                                     StringAPIVersion(VK_HEADER_VERSION_COMPLETE).c_str());
@@ -1781,14 +1780,14 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
             VK_API_VERSION_MINOR(requested_version) < VK_API_VERSION_MINOR(profile_api_version)) {
             if (layer_settings->simulate.capabilities & SIMULATE_API_VERSION_BIT) {
                 if (layer_settings->simulate.profile_name.empty()) {
-                    LogMessage(
+                    LogMessage(layer_settings,
                         DEBUG_REPORT_NOTIFICATION_BIT,
                         "The Vulkan application requested a Vulkan %s instance but the selected %s file requires %s. The "
                                  "application requested instance version is overridden to %s.\\n",
                                  StringAPIVersion(requested_version).c_str(), layer_settings->simulate.profile_file.c_str(),
                                  StringAPIVersion(profile_api_version).c_str(), StringAPIVersion(profile_api_version).c_str());
                 } else {
-                    LogMessage(
+                    LogMessage(layer_settings,
                         DEBUG_REPORT_NOTIFICATION_BIT,
                         "The Vulkan application requested a Vulkan %s instance but the selected %s profile requires %s. "
                                  "The application requested instance version is overridden to %s.\\n",
@@ -1799,14 +1798,14 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
                 changed_version = true;
             } else {
                 if (layer_settings->simulate.profile_name.empty()) {
-                    LogMessage(
+                    LogMessage(layer_settings,
                         DEBUG_REPORT_WARNING_BIT,
                         "The Vulkan application requested a Vulkan %s instance but the selected %s file requires %s. The "
                                  "profile may not be initialized correctly which will produce unexpected warning messages.\\n",
                                  StringAPIVersion(requested_version).c_str(), layer_settings->simulate.profile_file.c_str(),
                                  StringAPIVersion(profile_api_version).c_str());
                 } else {
-                    LogMessage(
+                    LogMessage(layer_settings,
                         DEBUG_REPORT_WARNING_BIT,
                         "The Vulkan application requested a Vulkan %s instance but the selected %s profile requires %s. "
                                  "The profile may not be initialized correctly which will produce unexpected warning messages.\\n",
@@ -1836,7 +1835,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
     }
 
     if (!get_physical_device_properties2_active) {
-        LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+        LogMessage(layer_settings, DEBUG_REPORT_NOTIFICATION_BIT,
                    "The Profiles Layer requires the %s extension, but it was not included in "
                             "VkInstanceCreateInfo::ppEnabledExtensionNames, adding the extension.\\n",
                             VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
@@ -1899,10 +1898,12 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
 }
 
 VKAPI_ATTR void VKAPI_CALL DestroyInstance(VkInstance instance, const VkAllocationCallbacks *pAllocator) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "DestroyInstance\\n");
-
     if (instance) {
         std::lock_guard<std::recursive_mutex> lock(global_lock);
+
+        ProfileLayerSettings* layer_settings = &JsonLoader::Find(instance)->layer_settings;
+
+        LogMessage(layer_settings, DEBUG_REPORT_DEBUG_BIT, "DestroyInstance\\n");
 
         {
             const auto dt = instance_dispatch_table(instance);
@@ -1921,17 +1922,6 @@ VKAPI_ATTR void VKAPI_CALL DestroyInstance(VkInstance instance, const VkAllocati
 
         JsonLoader::Destroy(instance);
     }
-
-    if (layer_settings->log.debug_actions & DEBUG_ACTION_FILE_BIT) {
-        LogMessage(DEBUG_REPORT_DEBUG_BIT, "Closing log file %s, bye!\\n", layer_settings->log.debug_filename.c_str());
-    }
-
-    if (profiles_log_file != nullptr) {
-        fclose(profiles_log_file);
-        profiles_log_file = nullptr;
-    }
-
-    layer_settings.reset();
 }
 '''
 
@@ -1963,9 +1953,6 @@ void FillFormatPropertiesPNextChain(PhysicalDeviceData *physicalDeviceData, void
 
 GET_PHYSICAL_DEVICE_FEATURES_PROPERTIES_FUNCTIONS = '''
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceProperties(VkPhysicalDevice physicalDevice, VkPhysicalDeviceProperties *pProperties) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "GetPhysicalDeviceProperties\\n");
-    LogFlush();
-
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
 
@@ -1993,9 +1980,6 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceProperties2KHR(VkPhysicalDevice phys
 }
 
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFeatures(VkPhysicalDevice physicalDevice, VkPhysicalDeviceFeatures *pFeatures) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "GetPhysicalDeviceFeatures\\n");
-    LogFlush();
-
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
 
@@ -2028,18 +2012,11 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFeatures2KHR(VkPhysicalDevice physic
 
 ENUMERATE_FUNCTIONS = '''
 VKAPI_ATTR VkResult VKAPI_CALL EnumerateInstanceLayerProperties(uint32_t *pCount, VkLayerProperties *pProperties) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "vkEnumerateInstanceLayerProperties %s \\n", pProperties ? "VALUES" : "COUNT");
-    LogFlush();
-
     return EnumerateProperties(kLayerPropertiesCount, kLayerProperties, pCount, pProperties);
 }
 
 VKAPI_ATTR VkResult VKAPI_CALL EnumerateInstanceExtensionProperties(const char *pLayerName, uint32_t *pCount,
                                                                     VkExtensionProperties *pProperties) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "vkEnumerateInstanceExtensionProperties \\"%s\\" %s \\n", (pLayerName ? pLayerName : ""),
-                                              (pProperties ? "VALUES" : "COUNT"));
-    LogFlush();
-
     if (pLayerName && !strcmp(pLayerName, kLayerName)) {
         return EnumerateProperties(kInstanceExtensionPropertiesCount, kInstanceExtensionProperties.data(), pCount, pProperties);
     }
@@ -2050,9 +2027,6 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateInstanceExtensionProperties(const char *
 
 VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevice physicalDevice, const char *pLayerName,
                                                                   uint32_t *pCount, VkExtensionProperties *pProperties) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "EnumerateDeviceExtensionProperties\\n");
-    LogFlush();
-
     VkResult result = VK_SUCCESS;
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
@@ -2060,14 +2034,12 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
     uint32_t pCount_copy = *pCount;
 
     PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
-    //const uint32_t src_count = pdd ? static_cast<uint32_t>(pdd->simulation_extensions_.size()) : 0;
+    ProfileLayerSettings* layer_settings = &JsonLoader::Find(pdd->instance())->layer_settings;
     if (pLayerName) {
         if (strcmp(pLayerName, kLayerName) == 0)
             result = EnumerateProperties(kDeviceExtensionPropertiesCount, kDeviceExtensionProperties.data(), pCount, pProperties);
         else
             result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
-    //} else if (src_count == 0 || (!(layer_settings->simulate.capabilities & SIMULATE_EXTENSIONS_BIT) &&
-    //                              layer_settings->simulate.exclude_device_extensions.empty())) {
     } else if (pdd == nullptr || (!(layer_settings->simulate.capabilities & SIMULATE_EXTENSIONS_BIT) &&
                                   layer_settings->simulate.exclude_device_extensions.empty())) {
         result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
@@ -2159,7 +2131,12 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties2(VkPhysicalDev
 PHYSICAL_DEVICE_FORMAT_FUNCTIONS = '''
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice physicalDevice, VkFormat format,
                                                              VkFormatProperties *pFormatProperties) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "GetPhysicalDeviceFormatProperties\\n");
+    std::lock_guard<std::recursive_mutex> lock(global_lock);
+    const auto dt = instance_dispatch_table(physicalDevice);
+
+    // Are there JSON overrides, or should we call down to return the original values?
+    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
+    ProfileLayerSettings* layer_settings = &JsonLoader::Find(pdd->instance())->layer_settings;
 
     // Check if Format was excluded
     for (std::size_t j = 0, m = layer_settings->simulate.exclude_formats.size(); j < m; ++j) {
@@ -2172,11 +2149,6 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice ph
         }
     }
 
-    std::lock_guard<std::recursive_mutex> lock(global_lock);
-    const auto dt = instance_dispatch_table(physicalDevice);
-
-    // Are there JSON overrides, or should we call down to return the original values?
-    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
     const uint32_t src_count = (pdd) ? static_cast<uint32_t>(pdd->map_of_format_properties_.size()) : 0;
     if (src_count == 0) {
         dt->GetPhysicalDeviceFormatProperties(physicalDevice, format, pFormatProperties);
@@ -2201,20 +2173,17 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice ph
             if (!HasFlags(device_format.linearTilingFeatures, pFormatProperties->linearTilingFeatures) ||
                 !HasFlags(device_format.optimalTilingFeatures, pFormatProperties->optimalTilingFeatures) ||
                 !HasFlags(device_format.bufferFeatures, pFormatProperties->bufferFeatures)) {
-                LogMessage(DEBUG_REPORT_WARNING_BIT,
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                            "format %s is simulating unsupported features!\\n", vkFormatToString(format).c_str());
             }
         }
     }
 
-    LogFlush();
+    LogFlush(layer_settings);
 }
 
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties2(VkPhysicalDevice physicalDevice, VkFormat format,
                                                               VkFormatProperties2KHR *pFormatProperties) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "GetPhysicalDeviceFormatProperties2\\n");
-    LogFlush();
-
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
     dt->GetPhysicalDeviceFormatProperties2(physicalDevice, format, pFormatProperties);
@@ -2232,11 +2201,11 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties(VkPhysical
                                                                       VkImageType type, VkImageTiling tiling,
                                                                       VkImageUsageFlags usage, VkImageCreateFlags flags,
                                                                       VkImageFormatProperties *pImageFormatProperties) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "GetPhysicalDeviceImageFormatProperties\\n");
-    LogFlush();
-
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
+
+    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
+    ProfileLayerSettings* layer_settings = &JsonLoader::Find(pdd->instance())->layer_settings;
 
     // Are there JSON overrides, or should we call down to return the original values?
     if (!(layer_settings->simulate.capabilities & SIMULATE_FORMATS_BIT)) {
@@ -2261,9 +2230,6 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties(VkPhysical
 VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties2KHR(
     VkPhysicalDevice physicalDevice, const VkPhysicalDeviceImageFormatInfo2KHR *pImageFormatInfo,
     VkImageFormatProperties2KHR *pImageFormatProperties) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "GetPhysicalDeviceImageFormatProperties2KHR\\n");
-    LogFlush();
-
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
     dt->GetPhysicalDeviceImageFormatProperties2KHR(physicalDevice, pImageFormatInfo, pImageFormatProperties);
@@ -2282,9 +2248,6 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties2(VkPhysica
 TOOL_PROPERTIES_FUNCTIONS = '''
 VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceToolPropertiesEXT(VkPhysicalDevice physicalDevice, uint32_t *pToolCount,
                                                                   VkPhysicalDeviceToolPropertiesEXT *pToolProperties) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, "GetPhysicalDeviceToolPropertiesEXT\\n");
-    LogFlush();
-
     std::stringstream version_stream;
     version_stream << kVersionProfilesMajor << "." << kVersionProfilesMinor << "." << kVersionProfilesPatch;
     std::string version_string(version_stream.str());
@@ -2400,6 +2363,8 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(instance);
 
+    ProfileLayerSettings *layer_settings = &JsonLoader::Find(instance)->layer_settings;
+
     VkResult result = VK_SUCCESS;
     result = dt->EnumeratePhysicalDevices(instance, pPhysicalDeviceCount, pPhysicalDevices);
 
@@ -2416,7 +2381,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
         }
 
         if (layer_settings->device.force_device != FORCE_DEVICE_OFF && *pPhysicalDeviceCount == 1) {
-            LogMessage(DEBUG_REPORT_NOTIFICATION_BIT, "Forced physical device is disabled because a single physical device was found.\\n");
+            LogMessage(layer_settings, DEBUG_REPORT_NOTIFICATION_BIT, "Forced physical device is disabled because a single physical device was found.\\n");
             layer_settings->device.force_device = FORCE_DEVICE_OFF;
         }
 
@@ -2450,14 +2415,14 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     std::swap(physical_devices, physical_devices_tmp);
 
                     if (!force_physical_device_log_once) {
-                        LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+                        LogMessage(layer_settings, DEBUG_REPORT_NOTIFICATION_BIT,
                             "Force physical device by device UUID: '%s'('%s').\\n",
                             layer_settings->device.force_device_uuid.c_str(),
                             layer_settings->device.force_device_name.c_str());
                     }
                 } else {
                     if (!force_physical_device_log_once) {
-                        LogMessage(DEBUG_REPORT_ERROR_BIT,
+                        LogMessage(layer_settings, DEBUG_REPORT_ERROR_BIT,
                             "Force physical device by device name is active but the requested physical device '%s'('%s') couldn't be found.\\n",
                             layer_settings->device.force_device_uuid.c_str(),
                             layer_settings->device.force_device_name.c_str());
@@ -2488,14 +2453,14 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                     std::swap(physical_devices, physical_devices_tmp);
 
                     if (!force_physical_device_log_once) {
-                        LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+                        LogMessage(layer_settings, DEBUG_REPORT_NOTIFICATION_BIT,
                             "Force physical device by device name: '%s'.\\n",
                             layer_settings->device.force_device_name.c_str());
                     }
                 }
                 else {
                     if (!force_physical_device_log_once) {
-                        LogMessage(DEBUG_REPORT_ERROR_BIT,
+                        LogMessage(layer_settings, DEBUG_REPORT_ERROR_BIT,
                             "Force physical device by device name is active but the requested physical device '%s' couldn't be found.\\n",
                             layer_settings->device.force_device_name.c_str());
                     }
@@ -2597,7 +2562,7 @@ ENUMERATE_PHYSICAL_DEVICES_MIDDLE = '''
                 LoadQueueFamilyProperties(instance, physical_device, &pdd);
             }
 
-            LogMessage(DEBUG_REPORT_NOTIFICATION_BIT,
+            LogMessage(layer_settings, DEBUG_REPORT_NOTIFICATION_BIT,
                        "Found \\"%s\\" with Vulkan %d.%d.%d driver.\\n", pdd.physical_device_properties_.deviceName,
                               VK_API_VERSION_MAJOR(pdd.physical_device_properties_.apiVersion),
                               VK_API_VERSION_MINOR(pdd.physical_device_properties_.apiVersion),
@@ -2623,7 +2588,7 @@ ENUMERATE_PHYSICAL_DEVICES_END = '''
         }
     }
 
-    LogFlush();
+    LogFlush(layer_settings);
 
     return result;
 }
@@ -2676,7 +2641,7 @@ VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL GetInstanceProcAddr(VkInstance instance
 
 GET_VALUE_PHYSICAL_DEVICE_PROPERTIES = '''
 bool JsonLoader::GetStruct(const char* device_name, const Json::Value &parent, VkPhysicalDeviceProperties *dest) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, \"\\tJsonLoader::GetStruct(VkPhysicalDeviceProperties)\\n");
+    LogMessage(&layer_settings, DEBUG_REPORT_DEBUG_BIT, \"\\tJsonLoader::GetStruct(VkPhysicalDeviceProperties)\\n");
     bool valid = true;
     if (!GetStruct(device_name, parent["limits"], &dest->limits)) {
         valid = false;
@@ -2699,7 +2664,7 @@ bool JsonLoader::GetStruct(const char* device_name, const Json::Value &parent, V
 
 GET_VALUE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES = '''
 bool JsonLoader::GetStruct(const char* device_name, const Json::Value &parent, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, \"\\tJsonLoader::GetStruct(VkPhysicalDevicePortabilitySubsetPropertiesKHR)\\n");
+    LogMessage(&layer_settings, DEBUG_REPORT_DEBUG_BIT, \"\\tJsonLoader::GetStruct(VkPhysicalDevicePortabilitySubsetPropertiesKHR)\\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
         GET_VALUE_WARN(member, minVertexInputBindingStrideAlignment, false, WarnIfLesser);
@@ -2710,25 +2675,25 @@ bool JsonLoader::GetStruct(const char* device_name, const Json::Value &parent, V
 
 GET_VALUE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES = '''
 bool JsonLoader::GetStruct(const char* device_name, const Json::Value &parent, VkPhysicalDevicePortabilitySubsetFeaturesKHR *dest) {
-    LogMessage(DEBUG_REPORT_DEBUG_BIT, \"\\tJsonLoader::GetStruct(VkPhysicalDevicePortabilitySubsetFeaturesKHR)\\n");
+    LogMessage(&layer_settings, DEBUG_REPORT_DEBUG_BIT, \"\\tJsonLoader::GetStruct(VkPhysicalDevicePortabilitySubsetFeaturesKHR)\\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        if (layer_settings->simulate.emulate_portability) {
-            dest->constantAlphaColorBlendFactors = layer_settings->portability.constantAlphaColorBlendFactors;
-            dest->events = layer_settings->portability.events;
-            dest->imageViewFormatReinterpretation = layer_settings->portability.imageViewFormatReinterpretation;
-            dest->imageViewFormatSwizzle = layer_settings->portability.imageViewFormatSwizzle;
-            dest->imageView2DOn3DImage = layer_settings->portability.imageView2DOn3DImage;
-            dest->multisampleArrayImage = layer_settings->portability.multisampleArrayImage;
-            dest->mutableComparisonSamplers = layer_settings->portability.mutableComparisonSamplers;
-            dest->pointPolygons = layer_settings->portability.pointPolygons;
-            dest->samplerMipLodBias = layer_settings->portability.samplerMipLodBias;
-            dest->separateStencilMaskRef = layer_settings->portability.separateStencilMaskRef;
-            dest->shaderSampleRateInterpolationFunctions = layer_settings->portability.shaderSampleRateInterpolationFunctions;
-            dest->tessellationIsolines = layer_settings->portability.tessellationIsolines;
-            dest->tessellationPointMode = layer_settings->portability.tessellationPointMode;
-            dest->triangleFans = layer_settings->portability.triangleFans;
-            dest->vertexAttributeAccessBeyondStride = layer_settings->portability.vertexAttributeAccessBeyondStride;
+        if (layer_settings.simulate.emulate_portability) {
+            dest->constantAlphaColorBlendFactors = layer_settings.portability.constantAlphaColorBlendFactors;
+            dest->events = layer_settings.portability.events;
+            dest->imageViewFormatReinterpretation = layer_settings.portability.imageViewFormatReinterpretation;
+            dest->imageViewFormatSwizzle = layer_settings.portability.imageViewFormatSwizzle;
+            dest->imageView2DOn3DImage = layer_settings.portability.imageView2DOn3DImage;
+            dest->multisampleArrayImage = layer_settings.portability.multisampleArrayImage;
+            dest->mutableComparisonSamplers = layer_settings.portability.mutableComparisonSamplers;
+            dest->pointPolygons = layer_settings.portability.pointPolygons;
+            dest->samplerMipLodBias = layer_settings.portability.samplerMipLodBias;
+            dest->separateStencilMaskRef = layer_settings.portability.separateStencilMaskRef;
+            dest->shaderSampleRateInterpolationFunctions = layer_settings.portability.shaderSampleRateInterpolationFunctions;
+            dest->tessellationIsolines = layer_settings.portability.tessellationIsolines;
+            dest->tessellationPointMode = layer_settings.portability.tessellationPointMode;
+            dest->triangleFans = layer_settings.portability.triangleFans;
+            dest->vertexAttributeAccessBeyondStride = layer_settings.portability.vertexAttributeAccessBeyondStride;
         } else {
             GET_VALUE_WARN(member, constantAlphaColorBlendFactors, false, WarnIfNotEqualBool);
             GET_VALUE_WARN(member, events, false, WarnIfNotEqualBool);
@@ -2928,7 +2893,7 @@ class VulkanProfilesLayerGenerator():
                 if promoted:
                     aliases.append(promoted)
                 if aliases:
-                    gen += '    valid &= WarnDuplicated(parent, {\"' + name + '\"'
+                    gen += '    valid &= WarnDuplicated(&layer_settings, parent, {\"' + name + '\"'
                     for alias in aliases:
                         gen += ', \"' + alias + '\"'
                     gen += '});\n'
@@ -3050,7 +3015,7 @@ class VulkanProfilesLayerGenerator():
         gen = '\nvoid JsonLoader::AddPromotedExtensions(uint32_t api_version) {\n'
         gen += '\tconst uint32_t minor = VK_API_VERSION_MINOR(api_version);\n'
         gen += '\tconst uint32_t major = VK_API_VERSION_MAJOR(api_version);\n'
-        gen += '\tLogMessage(DEBUG_REPORT_NOTIFICATION_BIT,\n'
+        gen += '\tLogMessage(&layer_settings, DEBUG_REPORT_NOTIFICATION_BIT,\n'
         gen += '\t\"Adding promoted extensions to core in Vulkan (%" PRIu32 ".%" PRIu32 ").\\n", major, minor);\n\n'
 
         for i in range(registry.headerVersionNumber.major):
@@ -3108,6 +3073,7 @@ class VulkanProfilesLayerGenerator():
 
     def generate_fill_physical_device_pnext_chain(self):
         gen = '\nvoid FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {\n'
+        gen += '    ProfileLayerSettings *layer_settings = &JsonLoader::Find(physicalDeviceData->instance())->layer_settings;'
         gen += '    while (place) {\n'
         gen += '        VkBaseOutStructure *structure = (VkBaseOutStructure *)place;\n\n'
         gen += '        // These switch statements check which struct is in the pNext chain and, if the physical device has the proper extension,\n'
@@ -3360,7 +3326,7 @@ class VulkanProfilesLayerGenerator():
     def generate_get_value_function(self, structure):
         gen = 'bool JsonLoader::GetStruct(const char* device_name, const Json::Value &parent, ' + structure + ' *dest) {\n'
         gen += '    (void)dest;\n'
-        gen += '    LogMessage(DEBUG_REPORT_DEBUG_BIT, \"\\tJsonLoader::GetStruct(' + structure + ')\\n\");\n'
+        gen += '    LogMessage(&layer_settings, DEBUG_REPORT_DEBUG_BIT, \"\\tJsonLoader::GetStruct(' + structure + ')\\n\");\n'
         gen += '    bool valid = true;\n'
         gen += '    for (const auto &member : parent.getMemberNames()) {\n'
         for member_name in registry.structs[structure].members:
