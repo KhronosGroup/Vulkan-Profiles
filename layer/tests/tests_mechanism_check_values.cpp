@@ -150,3 +150,40 @@ TEST_F(TestsMechanismCheckValues, reading_sparseProperties) {
     EXPECT_EQ(gpu_props.properties.sparseProperties.residencyAlignedMipSize, VK_FALSE);
     EXPECT_EQ(gpu_props.properties.sparseProperties.residencyNonResidentStrict, VK_FALSE);
 }
+
+TEST_F(TestsMechanismCheckValues, reading_mutable_descriptor_type) {
+    VkResult err = VK_SUCCESS;
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_device_features.json";
+    const char* profile_name_data = "VP_LUNARG_test_device_features";
+    const std::vector<const char*> simulate_capabilities = {"SIMULATE_FEATURES_BIT"};
+    VkBool32 emulate_portability_data = VK_FALSE;
+
+    std::vector<VkLayerSettingEXT> settings = {
+        {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+        {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT,
+         static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+        {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data}};
+
+    err = inst_builder.init(settings);
+    ASSERT_EQ(err, VK_SUCCESS);
+
+    VkPhysicalDevice gpu_profile = VK_NULL_HANDLE;
+    err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu_profile);
+    if (gpu_profile == VK_NULL_HANDLE) return;
+
+    if (!profiles_test::IsExtensionSupported(gpu_profile, "VK_EXT_mutable_descriptor_type")) return;
+
+    VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT mutable_descriptor_features{};
+    mutable_descriptor_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MUTABLE_DESCRIPTOR_TYPE_FEATURES_EXT;
+
+    VkPhysicalDeviceFeatures2 gpu_features{};
+    gpu_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+    gpu_features.pNext = &mutable_descriptor_features;
+    vkGetPhysicalDeviceFeatures2(gpu_profile, &gpu_features);
+
+    EXPECT_EQ(mutable_descriptor_features.mutableDescriptorType, VK_TRUE);
+}
