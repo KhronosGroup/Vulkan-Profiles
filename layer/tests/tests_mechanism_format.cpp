@@ -36,6 +36,77 @@ class TestsMechanismFormat : public VkTestFramework {
     static void TearDownTestSuite(){};
 };
 
+TEST_F(TestsMechanismFormat, TestFullySupportedFormat) {
+    TEST_DESCRIPTION("Test format capabilities of a supported format");
+
+    VkResult err = VK_SUCCESS;
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_baseline_formats.json";
+    const char* profile_name_data = "VP_LUNARG_test_formats";
+    VkBool32 emulate_portability_data = VK_TRUE;
+    const std::vector<const char*> simulate_capabilities = {"SIMULATE_FORMATS_BIT"};
+
+    std::vector<VkLayerSettingEXT> settings = {
+        {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+        {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL_EXT, 1, &emulate_portability_data},
+        {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT,
+         static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]}};
+
+    err = inst_builder.init(settings);
+    ASSERT_EQ(err, VK_SUCCESS);
+
+    VkPhysicalDevice gpu;
+    err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+    if (err != VK_SUCCESS) {
+        printf("Profile not supported on device, skipping test.\n");
+        return;
+    }
+
+    {
+        VkFormatFeatureFlags linear_tiling_features = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+        VkFormatFeatureFlags optimal_tiling_features = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT |
+                                                       VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT |
+                                                       VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
+        VkFormatFeatureFlags buffer_features = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
+
+        VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
+        VkFormatProperties format_properties;
+        vkGetPhysicalDeviceFormatProperties(gpu, format, &format_properties);
+
+        EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
+        EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
+        EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);
+
+        VkFormatProperties2 format_properties2 = {};
+        format_properties2.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;
+        vkGetPhysicalDeviceFormatProperties2(gpu, format, &format_properties2);
+
+        EXPECT_EQ(format_properties2.formatProperties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);
+        EXPECT_EQ(format_properties2.formatProperties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);
+        EXPECT_EQ(format_properties2.formatProperties.bufferFeatures & buffer_features, buffer_features);
+
+#ifdef VK_KHR_format_feature_flags2
+        VkFormatProperties3 format_properties3 = {};
+        format_properties3.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3;
+        format_properties2.pNext = &format_properties3;
+        vkGetPhysicalDeviceFormatProperties2(gpu, format, &format_properties2);
+
+        VkFormatFeatureFlags2KHR linear_tiling_features2 = VK_FORMAT_FEATURE_TRANSFER_SRC_BIT;
+        VkFormatFeatureFlags2KHR optimal_tiling_features2 = VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT |
+                                                            VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT |
+                                                            VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT;
+        VkFormatFeatureFlags2KHR buffer_features2 = VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
+
+        EXPECT_EQ(format_properties3.linearTilingFeatures & linear_tiling_features2, linear_tiling_features2);
+        EXPECT_EQ(format_properties3.optimalTilingFeatures & optimal_tiling_features2, optimal_tiling_features2);
+        EXPECT_EQ(format_properties3.bufferFeatures & buffer_features2, buffer_features2);
+#endif
+    }
+}
+
 TEST_F(TestsMechanismFormat, TestParsingAllFormatProperties) {
     TEST_DESCRIPTION("Test all different ways of setting image formats");
 
