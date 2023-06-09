@@ -149,3 +149,20 @@ void profiles_test::VulkanInstanceBuilder::reset() {
     _layer_names.clear();
     _extension_names.clear();
 }
+
+bool profiles_test::IsExtensionSupported(VkPhysicalDevice physical_device, const char* extension_name) {
+    uint32_t property_count = 0;
+    vkEnumerateDeviceExtensionProperties(physical_device, nullptr, &property_count, nullptr);
+    if (property_count == 0) return false;
+
+    std::vector<VkExtensionProperties> properties(static_cast<std::size_t>(property_count));
+    vkEnumerateDeviceExtensionProperties(physical_device, nullptr, &property_count, &properties[0]);
+
+    for (std::size_t i = 0, n = properties.size(); i < n; ++i) {
+        if (strcmp(properties[i].extensionName, extension_name) == 0) {
+            return true;
+        }
+    }
+
+    return false;
+}

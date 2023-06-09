@@ -54,6 +54,8 @@ std::string getAbsolutePath(std::string filepath);
 
 VkApplicationInfo GetDefaultApplicationInfo();
 
+bool IsExtensionSupported(VkPhysicalDevice physical_device, const char* extension_name);
+
 enum Mode {
     MODE_NATIVE = 0,
     MODE_PROFILE,
