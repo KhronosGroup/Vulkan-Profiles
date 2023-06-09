@@ -20,9 +20,10 @@
  */
 
 #include <string>
-#include <cmath>
 #include <vector>
 #include <array>
+#include <cmath>
+#include <cstdarg>
 
 #include <vulkan/vulkan.h>
 #include "../profiles.h"
