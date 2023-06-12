@@ -1050,7 +1050,7 @@ bool JsonLoader::GetFormat(const char *device_name, const Json::Value &formats, 
 
 bool JsonLoader::CheckVersionSupport(uint32_t version, const std::string &name) {
     if (pdd_->GetEffectiveVersion() < version) {
-        LogMessage(&layer_settings, 
+        LogMessage(&layer_settings,
             DEBUG_REPORT_ERROR_BIT,
             "Profile sets %s which is provided by Vulkan version %s, but the current effective API version is %s.\\n",
                      name.c_str(), StringAPIVersion(version).c_str(), StringAPIVersion(pdd_->GetEffectiveVersion()).c_str());
@@ -1079,7 +1079,7 @@ JsonLoader::ExtensionSupport JsonLoader::CheckExtensionSupport(const char *exten
         }
     } else {
         if (!PhysicalDeviceData::HasExtension(pdd_, extension)) {
-            LogMessage(&layer_settings, 
+            LogMessage(&layer_settings,
                 DEBUG_REPORT_WARNING_BIT,
                 "Profile requires by %s capabilities, but %s is not supported by the device.\\n", name.c_str(), extension);
         }
@@ -3104,9 +3104,6 @@ class VulkanProfilesLayerGenerator():
                     continue
                 gen += self.generate_fill_case(property)
             for feature in features:
-                # Currently a bug in the spec, skip
-                if feature == 'VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM':
-                    continue
                 gen += self.generate_fill_case(feature)
 
         gen += '            default:\n'
