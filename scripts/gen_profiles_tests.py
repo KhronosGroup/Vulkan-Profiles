@@ -100,7 +100,7 @@ class TestsCapabilitiesGenerated : public VkTestFramework {
         VkResult err = VK_SUCCESS;
 
         const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_generated.json";
-        const char* profile_name_data = "VP_LUNARG_test_api"; 
+        const char* profile_name_data = "VP_LUNARG_test_api";
         VkBool32 emulate_portability_data = VK_TRUE;
         const std::vector<const char*> simulate_capabilities = {
             "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT", "SIMULATE_FORMATS_BIT", "SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT"};
@@ -150,8 +150,7 @@ bool IsSupported(VkPhysicalDevice device, const char* extension_name){
 
 class ProfileGenerator():
     i = 1
-    # Currently a bug in vk.xml, can be removed once pNext is no longer const
-    skipped_features = ["VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM"]
+    skipped_features = []
     skipped_members = ["sType", "pNext", "physicalDevices", "driverID"]
 
     def generate_profile(self, outProfile, registry):
@@ -319,7 +318,7 @@ class ProfileGenerator():
                     gen += property_name
                     gen += '\": '
                     #if member.limittype == "":
-                    #    self.test_values[name][property] = 
+                    #    self.test_values[name][property] =
                     if property_type == "VkBool32":
                         gen += "true"
                         self.test_values[name][property] = 'VK_TRUE'
@@ -619,7 +618,7 @@ class ProfileGenerator():
                         # VkConformanceVersion is noauto and unmodified
                         if 'VkConformanceVersion' in member_type:
                             continue
-                        
+
                         gen += '    if (supported) {\n'
                         if type(property_value) is list:
                             if (len(property_value) > 1):
@@ -686,7 +685,7 @@ class ProfileGenerator():
         gen += '    features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;\n'
         gen += '    features.pNext = &' + var_name + ';\n'
         gen += '    vkGetPhysicalDeviceFeatures2(gpu_profile, &features);\n\n'
-        
+
         for member in value.members:
             gen += '    EXPECT_EQ(' + var_name + '.' + member + ', VK_TRUE);\n'
 
@@ -712,7 +711,7 @@ class ProfileGenerator():
         if first:
             gen += '0'
         gen += ';\n'
-        
+
         gen += '    VkFormatFeatureFlags optimal_tiling_features = '
         first = True
         for feature in values[1]:
@@ -724,7 +723,7 @@ class ProfileGenerator():
         if first:
             gen += '0'
         gen += ';\n'
-        
+
         gen += '    VkFormatFeatureFlags buffer_features = '
         first = True
         for feature in values[2]:
