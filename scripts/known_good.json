@@ -6,7 +6,7 @@
             "sub_dir": "Vulkan-Headers",
             "build_dir": "Vulkan-Headers/build",
             "install_dir": "Vulkan-Headers/build/install",
-            "commit": "v1.3.251"
+            "commit": "v1.3.254"
         },
         {
             "name": "Vulkan-Utility-Libraries",
@@ -14,7 +14,7 @@
             "sub_dir": "Vulkan-Utility-Libraries",
             "build_dir": "Vulkan-Utility-Libraries/build",
             "install_dir": "Vulkan-Utility-Libraries/build/install",
-            "commit": "main",
+            "commit": "066c8d869860f15b7775de4c2d9906faa5cc9555",
             "deps": [
                 {
                     "var_name": "VULKAN_HEADERS_INSTALL_DIR",
@@ -28,7 +28,7 @@
             "sub_dir": "Vulkan-ValidationLayers",
             "build_dir": "Vulkan-ValidationLayers/build",
             "install_dir": "Vulkan-ValidationLayers/build/install",
-            "commit": "v1.3.250",
+            "commit": "v1.3.254",
             "deps": [
                 {
                     "var_name": "VULKAN_HEADERS_INSTALL_DIR",
@@ -86,15 +86,12 @@
             "sub_dir": "Vulkan-Loader",
             "build_dir": "Vulkan-Loader/build",
             "install_dir": "Vulkan-Loader/build/install",
-            "commit": "v1.3.250",
+            "commit": "v1.3.254",
             "deps": [
                 {
                     "var_name": "VULKAN_HEADERS_INSTALL_DIR",
                     "repo_name": "Vulkan-Headers"
                 }
-            ],
-            "cmake_options": [
-                "-DBUILD_TESTS=OFF"
             ],
             "build_platforms": [
                 "linux",
