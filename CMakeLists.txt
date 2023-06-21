@@ -17,12 +17,6 @@ set(CMAKE_CXX_VISIBILITY_PRESET "hidden")
 set(CMAKE_C_VISIBILITY_PRESET "hidden")
 set(CMAKE_VISIBILITY_INLINES_HIDDEN "YES")
 
-# Regenerating profiles requires Python 3.7.2 or better (for typing.OrderedDict).
-# Regeneration jsoncpp requires Python 3.
-# Otherwise Python is not required, as checked-in generated code and
-# headers will be used.
-find_package(PythonInterp 3.7.2 REQUIRED)
-
 add_subdirectory(scripts)
 
 find_package(VulkanHeaders REQUIRED CONFIG QUIET)
@@ -106,6 +100,8 @@ elseif(MSVC)
 endif()
 
 set(PROFILES_SCHEMA_FILENAME "profiles-0.8-latest.json")
+
+find_package(Python3 REQUIRED)
 
 # The profiles directory regenerates the Profiles source and headers.
 add_subdirectory(profiles)
