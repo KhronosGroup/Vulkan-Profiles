@@ -19,17 +19,6 @@ The *Vulkan Profiles Toolset* is a collection of tools delivered with the [Vulka
 * **[Contributing](./CONTRIBUTING.md)**: How to contribute to the *Vulkan Profiles* repository.
 * **[Bug reports](https://github.com/KhronosGroup/Vulkan-Profiles)**: Open a GitHub issue when you encounter a bug.
 
-## Default branch changed to 'main' 2023-01-16
-
-As discussed in #338, the default branch of this repository is now 'main'. This change should be largely transparent to repository users, since github rewrites many references to the old 'master' branch to 'main'. However, if you have a checked-out local clone, you may wish to take the following steps as recommended by github:
-
-```sh
-git branch -m master main
-git fetch origin
-git branch -u origin/main main
-git remote set-head origin -a
-```
-
 --------------
 ## Contact Information
 * [Christophe Riccio](mailto:christophe@lunarg.com)
