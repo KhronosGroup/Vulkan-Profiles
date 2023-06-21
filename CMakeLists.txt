@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.17.2)
 
-enable_testing()
-
 project(VULKAN_PROFILES LANGUAGES CXX C)
 
 include(GNUInstallDirs)
@@ -36,6 +34,7 @@ find_package(valijson REQUIRED CONFIG)
 find_package(jsoncpp REQUIRED CONFIG)
 
 if(PROFILES_BUILD_TESTS)
+    enable_testing()
     find_package(GTest REQUIRED CONFIG)
 endif()
 
