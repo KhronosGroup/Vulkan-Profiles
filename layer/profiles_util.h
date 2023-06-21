@@ -37,6 +37,7 @@
 
 #include "vulkan/vk_layer.h"
 #include "vulkan/vulkan_beta.h"
+#include "vulkan/vulkan_screen.h"
 #include "vk_layer_table.h"
 #include "generated/vk_enum_string_helper.h"
 #include <vulkan/layer/vk_layer_settings.h>
