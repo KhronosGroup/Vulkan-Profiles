@@ -91,6 +91,36 @@ jobs:
       - name: Install
         run: cmake --install build --prefix build/install --config ${{matrix.config}}
 
+  android:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+      - name: Install jsonschema
+        run: python3 -m pip install jsonschema
+      - uses: lukka/get-cmake@latest
+      - name: Configure
+        run: |
+          cmake -S . -B build/ --toolchain $ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
+          -D ANDROID_PLATFORM=26 \
+          -D CMAKE_ANDROID_ARCH_ABI=x86_64 \
+          -D CMAKE_ANDROID_STL_TYPE=c++_static \
+          -D CMAKE_ANDROID_RTTI=YES \
+          -D CMAKE_ANDROID_EXCEPTIONS=YES \
+          -D ANDROID_BUILD_TOOLS=34.0.0 \
+          -D ANDROID_USE_LEGACY_TOOLCHAIN_FILE=NO \
+          -D BUILD_WERROR=ON \
+          -D CMAKE_BUILD_TYPE=Release \
+          -D UPDATE_DEPS=ON \
+          -D PROFILES_BUILD_TESTS=OFF \
+          -G "Ninja"
+      - name: Build
+        run: cmake --build build
+      - name: Install
+        run: cmake --install build --prefix build/install
+
   windows-latest:
     runs-on: windows-latest
     strategy:
