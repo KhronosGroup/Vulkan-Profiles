@@ -1209,7 +1209,7 @@ bool JsonLoader::GetQueueFamilyProperties(const char* device_name, const Json::V
         }
         if (dest->checkpoint_properties_2_.checkpointExecutionStageMask > 0) {
             message += format(", VkQueueFamilyCheckpointProperties2NV [checkpointExecutionStageMask: %s]",
-                              string_VkPipelineStageFlags2KHR(dest->checkpoint_properties_2_.checkpointExecutionStageMask).c_str());
+                              string_VkPipelineStageFlags2(dest->checkpoint_properties_2_.checkpointExecutionStageMask).c_str());
         }
         if (dest->query_result_status_properties_.queryResultStatusSupport) {
             message += format(", VkQueueFamilyQueryResultStatusProperties2KHR [queryResultStatusSupport: VK_TRUE]");
@@ -3537,6 +3537,8 @@ class VulkanProfilesLayerGenerator():
         if 'queue_family_' in var_name:
             var_name = 'arrayof_queue_family_properties_[i].' + var_name.replace('queue_family_', '')
         if (var_name == 'physical_device_mesh_shader_features_' or var_name == 'physical_device_mesh_shader_properties_') and nv:
+            var_name += 'nv_'
+        if (var_name == 'physical_device_cooperative_matrix_features_' or var_name == 'physical_device_cooperative_matrix_properties_') and nv:
             var_name += 'nv_'
         if (var_name == 'physical_device_shader_core_properties_' and arm):
             var_name += 'arm_'
