@@ -143,7 +143,7 @@ On OSX:
 git clone git@github.com:KhronosGroup/Vulkan-Profiles.git
 cd Vulkan-Profiles
 cmake -S . -B build/ -D CMAKE_BUILD_TYPE=Debug -D UPDATE_DEPS=ON -A x64
-cmake --build . --config Debug
+cmake --build ./build/ --config Debug
 ```
 
 ### Windows Unit Tests
@@ -158,7 +158,7 @@ ctest -C Debug --output-on-failure --parallel 16
 git clone git@github.com:KhronosGroup/Vulkan-Profiles.git
 cd Vulkan-Profiles
 cmake -S . -B build/ -D CMAKE_BUILD_TYPE=Debug -D UPDATE_DEPS=ON
-cmake --build .
+cmake --build ./build/
 ```
 
 ### Linux and macOS Unit Tests
