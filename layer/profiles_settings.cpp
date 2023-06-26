@@ -194,26 +194,12 @@ static void GetLayerSettingValues(VlLayerSettingSet layerSettingSet, const char 
     }
 }
 
-static const VkLayerSettingsCreateInfoEXT *FindSettingsInChain(const void *next) {
-    const VkBaseOutStructure *current = reinterpret_cast<const VkBaseOutStructure *>(next);
-    const VkLayerSettingsCreateInfoEXT *found = nullptr;
-    while (current) {
-        if (VK_STRUCTURE_TYPE_LAYER_SETTINGS_EXT == current->sType) {
-            found = reinterpret_cast<const VkLayerSettingsCreateInfoEXT *>(current);
-            current = nullptr;
-        } else {
-            current = current->pNext;
-        }
-    }
-    return found;
-}
-
 void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
                                ProfileLayerSettings *layer_settings) {
     assert(layer_settings != nullptr);
 
     VlLayerSettingSet layerSettingSet = VK_NULL_HANDLE;
-    vlCreateLayerSettingSet(kLayerName, FindSettingsInChain(pCreateInfo), pAllocator, nullptr, &layerSettingSet);
+    vlCreateLayerSettingSet(kLayerName, vlFindLayerSettingsCreateInfo(pCreateInfo), pAllocator, nullptr, &layerSettingSet);
 
     if (vlHasLayerSetting(layerSettingSet, kLayerSettingsProfileFile)) {
         GetLayerSettingValue(layerSettingSet, kLayerSettingsProfileFile, layer_settings->simulate.profile_file);
