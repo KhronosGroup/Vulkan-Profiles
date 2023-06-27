@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <vulkan/layer/vk_layer_settings.h>
+#include <vulkan/layer/vk_layer_settings.hpp>
 #include <memory>
 #include <vector>
 #include <string>
