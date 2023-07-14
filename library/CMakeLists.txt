@@ -7,7 +7,7 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_SOURCE_DIR}/library/in
 execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_SOURCE_DIR}/library/source/vulkan_profiles.cpp)
 execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_SOURCE_DIR}/library/source/debug/vulkan_profiles.cpp)
 
-if(PROFILES_BUILD_TESTS)
+if(BUILD_TESTS)
     add_subdirectory(test)
 endif()
 

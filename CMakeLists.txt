@@ -4,8 +4,6 @@ project(VULKAN_PROFILES LANGUAGES CXX C)
 
 include(GNUInstallDirs)
 
-option(PROFILES_BUILD_TESTS "Build profile tests" ON)
-
 set(PROFILES_CPP_STANDARD 17 CACHE STRING "Set the C++ standard to build against.")
 set(CMAKE_CXX_STANDARD ${PROFILES_CPP_STANDARD})
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -33,7 +31,8 @@ find_package(valijson REQUIRED CONFIG)
 
 find_package(jsoncpp REQUIRED CONFIG)
 
-if(PROFILES_BUILD_TESTS)
+option(BUILD_TESTS "Build the tests")
+if (BUILD_TESTS)
     enable_testing()
     find_package(GTest REQUIRED CONFIG)
 endif()
