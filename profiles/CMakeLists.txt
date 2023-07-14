@@ -1,4 +1,4 @@
-if (PROFILES_BUILD_TESTS AND NOT ANDROID)
+if (BUILD_TESTS AND NOT ANDROID)
     add_subdirectory(test)
 endif()
 

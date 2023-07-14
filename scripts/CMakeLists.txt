@@ -49,7 +49,7 @@ if (UPDATE_DEPS)
     list(APPEND update_dep_command "--dir" )
     list(APPEND update_dep_command "${UPDATE_DEPS_DIR}")
 
-    if (NOT PROFILES_BUILD_TESTS)
+    if (NOT BUILD_TESTS)
         list(APPEND update_dep_command "--optional=tests")
     endif()
 
