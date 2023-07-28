@@ -35,9 +35,9 @@
 #include <gtest/gtest.h>
 
 #ifdef _WIN32
-#include <windows.h>
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #endif
 #endif  // _WIN32
 
