@@ -932,6 +932,22 @@ GET_VALUE_FUNCTIONS = '''
         }
         return count;
     }
+
+    int GetArray(const Json::Value &parent, const std::string &member, const char *name, VkImageLayout *dest, bool not_modifiable) {
+        if (member != name) {
+            return -1;
+        }
+
+        const Json::Value value = parent[name];
+        if (value.type() != Json::arrayValue) {
+            return -1;
+        }
+        const int count = static_cast<int>(value.size());
+        for (int i = 0; i < count; ++i) {
+            dest[i] = StringToImageLayout(value[i].asCString());
+        }
+        return count;
+    }
 '''
 
 JSON_LOADER_NON_GENERATED = '''
@@ -2776,6 +2792,8 @@ class VulkanProfilesLayerGenerator():
         gen += self.generate_format_to_string(registry.enums['VkFormat'].values, registry.enums['VkFormat'].aliasValues)
         gen += self.generate_string_to_format(registry.enums['VkFormat'].values)
 
+        gen += self.generate_string_to_image_layout(registry.enums['VkImageLayout'].values)
+
         gen += self.generate_string_to_uint(('VkToolPurposeFlagBits', 'VkSampleCountFlagBits', 'VkResolveModeFlagBits', 'VkShaderStageFlagBits', 'VkSubgroupFeatureFlagBits', 'VkShaderFloatControlsIndependence', 'VkPointClippingBehavior', 'VkOpticalFlowGridSizeFlagBitsNV', 'VkQueueFlagBits', 'VkMemoryDecompressionMethodFlagBitsNV'), registry.enums)
 
         gen += self.generate_string_to_flag_functions(('VkToolPurposeFlags', 'VkFormatFeatureFlags', 'VkQueueFlags', 'VkQueueGlobalPriorityKHR', 'VkVideoCodecOperationFlagsKHR', 'VkPipelineStageFlags', 'VkPipelineStageFlags2', 'VkFormatFeatureFlags2'))
@@ -3652,6 +3670,20 @@ class VulkanProfilesLayerGenerator():
         gen += '        return it->second;\n'
         gen += '    }\n'
         gen += '    return VK_FORMAT_UNDEFINED;\n'
+        gen += '}\n'
+        return gen
+
+    def generate_string_to_image_layout(self, imageLayouts):
+        gen = '\nstatic VkImageLayout StringToImageLayout(const std::string &input_value) {\n'
+        gen += '    static const std::unordered_map<std::string, VkImageLayout> map = {\n'
+        for imageLayout in imageLayouts:
+            gen += '        {\"' + imageLayout + '\", ' + imageLayout + '},\n'
+        gen += '    };\n'
+        gen += '    const auto it = map.find(input_value);\n'
+        gen += '    if (it != map.end()) {\n'
+        gen += '        return it->second;\n'
+        gen += '    }\n'
+        gen += '    return VK_IMAGE_LAYOUT_UNDEFINED;\n'
         gen += '}\n'
         return gen
 
