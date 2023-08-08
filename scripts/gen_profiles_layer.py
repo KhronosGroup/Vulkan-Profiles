@@ -2439,7 +2439,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                 } else {
                     if (!force_physical_device_log_once) {
                         LogMessage(layer_settings, DEBUG_REPORT_ERROR_BIT,
-                            "Force physical device by device name is active but the requested physical device '%s'('%s') couldn't be found.\\n",
+                            "Force physical device by device UUID is active but the requested physical device '%s'('%s') couldn't be found.\\n",
                             layer_settings->device.force_device_uuid.c_str(),
                             layer_settings->device.force_device_name.c_str());
                     }
