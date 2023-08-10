@@ -2206,7 +2206,7 @@ class VulkanProfileCapabilities():
             # When we have multiple possible capabilities blocks, we load them all but effectively the API library can't effectively implement this behavior.
             if type(capName).__name__ == 'list':
                 for capNameCase in capName:
-                    self.mergeCaps(registry, caps[capNameElement])
+                    self.mergeCaps(registry, caps[capNameCase])
             elif capName in caps:
                 self.mergeCaps(registry, caps[capName])
             else:
