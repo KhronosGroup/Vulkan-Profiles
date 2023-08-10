@@ -16,6 +16,7 @@
 ### Bugfixes:
 - Fix query of capabilities of aliased extensions
 - Fix error message typo
+- Fix library generation when using profiles with multiple variants #464
 
 ## [Vulkan Profiles Toolset 1.3.250](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.250.0) - June 2023
 
