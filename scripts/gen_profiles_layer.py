@@ -3323,8 +3323,16 @@ class VulkanProfilesLayerGenerator():
                     first = False
                 else:
                     gen += ' && '
-                gen += 'PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, '
-                gen += registry.extensions[ext].upperCaseName + '_EXTENSION_NAME'
+                promotedTo = ext
+                while promotedTo != None and promotedTo in registry.extensions:
+                    if promotedTo != ext:
+                        gen += ' || '
+                    else:
+                        gen += '('
+                    gen += 'PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, '
+                    gen += registry.extensions[promotedTo].upperCaseName + '_EXTENSION_NAME'
+                    gen += ')'
+                    promotedTo = registry.extensions[promotedTo].promotedTo
                 gen += ')'
             gen += ') '
         elif structure.definedByVersion and (structure.definedByVersion.major != 1 or structure.definedByVersion.minor != 0):
