@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 #
 # Copyright (c) 2021-2023 LunarG, Inc.
+# Copyright (c) 2023-2023 RasterGrid Kft.
 #
 # Licensed under the Apache License, Version 2.0 (the "License")
 # you may not use this file except in compliance with the License.
@@ -1340,7 +1341,7 @@ class VulkanLimit():
 
 
 class VulkanVersionNumber():
-    def __init__(self, versionStr):
+    def __init__(self, versionStr, targetApi = None, versionName = None):
         match = re.search(r"^([1-9][0-9]*)\.([0-9]+)$", versionStr)
         if match != None:
             # Only major and minor version specified
@@ -1358,7 +1359,15 @@ class VulkanVersionNumber():
                 Log.f("Invalid API version string: '{0}'".format(versionStr))
 
         # Construct version number pre-processor definition's name
-        self.define = 'VK_VERSION_{0}_{1}'.format(self.major, self.minor)
+        if targetApi == 'vulkan':
+            self.versionName = 'VK_VERSION_{0}_{1}'.format(self.major, self.minor)
+            self.versionMacro = 'VK_API_VERSION_{0}_{1}'.format(self.major, self.minor)
+            self.versionStructSuffic = '{0}{1}'.format(self.major, self.minor)
+            if versionName is not None and versionName != self.versionName:
+                Log.f("Mismatch between version number {0} and name '{1}'".format(versionStr, versionName))
+
+        elif targetApi is not None:
+            Log.f("Unknown target API '{0}'".format(targetApi))
 
     def get_api_version_string(self):
         return 'VK_API_VERSION_' + str(self.major) + '_' + str(self.minor)
@@ -1394,6 +1403,31 @@ class VulkanVersionNumber():
             return '{0}.{1}'.format(self.major, self.minor)
 
 
+class VulkanDefinitions():
+    def __init__(self):
+        self.enums = set()
+        self.types = set()
+
+    def add(self, elements):
+        for element in elements:
+            for enum in element.findall("./enum"):
+                self.enums.add(enum.get('name'))
+            for type in element.findall("./type"):
+                self.types.add(type.get('name'))
+
+    def addDependencies(self, xml, targetApi):
+        for type in xml.findall("./types/type[@requires]"):
+            apiList = type.get('api')
+
+            # Skip dependency if it does not apply to the target API
+            if apiList is not None and not targetApi in apiList.split(','):
+                continue
+
+            name = type.find('./name')
+            if name is not None and name.text in self.types:
+                self.types.add(type.get('requires'))
+
+
 class VulkanDefinitionScope():
     def parseAliases(self, xml):
         self.sTypeAliases = dict()
@@ -1403,9 +1437,9 @@ class VulkanDefinitionScope():
 
 
 class VulkanVersion(VulkanDefinitionScope):
-    def __init__(self, xml):
+    def __init__(self, xml, targetApi):
         self.name = xml.get('name')
-        self.number = VulkanVersionNumber(xml.get('number'))
+        self.number = VulkanVersionNumber(xml.get('number'), targetApi, self.name)
         self.extensions = []
         self.features = dict()
         self.limits = dict()
@@ -1421,7 +1455,7 @@ class VulkanExtension(VulkanDefinitionScope):
         self.limits = dict()
         self.platform = xml.get('platform')
         self.provisional = xml.get('provisional')
-        self.promotedTo = xml.get('promotedto')
+        self.promotedTo = xml.get('promotedto').split(',') if xml.get('promotedto') is not None else []
         self.obsoletedBy = xml.get('obsoletedby')
         self.deprecatedBy = xml.get('deprecatedby')
         self.spec_version = 1
@@ -1433,14 +1467,21 @@ class VulkanExtension(VulkanDefinitionScope):
 
 
 class VulkanRegistry():
-    def __init__(self, registryFile):
+    def __init__(self, registryFile, api = 'vulkan'):
         Log.i("Loading registry file: '{0}'".format(registryFile))
         xml = etree.parse(registryFile)
-        stripNonmatchingAPIs(xml.getroot(), 'vulkan', actuallyDelete = True)
+        stripNonmatchingAPIs(xml.getroot(), api, actuallyDelete = True)
+
+        self.api = api
+        self.require = VulkanDefinitions()
+        self.remove = VulkanDefinitions()
 
         self.parsePlatformInfo(xml)
         self.parseVersionInfo(xml)
         self.parseExtensionInfo(xml)
+
+        self.require.addDependencies(xml, self.api)
+
         self.parseStructInfo(xml)
         self.parsePrerequisites(xml)
         self.parseEnums(xml)
@@ -1455,6 +1496,35 @@ class VulkanRegistry():
         self.applyWorkarounds()
 
 
+    def findAllFeatures(self, xml, xpath = None):
+        results = []
+        for feature in xml.findall("./feature"):
+            apiList = feature.get('api')
+            if self.api in apiList.split(','):
+                if xpath is None:
+                    results.append(feature)
+                else:
+                    results.extend(feature.findall(xpath))
+        return results
+
+
+    def findAllExtensions(self, xml, xpath = None):
+        results = []
+        for extension in xml.findall("./extensions/extension"):
+            apiList = extension.get('supported')
+            if self.api in apiList.split(','):
+                if xpath is None:
+                    results.append(extension)
+                else:
+                    results.extend(extension.findall(xpath))
+        return results
+
+
+    def parseRequireRemove(self, xml):
+        self.require.add(xml.findall("./require"))
+        self.remove.add(xml.findall("./remove"))
+
+
     def parsePlatformInfo(self, xml):
         self.platforms = dict()
         for plat in xml.findall("./platforms/platform"):
@@ -1463,16 +1533,17 @@ class VulkanRegistry():
 
     def parseVersionInfo(self, xml):
         self.versions = dict()
-        for feature in xml.findall("./feature[@api='vulkan']") + xml.findall("./feature[@api='vulkan,vulkansc']"):
+        for feature in self.findAllFeatures(xml):
             if re.search(r"^[1-9][0-9]*\.[0-9]+$", feature.get('number')):
-                self.versions[feature.get('name')] = VulkanVersion(feature)
+                self.versions[feature.get('name')] = VulkanVersion(feature, self.api)
+                self.parseRequireRemove(feature)
             else:
                 Log.f("Unsupported feature with number '{0}'".format(feature.get('number')))
 
 
     def parseExtensionInfo(self, xml):
         self.extensions = dict()
-        for ext in xml.findall("./extensions/extension[@supported='vulkan']") + xml.findall("./extensions/extension[@supported='vulkan,vulkansc']"):
+        for ext in self.findAllExtensions(xml):
             name = ext.get('name')
 
             # Find name enum (due to inconsistencies in lower case and upper case names this is non-trivial)
@@ -1487,26 +1558,20 @@ class VulkanRegistry():
             if not foundNameEnum:
                 Log.f("Cannot find name enum for extension '{0}'".format(name))
 
+            self.parseRequireRemove(ext)
 
-    def isVulkanscStruct(self, xml, structName):
-        if (structName == 'VkPhysicalDeviceVulkanSC10Features'):
-            return True
-        if (structName == 'VkPhysicalDeviceVulkanSC10Properties'):
-            return True
-        for extension in xml.findall("./extensions/extension[@supported='vulkansc']"):
-            for requireType in extension.findall('./require/type'):
-                if requireType.get('name') == structName:
-                    return True
-        return False
 
     def parseStructInfo(self, xml):
         self.structs = dict()
         for struct in xml.findall("./types/type[@category='struct']"):
-            if self.isVulkanscStruct(xml, struct.get('name')):
+            name = struct.get('name')
+
+            # Don't process structure if it is not required or if it is removed
+            if name not in self.require.types or name in self.remove.types:
                 continue
 
             # Define base struct information
-            structDef = VulkanStruct(struct.get('name'))
+            structDef = VulkanStruct(name)
 
             # Find out whether it's an extension structure
             extends = struct.get('structextends')
@@ -1574,14 +1639,14 @@ class VulkanRegistry():
 
     def parsePrerequisites(self, xml):
         # Check features (i.e. API versions)
-        for feature in xml.findall("./feature[@api='vulkan']") + xml.findall("./feature[@api='vulkan,vulkansc']"):
+        for feature in self.findAllFeatures(xml):
             for requireType in feature.findall('./require/type'):
                 # Add feature as the source of the definition of a struct
                 if requireType.get('name') in self.structs:
-                    self.structs[requireType.get('name')].definedByVersion = VulkanVersionNumber(feature.get('number'))
+                    self.structs[requireType.get('name')].definedByVersion = VulkanVersionNumber(feature.get('number'), self.api, feature.get('name'))
 
         # Check extensions
-        for extension in xml.findall("./extensions/extension[@supported='vulkan']") + xml.findall("./extensions/extension[@supported='vulkan,vulkansc']"):
+        for extension in self.findAllExtensions(xml):
             for requireType in extension.findall('./require/type'):
                 # Add extension as the source of the definition of a struct
                 if requireType.get('name') in self.structs:
@@ -1592,8 +1657,14 @@ class VulkanRegistry():
         self.enums = dict()
         # Find enum definitions
         for enum in xml.findall("./types/type[@category='enum']"):
+            name = enum.get('name')
+
+            # Don't process enum type if it is not required or if it is removed
+            if name not in self.require.types or name in self.remove.types:
+                continue
+
             # Create enum type
-            enumDef = VulkanEnum(enum.get('name'))
+            enumDef = VulkanEnum(name)
 
             # First collect base values
             values = xml.find("./enums[@name='" + enumDef.name + "']")
@@ -1603,12 +1674,20 @@ class VulkanRegistry():
                         enumDef.values.append(value.get('name'))
 
             # Then find extension values
-            for value in xml.findall(".//feature[@api='vulkan']/require/enum[@extends='" + enumDef.name + "']") + xml.findall(".//feature[@api='vulkan,vulkansc']/require/enum[@extends='" + enumDef.name + "']"):
+            for value in self.findAllFeatures(xml, "./require/enum[@extends='" + enumDef.name + "']"):
                 if value.get('alias') is None:
                     enumDef.values.append(value.get('name'))
-            for value in xml.findall(".//extension[@supported='vulkan']/require/enum[@extends='" + enumDef.name + "']") + xml.findall(".//extension[@supported='vulkan,vulkansc']/require/enum[@extends='" + enumDef.name + "']"):
+            for value in self.findAllExtensions(xml, "./require/enum[@extends='" + enumDef.name + "']"):
                 if value.get('alias') is None:
                     enumDef.values.append(value.get('name'))
+
+            # Remove any values that are marked as removed
+            removedValues = []
+            for name in enumDef.values:
+                if name in self.remove.enums:
+                    removedValues.append(name)
+            for name in removedValues:
+                enumDef.values.remove(name)
 
             # Finally store it in the registry
             self.enums[enumDef.name] = enumDef
@@ -1621,12 +1700,13 @@ class VulkanRegistry():
                 self.formatCompression[enum.get('name')] = enum.get('compressed')
 
         self.aliasFormats = list()
-        for format in xml.findall("./extensions/extension[@supported='vulkan']/require/enum[@extends='VkFormat'][@alias]") + xml.findall("./extensions/extension[@supported='vulkan,vulkansc']/require/enum[@extends='VkFormat'][@alias]"):
+        for format in self.findAllExtensions(xml, "./require/enum[@extends='VkFormat'][@alias]"):
             self.aliasFormats.append(format.attrib["name"])
 
         self.betaFormatFeatures = list()
-        for format_feature in xml.findall("./extensions/extension[@supported='vulkan']/require/enum[@protect='VK_ENABLE_BETA_EXTENSIONS']") + xml.findall("./extensions/extension[@supported='vulkan,vulkansc']/require/enum[@protect='VK_ENABLE_BETA_EXTENSIONS']"):
+        for format_feature in self.findAllExtensions(xml, "./require/enum[@protect='VK_ENABLE_BETA_EXTENSIONS']"):
             self.betaFormatFeatures.append(format_feature.attrib["name"])
+
 
     def parseBitmasks(self, xml):
         self.bitmasks = dict()
@@ -1635,6 +1715,10 @@ class VulkanRegistry():
             # Only consider non-alias bitmasks
             name = bitmask.find("./name")
             if bitmask.get('alias') is None and name != None:
+                # Don't process bitmask type if it is not required or if it is removed
+                if name.text not in self.require.types or name.text in self.remove.types:
+                    continue
+
                 bitmaskDef = VulkanBitmask(name.text)
 
                 # Get the name of the corresponding FlagBits type
@@ -1647,7 +1731,7 @@ class VulkanRegistry():
                     if bitsName in self.enums:
                         bitmaskDef.bitsType = self.enums[bitsName]
                     else:
-                        Log.f("Could not find bits enum '{0}' for bitmask '{1}'", bitsName, bitmaskDef.name)
+                        Log.f("Could not find bits enum '{0}' for bitmask '{1}'".format(bitsName, bitmaskDef.name))
                 else:
                     # This bitmask doesn't have any bits defined
                     pass
@@ -1670,11 +1754,21 @@ class VulkanRegistry():
     def parseAliases(self, xml):
         # Find any struct aliases
         for struct in xml.findall("./types/type[@category='struct']"):
+            name = struct.get('name')
+
+            # Don't process structure if it is not required or if it is removed
+            if name not in self.require.types or name in self.remove.types:
+                continue
+
             alias = struct.get('alias')
             if alias != None:
+                # Don't process alias if it is not required or if it is removed
+                if alias not in self.require.types or alias in self.remove.types:
+                    continue
+
                 if alias in self.structs:
                     baseStructDef = self.structs[alias]
-                    aliasStructDef = self.structs[struct.get('name')]
+                    aliasStructDef = self.structs[name]
 
                     # Set as alias
                     aliasStructDef.isAlias = True
@@ -1683,7 +1777,7 @@ class VulkanRegistry():
                     aliasStructDef.extends = baseStructDef.extends
                     aliasStructDef.members = baseStructDef.members
                     aliasStructDef.aliases = baseStructDef.aliases
-                    aliasStructDef.aliases.append(struct.get('name'))
+                    aliasStructDef.aliases.append(name)
 
                     if baseStructDef.sType != None:
                         sTypeAlias = None
@@ -1714,18 +1808,28 @@ class VulkanRegistry():
 
         # Find any enum aliases
         for enum in xml.findall("./types/type[@category='enum']"):
+            name = enum.get('name')
+
+            # Don't process enum type if it is not required or if it is removed
+            if name not in self.require.types or name in self.remove.types:
+                continue
+
             alias = enum.get('alias')
             if alias != None:
+                # Don't process alias if it is not required or if it is removed
+                if alias not in self.require.types or alias in self.remove.types:
+                    continue
+
                 if alias in self.enums:
                     baseEnumDef = self.enums[alias]
-                    aliasEnumDef = self.enums[enum.get('name')]
+                    aliasEnumDef = self.enums[name]
 
                     # Set as alias
                     aliasEnumDef.isAlias = True
 
                     # Merge aliases
                     aliasEnumDef.aliases = baseEnumDef.aliases
-                    aliasEnumDef.aliases.append(enum.get('name'))
+                    aliasEnumDef.aliases.append(name)
 
                     # Merge values respecting original order
                     for value in aliasEnumDef.values:
@@ -1744,7 +1848,7 @@ class VulkanRegistry():
                     alias = aliasValue.get('alias')
                     enumDef.values.append(name)
                     enumDef.aliasValues[name] = alias
-        for aliasValue in xml.findall("./extensions/extension[@supported='vulkan']/require/enum[@alias]") + xml.findall("./extensions/extension[@supported='vulkan,vulkansc']/require/enum[@alias]"):
+        for aliasValue in self.findAllExtensions(xml, "./require/enum[@alias]"):
             if aliasValue.get('extends'):
                 enumDef = self.enums[aliasValue.get('extends')]
                 name = aliasValue.get('name')
@@ -1755,8 +1859,17 @@ class VulkanRegistry():
         # Find any bitmask (flags) aliases
         for bitmask in xml.findall("./types/type[@category='bitmask']"):
             name = bitmask.get('name')
+
+            # Don't process bitmask if it is not required or if it is removed
+            if name not in self.require.types or name in self.remove.types:
+                continue
+
             alias = bitmask.get('alias')
             if alias != None:
+                # Don't process alias if it is not required or if it is removed
+                if alias not in self.require.types or alias in self.remove.types:
+                    continue
+
                 if alias in self.bitmasks:
                     # Duplicate bitmask definition
                     baseBitmaskDef = self.bitmasks[alias]
@@ -2135,9 +2248,10 @@ class VulkanRegistry():
         self.structs['VkQueueFamilyProperties'].members['timestampValidBits'].limittype = 'bits'
         self.structs['VkQueueFamilyProperties'].members['minImageTransferGranularity'].limittype = 'min,mul'
 
-        self.structs['VkSparseImageFormatProperties'].members['aspectMask'].limittype = 'bitmask'
-        self.structs['VkSparseImageFormatProperties'].members['imageGranularity'].limittype = 'min,mul'
-        self.structs['VkSparseImageFormatProperties'].members['flags'].limittype = 'bitmask'
+        if 'VkSparseImageFormatProperties' in self.structs:
+            self.structs['VkSparseImageFormatProperties'].members['aspectMask'].limittype = 'bitmask'
+            self.structs['VkSparseImageFormatProperties'].members['imageGranularity'].limittype = 'min,mul'
+            self.structs['VkSparseImageFormatProperties'].members['flags'].limittype = 'bitmask'
 
         # TODO: The registry xml contains some return structures that contain count + pointers to arrays
         # While the script itself is prepared to drop those, as they are ill-formed, as return structures
@@ -2146,21 +2260,41 @@ class VulkanRegistry():
         # Hence here we simply remove such "disallow-listed" structs so that they don't get in the way
         self.structs.pop('VkDrmFormatModifierPropertiesListEXT', None)
         self.structs.pop('VkDrmFormatModifierPropertiesList2EXT', None)
-        self.structs.pop('VkVideoProfilesKHR', None)
 
 
     def getExtensionPromotedToVersion(self, extensionName):
-        promotedTo = self.extensions[extensionName].promotedTo
+        promotedTo = self.extensions[extensionName].promotedTo.copy()
         version = None
-        while promotedTo != None:
-            if promotedTo in self.extensions:
+        while len(promotedTo) > 0:
+            target = promotedTo[0]
+            if target in self.extensions:
                 # Functionality was promoted to another extension, continue with that
-                promotedTo = self.extensions[promotedTo].promotedTo
-            elif promotedTo in self.versions:
+                promotedTo.remove(target)
+                promotedTo.extend(self.extensions[target].promotedTo)
+            elif target in self.versions:
                 # Found extension in a core API version, we're done
-                version = self.versions[promotedTo]
+                version = self.versions[target]
                 break
+            else:
+                # Version or extension is not included in the target API
+                promotedTo.remove(target)
         return version
+
+
+    def getExtensionPromotedToExtensionList(self, extensionName):
+        promotedTo = self.extensions[extensionName].promotedTo.copy()
+        extensions = []
+        while len(promotedTo) > 0:
+            target = promotedTo[0]
+            if target in self.extensions:
+                # Functionality was promoted to another extension, add to list and continue with that
+                extensions.append(target)
+                promotedTo.remove(target)
+                promotedTo.extend(self.extensions[target].promotedTo)
+            else:
+                # Extension is not included in the target API or is a version, skip
+                promotedTo.remove(target)
+        return extensions
 
 
     def getChainableStructDef(self, name, extends):
@@ -2285,8 +2419,11 @@ class VulkanProfileStructs():
         self.feature = []
         for name in caps.features:
             if name in [ 'VkPhysicalDeviceFeatures', 'VkPhysicalDeviceFeatures2KHR' ]:
-                # Special case, add both as VkPhysicalDeviceFeatures2KHR
-                self.feature.append(registry.structs['VkPhysicalDeviceFeatures2KHR'])
+                # Special case, add both as VkPhysicalDeviceFeatures2[KHR]
+                if 'VkPhysicalDeviceFeatures2KHR' in registry.structs:
+                    self.feature.append(registry.structs['VkPhysicalDeviceFeatures2KHR'])
+                else:
+                    self.feature.append(registry.structs['VkPhysicalDeviceFeatures2'])
             else:
                 self.feature.append(registry.getChainableStructDef(name, 'VkPhysicalDeviceFeatures2'))
         self.eliminateAliases(self.feature)
@@ -2295,8 +2432,11 @@ class VulkanProfileStructs():
         self.property = []
         for name in caps.properties:
             if name in [ 'VkPhysicalDeviceProperties', 'VkPhysicalDeviceProperties2KHR' ]:
-                # Special case, add both as VkPhysicalDeviceProperties2KHR
-                self.property.append(registry.structs['VkPhysicalDeviceProperties2KHR'])
+                # Special case, add both as VkPhysicalDeviceProperties2[KHR]
+                if 'VkPhysicalDeviceProperties2KHR' in registry.structs:
+                    self.property.append(registry.structs['VkPhysicalDeviceProperties2KHR'])
+                else:
+                    self.property.append(registry.structs['VkPhysicalDeviceProperties2'])
             else:
                 self.property.append(registry.getChainableStructDef(name, 'VkPhysicalDeviceProperties2'))
         self.eliminateAliases(self.property)
@@ -2308,8 +2448,11 @@ class VulkanProfileStructs():
             queueFamilyStructs.update(queueFamilyProps)
         for name in queueFamilyStructs:
             if name in [ 'VkQueueFamilyProperties', 'VkQueueFamilyProperties2KHR' ]:
-                # Special case, add both as VkQueueFamilyProperties2KHR
-                self.queueFamily.append(registry.structs['VkQueueFamilyProperties2KHR'])
+                # Special case, add both as VkQueueFamilyProperties2[KHR]
+                if 'VkQueueFamilyProperties2KHR' in registry.structs:
+                    self.queueFamily.append(registry.structs['VkQueueFamilyProperties2KHR'])
+                else:
+                    self.queueFamily.append(registry.structs['VkQueueFamilyProperties2'])
             else:
                 self.queueFamily.append(registry.getChainableStructDef(name, 'VkQueueFamilyProperties2'))
         self.eliminateAliases(self.queueFamily)
@@ -2321,8 +2464,11 @@ class VulkanProfileStructs():
             formatStructs.update(formatProps)
         for name in formatStructs:
             if name in [ 'VkFormatProperties', 'VkFormatProperties2KHR', 'VkFormatProperties3KHR' ]:
-                # Special case, add all as VkFormatProperties2KHR and VkFormatProperties3KHR
-                self.format.append(registry.structs['VkFormatProperties2KHR'])
+                # Special case, add all as VkFormatProperties2[KHR] and VkFormatProperties3KHR
+                if 'VkFormatProperties2KHR' in registry.structs:
+                    self.format.append(registry.structs['VkFormatProperties2KHR'])
+                else:
+                    self.format.append(registry.structs['VkFormatProperties2'])
                 if 'VkFormatProperties3KHR' in registry.structs:
                     self.format.append(registry.structs['VkFormatProperties3KHR'])
             else:
@@ -2351,7 +2497,7 @@ class VulkanProfile():
         self.description = data['description']
         self.version = data['version']
         self.apiVersion = data['api-version']
-        self.apiVersionNumber = VulkanVersionNumber(self.apiVersion)
+        self.apiVersionNumber = VulkanVersionNumber(self.apiVersion, registry.api)
         self.fallback = data.get('fallback')
         self.versionRequirements = []
         self.extensionRequirements = []
@@ -2363,7 +2509,7 @@ class VulkanProfile():
 
     def collectCompileTimeRequirements(self):
         # Add API version to the list of requirements
-        versionName = self.apiVersionNumber.define
+        versionName = self.apiVersionNumber.versionName
         if versionName in self.registry.versions:
             self.versionRequirements.append(versionName)
         else:
