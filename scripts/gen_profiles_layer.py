@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 #
 # Copyright (c) 2021-2023 LunarG, Inc.
+# Copyright (c) 2023-2023 RasterGrid Kft.
 #
 # Licensed under the Apache License, Version 2.0 (the "License")
 # you may not use this file except in compliance with the License.
@@ -2804,11 +2805,13 @@ class VulkanProfilesLayerGenerator():
         gen = PHYSICAL_DEVICE_DATA_BEGIN
         gen += '\n    // Core properties\n'
         for property in self.non_extension_properties:
-            gen += '    ' + property + ' ' + self.create_var_name(property) + ';\n'
+            typename = self.registry.getNonAliasTypeName(property, self.registry.structs)
+            gen += '    ' + typename + ' ' + self.create_var_name(property) + ';\n'
 
         gen += '\n    // Core features\n'
         for feature in self.non_extension_features:
-            gen += '    ' + feature + ' ' + self.create_var_name(feature) + ';\n'
+            typename = self.registry.getNonAliasTypeName(feature, self.registry.structs)
+            gen += '    ' + typename + ' ' + self.create_var_name(feature) + ';\n'
 
         for ext, properties, features in self.extension_structs:
             gen += '\n    // ' + ext + ' structs\n'
@@ -2821,10 +2824,12 @@ class VulkanProfilesLayerGenerator():
 
         gen += '\n        // Core properties\n'
         for property in self.non_extension_properties:
-            gen += '        ' + self.create_var_name(property) + ' = { ' + registry.structs[property].sType +  ' };\n'
+            stype = self.registry.structs[self.registry.getNonAliasTypeName(property, self.registry.structs)].sType
+            gen += '        ' + self.create_var_name(property) + ' = { ' + stype +  ' };\n'
         gen += '\n        // Core features\n'
         for feature in self.non_extension_features:
-            gen += '        ' + self.create_var_name(feature) + ' = { ' + registry.structs[feature].sType +  ' };\n'
+            stype = self.registry.structs[self.registry.getNonAliasTypeName(feature, self.registry.structs)].sType
+            gen += '        ' + self.create_var_name(feature) + ' = { ' + stype +  ' };\n'
         for ext, properties, features in self.extension_structs:
             gen += '\n        // ' + ext + ' structs\n'
             for property in properties:
@@ -2966,7 +2971,7 @@ class VulkanProfilesLayerGenerator():
                     version = registry.structs[current].definedByVersion
                     if version:
                         if version and (version.major != 1 or version.minor != 0):
-                            gen += '        if (!CheckVersionSupport(' + registry.structs[current].definedByVersion.get_api_version_string() + ', name)) return false;\n'
+                            gen += '        if (!CheckVersionSupport(' + registry.structs[current].definedByVersion.versionMacro + ', name)) return false;\n'
                     else:
                         ext = registry.extensions[registry.structs[current].definedByExtensions[0]]
                         if not ext.name in self.emulated_extensions:
@@ -3043,7 +3048,7 @@ class VulkanProfilesLayerGenerator():
                 gen += '    static const std::vector<const char *> promoted_' + major + '_' + minor + ' = {\n'
                 for ext in registry.extensions:
                     extension = registry.extensions[ext]
-                    if extension.promotedTo == 'VK_VERSION_' + major + '_' + minor:
+                    if 'VK_VERSION_' + major + '_' + minor in extension.promotedTo:
                         gen += '        ' + extension.upperCaseName + '_EXTENSION_NAME,\n'
                 gen += '    };\n'
                 gen += '    if (api_version >= VK_API_VERSION_' + major + '_' + minor + ') {\n'
@@ -3323,8 +3328,7 @@ class VulkanProfilesLayerGenerator():
                     first = False
                 else:
                     gen += ' && '
-                promotedTo = ext
-                while promotedTo != None and promotedTo in registry.extensions:
+                for promotedTo in [ext] + registry.getExtensionPromotedToExtensionList(ext):
                     if promotedTo != ext:
                         gen += ' || '
                     else:
@@ -3332,11 +3336,10 @@ class VulkanProfilesLayerGenerator():
                     gen += 'PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, '
                     gen += registry.extensions[promotedTo].upperCaseName + '_EXTENSION_NAME'
                     gen += ')'
-                    promotedTo = registry.extensions[promotedTo].promotedTo
                 gen += ')'
             gen += ') '
         elif structure.definedByVersion and (structure.definedByVersion.major != 1 or structure.definedByVersion.minor != 0):
-            gen += 'if (physicalDeviceData->GetEffectiveVersion() >= ' + structure.definedByVersion.get_api_version_string() + ') '
+            gen += 'if (physicalDeviceData->GetEffectiveVersion() >= ' + structure.definedByVersion.versionMacro + ') '
         gen += '{\n'
         gen += '                    ' + structure.name + ' *data = (' + structure.name + ' *)place;\n'
         gen += '                    void *pNext = data->pNext;\n'
@@ -3432,7 +3435,7 @@ class VulkanProfilesLayerGenerator():
             if value.name[len('VkPhysicalDeviceVulkan'):][:2].isdigit():
                 return None
         if value.definedByVersion:
-            promoted = 'VkPhysicalDeviceVulkan' + value.definedByVersion.define[11:].replace('_', '')
+            promoted = 'VkPhysicalDeviceVulkan' + value.definedByVersion.versionStructSuffic
             if (('VkPhysicalDeviceProperties2' in value.extends)):
                 promoted += 'Properties'
             else:
@@ -3581,6 +3584,8 @@ class VulkanProfilesLayerGenerator():
         gen = '\nstatic uint32_t VkStringToUint(const std::string &input_value) {\n'
         gen += '    static const std::unordered_map<std::string, uint32_t> map = {\n'
         for list in lists:
+            if list not in enums:
+                continue
             gen += '        // ' + list + '\n'
             for enum in enums[list].values:
                 gen += '        {\"' + enum + '\", static_cast<uint32_t>(' + enum + ')},\n'
