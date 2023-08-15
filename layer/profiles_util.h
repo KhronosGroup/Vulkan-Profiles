@@ -39,14 +39,10 @@
 #include "vulkan/vulkan_beta.h"
 #include "vulkan/vulkan_screen.h"
 #include "vk_layer_table.h"
-#include "generated/vk_enum_string_helper.h"
+#include <vulkan/vk_enum_string_helper.h>
 #include <vulkan/layer/vk_layer_settings.h>
 
 #include "profiles.h"
-
-//typedef std::vector<std::pair<std::string, int>> List;
-
-//void LayerSettingsLog(const char *pSettingName, const char *pMessage);
 
 std::string format(const char *message, ...);
 
