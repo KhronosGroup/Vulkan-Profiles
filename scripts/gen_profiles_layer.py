@@ -2329,7 +2329,11 @@ LOAD_QUEUE_FAMILY_PROPERTIES = '''
 void LoadQueueFamilyProperties(VkInstance instance, VkPhysicalDevice pd, PhysicalDeviceData *pdd) {
     const auto dt = instance_dispatch_table(instance);
     uint32_t count = 0;
-    dt->GetPhysicalDeviceQueueFamilyProperties2KHR(pd, &count, nullptr);
+    if (pdd->GetEffectiveVersion() >= VK_API_VERSION_1_1) {
+        dt->GetPhysicalDeviceQueueFamilyProperties2(pd, &count, nullptr);
+    } else {
+        dt->GetPhysicalDeviceQueueFamilyProperties2KHR(pd, &count, nullptr);
+    }
     if (count > 0) {
         pdd->device_queue_family_properties_.resize(count);
         std::vector<void *> pNext(count);
@@ -2363,7 +2367,11 @@ void LoadQueueFamilyProperties(VkInstance instance, VkPhysicalDevice pd, Physica
             pdd->device_queue_family_properties_[i].properties_2.pNext = pNext[i];
             props[i] = pdd->device_queue_family_properties_[i].properties_2;
         }
-        dt->GetPhysicalDeviceQueueFamilyProperties2KHR(pd, &count, props.data());
+        if (pdd->GetEffectiveVersion() >= VK_API_VERSION_1_1) {
+            dt->GetPhysicalDeviceQueueFamilyProperties2(pd, &count, props.data());
+        } else {
+            dt->GetPhysicalDeviceQueueFamilyProperties2KHR(pd, &count, props.data());
+        } 
         for (uint32_t i = 0; i < count; ++i) {
             pdd->device_queue_family_properties_[i].properties_2 = props[i];
         }
@@ -2548,7 +2556,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
 '''
 
 ENUMERATE_PHYSICAL_DEVICES_MIDDLE = '''
-                if (VK_API_VERSION_MINOR(pdd.GetEffectiveVersion())) {
+                if (pdd.GetEffectiveVersion() >= VK_API_VERSION_1_1) {
                     dt->GetPhysicalDeviceProperties2(physical_device, &property_chain);
                     if (layer_settings->simulate.default_feature_values == DEFAULT_FEATURE_VALUES_DEVICE) {
                         dt->GetPhysicalDeviceFeatures2(physical_device, &feature_chain);
