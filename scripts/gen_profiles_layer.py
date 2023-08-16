@@ -348,7 +348,7 @@ WARN_FUNCTIONS = '''
             if (not_modifiable) {
                 LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' is not modifiable but the profile value (%s) is different from the device (%s) value (%s)\\n", cap_name, new_value ? "true" : "false", device_name, old_value ? "true" : "false");
-            } else {
+            } else if (new_value) {
                 LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "'%s' profile value is enabled in the profile, but the device (%s) does not support it.\\n", cap_name, device_name);
             }
