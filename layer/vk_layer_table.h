@@ -1,6 +1,7 @@
 /* Copyright (c) 2015-2022 The Khronos Group Inc.
  * Copyright (c) 2015-2022 Valve Corporation
  * Copyright (c) 2015-2022 LunarG, Inc.
+ * Copyright (c) 2023-2023 RasterGrid Kft.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +22,12 @@
 
 #include "vulkan/vk_layer.h"
 #include "vulkan/vulkan.h"
+#include <memory>
 #include <unordered_map>
 #include "utils/vk_layer_utils.h"
 
-typedef std::unordered_map<void *, VkLayerDispatchTable *> device_table_map;
-typedef std::unordered_map<void *, VkLayerInstanceDispatchTable *> instance_table_map;
+typedef std::unordered_map<void *, std::unique_ptr<VkLayerDispatchTable>> device_table_map;
+typedef std::unordered_map<void *, std::unique_ptr<VkLayerInstanceDispatchTable>> instance_table_map;
 VkLayerDispatchTable *initDeviceTable(VkDevice device, const PFN_vkGetDeviceProcAddr gpa, device_table_map &map);
 VkLayerDispatchTable *initDeviceTable(VkDevice device, const PFN_vkGetDeviceProcAddr gpa);
 VkLayerInstanceDispatchTable *initInstanceTable(VkInstance instance, const PFN_vkGetInstanceProcAddr gpa, instance_table_map &map);
