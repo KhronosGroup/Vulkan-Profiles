@@ -116,7 +116,7 @@ VkResult profiles_test::VulkanInstanceBuilder::init(uint32_t apiVersion, const s
     if (result != VK_SUCCESS) return result;
 
     VkLayerSettingsCreateInfoEXT layer_settings_create_info{
-        VK_STRUCTURE_TYPE_LAYER_SETTINGS_EXT, nullptr,
+        VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT, nullptr,
         settings.empty() ? 0 : static_cast<uint32_t>(settings.size()),
         settings.empty() ? nullptr : &settings[0]};
 
