@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: profiles
+name: ci
 
 # https://docs.github.com/en/actions/using-jobs/using-concurrency
 concurrency:
@@ -21,6 +21,11 @@ concurrency:
   # Fallback to the run ID, which is guaranteed to be both unique and defined for the run.
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id  }}
   cancel-in-progress: true
+
+env:
+  CMAKE_GENERATOR: Ninja
+  CMAKE_C_COMPILER_LAUNCHER: ccache
+  CMAKE_CXX_COMPILER_LAUNCHER: ccache
 
 on:
     push:
@@ -48,10 +53,8 @@ jobs:
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           key: ${{ runner.os }}-ccache
-      - name: Add ccache to PATH
-        run: echo "/usr/lib/ccache:/usr/local/opt/ccache/libexec" >> $GITHUB_PATH
       - name: Configure/Generate
-        run: cmake -S. -B build -D BUILD_TESTS=OFF -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=Release -G "Ninja"
+        run: cmake -S. -B build -D BUILD_TESTS=OFF -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=Release
         env:
           # Ensure we can build against 10.15: https://cmake.org/cmake/help/latest/envvar/MACOSX_DEPLOYMENT_TARGET.html
           MACOSX_DEPLOYMENT_TARGET: 10.15
@@ -82,10 +85,8 @@ jobs:
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           key: ${{ runner.os }}-${{ matrix.config }}
-      - name: Add ccache to PATH
-        run: echo "/usr/lib/ccache" >> $GITHUB_PATH
       - name: Configure/Generate
-        run: cmake -S. -B build -D BUILD_TESTS=OFF -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -G "Ninja"
+        run: cmake -S. -B build -D BUILD_TESTS=OFF -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}}
       - name: Build
         run: cmake --build build --config ${{matrix.config}}
       - name: Install
@@ -100,6 +101,10 @@ jobs:
           python-version: '3.8'
       - name: Install jsonschema
         run: python3 -m pip install jsonschema
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: android-ccache
       - uses: lukka/get-cmake@latest
       - name: Configure
         run: |
@@ -114,8 +119,7 @@ jobs:
           -D BUILD_WERROR=ON \
           -D CMAKE_BUILD_TYPE=Release \
           -D UPDATE_DEPS=ON \
-          -D BUILD_TESTS=OFF \
-          -G "Ninja"
+          -D BUILD_TESTS=OFF
       - name: Build
         run: cmake --build build
       - name: Install
@@ -145,7 +149,7 @@ jobs:
         with:
           arch: ${{ matrix.arch }}
       - name: Configure/Generate
-        run: cmake -S. -B build -D BUILD_TESTS=OFF -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -G "Ninja"
+        run: cmake -S. -B build -D BUILD_TESTS=OFF -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}}
       - name: Build
         run: cmake --build build --config ${{matrix.config}}
       - name: Install
