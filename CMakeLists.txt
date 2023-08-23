@@ -19,14 +19,6 @@ find_package(VulkanHeaders REQUIRED CONFIG QUIET)
 
 find_package(VulkanUtilityLibraries REQUIRED CONFIG QUIET)
 
-# Search the VVL include directory using the VVL vk_layer_config.h file
-find_file(VVL_INCLUDE_DIR vk_layer_config.h REQUIRED CMAKE_FIND_ROOT_PATH_BOTH)
-get_filename_component(VVL_INCLUDE_DIR ${VVL_INCLUDE_DIR} DIRECTORY)
-
-# Effectively the header files installed by VVL are part of Vulkan::Headers
-# This reflects the current structure of the VulkanSDK.
-target_include_directories(Vulkan::Headers INTERFACE ${VVL_INCLUDE_DIR})
-
 find_package(valijson REQUIRED CONFIG)
 
 find_package(jsoncpp REQUIRED CONFIG)

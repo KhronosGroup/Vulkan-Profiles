@@ -2285,7 +2285,7 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceToolPropertiesEXT(VkPhysicalDevi
         (*pToolCount)--;
     }
 
-    VkLayerInstanceDispatchTable *pInstanceTable = instance_dispatch_table(physicalDevice);
+    VulInstanceDispatchTable *pInstanceTable = instance_dispatch_table(physicalDevice);
     VkResult result = pInstanceTable->GetPhysicalDeviceToolPropertiesEXT(physicalDevice, pToolCount, pToolProperties);
 
     if (original_pToolProperties != nullptr) {
@@ -2372,7 +2372,7 @@ void LoadQueueFamilyProperties(VkInstance instance, VkPhysicalDevice pd, Physica
             dt->GetPhysicalDeviceQueueFamilyProperties2(pd, &count, props.data());
         } else {
             dt->GetPhysicalDeviceQueueFamilyProperties2KHR(pd, &count, props.data());
-        } 
+        }
         for (uint32_t i = 0; i < count; ++i) {
             pdd->device_queue_family_properties_[i].properties_2 = props[i];
         }

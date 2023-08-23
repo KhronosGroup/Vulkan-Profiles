@@ -34,7 +34,6 @@ build-android/external
 helper.cmake
 Vulkan-Headers/
 Vulkan-Tools/
-Vulkan-ValidationLayers/
 external/
 profiles/test/data/VP_LUNARG_test_generated_name.json
 profiles/test/data/VP_LUNARG_test_api_generated.json
