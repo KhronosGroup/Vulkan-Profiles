@@ -20,28 +20,29 @@
 
 #pragma once
 
+#include "vulkan/utility/vul_dispatch_table.h"
 #include "vulkan/vk_layer.h"
 #include "vulkan/vulkan.h"
 #include <memory>
 #include <unordered_map>
-#include "utils/vk_layer_utils.h"
 
-typedef std::unordered_map<void *, std::unique_ptr<VkLayerDispatchTable>> device_table_map;
-typedef std::unordered_map<void *, std::unique_ptr<VkLayerInstanceDispatchTable>> instance_table_map;
-VkLayerDispatchTable *initDeviceTable(VkDevice device, const PFN_vkGetDeviceProcAddr gpa, device_table_map &map);
-VkLayerDispatchTable *initDeviceTable(VkDevice device, const PFN_vkGetDeviceProcAddr gpa);
-VkLayerInstanceDispatchTable *initInstanceTable(VkInstance instance, const PFN_vkGetInstanceProcAddr gpa, instance_table_map &map);
-VkLayerInstanceDispatchTable *initInstanceTable(VkInstance instance, const PFN_vkGetInstanceProcAddr gpa);
+typedef std::unordered_map<void *, std::unique_ptr<VulDeviceDispatchTable>> device_table_map;
+typedef std::unordered_map<void *, std::unique_ptr<VulInstanceDispatchTable>> instance_table_map;
+VulDeviceDispatchTable *initDeviceTable(VkDevice device, const PFN_vkGetDeviceProcAddr gpa, device_table_map &map);
+VulDeviceDispatchTable *initDeviceTable(VkDevice device, const PFN_vkGetDeviceProcAddr gpa);
+VulInstanceDispatchTable *initInstanceTable(VkInstance instance, const PFN_vkGetInstanceProcAddr gpa, instance_table_map &map);
+VulInstanceDispatchTable *initInstanceTable(VkInstance instance, const PFN_vkGetInstanceProcAddr gpa);
 
 typedef void *dispatch_key;
+dispatch_key get_dispatch_key(const void *object);
 
-VkLayerDispatchTable *device_dispatch_table(void *object);
+VulDeviceDispatchTable *device_dispatch_table(void *object);
 
-VkLayerInstanceDispatchTable *instance_dispatch_table(void *object);
+VulInstanceDispatchTable *instance_dispatch_table(void *object);
 
-VkLayerDispatchTable *get_dispatch_table(device_table_map &map, void *object);
+VulDeviceDispatchTable *get_dispatch_table(device_table_map &map, void *object);
 
-VkLayerInstanceDispatchTable *get_dispatch_table(instance_table_map &map, void *object);
+VulInstanceDispatchTable *get_dispatch_table(instance_table_map &map, void *object);
 
 VkLayerInstanceCreateInfo *get_chain_info(const VkInstanceCreateInfo *pCreateInfo, VkLayerFunction func);
 VkLayerDeviceCreateInfo *get_chain_info(const VkDeviceCreateInfo *pCreateInfo, VkLayerFunction func);
@@ -50,3 +51,6 @@ void destroy_device_dispatch_table(dispatch_key key);
 void destroy_instance_dispatch_table(dispatch_key key);
 void destroy_dispatch_table(device_table_map &map, dispatch_key key);
 void destroy_dispatch_table(instance_table_map &map, dispatch_key key);
+
+// Convert integer API version to a string
+std::string StringAPIVersion(uint32_t version);

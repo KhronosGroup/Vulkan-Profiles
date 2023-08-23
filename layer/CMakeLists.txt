@@ -89,6 +89,7 @@ target_sources(VkLayer_khronos_profiles PRIVATE
 target_link_libraries(VkLayer_khronos_profiles PRIVATE
     Vulkan::LayerSettings
     Vulkan::Headers
+    Vulkan::UtilityHeaders
     jsoncpp_static
     valijson
 )
@@ -110,7 +111,7 @@ add_custom_target(VpLayer_generate ALL
     DEPENDS ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml)
 set_target_properties(VpLayer_generate PROPERTIES FOLDER "Profiles layer")
 add_dependencies(VkLayer_khronos_profiles VpLayer_generate)
-	
+
 source_group("Python Files" FILES ${CMAKE_SOURCE_DIR}/scripts/gen_profiles_tests.py)
 add_custom_target(VpLayer_generate_tests ALL
 	COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/scripts/gen_profiles_tests.py
