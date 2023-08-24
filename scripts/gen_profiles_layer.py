@@ -73,6 +73,7 @@ INCLUDES_HEADER = '''
 #include "profiles_util.h"
 #include "profiles_json.h"
 #include "profiles_settings.h"
+#include <algorithm>
 '''
 
 GLOBAL_CONSTANTS = '''
