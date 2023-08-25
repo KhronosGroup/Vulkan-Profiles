@@ -21,8 +21,8 @@
 #include "profiles_util.h"
 
 void WarnMissingFormatFeatures(ProfileLayerSettings *layer_settings, const char *device_name, const std::string &format_name,
-                               const std::string &features,
-                               VkFormatFeatureFlags profile_features, VkFormatFeatureFlags device_features) {
+                               const std::string &features, VkFormatFeatureFlags profile_features,
+                               VkFormatFeatureFlags device_features) {
     if (!(layer_settings->log.debug_reports & DEBUG_REPORT_WARNING_BIT)) {
         return;
     }
@@ -35,8 +35,8 @@ void WarnMissingFormatFeatures(ProfileLayerSettings *layer_settings, const char 
 }
 
 void WarnMissingFormatFeatures2(ProfileLayerSettings *layer_settings, const char *device_name, const std::string &format_name,
-                                const std::string &features,
-                                VkFormatFeatureFlags2 profile_features, VkFormatFeatureFlags2 device_features) {
+                                const std::string &features, VkFormatFeatureFlags2 profile_features,
+                                VkFormatFeatureFlags2 device_features) {
     if (!(layer_settings->log.debug_reports & DEBUG_REPORT_WARNING_BIT)) {
         return;
     }
@@ -64,6 +64,9 @@ std::string GetDebugActionsLog(DebugActionFlags flags) {
 }
 
 #if defined(__ANDROID__)
+
+#include <android/log.h>
+
 void AndroidPrintf(DebugReportBits level, const std::string &message) {
     switch (level) {
         default:
@@ -198,7 +201,7 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
 
     if (vlHasLayerSetting(layerSettingSet, kLayerSettingsExcludeDeviceExtensions)) {
         vlGetLayerSettingValues(layerSettingSet, kLayerSettingsExcludeDeviceExtensions,
-                              layer_settings->simulate.exclude_device_extensions);
+                                layer_settings->simulate.exclude_device_extensions);
     }
 
     if (vlHasLayerSetting(layerSettingSet, kLayerSettingsExcludeFormats)) {
@@ -210,7 +213,7 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
 
         if (vlHasLayerSetting(layerSettingSet, kLayerSettings_constantAlphaColorBlendFactors)) {
             vlGetLayerSettingValue(layerSettingSet, kLayerSettings_constantAlphaColorBlendFactors,
-                                 layer_settings->portability.constantAlphaColorBlendFactors);
+                                   layer_settings->portability.constantAlphaColorBlendFactors);
         }
 
         if (vlHasLayerSetting(layerSettingSet, kLayerSettings_events)) {
@@ -219,27 +222,27 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
 
         if (vlHasLayerSetting(layerSettingSet, kLayerSettings_imageViewFormatReinterpretation)) {
             vlGetLayerSettingValue(layerSettingSet, kLayerSettings_imageViewFormatReinterpretation,
-                                 layer_settings->portability.imageViewFormatReinterpretation);
+                                   layer_settings->portability.imageViewFormatReinterpretation);
         }
 
         if (vlHasLayerSetting(layerSettingSet, kLayerSettings_imageViewFormatSwizzle)) {
             vlGetLayerSettingValue(layerSettingSet, kLayerSettings_imageViewFormatSwizzle,
-                                 layer_settings->portability.imageViewFormatSwizzle);
+                                   layer_settings->portability.imageViewFormatSwizzle);
         }
 
         if (vlHasLayerSetting(layerSettingSet, kLayerSettings_imageView2DOn3DImage)) {
             vlGetLayerSettingValue(layerSettingSet, kLayerSettings_imageView2DOn3DImage,
-                                 layer_settings->portability.imageView2DOn3DImage);
+                                   layer_settings->portability.imageView2DOn3DImage);
         }
 
         if (vlHasLayerSetting(layerSettingSet, kLayerSettings_multisampleArrayImage)) {
             vlGetLayerSettingValue(layerSettingSet, kLayerSettings_multisampleArrayImage,
-                                 layer_settings->portability.multisampleArrayImage);
+                                   layer_settings->portability.multisampleArrayImage);
         }
 
         if (vlHasLayerSetting(layerSettingSet, kLayerSettings_mutableComparisonSamplers)) {
             vlGetLayerSettingValue(layerSettingSet, kLayerSettings_mutableComparisonSamplers,
-                                 layer_settings->portability.mutableComparisonSamplers);
+                                   layer_settings->portability.mutableComparisonSamplers);
         }
 
         if (vlHasLayerSetting(layerSettingSet, kLayerSettings_pointPolygons)) {
@@ -248,27 +251,27 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
 
         if (vlHasLayerSetting(layerSettingSet, kLayerSettings_samplerMipLodBias)) {
             vlGetLayerSettingValue(layerSettingSet, kLayerSettings_samplerMipLodBias,
-                                 layer_settings->portability.samplerMipLodBias);
+                                   layer_settings->portability.samplerMipLodBias);
         }
 
         if (vlHasLayerSetting(layerSettingSet, kLayerSettings_separateStencilMaskRef)) {
             vlGetLayerSettingValue(layerSettingSet, kLayerSettings_separateStencilMaskRef,
-                                 layer_settings->portability.separateStencilMaskRef);
+                                   layer_settings->portability.separateStencilMaskRef);
         }
 
         if (vlHasLayerSetting(layerSettingSet, kLayerSettings_shaderSampleRateInterpolationFunctions)) {
             vlGetLayerSettingValue(layerSettingSet, kLayerSettings_shaderSampleRateInterpolationFunctions,
-                                 layer_settings->portability.shaderSampleRateInterpolationFunctions);
+                                   layer_settings->portability.shaderSampleRateInterpolationFunctions);
         }
 
         if (vlHasLayerSetting(layerSettingSet, kLayerSettings_tessellationIsolines)) {
             vlGetLayerSettingValue(layerSettingSet, kLayerSettings_tessellationIsolines,
-                                 layer_settings->portability.tessellationIsolines);
+                                   layer_settings->portability.tessellationIsolines);
         }
 
         if (vlHasLayerSetting(layerSettingSet, kLayerSettings_tessellationPointMode)) {
             vlGetLayerSettingValue(layerSettingSet, kLayerSettings_tessellationPointMode,
-                                 layer_settings->portability.tessellationPointMode);
+                                   layer_settings->portability.tessellationPointMode);
         }
 
         if (vlHasLayerSetting(layerSettingSet, kLayerSettings_triangleFans)) {
@@ -277,12 +280,12 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
 
         if (vlHasLayerSetting(layerSettingSet, kLayerSettings_vertexAttributeAccessBeyondStride)) {
             vlGetLayerSettingValue(layerSettingSet, kLayerSettings_vertexAttributeAccessBeyondStride,
-                                 layer_settings->portability.vertexAttributeAccessBeyondStride);
+                                   layer_settings->portability.vertexAttributeAccessBeyondStride);
         }
 
         if (vlHasLayerSetting(layerSettingSet, kLayerSettings_minVertexInputBindingStrideAlignment)) {
             vlGetLayerSettingValue(layerSettingSet, kLayerSettings_minVertexInputBindingStrideAlignment,
-                                 layer_settings->portability.minVertexInputBindingStrideAlignment);
+                                   layer_settings->portability.minVertexInputBindingStrideAlignment);
         }
     }
 
@@ -355,38 +358,55 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
     std::string settings_log;
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileFile, layer_settings->simulate.profile_file.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileName, layer_settings->simulate.profile_name.c_str());
-    settings_log += format("\t%s: %s\n", kLayerSettingsProfileValidation, layer_settings->simulate.profile_validation ? "true" : "false");
+    settings_log +=
+        format("\t%s: %s\n", kLayerSettingsProfileValidation, layer_settings->simulate.profile_validation ? "true" : "false");
     settings_log += format("\t%s: %s\n", kLayerSettingsSimulateCapabilities, simulation_capabilities_log.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsDefaultFeatureValues, default_feature_values.c_str());
 
-    settings_log += format("\t%s: %s\n", kLayerSettingsEmulatePortability, layer_settings->simulate.emulate_portability ? "true" : "false");
+    settings_log +=
+        format("\t%s: %s\n", kLayerSettingsEmulatePortability, layer_settings->simulate.emulate_portability ? "true" : "false");
     if (layer_settings->simulate.emulate_portability) {
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_constantAlphaColorBlendFactors, layer_settings->portability.constantAlphaColorBlendFactors ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_constantAlphaColorBlendFactors,
+                               layer_settings->portability.constantAlphaColorBlendFactors ? "true" : "false");
         settings_log += format("\t\t%s: %s\n", kLayerSettings_events, layer_settings->portability.events ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_imageViewFormatReinterpretation, layer_settings->portability.imageViewFormatReinterpretation ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_imageViewFormatSwizzle, layer_settings->portability.imageViewFormatSwizzle ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_imageView2DOn3DImage, layer_settings->portability.imageView2DOn3DImage ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_multisampleArrayImage, layer_settings->portability.multisampleArrayImage ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_mutableComparisonSamplers, layer_settings->portability.mutableComparisonSamplers ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_pointPolygons, layer_settings->portability.pointPolygons ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_samplerMipLodBias, layer_settings->portability.samplerMipLodBias ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_separateStencilMaskRef, layer_settings->portability.separateStencilMaskRef ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_shaderSampleRateInterpolationFunctions, layer_settings->portability.shaderSampleRateInterpolationFunctions ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_tessellationIsolines, layer_settings->portability.tessellationIsolines ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_triangleFans, layer_settings->portability.triangleFans ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_vertexAttributeAccessBeyondStride, layer_settings->portability.vertexAttributeAccessBeyondStride ? "true" : "false");
-        settings_log += format("\t\t%s: %d\n", kLayerSettings_minVertexInputBindingStrideAlignment, static_cast<int>(layer_settings->portability.minVertexInputBindingStrideAlignment));
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_imageViewFormatReinterpretation,
+                               layer_settings->portability.imageViewFormatReinterpretation ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_imageViewFormatSwizzle,
+                               layer_settings->portability.imageViewFormatSwizzle ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_imageView2DOn3DImage,
+                               layer_settings->portability.imageView2DOn3DImage ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_multisampleArrayImage,
+                               layer_settings->portability.multisampleArrayImage ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_mutableComparisonSamplers,
+                               layer_settings->portability.mutableComparisonSamplers ? "true" : "false");
+        settings_log +=
+            format("\t\t%s: %s\n", kLayerSettings_pointPolygons, layer_settings->portability.pointPolygons ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_samplerMipLodBias,
+                               layer_settings->portability.samplerMipLodBias ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_separateStencilMaskRef,
+                               layer_settings->portability.separateStencilMaskRef ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_shaderSampleRateInterpolationFunctions,
+                               layer_settings->portability.shaderSampleRateInterpolationFunctions ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_tessellationIsolines,
+                               layer_settings->portability.tessellationIsolines ? "true" : "false");
+        settings_log +=
+            format("\t\t%s: %s\n", kLayerSettings_triangleFans, layer_settings->portability.triangleFans ? "true" : "false");
+        settings_log += format("\t\t%s: %s\n", kLayerSettings_vertexAttributeAccessBeyondStride,
+                               layer_settings->portability.vertexAttributeAccessBeyondStride ? "true" : "false");
+        settings_log += format("\t\t%s: %d\n", kLayerSettings_minVertexInputBindingStrideAlignment,
+                               static_cast<int>(layer_settings->portability.minVertexInputBindingStrideAlignment));
     }
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugActions, debug_actions_log.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugFilename, layer_settings->log.debug_filename.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugFileClear, layer_settings->log.debug_file_discard ? "true" : "false");
-    settings_log += format("\t%s: %s\n", kLayerSettingsDebugFailOnError, layer_settings->log.debug_fail_on_error ? "true" : "false");
+    settings_log +=
+        format("\t%s: %s\n", kLayerSettingsDebugFailOnError, layer_settings->log.debug_fail_on_error ? "true" : "false");
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugReports, debug_reports_log.c_str());
-    settings_log += format("\t%s: %s\n", kLayerSettingsExcludeDeviceExtensions, GetString(layer_settings->simulate.exclude_device_extensions).c_str());
+    settings_log += format("\t%s: %s\n", kLayerSettingsExcludeDeviceExtensions,
+                           GetString(layer_settings->simulate.exclude_device_extensions).c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsExcludeFormats, GetString(layer_settings->simulate.exclude_formats).c_str());
 
     LogMessage(layer_settings, DEBUG_REPORT_NOTIFICATION_BIT, "Profile Layers Settings: {\n%s}\n", settings_log.c_str());
 
     vlDestroyLayerSettingSet(layerSettingSet, pAllocator);
 }
-
