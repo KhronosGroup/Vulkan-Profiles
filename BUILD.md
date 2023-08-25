@@ -1,8 +1,6 @@
 # Build Instructions
-This document contains the instructions for building this repository on Linux and Windows.
 
-This repository contains *Vulkan* development tools and layers,
-supplementing the loader and validation layer core components found at https://github.com/KhronosGroup.
+This document contains the instructions for building this repository.
 
 ## System Requirements
 
@@ -28,8 +26,6 @@ Optional software packages:
     You can also use a Git package that does not come from *Cygwin*.
 
 ### Ubuntu System Requirements
-
-Ubuntu 18.04 LTS and 20.04 have been tested with this repo.
 
 [CMake 3.17.2](https://github.com/Kitware/CMake/releases/download/v3.17.2/cmake-3.17.2-Linux-x86_64.tar.gz) is recommended.
 
@@ -195,54 +191,3 @@ adb shell am start -a android.intent.MAIN -c android-intent.category.LAUNCH -n c
 adb logcat > tempfile
 grep VulkanProfilesLayerTests: tempfile
 ```
-
-### Repository Dependencies
-This repository attempts to resolve some of its dependencies by using
-components found from the following places, in this order:
-
-1. CMake or Environment variable overrides (e.g., -DVULKAN_HEADERS_INSTALL_DIR)
-1. LunarG Vulkan SDK, located by the `VULKAN_SDK` environment variable
-1. System-installed packages, mostly applicable on Linux
-
-Dependencies that cannot be resolved by the SDK or installed packages must be
-resolved with the "install directory" override and are listed below. The
-"install directory" override can also be used to force the use of a specific
-version of that dependency.
-
-#### Vulkan-Headers
-
-This repository has a required dependency on the
-[Vulkan Headers repository](https://github.com/KhronosGroup/Vulkan-Headers).
-You must clone the headers repository and build its `install` target before
-building this repository. The Vulkan-Headers repository is required because it
-contains the Vulkan API definition files (registry) that are required to build
-the validation layers. You must also take note of the headers' install
-directory and pass it on the CMake command line for building this repository,
-as described below.
-
-#### Vulkan-Loader
-
-The tools in this repository depend on the Vulkan loader.
-
-A loader can be used from an installed LunarG SDK, an installed Linux package,
-or from a driver installation on Windows.
-
-If a loader is not available from any of these methods and/or it is important
-to use a loader built from a repository, then you must build the
-[Vulkan-Loader repository](https://github.com/KhronosGroup/Vulkan-Loader.git)
-with its install target. Take note of its install directory location and pass
-it on the CMake command line for building this repository, as described below.
-
-#### Vulkan-ValidationLayers
-The tools in this repository depend on the Vulkan validation layers.
-
-Validation layers can be used from an installed LunarG SDK, an installed Linux
-package, or from a driver installation on Windows.
-
-If the validation layers are not available from any of these methods and/or
-it is important to use the validation layers built from a repository, then you
-must build the
-[Vulkan-ValidationLayers repository](https://github.com/KhronosGroup/Vulkan-ValidationLayers.git)
-with its install target. Take note of its install directory location and pass
-it on the CMake command line for building this repository, as described below.
-
