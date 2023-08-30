@@ -2790,6 +2790,32 @@ class VulkanProfilesLayerGenerator():
             f.write(self.generate_enumerate_physical_device())
             f.write(GET_INSTANCE_PROC_ADDR)
 
+    def struct_or_extension_platform(self, struct_or_ext_name):
+        if struct_or_ext_name is None:
+            return None
+        if struct_or_ext_name in self.registry.structs:
+            if self.registry.structs[struct_or_ext_name].definedByVersion:
+                # Structure defined by a core version, not platform-specific
+                return None
+            else:
+                # Structure defined by an extension, use extension name to continue the search
+                struct_or_ext_name = self.registry.structs[struct_or_ext_name].definedByExtensions[0]
+        return self.registry.extensions[struct_or_ext_name].platform
+
+    def generate_platform_protect_begin(self, struct_or_ext_name):
+        platform = self.struct_or_extension_platform(struct_or_ext_name)
+        if platform:
+            return '#ifdef ' + self.registry.platforms[platform].protect + '\n'
+        else:
+            return ''
+
+    def generate_platform_protect_end(self, struct_or_ext_name):
+        platform = self.struct_or_extension_platform(struct_or_ext_name)
+        if platform:
+            return '#endif // ' + self.registry.platforms[platform].protect + '\n'
+        else:
+            return ''
+
     def generate_helpers(self):
         gen = self.generate_string_to_enum('SimulateCapabilityFlags', ('SIMULATE_API_VERSION_BIT', 'SIMULATE_FEATURES_BIT', 'SIMULATE_PROPERTIES_BIT', 'SIMULATE_EXTENSIONS_BIT', 'SIMULATE_FORMATS_BIT', 'SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT', 'SIMULATE_MAX_ENUM'))
         gen += self.generate_enum_to_string('SimulateCapabilityFlags', ('SIMULATE_API_VERSION_BIT', 'SIMULATE_FEATURES_BIT', 'SIMULATE_PROPERTIES_BIT', 'SIMULATE_EXTENSIONS_BIT', 'SIMULATE_FORMATS_BIT', 'SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT'), 'GetSimulateCapabilitiesLog')
@@ -2841,10 +2867,12 @@ class VulkanProfilesLayerGenerator():
             gen += '        ' + self.create_var_name(feature) + ' = { ' + stype +  ' };\n'
         for ext, properties, features in self.extension_structs:
             gen += '\n        // ' + ext + ' structs\n'
+            gen += self.generate_platform_protect_begin(ext)
             for property in properties:
                 gen += '        ' + self.create_var_name(property) + ' = {' + registry.structs[property].sType +  '};\n'
             for feature in features:
                 gen += '        ' + self.create_var_name(feature) + ' = {' + registry.structs[feature].sType +  '};\n'
+            gen += self.generate_platform_protect_end(ext)
 
         gen += PHYSICAL_DEVICE_DATA_END
 
@@ -2983,6 +3011,7 @@ class VulkanProfilesLayerGenerator():
                             gen += '        if (!CheckVersionSupport(' + registry.structs[current].definedByVersion.versionMacro + ', name)) return false;\n'
                     else:
                         ext = registry.extensions[registry.structs[current].definedByExtensions[0]]
+                        gen += self.generate_platform_protect_begin(ext.name)
                         if not ext.name in self.emulated_extensions:
                             ext_name = ext.upperCaseName + '_EXTENSION_NAME'
                             gen += '        auto support = CheckExtensionSupport(' + ext_name + ', name);\n'
@@ -2994,6 +3023,10 @@ class VulkanProfilesLayerGenerator():
                         gen += '        return GetStruct(device_name, ' + struct + ', &pdd_->physical_device_properties_.sparseProperties);\n'
                     else:
                         gen += '        return GetStruct(device_name, ' + struct + ', &pdd_->' + self.create_var_name(current) + ');\n'
+
+                    if self.struct_or_extension_platform(current):
+                        gen += '#else\n        return false;\n'
+                        gen += self.generate_platform_protect_end(ext.name)
 
                     gen += '    }'
         return gen
@@ -3130,6 +3163,7 @@ class VulkanProfilesLayerGenerator():
         for feature in self.non_extension_features:
             gen += self.generate_fill_case(feature)
         for ext, properties, features in self.extension_structs:
+            gen += self.generate_platform_protect_begin(ext)
             for property in properties:
                 # exception, already handled above
                 if property == 'VkPhysicalDevicePortabilitySubsetPropertiesKHR':
@@ -3137,6 +3171,7 @@ class VulkanProfilesLayerGenerator():
                 gen += self.generate_fill_case(property)
             for feature in features:
                 gen += self.generate_fill_case(feature)
+            gen += self.generate_platform_protect_end(ext)
 
         gen += '            default:\n'
         gen += '                break;\n'
@@ -3297,11 +3332,12 @@ class VulkanProfilesLayerGenerator():
         return gen
 
     def generate_physical_device_chain_case(self, ext, version, property_names, feature_names):
+        gen = self.generate_platform_protect_begin(ext)
         if ext:
             ext_name = registry.extensions[ext].upperCaseName
-            gen = '\n                if (PhysicalDeviceData::HasExtension(&pdd, ' + ext_name + '_EXTENSION_NAME)) {\n'
+            gen += '\n                if (PhysicalDeviceData::HasExtension(&pdd, ' + ext_name + '_EXTENSION_NAME)) {\n'
         else:
-            gen = '\n                if (api_version_above_' + str(version.major) + '_' + str(version.minor) + ') {\n'
+            gen += '\n                if (api_version_above_' + str(version.major) + '_' + str(version.minor) + ') {\n'
         for property_name in property_names:
             name = self.create_var_name(property_name)
             gen += '                    pdd.' + name + '.pNext = property_chain.pNext;\n\n'
@@ -3311,6 +3347,7 @@ class VulkanProfilesLayerGenerator():
             gen += '                    pdd.' + name + '.pNext = feature_chain.pNext;\n\n'
             gen += '                    feature_chain.pNext = &(pdd.' + name + ');\n'
         gen += '                }\n'
+        gen += self.generate_platform_protect_end(ext)
         return gen
 
     def generate_transfer_function(self, major, minor, type, name):
@@ -3359,7 +3396,8 @@ class VulkanProfilesLayerGenerator():
         return gen
 
     def generate_get_value_function(self, structure):
-        gen = 'bool JsonLoader::GetStruct(const char* device_name, const Json::Value &parent, ' + structure + ' *dest) {\n'
+        gen = self.generate_platform_protect_begin(structure)
+        gen += 'bool JsonLoader::GetStruct(const char* device_name, const Json::Value &parent, ' + structure + ' *dest) {\n'
         gen += '    (void)dest;\n'
         gen += '    LogMessage(&layer_settings, DEBUG_REPORT_DEBUG_BIT, \"\\tJsonLoader::GetStruct(' + structure + ')\\n\");\n'
         gen += '    bool valid = true;\n'
@@ -3430,6 +3468,7 @@ class VulkanProfilesLayerGenerator():
         gen += '    }\n'
         gen += '    return valid;\n'
         gen += '}\n\n'
+        gen += self.generate_platform_protect_end(structure)
         return gen
 
     def get_read_from_type(self, type):
@@ -3460,12 +3499,14 @@ class VulkanProfilesLayerGenerator():
         for feature in self.non_extension_features:
             gen += '    bool GetStruct(const char* device_name, const Json::Value &parent, ' + feature + ' *dest);\n'
         for ext, properties, features in self.extension_structs:
+            gen += self.generate_platform_protect_begin(ext)
             for property in properties:
                 if property != 'VkPhysicalDevicePortabilitySubsetPropertiesKHR':
                     gen += '    bool GetStruct(const char* device_name, const Json::Value &parent, ' + property + ' *dest);\n'
             for feature in features:
                 if feature != 'VkPhysicalDevicePortabilitySubsetFeaturesKHR':
                     gen += '    bool GetStruct(const char* device_name, const Json::Value &parent, ' + feature + ' *dest);\n'
+            gen += self.generate_platform_protect_end(ext)
         for struct in self.additional_features:
             gen += '    bool GetStruct(const char* device_name, const Json::Value &parent, ' + struct + ' *dest);\n'
         for struct in self.additional_properties:
