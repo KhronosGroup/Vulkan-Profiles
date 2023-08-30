@@ -48,16 +48,16 @@ function(LayerTest NAME)
                    profiles_test_helper.cpp
                    layer_tests_main.cpp
                    vktestframework.cpp)
-    add_dependencies(${TEST_NAME} VkLayer_khronos_profiles ${TEST_JSON_FILES})
+    add_dependencies(${TEST_NAME} ProfilesLayer ${TEST_JSON_FILES})
     target_link_libraries(${TEST_NAME} Vulkan::Headers Vulkan::Vulkan GTest::gtest GTest::gtest_main Vulkan::LayerSettings)
     target_compile_definitions(${TEST_NAME} PUBLIC JSON_TEST_FILES_PATH="${CMAKE_SOURCE_DIR}/profiles/test/data/")
     target_compile_definitions(${TEST_NAME} PUBLIC JSON_PROFILES_PATH="${CMAKE_SOURCE_DIR}/profiles/")
 
-    target_compile_definitions(${TEST_NAME} PUBLIC TEST_BINARY_PATH="$<TARGET_FILE_DIR:VkLayer_khronos_profiles>")
+    target_compile_definitions(${TEST_NAME} PUBLIC TEST_BINARY_PATH="$<TARGET_FILE_DIR:ProfilesLayer>")
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
     set_tests_properties(${TEST_NAME} PROPERTIES ENVIRONMENT
-        "VK_LAYER_PATH=$<TARGET_FILE_DIR:VkLayer_khronos_profiles>"
+        "VK_LAYER_PATH=$<TARGET_FILE_DIR:ProfilesLayer>"
     )
 
     set_target_properties(${TEST_NAME} PROPERTIES FOLDER "Profiles layer/Tests")
@@ -77,7 +77,7 @@ function(LayerTestAndroid NAME)
                 vktestframework.cpp)
 
     add_test(NAME ${ANDROID_APK_NAME} COMMAND profiles_${NAME})
-    add_dependencies(${ANDROID_APK_NAME} VkLayer_khronos_profiles VpCreateDesktopBaseline2022 VpCreateDesktopPortability2022)
+    add_dependencies(${ANDROID_APK_NAME} ProfilesLayer VpCreateDesktopBaseline2022 VpCreateDesktopPortability2022)
 
     if (NOT ANDROID_SDK_HOME)
         set(ANDROID_SDK_HOME $ENV{ANDROID_SDK_HOME})
@@ -111,7 +111,7 @@ function(LayerTestAndroid NAME)
     target_compile_definitions(${ANDROID_APK_NAME} PUBLIC
                                JSON_TEST_FILES_PATH="/sdcard/Android/data/com.example.VulkanProfilesLayerTests/files/"
                                JSON_PROFILES_PATH="/sdcard/Android/data/com.example.VulkanProfilesLayerTests/files/"
-                               TEST_BINARY_PATH="$<TARGET_FILE_DIR:VkLayer_khronos_profiles>"
+                               TEST_BINARY_PATH="$<TARGET_FILE_DIR:ProfilesLayer>"
                                PROFILES_LAYER_APK VK_PROTOTYPES
                                )
     target_include_directories(${ANDROID_APK_NAME} PUBLIC
@@ -131,7 +131,7 @@ function(LayerTestAndroid NAME)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${TEST_FILES_JSON} ${PROJECT_BINARY_DIR}/apk/assets
         COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/apk/out
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${ANDROID_APK_NAME}> ${PROJECT_BINARY_DIR}/apk/out/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:${ANDROID_APK_NAME}>
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:VkLayer_khronos_profiles> ${PROJECT_BINARY_DIR}/apk/out/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:VkLayer_khronos_profiles>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:ProfilesLayer> ${PROJECT_BINARY_DIR}/apk/out/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:ProfilesLayer>
         COMMAND ${_aapt} package -f -M ${CMAKE_CURRENT_SOURCE_DIR}/platforms/android/AndroidManifest.xml -I ${_android_jar} -A ${PROJECT_BINARY_DIR}/apk/assets -F ${PROJECT_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}-unaligned.apk ${PROJECT_BINARY_DIR}/apk/out
         COMMAND jarsigner -verbose -keystore $ENV{HOME}/.android/debug.keystore -storepass android -keypass android ${PROJECT_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}-unaligned.apk androiddebugkey
         COMMAND ${_zipalign} -f 4 ${PROJECT_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}-unaligned.apk ${PROJECT_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}.apk

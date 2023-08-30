@@ -101,6 +101,7 @@ add_custom_target(VpGenerated
 	COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/schema
 	COMMAND ${CMAKE_COMMAND} -E copy_directory ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/profiles ${CMAKE_CURRENT_LIST_DIR}
 	COMMAND Python3::Interpreter ${LAYER_PYTHON_FILES}
+		--api ${API_TYPE}
 		--registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
 		--input ${CMAKE_CURRENT_LIST_DIR}
 		--output-library-inc ${PROJECT_SOURCE_DIR}/library/include/vulkan

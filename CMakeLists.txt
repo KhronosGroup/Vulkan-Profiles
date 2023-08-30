@@ -4,6 +4,9 @@ project(VULKAN_PROFILES LANGUAGES CXX C)
 
 include(GNUInstallDirs)
 
+# This variable enables downstream users to customize the target API variant (e.g. Vulkan SC)
+set(API_TYPE "vulkan")
+
 set(PROFILES_CPP_STANDARD 17 CACHE STRING "Set the C++ standard to build against.")
 set(CMAKE_CXX_STANDARD ${PROFILES_CPP_STANDARD})
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
