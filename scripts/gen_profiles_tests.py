@@ -770,6 +770,10 @@ class ProfileGenerator():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
+    parser.add_argument('-api', action='store',
+                        default='vulkan',
+                        choices=['vulkan'],
+                        help="Target API")
     parser.add_argument('-registry', action='store',
                         help='Use specified registry file instead of vk.xml')
     parser.add_argument('-outProfile', action='store',
@@ -783,7 +787,7 @@ if __name__ == '__main__':
         parser.print_help()
         exit()
 
-    registry = gen_profiles_solution.VulkanRegistry(args.registry)
+    registry = gen_profiles_solution.VulkanRegistry(args.registry, args.api)
     generator = ProfileGenerator()
     generator.generate_profile(args.outProfile, registry)
     generator.generate_tests(args.outTests, registry)

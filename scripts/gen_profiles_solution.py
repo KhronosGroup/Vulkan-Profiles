@@ -4485,6 +4485,10 @@ class VulkanProfilesDocGenerator():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
+    parser.add_argument('--api', action='store',
+                        default='vulkan',
+                        choices=['vulkan'],
+                        help="Target API")
     parser.add_argument('--registry', '-r', action='store', required=True,
                         help='Use specified registry file instead of vk.xml')
     parser.add_argument('--input', '-i', action='store', required=True,
@@ -4529,7 +4533,7 @@ if __name__ == '__main__':
     schema = None
 
     if args.registry != None:
-        registry = VulkanRegistry(args.registry)
+        registry = VulkanRegistry(args.registry, args.api)
 
     if args.output_schema != None or args.validate:
         generator = VulkanProfilesSchemaGenerator(registry)
