@@ -1148,7 +1148,7 @@ bool JsonLoader::GetQueueFamilyProperties(const char* device_name, const Json::V
                 dest->global_priority_properties_.priorities[i++] = StringToVkQueueGlobalPriorityKHR(feature.asString());
             }
             dest->global_priority_properties_.priorityCount = props["priorityCount"].asUInt();
-        } else if (name == "VkVideoQueueFamilyProperties2KHR") {
+        } else if (name == "VkQueueFamilyVideoPropertiesKHR") {
             for (const auto &feature : props["videoCodecOperations"]) {
                 dest->video_properties_.videoCodecOperations |= StringToVkVideoCodecOperationFlagsKHR(feature.asString());
             }
@@ -1218,7 +1218,7 @@ bool JsonLoader::GetQueueFamilyProperties(const char* device_name, const Json::V
                               dest->global_priority_properties_.priorityCount, priorities.c_str());
         }
         if (dest->video_properties_.videoCodecOperations > 0) {
-            message += format(", VkVideoQueueFamilyProperties2KHR [videoCodecOperations: %s]",
+            message += format(", VkQueueFamilyVideoPropertiesKHR [videoCodecOperations: %s]",
                               string_VkVideoCodecOperationFlagsKHR(dest->video_properties_.videoCodecOperations).c_str());
         }
         if (dest->checkpoint_properties_.checkpointExecutionStageMask > 0) {
