@@ -51,20 +51,8 @@ endif()
 # Enable GUI folders
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-# NOTE: The idiom for open source projects is to not enable warnings as errors.
-# This reduces problems for users who simply want to build the repository.
-option(BUILD_WERROR "Treat compiler warnings as errors" OFF)
-if (BUILD_WERROR)
-    add_compile_options("$<IF:$<CXX_COMPILER_ID:MSVC>,/WX,-Werror>")
-endif()
-
 # Platform-specific compiler switches
-if(${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
-    add_compile_options(-Werror)
-endif()
-if(${CMAKE_C_COMPILER_ID} MATCHES "(GNU|Clang)")
-    add_compile_options(-Werror)
-elseif(MSVC)
+if(MSVC)
     # PDBs aren't generated on Release builds by default.
     add_compile_options("$<$<CONFIG:Release>:/Zi>")
     add_link_options("$<$<CONFIG:Release>:/DEBUG:FULL>")
@@ -73,8 +61,6 @@ elseif(MSVC)
     # Merge duplicate data/functions
     add_link_options("$<$<CONFIG:Release>:/OPT:ICF>")
 
-    add_compile_options(/W4 /WX)
-    add_link_options(/WX)
     # Ignore some warnings that we know we'll generate.  In the future the
     # code that generates these warnings should be fixed properly.
     # vk_layer_logging.h provokes:

@@ -104,6 +104,47 @@ if (UPDATE_DEPS)
     endif()
 endif()
 
+# Configure compiler build options common to all targets
+function(lunarg_target_compiler_configurations TARGET_NAME WERROR_OPTION)
+    if (${WERROR_OPTION})
+        if (MSVC)
+            target_compile_options(${TARGET_NAME} INTERFACE /WX)
+            target_link_options(${TARGET_NAME} INTERFACE /WX)
+        else()
+            target_compile_options(${TARGET_NAME} INTERFACE -Werror)
+        endif()
+    endif()
+
+    if(${CMAKE_CXX_COMPILER_ID} MATCHES "(GNU|Clang)")
+        target_compile_options(${TARGET_NAME} INTERFACE
+            -Wpedantic
+            -Wall
+            -Wextra
+            -Wpointer-arith
+        )
+        if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+            target_compile_options(${TARGET_NAME} INTERFACE
+                -Wconversion
+                -Wimplicit-fallthrough
+                -Wstring-conversion
+            )
+        endif()
+    elseif(MSVC)
+        target_compile_options(${TARGET_NAME} INTERFACE
+            /W4
+            /we5038 # Enable warning about MIL ordering in constructors
+        )
+
+        # Enforce stricter ISO C++
+        target_compile_options(${TARGET_NAME} INTERFACE /permissive-)
+
+        target_compile_options(${TARGET_NAME} INTERFACE $<$<BOOL:${MSVC_IDE}>:/MP>) # Speed up Visual Studio builds
+
+        # Allow usage of unsafe CRT functions and minimize what Windows.h leaks
+        target_compile_definitions(${TARGET_NAME} INTERFACE _CRT_SECURE_NO_WARNINGS NOMINMAX WIN32_LEAN_AND_MEAN)
+    endif()
+endfunction()
+
 if (JSONCPP_INSTALL_DIR)
     list(APPEND CMAKE_PREFIX_PATH ${JSONCPP_INSTALL_DIR})
 endif()

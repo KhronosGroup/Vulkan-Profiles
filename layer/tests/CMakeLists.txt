@@ -52,8 +52,9 @@ function(LayerTest NAME)
     target_link_libraries(${TEST_NAME} Vulkan::Headers Vulkan::Vulkan GTest::gtest GTest::gtest_main Vulkan::LayerSettings)
     target_compile_definitions(${TEST_NAME} PUBLIC JSON_TEST_FILES_PATH="${CMAKE_SOURCE_DIR}/profiles/test/data/")
     target_compile_definitions(${TEST_NAME} PUBLIC JSON_PROFILES_PATH="${CMAKE_SOURCE_DIR}/profiles/")
-
     target_compile_definitions(${TEST_NAME} PUBLIC TEST_BINARY_PATH="$<TARGET_FILE_DIR:ProfilesLayer>")
+    lunarg_target_compiler_configurations(${TEST_NAME} ${BUILD_TESTS})
+
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
     set_tests_properties(${TEST_NAME} PROPERTIES ENVIRONMENT
@@ -75,6 +76,7 @@ function(LayerTestAndroid NAME)
                 profiles_test_helper.cpp
                 layer_tests_main.cpp
                 vktestframework.cpp)
+    lunarg_target_compiler_configurations(${ANDROID_APK_NAME} ${BUILD_TESTS})
 
     add_test(NAME ${ANDROID_APK_NAME} COMMAND profiles_${NAME})
     add_dependencies(${ANDROID_APK_NAME} ProfilesLayer VpCreateDesktopBaseline2022 VpCreateDesktopPortability2022)
