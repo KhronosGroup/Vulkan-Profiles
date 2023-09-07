@@ -21,18 +21,10 @@
 #include "profiles_util.h"
 
 #include <valijson/adapters/jsoncpp_adapter.hpp>
-#include <valijson/schema.hpp>
 #include <valijson/schema_parser.hpp>
-#include <valijson/validation_results.hpp>
 #include <valijson/validator.hpp>
 
-using valijson::Schema;
-using valijson::SchemaParser;
-using valijson::ValidationResults;
-using valijson::Validator;
-using valijson::adapters::JsonCppAdapter;
-
-std::unique_ptr<Schema> schema;
+std::unique_ptr<valijson::Schema> schema;
 
 static Json::Value ParseJsonFile(std::string filename) {
     Json::Value root = Json::nullValue;
@@ -74,11 +66,11 @@ bool JsonValidator::Init() {
         if (schema_document == Json::nullValue) {
             return false;
         }
+        
+        schema.reset(new valijson::Schema);
 
-        schema.reset(new Schema);
-
-        SchemaParser parser;
-        JsonCppAdapter schema_adapter(schema_document);
+        valijson::SchemaParser parser;
+        valijson::adapters::JsonCppAdapter schema_adapter(schema_document);
         parser.populateSchema(schema_adapter, *schema);
     }
 
@@ -90,12 +82,13 @@ bool JsonValidator::Check(const Json::Value &json_document) {
 
     if (schema.get() == nullptr) return true;
 
-    Validator validator(Validator::kWeakTypes);
-    JsonCppAdapter document_adapter(json_document);
+    valijson::Validator validator(valijson::Validator::kWeakTypes);
+    valijson::adapters::JsonCppAdapter document_adapter(json_document);
 
-    ValidationResults results;
+    valijson::ValidationResults results;
+
     if (!validator.validate(*schema, document_adapter, &results)) {
-        ValidationResults::Error error;
+        valijson::ValidationResults::Error error;
         unsigned int error_num = 1;
         while (results.popError(error)) {
             std::string context;
@@ -119,13 +112,12 @@ bool JsonValidator::Check(const Json::Value &json_document) {
 
         return false;
     }
-
     return true;
 }
 
 bool WarnDuplicated(ProfileLayerSettings *layer_settings, const Json::Value &parent, const std::vector<std::string> &members) {
     assert(layer_settings != nullptr);
-
+    
     std::vector<std::string> set;
     for (const auto &member : members) {
         if (parent.isMember(member)) {
@@ -137,6 +129,5 @@ bool WarnDuplicated(ProfileLayerSettings *layer_settings, const Json::Value &par
         LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT, "Profile sets variables for %s while also using %s\n", set[0].c_str(),
                    set[i].c_str());
     }
-
     return set.size() <= 1;
 }
