@@ -22,7 +22,7 @@
 #include <sstream>
 #include <iomanip>
 #include <unordered_map>
-#include <vulkan/utility/vul_dispatch_table.h>
+#include <vulkan/utility/vk_dispatch_table.h>
 #include "vulkan/vk_layer.h"
 #include "vk_layer_table.h"
 static device_table_map tableMap;
