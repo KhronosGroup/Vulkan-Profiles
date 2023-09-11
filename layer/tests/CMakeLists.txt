@@ -150,6 +150,7 @@ if (NOT ANDROID)
 
     add_dependencies(VkLayer_tests_combine_intersection VpTestIntersect)
     add_dependencies(VkLayer_tests_combine_union VpTestUnion)
+    add_dependencies(VkLayer_tests_generated VpLayer_generate_tests)
 else()
     LayerTestAndroid("VulkanProfilesLayerTests")
 endif()

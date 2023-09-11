@@ -56,8 +56,11 @@ set_target_properties(ProfilesLayer PROPERTIES OUTPUT_NAME ${LAYER_NAME})
 lunarg_target_compiler_configurations(ProfilesLayer ${BUILD_TESTS})
 
 if (MSVC)
-    target_compile_options(ProfilesLayer PRIVATE /bigobj)
+    target_compile_options(ProfilesLayer PRIVATE "$<$<CONFIG:Release>:/Zi>")
     target_link_options(ProfilesLayer PRIVATE /DEF:${CMAKE_CURRENT_SOURCE_DIR}/${LAYER_NAME}.def)
+    target_link_options(ProfilesLayer PRIVATE "$<$<CONFIG:Release>:/DEBUG:FULL>")
+    target_link_options(ProfilesLayer PRIVATE "$<$<CONFIG:Release>:/OPT:REF>")
+    target_link_options(ProfilesLayer PRIVATE "$<$<CONFIG:Release>:/OPT:ICF>")
 elseif(MINGW)
     target_sources(ProfilesLayer PRIVATE ${LAYER_NAME}.def)
 elseif(APPLE)
@@ -121,7 +124,7 @@ add_custom_target(VpLayer_generate_tests ALL
 		-outProfile ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_api_generated.json
 		-outTests ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp
 	VERBATIM
-	DEPENDS ProfilesLayer
+	DEPENDS ProfilesLayer VpLayer_generate
 	)
 set_target_properties(VpLayer_generate_tests PROPERTIES FOLDER "Profiles layer")
 
