@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.17.2)
 
 project(VULKAN_PROFILES LANGUAGES CXX C)
 
+# Enable GUI folders
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 include(GNUInstallDirs)
 
 # This variable enables downstream users to customize the target API variant (e.g. Vulkan SC)
@@ -46,36 +49,6 @@ if (NOT ANDROID)
     endif()
     set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH};${VULKAN_LOADER_INSTALL_DIR};${VULKAN_HEADERS_INSTALL_DIR};$ENV{VULKAN_LOADER_INSTALL_DIR};$ENV{VULKAN_HEADERS_INSTALL_DIR})
     find_package(Vulkan)
-endif()
-
-# Enable GUI folders
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-# Platform-specific compiler switches
-if(MSVC)
-    # PDBs aren't generated on Release builds by default.
-    add_compile_options("$<$<CONFIG:Release>:/Zi>")
-    add_link_options("$<$<CONFIG:Release>:/DEBUG:FULL>")
-    # Remove unreferenced code/data.
-    add_link_options("$<$<CONFIG:Release>:/OPT:REF>")
-    # Merge duplicate data/functions
-    add_link_options("$<$<CONFIG:Release>:/OPT:ICF>")
-
-    # Ignore some warnings that we know we'll generate.  In the future the
-    # code that generates these warnings should be fixed properly.
-    # vk_layer_logging.h provokes:
-    #    warning C4100: 'default_flag_is_spec': unreferenced formal parameter
-    # vk_loader_platform.h provokes:
-    #    warning C4505: unreferenced local function has been removed
-    # jsoncpp.cpp provokes:
-    #    warning C4702: unreachable code
-    # gtest.h provokes:
-    #    warning C4389: '==': signed/unsigned mismatch
-    #    warning C4018: '>=': signed/unsigned mismatch
-    # vulkan_profiles.hpp provokes:
-    #    warning C4245: '=': conversion from 'int' to 'uint64_t', signed/unsigned mismatch
-    #    warning C4305: '=': truncation from 'double' to 'float'
-    add_compile_options(/wd4100 /wd4505 /wd4702 /wd4389 /wd4245 /wd4305 /wd4018)
 endif()
 
 set(PROFILES_SCHEMA_FILENAME "profiles-0.8-latest.json")
