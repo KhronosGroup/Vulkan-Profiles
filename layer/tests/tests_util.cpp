@@ -38,6 +38,21 @@ TEST(TestsUtil, DebugAction) {
     EXPECT_TRUE(flags & DEBUG_ACTION_BREAKPOINT_BIT);
 }
 
+static std::vector<std::string> GetDebugReportStrings(DebugReportFlags flags) {
+    static const char *table[] = {"DEBUG_REPORT_NOTIFICATION_BIT", "DEBUG_REPORT_WARNING_BIT", "DEBUG_REPORT_ERROR_BIT",
+                                  "DEBUG_REPORT_DEBUG_BIT"};
+
+    std::vector<std::string> result;
+
+    for (std::size_t i = 0, n = std::size(table); i < n; ++i) {
+        if (flags & (1 << i)) {
+            result.push_back(table[i]);
+        }
+    }
+
+    return result;
+}
+
 TEST(TestsUtil, DebugReport) {
     std::vector<std::string> strings = GetDebugReportStrings(DEBUG_REPORT_MAX_ENUM);
 
@@ -70,6 +85,21 @@ static SimulateCapabilityFlags GetSimulateCapability(const std::vector<std::stri
             result |= SIMULATE_FORMATS_BIT;
         } else if (values[i] == "SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT") {
             result |= SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT;
+        }
+    }
+
+    return result;
+}
+
+static std::vector<std::string> GetSimulateCapabilityStrings(SimulateCapabilityFlags flags) {
+    static const char *table[] = {"SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT",
+                                  "SIMULATE_EXTENSIONS_BIT",  "SIMULATE_FORMATS_BIT",  "SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT"};
+
+    std::vector<std::string> result;
+
+    for (std::size_t i = 0, n = std::size(table); i < n; ++i) {
+        if (flags & (1 << i)) {
+            result.push_back(table[i]);
         }
     }
 
