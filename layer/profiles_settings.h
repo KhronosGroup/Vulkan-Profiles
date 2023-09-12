@@ -35,22 +35,6 @@ enum SimulateCapabilityBits {
 };
 typedef int SimulateCapabilityFlags;
 
-static std::vector<std::string> GetSimulateCapabilityStrings(SimulateCapabilityFlags flags) {
-    static const char *table[] = {
-        "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT",
-        "SIMULATE_EXTENSIONS_BIT",  "SIMULATE_FORMATS_BIT",  "SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT"};
-
-    std::vector<std::string> result;
-
-    for (std::size_t i = 0, n = std::size(table); i < n; ++i) {
-        if (flags & (1 << i)) {
-            result.push_back(table[i]);
-        }
-    }
-
-    return result;
-}
-
 enum DebugActionBits {
     DEBUG_ACTION_FILE_BIT = (1 << 0),
     DEBUG_ACTION_STDOUT_BIT = (1 << 1),
@@ -125,21 +109,6 @@ static DebugReportFlags GetDebugReportFlags(const std::vector<std::string> &valu
     return result;
 }
 
-static std::vector<std::string> GetDebugReportStrings(DebugReportFlags flags) {
-    static const char *table[] = {
-        "DEBUG_REPORT_NOTIFICATION_BIT", "DEBUG_REPORT_WARNING_BIT", "DEBUG_REPORT_ERROR_BIT", "DEBUG_REPORT_DEBUG_BIT"};
-
-    std::vector<std::string> result;
-
-    for (std::size_t i = 0, n = std::size(table); i < n; ++i) {
-        if (flags & (1 << i)) {
-            result.push_back(table[i]);
-        }
-    }
-
-    return result;
-}
-
 enum DefaultFeatureValues {
     DEFAULT_FEATURE_VALUES_FALSE = 0,
     DEFAULT_FEATURE_VALUES_DEVICE
@@ -170,18 +139,6 @@ enum ForceDevice {
     FORCE_DEVICE_WITH_UUID,
     FORCE_DEVICE_WITH_NAME
 };
-
-static ForceDevice GetForceDevice(const std::string &value) {
-    if (value == "FORCE_DEVICE_OFF") {
-        return FORCE_DEVICE_OFF;
-    } else if (value == "FORCE_DEVICE_WITH_UUID") {
-        return FORCE_DEVICE_WITH_UUID;
-    } else if (value == "FORCE_DEVICE_WITH_NAME") {
-        return FORCE_DEVICE_WITH_NAME;
-    }
-
-    return FORCE_DEVICE_OFF;
-}
 
 struct ProfileLayerSettings {
     ~ProfileLayerSettings() {
