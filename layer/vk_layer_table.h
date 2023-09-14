@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "vulkan/utility/vk_dispatch_table.h"
+#include "vulkan/utility/vul_dispatch_table.h"
 #include "vulkan/vk_layer.h"
 #include "vulkan/vulkan.h"
 #include <memory>
