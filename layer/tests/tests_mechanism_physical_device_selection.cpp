@@ -47,9 +47,9 @@ TEST_F(TestsMechanismPhysicalSelection, force_physical_device) {
         const char* force_device_uuid = "BC4A01B15641805847A8151A395A80C7";
 
         std::vector<VkLayerSettingEXT> settings = {
-            {kLayerName, kLayerSettingsForceDevice, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &force_device},
-            {kLayerName, kLayerSettingsForceDeviceName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &force_device_name},
-            {kLayerName, kLayerSettingsForceDeviceUUID, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &force_device_uuid}
+            {kLayerName, GetString(SETTING_FORCE_DEVICE), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &force_device},
+            {kLayerName, GetString(SETTING_FORCE_DEVICE_NAME), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &force_device_name},
+            {kLayerName, GetString(SETTING_FORCE_DEVICE_UUID), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &force_device_uuid}
         };
 
         err = inst_builder.init(settings);

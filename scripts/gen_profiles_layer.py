@@ -2286,7 +2286,7 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceToolPropertiesEXT(VkPhysicalDevi
         (*pToolCount)--;
     }
 
-    VulInstanceDispatchTable *pInstanceTable = instance_dispatch_table(physicalDevice);
+    VkuInstanceDispatchTable *pInstanceTable = instance_dispatch_table(physicalDevice);
     VkResult result = pInstanceTable->GetPhysicalDeviceToolPropertiesEXT(physicalDevice, pToolCount, pToolProperties);
 
     if (original_pToolProperties != nullptr) {

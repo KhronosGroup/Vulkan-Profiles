@@ -24,6 +24,82 @@
 #include <vector>
 #include <string>
 
+enum SettingId {
+    SETTING_PROFILE_FILE = 0,
+    SETTING_PROFILE_NAME,
+    SETTING_PROFILE_VALIDATION,
+    SETTING_EMULATE_PORTABILITY,
+    SETTING_CONTANT_ALPHA_COLOR_BLEND_FACTORS,
+    SETTING_EVENTS,
+    SETTING_IMAGE_VIEW_FORMAT_REINTERPRETATION,
+    SETTING_IMAGE_VIEW_FORMAT_SWIZZLE,
+    SETTING_IMAGE_VIEW_2D_ON_3D_IMAGE,
+    SETTING_MULTISAMPLE_ARRAY_IMAGE,
+    SETTING_MUTABLE_COMPARISON_SAMPLERS,
+    SETTING_POINT_POLYGONS,
+    SETTING_SAMPLER_MIP_LOD_BIAS,
+    SETTING_SEPARATE_STENCIL_MASK_REF,
+    SETTING_SEPARATE_SAMPLE_RATE_INTERPOLATION_FUNCTIONS,
+    SETTING_TESSELLATION_ISOLINES,
+    SETTING_TESSELLATION_POINT_MODE,
+    SETTING_TRIANGLE_FANS,
+    SETTING_VERTEX_ATTRIBUTE_ACCESS_BEYOND_STRIDE,
+    SETTING_MIN_VERTEX_INPUT_BINDING_STRIDE_ALIGMENT,
+    SETTING_SIMULATE_CAPABILITIES,
+    SETTING_DEBUG_ACTIONS,
+    SETTING_DEBUG_FILENAME,
+    SETTING_DEBUG_FILE_CLEAR,
+    SETTING_DEBUG_FAIL_ON_ERROR,
+    SETTING_DEBUG_REPORTS,
+    SETTING_EXCLUDE_DEVICE_EXTENSIONS,
+    SETTING_EXCLUDE_FORMATS,
+    SETTING_DEFAULT_FEATURE_VALUES,
+    SETTING_FORCE_DEVICE,
+    SETTING_FORCE_DEVICE_UUID,
+    SETTING_FORCE_DEVICE_NAME,
+
+    SETTING_FIRST = SETTING_PROFILE_FILE,
+    SETTING_LAST = SETTING_FORCE_DEVICE_NAME
+};
+
+enum { SETTING_COUNT = SETTING_LAST - SETTING_FIRST + 1 };
+
+static const char *kSettingNames[] = {"profile_file",
+                                      "profile_name",
+                                      "profile_validation",
+                                      "emulate_portability",
+                                      "constantAlphaColorBlendFactors",
+                                      "events",
+                                      "imageViewFormatReinterpretation",
+                                      "imageViewFormatSwizzle",
+                                      "imageView2DOn3DImage",
+                                      "multisampleArrayImage",
+                                      "mutableComparisonSamplers",
+                                      "pointPolygons",
+                                      "samplerMipLodBias",
+                                      "separateStencilMaskRef",
+                                      "shaderSampleRateInterpolationFunctions",
+                                      "tessellationIsolines",
+                                      "tessellationPointMode",
+                                      "triangleFans",
+                                      "vertexAttributeAccessBeyondStride",
+                                      "minVertexInputBindingStrideAlignment",
+                                      "simulate_capabilities",
+                                      "debug_actions",
+                                      "debug_filename",
+                                      "debug_file_clear",
+                                      "debug_fail_on_error",
+                                      "debug_reports",
+                                      "exclude_device_extensions",
+                                      "exclude_formats",
+                                      "default_feature_values",
+                                      "force_device",
+                                      "force_device_uuid",
+                                      "force_device_name"};
+static_assert(std::size(kSettingNames) == SETTING_COUNT);
+
+inline const char *GetString(SettingId setting_id) { return kSettingNames[setting_id]; }
+
 enum SimulateCapabilityBits {
     SIMULATE_API_VERSION_BIT = 1 << 0,
     SIMULATE_FEATURES_BIT = 1 << 1,
@@ -44,7 +120,7 @@ enum DebugActionBits {
 };
 typedef int DebugActionFlags;
 
-static DebugActionFlags GetDebugActionFlags(const std::vector<std::string> &values) {
+inline DebugActionFlags GetDebugActionFlags(const std::vector<std::string> &values) {
     DebugActionFlags result = 0;
 
     for (std::size_t i = 0, n = values.size(); i < n; ++i) {
@@ -64,9 +140,9 @@ static DebugActionFlags GetDebugActionFlags(const std::vector<std::string> &valu
     return result;
 }
 
-static std::vector<std::string> GetDebugActionStrings(DebugActionFlags flags) {
-    static const char *table[] = {
-        "DEBUG_ACTION_FILE_BIT", "DEBUG_ACTION_STDOUT_BIT", "DEBUG_ACTION_OUTPUT_BIT", "DEBUG_ACTION_BREAKPOINT_BIT"};
+inline std::vector<std::string> GetDebugActionStrings(DebugActionFlags flags) {
+    static const char *table[] = {"DEBUG_ACTION_FILE_BIT", "DEBUG_ACTION_STDOUT_BIT", "DEBUG_ACTION_OUTPUT_BIT",
+                                  "DEBUG_ACTION_BREAKPOINT_BIT"};
 
     std::vector<std::string> result;
 
@@ -78,6 +154,7 @@ static std::vector<std::string> GetDebugActionStrings(DebugActionFlags flags) {
 
     return result;
 }
+
 std::string GetDebugActionsLog(DebugActionFlags flags);
 
 enum DebugReportBits {
@@ -89,7 +166,7 @@ enum DebugReportBits {
 };
 typedef int DebugReportFlags;
 
-static DebugReportFlags GetDebugReportFlags(const std::vector<std::string> &values) {
+inline DebugReportFlags GetDebugReportFlags(const std::vector<std::string> &values) {
     DebugReportFlags result = 0;
 
     for (std::size_t i = 0, n = values.size(); i < n; ++i) {
@@ -114,7 +191,7 @@ enum DefaultFeatureValues {
     DEFAULT_FEATURE_VALUES_DEVICE
 };
 
-static DefaultFeatureValues GetDefaultFeatureValues(const std::string &value) {
+inline DefaultFeatureValues GetDefaultFeatureValues(const std::string &value) {
     if (value == "DEFAULT_FEATURE_VALUES_FALSE") {
         return DEFAULT_FEATURE_VALUES_FALSE;
     } else if (value == "DEFAULT_FEATURE_VALUES_DEVICE") {
@@ -124,7 +201,7 @@ static DefaultFeatureValues GetDefaultFeatureValues(const std::string &value) {
     return DEFAULT_FEATURE_VALUES_DEVICE;
 }
 
-static std::string GetDefaultFeatureValuesString(DefaultFeatureValues value) {
+inline std::string GetDefaultFeatureValuesString(DefaultFeatureValues value) {
     if (value == DEFAULT_FEATURE_VALUES_FALSE) {
         return "DEFAULT_FEATURE_VALUES_FALSE";
     } else if (value == DEFAULT_FEATURE_VALUES_DEVICE) {

@@ -52,11 +52,11 @@ TEST_F(TestsMechanism, selecting_profile) {
         const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
         std::vector<VkLayerSettingEXT> settings = {
-            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
-            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
-            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
-            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
+            {kLayerName, GetString(SETTING_PROFILE_FILE), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, GetString(SETTING_PROFILE_NAME), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, GetString(SETTING_EMULATE_PORTABILITY), VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
+            {kLayerName, GetString(SETTING_SIMULATE_CAPABILITIES), VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+            {kLayerName, GetString(SETTING_DEBUG_REPORTS), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
 
         err = inst_builder.init(settings);
         ASSERT_EQ(err, VK_SUCCESS);
@@ -95,11 +95,11 @@ TEST_F(TestsMechanism, selecting_profile) {
         const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
         std::vector<VkLayerSettingEXT> settings = {
-            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
-            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
-            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
-            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
+            {kLayerName, GetString(SETTING_PROFILE_FILE), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, GetString(SETTING_PROFILE_NAME), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, GetString(SETTING_EMULATE_PORTABILITY), VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
+            {kLayerName, GetString(SETTING_SIMULATE_CAPABILITIES), VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+            {kLayerName, GetString(SETTING_DEBUG_REPORTS), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
 
         err = inst_builder.init(settings);
         ASSERT_EQ(err, VK_SUCCESS);
@@ -136,10 +136,10 @@ TEST_F(TestsMechanism, selecting_profile) {
         const std::vector<const char*> simulate_capabilities = {"SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT"};
 
         std::vector<VkLayerSettingEXT> settings = {
-            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
-            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
-            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]}
+            {kLayerName, GetString(SETTING_PROFILE_FILE), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, GetString(SETTING_PROFILE_NAME), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, GetString(SETTING_EMULATE_PORTABILITY), VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
+            {kLayerName, GetString(SETTING_SIMULATE_CAPABILITIES), VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]}
         };
 
         err = inst_builder.init(settings);
@@ -168,10 +168,10 @@ TEST_F(TestsMechanism, selecting_profile) {
         const std::vector<const char*> simulate_capabilities = {"SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT"};
 
         std::vector<VkLayerSettingEXT> settings = {
-            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
-            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
-            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]}};
+            {kLayerName, GetString(SETTING_PROFILE_FILE), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, GetString(SETTING_PROFILE_NAME), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, GetString(SETTING_EMULATE_PORTABILITY), VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
+            {kLayerName, GetString(SETTING_SIMULATE_CAPABILITIES), VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]}};
 
         err = inst_builder.init(settings);
         ASSERT_EQ(err, VK_SUCCESS);
@@ -207,12 +207,12 @@ TEST_F(TestsMechanism, profile_variants_all) {
         const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
         std::vector<VkLayerSettingEXT> settings = {
-            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
-            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
-            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT,
+            {kLayerName, GetString(SETTING_PROFILE_FILE), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, GetString(SETTING_PROFILE_NAME), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, GetString(SETTING_EMULATE_PORTABILITY), VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
+            {kLayerName, GetString(SETTING_SIMULATE_CAPABILITIES), VK_LAYER_SETTING_TYPE_STRING_EXT,
              static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
-            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
+            {kLayerName, GetString(SETTING_DEBUG_REPORTS), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
 
         err = inst_builder.init(settings);
         ASSERT_EQ(err, VK_SUCCESS);
@@ -278,12 +278,12 @@ TEST_F(TestsMechanism, default_feature_values) {
         const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
         std::vector<VkLayerSettingEXT> settings = {
-            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
-            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
-            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
-            {kLayerName, kLayerSettingsDefaultFeatureValues, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &default_feature_values_data},
-            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
+            {kLayerName, GetString(SETTING_PROFILE_FILE), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, GetString(SETTING_PROFILE_NAME), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, GetString(SETTING_EMULATE_PORTABILITY), VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
+            {kLayerName, GetString(SETTING_SIMULATE_CAPABILITIES), VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+            {kLayerName, GetString(SETTING_DEFAULT_FEATURE_VALUES), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &default_feature_values_data},
+            {kLayerName, GetString(SETTING_DEBUG_REPORTS), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
 
         err = inst_builder.init(settings);
         ASSERT_EQ(err, VK_SUCCESS);
@@ -328,11 +328,11 @@ TEST_F(TestsMechanism, reading_duplicated_members) {
     VkBool32 debug_fail_on_error = VK_TRUE;
 
     std::vector<VkLayerSettingEXT> settings = {
-        {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
-        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-        {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
-        {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
-        {kLayerName, kLayerSettingsDebugFailOnError, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &debug_fail_on_error}
+        {kLayerName, GetString(SETTING_PROFILE_FILE), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+        {kLayerName, GetString(SETTING_PROFILE_NAME), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+        {kLayerName, GetString(SETTING_EMULATE_PORTABILITY), VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
+        {kLayerName, GetString(SETTING_SIMULATE_CAPABILITIES), VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+        {kLayerName, GetString(SETTING_DEBUG_FAIL_ON_ERROR), VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &debug_fail_on_error}
     };
 
     err = inst_builder.init(settings);
@@ -353,11 +353,11 @@ TEST_F(TestsMechanism, capabilities_or) {
     VkBool32 debug_fail_on_error = VK_TRUE;
 
     std::vector<VkLayerSettingEXT> settings = {
-        {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
-        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-        {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
-        {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
-        {kLayerName, kLayerSettingsDebugFailOnError, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &debug_fail_on_error}};
+        {kLayerName, GetString(SETTING_PROFILE_FILE), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+        {kLayerName, GetString(SETTING_PROFILE_NAME), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+        {kLayerName, GetString(SETTING_EMULATE_PORTABILITY), VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
+        {kLayerName, GetString(SETTING_SIMULATE_CAPABILITIES), VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+        {kLayerName, GetString(SETTING_DEBUG_FAIL_ON_ERROR), VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &debug_fail_on_error}};
 
     profiles_test::VulkanInstanceBuilder inst_builder;
     VkResult err = inst_builder.init(settings);

@@ -108,11 +108,11 @@ class TestsCapabilitiesGenerated : public VkTestFramework {
             "DEBUG_REPORT_ERROR_BIT"};
 
         std::vector<VkLayerSettingEXT> settings = {
-            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
-            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
-            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
-            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(debug_reports.size()), &debug_reports[0]}
+            {kLayerName, GetString(SETTING_PROFILE_FILE), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, GetString(SETTING_PROFILE_NAME), VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, GetString(SETTING_EMULATE_PORTABILITY), VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
+            {kLayerName, GetString(SETTING_SIMULATE_CAPABILITIES), VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+            {kLayerName, GetString(SETTING_DEBUG_REPORTS), VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(debug_reports.size()), &debug_reports[0]}
         };
 
         err = inst_builder.init(settings);
