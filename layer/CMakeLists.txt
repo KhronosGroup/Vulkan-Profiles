@@ -72,6 +72,16 @@ else()
     target_link_options(ProfilesLayer PRIVATE LINKER:--version-script=${CMAKE_CURRENT_SOURCE_DIR}/${LAYER_NAME}.map,-Bsymbolic,--exclude-libs,ALL)
 endif()
 
+set(TESTS_PYTHON_SCRIPT ${CMAKE_SOURCE_DIR}/scripts/gen_profiles_tests.py)
+set(LAYER_PYTHON_SCRIPT ${CMAKE_SOURCE_DIR}/scripts/gen_profiles_layer.py)
+set(PYTHON_SCRIPTS
+    ${LAYER_PYTHON_SCRIPT}
+    ${TESTS_PYTHON_SCRIPT}
+    ${CMAKE_SOURCE_DIR}/scripts/gen_profiles_solution.py
+)
+
+source_group("Python Files" FILES ${PYTHON_SCRIPTS})
+
 target_sources(ProfilesLayer PRIVATE
     profiles_interface.cpp
     profiles_interface.h
@@ -84,9 +94,11 @@ target_sources(ProfilesLayer PRIVATE
     profiles_generated.cpp
     profiles.h
     vk_layer_table.cpp
+    vk_layer_table.h
     ${LAYER_NAME}.json.in
     ${LAYER_NAME}.def
     ${LAYER_NAME}.map
+    ${PYTHON_SCRIPTS}
 )
 
 target_link_libraries(ProfilesLayer PRIVATE
@@ -102,23 +114,20 @@ if(ANDROID)
     target_link_Libraries(ProfilesLayer PRIVATE log)
 endif()
 
-set(LAYER_PYTHON_FILES ${CMAKE_SOURCE_DIR}/scripts/gen_profiles_layer.py)
-source_group("Python Files" FILES ${LAYER_PYTHON_FILES})
-
 add_custom_target(VpLayer_generate ALL
-    COMMAND Python3::Interpreter ${LAYER_PYTHON_FILES}
+    COMMAND Python3::Interpreter ${LAYER_PYTHON_SCRIPT}
         -api ${API_TYPE}
         -registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         -outLayer ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp
     VERBATIM
-    SOURCES ${LAYER_PYTHON_FILES}
+    SOURCES ${LAYER_PYTHON_SCRIPT}
     DEPENDS ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml)
 set_target_properties(VpLayer_generate PROPERTIES FOLDER "Profiles layer")
 add_dependencies(ProfilesLayer VpLayer_generate)
 
-source_group("Python Files" FILES ${CMAKE_SOURCE_DIR}/scripts/gen_profiles_tests.py)
+source_group("Python Files" FILES ${TESTS_PYTHON_SCRIPT})
 add_custom_target(VpLayer_generate_tests ALL
-	COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/scripts/gen_profiles_tests.py
+	COMMAND Python3::Interpreter ${TESTS_PYTHON_SCRIPT}
 		-api ${API_TYPE}
 		-registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
 		-outProfile ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_api_generated.json
