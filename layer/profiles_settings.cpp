@@ -165,18 +165,6 @@ void LogFlush(ProfileLayerSettings *layer_settings) {
     }
 }
 
-static ForceDevice GetForceDevice(const std::string &value) {
-    if (value == "FORCE_DEVICE_OFF") {
-        return FORCE_DEVICE_OFF;
-    } else if (value == "FORCE_DEVICE_WITH_UUID") {
-        return FORCE_DEVICE_WITH_UUID;
-    } else if (value == "FORCE_DEVICE_WITH_NAME") {
-        return FORCE_DEVICE_WITH_NAME;
-    }
-
-    return FORCE_DEVICE_OFF;
-}
-
 void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
                                ProfileLayerSettings *layer_settings) {
     assert(layer_settings != nullptr);
