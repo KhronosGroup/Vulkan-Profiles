@@ -181,8 +181,63 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
                                ProfileLayerSettings *layer_settings) {
     assert(layer_settings != nullptr);
 
+    const VkLayerSettingsCreateInfoEXT *create_info = vlFindLayerSettingsCreateInfo(pCreateInfo);
+
     VlLayerSettingSet layerSettingSet = VK_NULL_HANDLE;
-    vlCreateLayerSettingSet(kLayerName, vlFindLayerSettingsCreateInfo(pCreateInfo), pAllocator, nullptr, &layerSettingSet);
+    vlCreateLayerSettingSet(kLayerName, create_info, pAllocator, nullptr, &layerSettingSet);
+
+    // Check if there is unknown settings if API settings are set
+    if (create_info != nullptr) {
+        static const char *setting_names[] = {kLayerSettingsProfileFile,
+                                              kLayerSettingsProfileName,
+                                              kLayerSettingsProfileValidation,
+                                              kLayerSettingsEmulatePortability,
+                                              kLayerSettings_constantAlphaColorBlendFactors,
+                                              kLayerSettings_events,
+                                              kLayerSettings_imageViewFormatReinterpretation,
+                                              kLayerSettings_imageViewFormatSwizzle,
+                                              kLayerSettings_imageView2DOn3DImage,
+                                              kLayerSettings_multisampleArrayImage,
+                                              kLayerSettings_mutableComparisonSamplers,
+                                              kLayerSettings_pointPolygons,
+                                              kLayerSettings_samplerMipLodBias,
+                                              kLayerSettings_separateStencilMaskRef,
+                                              kLayerSettings_shaderSampleRateInterpolationFunctions,
+                                              kLayerSettings_tessellationIsolines,
+                                              kLayerSettings_tessellationPointMode,
+                                              kLayerSettings_triangleFans,
+                                              kLayerSettings_vertexAttributeAccessBeyondStride,
+                                              kLayerSettings_minVertexInputBindingStrideAlignment,
+                                              kLayerSettingsSimulateCapabilities,
+                                              kLayerSettingsDebugActions,
+                                              kLayerSettingsDebugFilename,
+                                              kLayerSettingsDebugFileClear,
+                                              kLayerSettingsDebugFailOnError,
+                                              kLayerSettingsDebugReports,
+                                              kLayerSettingsExcludeDeviceExtensions,
+                                              kLayerSettingsExcludeFormats,
+                                              kLayerSettingsDefaultFeatureValues,
+                                              kLayerSettingsForceDevice,
+                                              kLayerSettingsForceDeviceUUID,
+                                              kLayerSettingsForceDeviceName};
+        uint32_t setting_name_count = static_cast<uint32_t>(std::size(setting_names));
+
+        uint32_t unknown_setting_count = 0;
+        vlGetUnknownSettings(create_info, setting_name_count, setting_names, &unknown_setting_count, nullptr);
+
+        if (unknown_setting_count > 0) {
+            std::vector<const char *> unknown_settings;
+            unknown_settings.resize(unknown_setting_count);
+
+            vlGetUnknownSettings(create_info, setting_name_count, setting_names, &unknown_setting_count, &unknown_settings[0]);
+
+            for (std::size_t i = 0, n = unknown_settings.size(); i < n; ++i) {
+                LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
+                           "Unknown %s setting listed in VkLayerSettingsCreateInfoEXT, this setting is ignored.\n",
+                           unknown_settings[i]);
+            }
+        }
+    }
 
     if (vlHasLayerSetting(layerSettingSet, kLayerSettingsProfileFile)) {
         vlGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileFile, layer_settings->simulate.profile_file);
