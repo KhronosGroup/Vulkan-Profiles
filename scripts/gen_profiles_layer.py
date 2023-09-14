@@ -2830,7 +2830,7 @@ class VulkanProfilesLayerGenerator():
 
         gen += self.generate_string_to_image_layout(registry.enums['VkImageLayout'].values)
 
-        gen += self.generate_string_to_uint(('VkToolPurposeFlagBits', 'VkSampleCountFlagBits', 'VkResolveModeFlagBits', 'VkShaderStageFlagBits', 'VkSubgroupFeatureFlagBits', 'VkShaderFloatControlsIndependence', 'VkPointClippingBehavior', 'VkOpticalFlowGridSizeFlagBitsNV', 'VkQueueFlagBits', 'VkMemoryDecompressionMethodFlagBitsNV'), registry.enums)
+        gen += self.generate_string_to_uint(('VkToolPurposeFlagBits', 'VkSampleCountFlagBits', 'VkResolveModeFlagBits', 'VkShaderStageFlagBits', 'VkSubgroupFeatureFlagBits', 'VkShaderFloatControlsIndependence', 'VkPointClippingBehavior', 'VkOpticalFlowGridSizeFlagBitsNV', 'VkQueueFlagBits', 'VkMemoryDecompressionMethodFlagBitsNV', 'VkLayeredDriverUnderlyingApiMSFT'), registry.enums)
 
         gen += self.generate_string_to_flag_functions(('VkToolPurposeFlags', 'VkFormatFeatureFlags', 'VkQueueFlags', 'VkQueueGlobalPriorityKHR', 'VkVideoCodecOperationFlagsKHR', 'VkPipelineStageFlags', 'VkPipelineStageFlags2', 'VkFormatFeatureFlags2'))
 
