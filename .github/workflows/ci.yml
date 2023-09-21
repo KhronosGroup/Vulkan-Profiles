@@ -24,8 +24,6 @@ concurrency:
 
 env:
   CMAKE_GENERATOR: Ninja
-  CMAKE_C_COMPILER_LAUNCHER: ccache
-  CMAKE_CXX_COMPILER_LAUNCHER: ccache
 
 on:
     push:
@@ -38,6 +36,9 @@ permissions:
 
 jobs:
   macos:
+    env:
+      CMAKE_C_COMPILER_LAUNCHER: ccache
+      CMAKE_CXX_COMPILER_LAUNCHER: ccache
     runs-on: macos-latest
     strategy:
       fail-fast: false
@@ -64,6 +65,9 @@ jobs:
         run: cmake --install build --prefix build/install --config Release
 
   ubuntu-latest:
+    env:
+      CMAKE_C_COMPILER_LAUNCHER: ccache
+      CMAKE_CXX_COMPILER_LAUNCHER: ccache
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -93,6 +97,9 @@ jobs:
         run: cmake --install build --prefix build/install --config ${{matrix.config}}
 
   android:
+    env:
+      CMAKE_C_COMPILER_LAUNCHER: ccache
+      CMAKE_CXX_COMPILER_LAUNCHER: ccache
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
