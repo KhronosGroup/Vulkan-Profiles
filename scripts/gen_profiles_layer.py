@@ -102,8 +102,9 @@ const VkLayerProperties kLayerProperties[] = {{
 const uint32_t kLayerPropertiesCount = (sizeof(kLayerProperties) / sizeof(kLayerProperties[0]));
 
 // Instance extensions that this layer provides:
-const std::array<VkExtensionProperties, 0> kInstanceExtensionProperties = {};
-const uint32_t kInstanceExtensionPropertiesCount = static_cast<uint32_t>(kInstanceExtensionProperties.size());
+const VkExtensionProperties kInstanceExtensionProperties[] = {
+    VkExtensionProperties{VK_EXT_LAYER_SETTINGS_EXTENSION_NAME, VK_EXT_LAYER_SETTINGS_SPEC_VERSION}};
+const uint32_t kInstanceExtensionPropertiesCount = static_cast<uint32_t>(std::size(kInstanceExtensionProperties));
 
 // Device extensions that this layer provides:
 const std::array<VkExtensionProperties, 2> kDeviceExtensionProperties = {
@@ -2036,7 +2037,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateInstanceLayerProperties(uint32_t *pCount
 VKAPI_ATTR VkResult VKAPI_CALL EnumerateInstanceExtensionProperties(const char *pLayerName, uint32_t *pCount,
                                                                     VkExtensionProperties *pProperties) {
     if (pLayerName && !strcmp(pLayerName, kLayerName)) {
-        return EnumerateProperties(kInstanceExtensionPropertiesCount, kInstanceExtensionProperties.data(), pCount, pProperties);
+        return EnumerateProperties(kInstanceExtensionPropertiesCount, kInstanceExtensionProperties, pCount, pProperties);
     }
     return VK_ERROR_LAYER_NOT_PRESENT;
 }
