@@ -3754,12 +3754,12 @@ class VulkanProfilesLayerGenerator():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-api', action='store',
+    parser.add_argument('--api', action='store',
                         default='vulkan',
                         choices=['vulkan'],
                         help="Target API")
-    parser.add_argument('-registry', action='store', help='Use specified registry file instead of vk.xml')
-    parser.add_argument('-outLayer', action='store', help='Output the layer source file')
+    parser.add_argument('--registry', '-r', action='store', help='Use specified registry file instead of vk.xml')
+    parser.add_argument('--out-layer', action='store', help='Output the layer source file')
 
     args = parser.parse_args()
 
@@ -3768,8 +3768,8 @@ if __name__ == '__main__':
         registryPath = args.registry
 
     outputPath = "./layer/profiles.cpp"
-    if args.outLayer is not None:
-        outputPath = args.outLayer
+    if args.out_layer is not None:
+        outputPath = args.out_layer
 
     registry = gen_profiles_solution.VulkanRegistry(registryPath, args.api)
 
