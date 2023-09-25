@@ -360,38 +360,43 @@ struct VpStructChainerDesc {
     PFN_vpStructChainer             pfnFormat;
 };
 
+struct VpCapabilitiesDesc {
+    const VkExtensionProperties* pInstanceExtensions;
+    uint32_t instanceExtensionCount;
+
+    const VkExtensionProperties* pDeviceExtensions;
+    uint32_t deviceExtensionCount;
+
+    const VpProfileProperties* pFallbacks;
+    uint32_t fallbackCount;
+
+    const VkStructureType* pFeatureStructTypes;
+    uint32_t featureStructTypeCount;
+    VpFeatureDesc feature;
+
+    const VkStructureType* pPropertyStructTypes;
+    uint32_t propertyStructTypeCount;
+    VpPropertyDesc property;
+
+    const VkStructureType* pQueueFamilyStructTypes;
+    uint32_t queueFamilyStructTypeCount;
+    const VpQueueFamilyDesc* pQueueFamilies;
+    uint32_t queueFamilyCount;
+
+    const VkStructureType* pFormatStructTypes;
+    uint32_t formatStructTypeCount;
+    const VpFormatDesc* pFormats;
+    uint32_t formatCount;
+
+    VpStructChainerDesc chainers;
+};
+
 struct VpProfileDesc {
     VpProfileProperties             props;
     uint32_t                        minApiVersion;
 
-    const VkExtensionProperties*    pInstanceExtensions;
-    uint32_t                        instanceExtensionCount;
-
-    const VkExtensionProperties*    pDeviceExtensions;
-    uint32_t                        deviceExtensionCount;
-
-    const VpProfileProperties*      pFallbacks;
-    uint32_t                        fallbackCount;
-
-    const VkStructureType*          pFeatureStructTypes;
-    uint32_t                        featureStructTypeCount;
-    VpFeatureDesc                   feature;
-
-    const VkStructureType*          pPropertyStructTypes;
-    uint32_t                        propertyStructTypeCount;
-    VpPropertyDesc                  property;
-
-    const VkStructureType*          pQueueFamilyStructTypes;
-    uint32_t                        queueFamilyStructTypeCount;
-    const VpQueueFamilyDesc*        pQueueFamilies;
-    uint32_t                        queueFamilyCount;
-
-    const VkStructureType*          pFormatStructTypes;
-    uint32_t                        formatStructTypeCount;
-    const VpFormatDesc*             pFormats;
-    uint32_t                        formatCount;
-
-    VpStructChainerDesc             chainers;
+    const VpCapabilitiesDesc*       pCapabilities;
+    uint32_t                        capabilityCount;
 };
 
 template <typename T>
