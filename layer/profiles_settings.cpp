@@ -181,10 +181,10 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
                                ProfileLayerSettings *layer_settings) {
     assert(layer_settings != nullptr);
 
-    const VkLayerSettingsCreateInfoEXT *create_info = vlFindLayerSettingsCreateInfo(pCreateInfo);
+    const VkLayerSettingsCreateInfoEXT *create_info = vkuFindLayerSettingsCreateInfo(pCreateInfo);
 
-    VlLayerSettingSet layerSettingSet = VK_NULL_HANDLE;
-    vlCreateLayerSettingSet(kLayerName, create_info, pAllocator, nullptr, &layerSettingSet);
+    VkuLayerSettingSet layerSettingSet = VK_NULL_HANDLE;
+    vkuCreateLayerSettingSet(kLayerName, create_info, pAllocator, nullptr, &layerSettingSet);
 
     // Check if there is unknown settings if API settings are set
     if (create_info != nullptr) {
@@ -223,170 +223,170 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
         uint32_t setting_name_count = static_cast<uint32_t>(std::size(setting_names));
 
         std::vector<const char *> unknown_settings;
-        vlGetUnknownSettings(create_info, setting_name_count, setting_names, unknown_settings);
+        vkuGetUnknownSettings(create_info, setting_name_count, setting_names, unknown_settings);
 
         for (std::size_t i = 0, n = unknown_settings.size(); i < n; ++i) {
             LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
-                        "Unknown %s setting listed in VkLayerSettingsCreateInfoEXT, this setting is ignored.\n",
-                        unknown_settings[i]);
+                       "Unknown %s setting listed in VkLayerSettingsCreateInfoEXT, this setting is ignored.\n",
+                       unknown_settings[i]);
         }
     }
 
-    if (vlHasLayerSetting(layerSettingSet, kLayerSettingsProfileFile)) {
-        vlGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileFile, layer_settings->simulate.profile_file);
+    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileFile)) {
+        vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileFile, layer_settings->simulate.profile_file);
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettingsProfileName)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileName, layer_settings->simulate.profile_name);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileName)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileName, layer_settings->simulate.profile_name);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettingsProfileValidation)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileValidation, layer_settings->simulate.profile_validation);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileValidation)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileValidation, layer_settings->simulate.profile_validation);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettingsSimulateCapabilities)) {
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsSimulateCapabilities)) {
             std::vector<std::string> values;
-            vlGetLayerSettingValues(layerSettingSet, kLayerSettingsSimulateCapabilities, values);
+            vkuGetLayerSettingValues(layerSettingSet, kLayerSettingsSimulateCapabilities, values);
             for (std::size_t i = 0, n = values.size(); i < n; ++i) {
                 values[i] = ToUpper(values[i]);
             }
             layer_settings->simulate.capabilities = GetSimulateCapabilityFlags(values);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettingsDefaultFeatureValues)) {
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsDefaultFeatureValues)) {
             std::string value;
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettingsDefaultFeatureValues, value);
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsDefaultFeatureValues, value);
             layer_settings->simulate.default_feature_values = GetDefaultFeatureValues(ToUpper(value));
         }
     }
 
-    if (vlHasLayerSetting(layerSettingSet, kLayerSettingsExcludeDeviceExtensions)) {
-        vlGetLayerSettingValues(layerSettingSet, kLayerSettingsExcludeDeviceExtensions,
-                                layer_settings->simulate.exclude_device_extensions);
+    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsExcludeDeviceExtensions)) {
+        vkuGetLayerSettingValues(layerSettingSet, kLayerSettingsExcludeDeviceExtensions,
+                                 layer_settings->simulate.exclude_device_extensions);
     }
 
-    if (vlHasLayerSetting(layerSettingSet, kLayerSettingsExcludeFormats)) {
-        vlGetLayerSettingValues(layerSettingSet, kLayerSettingsExcludeFormats, layer_settings->simulate.exclude_formats);
+    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsExcludeFormats)) {
+        vkuGetLayerSettingValues(layerSettingSet, kLayerSettingsExcludeFormats, layer_settings->simulate.exclude_formats);
     }
 
-    if (vlHasLayerSetting(layerSettingSet, kLayerSettingsEmulatePortability)) {
-        vlGetLayerSettingValue(layerSettingSet, kLayerSettingsEmulatePortability, layer_settings->simulate.emulate_portability);
+    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsEmulatePortability)) {
+        vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsEmulatePortability, layer_settings->simulate.emulate_portability);
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettings_constantAlphaColorBlendFactors)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettings_constantAlphaColorBlendFactors,
-                                   layer_settings->portability.constantAlphaColorBlendFactors);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_constantAlphaColorBlendFactors)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_constantAlphaColorBlendFactors,
+                                    layer_settings->portability.constantAlphaColorBlendFactors);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettings_events)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettings_events, layer_settings->portability.events);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_events)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_events, layer_settings->portability.events);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettings_imageViewFormatReinterpretation)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettings_imageViewFormatReinterpretation,
-                                   layer_settings->portability.imageViewFormatReinterpretation);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_imageViewFormatReinterpretation)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_imageViewFormatReinterpretation,
+                                    layer_settings->portability.imageViewFormatReinterpretation);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettings_imageViewFormatSwizzle)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettings_imageViewFormatSwizzle,
-                                   layer_settings->portability.imageViewFormatSwizzle);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_imageViewFormatSwizzle)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_imageViewFormatSwizzle,
+                                    layer_settings->portability.imageViewFormatSwizzle);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettings_imageView2DOn3DImage)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettings_imageView2DOn3DImage,
-                                   layer_settings->portability.imageView2DOn3DImage);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_imageView2DOn3DImage)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_imageView2DOn3DImage,
+                                    layer_settings->portability.imageView2DOn3DImage);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettings_multisampleArrayImage)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettings_multisampleArrayImage,
-                                   layer_settings->portability.multisampleArrayImage);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_multisampleArrayImage)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_multisampleArrayImage,
+                                    layer_settings->portability.multisampleArrayImage);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettings_mutableComparisonSamplers)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettings_mutableComparisonSamplers,
-                                   layer_settings->portability.mutableComparisonSamplers);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_mutableComparisonSamplers)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_mutableComparisonSamplers,
+                                    layer_settings->portability.mutableComparisonSamplers);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettings_pointPolygons)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettings_pointPolygons, layer_settings->portability.pointPolygons);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_pointPolygons)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_pointPolygons, layer_settings->portability.pointPolygons);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettings_samplerMipLodBias)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettings_samplerMipLodBias,
-                                   layer_settings->portability.samplerMipLodBias);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_samplerMipLodBias)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_samplerMipLodBias,
+                                    layer_settings->portability.samplerMipLodBias);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettings_separateStencilMaskRef)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettings_separateStencilMaskRef,
-                                   layer_settings->portability.separateStencilMaskRef);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_separateStencilMaskRef)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_separateStencilMaskRef,
+                                    layer_settings->portability.separateStencilMaskRef);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettings_shaderSampleRateInterpolationFunctions)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettings_shaderSampleRateInterpolationFunctions,
-                                   layer_settings->portability.shaderSampleRateInterpolationFunctions);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_shaderSampleRateInterpolationFunctions)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_shaderSampleRateInterpolationFunctions,
+                                    layer_settings->portability.shaderSampleRateInterpolationFunctions);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettings_tessellationIsolines)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettings_tessellationIsolines,
-                                   layer_settings->portability.tessellationIsolines);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_tessellationIsolines)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_tessellationIsolines,
+                                    layer_settings->portability.tessellationIsolines);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettings_tessellationPointMode)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettings_tessellationPointMode,
-                                   layer_settings->portability.tessellationPointMode);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_tessellationPointMode)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_tessellationPointMode,
+                                    layer_settings->portability.tessellationPointMode);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettings_triangleFans)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettings_triangleFans, layer_settings->portability.triangleFans);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_triangleFans)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_triangleFans, layer_settings->portability.triangleFans);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettings_vertexAttributeAccessBeyondStride)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettings_vertexAttributeAccessBeyondStride,
-                                   layer_settings->portability.vertexAttributeAccessBeyondStride);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_vertexAttributeAccessBeyondStride)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_vertexAttributeAccessBeyondStride,
+                                    layer_settings->portability.vertexAttributeAccessBeyondStride);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettings_minVertexInputBindingStrideAlignment)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettings_minVertexInputBindingStrideAlignment,
-                                   layer_settings->portability.minVertexInputBindingStrideAlignment);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_minVertexInputBindingStrideAlignment)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_minVertexInputBindingStrideAlignment,
+                                    layer_settings->portability.minVertexInputBindingStrideAlignment);
         }
     }
 
-    if (vlHasLayerSetting(layerSettingSet, kLayerSettingsForceDevice)) {
+    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsForceDevice)) {
         std::string value;
-        vlGetLayerSettingValue(layerSettingSet, kLayerSettingsForceDevice, value);
+        vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsForceDevice, value);
         layer_settings->device.force_device = GetForceDevice(ToUpper(value));
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettingsForceDeviceUUID)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettingsForceDeviceUUID, layer_settings->device.force_device_uuid);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsForceDeviceUUID)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsForceDeviceUUID, layer_settings->device.force_device_uuid);
         }
 
-        if (vlHasLayerSetting(layerSettingSet, kLayerSettingsForceDeviceName)) {
-            vlGetLayerSettingValue(layerSettingSet, kLayerSettingsForceDeviceName, layer_settings->device.force_device_name);
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsForceDeviceName)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsForceDeviceName, layer_settings->device.force_device_name);
         }
     }
 
-    if (vlHasLayerSetting(layerSettingSet, kLayerSettingsDebugFailOnError)) {
-        vlGetLayerSettingValue(layerSettingSet, kLayerSettingsDebugFailOnError, layer_settings->log.debug_fail_on_error);
+    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsDebugFailOnError)) {
+        vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsDebugFailOnError, layer_settings->log.debug_fail_on_error);
     }
 
-    if (vlHasLayerSetting(layerSettingSet, kLayerSettingsDebugActions)) {
+    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsDebugActions)) {
         std::vector<std::string> values;
-        vlGetLayerSettingValues(layerSettingSet, kLayerSettingsDebugActions, values);
+        vkuGetLayerSettingValues(layerSettingSet, kLayerSettingsDebugActions, values);
         for (std::size_t i = 0, n = values.size(); i < n; ++i) {
             values[i] = ToUpper(values[i]);
         }
         layer_settings->log.debug_actions = GetDebugActionFlags(values);
     }
 
-    if (vlHasLayerSetting(layerSettingSet, kLayerSettingsDebugFilename)) {
-        vlGetLayerSettingValue(layerSettingSet, kLayerSettingsDebugFilename, layer_settings->log.debug_filename);
+    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsDebugFilename)) {
+        vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsDebugFilename, layer_settings->log.debug_filename);
     }
 
-    if (vlHasLayerSetting(layerSettingSet, kLayerSettingsDebugFileClear)) {
-        vlGetLayerSettingValue(layerSettingSet, kLayerSettingsDebugFileClear, layer_settings->log.debug_file_discard);
+    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsDebugFileClear)) {
+        vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsDebugFileClear, layer_settings->log.debug_file_discard);
     }
 
-    if (vlHasLayerSetting(layerSettingSet, kLayerSettingsDebugReports)) {
+    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsDebugReports)) {
         std::vector<std::string> values;
-        vlGetLayerSettingValues(layerSettingSet, kLayerSettingsDebugReports, values);
+        vkuGetLayerSettingValues(layerSettingSet, kLayerSettingsDebugReports, values);
         for (std::size_t i = 0, n = values.size(); i < n; ++i) {
             values[i] = ToUpper(values[i]);
         }
@@ -468,5 +468,5 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
 
     LogMessage(layer_settings, DEBUG_REPORT_NOTIFICATION_BIT, "Profile Layers Settings: {\n%s}\n", settings_log.c_str());
 
-    vlDestroyLayerSettingSet(layerSettingSet, pAllocator);
+    vkuDestroyLayerSettingSet(layerSettingSet, pAllocator);
 }
