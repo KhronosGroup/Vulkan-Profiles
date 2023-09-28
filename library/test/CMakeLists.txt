@@ -2,7 +2,7 @@ set(test_libraries GTest::gtest GTest::gtest_main Vulkan::Headers Vulkan::Profil
 if(ANDROID)
     list(APPEND test_libraries log android dl vulkan)
 else()
-    list(APPEND test_libraries Vulkan::Vulkan)
+    list(APPEND test_libraries Vulkan::Loader)
 endif()
 
 # The release source is in ../source/vulkan_profiles.cpp, but the debug source (with
