@@ -33,22 +33,10 @@ option(BUILD_TESTS "Build the tests")
 if (BUILD_TESTS)
     enable_testing()
     find_package(GTest REQUIRED CONFIG)
-endif()
 
-if (NOT ANDROID)
-    # The vulkan loader search is:
-    #     User-supplied setting of CMAKE_PREFIX_PATH
-    #     VULKAN_LOADER_INSTALL_DIR defined via cmake option
-    #     VULKAN_LOADER_INSTALL_DIR defined via environment variable
-    #     Default findVulkan operation if the VULKAN_SDK environment variable is defined
-    set(VULKAN_LOADER_INSTALL_DIR "LOADER-NOTFOUND" CACHE PATH "Absolute path to a Vulkan-Loader install directory")
-    if (VULKAN_LOADER_INSTALL_DIR)
-        message(STATUS "VULKAN_LOADER_INSTALL_DIR specified, using find_package to locate Vulkan")
-    elseif(ENV{VULKAN_LOADER_INSTALL_DIR})
-        message(STATUS "VULKAN_LOADER_INSTALL_DIR environment variable specified, using find_package to locate Vulkan")
+    if(NOT ANDROID)
+        find_package(VulkanLoader REQUIRED CONFIG)
     endif()
-    set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH};${VULKAN_LOADER_INSTALL_DIR};${VULKAN_HEADERS_INSTALL_DIR};$ENV{VULKAN_LOADER_INSTALL_DIR};$ENV{VULKAN_HEADERS_INSTALL_DIR})
-    find_package(Vulkan)
 endif()
 
 set(PROFILES_SCHEMA_FILENAME "profiles-0.8-latest.json")
