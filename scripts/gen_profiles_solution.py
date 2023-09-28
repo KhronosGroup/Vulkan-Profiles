@@ -160,8 +160,7 @@ CPP_HEADER = '''
 '''
 
 HPP_HEADER = '''
-#ifndef VULKAN_PROFILES_HPP_
-#define VULKAN_PROFILES_HPP_ 1
+#pragma once
 
 #define VPAPI_ATTR inline
 
@@ -172,10 +171,6 @@ HPP_HEADER = '''
 #include <cmath>
 #include <vector>
 #include <algorithm>
-'''
-
-HPP_FOOTER = '''
-#endif // VULKAN_PROFILES_HPP_
 '''
 
 API_DEFS = '''
@@ -2332,8 +2327,9 @@ class VulkanRegistry():
             return alias
 
 
-class VulkanProfileCapabilities():
-    def __init__(self, registry, data, caps):
+class VulkanCapabilities():
+    def __init__(self, registry, json_caps_key, json_capabilities_value):
+        self.key = json_caps_key
         self.extensions = dict()
         self.instanceExtensions = dict()
         self.deviceExtensions = dict()
@@ -2341,15 +2337,7 @@ class VulkanProfileCapabilities():
         self.properties = dict()
         self.formats = dict()
         self.queueFamiliesProperties = []
-        for capName in data['capabilities']:
-            # When we have multiple possible capabilities blocks, we load them all but effectively the API library can't effectively implement this behavior.
-            if type(capName).__name__ == 'list':
-                for capNameCase in capName:
-                    self.mergeCaps(registry, caps[capNameCase])
-            elif capName in caps:
-                self.mergeCaps(registry, caps[capName])
-            else:
-                Log.f("Capability '{0}' needed by profile '{1}' is missing".format(capName, data['name']))
+        self.mergeCaps(registry, json_capabilities_value)
 
     def mergeCaps(self, registry, caps):
         self.mergeProfileExtensions(registry, caps)
@@ -2357,7 +2345,6 @@ class VulkanProfileCapabilities():
         self.mergeProfileProperties(caps)
         self.mergeProfileFormats(caps)
         self.mergeProfileQueueFamiliesProperties(caps)
-
 
     def mergeProfileCapData(self, dst, src):
         if type(src) != type(dst):
@@ -2506,7 +2493,6 @@ class VulkanProfile():
         self.fallback = data.get('fallback')
         self.versionRequirements = []
         self.extensionRequirements = []
-        self.capabilities = VulkanProfileCapabilities(registry, data, caps)
         self.structs = VulkanProfileStructs(registry, self.capabilities)
         self.collectCompileTimeRequirements()
         self.validate()
@@ -2986,9 +2972,11 @@ class VulkanProfile():
         return gen
 
 
-class VulkanProfiles():
-    def loadFromDir(registry, profilesDir, validate, schema):
-        profiles = dict()
+class VulkanProfilesFile():
+    def __init__(self, registry, profilesDir, validate, schema):
+        self.profiles = dict()
+        self.capabilities = dict()
+        
         dirAbsPath = os.path.abspath(profilesDir)
         filenames = os.listdir(dirAbsPath)
         for filename in filenames:
@@ -2996,24 +2984,47 @@ class VulkanProfiles():
             if os.path.isfile(fileAbsPath) and os.path.splitext(filename)[-1] == '.json':
                 Log.i("Loading profile file: '{0}'".format(filename))
                 with open(fileAbsPath, 'r') as f:
-                    jsonData = json.load(f)
+                    json_root = json.load(f)
                     if validate:
                         Log.i("Validating profile file: '{0}'".format(filename))
-                        # jsonschema.validate(jsonData, schema)
-                    VulkanProfiles.parseProfiles(registry, profiles, jsonData['profiles'], jsonData['capabilities'])
-        return profiles
+                        jsonschema.validate(json_root, schema)
+                    if checkMissingCapabilities(json_root):
+                        self.parseCapabilities(registry, self.capabilities, json_root['capabilities'])
+                        self.parseProfiles(registry, self.profiles, json_root['profiles'])
 
+    def checkMissingCapabilities(self, json_root):
+        json_available_capabilities_object = json_root['capabilities']
+        json_profiles_object = json_root['profiles']
+        
+        for json_profile_key, json_profile_value in json_profiles_object.items():
+            for json_required_capabilities in json_profile_value['capabilities']:
 
-    def parseProfiles(registry, profiles, json, caps):
-        for name, data in json.items():
-            Log.i("Registering profile '{0}'".format(name))
-            profiles[name] = VulkanProfile(registry, name, data, caps)
+                # When we have multiple possible capabilities blocks, we load them all but effectively the API library can't effectively implement this behavior.
+                if type(json_required_capabilities).__name__ == 'list':
+                    for capNameCase in capName:
+                        self.mergeCaps(registry, caps[capNameCase])
+                elif json_required_capabilities in json_available_capabilities_object:
+                        self.mergeCaps(registry, caps[capName])
+                else:
+                    Log.f("Capability '{0}' needed by profile '{1}' is missing".format(capName, json_capabilities_value['name']))
+                    return False
+        
+        return True        
+
+    def parseCapabilities(self, registry, capabilities, json_caps):
+        for json_caps_key, json_caps_value in json_caps.items():
+            capabilities[json_caps_key] = VulkanCapabilities(registry, json_caps_key, json_caps_value)
+
+    def parseProfiles(self, registry, profiles, json_profiles):
+        for json_profile_key, json_profile_value in json_profiles.items():
+            Log.i("Registering profile '{0}'".format(json_profile_key))
+            profiles[json_profile_key] = VulkanProfile(registry, json_profile_key, json_profile_value)
 
 
 class VulkanProfilesLibraryGenerator():
-    def __init__(self, registry, profiles, debugMessages = False):
+    def __init__(self, registry, profiles_file, debugMessages = False):
         self.registry = registry
-        self.profiles = profiles
+        self.profiles_file = profiles_file
         self.debugMessages = debugMessages
 
 
@@ -3076,12 +3087,11 @@ class VulkanProfilesLibraryGenerator():
                 f.write(DEBUG_MSG_UTIL_IMPL)
             f.write(self.gen_privateImpl())
             f.write(self.gen_publicImpl())
-            f.write(HPP_FOOTER)
 
 
     def gen_profileDefs(self):
         gen = ''
-        for name, profile in sorted(self.profiles.items()):
+        for name, profile in sorted(self.profiles_file.items()):
             uname = name.upper()
             gen += '\n'
 
@@ -4549,7 +4559,7 @@ if __name__ == '__main__':
             schema = generator.schema
 
     if args.input != None:
-        profiles = VulkanProfiles.loadFromDir(registry, args.input, args.validate, schema)
+        profiles = VulkanProfilesFile(registry, args.input, args.validate, schema)
 
     if args.output_library_inc != None:
         generator = VulkanProfilesLibraryGenerator(registry, profiles)
