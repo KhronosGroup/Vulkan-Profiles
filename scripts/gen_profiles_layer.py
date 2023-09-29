@@ -2851,10 +2851,12 @@ class VulkanProfilesLayerGenerator():
 
         for ext, properties, features in self.extension_structs:
             gen += '\n    // ' + ext + ' structs\n'
+            gen += self.generate_platform_protect_begin(ext)
             for property in properties:
                 gen += '    ' + property + ' ' + self.create_var_name(property) + ';\n'
             for feature in features:
                 gen += '    ' + feature + ' ' + self.create_var_name(feature) + ';\n'
+            gen += self.generate_platform_protect_end(ext)
 
         gen += PHYSICAL_DEVICE_DATA_CONSTRUCTOR_BEGIN
 
