@@ -138,7 +138,7 @@ On OSX:
 ```
 git clone git@github.com:KhronosGroup/Vulkan-Profiles.git
 cd Vulkan-Profiles
-cmake -S . -B build/ -D CMAKE_BUILD_TYPE=Debug -D UPDATE_DEPS=ON -A x64
+cmake -S . -B build/ -D CMAKE_BUILD_TYPE=Debug -D BUILD_TESTS=ON -D UPDATE_DEPS=ON -A x64
 cmake --build ./build/ --config Debug
 ```
 
