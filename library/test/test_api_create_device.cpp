@@ -22,7 +22,7 @@
 
 #include "test.hpp"
 #ifndef VULKAN_PROFILES_HEADER_ONLY
-#include <vulkan/debug/vulkan_profiles.hpp>
+#include <vulkan/vulkan_profiles.hpp>
 #else
 #include <vulkan/debug/vulkan_profiles.h>
 #endif

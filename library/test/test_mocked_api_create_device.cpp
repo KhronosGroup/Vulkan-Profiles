@@ -34,10 +34,11 @@ TEST(mocked_api_create_device, default_extensions) {
     inCreateInfo.queueCreateInfoCount = 1;
     inCreateInfo.pQueueCreateInfos = &queueCreateInfo;
 
-    std::vector<const char*> outExtensions(sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions) /
-                                           sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions[0]));
+    std::vector<const char *> outExtensions(
+        sizeof(detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions) /
+        sizeof(detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions[0]));
     for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::deviceExtensions[i].extensionName;
+        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions[i].extensionName;
     }
 
     VkDeviceCreateInfo outCreateInfo = inCreateInfo;
@@ -86,10 +87,10 @@ TEST(mocked_api_create_device, default_extensions_negative) {
     inCreateInfo.enabledExtensionCount = static_cast<uint32_t>(inExtensions.size());
     inCreateInfo.ppEnabledExtensionNames = inExtensions.data();
 
-    std::vector<const char*> outExtensions(sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions) /
-                                           sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions[0]));
+    std::vector<const char *> outExtensions(sizeof(detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions) /
+        sizeof(detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions[0]));
     for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::deviceExtensions[i].extensionName;
+        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions[i].extensionName;
     }
 
     VkDeviceCreateInfo outCreateInfo = inCreateInfo;
@@ -185,10 +186,9 @@ TEST(mocked_api_create_device, merge_extensions) {
     inCreateInfo.enabledExtensionCount = static_cast<uint32_t>(inExtensions.size());
     inCreateInfo.ppEnabledExtensionNames = inExtensions.data();
 
-    std::vector<const char*> outExtensions(sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions) /
-                                           sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions[0]));
+    std::vector<const char *> outExtensions(std::size(detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions));
     for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::deviceExtensions[i].extensionName;
+        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions[i].extensionName;
     }
     outExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
@@ -231,10 +231,9 @@ TEST(mocked_api_create_device, default_features) {
     inCreateInfo.queueCreateInfoCount = 1;
     inCreateInfo.pQueueCreateInfos = &queueCreateInfo;
 
-    std::vector<const char*> outExtensions(sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions) /
-                                           sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions[0]));
+    std::vector<const char *> outExtensions(std::size(detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions));
     for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::deviceExtensions[i].extensionName;
+        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions[i].extensionName;
     }
 
     VkDeviceCreateInfo outCreateInfo = inCreateInfo;
@@ -279,10 +278,10 @@ TEST(mocked_api_create_device, default_features_negative) {
     inCreateInfo.queueCreateInfoCount = 1;
     inCreateInfo.pQueueCreateInfos = &queueCreateInfo;
 
-    std::vector<const char*> outExtensions(sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions) /
-                                           sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions[0]));
+    std::vector<const char *> outExtensions(
+        std::size(detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions));
     for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::deviceExtensions[i].extensionName;
+        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions[i].extensionName;
     }
 
     VkDeviceCreateInfo outCreateInfo = inCreateInfo;
@@ -334,10 +333,10 @@ TEST(mocked_api_create_device, override_features) {
     inCreateInfo.queueCreateInfoCount = 1;
     inCreateInfo.pQueueCreateInfos = &queueCreateInfo;
 
-    std::vector<const char*> outExtensions(sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions) /
-                                           sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions[0]));
+    std::vector<const char *> outExtensions(
+        std::size(detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions));
     for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::deviceExtensions[i].extensionName;
+        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions[i].extensionName;
     }
 
     VkDeviceCreateInfo outCreateInfo = inCreateInfo;
@@ -385,10 +384,9 @@ TEST(mocked_api_create_device, override_all_features) {
     inCreateInfo.queueCreateInfoCount = 1;
     inCreateInfo.pQueueCreateInfos = &queueCreateInfo;
 
-    std::vector<const char*> outExtensions(sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions) /
-                                           sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions[0]));
+    std::vector<const char *> outExtensions(std::size(detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions));
     for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::deviceExtensions[i].extensionName;
+        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions[i].extensionName;
     }
 
     VkDeviceCreateInfo outCreateInfo = inCreateInfo;
@@ -431,10 +429,10 @@ TEST(mocked_api_create_device, legacy_enabled_features) {
     inCreateInfo.pQueueCreateInfos = &queueCreateInfo;
     inCreateInfo.pEnabledFeatures = &inFeatures.features;
 
-    std::vector<const char*> outExtensions(sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions) /
-                                           sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions[0]));
+    std::vector<const char *> outExtensions(
+        std::size(detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions));
     for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::deviceExtensions[i].extensionName;
+        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions[i].extensionName;
     }
 
     VkDeviceCreateInfo outCreateInfo = inCreateInfo;
@@ -487,10 +485,10 @@ TEST(mocked_api_create_device, legacy_enabled_features_override_all) {
     inCreateInfo.pQueueCreateInfos = &queueCreateInfo;
     inCreateInfo.pEnabledFeatures = &inFeatures;
 
-    std::vector<const char*> outExtensions(sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions) /
-                                           sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions[0]));
+    std::vector<const char *> outExtensions(
+        std::size(detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions));
     for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::deviceExtensions[i].extensionName;
+        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions[i].extensionName;
     }
 
     VkDeviceCreateInfo outCreateInfo = inCreateInfo;
@@ -524,10 +522,9 @@ TEST(mocked_api_create_device, disable_robust_buffer_access) {
     inCreateInfo.queueCreateInfoCount = 1;
     inCreateInfo.pQueueCreateInfos = &queueCreateInfo;
 
-    std::vector<const char*> outExtensions(sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions) /
-                                           sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions[0]));
+    std::vector<const char *> outExtensions(std::size(detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions));
     for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::deviceExtensions[i].extensionName;
+        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions[i].extensionName;
     }
 
     VkDeviceCreateInfo outCreateInfo = inCreateInfo;
@@ -572,10 +569,10 @@ TEST(mocked_api_create_device, disable_robust_image_access) {
     inCreateInfo.queueCreateInfoCount = 1;
     inCreateInfo.pQueueCreateInfos = &queueCreateInfo;
 
-    std::vector<const char*> outExtensions(sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions) /
-                                           sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions[0]));
+    std::vector<const char *> outExtensions(
+        std::size(detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions));
     for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::deviceExtensions[i].extensionName;
+        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions[i].extensionName;
     }
 
     VkDeviceCreateInfo outCreateInfo = inCreateInfo;
@@ -619,10 +616,9 @@ TEST(mocked_api_create_device, disable_robust_access) {
     inCreateInfo.queueCreateInfoCount = 1;
     inCreateInfo.pQueueCreateInfos = &queueCreateInfo;
 
-    std::vector<const char*> outExtensions(sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions) /
-                                           sizeof(detail::VP_KHR_ROADMAP_2022::deviceExtensions[0]));
+    std::vector<const char *> outExtensions(std::size(detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions));
     for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::deviceExtensions[i].extensionName;
+        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions[i].extensionName;
     }
 
     VkDeviceCreateInfo outCreateInfo = inCreateInfo;

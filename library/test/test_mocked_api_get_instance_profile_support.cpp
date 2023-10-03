@@ -58,8 +58,8 @@ TEST(mocked_api_get_instance_profile_support, vulkan10_no_gpdp2) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
-        "Unsupported extension: VK_KHR_get_physical_device_properties2",
-        "Unsupported mandatory extension VK_KHR_get_physical_device_properties2 on Vulkan 1.0"
+        "Unsupported mandatory extension VK_KHR_get_physical_device_properties2 on Vulkan 1.0",
+        "Unsupported extension: VK_KHR_get_physical_device_properties2"
     });
 #endif
 
@@ -261,14 +261,14 @@ TEST(mocked_api_get_instance_profile_support, layer_unsupported) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
+        "Unsupported mandatory extension VK_KHR_get_physical_device_properties2 on Vulkan 1.0",
         "Unsupported extension: VK_EXT_swapchain_colorspace",
         "Unsupported extension: VK_KHR_android_surface",
         "Unsupported extension: VK_KHR_external_fence_capabilities",
         "Unsupported extension: VK_KHR_external_memory_capabilities",
         "Unsupported extension: VK_KHR_external_semaphore_capabilities",
         "Unsupported extension: VK_KHR_get_physical_device_properties2",
-        "Unsupported extension: VK_KHR_get_surface_capabilities2",
-        "Unsupported mandatory extension VK_KHR_get_physical_device_properties2 on Vulkan 1.0"
+        "Unsupported extension: VK_KHR_get_surface_capabilities2"
     });
 #endif
 
