@@ -16,6 +16,7 @@
  *
  * Authors:
  * - Daniel Rakos <daniel.rakos@rastergrid.com>
+ * - Christophe Riccio <christophe@lunarg.com>
  */
 
 #include "mock_vulkan_api.hpp"
@@ -125,7 +126,7 @@ TEST(mocked_api_create_instance, vulkan11) {
 TEST(mocked_api_create_instance, default_extensions) {
     MockVulkanAPI mock;
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
+    VpProfileProperties profile{VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION};
 
     VkApplicationInfo inAppInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
     inAppInfo.apiVersion = VK_API_VERSION_1_1;
@@ -133,10 +134,10 @@ TEST(mocked_api_create_instance, default_extensions) {
     VkInstanceCreateInfo inCreateInfo{ VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
     inCreateInfo.pApplicationInfo = &inAppInfo;
 
-    std::vector<const char*> outExtensions(sizeof(detail::VP_ANDROID_BASELINE_2021::instanceExtensions) /
-                                           sizeof(detail::VP_ANDROID_BASELINE_2021::instanceExtensions[0]));
+    std::vector<const char*> outExtensions(sizeof(detail::VP_ANDROID_BASELINE_2021::baseline::instanceExtensions) /
+                                           sizeof(detail::VP_ANDROID_BASELINE_2021::baseline::instanceExtensions[0]));
     for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_ANDROID_BASELINE_2021::instanceExtensions[i].extensionName;
+        outExtensions[i] = detail::VP_ANDROID_BASELINE_2021::baseline::instanceExtensions[i].extensionName;
     }
 
     VkInstanceCreateInfo outCreateInfo = inCreateInfo;
@@ -173,10 +174,10 @@ TEST(mocked_api_create_instance, default_extensions_negative) {
     inCreateInfo.enabledExtensionCount = static_cast<uint32_t>(inExtensions.size());
     inCreateInfo.ppEnabledExtensionNames = inExtensions.data();
 
-    std::vector<const char*> outExtensions(sizeof(detail::VP_ANDROID_BASELINE_2021::instanceExtensions) /
-                                           sizeof(detail::VP_ANDROID_BASELINE_2021::instanceExtensions[0]));
+    std::vector<const char*> outExtensions(sizeof(detail::VP_ANDROID_BASELINE_2021::baseline::instanceExtensions) /
+                                           sizeof(detail::VP_ANDROID_BASELINE_2021::baseline::instanceExtensions[0]));
     for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_ANDROID_BASELINE_2021::instanceExtensions[i].extensionName;
+        outExtensions[i] = detail::VP_ANDROID_BASELINE_2021::baseline::instanceExtensions[i].extensionName;
     }
 
     VkInstanceCreateInfo outCreateInfo = inCreateInfo;
@@ -248,10 +249,10 @@ TEST(mocked_api_create_instance, merge_extensions) {
     inCreateInfo.enabledExtensionCount = static_cast<uint32_t>(inExtensions.size());
     inCreateInfo.ppEnabledExtensionNames = inExtensions.data();
 
-    std::vector<const char*> outExtensions(sizeof(detail::VP_ANDROID_BASELINE_2021::instanceExtensions) /
-                                           sizeof(detail::VP_ANDROID_BASELINE_2021::instanceExtensions[0]));
+    std::vector<const char*> outExtensions(sizeof(detail::VP_ANDROID_BASELINE_2021::baseline::instanceExtensions) /
+                                           sizeof(detail::VP_ANDROID_BASELINE_2021::baseline::instanceExtensions[0]));
     for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_ANDROID_BASELINE_2021::instanceExtensions[i].extensionName;
+        outExtensions[i] = detail::VP_ANDROID_BASELINE_2021::baseline::instanceExtensions[i].extensionName;
     }
     outExtensions.push_back(VK_KHR_DISPLAY_EXTENSION_NAME);
 

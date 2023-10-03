@@ -11,6 +11,11 @@
 
 # Release Notes
 
+## [Vulkan Profiles Toolset 1.3.XXX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - January 2024
+
+### Features:
+- Add API library support of checking the support of profiles with multiple variants
+
 ## [Vulkan Profiles Toolset 1.3.261](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - August 2023
 
 ### Bugfixes:

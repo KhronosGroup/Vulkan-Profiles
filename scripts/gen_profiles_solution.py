@@ -90,7 +90,7 @@ COPYRIGHT_HEADER = '''
 '''
 
 DEBUG_MSG_CB_DEFINE = '''
-#include <stdio.h>
+#include <cstdio>
 
 #ifndef VP_DEBUG_MESSAGE_CALLBACK
 #if defined(ANDROID) || defined(__ANDROID__)
@@ -150,32 +150,22 @@ H_FOOTER = '''
 #endif // VULKAN_PROFILES_H_
 '''
 
-CPP_HEADER = '''
-#include <cstddef>
-#include <cstring>
-#include <cstdint>
-#include <cmath>
-#include <vector>
-#include <algorithm>
-'''
-
 HPP_HEADER = '''
-#ifndef VULKAN_PROFILES_HPP_
-#define VULKAN_PROFILES_HPP_ 1
+#pragma once
 
 #define VPAPI_ATTR inline
 
 #include <vulkan/vulkan.h>
+'''
+
+SHARED_INCLUDE = '''
 #include <cstddef>
 #include <cstring>
 #include <cstdint>
+#include <cassert>
 #include <cmath>
 #include <vector>
 #include <algorithm>
-'''
-
-HPP_FOOTER = '''
-#endif // VULKAN_PROFILES_HPP_
 '''
 
 API_DEFS = '''
@@ -252,8 +242,14 @@ typedef struct VpDeviceCreateInfo {
 // Query the list of available profiles in the library
 VPAPI_ATTR VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
+// List the required profiles of a profile
+VPAPI_ATTR VkResult vpGetProfileRequiredProfiles(const VpProfileProperties* pProfile, uint32_t* pPropertyCount, VpProfileProperties* pProperties);
+
 // List the recommended fallback profiles of a profile
 VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
+
+// Query whether the profile has multiple variants. Profiles with multiple variants can only use vpGetInstanceProfileSupport and vpGetPhysicalDeviceProfileSupport capabilities of the library. Other function will return a VK_ERROR_UNKNOWN error
+VPAPI_ATTR VkResult vpHasMultipleVariantsProfile(const VpProfileProperties *pProfile, VkBool32 *pHasMultipleVariants);
 
 // Check whether a profile is supported at the instance level
 VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const VpProfileProperties *pProfile, VkBool32 *pSupported);
@@ -279,14 +275,14 @@ VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfilePropert
                                                           VkExtensionProperties *pProperties);
 
 // Fill the feature structures with the requirements of a profile
-VPAPI_ATTR void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext);
+VPAPI_ATTR VkResult vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext);
 
 // Query the list of feature structure types specified by the profile
 VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
                                                       VkStructureType *pStructureTypes);
 
 // Fill the property structures with the requirements of a profile
-VPAPI_ATTR void vpGetProfileProperties(const VpProfileProperties *pProfile, void *pNext);
+VPAPI_ATTR VkResult vpGetProfileProperties(const VpProfileProperties *pProfile, void *pNext);
 
 // Query the list of property structure types specified by the profile
 VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
@@ -304,7 +300,7 @@ VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(const VpProfilePropert
 VPAPI_ATTR VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats);
 
 // Query the requirements of a format for a profile
-VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
+VPAPI_ATTR VkResult vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext);
 
 // Query the list of format structure types specified by the profile
 VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
@@ -333,13 +329,11 @@ using PFN_vpStructChainer = void(*)(VkBaseOutStructure* p, void* pUser, PFN_vpSt
 struct VpFeatureDesc {
     PFN_vpStructFiller              pfnFiller;
     PFN_vpStructComparator          pfnComparator;
-    PFN_vpStructChainer             pfnChainer;
 };
 
 struct VpPropertyDesc {
     PFN_vpStructFiller              pfnFiller;
     PFN_vpStructComparator          pfnComparator;
-    PFN_vpStructChainer             pfnChainer;
 };
 
 struct VpQueueFamilyDesc {
@@ -360,38 +354,53 @@ struct VpStructChainerDesc {
     PFN_vpStructChainer             pfnFormat;
 };
 
+struct VpVariantDesc {
+    uint32_t instanceExtensionCount;
+    const VkExtensionProperties* pInstanceExtensions;
+
+    uint32_t deviceExtensionCount;
+    const VkExtensionProperties* pDeviceExtensions;
+
+    uint32_t featureStructTypeCount;
+    const VkStructureType* pFeatureStructTypes;
+    VpFeatureDesc feature;
+
+    uint32_t propertyStructTypeCount;
+    const VkStructureType* pPropertyStructTypes;
+    VpPropertyDesc property;
+
+    uint32_t queueFamilyStructTypeCount;
+    const VkStructureType* pQueueFamilyStructTypes;
+    uint32_t queueFamilyCount;
+    const VpQueueFamilyDesc* pQueueFamilies;
+
+    uint32_t formatStructTypeCount;
+    const VkStructureType* pFormatStructTypes;
+    uint32_t formatCount;
+    const VpFormatDesc* pFormats;
+
+    VpStructChainerDesc chainers;
+};
+
+struct VpCapabilitiesDesc {
+    uint32_t variantCount;
+    const VpVariantDesc* pVariants;
+};
+
 struct VpProfileDesc {
     VpProfileProperties             props;
     uint32_t                        minApiVersion;
 
-    const VkExtensionProperties*    pInstanceExtensions;
-    uint32_t                        instanceExtensionCount;
+    const detail::VpVariantDesc*    pMergedCapabilities;
+    
+    uint32_t                        requiredProfileCount;
+    const VpProfileProperties*      pRequiredProfiles;
 
-    const VkExtensionProperties*    pDeviceExtensions;
-    uint32_t                        deviceExtensionCount;
+    uint32_t                        requiredCapabilityCount;
+    const VpCapabilitiesDesc*       pRequiredCapabilities;
 
-    const VpProfileProperties*      pFallbacks;
     uint32_t                        fallbackCount;
-
-    const VkStructureType*          pFeatureStructTypes;
-    uint32_t                        featureStructTypeCount;
-    VpFeatureDesc                   feature;
-
-    const VkStructureType*          pPropertyStructTypes;
-    uint32_t                        propertyStructTypeCount;
-    VpPropertyDesc                  property;
-
-    const VkStructureType*          pQueueFamilyStructTypes;
-    uint32_t                        queueFamilyStructTypeCount;
-    const VpQueueFamilyDesc*        pQueueFamilies;
-    uint32_t                        queueFamilyCount;
-
-    const VkStructureType*          pFormatStructTypes;
-    uint32_t                        formatStructTypeCount;
-    const VpFormatDesc*             pFormats;
-    uint32_t                        formatCount;
-
-    VpStructChainerDesc             chainers;
+    const VpProfileProperties*      pFallbacks;
 };
 
 template <typename T>
@@ -402,10 +411,24 @@ VPAPI_ATTR bool vpCheckFlags(const T& actual, const uint64_t expected) {
 
 PRIVATE_IMPL_BODY = '''
 VPAPI_ATTR const VpProfileDesc* vpGetProfileDesc(const char profileName[VP_MAX_PROFILE_NAME_SIZE]) {
-    for (uint32_t i = 0; i < vpProfileCount; ++i) {
-        if (strncmp(vpProfiles[i].props.profileName, profileName, VP_MAX_PROFILE_NAME_SIZE) == 0) return &vpProfiles[i];
+    for (uint32_t i = 0; i < profileCount; ++i) {
+        if (strncmp(profiles[i].props.profileName, profileName, VP_MAX_PROFILE_NAME_SIZE) == 0) return &profiles[i];
     }
     return nullptr;
+}
+
+VPAPI_ATTR std::vector<VpProfileProperties> GatherProfiles(const VpProfileProperties& profile) {
+    std::vector<VpProfileProperties> profiles;
+
+    const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(profile.profileName);
+
+    for (uint32_t profile_index = 0; profile_index < profile_desc->requiredProfileCount; ++profile_index) {
+        profiles.push_back(profile_desc->pRequiredProfiles[profile_index]);
+    }
+
+    profiles.push_back(profile);
+
+    return profiles;
 }
 
 VPAPI_ATTR bool vpCheckVersion(uint32_t actual, uint32_t expected) {
@@ -470,6 +493,81 @@ VPAPI_ATTR void* vpGetStructure(void* pNext, VkStructureType type) {
     }
     return nullptr;
 }
+
+VPAPI_ATTR VkResult vpGetInstanceProfileSupportSingleProfile(
+    uint32_t api_version,
+    const std::vector<VkExtensionProperties>& supported_extensions,
+    const VpProfileProperties* pProfile, VkBool32* pSupported) {
+    assert(pProfile != nullptr);
+
+#ifndef VP_DEBUG_MESSAGE_CALLBACK
+#define VP_ENABLE_EARLY_EXIT
+#endif //VP_DEBUG_MESSAGE_CALLBACK
+
+#ifdef VP_ENABLE_EARLY_EXIT
+    const bool early_exit = true;
+#else //VP_ENABLE_EARLY_EXIT
+    const bool early_exit = false;
+#endif //VP_ENABLE_EARLY_EXIT
+
+    const detail::VpProfileDesc* pProfileDesc = detail::vpGetProfileDesc(pProfile->profileName);
+    if (pProfileDesc == nullptr) {
+        *pSupported = VK_FALSE;
+        return VK_ERROR_UNKNOWN;
+    }
+
+    if (pProfileDesc->props.specVersion < pProfile->specVersion) {
+        VP_DEBUG_MSGF("Unsupported profile version: %u", pProfile->specVersion);
+        *pSupported = VK_FALSE;
+
+        if (early_exit) {
+            return VK_SUCCESS;
+        }
+    }
+
+    if (!detail::vpCheckVersion(api_version, pProfileDesc->minApiVersion)) {
+        VP_DEBUG_MSGF("Unsupported API version: %u.%u.%u", VK_API_VERSION_MAJOR(pProfileDesc->minApiVersion), VK_API_VERSION_MINOR(pProfileDesc->minApiVersion), VK_API_VERSION_PATCH(pProfileDesc->minApiVersion));
+        *pSupported = VK_FALSE;
+
+        if (early_exit) {
+            return VK_SUCCESS;
+        }
+    }
+
+    for (uint32_t capability_index = 0; capability_index < pProfileDesc->requiredCapabilityCount; ++capability_index) {
+        const VpCapabilitiesDesc& capabilities_desc = pProfileDesc->pRequiredCapabilities[capability_index];
+
+        VkBool32 supported_capabilities = VK_FALSE;
+        for (uint32_t variant_index = 0; variant_index < capabilities_desc.variantCount; ++variant_index) {
+            const VpVariantDesc& variant_desc = capabilities_desc.pVariants[variant_index];
+
+            VkBool32 supported_variant = VK_TRUE;
+            for (uint32_t i = 0; i < variant_desc.instanceExtensionCount; ++i) {
+                if (!detail::vpCheckExtension(supported_extensions.data(), supported_extensions.size(),
+                                              variant_desc.pInstanceExtensions[i].extensionName)) {
+                    supported_variant = VK_FALSE;
+                    if (early_exit) {
+                        break;
+                    }
+                }
+            }
+
+            if (supported_variant == VK_TRUE) {
+                supported_capabilities = VK_TRUE;
+                if (early_exit) {
+                    break;
+                }
+            }
+        }
+
+        if (supported_capabilities == VK_FALSE) {
+            *pSupported = VK_FALSE;
+            return VK_SUCCESS;
+        }
+    }
+
+    return VK_SUCCESS;
+}
 '''
 
 PUBLIC_IMPL_BODY = '''
@@ -477,15 +575,36 @@ VPAPI_ATTR VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties 
     VkResult result = VK_SUCCESS;
 
     if (pProperties == nullptr) {
-        *pPropertyCount = detail::vpProfileCount;
+        *pPropertyCount = detail::profileCount;
     } else {
-        if (*pPropertyCount < detail::vpProfileCount) {
+        if (*pPropertyCount < detail::profileCount) {
             result = VK_INCOMPLETE;
         } else {
-            *pPropertyCount = detail::vpProfileCount;
+            *pPropertyCount = detail::profileCount;
         }
         for (uint32_t i = 0; i < *pPropertyCount; ++i) {
-            pProperties[i] = detail::vpProfiles[i].props;
+            pProperties[i] = detail::profiles[i].props;
+        }
+    }
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileRequiredProfiles(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
+    VkResult result = VK_SUCCESS;
+
+    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
+    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+    if (pProperties == nullptr) {
+        *pPropertyCount = pDesc->requiredProfileCount;
+    } else {
+        if (*pPropertyCount < pDesc->requiredProfileCount) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pPropertyCount = pDesc->requiredProfileCount;
+        }
+        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
+            pProperties[i] = pDesc->pRequiredProfiles[i];
         }
     }
     return result;
@@ -512,69 +631,104 @@ VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, u
     return result;
 }
 
+VPAPI_ATTR VkResult vpHasMultipleVariantsProfile(const VpProfileProperties *pProfile, VkBool32 *pHasMultipleVariants) {
+    const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
+
+    for (std::size_t profile_index = 0, profile_count = profiles.size(); profile_index < profile_count; ++profile_index) {
+        const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(profiles[profile_index].profileName);
+        if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+        for (uint32_t capabilities_index = 0, n = pDesc->requiredCapabilityCount; capabilities_index < n; ++capabilities_index) {
+            if (pDesc->pRequiredCapabilities[capabilities_index].variantCount > 1) {
+                *pHasMultipleVariants = VK_TRUE;
+                return VK_SUCCESS;
+            }
+        }
+    }
+
+    *pHasMultipleVariants = VK_FALSE;
+    return VK_SUCCESS;
+}
+
 VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const VpProfileProperties *pProfile, VkBool32 *pSupported) {
     VkResult result = VK_SUCCESS;
 
-    uint32_t apiVersion = VK_MAKE_VERSION(1, 0, 0);
+    uint32_t api_version = VK_MAKE_VERSION(1, 0, 0);
     static PFN_vkEnumerateInstanceVersion pfnEnumerateInstanceVersion =
         (PFN_vkEnumerateInstanceVersion)vkGetInstanceProcAddr(VK_NULL_HANDLE, "vkEnumerateInstanceVersion");
     if (pfnEnumerateInstanceVersion != nullptr) {
-        result = pfnEnumerateInstanceVersion(&apiVersion);
+        result = pfnEnumerateInstanceVersion(&api_version);
         if (result != VK_SUCCESS) {
             return result;
         }
     }
 
-    uint32_t extCount = 0;
-    result = vkEnumerateInstanceExtensionProperties(pLayerName, &extCount, nullptr);
+    uint32_t supported_instance_extension_count = 0;
+    result = vkEnumerateInstanceExtensionProperties(pLayerName, &supported_instance_extension_count, nullptr);
     if (result != VK_SUCCESS) {
         return result;
     }
-    std::vector<VkExtensionProperties> ext(extCount);
-    result = vkEnumerateInstanceExtensionProperties(pLayerName, &extCount, ext.data());
+    std::vector<VkExtensionProperties> supported_instance_extensions;
+    if (supported_instance_extension_count > 0) {
+        supported_instance_extensions.resize(supported_instance_extension_count);
+    }
+    result = vkEnumerateInstanceExtensionProperties(pLayerName, &supported_instance_extension_count, supported_instance_extensions.data());
     if (result != VK_SUCCESS) {
         return result;
     }
 
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
-    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+#ifndef VP_DEBUG_MESSAGE_CALLBACK
+#define VP_ENABLE_EARLY_EXIT
+#endif //VP_DEBUG_MESSAGE_CALLBACK
 
-    *pSupported = VK_TRUE;
-
-    if (pDesc->props.specVersion < pProfile->specVersion) {
-        VP_DEBUG_MSGF("Unsupported profile version: %u", pProfile->specVersion);
-        *pSupported = VK_FALSE;
-    }
-
-    if (!detail::vpCheckVersion(apiVersion, pDesc->minApiVersion)) {
-        VP_DEBUG_MSGF("Unsupported API version: %u.%u.%u", VK_API_VERSION_MAJOR(pDesc->minApiVersion), VK_API_VERSION_MINOR(pDesc->minApiVersion), VK_API_VERSION_PATCH(pDesc->minApiVersion));
-        *pSupported = VK_FALSE;
-    }
-
-    for (uint32_t i = 0; i < pDesc->instanceExtensionCount; ++i) {
-        if (!detail::vpCheckExtension(ext.data(), ext.size(),
-            pDesc->pInstanceExtensions[i].extensionName)) {
-            *pSupported = VK_FALSE;
-        }
-    }
-
+#ifdef VP_ENABLE_EARLY_EXIT
+    const bool early_exit = true;
+#else //VP_ENABLE_EARLY_EXIT
+    const bool early_exit = false;
+#endif //VP_ENABLE_EARLY_EXIT
+    
+    VkBool32 supported = VK_TRUE;
+    
     // We require VK_KHR_get_physical_device_properties2 if we are on Vulkan 1.0
-    if (apiVersion < VK_API_VERSION_1_1) {
+    if (api_version < VK_API_VERSION_1_1) {
         bool foundGPDP2 = false;
-        for (size_t i = 0; i < ext.size(); ++i) {
-            if (strcmp(ext[i].extensionName, VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME) == 0) {
+        for (size_t i = 0; i < supported_instance_extensions.size(); ++i) {
+            if (strcmp(supported_instance_extensions[i].extensionName, VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME) == 0) {
                 foundGPDP2 = true;
                 break;
             }
         }
         if (!foundGPDP2) {
             VP_DEBUG_MSG("Unsupported mandatory extension VK_KHR_get_physical_device_properties2 on Vulkan 1.0");
-            *pSupported = VK_FALSE;
+            supported = VK_FALSE;
+            if (early_exit) {
+                *pSupported = supported;
+                return result;
+            }
         }
     }
 
+    const detail::VpProfileDesc* pProfileDesc = detail::vpGetProfileDesc(pProfile->profileName);
+    if (pProfileDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+    result = detail::vpGetInstanceProfileSupportSingleProfile(api_version, supported_instance_extensions, pProfile, &supported);
+    if (result != VK_SUCCESS || (supported == VK_FALSE && early_exit)) {
+        *pSupported = supported;
+        return result;
+    }
+ 
+    for (std::size_t i = 0; i < pProfileDesc->requiredProfileCount; ++i) {
+        result = detail::vpGetInstanceProfileSupportSingleProfile(api_version, supported_instance_extensions, &pProfileDesc->pRequiredProfiles[i], &supported);
+        if (result != VK_SUCCESS || (supported == VK_FALSE && early_exit)) {
+            *pSupported = supported;
+            return result;
+        }
+    }
+
+    *pSupported = supported;
     return result;
 }
+
 
 VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
                                      const VkAllocationCallbacks *pAllocator, VkInstance *pInstance) {
@@ -587,59 +741,80 @@ VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
         createInfo = *pCreateInfo->pCreateInfo;
         pInstanceCreateInfo = &createInfo;
 
-        const detail::VpProfileDesc* pDesc = nullptr;
+        const detail::VpProfileDesc* profile_desc = nullptr;
         if (pCreateInfo->pProfile != nullptr) {
-            pDesc = detail::vpGetProfileDesc(pCreateInfo->pProfile->profileName);
-            if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+            // Unknown profile
+            profile_desc = detail::vpGetProfileDesc(pCreateInfo->pProfile->profileName);
+            if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
+
+            // Multiple variants profile, not supported
+            VkBool32 multiple_variants = VK_FALSE;
+            VkResult result = vpHasMultipleVariantsProfile(pCreateInfo->pProfile, &multiple_variants);
+            if (result != VK_SUCCESS || multiple_variants == VK_TRUE) return VK_ERROR_UNKNOWN;
         }
 
         if (createInfo.pApplicationInfo == nullptr) {
-            appInfo.apiVersion = pDesc->minApiVersion;
+            appInfo.apiVersion = profile_desc->minApiVersion;
             createInfo.pApplicationInfo = &appInfo;
         }
 
-        if (pDesc != nullptr && pDesc->pInstanceExtensions != nullptr) {
-            bool merge = (pCreateInfo->flags & VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT) != 0;
-            bool override = (pCreateInfo->flags & VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0;
+        const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pCreateInfo->pProfile);
 
-            if (!merge && !override && pCreateInfo->pCreateInfo->enabledExtensionCount > 0) {
-                // If neither merge nor override is used then the application must not specify its
-                // own extensions
-                return VK_ERROR_UNKNOWN;
-            }
+        for (std::size_t profile_index = 0, profile_count = profiles.size(); profile_index < profile_count; ++profile_index) {
+            const char* profile_name = profiles[profile_index].profileName;
+            const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(profile_name);
 
-            detail::vpGetExtensions(pCreateInfo->pCreateInfo->enabledExtensionCount,
-                                    pCreateInfo->pCreateInfo->ppEnabledExtensionNames,
-                                    pDesc->instanceExtensionCount,
-                                    pDesc->pInstanceExtensions,
-                                    extensions, merge, override);
-            {
-                bool foundPortEnum = false;
-                for (size_t i = 0; i < extensions.size(); ++i) {
-                    if (strcmp(extensions[i], VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME) == 0) {
-                        foundPortEnum = true;
-                        break;
+            for (std::size_t caps_index = 0, caps_count = profiles.size(); caps_index < caps_count; ++caps_index) {
+                const detail::VpCapabilitiesDesc* caps_desc = &profile_desc->pRequiredCapabilities[caps_index];
+
+                assert(caps_desc->variantCount == 1);
+                const detail::VpVariantDesc* variant = caps_desc->pVariants;
+
+                if (variant != nullptr && variant->pInstanceExtensions != nullptr) {
+                    bool merge = (pCreateInfo->flags & VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT) != 0;
+                    bool override = (pCreateInfo->flags & VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0;
+
+                    if (!merge && !override && pCreateInfo->pCreateInfo->enabledExtensionCount > 0) {
+                        // If neither merge nor override is used then the application must not specify its
+                        // own extensions
+                        return VK_ERROR_UNKNOWN;
+                    }
+
+                    detail::vpGetExtensions(pCreateInfo->pCreateInfo->enabledExtensionCount,
+                                            pCreateInfo->pCreateInfo->ppEnabledExtensionNames, variant->instanceExtensionCount,
+                                            variant->pInstanceExtensions, extensions, merge, override);
+
+                    {
+                        bool foundPortEnum = false;
+                        for (size_t i = 0; i < extensions.size(); ++i) {
+                            if (strcmp(extensions[i], VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME) == 0) {
+                                foundPortEnum = true;
+                                break;
+                            }
+                        }
+                        if (foundPortEnum) {
+                            createInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+                        }
+                    }
+
+                    // Need to include VK_KHR_get_physical_device_properties2 if we are on Vulkan 1.0
+                    if (createInfo.pApplicationInfo->apiVersion < VK_API_VERSION_1_1) {
+                        bool foundGPDP2 = false;
+                        for (size_t i = 0; i < extensions.size(); ++i) {
+                            if (strcmp(extensions[i], VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME) == 0) {
+                                foundGPDP2 = true;
+                                break;
+                            }
+                        }
+                        if (!foundGPDP2) {
+                            extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+                        }
                     }
                 }
-                if (foundPortEnum) {
-                    createInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
-                }
             }
+        }
 
-            // Need to include VK_KHR_get_physical_device_properties2 if we are on Vulkan 1.0
-            if (createInfo.pApplicationInfo->apiVersion < VK_API_VERSION_1_1) {
-                bool foundGPDP2 = false;
-                for (size_t i = 0; i < extensions.size(); ++i) {
-                    if (strcmp(extensions[i], VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME) == 0) {
-                        foundGPDP2 = true;
-                        break;
-                    }
-                }
-                if (!foundGPDP2) {
-                    extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
-                }
-            }
-
+        if (!extensions.empty()) {
             createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
             createInfo.ppEnabledExtensionNames = extensions.data();
         }
@@ -652,27 +827,27 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
                                                       const VpProfileProperties *pProfile, VkBool32 *pSupported) {
     VkResult result = VK_SUCCESS;
 
-    uint32_t extCount = 0;
-    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, nullptr);
+    uint32_t supported_device_extension_count = 0;
+    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &supported_device_extension_count, nullptr);
     if (result != VK_SUCCESS) {
         return result;
     }
-    std::vector<VkExtensionProperties> ext;
-    if (extCount > 0) {
-        ext.resize(extCount);
+    std::vector<VkExtensionProperties> supported_device_extensions;
+    if (supported_device_extension_count > 0) {
+        supported_device_extensions.resize(supported_device_extension_count);
     }
-    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, ext.data());
+    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &supported_device_extension_count, supported_device_extensions.data());
     if (result != VK_SUCCESS) {
         return result;
     }
 
     // Workaround old loader bug where count could be smaller on the second call to vkEnumerateDeviceExtensionProperties
-    if (extCount > 0) {
-        ext.resize(extCount);
+    if (supported_device_extension_count > 0) {
+        supported_device_extensions.resize(supported_device_extension_count);
     }
 
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
-    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+    const detail::VpProfileDesc* pProfileDesc = detail::vpGetProfileDesc(pProfile->profileName);
+    if (pProfileDesc == nullptr) return VK_ERROR_UNKNOWN;
 
     struct GPDP2EntryPoints {
         PFN_vkGetPhysicalDeviceFeatures2KHR                 pfnGetPhysicalDeviceFeatures2;
@@ -682,14 +857,14 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
     };
 
     struct UserData {
-        VkPhysicalDevice                    physicalDevice;
-        const detail::VpProfileDesc*        pDesc;
-        GPDP2EntryPoints                    gpdp2;
-        uint32_t                            index;
-        uint32_t                            count;
-        detail::PFN_vpStructChainerCb       pfnCb;
-        bool                                supported;
-    } userData{ physicalDevice, pDesc };
+        VkPhysicalDevice physicalDevice;
+        const detail::VpVariantDesc* variant;
+        GPDP2EntryPoints gpdp2;
+        uint32_t index;
+        uint32_t count;
+        detail::PFN_vpStructChainerCb pfnCb;
+        bool supported;
+    } userData{physicalDevice};
 
     // Attempt to load core versions of the GPDP2 entry points
     userData.gpdp2.pfnGetPhysicalDeviceFeatures2 =
@@ -720,184 +895,246 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhy
         return VK_ERROR_EXTENSION_NOT_PRESENT;
     }
 
-    *pSupported = VK_TRUE;
     VP_DEBUG_MSGF("Checking device support for profile %s (%s). You may find the details of the capabilities of this device on https://vulkan.gpuinfo.org/", pProfile->profileName, detail::vpGetDeviceAndDriverInfoString(physicalDevice, userData.gpdp2.pfnGetPhysicalDeviceProperties2).c_str());
 
-    if (pDesc->props.specVersion < pProfile->specVersion) {
-        VP_DEBUG_MSGF("Unsupported profile version: %u", pProfile->specVersion);
-        *pSupported = VK_FALSE;
-    }
+#ifndef VP_DEBUG_MESSAGE_CALLBACK
+#define VP_ENABLE_EARLY_EXIT
+#endif //VP_DEBUG_MESSAGE_CALLBACK
 
-    {
-        VkPhysicalDeviceProperties props{};
-        vkGetPhysicalDeviceProperties(physicalDevice, &props);
-        if (!detail::vpCheckVersion(props.apiVersion, pDesc->minApiVersion)) {
-            VP_DEBUG_MSGF("Unsupported API version: %u.%u.%u", VK_API_VERSION_MAJOR(pDesc->minApiVersion), VK_API_VERSION_MINOR(pDesc->minApiVersion), VK_API_VERSION_PATCH(pDesc->minApiVersion));
+#ifdef VP_ENABLE_EARLY_EXIT
+    const bool early_exit = true;
+#else //VP_ENABLE_EARLY_EXIT
+    const bool early_exit = false;
+#endif //VP_ENABLE_EARLY_EXIT
+
+    VkBool32 supported = VK_TRUE;
+
+    const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
+
+    for (std::size_t i = 0, n = profiles.size(); i < n; ++i) {
+        const char* profile_name = profiles[i].profileName;
+
+        const detail::VpProfileDesc* pProfileDesc = detail::vpGetProfileDesc(profile_name);
+        if (pProfileDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+        if (pProfileDesc->props.specVersion < pProfile->specVersion) {
             *pSupported = VK_FALSE;
+            return VK_SUCCESS;
         }
-    }
 
-    for (uint32_t i = 0; i < pDesc->deviceExtensionCount; ++i) {
-        if (!detail::vpCheckExtension(ext.data(), ext.size(),
-            pDesc->pDeviceExtensions[i].extensionName)) {
-            *pSupported = VK_FALSE;
-        }
-    }
-
-    {
-        VkPhysicalDeviceFeatures2KHR features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR };
-        pDesc->chainers.pfnFeature(static_cast<VkBaseOutStructure*>(static_cast<void*>(&features)), &userData,
-            [](VkBaseOutStructure* p, void* pUser) {
-                UserData* pUserData = static_cast<UserData*>(pUser);
-                pUserData->gpdp2.pfnGetPhysicalDeviceFeatures2(pUserData->physicalDevice,
-                                                               static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p)));
-                pUserData->supported = true;
-                while (p != nullptr) {
-                    if (!pUserData->pDesc->feature.pfnComparator(p)) {
-                        pUserData->supported = false;
-                    }
-                    p = p->pNext;
-                }
-            }
-        );
-        if (!userData.supported) {
-            *pSupported = VK_FALSE;
-        }
-    }
-
-    {
-        VkPhysicalDeviceProperties2KHR props{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR };
-        pDesc->chainers.pfnProperty(static_cast<VkBaseOutStructure*>(static_cast<void*>(&props)), &userData,
-            [](VkBaseOutStructure* p, void* pUser) {
-                UserData* pUserData = static_cast<UserData*>(pUser);
-                pUserData->gpdp2.pfnGetPhysicalDeviceProperties2(pUserData->physicalDevice,
-                                                                 static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p)));
-                pUserData->supported = true;
-                while (p != nullptr) {
-                    if (!pUserData->pDesc->property.pfnComparator(p)) {
-                        pUserData->supported = false;
-                    }
-                    p = p->pNext;
-                }
-            }
-        );
-        if (!userData.supported) {
-            *pSupported = VK_FALSE;
-        }
-    }
-
-    for (uint32_t i = 0; i < pDesc->formatCount; ++i) {
-        userData.index = i;
-        VkFormatProperties2KHR props{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-        pDesc->chainers.pfnFormat(static_cast<VkBaseOutStructure*>(static_cast<void*>(&props)), &userData,
-            [](VkBaseOutStructure* p, void* pUser) {
-                UserData* pUserData = static_cast<UserData*>(pUser);
-                pUserData->gpdp2.pfnGetPhysicalDeviceFormatProperties2(pUserData->physicalDevice,
-                                                                       pUserData->pDesc->pFormats[pUserData->index].format,
-                                                                       static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p)));
-                pUserData->supported = true;
-                while (p != nullptr) {
-                    if (!pUserData->pDesc->pFormats[pUserData->index].pfnComparator(p)) {
-                        pUserData->supported = false;
-                    }
-                    p = p->pNext;
-                }
-            }
-        );
-        if (!userData.supported) {
-            *pSupported = VK_FALSE;
-        }
-    }
-
-    {
-        userData.gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2(physicalDevice, &userData.count, nullptr);
-        std::vector<VkQueueFamilyProperties2KHR> props(userData.count, { VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR });
-        userData.index = 0;
-
-        detail::PFN_vpStructChainerCb callback = [](VkBaseOutStructure* p, void* pUser) {
-            UserData* pUserData = static_cast<UserData*>(pUser);
-            VkQueueFamilyProperties2KHR* pProps = static_cast<VkQueueFamilyProperties2KHR*>(static_cast<void*>(p));
-            if (++pUserData->index < pUserData->count) {
-                pUserData->pDesc->chainers.pfnQueueFamily(static_cast<VkBaseOutStructure*>(static_cast<void*>(++pProps)),
-                                                          pUser, pUserData->pfnCb);
-            } else {
-                pProps -= pUserData->count - 1;
-                pUserData->gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2(pUserData->physicalDevice,
-                                                                            &pUserData->count,
-                                                                            pProps);
-                pUserData->supported = true;
-
-                // Check first that each queue family defined is supported by the device
-                for (uint32_t i = 0; i < pUserData->pDesc->queueFamilyCount; ++i) {
-                    bool found = false;
-                    for (uint32_t j = 0; j < pUserData->count; ++j) {
-                        bool propsMatch = true;
-                        p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pProps[j]));
-                        while (p != nullptr) {
-                            if (!pUserData->pDesc->pQueueFamilies[i].pfnComparator(p)) {
-                                propsMatch = false;
-                                break;
-                            }
-                            p = p->pNext;
-                        }
-                        if (propsMatch) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        VP_DEBUG_MSGF("Unsupported queue family defined at profile data index #%u", i);
-                        pUserData->supported = false;
-                        return;
-                    }
-                }
-
-                // Then check each permutation to ensure that while order of the queue families
-                // doesn't matter, each queue family property criteria is matched with a separate
-                // queue family of the actual device
-                std::vector<uint32_t> permutation(pUserData->count);
-                for (uint32_t i = 0; i < pUserData->count; ++i) {
-                    permutation[i] = i;
-                }
-                bool found = false;
-                do {
-                    bool propsMatch = true;
-                    for (uint32_t i = 0; i < pUserData->pDesc->queueFamilyCount && propsMatch; ++i) {
-                        p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pProps[permutation[i]]));
-                        while (p != nullptr) {
-                            if (!pUserData->pDesc->pQueueFamilies[i].pfnComparator(p)) {
-                                propsMatch = false;
-                                break;
-                            }
-                            p = p->pNext;
-                        }
-                    }
-                    if (propsMatch) {
-                        found = true;
-                        break;
-                    }
-                } while (std::next_permutation(permutation.begin(), permutation.end()));
-
-                if (!found) {
-                    VP_DEBUG_MSG("Unsupported combination of queue families");
-                    pUserData->supported = false;
-                }
-            }
-        };
-        userData.pfnCb = callback;
-
-        if (userData.count >= userData.pDesc->queueFamilyCount) {
-            pDesc->chainers.pfnQueueFamily(static_cast<VkBaseOutStructure*>(static_cast<void*>(props.data())), &userData, callback);
-            if (!userData.supported) {
+        {
+            VkPhysicalDeviceProperties props{};
+            vkGetPhysicalDeviceProperties(physicalDevice, &props);
+            if (!detail::vpCheckVersion(props.apiVersion, pProfileDesc->minApiVersion)) {
+                VP_DEBUG_MSGF("Unsupported API version: %u.%u.%u", VK_API_VERSION_MAJOR(pProfileDesc->minApiVersion), VK_API_VERSION_MINOR(pProfileDesc->minApiVersion), VK_API_VERSION_PATCH(pProfileDesc->minApiVersion));
                 *pSupported = VK_FALSE;
+                return VK_SUCCESS;
             }
-        } else {
-            VP_DEBUG_MSGF("Unsupported number of queue families: device has fewer (%u) than what the profile defines (%u)", userData.count, userData.pDesc->queueFamilyCount);
-            *pSupported = VK_FALSE;
+        }
+
+        for (uint32_t required_capability_index = 0; required_capability_index < pProfileDesc->requiredCapabilityCount; ++required_capability_index) {
+            const detail::VpCapabilitiesDesc* required_capabilities = &pProfileDesc->pRequiredCapabilities[required_capability_index];
+
+            for (uint32_t required_variant_index = 0; required_variant_index < required_capabilities->variantCount; ++required_variant_index) {
+                const detail::VpVariantDesc* variant = &required_capabilities->pVariants[required_variant_index];
+
+                for (uint32_t i = 0; i < variant->deviceExtensionCount; ++i) {
+                    const char *requested_extension = variant->pDeviceExtensions[i].extensionName;
+                    if (!detail::vpCheckExtension(supported_device_extensions.data(), supported_device_extensions.size(), requested_extension)) {
+                        *pSupported = VK_FALSE;
+                        return VK_SUCCESS;
+                    }
+                }
+            }
+        }
+
+        for (uint32_t required_capability_index = 0; required_capability_index < pProfileDesc->requiredCapabilityCount; ++required_capability_index) {
+            const detail::VpCapabilitiesDesc* required_capabilities = &pProfileDesc->pRequiredCapabilities[required_capability_index];
+
+            for (uint32_t required_variant_index = 0; required_variant_index < required_capabilities->variantCount; ++required_variant_index) {
+                userData.variant = &required_capabilities->pVariants[required_variant_index];
+
+                VkPhysicalDeviceFeatures2KHR features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR };
+                userData.variant->chainers.pfnFeature(
+                    static_cast<VkBaseOutStructure*>(static_cast<void*>(&features)), &userData,
+                    [](VkBaseOutStructure* p, void* pUser) {
+                        UserData* pUserData = static_cast<UserData*>(pUser);
+                        pUserData->gpdp2.pfnGetPhysicalDeviceFeatures2(pUserData->physicalDevice,
+                                                                        static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p)));
+                        pUserData->supported = true;
+                        while (p != nullptr) {
+                            if (!pUserData->variant->feature.pfnComparator(p)) {
+                                pUserData->supported = false;
+                            }
+                            p = p->pNext;
+                        }
+                    }
+                );
+
+                if (!userData.supported) {
+                    *pSupported = VK_FALSE;
+                    return VK_SUCCESS;
+                }
+            }
+        }
+
+        for (uint32_t required_capability_index = 0; required_capability_index < pProfileDesc->requiredCapabilityCount; ++required_capability_index) {
+            const detail::VpCapabilitiesDesc* required_capabilities = &pProfileDesc->pRequiredCapabilities[required_capability_index];
+
+            for (uint32_t required_variant_index = 0; required_variant_index < required_capabilities->variantCount; ++required_variant_index) {
+                userData.variant = &required_capabilities->pVariants[required_variant_index];
+        
+                VkPhysicalDeviceProperties2KHR props{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR };
+                userData.variant->chainers.pfnProperty(
+                    static_cast<VkBaseOutStructure*>(static_cast<void*>(&props)), &userData,
+                    [](VkBaseOutStructure* p, void* pUser) {
+                        UserData* pUserData = static_cast<UserData*>(pUser);
+                        pUserData->gpdp2.pfnGetPhysicalDeviceProperties2(pUserData->physicalDevice,
+                                                                         static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p)));
+                        pUserData->supported = true;
+                        while (p != nullptr) {
+                            if (!pUserData->variant->property.pfnComparator(p)) {
+                                pUserData->supported = false;
+                            }
+                            p = p->pNext;
+                        }
+                    }
+                );
+                if (!userData.supported) {
+                    *pSupported = VK_FALSE;
+                    return VK_SUCCESS;
+                }
+            }
+        }
+
+        for (uint32_t required_capability_index = 0; required_capability_index < pProfileDesc->requiredCapabilityCount; ++required_capability_index) {
+            const detail::VpCapabilitiesDesc* required_capabilities = &pProfileDesc->pRequiredCapabilities[required_capability_index];
+
+            for (uint32_t required_variant_index = 0; required_variant_index < required_capabilities->variantCount; ++required_variant_index) {
+                userData.variant = &required_capabilities->pVariants[required_variant_index];
+        
+                for (uint32_t i = 0; i < userData.variant->formatCount; ++i) {
+                    userData.index = i;
+                    VkFormatProperties2KHR props{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
+                    userData.variant->chainers.pfnFormat(
+                        static_cast<VkBaseOutStructure*>(static_cast<void*>(&props)), &userData,
+                        [](VkBaseOutStructure* p, void* pUser) {
+                            UserData* pUserData = static_cast<UserData*>(pUser);
+                            pUserData->gpdp2.pfnGetPhysicalDeviceFormatProperties2(pUserData->physicalDevice, pUserData->variant->pFormats[pUserData->index].format,
+                                                                                   static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p)));
+                            pUserData->supported = true;
+                            while (p != nullptr) {
+                                if (!pUserData->variant->pFormats[pUserData->index].pfnComparator(p)) {
+                                    pUserData->supported = false;
+                                }
+                                p = p->pNext;
+                            }
+                        }
+                    );
+                    if (!userData.supported) {
+                        *pSupported = VK_FALSE;
+                        return VK_SUCCESS;
+                    }
+                }
+            }
+        }
+
+        for (uint32_t required_capability_index = 0; required_capability_index < pProfileDesc->requiredCapabilityCount; ++required_capability_index) {
+            const detail::VpCapabilitiesDesc* required_capabilities = &pProfileDesc->pRequiredCapabilities[required_capability_index];
+
+            for (uint32_t required_variant_index = 0; required_variant_index < required_capabilities->variantCount; ++required_variant_index) {
+                userData.variant = &required_capabilities->pVariants[required_variant_index];
+            
+                userData.gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2(physicalDevice, &userData.count, nullptr);
+                std::vector<VkQueueFamilyProperties2KHR> props(userData.count, { VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR });
+                userData.index = 0;
+
+                detail::PFN_vpStructChainerCb callback = [](VkBaseOutStructure* p, void* pUser) {
+                    UserData* pUserData = static_cast<UserData*>(pUser);
+                    VkQueueFamilyProperties2KHR* pProps = static_cast<VkQueueFamilyProperties2KHR*>(static_cast<void*>(p));
+                    if (++pUserData->index < pUserData->count) {
+                        pUserData->variant->chainers.pfnQueueFamily(static_cast<VkBaseOutStructure*>(static_cast<void*>(++pProps)),
+                                                                    pUser, pUserData->pfnCb);
+                    } else {
+                        pProps -= pUserData->count - 1;
+                        pUserData->gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2(pUserData->physicalDevice,
+                                                                                    &pUserData->count, pProps);
+                        pUserData->supported = true;
+
+                        // Check first that each queue family defined is supported by the device
+                        for (uint32_t i = 0; i < pUserData->variant->queueFamilyCount; ++i) {
+                            bool found = false;
+                            for (uint32_t j = 0; j < pUserData->count; ++j) {
+                                bool propsMatch = true;
+                                p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pProps[j]));
+                                while (p != nullptr) {
+                                    if (!pUserData->variant->pQueueFamilies[i].pfnComparator(p)) {
+                                        propsMatch = false;
+                                        break;
+                                    }
+                                    p = p->pNext;
+                                }
+                                if (propsMatch) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found) {
+                                pUserData->supported = false;
+                                return;
+                            }
+                        }
+
+                        // Then check each permutation to ensure that while order of the queue families
+                        // doesn't matter, each queue family property criteria is matched with a separate
+                        // queue family of the actual device
+                        std::vector<uint32_t> permutation(pUserData->count);
+                        for (uint32_t i = 0; i < pUserData->count; ++i) {
+                            permutation[i] = i;
+                        }
+                        bool found = false;
+                        do {
+                            bool propsMatch = true;
+                            for (uint32_t i = 0; i < pUserData->variant->queueFamilyCount && propsMatch; ++i) {
+                                p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pProps[permutation[i]]));
+                                while (p != nullptr) {
+                                    if (!pUserData->variant->pQueueFamilies[i].pfnComparator(p)) {
+                                        propsMatch = false;
+                                        break;
+                                    }
+                                    p = p->pNext;
+                                }
+                            }
+                            if (propsMatch) {
+                                found = true;
+                                break;
+                            }
+                        } while (std::next_permutation(permutation.begin(), permutation.end()));
+
+                        if (!found) {
+                            pUserData->supported = false;
+                        }
+                    }
+                };
+                userData.pfnCb = callback;
+
+                if (userData.count >= userData.variant->queueFamilyCount) {
+                    userData.variant->chainers.pfnQueueFamily(static_cast<VkBaseOutStructure*>(static_cast<void*>(props.data())),
+                                                              &userData, callback);
+                    if (!userData.supported) {
+                        *pSupported = VK_FALSE;
+                        return VK_SUCCESS;
+                    }
+                } else {
+                    *pSupported = VK_FALSE;
+                    return VK_SUCCESS;
+                }
+            }
         }
     }
 
-    return result;
+    *pSupported = VK_TRUE;
+    return VK_SUCCESS;
 }
 
 VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
@@ -906,23 +1143,30 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
         return vkCreateDevice(physicalDevice, pCreateInfo == nullptr ? nullptr : pCreateInfo->pCreateInfo, pAllocator, pDevice);
     }
 
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pCreateInfo->pProfile->profileName);
-    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+    const detail::VpProfileDesc* pProfileDesc = detail::vpGetProfileDesc(pCreateInfo->pProfile->profileName);
+    if (pProfileDesc == nullptr) return VK_ERROR_UNKNOWN;
 
+    // Multiple variants profile, not supported
+    VkBool32 multiple_variants = VK_FALSE;
+    VkResult result = vpHasMultipleVariantsProfile(pCreateInfo->pProfile, &multiple_variants);
+    if (result != VK_SUCCESS || multiple_variants == VK_TRUE) return VK_ERROR_UNKNOWN;
+
+    const detail::VpVariantDesc* variant = pProfileDesc->pMergedCapabilities;
+    
     struct UserData {
         VkPhysicalDevice                physicalDevice;
-        const detail::VpProfileDesc*    pDesc;
+        const detail::VpVariantDesc*    variant;
         const VpDeviceCreateInfo*       pCreateInfo;
         const VkAllocationCallbacks*    pAllocator;
         VkDevice*                       pDevice;
         VkResult                        result;
-    } userData{ physicalDevice, pDesc, pCreateInfo, pAllocator, pDevice };
+    } userData{ physicalDevice, variant, pCreateInfo, pAllocator, pDevice };
 
     VkPhysicalDeviceFeatures2KHR features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR };
-    pDesc->chainers.pfnFeature(static_cast<VkBaseOutStructure*>(static_cast<void*>(&features)), &userData,
+    variant->chainers.pfnFeature(static_cast<VkBaseOutStructure*>(static_cast<void*>(&features)), &userData,
         [](VkBaseOutStructure* p, void* pUser) {
             UserData* pUserData = static_cast<UserData*>(pUser);
-            const detail::VpProfileDesc* pDesc = pUserData->pDesc;
+            const detail::VpVariantDesc* variant = pUserData->variant;
             const VpDeviceCreateInfo* pCreateInfo = pUserData->pCreateInfo;
 
             bool merge = (pCreateInfo->flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) != 0;
@@ -938,16 +1182,16 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
             std::vector<const char*> extensions;
             detail::vpGetExtensions(pCreateInfo->pCreateInfo->enabledExtensionCount,
                                     pCreateInfo->pCreateInfo->ppEnabledExtensionNames,
-                                    pDesc->deviceExtensionCount,
-                                    pDesc->pDeviceExtensions,
+                                    variant->deviceExtensionCount,
+                                    variant->pDeviceExtensions,
                                     extensions, merge, override);
 
             VkBaseOutStructure profileStructList;
             profileStructList.pNext = p;
             VkPhysicalDeviceFeatures2KHR* pFeatures = static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p));
-            if (pDesc->feature.pfnFiller != nullptr) {
+            if (variant->feature.pfnFiller != nullptr) {
                 while (p != nullptr) {
-                    pDesc->feature.pfnFiller(p);
+                    variant->feature.pfnFiller(p);
                     p = p->pNext;
                 }
             }
@@ -991,12 +1235,12 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
 
             VkBaseOutStructure* pNext = static_cast<VkBaseOutStructure*>(const_cast<void*>(pCreateInfo->pCreateInfo->pNext));
             if ((pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT) == 0) {
-                for (uint32_t i = 0; i < pDesc->featureStructTypeCount; ++i) {
-                    const void* pRequested = detail::vpGetStructure(pNext, pDesc->pFeatureStructTypes[i]);
+                for (uint32_t i = 0; i < variant->featureStructTypeCount; ++i) {
+                    const void* pRequested = detail::vpGetStructure(pNext, variant->pFeatureStructTypes[i]);
                     if (pRequested == nullptr) {
                         VkBaseOutStructure* pPrevStruct = &profileStructList;
                         VkBaseOutStructure* pCurrStruct = pPrevStruct->pNext;
-                        while (pCurrStruct->sType != pDesc->pFeatureStructTypes[i]) {
+                        while (pCurrStruct->sType != variant->pFeatureStructTypes[i]) {
                             pPrevStruct = pCurrStruct;
                             pCurrStruct = pCurrStruct->pNext;
                         }
@@ -1029,240 +1273,616 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
     return userData.result;
 }
 
-VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                            VkExtensionProperties *pProperties) {
-    VkResult result = VK_SUCCESS;
-
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
-    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
-
-    if (pProperties == nullptr) {
-        *pPropertyCount = pDesc->instanceExtensionCount;
-    } else {
-        if (*pPropertyCount < pDesc->instanceExtensionCount) {
-            result = VK_INCOMPLETE;
-        } else {
-            *pPropertyCount = pDesc->instanceExtensionCount;
-        }
-        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
-            pProperties[i] = pDesc->pInstanceExtensions[i];
-        }
+/*
+VPAPI_ATTR VkResult vpCreateDevice2(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
+                                   const VkAllocationCallbacks *pAllocator, VkDevice *pDevice) {
+    if (physicalDevice == VK_NULL_HANDLE || pCreateInfo == nullptr || pDevice == nullptr) {
+        return vkCreateDevice(physicalDevice, pCreateInfo == nullptr ? nullptr : pCreateInfo->pCreateInfo, pAllocator, pDevice);
     }
-    return result;
-}
 
-VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                          VkExtensionProperties *pProperties) {
-    VkResult result = VK_SUCCESS;
+    const detail::VpProfileDesc* pProfileDesc = detail::vpGetProfileDesc(pCreateInfo->pProfile->profileName);
+    if (pProfileDesc == nullptr) return VK_ERROR_UNKNOWN;
 
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
-    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+    // Multiple variants profile, not supported
+    VkBool32 multiple_variants = VK_FALSE;
+    VkResult result = vpHasMultipleVariantsProfile(pCreateInfo->pProfile, &multiple_variants);
+    if (result != VK_SUCCESS || multiple_variants == VK_TRUE) return VK_ERROR_UNKNOWN;
 
-    if (pProperties == nullptr) {
-        *pPropertyCount = pDesc->deviceExtensionCount;
-    } else {
-        if (*pPropertyCount < pDesc->deviceExtensionCount) {
-            result = VK_INCOMPLETE;
-        } else {
-            *pPropertyCount = pDesc->deviceExtensionCount;
+    VkPhysicalDeviceFeatures2KHR features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR, nullptr };
+    std::vector<const char*> extensions;
+
+    const detail::VpVariantDesc* variant = pProfileDesc->pMergedCapabilities;
+
+    struct UserData {
+        VkPhysicalDevice                physicalDevice;
+        const detail::VpVariantDesc*    variant;
+        const VpDeviceCreateInfo*       pCreateInfo;
+        VkPhysicalDeviceFeatures2KHR&   features;
+        std::vector<const char*>&       extensions;
+        const VkAllocationCallbacks*    pAllocator;
+        VkDevice*                       pDevice;
+        VkResult                        result;
+    } userData{ physicalDevice, variant, pCreateInfo, features, extensions, pAllocator, pDevice };
+
+    variant->chainers.pfnFeature(static_cast<VkBaseOutStructure*>(static_cast<void*>(&features)), &userData, [](VkBaseOutStructure* pStructure, void* pUser) {
+        UserData* pUserData = static_cast<UserData*>(pUser);
+        const detail::VpVariantDesc* variant = pUserData->variant;
+        const VpDeviceCreateInfo* pCreateInfo = pUserData->pCreateInfo;
+
+        bool merge = (pCreateInfo->flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) != 0;
+        bool override = (pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0;
+
+        if (!merge && !override && pCreateInfo->pCreateInfo->enabledExtensionCount > 0) {
+            // If neither merge nor override is used then the application must not specify its
+            // own extensions
+            pUserData->result = VK_ERROR_UNKNOWN;
+            return;
         }
-        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
-            pProperties[i] = pDesc->pDeviceExtensions[i];
-        }
-    }
-    return result;
-}
 
-VPAPI_ATTR void vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext) {
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
-    if (pDesc != nullptr && pDesc->feature.pfnFiller != nullptr) {
-        VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
-        while (p != nullptr) {
-            pDesc->feature.pfnFiller(p);
-            p = p->pNext;
-        }
-    }
-}
+        detail::vpGetExtensions(pCreateInfo->pCreateInfo->enabledExtensionCount,
+                                pCreateInfo->pCreateInfo->ppEnabledExtensionNames,
+                                variant->deviceExtensionCount,
+                                variant->pDeviceExtensions,
+                                pUserData->extensions, merge, override);
 
-VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
-                                                      VkStructureType *pStructureTypes) {
-    VkResult result = VK_SUCCESS;
+        VkBaseOutStructure* p = (VkBaseOutStructure*)&pUserData->features;
 
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
-    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+        VkBaseOutStructure profileStructList;
+        profileStructList.pNext = p;
 
-    if (pStructureTypes == nullptr) {
-        *pStructureTypeCount = pDesc->featureStructTypeCount;
-    } else {
-        if (*pStructureTypeCount < pDesc->featureStructTypeCount) {
-            result = VK_INCOMPLETE;
-        } else {
-            *pStructureTypeCount = pDesc->featureStructTypeCount;
-        }
-        for (uint32_t i = 0; i < *pStructureTypeCount; ++i) {
-            pStructureTypes[i] = pDesc->pFeatureStructTypes[i];
-        }
-    }
-    return result;
-}
+        std::vector<VkStructureType> features_stype;
 
-VPAPI_ATTR void vpGetProfileProperties(const VpProfileProperties *pProfile, void *pNext) {
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
-    if (pDesc != nullptr && pDesc->property.pfnFiller != nullptr) {
-        VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
-        while (p != nullptr) {
-            pDesc->property.pfnFiller(p);
-            p = p->pNext;
-        }
-    }
-}
-
-VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
-                                                       VkStructureType *pStructureTypes) {
-    VkResult result = VK_SUCCESS;
-
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
-    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
-
-    if (pStructureTypes == nullptr) {
-        *pStructureTypeCount = pDesc->propertyStructTypeCount;
-    } else {
-        if (*pStructureTypeCount < pDesc->propertyStructTypeCount) {
-            result = VK_INCOMPLETE;
-        } else {
-            *pStructureTypeCount = pDesc->propertyStructTypeCount;
-        }
-        for (uint32_t i = 0; i < *pStructureTypeCount; ++i) {
-            pStructureTypes[i] = pDesc->pPropertyStructTypes[i];
-        }
-    }
-    return result;
-}
-
-VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                      VkQueueFamilyProperties2KHR *pProperties) {
-    VkResult result = VK_SUCCESS;
-
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
-    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
-
-    if (pProperties == nullptr) {
-        *pPropertyCount = pDesc->queueFamilyCount;
-    } else {
-        if (*pPropertyCount < pDesc->queueFamilyCount) {
-            result = VK_INCOMPLETE;
-        } else {
-            *pPropertyCount = pDesc->queueFamilyCount;
-        }
-        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
-            VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pProperties[i]));
+        if (variant->feature.pfnFiller != nullptr) {
             while (p != nullptr) {
-                pDesc->pQueueFamilies[i].pfnFiller(p);
+                features_stype.push_back(p->sType);
+                variant->feature.pfnFiller(p);
                 p = p->pNext;
             }
         }
+
+        if (pCreateInfo->pCreateInfo->pEnabledFeatures != nullptr) {
+            pUserData->features.features = *pCreateInfo->pCreateInfo->pEnabledFeatures;
+        }
+
+        if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {
+            pUserData->features.features.robustBufferAccess = VK_FALSE;
+        }
+
+#ifdef VK_EXT_robustness2
+        VkPhysicalDeviceRobustness2FeaturesEXT* pRobustness2FeaturesEXT = static_cast<VkPhysicalDeviceRobustness2FeaturesEXT*>(
+            detail::vpGetStructure(&pUserData->features, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT));
+        if (pRobustness2FeaturesEXT != nullptr) {
+            if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {
+                pRobustness2FeaturesEXT->robustBufferAccess2 = VK_FALSE;
+            }
+            if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT) {
+                pRobustness2FeaturesEXT->robustImageAccess2 = VK_FALSE;
+            }
+        }
+#endif//VK_EXT_robustness2
+
+#ifdef VK_EXT_image_robustness
+        VkPhysicalDeviceImageRobustnessFeaturesEXT* pImageRobustnessFeaturesEXT = static_cast<VkPhysicalDeviceImageRobustnessFeaturesEXT*>(
+            detail::vpGetStructure(&pUserData->features, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT));
+        if (pImageRobustnessFeaturesEXT != nullptr && (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT)) {
+            pImageRobustnessFeaturesEXT->robustImageAccess = VK_FALSE;
+        }
+#endif//VK_EXT_image_robustness
+
+#ifdef VK_VERSION_1_3
+        VkPhysicalDeviceVulkan13Features* pVulkan13Features = static_cast<VkPhysicalDeviceVulkan13Features*>(
+            detail::vpGetStructure(&pUserData->features, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES));
+        if (pVulkan13Features != nullptr && (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT)) {
+            pVulkan13Features->robustImageAccess = VK_FALSE;
+        }
+#endif//VK_VERSION_1_3
+
+        VkBaseOutStructure* pNext = static_cast<VkBaseOutStructure*>(const_cast<void*>(pCreateInfo->pCreateInfo->pNext));
+        if ((pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT) == 0) {
+            for (uint32_t i = 0; i < variant->featureStructTypeCount; ++i) {
+                const void* pRequested = detail::vpGetStructure(pNext, variant->pFeatureStructTypes[i]);
+                if (pRequested == nullptr) {
+                    VkBaseOutStructure* pPrevStruct = &profileStructList;
+                    VkBaseOutStructure* pCurrStruct = pPrevStruct->pNext;
+                    while (pCurrStruct->sType != variant->pFeatureStructTypes[i]) {
+                        pPrevStruct = pCurrStruct;
+                        pCurrStruct = pCurrStruct->pNext;
+                    }
+                    pPrevStruct->pNext = pCurrStruct->pNext;
+                    pCurrStruct->pNext = pNext;
+                    pNext = pCurrStruct;
+                }
+            }
+        } else if ((pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT) == 0) {
+            // If override is not used then the application must not specify its
+            // own feature structure for anything that the profile defines
+            pUserData->result = VK_ERROR_UNKNOWN;
+            return;
+        }
+    });
+
+    if (userData.result != VK_SUCCESS) {
+        return userData.result;
     }
+
+    VkBaseOutStructure* pNext = static_cast<VkBaseOutStructure*>(const_cast<void*>(pCreateInfo->pCreateInfo->pNext));
+    
+    VkDeviceCreateInfo createInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
+    createInfo.pNext = &features;
+    createInfo.queueCreateInfoCount = pCreateInfo->pCreateInfo->queueCreateInfoCount;
+    createInfo.pQueueCreateInfos = pCreateInfo->pCreateInfo->pQueueCreateInfos;
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+    createInfo.ppEnabledExtensionNames = extensions.data();
+    if (pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT) {
+        createInfo.pEnabledFeatures = pCreateInfo->pCreateInfo->pEnabledFeatures;
+    }
+
+    std::vector<VkStructureType> features_stype;
+    VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(&features);
+    while (p != nullptr) {
+        features_stype.push_back(p->sType);
+        p = p->pNext;
+    }
+
+    return vkCreateDevice(physicalDevice, &createInfo, pAllocator, pDevice);
+}
+*/
+
+VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkExtensionProperties *pProperties) {
+    // Multiple variants profile, not supported
+    VkBool32 multiple_variants = VK_FALSE;
+    VkResult result = vpHasMultipleVariantsProfile(pProfile, &multiple_variants);
+    if (result != VK_SUCCESS || multiple_variants == VK_TRUE) return VK_ERROR_UNKNOWN;
+
+    std::vector<VkExtensionProperties> results;
+
+    const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
+
+    for (std::size_t profile_index = 0, profile_count = profiles.size(); profile_index < profile_count; ++profile_index) {
+        const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(profiles[profile_index].profileName);
+        if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
+
+        for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
+            const detail::VpCapabilitiesDesc& capabilities = profile_desc->pRequiredCapabilities[capability_index];
+
+            for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
+                const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
+
+                for (uint32_t i = 0; i < variant.instanceExtensionCount; ++i) {
+                    results.push_back(variant.pInstanceExtensions[i]);
+                }
+            }
+        }
+    }
+
+    const uint32_t count = static_cast<uint32_t>(results.size());
+
+    if (pProperties == nullptr) {
+        *pPropertyCount = count;
+    } else {
+        if (*pPropertyCount < count) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pPropertyCount = count;
+        }
+        if (*pPropertyCount > 0) {
+            memcpy(pProperties, &results[0], *pPropertyCount * sizeof(VkExtensionProperties));
+        }
+    }
+
     return result;
 }
 
-VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
-                                                          VkStructureType *pStructureTypes) {
-    VkResult result = VK_SUCCESS;
+VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkExtensionProperties *pProperties) {
+    // Multiple variants profile, not supported
+    VkBool32 multiple_variants = VK_FALSE;
+    VkResult result = vpHasMultipleVariantsProfile(pProfile, &multiple_variants);
+    if (result != VK_SUCCESS || multiple_variants == VK_TRUE) return VK_ERROR_UNKNOWN;
 
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
-    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+    std::vector<VkExtensionProperties> results;
 
-    if (pStructureTypes == nullptr) {
-        *pStructureTypeCount = pDesc->queueFamilyStructTypeCount;
+    const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
+
+    for (std::size_t profile_index = 0, profile_count = profiles.size(); profile_index < profile_count; ++profile_index) {
+        const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(profiles[profile_index].profileName);
+        if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
+
+        for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
+            const detail::VpCapabilitiesDesc& capabilities = profile_desc->pRequiredCapabilities[capability_index];
+
+            for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
+                const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
+
+                for (uint32_t i = 0; i < variant.deviceExtensionCount; ++i) {
+                    results.push_back(variant.pDeviceExtensions[i]);
+                }
+            }
+        }
+    }
+
+    const uint32_t count = static_cast<uint32_t>(results.size());
+
+    if (pProperties == nullptr) {
+        *pPropertyCount = count;
     } else {
-        if (*pStructureTypeCount < pDesc->queueFamilyStructTypeCount) {
+        if (*pPropertyCount < count) {
             result = VK_INCOMPLETE;
         } else {
-            *pStructureTypeCount = pDesc->queueFamilyStructTypeCount;
+            *pPropertyCount = count;
         }
-        for (uint32_t i = 0; i < *pStructureTypeCount; ++i) {
-            pStructureTypes[i] = pDesc->pQueueFamilyStructTypes[i];
+        if (*pPropertyCount > 0) {
+            memcpy(pProperties, &results[0], *pPropertyCount * sizeof(VkExtensionProperties));
+        }
+    }
+
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileFeatures(const VpProfileProperties *pProfile, void *pNext) {
+    // Multiple variants profile, not supported
+    VkBool32 multiple_variants = VK_FALSE;
+    VkResult result = vpHasMultipleVariantsProfile(pProfile, &multiple_variants);
+    if (result != VK_SUCCESS || multiple_variants == VK_TRUE) return VK_ERROR_UNKNOWN;
+
+    const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
+
+    for (std::size_t profile_index = 0, profile_count = profiles.size(); profile_index < profile_count; ++profile_index) {
+        const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(profiles[profile_index].profileName);
+        if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
+
+        for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
+            const detail::VpCapabilitiesDesc& capabilities = profile_desc->pRequiredCapabilities[capability_index];
+
+            for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
+                const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
+                if (variant.feature.pfnFiller == nullptr) continue;
+
+                VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
+                while (p != nullptr) {
+                    variant.feature.pfnFiller(p);
+                    p = p->pNext;
+                }
+            }
+        }
+    }
+
+    return VK_SUCCESS;
+}
+
+VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount, VkStructureType *pStructureTypes) {
+    // Multiple variants profile, not supported
+    VkBool32 multiple_variants = VK_FALSE;
+    VkResult result = vpHasMultipleVariantsProfile(pProfile, &multiple_variants);
+    if (result != VK_SUCCESS || multiple_variants == VK_TRUE) return VK_ERROR_UNKNOWN;
+
+    std::vector<VkStructureType> results;
+
+    const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
+
+    for (std::size_t profile_index = 0, profile_count = profiles.size(); profile_index < profile_count; ++profile_index) {
+        const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(profiles[profile_index].profileName);
+        if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
+
+        for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
+            const detail::VpCapabilitiesDesc& capabilities = profile_desc->pRequiredCapabilities[capability_index];
+
+            for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
+                const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
+
+                for (uint32_t i = 0; i < variant.featureStructTypeCount; ++i) {
+                    const VkStructureType type = variant.pFeatureStructTypes[i];
+                    if (std::find(results.begin(), results.end(), type) == std::end(results)) {
+                        results.push_back(type);
+                    }
+                }
+            }
+        }
+    }
+
+    const uint32_t count = static_cast<uint32_t>(results.size());
+
+    if (pStructureTypes == nullptr) {
+        *pStructureTypeCount = count;
+    } else {
+        if (*pStructureTypeCount < count) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pStructureTypeCount = count;
+        }
+
+        if (*pStructureTypeCount > 0) {
+            memcpy(pStructureTypes, &results[0], *pStructureTypeCount * sizeof(VkStructureType));
+        }
+    }
+
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileProperties(const VpProfileProperties *pProfile, void *pNext) {
+    // Multiple variants profile, not supported
+    VkBool32 multiple_variants = VK_FALSE;
+    VkResult result = vpHasMultipleVariantsProfile(pProfile, &multiple_variants);
+    if (result != VK_SUCCESS || multiple_variants == VK_TRUE) return VK_ERROR_UNKNOWN;
+
+    const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
+
+    for (std::size_t profile_index = 0, profile_count = profiles.size(); profile_index < profile_count; ++profile_index) {
+        const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(profiles[profile_index].profileName);
+        if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
+
+        for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
+            const detail::VpCapabilitiesDesc& capabilities = profile_desc->pRequiredCapabilities[capability_index];
+
+            for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
+                const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
+                if (variant.property.pfnFiller == nullptr) continue;
+                
+                VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
+                while (p != nullptr) {
+                    variant.property.pfnFiller(p);
+                    p = p->pNext;
+                }
+            }
+        }
+    }
+    
+    return VK_SUCCESS;
+}
+
+VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount, VkStructureType *pStructureTypes) {
+    // Multiple variants profile, not supported
+    VkBool32 multiple_variants = VK_FALSE;
+    VkResult result = vpHasMultipleVariantsProfile(pProfile, &multiple_variants);
+    if (result != VK_SUCCESS || multiple_variants == VK_TRUE) return VK_ERROR_UNKNOWN;
+
+    std::vector<VkStructureType> results;
+
+    const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
+
+    for (std::size_t profile_index = 0, profile_count = profiles.size(); profile_index < profile_count; ++profile_index) {
+        const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(profiles[profile_index].profileName);
+        if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
+
+        for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
+            const detail::VpCapabilitiesDesc& capabilities = profile_desc->pRequiredCapabilities[capability_index];
+
+            for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
+                const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
+
+                for (uint32_t i = 0; i < variant.propertyStructTypeCount; ++i) {
+                    const VkStructureType type = variant.pPropertyStructTypes[i];
+                    if (std::find(results.begin(), results.end(), type) == std::end(results)) {
+                        results.push_back(type);
+                    }
+                }
+            }
+        }
+    }
+
+    const uint32_t count = static_cast<uint32_t>(results.size());
+
+    if (pStructureTypes == nullptr) {
+        *pStructureTypeCount = count;
+    } else {
+        if (*pStructureTypeCount < count) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pStructureTypeCount = count;
+        }
+
+        if (*pStructureTypeCount > 0) {
+            memcpy(pStructureTypes, &results[0], *pStructureTypeCount * sizeof(VkStructureType));
+        }
+    }
+
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties2KHR *pProperties) {
+    // Multiple variants profile, not supported
+    VkBool32 multiple_variants = VK_FALSE;
+    VkResult result = vpHasMultipleVariantsProfile(pProfile, &multiple_variants);
+    if (result != VK_SUCCESS || multiple_variants == VK_TRUE) return VK_ERROR_UNKNOWN;
+
+    const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
+    uint32_t queue_family_count = 0;
+
+    for (std::size_t profile_index = 0, profile_count = profiles.size(); profile_index < profile_count; ++profile_index) {
+        const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(profiles[profile_index].profileName);
+        if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
+
+        for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
+            const detail::VpCapabilitiesDesc& capabilities = profile_desc->pRequiredCapabilities[capability_index];
+
+            for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
+                const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
+                queue_family_count += variant.queueFamilyCount;
+            }
+        }
+    }
+
+    if (pProperties == nullptr) {
+        *pPropertyCount = queue_family_count;
+    } else {
+        if (*pPropertyCount < queue_family_count) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pPropertyCount = queue_family_count;
+        }
+
+        if (*pPropertyCount > 0) {
+            for (std::size_t profile_index = 0, profile_count = profiles.size(); profile_index < profile_count; ++profile_index) {
+                const detail::VpProfileDesc& profile_desc = *detail::vpGetProfileDesc(profiles[profile_index].profileName);
+
+                for (uint32_t capability_index = 0; capability_index < profile_desc.requiredCapabilityCount; ++capability_index) {
+                    const detail::VpCapabilitiesDesc& capabilities = profile_desc.pRequiredCapabilities[capability_index];
+
+                    for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
+                        const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
+                        queue_family_count += variant.queueFamilyCount;
+                
+                        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
+                            VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pProperties[i]));
+                            while (p != nullptr) {
+                                if (variant.pQueueFamilies[i].pfnFiller == nullptr) continue;
+                                variant.pQueueFamilies[i].pfnFiller(p);
+                                p = p->pNext;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount, VkStructureType *pStructureTypes) {
+    // Multiple variants profile, not supported
+    VkBool32 multiple_variants = VK_FALSE;
+    VkResult result = vpHasMultipleVariantsProfile(pProfile, &multiple_variants);
+    if (result != VK_SUCCESS || multiple_variants == VK_TRUE) return VK_ERROR_UNKNOWN;
+
+    std::vector<VkStructureType> results;
+
+    const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
+
+    for (std::size_t profile_index = 0, profile_count = profiles.size(); profile_index < profile_count; ++profile_index) {
+        const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(profiles[profile_index].profileName);
+        if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
+
+        for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
+            const detail::VpCapabilitiesDesc& capabilities = profile_desc->pRequiredCapabilities[capability_index];
+
+            for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
+                const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
+
+                for (uint32_t i = 0; i < variant.queueFamilyStructTypeCount; ++i) {
+                    results.push_back(variant.pQueueFamilyStructTypes[i]);
+                }
+            }
+        }
+    }
+
+    const uint32_t count = static_cast<uint32_t>(results.size());
+
+    if (pStructureTypes == nullptr) {
+        *pStructureTypeCount = count;
+    } else {
+        if (*pStructureTypeCount < count) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pStructureTypeCount = count;
+        }
+
+        if (*pStructureTypeCount > 0) {
+            memcpy(pStructureTypes, &results[0], *pStructureTypeCount * sizeof(VkStructureType));
         }
     }
     return result;
 }
 
 VPAPI_ATTR VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats) {
-    VkResult result = VK_SUCCESS;
+    // Multiple variants profile, not supported
+    VkBool32 multiple_variants = VK_FALSE;
+    VkResult result = vpHasMultipleVariantsProfile(pProfile, &multiple_variants);
+    if (result != VK_SUCCESS || multiple_variants == VK_TRUE) return VK_ERROR_UNKNOWN;
 
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
-    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
+    std::vector<VkFormat> results;
+
+    const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
+
+    for (std::size_t profile_index = 0, profile_count = profiles.size(); profile_index < profile_count; ++profile_index) {
+        const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(profiles[profile_index].profileName);
+        if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
+
+        for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
+            const detail::VpCapabilitiesDesc& capabilities = profile_desc->pRequiredCapabilities[capability_index];
+
+            for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
+                const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
+
+                for (uint32_t i = 0; i < variant.formatCount; ++i) {
+                    results.push_back(variant.pFormats[i].format);
+                }
+            }
+        }
+    }
+
+    const uint32_t count = static_cast<uint32_t>(results.size());
 
     if (pFormats == nullptr) {
-        *pFormatCount = pDesc->formatCount;
+        *pFormatCount = count;
     } else {
-        if (*pFormatCount < pDesc->formatCount) {
+        if (*pFormatCount < count) {
             result = VK_INCOMPLETE;
         } else {
-            *pFormatCount = pDesc->formatCount;
+            *pFormatCount = count;
         }
-        for (uint32_t i = 0; i < *pFormatCount; ++i) {
-            pFormats[i] = pDesc->pFormats[i].format;
+
+        if (*pFormatCount > 0) {
+            memcpy(pFormats, &results[0], *pFormatCount * sizeof(VkFormat));
         }
     }
     return result;
 }
 
-VPAPI_ATTR void vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext) {
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
-    if (pDesc == nullptr) return;
+VPAPI_ATTR VkResult vpGetProfileFormatProperties(const VpProfileProperties *pProfile, VkFormat format, void *pNext) {
+    // Multiple variants profile, not supported
+    VkBool32 multiple_variants = VK_FALSE;
+    VkResult result = vpHasMultipleVariantsProfile(pProfile, &multiple_variants);
+    if (result != VK_SUCCESS || multiple_variants == VK_TRUE) return VK_ERROR_UNKNOWN;
 
-    for (uint32_t i = 0; i < pDesc->formatCount; ++i) {
-        if (pDesc->pFormats[i].format == format) {
-            VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(pNext));
-            while (p != nullptr) {
-                pDesc->pFormats[i].pfnFiller(p);
-                p = p->pNext;
-            }
+    const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
+    
+    for (std::size_t i = 0, n = profiles.size(); i < n; ++i) {
+        const char* profile_name = profiles[i].profileName;
+
+        const detail::VpProfileDesc* pProfileDesc = detail::vpGetProfileDesc(profile_name);
+        if (pProfileDesc == nullptr) return VK_ERROR_UNKNOWN;
+
+        for (uint32_t required_capability_index = 0; required_capability_index < pProfileDesc->requiredCapabilityCount;
+                ++required_capability_index) {
+            const detail::VpCapabilitiesDesc& required_capabilities = pProfileDesc->pRequiredCapabilities[required_capability_index];
+
+            for (uint32_t required_variant_index = 0; required_variant_index < required_capabilities.variantCount; ++required_variant_index) {
+                const detail::VpVariantDesc& variant = required_capabilities.pVariants[required_variant_index];
+
+                for (uint32_t i = 0; i < variant.formatCount; ++i) {
+                    if (variant.pFormats[i].format == format) {
+                        VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(pNext));
+                        while (p != nullptr) {
+                            variant.pFormats[i].pfnFiller(p);
+                            p = p->pNext;
+                        }
 #if defined(VK_VERSION_1_3) || defined(VK_KHR_format_feature_flags2)
-            VkFormatProperties2KHR* fp2 = static_cast<VkFormatProperties2KHR*>(
-                detail::vpGetStructure(pNext, VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR));
-            VkFormatProperties3KHR* fp3 = static_cast<VkFormatProperties3KHR*>(
-                detail::vpGetStructure(pNext, VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR));
-            if (fp3 != nullptr) {
-                VkFormatProperties2KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-                pDesc->pFormats[i].pfnFiller(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
-                fp3->linearTilingFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->linearTilingFeatures | fp.formatProperties.linearTilingFeatures);
-                fp3->optimalTilingFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->optimalTilingFeatures | fp.formatProperties.optimalTilingFeatures);
-                fp3->bufferFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->bufferFeatures | fp.formatProperties.bufferFeatures);
-            }
-            if (fp2 != nullptr) {
-                VkFormatProperties3KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR };
-                pDesc->pFormats[i].pfnFiller(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
-                fp2->formatProperties.linearTilingFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.linearTilingFeatures | fp.linearTilingFeatures);
-                fp2->formatProperties.optimalTilingFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.optimalTilingFeatures | fp.optimalTilingFeatures);
-                fp2->formatProperties.bufferFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.bufferFeatures | fp.bufferFeatures);
-            }
+                        VkFormatProperties2KHR* fp2 = static_cast<VkFormatProperties2KHR*>(
+                            detail::vpGetStructure(pNext, VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR));
+                        VkFormatProperties3KHR* fp3 = static_cast<VkFormatProperties3KHR*>(
+                            detail::vpGetStructure(pNext, VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR));
+                        if (fp3 != nullptr) {
+                            VkFormatProperties2KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
+                            variant.pFormats[i].pfnFiller(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
+                            fp3->linearTilingFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->linearTilingFeatures | fp.formatProperties.linearTilingFeatures);
+                            fp3->optimalTilingFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->optimalTilingFeatures | fp.formatProperties.optimalTilingFeatures);
+                            fp3->bufferFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->bufferFeatures | fp.formatProperties.bufferFeatures);
+                        }
+                        if (fp2 != nullptr) {
+                            VkFormatProperties3KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR };
+                            variant.pFormats[i].pfnFiller(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
+                            fp2->formatProperties.linearTilingFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.linearTilingFeatures | fp.linearTilingFeatures);
+                            fp2->formatProperties.optimalTilingFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.optimalTilingFeatures | fp.optimalTilingFeatures);
+                            fp2->formatProperties.bufferFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.bufferFeatures | fp.bufferFeatures);
+                        }
 #endif
+                    }
+                }
+            }
         }
     }
-}
 
-VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
-                                                     VkStructureType *pStructureTypes) {
-    VkResult result = VK_SUCCESS;
-
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
-    if (pDesc == nullptr) return VK_ERROR_UNKNOWN;
-
-    if (pStructureTypes == nullptr) {
-        *pStructureTypeCount = pDesc->formatStructTypeCount;
-    } else {
-        if (*pStructureTypeCount < pDesc->formatStructTypeCount) {
-            result = VK_INCOMPLETE;
-        } else {
-            *pStructureTypeCount = pDesc->formatStructTypeCount;
-        }
-        for (uint32_t i = 0; i < *pStructureTypeCount; ++i) {
-            pStructureTypes[i] = pDesc->pFormatStructTypes[i];
-        }
-    }
-    return result;
+    return VK_SUCCESS;
 }
 '''
 
@@ -1495,7 +2115,6 @@ class VulkanRegistry():
         self.parseHeaderVersion(xml)
         self.applyWorkarounds()
 
-
     def findAllFeatures(self, xml, xpath = None):
         results = []
         for feature in xml.findall("./feature"):
@@ -1506,7 +2125,6 @@ class VulkanRegistry():
                 else:
                     results.extend(feature.findall(xpath))
         return results
-
 
     def findAllExtensions(self, xml, xpath = None):
         results = []
@@ -1519,17 +2137,14 @@ class VulkanRegistry():
                     results.extend(extension.findall(xpath))
         return results
 
-
     def parseRequireRemove(self, xml):
         self.require.add(xml.findall("./require"))
         self.remove.add(xml.findall("./remove"))
-
 
     def parsePlatformInfo(self, xml):
         self.platforms = dict()
         for plat in xml.findall("./platforms/platform"):
             self.platforms[plat.get('name')] = VulkanPlatform(plat)
-
 
     def parseVersionInfo(self, xml):
         self.versions = dict()
@@ -1539,7 +2154,6 @@ class VulkanRegistry():
                 self.parseRequireRemove(feature)
             else:
                 Log.f("Unsupported feature with number '{0}'".format(feature.get('number')))
-
 
     def parseExtensionInfo(self, xml):
         self.extensions = dict()
@@ -1559,7 +2173,6 @@ class VulkanRegistry():
                 Log.f("Cannot find name enum for extension '{0}'".format(name))
 
             self.parseRequireRemove(ext)
-
 
     def parseStructInfo(self, xml):
         self.structs = dict()
@@ -1636,7 +2249,6 @@ class VulkanRegistry():
             # Store struct definition
             self.structs[struct.get('name')] = structDef
 
-
     def parsePrerequisites(self, xml):
         # Check features (i.e. API versions)
         for feature in self.findAllFeatures(xml):
@@ -1651,7 +2263,6 @@ class VulkanRegistry():
                 # Add extension as the source of the definition of a struct
                 if requireType.get('name') in self.structs:
                     self.structs[requireType.get('name')].definedByExtensions.append(extension.get('name'))
-
 
     def parseEnums(self, xml):
         self.enums = dict()
@@ -1692,7 +2303,6 @@ class VulkanRegistry():
             # Finally store it in the registry
             self.enums[enumDef.name] = enumDef
 
-
     def parseFormats(self, xml):
         self.formatCompression = dict()
         for enum in xml.findall("./formats/format"):
@@ -1706,7 +2316,6 @@ class VulkanRegistry():
         self.betaFormatFeatures = list()
         for format_feature in self.findAllExtensions(xml, "./require/enum[@protect='VK_ENABLE_BETA_EXTENSIONS']"):
             self.betaFormatFeatures.append(format_feature.attrib["name"])
-
 
     def parseBitmasks(self, xml):
         self.bitmasks = dict()
@@ -1739,7 +2348,6 @@ class VulkanRegistry():
                 # Finally store it in the registry
                 self.bitmasks[bitmaskDef.name] = bitmaskDef
 
-
     def parseConstants(self, xml):
         self.constants = dict()
         # Find constant definitions
@@ -1749,7 +2357,6 @@ class VulkanRegistry():
                 self.constants[constant.get('name')] = constant.get('value')
         else:
             Log.f("Failed to find API constants in the registry")
-
 
     def parseAliases(self, xml):
         # Find any struct aliases
@@ -1804,7 +2411,6 @@ class VulkanRegistry():
                         
                         if sTypeAlias != None:
                             aliasStructDef.sType = sTypeAlias
-
 
         # Find any enum aliases
         for enum in xml.findall("./types/type[@category='enum']"):
@@ -1889,7 +2495,6 @@ class VulkanRegistry():
         for constant in xml.find("./enums[@name='API Constants']").findall("./enum[@alias]"):
             self.constants[constant.get('name')] = self.constants[constant.get('alias')]
 
-
     def parseExternalTypes(self, xml):
         self.includes = set()
         self.externalTypes = set()
@@ -1956,7 +2561,6 @@ class VulkanRegistry():
                         if memberName in version.features and version.features[memberName].structs >= extension.features[memberName].structs:
                             extension.features[memberName].structs = version.features[memberName].structs
 
-
     def parseLimits(self, xml):
         # First, parse properties/limits specific to Vulkan versions
         for version in self.versions.values():
@@ -2012,7 +2616,6 @@ class VulkanRegistry():
                         if memberName in version.limits and version.limits[memberName].structs >= extension.limits[memberName].structs:
                             extension.limits[memberName].structs = version.limits[memberName].structs
 
-
     def parseHeaderVersion(self, xml):
         # Find the largest version number
         maxVersionNumber = self.versions[max(self.versions, key = lambda version: self.versions[version].number)].number
@@ -2023,7 +2626,6 @@ class VulkanRegistry():
             if name != None and name.text == 'VK_HEADER_VERSION':
                 self.headerVersionNumber.patch = int(name.tail.lstrip())
                 return
-
 
     def applyWorkarounds(self):
         if self.headerVersionNumber.patch < 207: # vk.xml declares maxColorAttachments with 'bitmask' limittype before header 207
@@ -2264,7 +2866,6 @@ class VulkanRegistry():
         self.structs.pop('VkDrmFormatModifierPropertiesListEXT', None)
         self.structs.pop('VkDrmFormatModifierPropertiesList2EXT', None)
 
-
     def getExtensionPromotedToVersion(self, extensionName):
         promotedTo = self.extensions[extensionName].promotedTo.copy()
         version = None
@@ -2283,7 +2884,6 @@ class VulkanRegistry():
                 promotedTo.remove(target)
         return version
 
-
     def getExtensionPromotedToExtensionList(self, extensionName):
         promotedTo = self.extensions[extensionName].promotedTo.copy()
         extensions = []
@@ -2299,7 +2899,6 @@ class VulkanRegistry():
                 promotedTo.remove(target)
         return extensions
 
-
     def getChainableStructDef(self, name, extends):
         structDef = self.structs.get(name)
         if structDef == None:
@@ -2309,7 +2908,6 @@ class VulkanRegistry():
         if not extends in structDef.extends + [ name ]:
             Log.f("Structure '{0}' does not extend '{1}'".format(name, extends))
         return structDef
-
 
     def evalArraySize(self, arraySize):
         if isinstance(arraySize, str):
@@ -2331,7 +2929,7 @@ class VulkanRegistry():
 
 
 class VulkanProfileCapabilities():
-    def __init__(self, registry, data, caps):
+    def __init__(self, registry, json_profile_value, json_capabilities, merge_mode):
         self.extensions = dict()
         self.instanceExtensions = dict()
         self.deviceExtensions = dict()
@@ -2339,15 +2937,18 @@ class VulkanProfileCapabilities():
         self.properties = dict()
         self.formats = dict()
         self.queueFamiliesProperties = []
-        for capName in data['capabilities']:
-            # When we have multiple possible capabilities blocks, we load them all but effectively the API library can't effectively implement this behavior.
-            if type(capName).__name__ == 'list':
-                for capNameCase in capName:
-                    self.mergeCaps(registry, caps[capNameCase])
-            elif capName in caps:
-                self.mergeCaps(registry, caps[capName])
-            else:
-                Log.f("Capability '{0}' needed by profile '{1}' is missing".format(capName, data['name']))
+        if merge_mode:
+            for capName in json_profile_value['capabilities']:
+                # When we have multiple possible capabilities blocks, we load them all but effectively the API library can't effectively implement this behavior.
+                if type(capName).__name__ == 'list':
+                    for capNameCase in capName:
+                        self.mergeCaps(registry, json_capabilities[capNameCase])
+                elif capName in json_capabilities:
+                    self.mergeCaps(registry, json_capabilities[capName])
+                else:
+                    Log.f("Capability '{0}' needed by profile '{1}' is missing".format(capName, json_profile_value['name']))
+        else:
+            self.mergeCaps(registry, json_capabilities)
 
     def mergeCaps(self, registry, caps):
         self.mergeProfileExtensions(registry, caps)
@@ -2355,7 +2956,6 @@ class VulkanProfileCapabilities():
         self.mergeProfileProperties(caps)
         self.mergeProfileFormats(caps)
         self.mergeProfileQueueFamiliesProperties(caps)
-
 
     def mergeProfileCapData(self, dst, src):
         if type(src) != type(dst):
@@ -2379,7 +2979,6 @@ class VulkanProfileCapabilities():
         else:
             Log.f("Unexpected data type during profile capability data merge (src is '{0}', dst is '{1}')".format(type(src), type(dst)))
 
-
     def mergeProfileExtensions(self, registry, data):
         if data.get('extensions') != None:
             for extName, specVer in data['extensions'].items():
@@ -2395,21 +2994,17 @@ class VulkanProfileCapabilities():
                 else:
                     Log.f("Extension '{0}' does not exist".format(extName))
 
-
     def mergeProfileFeatures(self, data):
         if data.get('features') != None:
             self.mergeProfileCapData(self.features, data['features'])
-
 
     def mergeProfileProperties(self, data):
         if data.get('properties') != None:
             self.mergeProfileCapData(self.properties, data['properties'])
 
-
     def mergeProfileFormats(self, data):
         if data.get('formats') != None:
             self.mergeProfileCapData(self.formats, data['formats'])
-
 
     def mergeProfileQueueFamiliesProperties(self, data):
         if data.get('queueFamiliesProperties') != None:
@@ -2420,62 +3015,83 @@ class VulkanProfileStructs():
     def __init__(self, registry, caps):
         # Feature struct types
         self.feature = []
-        for name in caps.features:
-            if name in [ 'VkPhysicalDeviceFeatures', 'VkPhysicalDeviceFeatures2KHR' ]:
-                # Special case, add both as VkPhysicalDeviceFeatures2[KHR]
-                if 'VkPhysicalDeviceFeatures2KHR' in registry.structs:
-                    self.feature.append(registry.structs['VkPhysicalDeviceFeatures2KHR'])
+
+        for capabilities_key, capabilities_value in caps.items():
+            for name in capabilities_value.features:
+                if name in [ 'VkPhysicalDeviceFeatures', 'VkPhysicalDeviceFeatures2KHR' ]:
+                    # Special case, add both as VkPhysicalDeviceFeatures2[KHR]
+                    if 'VkPhysicalDeviceFeatures2KHR' in registry.structs:
+                        if registry.structs['VkPhysicalDeviceFeatures2KHR'] not in self.feature:
+                            self.feature.append(registry.structs['VkPhysicalDeviceFeatures2KHR'])
+                    else:
+                        if registry.structs['VkPhysicalDeviceFeatures2'] not in self.feature:
+                            self.feature.append(registry.structs['VkPhysicalDeviceFeatures2'])
                 else:
-                    self.feature.append(registry.structs['VkPhysicalDeviceFeatures2'])
-            else:
-                self.feature.append(registry.getChainableStructDef(name, 'VkPhysicalDeviceFeatures2'))
+                    if registry.getChainableStructDef(name, 'VkPhysicalDeviceFeatures2') not in self.feature:
+                        self.feature.append(registry.getChainableStructDef(name, 'VkPhysicalDeviceFeatures2'))
         self.eliminateAliases(self.feature)
 
         # Property struct types
         self.property = []
-        for name in caps.properties:
-            if name in [ 'VkPhysicalDeviceProperties', 'VkPhysicalDeviceProperties2KHR' ]:
-                # Special case, add both as VkPhysicalDeviceProperties2[KHR]
-                if 'VkPhysicalDeviceProperties2KHR' in registry.structs:
-                    self.property.append(registry.structs['VkPhysicalDeviceProperties2KHR'])
+
+        for key, value in caps.items():
+            for name in value.properties:
+                if name in [ 'VkPhysicalDeviceProperties', 'VkPhysicalDeviceProperties2KHR' ]:
+                    # Special case, add both as VkPhysicalDeviceProperties2[KHR]
+                    if 'VkPhysicalDeviceProperties2KHR' in registry.structs:
+                        if registry.structs['VkPhysicalDeviceProperties2KHR'] not in self.property:
+                            self.property.append(registry.structs['VkPhysicalDeviceProperties2KHR'])
+                    else:
+                        if registry.structs['VkPhysicalDeviceProperties2'] not in self.property:
+                            self.property.append(registry.structs['VkPhysicalDeviceProperties2'])
                 else:
-                    self.property.append(registry.structs['VkPhysicalDeviceProperties2'])
-            else:
-                self.property.append(registry.getChainableStructDef(name, 'VkPhysicalDeviceProperties2'))
+                    if registry.getChainableStructDef(name, 'VkPhysicalDeviceProperties2') not in self.property:
+                        self.property.append(registry.getChainableStructDef(name, 'VkPhysicalDeviceProperties2'))
         self.eliminateAliases(self.property)
 
         # Queue family struct types
         self.queueFamily = []
-        queueFamilyStructs = dict()
-        for queueFamilyProps in caps.queueFamiliesProperties:
-            queueFamilyStructs.update(queueFamilyProps)
-        for name in queueFamilyStructs:
-            if name in [ 'VkQueueFamilyProperties', 'VkQueueFamilyProperties2KHR' ]:
-                # Special case, add both as VkQueueFamilyProperties2[KHR]
-                if 'VkQueueFamilyProperties2KHR' in registry.structs:
-                    self.queueFamily.append(registry.structs['VkQueueFamilyProperties2KHR'])
+
+        for key, value in caps.items():
+            queueFamilyStructs = dict()
+            for queueFamilyProps in value.queueFamiliesProperties:
+                queueFamilyStructs.update(queueFamilyProps)
+            for name in queueFamilyStructs:
+                if name in [ 'VkQueueFamilyProperties', 'VkQueueFamilyProperties2KHR' ]:
+                    # Special case, add both as VkQueueFamilyProperties2[KHR]
+                    if 'VkQueueFamilyProperties2KHR' in registry.structs:
+                        if registry.structs['VkQueueFamilyProperties2KHR'] not in self.queueFamily:
+                            self.queueFamily.append(registry.structs['VkQueueFamilyProperties2KHR'])
+                    else:
+                        if registry.structs['VkQueueFamilyProperties2'] not in self.queueFamily:
+                            self.queueFamily.append(registry.structs['VkQueueFamilyProperties2'])
                 else:
-                    self.queueFamily.append(registry.structs['VkQueueFamilyProperties2'])
-            else:
-                self.queueFamily.append(registry.getChainableStructDef(name, 'VkQueueFamilyProperties2'))
+                    if registry.getChainableStructDef(name, 'VkQueueFamilyProperties2') not in self.queueFamily:
+                        self.queueFamily.append(registry.getChainableStructDef(name, 'VkQueueFamilyProperties2'))
         self.eliminateAliases(self.queueFamily)
 
         # Format struct types
         self.format = []
-        formatStructs = dict()
-        for formatProps in caps.formats.values():
-            formatStructs.update(formatProps)
-        for name in formatStructs:
-            if name in [ 'VkFormatProperties', 'VkFormatProperties2KHR', 'VkFormatProperties3KHR' ]:
-                # Special case, add all as VkFormatProperties2[KHR] and VkFormatProperties3KHR
-                if 'VkFormatProperties2KHR' in registry.structs:
-                    self.format.append(registry.structs['VkFormatProperties2KHR'])
+
+        for key, value in caps.items():
+            formatStructs = dict()
+            for formatProps in value.formats.values():
+                formatStructs.update(formatProps)
+            for name in formatStructs:
+                if name in [ 'VkFormatProperties', 'VkFormatProperties2KHR', 'VkFormatProperties3KHR' ]:
+                    # Special case, add all as VkFormatProperties2[KHR] and VkFormatProperties3KHR
+                    if 'VkFormatProperties2KHR' in registry.structs:
+                        if registry.structs['VkFormatProperties2KHR'] not in self.format:
+                            self.format.append(registry.structs['VkFormatProperties2KHR'])
+                    else:
+                        if registry.structs['VkFormatProperties2'] not in self.format:
+                            self.format.append(registry.structs['VkFormatProperties2'])
+                    if 'VkFormatProperties3KHR' in registry.structs:
+                        if registry.structs['VkFormatProperties3KHR'] not in self.format:
+                            self.format.append(registry.structs['VkFormatProperties3KHR'])
                 else:
-                    self.format.append(registry.structs['VkFormatProperties2'])
-                if 'VkFormatProperties3KHR' in registry.structs:
-                    self.format.append(registry.structs['VkFormatProperties3KHR'])
-            else:
-                self.format.append(registry.getChainableStructDef(name, 'VkFormatProperties2'))
+                    if registry.getChainableStructDef(name, 'VkFormatProperties2') not in self.format:
+                        self.format.append(registry.getChainableStructDef(name, 'VkFormatProperties2'))
         self.eliminateAliases(self.format)
 
 
@@ -2493,22 +3109,41 @@ class VulkanProfileStructs():
 
 
 class VulkanProfile():
-    def __init__(self, registry, name, data, caps):
+    def __init__(self, registry, json_profile_key, json_profile_value, json_capabilities):
         self.registry = registry
-        self.name = name
-        self.label = data['label']
-        self.description = data['description']
-        self.version = data['version']
-        self.apiVersion = data['api-version']
+        self.key = json_profile_key
+        self.label = json_profile_value['label']
+        self.description = json_profile_value['description']
+        self.version = json_profile_value['version']
+        self.apiVersion = json_profile_value['api-version']
         self.apiVersionNumber = VulkanVersionNumber(self.apiVersion, registry.api)
-        self.fallback = data.get('fallback')
+        self.fallbacks = json_profile_value.get('fallback')
+        self.required_profiles = json_profile_value.get('profiles')
         self.versionRequirements = []
         self.extensionRequirements = []
-        self.capabilities = VulkanProfileCapabilities(registry, data, caps)
-        self.structs = VulkanProfileStructs(registry, self.capabilities)
+        
+        referenced_capabilities_list = json_profile_value.get('capabilities')
+
+        self.merge_capabilities = VulkanProfileCapabilities(registry, json_profile_value, json_capabilities, True)
+        self.split_capabilities = dict()
+        for referenced_capability in json_profile_value['capabilities']:        
+            # When we have multiple possible capabilities blocks, we load them all but effectively the API library can't effectively implement this behavior.
+            if type(referenced_capability).__name__ == 'list':
+                for capability_key in referenced_capability:
+                    self.split_capabilities[capability_key] = VulkanProfileCapabilities(registry, json_profile_value, json_capabilities[capability_key], False)
+            elif referenced_capability in json_capabilities:
+                self.split_capabilities[referenced_capability] = VulkanProfileCapabilities(registry, json_profile_value, json_capabilities[referenced_capability], False)
+
+        self.structs = VulkanProfileStructs(registry, self.split_capabilities)
+        self.multiple_variants = self.checkMultipleVariants(json_profile_value)
         self.collectCompileTimeRequirements()
         self.validate()
 
+    def checkMultipleVariants(self, json_profile_value):
+        for cap_key in json_profile_value['capabilities']:
+            if type(cap_key).__name__ == 'list':
+                return True
+        return False
 
     def collectCompileTimeRequirements(self):
         # Add API version to the list of requirements
@@ -2516,33 +3151,36 @@ class VulkanProfile():
         if versionName in self.registry.versions:
             self.versionRequirements.append(versionName)
         else:
-            Log.f("No version '{0}' found in registry required by profile '{1}'".format(str(self.apiVersionNumber), self.name))
+            Log.f("No version '{0}' found in registry required by profile '{1}'".format(str(self.apiVersionNumber), self.key))
 
         # Add any required extension to the list of requirements
-        for extName in self.capabilities.extensions:
-            if extName in self.registry.extensions:
-                self.extensionRequirements.append(extName)
-            else:
-                Log.f("Extension '{0}' required by profile '{1}' does not exist".format(extName, self.name))
+        for key, value in self.split_capabilities.items():
+            for extName in value.extensions:
+                if extName in self.registry.extensions:
+                    self.extensionRequirements.append(extName)
+                else:
+                    Log.f("Extension '{0}' required by profile '{1}' does not exist".format(extName, self.key))
 
 
     def validate(self):
-        self.validateStructDependencies()
+        self.validateStructDependencies(self.merge_capabilities)
+        for capabilities_key, capabilities_value in self.split_capabilities.items():
+            self.validateStructDependencies(capabilities_value)
 
 
-    def validateStructDependencies(self):
-        for feature in self.capabilities.features:
-            self.validateStructDependency(feature)
+    def validateStructDependencies(self, capabilities):
+        for feature in capabilities.features:
+            self.validateStructDependency(capabilities, feature)
 
-        for prop in self.capabilities.properties:
-            self.validateStructDependency(prop)
+        for prop in capabilities.properties:
+            self.validateStructDependency(capabilities, prop)
 
-        for queueFamilyData in self.capabilities.queueFamiliesProperties:
+        for queueFamilyData in capabilities.queueFamiliesProperties:
             for queueFamilyProp in queueFamilyData:
-                self.validateStructDependency(queueFamilyProp)
+                self.validateStructDependency(capabilities, queueFamilyProp)
 
 
-    def validateStructDependency(self, structName):
+    def validateStructDependency(self, capabilities, structName):
         if structName in self.registry.structs:
             structDef = self.registry.structs[structName]
             depFound = False
@@ -2553,54 +3191,51 @@ class VulkanProfile():
 
             # Check if any required extension defines this struct
             for definedByExtension in structDef.definedByExtensions:
-                if definedByExtension in self.capabilities.extensions:
+                if definedByExtension in capabilities.extensions:
                     depFound = True
                     break
 
             if not depFound:
-                Log.f("Unexpected required struct '{0}' in profile '{1}'".format(structName, self.name))
+                Log.f("Unexpected required struct '{0}' in profile '{1}'".format(structName, self.key))
         else:
-            Log.f("Struct '{0}' in profile '{1}' does not exist in the registry".format(structName, self.name))
+            Log.f("Struct '{0}' in profile '{1}' does not exist in the registry".format(structName, self.key))
 
 
     def generatePrivateImpl(self, debugMessages):
-        uname = self.name.upper()
-        gen = '\n'
-        gen += ('#ifdef {0}\n'
-                'namespace {1} {{\n').format(self.name, uname)
-        gen += self.gen_extensionData('instance')
-        gen += self.gen_extensionData('device')
-        gen += self.gen_fallbackData()
+        uname = self.key.upper()
+        gen = ('#ifdef {0}\n'
+               'namespace {1} {{\n').format(self.key, uname)
+        
         gen += self.gen_structTypeData()
-        gen += self.gen_structDesc(debugMessages)
-        gen += ('\n'
-                '}} // namespace {0}\n'
-                '#endif\n').format(uname)
+        
+        if not self.multiple_variants:
+            gen += self.gen_extensionData(self.merge_capabilities, 'instance')
+            gen += self.gen_extensionData(self.merge_capabilities, 'device')
+            gen += self.gen_structDesc(self.merge_capabilities, debugMessages)
+        gen += '\n'
+        
+        for key, value in self.split_capabilities.items():
+            gen += ('namespace {0} {{').format(key)
+            gen += self.gen_extensionData(value, 'instance')
+            gen += self.gen_extensionData(value, 'device')
+            gen += self.gen_structDesc(value, debugMessages)
+            gen += ('}} //namespace {0}\n').format(key)
+
+        gen += ('}} // namespace {1}\n'
+                '#endif // {0}\n\n').format(self.key, uname)
         return gen
 
-    def gen_extensionData(self, type):
+    def gen_extensionData(self, capabilities, type):
         foundExt = False
         gen = '\n'
         gen += 'static const VkExtensionProperties {0}Extensions[] = {{\n'.format(type)
-        for extName, specVer in sorted(self.capabilities.extensions.items()):
+        for extName, specVer in sorted(capabilities.extensions.items()):
             extInfo = self.registry.extensions[extName]
             if extInfo.type == type:
                 gen += '    VkExtensionProperties{{ {0}_EXTENSION_NAME, {1} }},\n'.format(extInfo.upperCaseName, specVer)
                 foundExt = True
         gen += '};\n'
         return gen if foundExt else ''
-
-
-    def gen_fallbackData(self):
-        gen = ''
-        if self.fallback:
-            gen += ('\n'
-                    'static const VpProfileProperties fallbacks[] = {\n')
-            for fallback in self.fallback:
-                gen += '    {{ {0}_NAME, {0}_SPEC_VERSION }},\n'.format(fallback.upper())
-            gen += '};\n'
-        return gen
-
 
     def gen_structTypeData(self, structDefs = None, name = None):
         gen = ''
@@ -2882,8 +3517,7 @@ class VulkanProfile():
         return gen
 
 
-
-    def gen_structDesc(self, debugMessages):
+    def gen_structDesc(self, capabilities, debugMessages):
         gen = ''
 
         fillFmt = '{0};\n'
@@ -2898,11 +3532,12 @@ class VulkanProfile():
         gen += ('\n'
                 'static const VpFeatureDesc featureDesc = {\n'
                 '    [](VkBaseOutStructure* p) {\n')
-        gen += self.gen_structFunc(self.structs.feature, self.capabilities.features, self.gen_structFill, fillFmt)
+        gen += self.gen_structFunc(self.structs.feature, capabilities.features, self.gen_structFill, fillFmt)
         gen += ('    },\n'
                 '    [](VkBaseOutStructure* p) -> bool {\n'
                 '        bool ret = true;\n')
-        gen += self.gen_structFunc(self.structs.feature, self.capabilities.features, self.gen_structCompare, cmpFmtFeatures, debugMessages)
+        if self.multiple_variants == False:
+            gen += self.gen_structFunc(self.structs.feature, capabilities.features, self.gen_structCompare, cmpFmtFeatures, debugMessages)
         gen += ('        return ret;\n'
                 '    }\n'
                 '};\n')
@@ -2916,11 +3551,12 @@ class VulkanProfile():
         gen += ('\n'
                 'static const VpPropertyDesc propertyDesc = {\n'
                 '    [](VkBaseOutStructure* p) {\n')
-        gen += self.gen_structFunc(self.structs.property, self.capabilities.properties, self.gen_structFill, fillFmt)
+        gen += self.gen_structFunc(self.structs.property, capabilities.properties, self.gen_structFill, fillFmt)
         gen += ('    },\n'
                 '    [](VkBaseOutStructure* p) -> bool {\n'
                 '        bool ret = true;\n')
-        gen += self.gen_structFunc(self.structs.property, self.capabilities.properties, self.gen_structCompare, cmpFmtProperties, debugMessages)
+        if self.multiple_variants == False:
+            gen += self.gen_structFunc(self.structs.property, capabilities.properties, self.gen_structCompare, cmpFmtProperties, debugMessages)
         gen += ('        return ret;\n'
                 '    }\n'
                 '};\n')
@@ -2929,24 +3565,25 @@ class VulkanProfile():
         if self.structs.queueFamily:
             gen += ('\n'
                     'static const VpQueueFamilyDesc queueFamilyDesc[] = {\n')
-            for queueFamilyCaps in self.capabilities.queueFamiliesProperties:
+            for queueFamilyCaps in capabilities.queueFamiliesProperties:
                 gen += ('    {\n'
                         '        [](VkBaseOutStructure* p) {\n')
                 gen += self.gen_structFunc(self.structs.queueFamily, queueFamilyCaps, self.gen_structFill, fillFmt)
                 gen += ('        },\n'
                         '        [](VkBaseOutStructure* p) -> bool {\n'
                         '            bool ret = true;\n')
-                gen += self.gen_structFunc(self.structs.queueFamily, queueFamilyCaps, self.gen_structCompare, cmpFmt)
+                if self.multiple_variants == False:
+                    gen += self.gen_structFunc(self.structs.queueFamily, queueFamilyCaps, self.gen_structCompare, cmpFmt)
                 gen += ('            return ret;\n'
                         '        }\n'
                         '    },\n')
             gen += ('};\n')
 
         # Format descriptor
-        if self.structs.format:
+        if capabilities.formats:
             gen += ('\n'
                     'static const VpFormatDesc formatDesc[] = {\n')
-            for formatName, formatCaps in sorted(self.capabilities.formats.items()):
+            for formatName, formatCaps in sorted(capabilities.formats.items()):
                 if debugMessages:
                     cmpFmtFormat = 'ret = ret && ({0}); VP_DEBUG_COND_MSG(!({0}), "Unsupported format condition for ' + formatName + ': {0}");\n'
                 else:
@@ -2959,7 +3596,8 @@ class VulkanProfile():
                 gen += ('        },\n'
                         '        [](VkBaseOutStructure* p) -> bool {\n'
                         '            bool ret = true;\n')
-                gen += self.gen_structFunc(self.structs.format, formatCaps, self.gen_structCompare, cmpFmtFormat, debugMessages)
+                if self.multiple_variants == False:
+                    gen += self.gen_structFunc(self.structs.format, formatCaps, self.gen_structCompare, cmpFmtFormat, debugMessages)
                 gen += ('            return ret;\n'
                         '        }\n'
                         '    },\n')
@@ -2984,34 +3622,32 @@ class VulkanProfile():
         return gen
 
 
-class VulkanProfiles():
-    def loadFromDir(registry, profilesDir, validate, schema):
-        profiles = dict()
-        dirAbsPath = os.path.abspath(profilesDir)
+class VulkanProfilesFiles():
+    def __init__(self, registry, profiles_dir, validate, schema):
+        self.profiles = dict()
+        dirAbsPath = os.path.abspath(profiles_dir)
         filenames = os.listdir(dirAbsPath)
         for filename in filenames:
             fileAbsPath = os.path.join(dirAbsPath, filename)
             if os.path.isfile(fileAbsPath) and os.path.splitext(filename)[-1] == '.json':
                 Log.i("Loading profile file: '{0}'".format(filename))
                 with open(fileAbsPath, 'r') as f:
-                    jsonData = json.load(f)
+                    json_root = json.load(f)
                     if validate:
                         Log.i("Validating profile file: '{0}'".format(filename))
-                        # jsonschema.validate(jsonData, schema)
-                    VulkanProfiles.parseProfiles(registry, profiles, jsonData['profiles'], jsonData['capabilities'])
-        return profiles
+                        jsonschema.validate(json_root, schema)
+                    self.parseProfiles(registry, json_root['profiles'], json_root['capabilities'])
 
-
-    def parseProfiles(registry, profiles, json, caps):
-        for name, data in json.items():
-            Log.i("Registering profile '{0}'".format(name))
-            profiles[name] = VulkanProfile(registry, name, data, caps)
+    def parseProfiles(self, registry, json_profiles, json_caps):
+        for json_profile_key, json_profile_value in json_profiles.items():
+            Log.i("Registering profile '{0}'".format(json_profile_key))
+            self.profiles[json_profile_key] = VulkanProfile(registry, json_profile_key, json_profile_value, json_caps)
 
 
 class VulkanProfilesLibraryGenerator():
-    def __init__(self, registry, profiles, debugMessages = False):
+    def __init__(self, registry, profiles_files, debugMessages = False):
         self.registry = registry
-        self.profiles = profiles
+        self.profiles_files = profiles_files
         self.debugMessages = debugMessages
 
 
@@ -3050,7 +3686,7 @@ class VulkanProfilesLibraryGenerator():
         Log.i("Generating '{0}'...".format(fileAbsPath))
         with open(fileAbsPath, 'w') as f:
             f.write(COPYRIGHT_HEADER)
-            f.write(CPP_HEADER)
+            f.write(SHARED_INCLUDE)
             if self.debugMessages:
                 f.write('#include <vulkan/debug/vulkan_profiles.h>\n')
                 f.write(DEBUG_MSG_CB_DEFINE)
@@ -3067,6 +3703,7 @@ class VulkanProfilesLibraryGenerator():
         with open(fileAbsPath, 'w') as f:
             f.write(COPYRIGHT_HEADER)
             f.write(HPP_HEADER)
+            f.write(SHARED_INCLUDE)
             f.write(self.gen_profileDefs())
             f.write(API_DEFS)
             if self.debugMessages:
@@ -3074,12 +3711,11 @@ class VulkanProfilesLibraryGenerator():
                 f.write(DEBUG_MSG_UTIL_IMPL)
             f.write(self.gen_privateImpl())
             f.write(self.gen_publicImpl())
-            f.write(HPP_FOOTER)
 
 
     def gen_profileDefs(self):
         gen = ''
-        for name, profile in sorted(self.profiles.items()):
+        for name, profile in sorted(self.profiles_files.profiles.items()):
             uname = name.upper()
             gen += '\n'
 
@@ -3123,47 +3759,109 @@ class VulkanProfilesLibraryGenerator():
 
     def gen_profilePrivateImpl(self):
         gen = ''
-        for _, profile in sorted(self.profiles.items()):
+        for _, profile in sorted(self.profiles_files.profiles.items()):
             gen += profile.generatePrivateImpl(self.debugMessages)
         return gen
 
 
     def gen_dataArrayInfo(self, condition, name):
         if condition:
-            return '        &{0}[0], static_cast<uint32_t>(sizeof({0}) / sizeof({0}[0])),\n'.format(name)
+            return '        static_cast<uint32_t>(std::size({0})), {0},\n'.format(name)
         else:
-            return '        nullptr, 0,\n'
+            return '        0, nullptr,\n'
 
 
     def gen_profileDescTable(self):
         gen = '\n'
-        gen += 'static const VpProfileDesc vpProfiles[] = {\n'
+        for profile_key, profile_value in sorted(self.profiles_files.profiles.items()):
+            profile_ukey = profile_key.upper()
+        
+            gen += ('#ifdef {0}\n').format(profile_key)
+            gen += ('namespace {0} {{\n').format(profile_ukey)
 
-        for name, profile in sorted(self.profiles.items()):
-            uname = name.upper()
+            if not profile_value.multiple_variants:
+                gen += '    static const VpVariantDesc mergedCapabilities[] = {\n'
+                gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.instanceExtensions, 'instanceExtensions')
+                gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.deviceExtensions, 'deviceExtensions')
+                gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.features, 'featureStructTypes')
+                gen += '            featureDesc,\n'
+                gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.properties, 'propertyStructTypes')
+                gen += '            propertyDesc,\n'
+                gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.queueFamiliesProperties, 'queueFamilyStructTypes')
+                gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.queueFamiliesProperties, 'queueFamilyDesc')
+                gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.formats, 'formatStructTypes')
+                gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.formats, 'formatDesc')
+                gen += '        chainerDesc,\n'
+                gen += '    };\n'
+
+            for capabilities_key, capabilities_value in profile_value.split_capabilities.items():
+                gen += ('namespace {0} {{\n').format(capabilities_key)
+                gen += '    static const VpVariantDesc variants[] = {\n'
+                gen += self.gen_dataArrayInfo(capabilities_value.instanceExtensions, 'instanceExtensions')
+                gen += self.gen_dataArrayInfo(capabilities_value.deviceExtensions, 'deviceExtensions')
+                gen += self.gen_dataArrayInfo(capabilities_value.features, 'featureStructTypes')
+                gen += '            featureDesc,\n'
+                gen += self.gen_dataArrayInfo(capabilities_value.properties, 'propertyStructTypes')
+                gen += '            propertyDesc,\n'
+                gen += self.gen_dataArrayInfo(capabilities_value.queueFamiliesProperties, 'queueFamilyStructTypes')
+                gen += self.gen_dataArrayInfo(capabilities_value.queueFamiliesProperties, 'queueFamilyDesc')
+                gen += self.gen_dataArrayInfo(capabilities_value.formats, 'formatStructTypes')
+                gen += self.gen_dataArrayInfo(capabilities_value.formats, 'formatDesc')
+                gen += '        chainerDesc,\n'
+                gen += '    };\n'
+                gen += '    static const uint32_t variantCount = static_cast<uint32_t>(std::size(variants));\n'
+                gen += ('\n}} // namespace {0}\n').format(capabilities_key)
+
+            gen += '    static const VpCapabilitiesDesc capabilities[] = {\n'
+            for capabilities_key, value in profile_value.split_capabilities.items():
+                gen += ('        {0}::variantCount, {0}::variants,\n').format(capabilities_key, profile_ukey)
+            gen += '    };\n'
+            gen += '    static const uint32_t capabilityCount = static_cast<uint32_t>(std::size(capabilities));\n'
+
+            if profile_value.fallbacks:
+                gen += ('\n'
+                    '    static const VpProfileProperties fallbacks[] = {\n')
+                for fallback in profile_value.fallbacks:
+                    gen += '        {{{0}_NAME, {0}_SPEC_VERSION}},\n'.format(fallback.upper())
+                gen += ('    };\n'
+                    '    static const uint32_t fallbackCount = static_cast<uint32_t>(std::size(fallbacks));\n')
+
+            if profile_value.required_profiles:
+                gen += ('\n'
+                    '    static const VpProfileProperties profiles[] = {\n')
+                for profile in profile_value.required_profiles:
+                    gen += '        {{{0}_NAME, {0}_SPEC_VERSION}},\n'.format(profile.upper())
+                gen += ('    };\n'
+                    '    static const uint32_t profileCount = static_cast<uint32_t>(std::size(profiles));\n')
+
+            gen += ('}} // namespace {0}\n').format(profile_ukey)
+            gen += ('#endif //{0}\n\n').format(profile_key)
+
+        gen += 'static const VpProfileDesc profiles[] = {\n'
+        for profile_key, profile_value in sorted(self.profiles_files.profiles.items()):
+            profile_ukey = profile_key.upper()
             gen += ('#ifdef {0}\n'
                     '    VpProfileDesc{{\n'
                     '        VpProfileProperties{{ {1}_NAME, {1}_SPEC_VERSION }},\n'
-                    '        {1}_MIN_API_VERSION,\n').format(name, uname)
-
-            gen += self.gen_dataArrayInfo(profile.capabilities.instanceExtensions, '{0}::instanceExtensions'.format(uname))
-            gen += self.gen_dataArrayInfo(profile.capabilities.deviceExtensions, '{0}::deviceExtensions'.format(uname))
-            gen += self.gen_dataArrayInfo(profile.fallback, '{0}::fallbacks'.format(uname))
-            gen += self.gen_dataArrayInfo(profile.structs.feature, '{0}::featureStructTypes'.format(uname))
-            gen += '        {0}::featureDesc,\n'.format(uname)
-            gen += self.gen_dataArrayInfo(profile.structs.property, '{0}::propertyStructTypes'.format(uname))
-            gen += '        {0}::propertyDesc,\n'.format(uname)
-            gen += self.gen_dataArrayInfo(profile.structs.queueFamily, '{0}::queueFamilyStructTypes'.format(uname))
-            gen += self.gen_dataArrayInfo(profile.structs.queueFamily, '{0}::queueFamilyDesc'.format(uname))
-            gen += self.gen_dataArrayInfo(profile.structs.format, '{0}::formatStructTypes'.format(uname))
-            gen += self.gen_dataArrayInfo(profile.structs.format, '{0}::formatDesc'.format(uname))
-            gen += '        {0}::chainerDesc,\n'.format(uname)
-
-            gen += ('    },\n'
-                    '#endif\n')
+                    '        {1}_MIN_API_VERSION,\n').format(profile_key, profile_ukey)
+            if profile_value.multiple_variants:
+                gen += '        nullptr,\n'
+            else:
+                gen += ('        {0}::mergedCapabilities,\n').format(profile_ukey)
+            if profile_value.required_profiles:
+                gen += ('        {0}::profileCount, {0}::profiles,\n').format(profile_ukey)
+            else:
+                gen += ('        0, nullptr,\n')
+            gen += ('        {0}::capabilityCount, {0}::capabilities,\n').format(profile_ukey)
+            if profile_value.fallbacks:
+                gen += ('        {1}::fallbackCount, {1}::fallbacks,\n').format(profile_key, profile_ukey)
+            else:
+                gen += ('        0, nullptr,\n')
+            gen += ('    }},\n'
+                    '#endif // {0}\n').format(profile_ukey)
 
         gen += ('};\n'
-                'static const uint32_t vpProfileCount = static_cast<uint32_t>(sizeof(vpProfiles) / sizeof(vpProfiles[0]));\n')
+                'static const uint32_t profileCount = static_cast<uint32_t>(std::size(profiles));\n')
         return gen
 
 
@@ -3200,7 +3898,7 @@ class VulkanProfilesSchemaGenerator():
 
         return OrderedDict({
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "$id": "https://schema.khronos.org/vulkan/profiles-0.8.1-{0}.json#".format(str(self.registry.headerVersionNumber.patch)),
+            "$id": "https://schema.khronos.org/vulkan/profiles-0.8.2-{0}.json#".format(str(self.registry.headerVersionNumber.patch)),
             "title": "Vulkan Profiles Schema for Vulkan {0}".format(versionStr),
             "additionalProperties": True,
             "required": [
@@ -3324,6 +4022,15 @@ class VulkanProfilesSchemaGenerator():
                                                 "type": "string"
                                             })
                                         })
+                                    })
+                                }),
+                                "profiles": OrderedDict({
+                                    "description": "The list of required profiles by the profile.",
+                                    "type": "array",
+                                    "additionalProperties": False,
+                                    "uniqueItems": True,
+                                    "items": OrderedDict({
+                                        "type": "string"
                                     })
                                 }),
                                 "capabilities": OrderedDict({
@@ -3697,9 +4404,14 @@ DOC_MD_HEADER = '''
 
 
 class VulkanProfilesDocGenerator():
-    def __init__(self, registry, profiles):
+    def __init__(self, registry, profiles_files):
         self.registry = registry
-        self.profiles = sorted(profiles.values(), key = self.sort_KHR_EXT_first)
+        sorted_profiles = sorted(profiles_files.profiles.values(), key = self.sort_KHR_EXT_first)
+
+        self.profiles = []
+        for profile in sorted_profiles:
+            if (not profile.multiple_variants):
+                self.profiles.append(profile)
 
         # Determine maximum core version required across all profiles
         self.maxRequiredCoreVersion = max(profile.apiVersionNumber for profile in self.profiles)
@@ -3719,7 +4431,7 @@ class VulkanProfilesDocGenerator():
 
     def sort_KHR_EXT_first(self, profileOrExtName):
         # Make sure KHR profiles and extensions come first and EXT extensions come next
-        key = profileOrExtName.name if isinstance(profileOrExtName, VulkanProfile) else profileOrExtName
+        key = profileOrExtName.key if isinstance(profileOrExtName, VulkanProfile) else profileOrExtName
         if key[2:7] == '_KHR_':
             return 'A' + key
         elif key[2:7] == '_KHX_':
@@ -3758,7 +4470,7 @@ class VulkanProfilesDocGenerator():
         gen = '| Profiles |'
         cellFmt = ' {0} |'
         for profile in self.profiles:
-            gen += cellFmt.format(profile.name)
+            gen += cellFmt.format(profile.key)
         gen += '\n{0}'.format(re.sub(r"[^|]", '-', gen))
         for row, rowHandler in rowHandlers.items():
             gen += '\n| {0} |'.format(row)
@@ -3771,7 +4483,7 @@ class VulkanProfilesDocGenerator():
         gen = '| Profiles |'
         cellFmt = ' {0} |'
         for profile in self.profiles:
-            gen += cellFmt.format(profile.name)
+            gen += cellFmt.format(profile.key)
         gen += '\n{0}'.format(re.sub(r"[^|]", '-', gen))
         for section, sectionRowHandlers in rowHandlers.items():
             gen += '\n| **{0}** |'.format(section)
@@ -3788,9 +4500,9 @@ class VulkanProfilesDocGenerator():
             'Description': lambda _, profile : profile.description,
             'Version': lambda _, profile : profile.version,
             'Required API version': lambda _, profile : profile.apiVersion,
-            'Fallback profiles': lambda _, profile : ', '.join(profile.fallback) if profile.fallback != None else '-'
+            'Required profiles': lambda _, profile : ', '.join(profile.required_profiles) if profile.required_profiles != None else '-',
+            'Fallback profiles': lambda _, profile : ', '.join(profile.fallbacks) if profile.fallbacks != None else '-'
         })))
-
 
     def gen_extension(self, section, extension, profile = None):
         # If no profile was specified then this is the first column so return the extension name
@@ -3799,7 +4511,7 @@ class VulkanProfilesDocGenerator():
             return self.gen_manPageLink(extension, extension)
 
         # If it's an extension explicitly required by the profile then this is a supported extension
-        if extension in profile.capabilities.extensions:
+        if extension in profile.merge_capabilities.extensions:
             return ':heavy_check_mark:'
 
         # Otherwise check if this extension has been promoted to a core API version that the profile requires
@@ -3815,13 +4527,13 @@ class VulkanProfilesDocGenerator():
     def gen_extensions(self):
         # Collect instance extensions defined by the profiles
         instanceExtensions = self.coreInstanceExtensions + list(itertools.chain(*[
-            profile.capabilities.instanceExtensions.keys() for profile in self.profiles
+            profile.merge_capabilities.instanceExtensions.keys() for profile in self.profiles
         ]))
         instanceExtensions.sort(key = self.sort_KHR_EXT_first)
 
         # Collect device extensions defined by the profiles
         deviceExtensions = self.coreDeviceExtensions + list(itertools.chain(*[
-            profile.capabilities.deviceExtensions.keys() for profile in self.profiles
+            profile.merge_capabilities.deviceExtensions.keys() for profile in self.profiles
         ]))
         deviceExtensions.sort(key = self.sort_KHR_EXT_first)
 
@@ -3917,8 +4629,8 @@ class VulkanProfilesDocGenerator():
                                         member)
 
         # If this feature struct member is defined in the profile as is, consider it supported
-        if struct in profile.capabilities.features:
-            featureStruct = profile.capabilities.features[struct]
+        if struct in profile.merge_capabilities.features:
+            featureStruct = profile.merge_capabilities.features[struct]
             if member in featureStruct:
                 return self.formatFeatureSupport(featureStruct[member], struct, section)
 
@@ -3927,16 +4639,16 @@ class VulkanProfilesDocGenerator():
         # consider it supported
         if struct == 'VkPhysicalDeviceFeatures':
             for wrapperStruct in [ 'VkPhysicalDeviceFeatures2', 'VkPhysicalDeviceFeatures2KHR' ]:
-                if wrapperStruct in profile.capabilities.features:
-                    featureStruct = profile.capabilities.features[wrapperStruct]['features']
+                if wrapperStruct in profile.merge_capabilities.features:
+                    featureStruct = profile.merge_capabilities.features[wrapperStruct]['features']
                     if member in featureStruct:
                         return self.formatFeatureSupport(featureStruct[member], struct, section)
 
         # If the struct has aliases and the feature struct member is defined in the profile in
         # one of those, consider it supported
         for alias in self.getFeatureStructSynonyms(struct, member):
-            if alias in profile.capabilities.features:
-                featureStruct = profile.capabilities.features[alias]
+            if alias in profile.merge_capabilities.features:
+                featureStruct = profile.merge_capabilities.features[alias]
                 if member in featureStruct:
                     return self.formatFeatureSupport(featureStruct[member], alias, section)
 
@@ -3967,7 +4679,7 @@ class VulkanProfilesDocGenerator():
         # Merge all feature references across the profiles to collect the relevant features to look at
         definedFeatures = dict()
         for profile in self.profiles:
-            for featureStructName, features in profile.capabilities.features.items():
+            for featureStructName, features in profile.merge_capabilities.features.items():
                 # VkPhysicalDeviceFeatures2 is an exception, as it contains a nested structure
                 # No other structure is allowed to have this
                 if featureStructName in [ 'VkPhysicalDeviceFeatures2', 'VkPhysicalDeviceFeatures2KHR' ]:
@@ -4145,8 +4857,8 @@ class VulkanProfilesDocGenerator():
                                         self.formatLimitName(struct, member))
 
         # If this limit/property struct member is defined in the profile as is, include it
-        if struct in profile.capabilities.properties:
-            limitStruct = profile.capabilities.properties[struct]
+        if struct in profile.merge_capabilities.properties:
+            limitStruct = profile.merge_capabilities.properties[struct]
             if member in limitStruct:
                 return self.formatProperty(limitStruct[member], struct, section)
 
@@ -4160,13 +4872,13 @@ class VulkanProfilesDocGenerator():
             else:
                 memberStruct = 'sparseProperties'
             propertyStruct = None
-            if 'VkPhysicalDeviceProperties' in profile.capabilities.properties:
+            if 'VkPhysicalDeviceProperties' in profile.merge_capabilities.properties:
                 propertyStructName = 'VkPhysicalDeviceProperties'
-                propertyStruct = profile.capabilities.properties[propertyStructName]
+                propertyStruct = profile.merge_capabilities.properties[propertyStructName]
             for wrapperStruct in [ 'VkPhysicalDeviceProperties2', 'VkPhysicalDeviceProperties2KHR' ]:
-                if wrapperStruct in profile.capabilities.properties:
+                if wrapperStruct in profile.merge_capabilities.properties:
                     propertyStructName = wrapperStruct
-                    propertyStruct = profile.capabilities.properties[wrapperStruct]['properties']
+                    propertyStruct = profile.merge_capabilities.properties[wrapperStruct]['properties']
             if propertyStruct != None: # and memberStruct != 'sparseProperties':
                 if memberStruct in propertyStruct:
                     limitStruct = propertyStruct[memberStruct]
@@ -4176,8 +4888,8 @@ class VulkanProfilesDocGenerator():
         # If the struct has aliases and the limit/property struct member is defined in the profile
         # in one of those then include it
         for alias in self.getLimitStructSynonyms(struct, member):
-            if alias in profile.capabilities.properties:
-                limitStruct = profile.capabilities.properties[alias]
+            if alias in profile.merge_capabilities.properties:
+                limitStruct = profile.merge_capabilities.properties[alias]
                 if member in limitStruct and limitStruct[member]:
                     return self.formatProperty(limitStruct[member], alias, section)
 
@@ -4208,7 +4920,7 @@ class VulkanProfilesDocGenerator():
         # Merge all limit/property references across the profiles to collect the relevant limits to look at
         definedLimits = dict()
         for profile in self.profiles:
-            for propertyStructName, properties in profile.capabilities.properties.items():
+            for propertyStructName, properties in profile.merge_capabilities.properties.items():
                 # VkPhysicalDeviceProperties and VkPhysicalDeviceProperties2 are exceptions,
                 # need custom handling due to only using their nested structures
                 if propertyStructName in [ 'VkPhysicalDeviceProperties2', 'VkPhysicalDeviceProperties2KHR' ]:
@@ -4316,7 +5028,7 @@ class VulkanProfilesDocGenerator():
         # properties to look at for each queue family definition index
         definedQueueFamilies = []
         for profile in self.profiles:
-            for index, queueFamily in enumerate(profile.capabilities.queueFamiliesProperties):
+            for index, queueFamily in enumerate(profile.merge_capabilities.queueFamiliesProperties):
                 definedQueueFamilyProperties = OrderedDict()
                 for structName, properties in queueFamily.items():
                     # VkPhysicalDeviceQueueFamilies2 is an exception, as it contains a nested structure
@@ -4379,16 +5091,16 @@ class VulkanProfilesDocGenerator():
                                         self.formatLimitName(struct, member))
 
         # If this profile doesn't even define this format then early out
-        if not format in profile.capabilities.formats:
+        if not format in profile.merge_capabilities.formats:
             # Before doing so, though, we have to check whether any of the aliases of the format
             # are defined by the profile
             formatAliases = self.registry.enums['VkFormat'].aliasValues
-            if not format in formatAliases or not formatAliases[format] in profile.capabilities.formats:
+            if not format in formatAliases or not formatAliases[format] in profile.merge_capabilities.formats:
                 return ''
 
         # If this format property struct member is defined in the profile as is, include it
-        if struct in profile.capabilities.formats[format]:
-            propertyStruct = profile.capabilities.formats[format][struct]
+        if struct in profile.merge_capabilities.formats[format]:
+            propertyStruct = profile.merge_capabilities.formats[format][struct]
             if member in propertyStruct:
                 return self.formatProperty(propertyStruct[member], struct)
 
@@ -4396,8 +5108,8 @@ class VulkanProfilesDocGenerator():
         # the flag bit to check for, so we check for that, or any of its aliases
         if struct == 'VkFormatProperties':
             for alternative in [ 'VkFormatProperties', 'VkFormatProperties2', 'VkFormatProperties2KHR', 'VkFormatProperties3', 'VkFormatProperties3KHR' ]:
-                if alternative in profile.capabilities.formats[format]:
-                    propertyStruct = profile.capabilities.formats[format][alternative]
+                if alternative in profile.merge_capabilities.formats[format]:
+                    propertyStruct = profile.merge_capabilities.formats[format][alternative]
                     # VkFormatProperties2[KHR] wrap the real structure in a member
                     if 'formatProperties' in propertyStruct:
                         propertyStruct = propertyStruct['formatProperties']
@@ -4408,8 +5120,8 @@ class VulkanProfilesDocGenerator():
         # in one of those then include it
         structDef = self.registry.structs[struct]
         for alias in structDef.aliases:
-            if alias in profile.capabilities.formats[format]:
-                propertyStruct = profile.capabilities.formats[format][alias]
+            if alias in profile.merge_capabilities.formats[format]:
+                propertyStruct = profile.merge_capabilities.formats[format][alias]
                 if member in propertyStruct and propertyStruct[member]:
                     return self.formatProperty(propertyStruct[member], alias)
 
@@ -4421,7 +5133,7 @@ class VulkanProfilesDocGenerator():
         # properties to look at for each format
         definedFormats = dict()
         for profile in self.profiles:
-            for format, formatProperties in profile.capabilities.formats.items():
+            for format, formatProperties in profile.merge_capabilities.formats.items():
                 # This may be an alias of a format name, so get the real name
                 formatAliases = self.registry.enums['VkFormat'].aliasValues
                 format = formatAliases[format] if format in formatAliases else format
@@ -4547,15 +5259,15 @@ if __name__ == '__main__':
             schema = generator.schema
 
     if args.input != None:
-        profiles = VulkanProfiles.loadFromDir(registry, args.input, args.validate, schema)
+        profiles_files = VulkanProfilesFiles(registry, args.input, args.validate, schema)
 
     if args.output_library_inc != None:
-        generator = VulkanProfilesLibraryGenerator(registry, profiles)
+        generator = VulkanProfilesLibraryGenerator(registry, profiles_files)
         generator.generate(args.output_library_inc, args.output_library_src)
         if args.debug:
-            generator = VulkanProfilesLibraryGenerator(registry, profiles, True)
+            generator = VulkanProfilesLibraryGenerator(registry, profiles_files, True)
             generator.generate(args.output_library_inc + '/debug', args.output_library_src + '/debug')
 
     if args.output_doc != None:
-        generator = VulkanProfilesDocGenerator(registry, profiles)
+        generator = VulkanProfilesDocGenerator(registry, profiles_files)
         generator.generate(args.output_doc)

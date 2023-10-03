@@ -60,6 +60,22 @@ TEST(api_get_profiles_beta, partial) {
     EXPECT_EQ(VP_KHR_ROADMAP_2022_SPEC_VERSION, properties[0].specVersion);
 }
 
+TEST(api_get_profile_required_profiles, empty) {
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, 1};
+
+    uint32_t count = 0;
+    VkResult result0 = vpGetProfileRequiredProfiles(&profile, &count, nullptr);
+    EXPECT_EQ(VK_SUCCESS, result0);
+    EXPECT_EQ(0, count);
+
+    count = 1;
+
+    std::vector<VpProfileProperties> data(count);
+    VkResult result1 = vpGetProfileRequiredProfiles(&profile, &count, &data[0]);
+    EXPECT_EQ(VK_SUCCESS, result1);
+    EXPECT_EQ(0, count);
+}
+
 TEST(api_get_profile_device_extension_properties, full) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 

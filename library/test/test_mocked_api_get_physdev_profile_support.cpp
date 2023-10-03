@@ -34,8 +34,8 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_supported) {
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
         "Checking device support for profile VP_ANDROID_baseline_2021 "
-            "(deviceName=, driverName=, driverInfo=). You may find the details "
-            "of the capabilities of this device on https://vulkan.gpuinfo.org/"
+        "(deviceName=, driverName=, driverInfo=). You may find the details "
+        "of the capabilities of this device on https://vulkan.gpuinfo.org/"
     });
 #endif
 
@@ -212,8 +212,8 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_version) {
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
         "Checking device support for profile VP_KHR_roadmap_2022 "
-            "(deviceName=, driverName=, driverInfo=). You may find the details "
-            "of the capabilities of this device on https://vulkan.gpuinfo.org/",
+        "(deviceName=, driverName=, driverInfo=). You may find the details "
+        "of the capabilities of this device on https://vulkan.gpuinfo.org/",
         "Unsupported API version: 1.3.204"
     });
 #endif
