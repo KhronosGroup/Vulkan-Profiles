@@ -34,11 +34,12 @@ Please see the [CONTRIBUTING.md](./CONTRIBUTING.md) file in this repository for 
 
 --------------
 ## Version Tagging Scheme
-Updates to the *Vulkan Profiles* repository which correspond to a new Vulkan specification release are tagged using the following format: v<version> (e.g., v1.1.96).
 
-Note: Marked version releases have undergone thorough testing but do not imply the same quality level as SDK tags. SDK tags follow the sdk-<version>.<patch> format (e.g., sdk-1.1.92.0).
+Updates to this repository which correspond to a new Vulkan specification release are tagged using the following format: `v<`_`version`_`>` (e.g., `v1.3.266`).
 
-This scheme was adopted following the 1.1.96 Vulkan specification release.
+**Note**: Marked version releases have undergone thorough testing but do not imply the same quality level as SDK tags. SDK tags follow the `vulkan-sdk-<`_`version`_`>.<`_`patch`_`>` format (e.g., `vulkan-sdk-1.3.266.0`).
+
+This scheme was adopted following the `1.3.266` Vulkan specification release.
 
 --------------
 ## License
