@@ -468,6 +468,16 @@ class ProfileGenerator():
                         gen += enum[0]
                         self.test_values[name][property] = enum[1]
                         self.i += 1
+                    elif property_type == "VkImageUsageFlags":
+                        enum = self.get_enum('VkImageUsageFlagBits', True)
+                        gen += enum[0]
+                        self.test_values[name][property] = enum[1]
+                        self.i += 1
+                    elif property_type == "VkBufferUsageFlags":
+                        enum = self.get_enum('VkBufferUsageFlagBits', True)
+                        gen += enum[0]
+                        self.test_values[name][property] = enum[1]
+                        self.i += 1
                     elif property_type == "char":
                         gen += "\""
                         gen += property_name
