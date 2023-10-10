@@ -45,6 +45,11 @@ else()
     message(FATAL_ERROR "Unsupported Platform!")
 endif()
 
+option(BUILD_MOCK_ANDROID_SUPPORT "Build with Android Platform headers" OFF)
+if(BUILD_MOCK_ANDROID_SUPPORT)
+    add_definitions(-DVK_USE_PLATFORM_ANDROID_KHR)
+endif()
+
 add_definitions(-DVK_ENABLE_BETA_EXTENSIONS)
 
 source_group("JSON Manifest" FILES ${LAYER_NAME}.json.in)
