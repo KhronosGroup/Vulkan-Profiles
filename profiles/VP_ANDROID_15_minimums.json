@@ -18,7 +18,7 @@
                 "VK_EXT_surface_maintenance1": 1,
                 "VK_EXT_swapchain_maintenance1": 1,
                 "VK_EXT_4444_formats": 1,
-                "VK_GOOGLE_surfaceless_query": 1,
+                "VK_GOOGLE_surfaceless_query": 1
             },
             "features": {
                 "VkPhysicalDeviceFeatures": {
@@ -29,10 +29,10 @@
                     "shaderStorageImageReadWithoutFormat": true,
                     "shaderStorageImageWriteWithoutFormat": true,
                     "samplerAnisotropy": true,
-                    "tessellationShader": true,
+                    "tessellationShader": true
                 },
                 "VkPhysicalDeviceVulkan12Features": {
-                    "shaderFloat16": true
+                    "shaderFloat16": true,
                     "shaderInt8": true
                 },
                 "VkPhysicalDeviceCustomBorderColorFeaturesEXT": {
@@ -54,7 +54,7 @@
                     "samplerYcbcrConversion": true
                 },
                 "VkPhysicalDeviceShaderFloat16Int8Features": {
-                    "shaderFloat16": true
+                    "shaderFloat16": true,
                     "shaderInt8": true
                 },
                 "VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures": {
@@ -78,7 +78,7 @@
                     }
                 },
                 "VkPhysicalDeviceVulkan11Properties": {
-                  "subgroupSupportedOperations": ["VK_SUBGROUP_FEATURE_BASIC_BIT", "VK_SUBGROUP_FEATURE_VOTE_BIT", "VK_SUBGROUP_FEATURE_ARITHMETIC_BIT", "VK_SUBGROUP_FEATURE_BALLOT_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT"],
+                  "subgroupSupportedOperations": ["VK_SUBGROUP_FEATURE_BASIC_BIT", "VK_SUBGROUP_FEATURE_VOTE_BIT", "VK_SUBGROUP_FEATURE_ARITHMETIC_BIT", "VK_SUBGROUP_FEATURE_BALLOT_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT"]
                 }
             },
             "formats": {
@@ -107,7 +107,7 @@
             "properties": {
                 "VkPhysicalDeviceProperties": {
                     "limits": {
-                        "maxGeometryTotalOutputComponents": 1028,
+                        "maxGeometryTotalOutputComponents": 1028
                     }
                 }
             }
@@ -187,14 +187,14 @@
                  }
             ],
             "profiles": [
-                "VP_ANDROID_baseline_2022",
+                "VP_ANDROID_baseline_2022"
              ],
              "capabilities": [
                 "MUST",
                 ["DepthClipControl", "maxGeometryTotalOutputComponents"],
                 ["primitivesGeneratedQuery", "pipelineStatisticsQuery"],
                 ["androidYUVtarget", "generalYUVtarget"],
-                ["swBresenhamLines", "hwBresenhamLines"],
+                ["swBresenhamLines", "hwBresenhamLines"]
             ]
         }
     }
