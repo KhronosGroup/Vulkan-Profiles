@@ -2233,6 +2233,9 @@ class VulkanRegistry():
         if 'VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM' in self.structs:
             self.structs['VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM'].members['fragmentDensityOffsetGranularity'].limittype = 'min,mul'
 
+        if 'VkPhysicalDeviceSchedulingControlsPropertiesARM' in self.structs:
+            self.structs['VkPhysicalDeviceSchedulingControlsPropertiesARM'].members['schedulingControlsFlags'].limittype = 'bitmask'
+
         # TODO: The registry xml is also missing limittype definitions for format and queue family properties
         # For now we just add the important ones, this needs a larger overhaul in the vk.xml
         self.structs['VkFormatProperties'].members['linearTilingFeatures'].limittype = 'bitmask'
