@@ -291,7 +291,7 @@ class ProfileMerger():
             # Remove format features not in intersect
             for feature in list(merged_formats[format][prop_name]):
                 if feature not in capability['formats'][format][prop_name]:
-                    merged_formats[format][prop_name].remove(feature)
+                    del merged_formats[format][prop_name][feature]
 
         # Iterate all format features in current json
         if prop_name in capability['formats'][format]:
