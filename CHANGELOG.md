@@ -16,6 +16,10 @@
 ### Features:
 - Add API library support of checking the support of profiles with multiple variants
 
+### Deprecation:
+- Remove `VP_LUNARG_desktop_portability_2022` profile
+- Remove `VP_LUNARG_desktop_baseline_2022` profile
+
 ## [Vulkan Profiles Toolset 1.3.261](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - August 2023
 
 ### Bugfixes:

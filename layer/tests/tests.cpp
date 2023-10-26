@@ -266,8 +266,8 @@ TEST_F(LayerTests, TestExcludingDeviceExtensions) {
 
     VkResult err = VK_SUCCESS;
 
-    const char* profile_file_data = JSON_PROFILES_PATH "VP_LUNARG_desktop_baseline_2022.json";
-    const char* profile_name_data = "VP_LUNARG_desktop_baseline_2022";
+    const char* profile_file_data = JSON_PROFILES_PATH "VP_LUNARG_desktop_baseline_2023.json";
+    const char* profile_name_data = "VP_LUNARG_desktop_baseline_2023";
     VkBool32 emulate_portability_data = VK_TRUE;
     VkBool32 debug_fail_on_error = VK_FALSE;
     const std::vector<const char*> exclude_device_extensions = {
@@ -331,7 +331,7 @@ TEST_F(LayerTests, TestExcludingDeviceExtensions) {
 TEST_F(LayerTests, TestExcludingFormats) {
     TEST_DESCRIPTION("Test specifying image formats to be excluded from being reported by the device");
 
-    const char* profile_file_data = JSON_PROFILES_PATH "VP_LUNARG_desktop_baseline_2022.json";
+    const char* profile_file_data = JSON_PROFILES_PATH "VP_LUNARG_desktop_baseline_2023.json";
     VkBool32 emulate_portability_data = VK_TRUE;
     VkBool32 debug_fail_on_error = VK_TRUE;
     const std::vector<const char*> exclude_formats = {"VK_FORMAT_R8G8B8A8_UNORM"};
