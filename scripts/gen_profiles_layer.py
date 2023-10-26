@@ -2121,7 +2121,7 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties2KHR(VkPhysical
     PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
     const uint32_t src_count = (pdd) ? static_cast<uint32_t>(pdd->arrayof_queue_family_properties_.size()) : 0;
     if (src_count == 0) {
-        dt->GetPhysicalDeviceQueueFamilyProperties2KHR(physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties2);
+        dt->GetPhysicalDeviceQueueFamilyProperties2(physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties2);
         return;
     }
 
@@ -2251,7 +2251,7 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties2KHR(
     VkImageFormatProperties2KHR *pImageFormatProperties) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
-    dt->GetPhysicalDeviceImageFormatProperties2KHR(physicalDevice, pImageFormatInfo, pImageFormatProperties);
+    dt->GetPhysicalDeviceImageFormatProperties2(physicalDevice, pImageFormatInfo, pImageFormatProperties);
     return GetPhysicalDeviceImageFormatProperties(physicalDevice, pImageFormatInfo->format, pImageFormatInfo->type,
                                                   pImageFormatInfo->tiling, pImageFormatInfo->usage, pImageFormatInfo->flags,
                                                   &pImageFormatProperties->imageFormatProperties);
@@ -2566,11 +2566,11 @@ ENUMERATE_PHYSICAL_DEVICES_MIDDLE = '''
                     }
                     dt->GetPhysicalDeviceMemoryProperties2(physical_device, &memory_chain);
                 } else {
-                    dt->GetPhysicalDeviceProperties2KHR(physical_device, &property_chain);
+                    dt->GetPhysicalDeviceProperties2(physical_device, &property_chain);
                     if (layer_settings->simulate.default_feature_values == DEFAULT_FEATURE_VALUES_DEVICE) {
-                        dt->GetPhysicalDeviceFeatures2KHR(physical_device, &feature_chain);
+                        dt->GetPhysicalDeviceFeatures2(physical_device, &feature_chain);
                     }
-                    dt->GetPhysicalDeviceMemoryProperties2KHR(physical_device, &memory_chain);
+                    dt->GetPhysicalDeviceMemoryProperties2(physical_device, &memory_chain);
                 }
 
                 pdd.physical_device_properties_ = property_chain.properties;
