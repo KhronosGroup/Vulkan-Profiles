@@ -245,6 +245,9 @@ VPAPI_ATTR VkResult vpGetProfiles(uint32_t *pPropertyCount, VpProfileProperties 
 // List the required profiles of a profile
 VPAPI_ATTR VkResult vpGetProfileRequiredProfiles(const VpProfileProperties* pProfile, uint32_t* pPropertyCount, VpProfileProperties* pProperties);
 
+// Query the profile required Vulkan API version
+VPAPI_ATTR uint32_t vpGetProfileAPIVersion(const VpProfileProperties* pProfile);
+
 // List the recommended fallback profiles of a profile
 VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties);
 
@@ -608,6 +611,13 @@ VPAPI_ATTR VkResult vpGetProfileRequiredProfiles(const VpProfileProperties *pPro
         }
     }
     return result;
+}
+
+VPAPI_ATTR uint32_t vpGetProfileAPIVersion(const VpProfileProperties* pProfile) {
+    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
+    if (pDesc == nullptr) return 0;
+
+    return pDesc->minApiVersion;
 }
 
 VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties) {
