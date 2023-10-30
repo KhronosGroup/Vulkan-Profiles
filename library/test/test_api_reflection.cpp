@@ -76,6 +76,14 @@ TEST(api_get_profile_required_profiles, empty) {
     EXPECT_EQ(0, count);
 }
 
+TEST(api_get_profile_api_version, get) {
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, 1};
+
+    uint32_t version = vpGetProfileAPIVersion(&profile);
+
+    EXPECT_EQ(VK_MAKE_API_VERSION(0, 1, 2, 148), version);
+}
+
 TEST(api_get_profile_device_extension_properties, full) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
