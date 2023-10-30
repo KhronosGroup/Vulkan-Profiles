@@ -1,10 +1,10 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-217.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.1-255.json#",
     "profiles": {
-        "VP_GPUINFO_AMD_Radeon_RX_6800_XT_2_0_233_windows_10": {
+        "VP_GPUINFO_AMD_Radeon_RX_6600__RADV_NAVI23__23_2_99_endeavouros_unknown": {
             "version": 1,
-            "api-version": "1.3.217",
-            "label": "AMD Radeon RX 6800 XT driver 2.0.233 on Windows 10",
+            "api-version": "1.3.255",
+            "label": "AMD Radeon RX 6600 (RADV NAVI23) driver 23.2.99 on Endeavouros unknown",
             "description": "Exported from https://vulkan.gpuinfo.org",
             "contributors": {
                 "Sascha Willems": {
@@ -15,7 +15,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2022-09-05",
+                    "date": "2023-10-30",
                     "author": "Sascha Willems",
                     "comment": "Automated export from https://vulkan.gpuinfo.org"
                 }
@@ -88,10 +88,10 @@
                 "VkPhysicalDeviceVulkan11Features": {
                     "storageBuffer16BitAccess": true,
                     "uniformAndStorageBuffer16BitAccess": true,
-                    "storagePushConstant16": false,
+                    "storagePushConstant16": true,
                     "storageInputOutput16": true,
                     "multiview": true,
-                    "multiviewGeometryShader": false,
+                    "multiviewGeometryShader": true,
                     "multiviewTessellationShader": true,
                     "variablePointersStorageBuffer": true,
                     "variablePointers": true,
@@ -104,7 +104,7 @@
                     "drawIndirectCount": true,
                     "storageBuffer8BitAccess": true,
                     "uniformAndStorageBuffer8BitAccess": true,
-                    "storagePushConstant8": false,
+                    "storagePushConstant8": true,
                     "shaderBufferInt64Atomics": true,
                     "shaderSharedInt64Atomics": true,
                     "shaderFloat16": true,
@@ -140,7 +140,7 @@
                     "timelineSemaphore": true,
                     "bufferDeviceAddress": true,
                     "bufferDeviceAddressCaptureReplay": true,
-                    "bufferDeviceAddressMultiDevice": true,
+                    "bufferDeviceAddressMultiDevice": false,
                     "vulkanMemoryModel": true,
                     "vulkanMemoryModelDeviceScope": true,
                     "vulkanMemoryModelAvailabilityVisibilityChains": false,
@@ -168,13 +168,19 @@
                 "VkPhysicalDeviceCoherentMemoryFeaturesAMD": {
                     "deviceCoherentMemory": true
                 },
+                "VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesAMD": {
+                    "shaderEarlyAndLateFragmentTests": true
+                },
                 "VkPhysicalDeviceTransformFeedbackFeaturesEXT": {
                     "transformFeedback": true,
                     "geometryStreams": true
                 },
+                "VkPhysicalDevicePipelineRobustnessFeaturesEXT": {
+                    "pipelineRobustness": true
+                },
                 "VkPhysicalDeviceConditionalRenderingFeaturesEXT": {
                     "conditionalRendering": true,
-                    "inheritedConditionalRendering": true
+                    "inheritedConditionalRendering": false
                 },
                 "VkPhysicalDeviceDepthClipEnableFeaturesEXT": {
                     "depthClipEnable": true
@@ -223,6 +229,21 @@
                 "VkPhysicalDeviceMemoryPriorityFeaturesEXT": {
                     "memoryPriority": true
                 },
+                "VkPhysicalDeviceBufferAddressFeaturesEXT": {
+                    "bufferDeviceAddress": true,
+                    "bufferDeviceAddressCaptureReplay": true,
+                    "bufferDeviceAddressMultiDevice": false
+                },
+                "VkPhysicalDeviceBufferDeviceAddressFeaturesEXT": {
+                    "bufferDeviceAddress": true,
+                    "bufferDeviceAddressCaptureReplay": true,
+                    "bufferDeviceAddressMultiDevice": false
+                },
+                "VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT": {
+                    "fragmentShaderSampleInterlock": true,
+                    "fragmentShaderPixelInterlock": true,
+                    "fragmentShaderShadingRateInterlock": false
+                },
                 "VkPhysicalDeviceYcbcrImageArraysFeaturesEXT": {
                     "ycbcrImageArrays": true
                 },
@@ -231,9 +252,9 @@
                     "transformFeedbackPreservesProvokingVertex": true
                 },
                 "VkPhysicalDeviceLineRasterizationFeaturesEXT": {
-                    "rectangularLines": false,
+                    "rectangularLines": true,
                     "bresenhamLines": true,
-                    "smoothLines": false,
+                    "smoothLines": true,
                     "stippledRectangularLines": false,
                     "stippledBresenhamLines": true,
                     "stippledSmoothLines": false
@@ -244,7 +265,7 @@
                     "shaderBufferFloat64Atomics": true,
                     "shaderBufferFloat64AtomicAdd": false,
                     "shaderSharedFloat32Atomics": true,
-                    "shaderSharedFloat32AtomicAdd": false,
+                    "shaderSharedFloat32AtomicAdd": true,
                     "shaderSharedFloat64Atomics": true,
                     "shaderSharedFloat64AtomicAdd": false,
                     "shaderImageFloat32Atomics": true,
@@ -275,6 +296,9 @@
                     "shaderImageFloat32AtomicMinMax": true,
                     "sparseImageFloat32AtomicMinMax": true
                 },
+                "VkPhysicalDeviceSwapchainMaintenance1FeaturesEXT": {
+                    "swapchainMaintenance1": true
+                },
                 "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT": {
                     "shaderDemoteToHelperInvocation": true
                 },
@@ -296,12 +320,34 @@
                 "VkPhysicalDevicePipelineCreationCacheControlFeaturesEXT": {
                     "pipelineCreationCacheControl": true
                 },
+                "VkPhysicalDeviceDescriptorBufferFeaturesEXT": {
+                    "descriptorBuffer": true,
+                    "descriptorBufferCaptureReplay": false,
+                    "descriptorBufferImageLayoutIgnored": true,
+                    "descriptorBufferPushDescriptors": true
+                },
+                "VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT": {
+                    "graphicsPipelineLibrary": true
+                },
+                "VkPhysicalDeviceMeshShaderFeaturesEXT": {
+                    "taskShader": true,
+                    "meshShader": true,
+                    "multiviewMeshShader": true,
+                    "primitiveFragmentShadingRateMeshShader": true,
+                    "meshShaderQueries": false
+                },
                 "VkPhysicalDeviceImageRobustnessFeaturesEXT": {
                     "robustImageAccess": true
+                },
+                "VkPhysicalDeviceAttachmentFeedbackLoopLayoutFeaturesEXT": {
+                    "attachmentFeedbackLoopLayout": true
                 },
                 "VkPhysicalDevice4444FormatsFeaturesEXT": {
                     "formatA4R4G4B4": true,
                     "formatA4B4G4R4": true
+                },
+                "VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT": {
+                    "vertexInputDynamicState": true
                 },
                 "VkPhysicalDeviceDepthClipControlFeaturesEXT": {
                     "depthClipControl": true
@@ -312,11 +358,16 @@
                 },
                 "VkPhysicalDeviceExtendedDynamicState2FeaturesEXT": {
                     "extendedDynamicState2": true,
-                    "extendedDynamicState2LogicOp": false,
-                    "extendedDynamicState2PatchControlPoints": false
+                    "extendedDynamicState2LogicOp": true,
+                    "extendedDynamicState2PatchControlPoints": true
                 },
                 "VkPhysicalDeviceColorWriteEnableFeaturesEXT": {
                     "colorWriteEnable": true
+                },
+                "VkPhysicalDevicePrimitivesGeneratedQueryFeaturesEXT": {
+                    "primitivesGeneratedQuery": true,
+                    "primitivesGeneratedQueryWithRasterizerDiscard": true,
+                    "primitivesGeneratedQueryWithNonZeroStreams": true
                 },
                 "VkPhysicalDeviceGlobalPriorityQueryFeaturesEXT": {
                     "globalPriorityQuery": true
@@ -324,20 +375,82 @@
                 "VkPhysicalDeviceImageViewMinLodFeaturesEXT": {
                     "minLod": true
                 },
+                "VkPhysicalDeviceMultiDrawFeaturesEXT": {
+                    "multiDraw": true
+                },
+                "VkPhysicalDeviceImage2DViewOf3DFeaturesEXT": {
+                    "image2DViewOf3D": true,
+                    "sampler2DViewOf3D": false
+                },
                 "VkPhysicalDeviceBorderColorSwizzleFeaturesEXT": {
                     "borderColorSwizzle": true,
                     "borderColorSwizzleFromImage": true
                 },
-                "VkPhysicalDevicePageableDeviceLocalMemoryFeaturesEXT": {
-                    "pageableDeviceLocalMemory": true
+                "VkPhysicalDeviceImageSlicedViewOf3DFeaturesEXT": {
+                    "imageSlicedViewOf3D": true
+                },
+                "VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT": {
+                    "nonSeamlessCubeMap": true
+                },
+                "VkPhysicalDeviceExtendedDynamicState3FeaturesEXT": {
+                    "extendedDynamicState3TessellationDomainOrigin": true,
+                    "extendedDynamicState3DepthClampEnable": true,
+                    "extendedDynamicState3PolygonMode": true,
+                    "extendedDynamicState3RasterizationSamples": true,
+                    "extendedDynamicState3SampleMask": true,
+                    "extendedDynamicState3AlphaToCoverageEnable": true,
+                    "extendedDynamicState3AlphaToOneEnable": false,
+                    "extendedDynamicState3LogicOpEnable": true,
+                    "extendedDynamicState3ColorBlendEnable": true,
+                    "extendedDynamicState3ColorBlendEquation": true,
+                    "extendedDynamicState3ColorWriteMask": true,
+                    "extendedDynamicState3RasterizationStream": false,
+                    "extendedDynamicState3ConservativeRasterizationMode": true,
+                    "extendedDynamicState3ExtraPrimitiveOverestimationSize": false,
+                    "extendedDynamicState3DepthClipEnable": true,
+                    "extendedDynamicState3SampleLocationsEnable": false,
+                    "extendedDynamicState3ColorBlendAdvanced": false,
+                    "extendedDynamicState3ProvokingVertexMode": true,
+                    "extendedDynamicState3LineRasterizationMode": true,
+                    "extendedDynamicState3LineStippleEnable": true,
+                    "extendedDynamicState3DepthClipNegativeOneToOne": true,
+                    "extendedDynamicState3ViewportWScalingEnable": false,
+                    "extendedDynamicState3ViewportSwizzle": false,
+                    "extendedDynamicState3CoverageToColorEnable": false,
+                    "extendedDynamicState3CoverageToColorLocation": false,
+                    "extendedDynamicState3CoverageModulationMode": false,
+                    "extendedDynamicState3CoverageModulationTableEnable": false,
+                    "extendedDynamicState3CoverageModulationTable": false,
+                    "extendedDynamicState3CoverageReductionMode": false,
+                    "extendedDynamicState3RepresentativeFragmentTestEnable": false,
+                    "extendedDynamicState3ShadingRateImageEnable": false
+                },
+                "VkPhysicalDeviceShaderModuleIdentifierFeaturesEXT": {
+                    "shaderModuleIdentifier": true
+                },
+                "VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT": {
+                    "mutableDescriptorType": true
+                },
+                "VkPhysicalDevicePipelineLibraryGroupHandlesFeaturesEXT": {
+                    "pipelineLibraryGroupHandles": true
+                },
+                "VkPhysicalDeviceAttachmentFeedbackLoopDynamicStateFeaturesEXT": {
+                    "attachmentFeedbackLoopDynamicState": true
+                },
+                "VkPhysicalDeviceShaderIntegerFunctions2FeaturesINTEL": {
+                    "shaderIntegerFunctions2": true
                 },
                 "VkPhysicalDeviceDynamicRenderingFeaturesKHR": {
                     "dynamicRendering": true
                 },
                 "VkPhysicalDeviceMultiviewFeaturesKHR": {
                     "multiview": true,
-                    "multiviewGeometryShader": false,
+                    "multiviewGeometryShader": true,
                     "multiviewTessellationShader": true
+                },
+                "VkPhysicalDeviceShaderFloat16Int8FeaturesKHR": {
+                    "shaderFloat16": true,
+                    "shaderInt8": true
                 },
                 "VkPhysicalDeviceFloat16Int8FeaturesKHR": {
                     "shaderFloat16": true,
@@ -346,11 +459,19 @@
                 "VkPhysicalDevice16BitStorageFeaturesKHR": {
                     "storageBuffer16BitAccess": true,
                     "uniformAndStorageBuffer16BitAccess": true,
-                    "storagePushConstant16": false,
+                    "storagePushConstant16": true,
                     "storageInputOutput16": true
                 },
                 "VkPhysicalDeviceImagelessFramebufferFeaturesKHR": {
                     "imagelessFramebuffer": true
+                },
+                "VkPhysicalDevicePerformanceQueryFeaturesKHR": {
+                    "performanceCounterQueryPools": true,
+                    "performanceCounterMultipleQueryPools": true
+                },
+                "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                    "variablePointersStorageBuffer": true,
+                    "variablePointers": true
                 },
                 "VkPhysicalDeviceVariablePointersFeaturesKHR": {
                     "variablePointersStorageBuffer": true,
@@ -359,14 +480,14 @@
                 "VkPhysicalDeviceAccelerationStructureFeaturesKHR": {
                     "accelerationStructure": true,
                     "accelerationStructureCaptureReplay": true,
-                    "accelerationStructureIndirectBuild": true,
+                    "accelerationStructureIndirectBuild": false,
                     "accelerationStructureHostCommands": false,
                     "descriptorBindingAccelerationStructureUpdateAfterBind": true
                 },
                 "VkPhysicalDeviceRayTracingPipelineFeaturesKHR": {
                     "rayTracingPipeline": true,
                     "rayTracingPipelineShaderGroupHandleCaptureReplay": true,
-                    "rayTracingPipelineShaderGroupHandleCaptureReplayMixed": true,
+                    "rayTracingPipelineShaderGroupHandleCaptureReplayMixed": false,
                     "rayTracingPipelineTraceRaysIndirect": true,
                     "rayTraversalPrimitiveCulling": true
                 },
@@ -382,7 +503,7 @@
                 "VkPhysicalDevice8BitStorageFeaturesKHR": {
                     "storageBuffer8BitAccess": true,
                     "uniformAndStorageBuffer8BitAccess": true,
-                    "storagePushConstant8": false
+                    "storagePushConstant8": true
                 },
                 "VkPhysicalDeviceShaderAtomicInt64FeaturesKHR": {
                     "shaderBufferInt64Atomics": true,
@@ -414,13 +535,16 @@
                 "VkPhysicalDeviceSeparateDepthStencilLayoutsFeaturesKHR": {
                     "separateDepthStencilLayouts": true
                 },
+                "VkPhysicalDevicePresentWaitFeaturesKHR": {
+                    "presentWait": true
+                },
                 "VkPhysicalDeviceUniformBufferStandardLayoutFeaturesKHR": {
                     "uniformBufferStandardLayout": true
                 },
                 "VkPhysicalDeviceBufferDeviceAddressFeaturesKHR": {
                     "bufferDeviceAddress": true,
                     "bufferDeviceAddressCaptureReplay": true,
-                    "bufferDeviceAddressMultiDevice": true
+                    "bufferDeviceAddressMultiDevice": false
                 },
                 "VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR": {
                     "pipelineExecutableInfo": true
@@ -428,8 +552,14 @@
                 "VkPhysicalDeviceShaderIntegerDotProductFeaturesKHR": {
                     "shaderIntegerDotProduct": true
                 },
+                "VkPhysicalDevicePresentIdFeaturesKHR": {
+                    "presentId": true
+                },
                 "VkPhysicalDeviceSynchronization2FeaturesKHR": {
                     "synchronization2": true
+                },
+                "VkPhysicalDeviceFragmentShaderBarycentricFeaturesKHR": {
+                    "fragmentShaderBarycentric": true
                 },
                 "VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR": {
                     "shaderSubgroupUniformControlFlow": true
@@ -443,31 +573,42 @@
                     "workgroupMemoryExplicitLayout8BitAccess": true,
                     "workgroupMemoryExplicitLayout16BitAccess": true
                 },
+                "VkPhysicalDeviceRayTracingMaintenance1FeaturesKHR": {
+                    "rayTracingMaintenance1": true,
+                    "rayTracingPipelineTraceRaysIndirect2": true
+                },
                 "VkPhysicalDeviceMaintenance4FeaturesKHR": {
                     "maintenance4": true
+                },
+                "VkPhysicalDeviceComputeShaderDerivativesFeaturesNV": {
+                    "computeDerivativeGroupQuads": false,
+                    "computeDerivativeGroupLinear": true
+                },
+                "VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE": {
+                    "mutableDescriptorType": true
                 }
             },
             "properties": {
                 "VkPhysicalDeviceProperties": {
                     "vendorID": 4098,
-                    "apiVersion": 4206809,
+                    "apiVersion": 4206847,
                     "pipelineCacheUUID": [
-                        84,
-                        11,
-                        51,
-                        109,
-                        5,
-                        206,
-                        80,
-                        207,
-                        152,
-                        133,
-                        229,
-                        69,
-                        112,
-                        52,
+                        191,
+                        135,
+                        96,
+                        214,
+                        90,
+                        170,
+                        220,
+                        88,
+                        186,
                         0,
-                        243
+                        202,
+                        173,
+                        50,
+                        159,
+                        158,
+                        125
                     ],
                     "sparseProperties": {
                         "residencyAlignedMipSize": false,
@@ -477,7 +618,7 @@
                         "residencyStandard3DBlockShape": true
                     },
                     "limits": {
-                        "bufferImageGranularity": "1",
+                        "bufferImageGranularity": 1,
                         "discreteQueuePriorities": 2,
                         "framebufferColorSampleCounts": [
                             "VK_SAMPLE_COUNT_1_BIT",
@@ -511,47 +652,47 @@
                         "maxComputeSharedMemorySize": 65536,
                         "maxComputeWorkGroupInvocations": 1024,
                         "maxCullDistances": 8,
-                        "maxDescriptorSetInputAttachments": 4294967295,
-                        "maxDescriptorSetSampledImages": 4294967295,
-                        "maxDescriptorSetSamplers": 4294967295,
-                        "maxDescriptorSetStorageBuffers": 4294967295,
+                        "maxDescriptorSetInputAttachments": 8388606,
+                        "maxDescriptorSetSampledImages": 8388606,
+                        "maxDescriptorSetSamplers": 8388606,
+                        "maxDescriptorSetStorageBuffers": 8388606,
                         "maxDescriptorSetStorageBuffersDynamic": 8,
-                        "maxDescriptorSetStorageImages": 4294967295,
-                        "maxDescriptorSetUniformBuffers": 4294967295,
-                        "maxDescriptorSetUniformBuffersDynamic": 8,
+                        "maxDescriptorSetStorageImages": 8388606,
+                        "maxDescriptorSetUniformBuffers": 8388606,
+                        "maxDescriptorSetUniformBuffersDynamic": 16,
                         "maxDrawIndexedIndexValue": 4294967295,
                         "maxDrawIndirectCount": 4294967295,
-                        "maxFragmentCombinedOutputResources": 4294967295,
+                        "maxFragmentCombinedOutputResources": 8388606,
                         "maxFragmentDualSrcAttachments": 1,
                         "maxFragmentInputComponents": 128,
                         "maxFragmentOutputAttachments": 8,
                         "maxFramebufferHeight": 16384,
-                        "maxFramebufferLayers": 8192,
+                        "maxFramebufferLayers": 1024,
                         "maxFramebufferWidth": 16384,
-                        "maxGeometryInputComponents": 128,
+                        "maxGeometryInputComponents": 64,
                         "maxGeometryOutputComponents": 128,
-                        "maxGeometryOutputVertices": 1023,
+                        "maxGeometryOutputVertices": 256,
                         "maxGeometryShaderInvocations": 127,
-                        "maxGeometryTotalOutputComponents": 4095,
-                        "maxImageArrayLayers": 8192,
+                        "maxGeometryTotalOutputComponents": 1024,
+                        "maxImageArrayLayers": 2048,
                         "maxImageDimension1D": 16384,
                         "maxImageDimension2D": 16384,
-                        "maxImageDimension3D": 8192,
+                        "maxImageDimension3D": 2048,
                         "maxImageDimensionCube": 16384,
-                        "maxInterpolationOffset": 1,
-                        "maxMemoryAllocationCount": 4096,
-                        "maxPerStageDescriptorInputAttachments": 4294967295,
-                        "maxPerStageDescriptorSampledImages": 4294967295,
-                        "maxPerStageDescriptorSamplers": 4294967295,
-                        "maxPerStageDescriptorStorageBuffers": 4294967295,
-                        "maxPerStageDescriptorStorageImages": 4294967295,
-                        "maxPerStageDescriptorUniformBuffers": 4294967295,
-                        "maxPerStageResources": 4294967295,
-                        "maxPushConstantsSize": 128,
+                        "maxInterpolationOffset": 2,
+                        "maxMemoryAllocationCount": 4294967295,
+                        "maxPerStageDescriptorInputAttachments": 8388606,
+                        "maxPerStageDescriptorSampledImages": 8388606,
+                        "maxPerStageDescriptorSamplers": 8388606,
+                        "maxPerStageDescriptorStorageBuffers": 8388606,
+                        "maxPerStageDescriptorStorageImages": 8388606,
+                        "maxPerStageDescriptorUniformBuffers": 8388606,
+                        "maxPerStageResources": 8388606,
+                        "maxPushConstantsSize": 256,
                         "maxSampleMaskWords": 1,
-                        "maxSamplerAllocationCount": 1048576,
+                        "maxSamplerAllocationCount": 65536,
                         "maxSamplerAnisotropy": 16,
-                        "maxSamplerLodBias": 15.9961000000000002074784788419492542743682861328125,
+                        "maxSamplerLodBias": 16,
                         "maxStorageBufferRange": 4294967295,
                         "maxTessellationControlPerPatchOutputComponents": 120,
                         "maxTessellationControlPerVertexInputComponents": 128,
@@ -563,25 +704,25 @@
                         "maxTessellationPatchSize": 32,
                         "maxTexelBufferElements": 4294967295,
                         "maxTexelGatherOffset": 31,
-                        "maxTexelOffset": 63,
+                        "maxTexelOffset": 31,
                         "maxUniformBufferRange": 4294967295,
                         "maxVertexInputAttributeOffset": 4294967295,
-                        "maxVertexInputAttributes": 64,
-                        "maxVertexInputBindingStride": 16383,
+                        "maxVertexInputAttributes": 32,
+                        "maxVertexInputBindingStride": 2048,
                         "maxVertexInputBindings": 32,
                         "maxVertexOutputComponents": 128,
                         "maxViewports": 16,
                         "minInterpolationOffset": -2,
-                        "minMemoryMapAlignment": 64,
-                        "minStorageBufferOffsetAlignment": "4",
-                        "minTexelBufferOffsetAlignment": "4",
+                        "minMemoryMapAlignment": 4096,
+                        "minStorageBufferOffsetAlignment": 4,
+                        "minTexelBufferOffsetAlignment": 4,
                         "minTexelGatherOffset": -32,
-                        "minTexelOffset": -64,
-                        "minUniformBufferOffsetAlignment": "16",
+                        "minTexelOffset": -32,
+                        "minUniformBufferOffsetAlignment": 4,
                         "mipmapPrecisionBits": 8,
-                        "nonCoherentAtomSize": "128",
-                        "optimalBufferCopyOffsetAlignment": "1",
-                        "optimalBufferCopyRowPitchAlignment": "1",
+                        "nonCoherentAtomSize": 64,
+                        "optimalBufferCopyOffsetAlignment": 1,
+                        "optimalBufferCopyRowPitchAlignment": 1,
                         "pointSizeGranularity": 0.125,
                         "sampledImageColorSampleCounts": [
                             "VK_SAMPLE_COUNT_1_BIT",
@@ -607,7 +748,7 @@
                             "VK_SAMPLE_COUNT_4_BIT",
                             "VK_SAMPLE_COUNT_8_BIT"
                         ],
-                        "sparseAddressSpaceSize": "17562100000000",
+                        "sparseAddressSpaceSize": 4294967296,
                         "standardSampleLocations": true,
                         "storageImageSampleCounts": [
                             "VK_SAMPLE_COUNT_1_BIT",
@@ -627,6 +768,11 @@
                             65535,
                             65535
                         ],
+                        "maxComputeWorkGroupSize": [
+                            1024,
+                            1024,
+                            1024
+                        ],
                         "maxViewportDimensions": [
                             16384,
                             16384
@@ -641,7 +787,7 @@
                         ],
                         "lineWidthRange": [
                             0,
-                            8191.8800000000001091393642127513885498046875
+                            8
                         ]
                     }
                 },
@@ -651,7 +797,7 @@
                         0,
                         0,
                         0,
-                        3,
+                        6,
                         0,
                         0,
                         0,
@@ -669,9 +815,10 @@
                         77,
                         68,
                         45,
-                        87,
-                        73,
-                        78,
+                        77,
+                        69,
+                        83,
+                        65,
                         45,
                         68,
                         82,
@@ -679,21 +826,20 @@
                         0,
                         0,
                         0,
-                        0,
                         0
                     ],
                     "deviceLUID": [
-                        237,
-                        9,
-                        1,
+                        0,
+                        0,
+                        0,
                         0,
                         0,
                         0,
                         0,
                         0
                     ],
-                    "deviceNodeMask": 1,
-                    "deviceLUIDValid": true,
+                    "deviceNodeMask": 0,
+                    "deviceLUIDValid": false,
                     "subgroupSize": 64,
                     "subgroupSupportedStages": [
                         "VK_SHADER_STAGE_VERTEX_BIT",
@@ -705,10 +851,13 @@
                         "VK_SHADER_STAGE_ALL_GRAPHICS",
                         "VK_SHADER_STAGE_ALL",
                         "VK_SHADER_STAGE_RAYGEN_BIT_KHR",
+                        "VK_SHADER_STAGE_ANY_HIT_BIT_KHR",
                         "VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR",
                         "VK_SHADER_STAGE_MISS_BIT_KHR",
                         "VK_SHADER_STAGE_INTERSECTION_BIT_KHR",
-                        "VK_SHADER_STAGE_CALLABLE_BIT_KHR"
+                        "VK_SHADER_STAGE_CALLABLE_BIT_KHR",
+                        "VK_SHADER_STAGE_TASK_BIT_NV",
+                        "VK_SHADER_STAGE_MESH_BIT_NV"
                     ],
                     "subgroupSupportedOperations": [
                         "VK_SUBGROUP_FEATURE_BASIC_BIT",
@@ -722,16 +871,16 @@
                     ],
                     "subgroupQuadOperationsInAllStages": true,
                     "pointClippingBehavior": "VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES",
-                    "maxMultiviewViewCount": 6,
-                    "maxMultiviewInstanceIndex": 4294967295,
+                    "maxMultiviewViewCount": 8,
+                    "maxMultiviewInstanceIndex": 2147483647,
                     "protectedNoFault": false,
-                    "maxPerSetDescriptors": 4294967295,
-                    "maxMemoryAllocationSize": "2147483648"
+                    "maxPerSetDescriptors": 22369621,
+                    "maxMemoryAllocationSize": 4294967292
                 },
                 "VkPhysicalDeviceVulkan12Properties": {
-                    "driverID": "VK_DRIVER_ID_AMD_PROPRIETARY",
-                    "driverName": "AMD proprietary driver",
-                    "driverInfo": "22.20.27.02",
+                    "driverID": "VK_DRIVER_ID_MESA_RADV",
+                    "driverName": "radv",
+                    "driverInfo": "Mesa 23.3.0-devel (git-5f5be9e4e1)",
                     "conformanceVersion": {
                         "major": 1,
                         "minor": 3,
@@ -755,31 +904,32 @@
                     "shaderRoundingModeRTZFloat16": true,
                     "shaderRoundingModeRTZFloat32": true,
                     "shaderRoundingModeRTZFloat64": true,
-                    "maxUpdateAfterBindDescriptorsInAllPools": 4294967295,
+                    "maxUpdateAfterBindDescriptorsInAllPools": 67108863,
                     "shaderUniformBufferArrayNonUniformIndexingNative": false,
                     "shaderSampledImageArrayNonUniformIndexingNative": false,
                     "shaderStorageBufferArrayNonUniformIndexingNative": false,
                     "shaderStorageImageArrayNonUniformIndexingNative": false,
                     "shaderInputAttachmentArrayNonUniformIndexingNative": false,
-                    "robustBufferAccessUpdateAfterBind": false,
+                    "robustBufferAccessUpdateAfterBind": true,
                     "quadDivergentImplicitLod": false,
-                    "maxPerStageDescriptorUpdateAfterBindSamplers": 4294967295,
-                    "maxPerStageDescriptorUpdateAfterBindUniformBuffers": 4294967295,
-                    "maxPerStageDescriptorUpdateAfterBindStorageBuffers": 4294967295,
-                    "maxPerStageDescriptorUpdateAfterBindSampledImages": 4294967295,
-                    "maxPerStageDescriptorUpdateAfterBindStorageImages": 4294967295,
-                    "maxPerStageDescriptorUpdateAfterBindInputAttachments": 4294967295,
-                    "maxPerStageUpdateAfterBindResources": 4294967295,
-                    "maxDescriptorSetUpdateAfterBindSamplers": 4294967295,
-                    "maxDescriptorSetUpdateAfterBindUniformBuffers": 4294967295,
-                    "maxDescriptorSetUpdateAfterBindUniformBuffersDynamic": 8,
-                    "maxDescriptorSetUpdateAfterBindStorageBuffers": 4294967295,
+                    "maxPerStageDescriptorUpdateAfterBindSamplers": 8388606,
+                    "maxPerStageDescriptorUpdateAfterBindUniformBuffers": 8388606,
+                    "maxPerStageDescriptorUpdateAfterBindStorageBuffers": 8388606,
+                    "maxPerStageDescriptorUpdateAfterBindSampledImages": 8388606,
+                    "maxPerStageDescriptorUpdateAfterBindStorageImages": 8388606,
+                    "maxPerStageDescriptorUpdateAfterBindInputAttachments": 8388606,
+                    "maxPerStageUpdateAfterBindResources": 8388606,
+                    "maxDescriptorSetUpdateAfterBindSamplers": 8388606,
+                    "maxDescriptorSetUpdateAfterBindUniformBuffers": 8388606,
+                    "maxDescriptorSetUpdateAfterBindUniformBuffersDynamic": 16,
+                    "maxDescriptorSetUpdateAfterBindStorageBuffers": 8388606,
                     "maxDescriptorSetUpdateAfterBindStorageBuffersDynamic": 8,
-                    "maxDescriptorSetUpdateAfterBindSampledImages": 4294967295,
-                    "maxDescriptorSetUpdateAfterBindStorageImages": 4294967295,
-                    "maxDescriptorSetUpdateAfterBindInputAttachments": 4294967295,
+                    "maxDescriptorSetUpdateAfterBindSampledImages": 8388606,
+                    "maxDescriptorSetUpdateAfterBindStorageImages": 8388606,
+                    "maxDescriptorSetUpdateAfterBindInputAttachments": 8388606,
                     "supportedDepthResolveModes": [
                         "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT",
+                        "VK_RESOLVE_MODE_AVERAGE_BIT",
                         "VK_RESOLVE_MODE_MIN_BIT",
                         "VK_RESOLVE_MODE_MAX_BIT"
                     ],
@@ -792,25 +942,27 @@
                     "independentResolve": true,
                     "filterMinmaxSingleComponentFormats": true,
                     "filterMinmaxImageComponentMapping": true,
-                    "maxTimelineSemaphoreValueDifference": "4294967295",
+                    "maxTimelineSemaphoreValueDifference": 9223372036854775807,
                     "framebufferIntegerColorSampleCounts": [
-                        "VK_SAMPLE_COUNT_1_BIT",
-                        "VK_SAMPLE_COUNT_2_BIT",
-                        "VK_SAMPLE_COUNT_4_BIT",
-                        "VK_SAMPLE_COUNT_8_BIT"
+                        "VK_SAMPLE_COUNT_1_BIT"
                     ]
                 },
                 "VkPhysicalDeviceVulkan13Properties": {
                     "minSubgroupSize": 32,
                     "maxSubgroupSize": 64,
                     "maxComputeWorkgroupSubgroups": 4294967295,
-                    "requiredSubgroupSizeStages": [],
-                    "maxInlineUniformBlockSize": 65536,
-                    "maxPerStageDescriptorInlineUniformBlocks": 16,
-                    "maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks": 16,
-                    "maxDescriptorSetInlineUniformBlocks": 16,
-                    "maxDescriptorSetUpdateAfterBindInlineUniformBlocks": 16,
-                    "maxInlineUniformTotalSize": 4294967295,
+                    "requiredSubgroupSizeStages": [
+                        "VK_SHADER_STAGE_COMPUTE_BIT",
+                        "VK_SHADER_STAGE_ALL",
+                        "VK_SHADER_STAGE_TASK_BIT_NV",
+                        "VK_SHADER_STAGE_MESH_BIT_NV"
+                    ],
+                    "maxInlineUniformBlockSize": 4194304,
+                    "maxPerStageDescriptorInlineUniformBlocks": 134217728,
+                    "maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks": 134217728,
+                    "maxDescriptorSetInlineUniformBlocks": 64,
+                    "maxDescriptorSetUpdateAfterBindInlineUniformBlocks": 64,
+                    "maxInlineUniformTotalSize": 65535,
                     "integerDotProduct8BitUnsignedAccelerated": true,
                     "integerDotProduct8BitSignedAccelerated": true,
                     "integerDotProduct8BitMixedSignednessAccelerated": false,
@@ -826,11 +978,11 @@
                     "integerDotProduct64BitUnsignedAccelerated": false,
                     "integerDotProduct64BitSignedAccelerated": false,
                     "integerDotProduct64BitMixedSignednessAccelerated": false,
-                    "integerDotProductAccumulatingSaturating8BitUnsignedAccelerated": false,
-                    "integerDotProductAccumulatingSaturating8BitSignedAccelerated": false,
+                    "integerDotProductAccumulatingSaturating8BitUnsignedAccelerated": true,
+                    "integerDotProductAccumulatingSaturating8BitSignedAccelerated": true,
                     "integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated": false,
-                    "integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated": false,
-                    "integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated": false,
+                    "integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated": true,
+                    "integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated": true,
                     "integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated": false,
                     "integerDotProductAccumulatingSaturating16BitUnsignedAccelerated": true,
                     "integerDotProductAccumulatingSaturating16BitSignedAccelerated": true,
@@ -841,29 +993,67 @@
                     "integerDotProductAccumulatingSaturating64BitUnsignedAccelerated": false,
                     "integerDotProductAccumulatingSaturating64BitSignedAccelerated": false,
                     "integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated": false,
-                    "storageTexelBufferOffsetAlignmentBytes": "4",
+                    "storageTexelBufferOffsetAlignmentBytes": 4,
                     "storageTexelBufferOffsetSingleTexelAlignment": true,
-                    "uniformTexelBufferOffsetAlignmentBytes": "4",
+                    "uniformTexelBufferOffsetAlignmentBytes": 4,
                     "uniformTexelBufferOffsetSingleTexelAlignment": true,
-                    "maxBufferSize": "2147483648"
+                    "maxBufferSize": 4294967292
+                },
+                "VkPhysicalDeviceDescriptorBufferPropertiesEXT": {
+                    "accelerationStructureCaptureReplayDescriptorDataSize": 0,
+                    "accelerationStructureDescriptorSize": 16,
+                    "allowSamplerImageViewPostSubmitCreation": true,
+                    "bufferCaptureReplayDescriptorDataSize": 0,
+                    "bufferlessPushDescriptors": true,
+                    "combinedImageSamplerDescriptorSingleArray": true,
+                    "combinedImageSamplerDescriptorSize": 96,
+                    "descriptorBufferAddressSpaceSize": 4294967292,
+                    "descriptorBufferOffsetAlignment": 4,
+                    "imageCaptureReplayDescriptorDataSize": 0,
+                    "imageViewCaptureReplayDescriptorDataSize": 0,
+                    "inputAttachmentDescriptorSize": 64,
+                    "maxDescriptorBufferBindings": 32,
+                    "maxEmbeddedImmutableSamplerBindings": 32,
+                    "maxEmbeddedImmutableSamplers": 8388606,
+                    "maxResourceDescriptorBufferBindings": 32,
+                    "maxResourceDescriptorBufferRange": 4294967295,
+                    "maxSamplerDescriptorBufferBindings": 32,
+                    "maxSamplerDescriptorBufferRange": 4294967295,
+                    "resourceDescriptorBufferAddressSpaceSize": 4294967292,
+                    "robustStorageBufferDescriptorSize": 16,
+                    "robustStorageTexelBufferDescriptorSize": 16,
+                    "robustUniformBufferDescriptorSize": 16,
+                    "robustUniformTexelBufferDescriptorSize": 16,
+                    "sampledImageDescriptorSize": 64,
+                    "samplerCaptureReplayDescriptorDataSize": 0,
+                    "samplerDescriptorBufferAddressSpaceSize": 4294967292,
+                    "samplerDescriptorSize": 16,
+                    "storageBufferDescriptorSize": 16,
+                    "storageImageDescriptorSize": 32,
+                    "storageTexelBufferDescriptorSize": 16,
+                    "uniformBufferDescriptorSize": 16,
+                    "uniformTexelBufferDescriptorSize": 16
                 },
                 "VkPhysicalDeviceShaderCoreProperties2AMD": {
-                    "activeComputeUnitCount": 72,
+                    "activeComputeUnitCount": 28,
                     "shaderCoreFeatures": []
                 },
+                "VkPhysicalDevicePerformanceQueryPropertiesKHR": {
+                    "allowCommandBufferQueryCopies": true
+                },
                 "VkPhysicalDeviceShaderCorePropertiesAMD": {
-                    "computeUnitsPerShaderArray": 10,
+                    "computeUnitsPerShaderArray": 6,
                     "maxSgprAllocation": 104,
                     "maxVgprAllocation": 256,
                     "minSgprAllocation": 128,
-                    "minVgprAllocation": 16,
+                    "minVgprAllocation": 4,
                     "sgprAllocationGranularity": 128,
                     "sgprsPerSimd": 2048,
                     "shaderArraysPerEngineCount": 2,
-                    "shaderEngineCount": 4,
+                    "shaderEngineCount": 2,
                     "simdPerComputeUnit": 2,
-                    "vgprAllocationGranularity": 16,
-                    "vgprsPerSimd": 1024,
+                    "vgprAllocationGranularity": 4,
+                    "vgprsPerSimd": 512,
                     "wavefrontSize": 64,
                     "wavefrontsPerSimd": 16
                 },
@@ -874,9 +1064,9 @@
                         "patch": 0,
                         "subminor": 0
                     },
-                    "driverID": "VK_DRIVER_ID_AMD_PROPRIETARY_KHR",
-                    "driverInfo": "22.20.27.02",
-                    "driverName": "AMD proprietary driver"
+                    "driverID": "VK_DRIVER_ID_MESA_RADV",
+                    "driverInfo": "Mesa 23.3.0-devel (git-5f5be9e4e1)",
+                    "driverName": "radv"
                 },
                 "VkPhysicalDeviceConservativeRasterizationPropertiesEXT": {
                     "conservativePointAndLineRasterization": true,
@@ -889,9 +1079,15 @@
                     "primitiveOverestimationSize": 0,
                     "primitiveUnderestimation": true
                 },
+                "VkPhysicalDevicePipelineRobustnessPropertiesEXT": {
+                    "defaultRobustnessImages": "VK_PIPELINE_ROBUSTNESS_IMAGE_BEHAVIOR_ROBUST_IMAGE_ACCESS_2_EXT",
+                    "defaultRobustnessStorageBuffers": "VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_EXT",
+                    "defaultRobustnessUniformBuffers": "VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_EXT",
+                    "defaultRobustnessVertexInputs": "VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_DISABLED_EXT"
+                },
                 "VkPhysicalDeviceFloatControlsPropertiesKHR": {
-                    "denormBehaviorIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY_KHR",
-                    "roundingModeIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY_KHR",
+                    "denormBehaviorIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY",
+                    "roundingModeIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY",
                     "shaderDenormFlushToZeroFloat16": true,
                     "shaderDenormFlushToZeroFloat32": true,
                     "shaderDenormFlushToZeroFloat64": true,
@@ -907,6 +1103,9 @@
                     "shaderSignedZeroInfNanPreserveFloat16": true,
                     "shaderSignedZeroInfNanPreserveFloat32": true,
                     "shaderSignedZeroInfNanPreserveFloat64": true
+                },
+                "VkPhysicalDeviceExtendedDynamicState3PropertiesEXT": {
+                    "dynamicPrimitiveTopologyUnrestricted": true
                 },
                 "VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT": {
                     "filterMinmaxImageComponentMapping": true,
@@ -928,7 +1127,7 @@
                     },
                     "maxFragmentShadingRateAttachmentTexelSizeAspectRatio": 1,
                     "maxFragmentShadingRateCoverageSamples": 32,
-                    "maxFragmentShadingRateRasterizationSamples": "VK_SAMPLE_COUNT_16_BIT",
+                    "maxFragmentShadingRateRasterizationSamples": "VK_SAMPLE_COUNT_8_BIT",
                     "maxFragmentSize": {
                         "width": 2,
                         "height": 2
@@ -940,11 +1139,24 @@
                     },
                     "primitiveFragmentShadingRateWithMultipleViewports": true
                 },
+                "VkPhysicalDeviceGraphicsPipelineLibraryPropertiesEXT": {
+                    "graphicsPipelineLibraryFastLinking": true,
+                    "graphicsPipelineLibraryIndependentInterpolationDecoration": true
+                },
+                "VkPhysicalDeviceDrmPropertiesEXT": {
+                    "hasPrimary": true,
+                    "hasRender": true,
+                    "primaryMajor": 226,
+                    "primaryMinor": 0,
+                    "renderMajor": 226,
+                    "renderMinor": 128
+                },
                 "VkPhysicalDeviceDepthStencilResolvePropertiesKHR": {
                     "independentResolve": true,
                     "independentResolveNone": true,
                     "supportedDepthResolveModes": [
                         "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT",
+                        "VK_RESOLVE_MODE_AVERAGE_BIT",
                         "VK_RESOLVE_MODE_MIN_BIT",
                         "VK_RESOLVE_MODE_MAX_BIT"
                     ],
@@ -990,51 +1202,56 @@
                     "lineSubPixelPrecisionBits": 4
                 },
                 "VkPhysicalDeviceMaintenance4PropertiesKHR": {
-                    "maxBufferSize": "2147483648"
+                    "maxBufferSize": 4294967292
                 },
                 "VkPhysicalDeviceSubgroupSizeControlPropertiesEXT": {
                     "maxComputeWorkgroupSubgroups": 4294967295,
                     "maxSubgroupSize": 64,
                     "minSubgroupSize": 32,
-                    "requiredSubgroupSizeStages": []
+                    "requiredSubgroupSizeStages": [
+                        "VK_SHADER_STAGE_COMPUTE_BIT",
+                        "VK_SHADER_STAGE_ALL",
+                        "VK_SHADER_STAGE_TASK_BIT_NV",
+                        "VK_SHADER_STAGE_MESH_BIT_NV"
+                    ]
                 },
                 "VkPhysicalDeviceCustomBorderColorPropertiesEXT": {
                     "maxCustomBorderColorSamplers": 4096
                 },
                 "VkPhysicalDeviceAccelerationStructurePropertiesKHR": {
-                    "maxDescriptorSetAccelerationStructures": 1048576,
-                    "maxDescriptorSetUpdateAfterBindAccelerationStructures": 1048576,
-                    "maxGeometryCount": "16777216",
-                    "maxInstanceCount": "16777216",
-                    "maxPerStageDescriptorAccelerationStructures": 1048576,
-                    "maxPerStageDescriptorUpdateAfterBindAccelerationStructures": 1048576,
-                    "maxPrimitiveCount": "536870912",
-                    "minAccelerationStructureScratchOffsetAlignment": 256
+                    "maxDescriptorSetAccelerationStructures": 8388606,
+                    "maxDescriptorSetUpdateAfterBindAccelerationStructures": 8388606,
+                    "maxGeometryCount": 16777215,
+                    "maxInstanceCount": 16777215,
+                    "maxPerStageDescriptorAccelerationStructures": 8388606,
+                    "maxPerStageDescriptorUpdateAfterBindAccelerationStructures": 8388606,
+                    "maxPrimitiveCount": 536870911,
+                    "minAccelerationStructureScratchOffsetAlignment": 128
                 },
                 "VkPhysicalDeviceInlineUniformBlockPropertiesEXT": {
-                    "maxDescriptorSetInlineUniformBlocks": 16,
-                    "maxDescriptorSetUpdateAfterBindInlineUniformBlocks": 16,
-                    "maxInlineUniformBlockSize": 65536,
-                    "maxPerStageDescriptorInlineUniformBlocks": 16,
-                    "maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks": 16
+                    "maxDescriptorSetInlineUniformBlocks": 64,
+                    "maxDescriptorSetUpdateAfterBindInlineUniformBlocks": 64,
+                    "maxInlineUniformBlockSize": 4194304,
+                    "maxPerStageDescriptorInlineUniformBlocks": 134217728,
+                    "maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks": 134217728
                 },
                 "VkPhysicalDeviceDescriptorIndexingPropertiesEXT": {
-                    "maxDescriptorSetUpdateAfterBindInputAttachments": 4294967295,
-                    "maxDescriptorSetUpdateAfterBindSampledImages": 4294967295,
-                    "maxDescriptorSetUpdateAfterBindSamplers": 4294967295,
-                    "maxDescriptorSetUpdateAfterBindStorageBuffers": 4294967295,
+                    "maxDescriptorSetUpdateAfterBindInputAttachments": 8388606,
+                    "maxDescriptorSetUpdateAfterBindSampledImages": 8388606,
+                    "maxDescriptorSetUpdateAfterBindSamplers": 8388606,
+                    "maxDescriptorSetUpdateAfterBindStorageBuffers": 8388606,
                     "maxDescriptorSetUpdateAfterBindStorageBuffersDynamic": 8,
-                    "maxDescriptorSetUpdateAfterBindStorageImages": 4294967295,
-                    "maxDescriptorSetUpdateAfterBindUniformBuffers": 4294967295,
-                    "maxDescriptorSetUpdateAfterBindUniformBuffersDynamic": 8,
-                    "maxPerStageDescriptorUpdateAfterBindInputAttachments": 4294967295,
-                    "maxPerStageDescriptorUpdateAfterBindSampledImages": 4294967295,
-                    "maxPerStageDescriptorUpdateAfterBindSamplers": 4294967295,
-                    "maxPerStageDescriptorUpdateAfterBindStorageBuffers": 4294967295,
-                    "maxPerStageDescriptorUpdateAfterBindStorageImages": 4294967295,
-                    "maxPerStageDescriptorUpdateAfterBindUniformBuffers": 4294967295,
-                    "maxPerStageUpdateAfterBindResources": 4294967295,
-                    "maxUpdateAfterBindDescriptorsInAllPools": 4294967295,
+                    "maxDescriptorSetUpdateAfterBindStorageImages": 8388606,
+                    "maxDescriptorSetUpdateAfterBindUniformBuffers": 8388606,
+                    "maxDescriptorSetUpdateAfterBindUniformBuffersDynamic": 16,
+                    "maxPerStageDescriptorUpdateAfterBindInputAttachments": 8388606,
+                    "maxPerStageDescriptorUpdateAfterBindSampledImages": 8388606,
+                    "maxPerStageDescriptorUpdateAfterBindSamplers": 8388606,
+                    "maxPerStageDescriptorUpdateAfterBindStorageBuffers": 8388606,
+                    "maxPerStageDescriptorUpdateAfterBindStorageImages": 8388606,
+                    "maxPerStageDescriptorUpdateAfterBindUniformBuffers": 8388606,
+                    "maxPerStageUpdateAfterBindResources": 8388606,
+                    "maxUpdateAfterBindDescriptorsInAllPools": 67108863,
                     "quadDivergentImplicitLod": true,
                     "robustBufferAccessUpdateAfterBind": true,
                     "shaderInputAttachmentArrayNonUniformIndexingNative": true,
@@ -1043,53 +1260,87 @@
                     "shaderStorageImageArrayNonUniformIndexingNative": true,
                     "shaderUniformBufferArrayNonUniformIndexingNative": true
                 },
+                "VkPhysicalDeviceDiscardRectanglePropertiesEXT": {
+                    "maxDiscardRectangles": 4
+                },
                 "VkPhysicalDeviceMaintenance3PropertiesKHR": {
-                    "maxMemoryAllocationSize": "2147483648",
-                    "maxPerSetDescriptors": 4294967295
+                    "maxMemoryAllocationSize": 4294967292,
+                    "maxPerSetDescriptors": 22369621
+                },
+                "VkPhysicalDeviceMeshShaderPropertiesEXT": {
+                    "maxMeshMultiviewViewCount": 8,
+                    "maxMeshOutputComponents": 128,
+                    "maxMeshOutputLayers": 8,
+                    "maxMeshOutputMemorySize": 32768,
+                    "maxMeshOutputPrimitives": 256,
+                    "maxMeshOutputVertices": 256,
+                    "maxMeshPayloadAndOutputMemorySize": 49152,
+                    "maxMeshPayloadAndSharedMemorySize": 45056,
+                    "maxMeshSharedMemorySize": 28672,
+                    "maxMeshWorkGroupCount": [
+                        65535,
+                        65535,
+                        65535
+                    ],
+                    "maxMeshWorkGroupInvocations": 256,
+                    "maxMeshWorkGroupSize": [
+                        256,
+                        256,
+                        256
+                    ],
+                    "maxMeshWorkGroupTotalCount": 4194304,
+                    "maxPreferredMeshWorkGroupInvocations": 128,
+                    "maxPreferredTaskWorkGroupInvocations": 64,
+                    "maxTaskPayloadAndSharedMemorySize": 65536,
+                    "maxTaskPayloadSize": 16384,
+                    "maxTaskSharedMemorySize": 65536,
+                    "maxTaskWorkGroupCount": [
+                        65535,
+                        65535,
+                        65535
+                    ],
+                    "maxTaskWorkGroupInvocations": 1024,
+                    "maxTaskWorkGroupSize": [
+                        1024,
+                        1024,
+                        1024
+                    ],
+                    "maxTaskWorkGroupTotalCount": 4194304,
+                    "meshOutputPerPrimitiveGranularity": 1,
+                    "meshOutputPerVertexGranularity": 1,
+                    "prefersCompactPrimitiveOutput": true,
+                    "prefersCompactVertexOutput": true,
+                    "prefersLocalInvocationPrimitiveOutput": true,
+                    "prefersLocalInvocationVertexOutput": true
+                },
+                "VkPhysicalDeviceMultiDrawPropertiesEXT": {
+                    "maxMultiDrawCount": 2048
                 },
                 "VkPhysicalDeviceMultiviewPropertiesKHR": {
-                    "maxMultiviewInstanceIndex": 4294967295,
-                    "maxMultiviewViewCount": 6
+                    "maxMultiviewInstanceIndex": 2147483647,
+                    "maxMultiviewViewCount": 8
                 },
                 "VkPhysicalDevicePushDescriptorPropertiesKHR": {
                     "maxPushDescriptors": 32
                 },
                 "VkPhysicalDeviceRayTracingPipelinePropertiesKHR": {
-                    "maxRayDispatchInvocationCount": 1073741824,
+                    "maxRayDispatchInvocationCount": 67108864,
                     "maxRayHitAttributeSize": 32,
-                    "maxRayRecursionDepth": 1,
-                    "maxShaderGroupStride": 4096,
-                    "shaderGroupBaseAlignment": 64,
-                    "shaderGroupHandleAlignment": 4,
+                    "maxRayRecursionDepth": 31,
+                    "maxShaderGroupStride": 16384,
+                    "shaderGroupBaseAlignment": 32,
+                    "shaderGroupHandleAlignment": 16,
                     "shaderGroupHandleCaptureReplaySize": 32,
                     "shaderGroupHandleSize": 32
                 },
-                "VkPhysicalDeviceSampleLocationsPropertiesEXT": {
-                    "maxSampleLocationGridSize": {
-                        "width": 2,
-                        "height": 2
-                    },
-                    "sampleLocationCoordinateRange": [
-                        0,
-                        1
-                    ],
-                    "sampleLocationSampleCounts": [
-                        "VK_SAMPLE_COUNT_1_BIT",
-                        "VK_SAMPLE_COUNT_2_BIT",
-                        "VK_SAMPLE_COUNT_4_BIT",
-                        "VK_SAMPLE_COUNT_8_BIT"
-                    ],
-                    "sampleLocationSubPixelBits": 4,
-                    "variableSampleLocations": true
-                },
                 "VkPhysicalDeviceTimelineSemaphorePropertiesKHR": {
-                    "maxTimelineSemaphoreValueDifference": "4294967295"
+                    "maxTimelineSemaphoreValueDifference": 9223372036854775807
                 },
                 "VkPhysicalDeviceTransformFeedbackPropertiesEXT": {
                     "maxTransformFeedbackBufferDataSize": 512,
                     "maxTransformFeedbackBufferDataStride": 512,
                     "maxTransformFeedbackBuffers": 4,
-                    "maxTransformFeedbackBufferSize": "4294967295",
+                    "maxTransformFeedbackBufferSize": 4294967295,
                     "maxTransformFeedbackStreamDataSize": 512,
                     "maxTransformFeedbackStreams": 4,
                     "transformFeedbackDraw": true,
@@ -1101,7 +1352,13 @@
                     "maxVertexAttribDivisor": 4294967295
                 },
                 "VkPhysicalDeviceExternalMemoryHostPropertiesEXT": {
-                    "minImportedHostPointerAlignment": "4096"
+                    "minImportedHostPointerAlignment": 4096
+                },
+                "VkPhysicalDevicePCIBusInfoPropertiesEXT": {
+                    "pciBus": 6,
+                    "pciDevice": 0,
+                    "pciDomain": 0,
+                    "pciFunction": 0
                 },
                 "VkPhysicalDevicePointClippingPropertiesKHR": {
                     "pointClippingBehavior": "VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES"
@@ -1111,14 +1368,69 @@
                     "transformFeedbackPreservesTriangleFanProvokingVertex": true
                 },
                 "VkPhysicalDeviceRobustness2PropertiesEXT": {
-                    "robustStorageBufferAccessSizeAlignment": "4",
-                    "robustUniformBufferAccessSizeAlignment": "4"
+                    "robustStorageBufferAccessSizeAlignment": 4,
+                    "robustUniformBufferAccessSizeAlignment": 4
+                },
+                "VkPhysicalDeviceShaderModuleIdentifierPropertiesEXT": {
+                    "shaderModuleIdentifierAlgorithmUUID": [
+                        77,
+                        69,
+                        83,
+                        65,
+                        45,
+                        66,
+                        76,
+                        65,
+                        75,
+                        69,
+                        51,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
                 },
                 "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT": {
-                    "storageTexelBufferOffsetAlignmentBytes": "4",
+                    "storageTexelBufferOffsetAlignmentBytes": 4,
                     "storageTexelBufferOffsetSingleTexelAlignment": true,
-                    "uniformTexelBufferOffsetAlignmentBytes": "4",
+                    "uniformTexelBufferOffsetAlignmentBytes": 4,
                     "uniformTexelBufferOffsetSingleTexelAlignment": true
+                },
+                "VkPhysicalDeviceFragmentShaderBarycentricPropertiesKHR": {
+                    "triStripVertexOrderIndependentOfProvokingVertex": true
+                },
+                "VkPhysicalDeviceSubgroupProperties": {
+                    "subgroupSize": 64,
+                    "supportedStages": [
+                        "VK_SHADER_STAGE_VERTEX_BIT",
+                        "VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT",
+                        "VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT",
+                        "VK_SHADER_STAGE_GEOMETRY_BIT",
+                        "VK_SHADER_STAGE_FRAGMENT_BIT",
+                        "VK_SHADER_STAGE_COMPUTE_BIT",
+                        "VK_SHADER_STAGE_ALL_GRAPHICS",
+                        "VK_SHADER_STAGE_ALL",
+                        "VK_SHADER_STAGE_RAYGEN_BIT_KHR",
+                        "VK_SHADER_STAGE_ANY_HIT_BIT_KHR",
+                        "VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR",
+                        "VK_SHADER_STAGE_MISS_BIT_KHR",
+                        "VK_SHADER_STAGE_INTERSECTION_BIT_KHR",
+                        "VK_SHADER_STAGE_CALLABLE_BIT_KHR",
+                        "VK_SHADER_STAGE_TASK_BIT_NV",
+                        "VK_SHADER_STAGE_MESH_BIT_NV"
+                    ],
+                    "supportedOperations": [
+                        "VK_SUBGROUP_FEATURE_BASIC_BIT",
+                        "VK_SUBGROUP_FEATURE_VOTE_BIT",
+                        "VK_SUBGROUP_FEATURE_ARITHMETIC_BIT",
+                        "VK_SUBGROUP_FEATURE_BALLOT_BIT",
+                        "VK_SUBGROUP_FEATURE_SHUFFLE_BIT",
+                        "VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT",
+                        "VK_SUBGROUP_FEATURE_CLUSTERED_BIT",
+                        "VK_SUBGROUP_FEATURE_QUAD_BIT"
+                    ],
+                    "quadOperationsInAllStages": true
                 }
             },
             "extensions": {
@@ -1134,22 +1446,23 @@
                 "VK_KHR_shader_draw_parameters": 1,
                 "VK_EXT_shader_subgroup_ballot": 1,
                 "VK_EXT_shader_subgroup_vote": 1,
+                "VK_EXT_display_control": 1,
                 "VK_KHR_descriptor_update_template": 1,
                 "VK_KHR_push_descriptor": 2,
+                "VK_EXT_discard_rectangles": 2,
+                "VK_KHR_incremental_present": 2,
                 "VK_EXT_sampler_filter_minmax": 2,
                 "VK_KHR_16bit_storage": 1,
                 "VK_KHR_dedicated_allocation": 3,
                 "VK_KHR_get_memory_requirements2": 1,
                 "VK_KHR_storage_buffer_storage_class": 1,
                 "VK_KHR_external_memory": 1,
-                "VK_KHR_external_memory_win32": 1,
                 "VK_KHR_external_semaphore": 1,
-                "VK_KHR_external_semaphore_win32": 1,
-                "VK_KHR_win32_keyed_mutex": 1,
                 "VK_KHR_external_fence": 1,
-                "VK_KHR_external_fence_win32": 1,
                 "VK_KHR_variable_pointers": 1,
-                "VK_AMD_shader_info": 1,
+                "VK_KHR_external_memory_fd": 1,
+                "VK_KHR_external_semaphore_fd": 1,
+                "VK_KHR_external_fence_fd": 1,
                 "VK_AMD_texture_gather_bias_lod": 1,
                 "VK_AMD_mixed_attachment_samples": 1,
                 "VK_KHR_relaxed_block_layout": 1,
@@ -1161,10 +1474,9 @@
                 "VK_KHR_image_format_list": 1,
                 "VK_KHR_maintenance2": 1,
                 "VK_KHR_sampler_ycbcr_conversion": 14,
-                "VK_EXT_sample_locations": 1,
                 "VK_AMD_shader_fragment_mask": 1,
                 "VK_EXT_shader_stencil_export": 1,
-                "VK_EXT_hdr_metadata": 2,
+                "VK_EXT_external_memory_dma_buf": 1,
                 "VK_EXT_global_priority": 2,
                 "VK_EXT_conservative_rasterization": 1,
                 "VK_KHR_multiview": 1,
@@ -1189,12 +1501,15 @@
                 "VK_KHR_shader_float16_int8": 1,
                 "VK_KHR_shader_float_controls": 4,
                 "VK_KHR_swapchain_mutable_format": 1,
+                "VK_NV_compute_shader_derivatives": 1,
                 "VK_GOOGLE_hlsl_functionality1": 1,
                 "VK_GOOGLE_decorate_string": 1,
                 "VK_EXT_transform_feedback": 1,
+                "VK_EXT_pci_bus_info": 2,
                 "VK_EXT_calibrated_timestamps": 2,
                 "VK_AMD_memory_overallocation_behavior": 1,
                 "VK_EXT_scalar_block_layout": 1,
+                "VK_EXT_buffer_device_address": 2,
                 "VK_EXT_memory_budget": 1,
                 "VK_EXT_memory_priority": 1,
                 "VK_EXT_depth_clip_enable": 1,
@@ -1203,13 +1518,11 @@
                 "VK_EXT_pipeline_creation_feedback": 1,
                 "VK_KHR_uniform_buffer_standard_layout": 1,
                 "VK_EXT_separate_stencil_usage": 1,
-                "VK_AMD_display_native_hdr": 1,
-                "VK_EXT_full_screen_exclusive": 4,
+                "VK_EXT_fragment_shader_interlock": 1,
                 "VK_EXT_shader_demote_to_helper_invocation": 1,
                 "VK_EXT_texel_buffer_alignment": 1,
                 "VK_KHR_imageless_framebuffer": 1,
                 "VK_AMD_shader_core_properties2": 1,
-                "VK_AMD_pipeline_compiler_control": 1,
                 "VK_EXT_subgroup_size_control": 2,
                 "VK_EXT_index_type_uint8": 1,
                 "VK_EXT_line_rasterization": 1,
@@ -1219,10 +1532,12 @@
                 "VK_KHR_shader_clock": 1,
                 "VK_KHR_timeline_semaphore": 2,
                 "VK_KHR_spirv_1_4": 1,
+                "VK_INTEL_shader_integer_functions2": 1,
                 "VK_KHR_separate_depth_stencil_layouts": 1,
                 "VK_KHR_buffer_device_address": 1,
                 "VK_EXT_tooling_info": 1,
                 "VK_EXT_provoking_vertex": 1,
+                "VK_KHR_performance_query": 1,
                 "VK_KHR_shader_non_semantic_info": 1,
                 "VK_KHR_deferred_host_operations": 4,
                 "VK_KHR_pipeline_library": 1,
@@ -1237,33 +1552,57 @@
                 "VK_EXT_4444_formats": 1,
                 "VK_EXT_shader_image_atomic_int64": 1,
                 "VK_KHR_copy_commands2": 1,
+                "VK_EXT_image_drm_format_modifier": 2,
                 "VK_KHR_fragment_shading_rate": 2,
                 "VK_KHR_shader_terminate_invocation": 1,
                 "VK_KHR_acceleration_structure": 13,
                 "VK_KHR_ray_query": 1,
                 "VK_KHR_ray_tracing_pipeline": 1,
+                "VK_VALVE_mutable_descriptor_type": 1,
                 "VK_KHR_workgroup_memory_explicit_layout": 1,
                 "VK_KHR_zero_initialize_workgroup_memory": 1,
                 "VK_KHR_synchronization2": 1,
                 "VK_EXT_color_write_enable": 1,
+                "VK_EXT_vertex_input_dynamic_state": 2,
                 "VK_EXT_extended_dynamic_state2": 1,
                 "VK_EXT_global_priority_query": 1,
                 "VK_KHR_shader_subgroup_uniform_control_flow": 1,
+                "VK_EXT_physical_device_drm": 1,
+                "VK_EXT_multi_draw": 1,
                 "VK_EXT_shader_atomic_float2": 1,
+                "VK_KHR_present_id": 1,
+                "VK_KHR_present_wait": 1,
                 "VK_EXT_load_store_op_none": 1,
                 "VK_KHR_shader_integer_dot_product": 1,
                 "VK_EXT_primitive_topology_list_restart": 1,
-                "VK_EXT_pageable_device_local_memory": 1,
-                "VK_KHR_format_feature_flags2": 1,
+                "VK_KHR_format_feature_flags2": 2,
                 "VK_KHR_maintenance4": 2,
                 "VK_KHR_dynamic_rendering": 1,
                 "VK_EXT_image_view_min_lod": 1,
                 "VK_EXT_border_color_swizzle": 1,
                 "VK_EXT_depth_clip_control": 1,
                 "VK_KHR_global_priority": 1,
+                "VK_EXT_primitives_generated_query": 1,
+                "VK_EXT_graphics_pipeline_library": 1,
+                "VK_EXT_image_2d_view_of_3d": 1,
                 "VK_KHR_ray_tracing_maintenance1": 1,
                 "VK_EXT_non_seamless_cube_map": 1,
-                "VK_AMD_shader_early_and_late_fragment_tests": 1
+                "VK_AMD_shader_early_and_late_fragment_tests": 1,
+                "VK_KHR_fragment_shader_barycentric": 1,
+                "VK_EXT_shader_module_identifier": 1,
+                "VK_EXT_pipeline_robustness": 1,
+                "VK_EXT_attachment_feedback_loop_layout": 2,
+                "VK_EXT_mesh_shader": 1,
+                "VK_EXT_mutable_descriptor_type": 1,
+                "VK_EXT_extended_dynamic_state3": 2,
+                "VK_EXT_descriptor_buffer": 1,
+                "VK_EXT_swapchain_maintenance1": 1,
+                "VK_EXT_pipeline_library_group_handles": 1,
+                "VK_EXT_image_sliced_view_of_3d": 1,
+                "VK_KHR_map_memory2": 1,
+                "VK_EXT_attachment_feedback_loop_dynamic_state": 1,
+                "VK_EXT_dynamic_rendering_unused_attachments": 1,
+                "VK_EXT_depth_bias_control": 1
             },
             "formats": {
                 "VK_FORMAT_A1R5G5B5_UNORM_PACK16": {
@@ -1325,7 +1664,6 @@
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -1335,7 +1673,6 @@
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -1345,7 +1682,6 @@
                         "bufferFeatures": [
                             "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -1383,16 +1719,10 @@
                 },
                 "VK_FORMAT_A2B10G10R10_USCALED_PACK32": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [
-                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -1429,7 +1759,6 @@
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -1439,7 +1768,6 @@
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -1449,7 +1777,6 @@
                         "bufferFeatures": [
                             "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -1487,16 +1814,10 @@
                 },
                 "VK_FORMAT_A2R10G10B10_USCALED_PACK32": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [
-                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -1506,7 +1827,6 @@
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -1516,7 +1836,6 @@
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -1526,7 +1845,6 @@
                         "bufferFeatures": [
                             "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -1584,21 +1902,17 @@
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
-                        "bufferFeatures": []
+                        "bufferFeatures": [
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT"
+                        ]
                     }
                 },
                 "VK_FORMAT_A8B8G8R8_SSCALED_PACK32": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [
-                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -1608,7 +1922,6 @@
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -1618,7 +1931,6 @@
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -1628,7 +1940,6 @@
                         "bufferFeatures": [
                             "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -1666,16 +1977,10 @@
                 },
                 "VK_FORMAT_A8B8G8R8_USCALED_PACK32": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [
-                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -1797,7 +2102,6 @@
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -1807,7 +2111,6 @@
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -1817,7 +2120,6 @@
                         "bufferFeatures": [
                             "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -1875,21 +2177,17 @@
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
-                        "bufferFeatures": []
+                        "bufferFeatures": [
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT"
+                        ]
                     }
                 },
                 "VK_FORMAT_B8G8R8A8_SSCALED": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [
-                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -1899,7 +2197,6 @@
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -1909,7 +2206,6 @@
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -1919,7 +2215,6 @@
                         "bufferFeatures": [
                             "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -1957,41 +2252,71 @@
                 },
                 "VK_FORMAT_B8G8R8A8_USCALED": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [
-                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
                 },
-                "VK_FORMAT_B8G8R8G8_422_UNORM": {
+                "VK_FORMAT_B8G8R8_SINT": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
-                        "bufferFeatures": []
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": [
+                            "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
+                        ]
+                    }
+                },
+                "VK_FORMAT_B8G8R8_SNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": [
+                            "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
+                        ]
+                    }
+                },
+                "VK_FORMAT_B8G8R8_SSCALED": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": [
+                            "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
+                        ]
+                    }
+                },
+                "VK_FORMAT_B8G8R8_UINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": [
+                            "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
+                        ]
+                    }
+                },
+                "VK_FORMAT_B8G8R8_UNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": [
+                            "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
+                        ]
+                    }
+                },
+                "VK_FORMAT_B8G8R8_USCALED": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": [
+                            "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
+                        ]
                     }
                 },
                 "VK_FORMAT_BC1_RGBA_SRGB_BLOCK": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
+                        "linearTilingFeatures": [],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -2004,10 +2329,7 @@
                 },
                 "VK_FORMAT_BC1_RGBA_UNORM_BLOCK": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
+                        "linearTilingFeatures": [],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -2020,10 +2342,7 @@
                 },
                 "VK_FORMAT_BC1_RGB_SRGB_BLOCK": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
+                        "linearTilingFeatures": [],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -2036,10 +2355,7 @@
                 },
                 "VK_FORMAT_BC1_RGB_UNORM_BLOCK": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
+                        "linearTilingFeatures": [],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -2052,10 +2368,7 @@
                 },
                 "VK_FORMAT_BC2_SRGB_BLOCK": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
+                        "linearTilingFeatures": [],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -2068,10 +2381,7 @@
                 },
                 "VK_FORMAT_BC2_UNORM_BLOCK": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
+                        "linearTilingFeatures": [],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -2084,10 +2394,7 @@
                 },
                 "VK_FORMAT_BC3_SRGB_BLOCK": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
+                        "linearTilingFeatures": [],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -2100,10 +2407,7 @@
                 },
                 "VK_FORMAT_BC3_UNORM_BLOCK": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
+                        "linearTilingFeatures": [],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -2116,10 +2420,7 @@
                 },
                 "VK_FORMAT_BC4_SNORM_BLOCK": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
+                        "linearTilingFeatures": [],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -2132,10 +2433,7 @@
                 },
                 "VK_FORMAT_BC4_UNORM_BLOCK": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
+                        "linearTilingFeatures": [],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -2148,10 +2446,7 @@
                 },
                 "VK_FORMAT_BC5_SNORM_BLOCK": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
+                        "linearTilingFeatures": [],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -2164,10 +2459,7 @@
                 },
                 "VK_FORMAT_BC5_UNORM_BLOCK": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
+                        "linearTilingFeatures": [],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -2180,10 +2472,7 @@
                 },
                 "VK_FORMAT_BC6H_SFLOAT_BLOCK": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
+                        "linearTilingFeatures": [],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -2196,10 +2485,7 @@
                 },
                 "VK_FORMAT_BC6H_UFLOAT_BLOCK": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
+                        "linearTilingFeatures": [],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -2212,10 +2498,7 @@
                 },
                 "VK_FORMAT_BC7_SRGB_BLOCK": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
+                        "linearTilingFeatures": [],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -2228,10 +2511,7 @@
                 },
                 "VK_FORMAT_BC7_UNORM_BLOCK": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
+                        "linearTilingFeatures": [],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -2305,7 +2585,6 @@
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -2317,7 +2596,6 @@
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -2333,26 +2611,13 @@
                     "VkFormatProperties": {
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
-                        "bufferFeatures": []
-                    }
-                },
-                "VK_FORMAT_G10X6_B10X6R10X6_2PLANE_422_UNORM_3PACK16": {
-                    "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
@@ -2363,26 +2628,64 @@
                     "VkFormatProperties": {
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
                         "bufferFeatures": []
                     }
                 },
-                "VK_FORMAT_G8B8G8R8_422_UNORM": {
+                "VK_FORMAT_G16_B16R16_2PLANE_422_UNORM": {
                     "VkFormatProperties": {
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                        ],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_G16_B16_R16_3PLANE_420_UNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                        ],
+                        "optimalTilingFeatures": [
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                        ],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_G16_B16_R16_3PLANE_422_UNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                        ],
+                        "optimalTilingFeatures": [
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
@@ -2393,11 +2696,13 @@
                     "VkFormatProperties": {
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
@@ -2408,11 +2713,13 @@
                     "VkFormatProperties": {
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
@@ -2423,15 +2730,113 @@
                     "VkFormatProperties": {
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
                         "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_G8_B8_R8_3PLANE_422_UNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                        ],
+                        "optimalTilingFeatures": [
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                        ],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_G8_B8_R8_3PLANE_444_UNORM": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                        ],
+                        "optimalTilingFeatures": [
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                        ],
+                        "bufferFeatures": []
+                    }
+                },
+                "VK_FORMAT_R10X6G10X6_UNORM_2PACK16": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
+                            "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT",
+                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
+                            "VK_FORMAT_FEATURE_BLIT_DST_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                        ],
+                        "optimalTilingFeatures": [
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
+                            "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT",
+                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
+                            "VK_FORMAT_FEATURE_BLIT_DST_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                        ],
+                        "bufferFeatures": [
+                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
+                        ]
+                    }
+                },
+                "VK_FORMAT_R10X6_UNORM_PACK16": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
+                            "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT",
+                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
+                            "VK_FORMAT_FEATURE_BLIT_DST_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                        ],
+                        "optimalTilingFeatures": [
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
+                            "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT",
+                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
+                            "VK_FORMAT_FEATURE_BLIT_DST_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                        ],
+                        "bufferFeatures": [
+                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
+                        ]
                     }
                 },
                 "VK_FORMAT_R16G16B16A16_SFLOAT": {
@@ -2470,7 +2875,6 @@
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -2480,7 +2884,6 @@
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -2490,7 +2893,6 @@
                         "bufferFeatures": [
                             "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -2528,16 +2930,10 @@
                 },
                 "VK_FORMAT_R16G16B16A16_SSCALED": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [
-                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -2547,7 +2943,6 @@
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -2557,7 +2952,6 @@
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -2567,7 +2961,6 @@
                         "bufferFeatures": [
                             "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -2605,16 +2998,28 @@
                 },
                 "VK_FORMAT_R16G16B16A16_USCALED": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [
-                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
+                        ]
+                    }
+                },
+                "VK_FORMAT_R16G16B16_SFLOAT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": [
+                            "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
+                        ]
+                    }
+                },
+                "VK_FORMAT_R16G16B16_SINT": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": [
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -2629,6 +3034,15 @@
                     }
                 },
                 "VK_FORMAT_R16G16B16_SSCALED": {
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
+                        "bufferFeatures": [
+                            "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
+                        ]
+                    }
+                },
+                "VK_FORMAT_R16G16B16_UINT": {
                     "VkFormatProperties": {
                         "linearTilingFeatures": [],
                         "optimalTilingFeatures": [],
@@ -2691,7 +3105,6 @@
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -2701,7 +3114,6 @@
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -2711,7 +3123,6 @@
                         "bufferFeatures": [
                             "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -2749,16 +3160,10 @@
                 },
                 "VK_FORMAT_R16G16_SSCALED": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [
-                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -2768,7 +3173,6 @@
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -2778,7 +3182,6 @@
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -2788,7 +3191,6 @@
                         "bufferFeatures": [
                             "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -2826,16 +3228,10 @@
                 },
                 "VK_FORMAT_R16G16_USCALED": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [
-                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -2931,16 +3327,10 @@
                 },
                 "VK_FORMAT_R16_SSCALED": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [
-                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -3005,16 +3395,10 @@
                 },
                 "VK_FORMAT_R16_USCALED": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [
-                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -3108,7 +3492,6 @@
                     "VkFormatProperties": {
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
@@ -3125,7 +3508,6 @@
                     "VkFormatProperties": {
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
@@ -3141,7 +3523,6 @@
                     "VkFormatProperties": {
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
@@ -3243,6 +3624,7 @@
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
@@ -3351,25 +3733,6 @@
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
-                        "bufferFeatures": []
-                    }
-                },
-                "VK_FORMAT_R4G4_UNORM_PACK8": {
-                    "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
@@ -3514,8 +3877,20 @@
                 },
                 "VK_FORMAT_R64_SFLOAT": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [],
+                        "linearTilingFeatures": [
+                            "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
+                            "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT",
+                            "VK_FORMAT_FEATURE_BLIT_DST_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                        ],
+                        "optimalTilingFeatures": [
+                            "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
+                            "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT",
+                            "VK_FORMAT_FEATURE_BLIT_DST_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                        ],
                         "bufferFeatures": [
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
@@ -3523,26 +3898,52 @@
                 },
                 "VK_FORMAT_R64_SINT": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [
+                        "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
+                            "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
+                            "VK_FORMAT_FEATURE_BLIT_DST_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
-                        "bufferFeatures": []
+                        "optimalTilingFeatures": [
+                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
+                            "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
+                            "VK_FORMAT_FEATURE_BLIT_DST_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                        ],
+                        "bufferFeatures": [
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
+                            "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
+                        ]
                     }
                 },
                 "VK_FORMAT_R64_UINT": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [],
-                        "optimalTilingFeatures": [
+                        "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
+                            "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
+                            "VK_FORMAT_FEATURE_BLIT_DST_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
-                        "bufferFeatures": []
+                        "optimalTilingFeatures": [
+                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
+                            "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
+                            "VK_FORMAT_FEATURE_BLIT_DST_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                            "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                        ],
+                        "bufferFeatures": [
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
+                            "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
+                        ]
                     }
                 },
                 "VK_FORMAT_R8G8B8A8_SINT": {
@@ -3550,7 +3951,6 @@
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -3560,7 +3960,6 @@
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -3570,7 +3969,6 @@
                         "bufferFeatures": [
                             "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -3628,21 +4026,17 @@
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
-                        "bufferFeatures": []
+                        "bufferFeatures": [
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT"
+                        ]
                     }
                 },
                 "VK_FORMAT_R8G8B8A8_SSCALED": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [
-                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -3652,7 +4046,6 @@
                         "linearTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -3662,7 +4055,6 @@
                         "optimalTilingFeatures": [
                             "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
                             "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
                             "VK_FORMAT_FEATURE_BLIT_DST_BIT",
@@ -3672,7 +4064,6 @@
                         "bufferFeatures": [
                             "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
-                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -3710,16 +4101,10 @@
                 },
                 "VK_FORMAT_R8G8B8A8_USCALED": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [
-                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -3858,21 +4243,17 @@
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
-                        "bufferFeatures": []
+                        "bufferFeatures": [
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT"
+                        ]
                     }
                 },
                 "VK_FORMAT_R8G8_SSCALED": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [
-                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -3937,16 +4318,10 @@
                 },
                 "VK_FORMAT_R8G8_USCALED": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [
-                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -4031,21 +4406,17 @@
                             "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
                             "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
                         ],
-                        "bufferFeatures": []
+                        "bufferFeatures": [
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT"
+                        ]
                     }
                 },
                 "VK_FORMAT_R8_SSCALED": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [
-                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -4110,16 +4481,10 @@
                 },
                 "VK_FORMAT_R8_USCALED": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
-                        "optimalTilingFeatures": [
-                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
-                        ],
+                        "linearTilingFeatures": [],
+                        "optimalTilingFeatures": [],
                         "bufferFeatures": [
-                            "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+                            "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
                             "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"
                         ]
                     }
@@ -4164,27 +4529,12 @@
                             "VK_QUEUE_TRANSFER_BIT",
                             "VK_QUEUE_SPARSE_BINDING_BIT"
                         ],
-                        "queueCount": 2,
+                        "queueCount": 4,
                         "timestampValidBits": 64,
                         "minImageTransferGranularity": {
                             "width": 1,
                             "height": 1,
                             "depth": 1
-                        }
-                    }
-                },
-                {
-                    "VkQueueFamilyProperties": {
-                        "queueFlags": [
-                            "VK_QUEUE_TRANSFER_BIT",
-                            "VK_QUEUE_SPARSE_BINDING_BIT"
-                        ],
-                        "queueCount": 2,
-                        "timestampValidBits": 64,
-                        "minImageTransferGranularity": {
-                            "width": 16,
-                            "height": 16,
-                            "depth": 8
                         }
                     }
                 }
