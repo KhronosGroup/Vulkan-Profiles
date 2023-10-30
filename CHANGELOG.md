@@ -15,6 +15,8 @@
 
 ### Features:
 - Add API library support of checking the support of profiles with multiple variants
+- Add `vpGetProfileAPIVersion` profile API library
+- Add `VP_LUNARG_desktop_baseline_2024` profile
 
 ### Deprecation:
 - Remove `VP_LUNARG_desktop_portability_2022` profile
