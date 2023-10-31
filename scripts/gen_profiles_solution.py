@@ -15,7 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Author: Daniel Rakos, RasterGrid
+# Authors: 
+# - Daniel Rakos <daniel.rakos@rastergrid.com>
+# - Christophe Riccio <christophe@lunarg.com>
 
 import os
 import re
@@ -614,10 +616,22 @@ VPAPI_ATTR VkResult vpGetProfileRequiredProfiles(const VpProfileProperties *pPro
 }
 
 VPAPI_ATTR uint32_t vpGetProfileAPIVersion(const VpProfileProperties* pProfile) {
-    const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(pProfile->profileName);
-    if (pDesc == nullptr) return 0;
+    const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
 
-    return pDesc->minApiVersion;
+    uint32_t major = 0;
+    uint32_t minor = 0;
+    uint32_t patch = 0;
+
+    for (std::size_t i = 0, n = profiles.size(); i < n; ++i) {
+        const detail::VpProfileDesc* pDesc = detail::vpGetProfileDesc(profiles[i].profileName);
+        if (pDesc == nullptr) return 0;
+
+        major = std::max<uint32_t>(major, VK_API_VERSION_MAJOR(pDesc->minApiVersion));
+        minor = std::max<uint32_t>(minor, VK_API_VERSION_MINOR(pDesc->minApiVersion));
+        patch = std::max<uint32_t>(patch, VK_API_VERSION_PATCH(pDesc->minApiVersion));
+    }
+
+    return VK_MAKE_API_VERSION(0, major, minor, patch);
 }
 
 VPAPI_ATTR VkResult vpGetProfileFallbacks(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VpProfileProperties *pProperties) {

@@ -16,6 +16,7 @@
  *
  * Authors:
  * - Daniel Rakos <daniel.rakos@rastergrid.com>
+ * - Christophe Riccio <christophe@lunarg.com>
  */
 
 #include "mock_vulkan_api.hpp"
