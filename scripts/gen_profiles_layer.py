@@ -15,7 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Author: Ziga Markus <ziga@lunarg.com>
+# Authors:
+# - Ziga Markus <ziga@lunarg.com>
+# - Christophe Riccio <christophe@lunarg.com>
 
 import gen_profiles_solution
 import argparse

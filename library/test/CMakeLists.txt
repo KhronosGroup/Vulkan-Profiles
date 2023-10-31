@@ -168,3 +168,8 @@ add_unit_test_with_debug_messages_variant(test_mocked_api_get_instance_profile_s
 add_unit_test_simple(test_mocked_api_create_instance)
 add_unit_test_with_debug_messages_variant(test_mocked_api_get_physdev_profile_support)
 add_unit_test_simple(test_mocked_api_create_device)
+
+if (NOT ANDROID)
+    add_unit_test_simple(test_mocked_api_create_device_profile_requirement)
+    add_dependencies(VpLibrary_test_mocked_api_create_device_profile_requirement VpLibrary_test_generated_ProfilesRequirements VpGenerated)
+endif()
