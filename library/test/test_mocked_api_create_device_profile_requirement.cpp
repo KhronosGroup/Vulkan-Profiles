@@ -21,7 +21,7 @@
 #include "mock_vulkan_api.hpp"
 #include "../../profiles/test/data/VP_LUNARG_test_profile_requirements/vulkan_profiles.hpp"
 
-TEST(mocked_api_create_device_profile_requirements, check_support_profile_a) {
+TEST(mocked_api_profile_requirements, check_support_profile_a) {
     MockVulkanAPI mock;
 
     const VpProfileProperties profile{VP_LUNARG_TEST_PROFILE_A_NAME, VP_LUNARG_TEST_PROFILE_A_SPEC_VERSION};
@@ -67,7 +67,7 @@ TEST(mocked_api_create_device_profile_requirements, check_support_profile_a) {
     EXPECT_EQ(supported, VK_TRUE);
 }
 
-TEST(mocked_api_create_device_profile_requirements, check_support_profile_b) {
+TEST(mocked_api_profile_requirements, check_support_profile_b) {
     MockVulkanAPI mock;
 
     const VpProfileProperties profile{VP_LUNARG_TEST_PROFILE_B_NAME, VP_LUNARG_TEST_PROFILE_B_SPEC_VERSION};
@@ -116,11 +116,23 @@ TEST(mocked_api_create_device_profile_requirements, check_support_profile_b) {
     EXPECT_EQ(supported, VK_TRUE);
 }
 
-/*
-TEST(mocked_api_create_device_profile_requirements, default_features) {
+TEST(mocked_api_profile_requirements, create_device) {
     MockVulkanAPI mock;
 
-    VpProfileProperties profile{ VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION };
+    const VpProfileProperties profile{VP_LUNARG_TEST_PROFILE_B_NAME, VP_LUNARG_TEST_PROFILE_B_SPEC_VERSION};
+
+    uint32_t extension_property_count = 0;
+    vpGetProfileDeviceExtensionProperties(&profile, &extension_property_count, nullptr);
+    std::vector<VkExtensionProperties> extension_properties(extension_property_count);
+    vpGetProfileDeviceExtensionProperties(&profile, &extension_property_count, &extension_properties[0]);
+
+    std::vector<const char*> extensions(extension_property_count);
+    for (std::size_t i = 0, n = extensions.size(); i < n; ++i) {
+        extensions[i] = extension_properties[i].extensionName;
+    }
+
+    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
+    vpGetProfileFeatures(&profile, &features);
 
     VkDeviceQueueCreateInfo queueCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO };
     queueCreateInfo.queueFamilyIndex = 0;
@@ -130,27 +142,11 @@ TEST(mocked_api_create_device_profile_requirements, default_features) {
     inCreateInfo.queueCreateInfoCount = 1;
     inCreateInfo.pQueueCreateInfos = &queueCreateInfo;
 
-    std::vector<const char *> outExtensions(std::size(detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions));
-    for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions[i].extensionName;
-    }
-
     VkDeviceCreateInfo outCreateInfo = inCreateInfo;
-    outCreateInfo.enabledExtensionCount = static_cast<uint32_t>(outExtensions.size());
-    outCreateInfo.ppEnabledExtensionNames = outExtensions.data();
+    outCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+    outCreateInfo.ppEnabledExtensionNames = extensions.data();
 
-    VkPhysicalDeviceVulkan13Features outFeatures13{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES };
-    VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
-    VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
-    VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, &outFeatures);
-
-    mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
-        VK_STRUCT(outFeatures),
-        VK_STRUCT(outFeatures11),
-        VK_STRUCT(outFeatures12),
-        VK_STRUCT(outFeatures13)
-    });
+    mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {VK_STRUCT(features)});
 
     VpDeviceCreateInfo createInfo{ &inCreateInfo, &profile, 0 };
 
@@ -160,4 +156,3 @@ TEST(mocked_api_create_device_profile_requirements, default_features) {
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_TRUE(device == mock.vkDevice);
 }
-*/

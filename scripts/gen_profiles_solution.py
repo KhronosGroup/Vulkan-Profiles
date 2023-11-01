@@ -1299,161 +1299,6 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
     return userData.result;
 }
 
-/*
-VPAPI_ATTR VkResult vpCreateDevice2(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
-                                   const VkAllocationCallbacks *pAllocator, VkDevice *pDevice) {
-    if (physicalDevice == VK_NULL_HANDLE || pCreateInfo == nullptr || pDevice == nullptr) {
-        return vkCreateDevice(physicalDevice, pCreateInfo == nullptr ? nullptr : pCreateInfo->pCreateInfo, pAllocator, pDevice);
-    }
-
-    const detail::VpProfileDesc* pProfileDesc = detail::vpGetProfileDesc(pCreateInfo->pProfile->profileName);
-    if (pProfileDesc == nullptr) return VK_ERROR_UNKNOWN;
-
-    // Multiple variants profile, not supported
-    VkBool32 multiple_variants = VK_FALSE;
-    VkResult result = vpHasMultipleVariantsProfile(pCreateInfo->pProfile, &multiple_variants);
-    if (result != VK_SUCCESS || multiple_variants == VK_TRUE) return VK_ERROR_UNKNOWN;
-
-    VkPhysicalDeviceFeatures2KHR features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR, nullptr };
-    std::vector<const char*> extensions;
-
-    const detail::VpVariantDesc* variant = pProfileDesc->pMergedCapabilities;
-
-    struct UserData {
-        VkPhysicalDevice                physicalDevice;
-        const detail::VpVariantDesc*    variant;
-        const VpDeviceCreateInfo*       pCreateInfo;
-        VkPhysicalDeviceFeatures2KHR&   features;
-        std::vector<const char*>&       extensions;
-        const VkAllocationCallbacks*    pAllocator;
-        VkDevice*                       pDevice;
-        VkResult                        result;
-    } userData{ physicalDevice, variant, pCreateInfo, features, extensions, pAllocator, pDevice };
-
-    variant->chainers.pfnFeature(static_cast<VkBaseOutStructure*>(static_cast<void*>(&features)), &userData, [](VkBaseOutStructure* pStructure, void* pUser) {
-        UserData* pUserData = static_cast<UserData*>(pUser);
-        const detail::VpVariantDesc* variant = pUserData->variant;
-        const VpDeviceCreateInfo* pCreateInfo = pUserData->pCreateInfo;
-
-        bool merge = (pCreateInfo->flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) != 0;
-        bool override = (pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0;
-
-        if (!merge && !override && pCreateInfo->pCreateInfo->enabledExtensionCount > 0) {
-            // If neither merge nor override is used then the application must not specify its
-            // own extensions
-            pUserData->result = VK_ERROR_UNKNOWN;
-            return;
-        }
-
-        detail::vpGetExtensions(pCreateInfo->pCreateInfo->enabledExtensionCount,
-                                pCreateInfo->pCreateInfo->ppEnabledExtensionNames,
-                                variant->deviceExtensionCount,
-                                variant->pDeviceExtensions,
-                                pUserData->extensions, merge, override);
-
-        VkBaseOutStructure* p = (VkBaseOutStructure*)&pUserData->features;
-
-        VkBaseOutStructure profileStructList;
-        profileStructList.pNext = p;
-
-        std::vector<VkStructureType> features_stype;
-
-        if (variant->feature.pfnFiller != nullptr) {
-            while (p != nullptr) {
-                features_stype.push_back(p->sType);
-                variant->feature.pfnFiller(p);
-                p = p->pNext;
-            }
-        }
-
-        if (pCreateInfo->pCreateInfo->pEnabledFeatures != nullptr) {
-            pUserData->features.features = *pCreateInfo->pCreateInfo->pEnabledFeatures;
-        }
-
-        if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {
-            pUserData->features.features.robustBufferAccess = VK_FALSE;
-        }
-
-#ifdef VK_EXT_robustness2
-        VkPhysicalDeviceRobustness2FeaturesEXT* pRobustness2FeaturesEXT = static_cast<VkPhysicalDeviceRobustness2FeaturesEXT*>(
-            detail::vpGetStructure(&pUserData->features, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT));
-        if (pRobustness2FeaturesEXT != nullptr) {
-            if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {
-                pRobustness2FeaturesEXT->robustBufferAccess2 = VK_FALSE;
-            }
-            if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT) {
-                pRobustness2FeaturesEXT->robustImageAccess2 = VK_FALSE;
-            }
-        }
-#endif//VK_EXT_robustness2
-
-#ifdef VK_EXT_image_robustness
-        VkPhysicalDeviceImageRobustnessFeaturesEXT* pImageRobustnessFeaturesEXT = static_cast<VkPhysicalDeviceImageRobustnessFeaturesEXT*>(
-            detail::vpGetStructure(&pUserData->features, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT));
-        if (pImageRobustnessFeaturesEXT != nullptr && (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT)) {
-            pImageRobustnessFeaturesEXT->robustImageAccess = VK_FALSE;
-        }
-#endif//VK_EXT_image_robustness
-
-#ifdef VK_VERSION_1_3
-        VkPhysicalDeviceVulkan13Features* pVulkan13Features = static_cast<VkPhysicalDeviceVulkan13Features*>(
-            detail::vpGetStructure(&pUserData->features, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES));
-        if (pVulkan13Features != nullptr && (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT)) {
-            pVulkan13Features->robustImageAccess = VK_FALSE;
-        }
-#endif//VK_VERSION_1_3
-
-        VkBaseOutStructure* pNext = static_cast<VkBaseOutStructure*>(const_cast<void*>(pCreateInfo->pCreateInfo->pNext));
-        if ((pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT) == 0) {
-            for (uint32_t i = 0; i < variant->featureStructTypeCount; ++i) {
-                const void* pRequested = detail::vpGetStructure(pNext, variant->pFeatureStructTypes[i]);
-                if (pRequested == nullptr) {
-                    VkBaseOutStructure* pPrevStruct = &profileStructList;
-                    VkBaseOutStructure* pCurrStruct = pPrevStruct->pNext;
-                    while (pCurrStruct->sType != variant->pFeatureStructTypes[i]) {
-                        pPrevStruct = pCurrStruct;
-                        pCurrStruct = pCurrStruct->pNext;
-                    }
-                    pPrevStruct->pNext = pCurrStruct->pNext;
-                    pCurrStruct->pNext = pNext;
-                    pNext = pCurrStruct;
-                }
-            }
-        } else if ((pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT) == 0) {
-            // If override is not used then the application must not specify its
-            // own feature structure for anything that the profile defines
-            pUserData->result = VK_ERROR_UNKNOWN;
-            return;
-        }
-    });
-
-    if (userData.result != VK_SUCCESS) {
-        return userData.result;
-    }
-
-    VkBaseOutStructure* pNext = static_cast<VkBaseOutStructure*>(const_cast<void*>(pCreateInfo->pCreateInfo->pNext));
-    
-    VkDeviceCreateInfo createInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
-    createInfo.pNext = &features;
-    createInfo.queueCreateInfoCount = pCreateInfo->pCreateInfo->queueCreateInfoCount;
-    createInfo.pQueueCreateInfos = pCreateInfo->pCreateInfo->pQueueCreateInfos;
-    createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-    createInfo.ppEnabledExtensionNames = extensions.data();
-    if (pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT) {
-        createInfo.pEnabledFeatures = pCreateInfo->pCreateInfo->pEnabledFeatures;
-    }
-
-    std::vector<VkStructureType> features_stype;
-    VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(&features);
-    while (p != nullptr) {
-        features_stype.push_back(p->sType);
-        p = p->pNext;
-    }
-
-    return vkCreateDevice(physicalDevice, &createInfo, pAllocator, pDevice);
-}
-*/
-
 VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkExtensionProperties *pProperties) {
     // Multiple variants profile, not supported
     VkBool32 multiple_variants = VK_FALSE;
@@ -2955,7 +2800,7 @@ class VulkanRegistry():
 
 
 class VulkanProfileCapabilities():
-    def __init__(self, registry, json_profile_value, json_capabilities, merge_mode):
+    def __init__(self, registry, json_profile_key, json_profile_value, json_capabilities_list, merge_mode):
         self.extensions = dict()
         self.instanceExtensions = dict()
         self.deviceExtensions = dict()
@@ -2964,24 +2809,27 @@ class VulkanProfileCapabilities():
         self.formats = dict()
         self.queueFamiliesProperties = []
         if merge_mode:
-            for capName in json_profile_value['capabilities']:
+            for json_capabilities in json_capabilities_list:
+                self.mergeCaps(registry, json_capabilities, merge_mode)
+            #for capName in json_profile_value['capabilities']:
                 # When we have multiple possible capabilities blocks, we load them all but effectively the API library can't effectively implement this behavior.
-                if type(capName).__name__ == 'list':
-                    for capNameCase in capName:
-                        self.mergeCaps(registry, json_capabilities[capNameCase])
-                elif capName in json_capabilities:
-                    self.mergeCaps(registry, json_capabilities[capName])
-                else:
-                    Log.f("Capability '{0}' needed by profile '{1}' is missing".format(capName, json_profile_value['name']))
+            #    if type(capName).__name__ == 'list':
+            #        for capNameCase in capName:
+            #            self.mergeCaps(registry, json_capabilities[capNameCase])
+            #    elif capName in json_capabilities:
+            #        self.mergeCaps(registry, json_capabilities[capName])
+            #    else:
+            #        Log.f("Capability '{0}' needed by profile '{1}' is missing".format(capName, json_profile_key))
         else:
-            self.mergeCaps(registry, json_capabilities)
+            self.mergeCaps(registry, json_capabilities_list, merge_mode)
 
-    def mergeCaps(self, registry, caps):
+    def mergeCaps(self, registry, caps, merge_mode):
         self.mergeProfileExtensions(registry, caps)
         self.mergeProfileFeatures(caps)
-        self.mergeProfileProperties(caps)
-        self.mergeProfileFormats(caps)
-        self.mergeProfileQueueFamiliesProperties(caps)
+        if not merge_mode:
+            self.mergeProfileProperties(caps)
+            self.mergeProfileFormats(caps)
+            self.mergeProfileQueueFamiliesProperties(caps)
 
     def mergeProfileCapData(self, dst, src):
         if type(src) != type(dst):
@@ -3135,7 +2983,7 @@ class VulkanProfileStructs():
 
 
 class VulkanProfile():
-    def __init__(self, registry, json_profile_key, json_profile_value, json_capabilities):
+    def __init__(self, registry, json_profiles_database, json_profile_key, json_profile_value, json_capabilities):
         self.registry = registry
         self.key = json_profile_key
         self.label = json_profile_value['label']
@@ -3144,21 +2992,28 @@ class VulkanProfile():
         self.apiVersion = json_profile_value['api-version']
         self.apiVersionNumber = VulkanVersionNumber(self.apiVersion, registry.api)
         self.fallbacks = json_profile_value.get('fallback')
-        self.required_profiles = json_profile_value.get('profiles')
         self.versionRequirements = []
-        self.extensionRequirements = []
-        
-        referenced_capabilities_list = json_profile_value.get('capabilities')
 
-        self.merge_capabilities = VulkanProfileCapabilities(registry, json_profile_value, json_capabilities, True)
+        profile_list = json_profiles_database.collectRequiredProfiles(json_profile_key)
+
+        self.profileRequirements = []
+        for profile in profile_list:
+            if profile != json_profile_key:
+                self.profileRequirements.append(profile)
+        self.extensionRequirements = []
+
+        collected_json_capabilities = []
+        collected_json_capabilities.extend(json_profiles_database.collectProfileCapabilities(profile_list))
+
+        self.merge_capabilities = VulkanProfileCapabilities(registry, json_profile_key, json_profile_value, collected_json_capabilities, True)
         self.split_capabilities = dict()
-        for referenced_capability in json_profile_value['capabilities']:        
+        for referenced_capability in json_profile_value['capabilities']:
             # When we have multiple possible capabilities blocks, we load them all but effectively the API library can't effectively implement this behavior.
             if type(referenced_capability).__name__ == 'list':
                 for capability_key in referenced_capability:
-                    self.split_capabilities[capability_key] = VulkanProfileCapabilities(registry, json_profile_value, json_capabilities[capability_key], False)
+                    self.split_capabilities[capability_key] = VulkanProfileCapabilities(registry, json_profile_key, json_profile_value, json_capabilities[capability_key], False)
             elif referenced_capability in json_capabilities:
-                self.split_capabilities[referenced_capability] = VulkanProfileCapabilities(registry, json_profile_value, json_capabilities[referenced_capability], False)
+                self.split_capabilities[referenced_capability] = VulkanProfileCapabilities(registry, json_profile_key, json_profile_value, json_capabilities[referenced_capability], False)
 
         self.structs = VulkanProfileStructs(registry, self.split_capabilities)
         self.multiple_variants = self.checkMultipleVariants(json_profile_value)
@@ -3647,11 +3502,72 @@ class VulkanProfile():
 
         return gen
 
+class VulkanProfilesDatabase():
+    def __init__(self):
+        self.json_files = [] # json_root[]
+
+    def recurseRequiredProfiles(self, json_files, results, profile_key):
+        for json_file in json_files:
+            for json_profile_key, json_profile_value in json_file['profiles'].items():
+                if profile_key == json_profile_key:
+                    json_profiles_required = json_profile_value.get('profiles')
+                    if json_profiles_required is None:
+                        break # This profile doesn't have required profiles
+                    for json_profile_required in json_profiles_required:
+                        self.recurseRequiredProfiles(json_files, results, json_profile_required)
+                    break
+        results.append(profile_key)
+
+    def collectRequiredProfiles(self, profile_key):
+        results = []
+        self.recurseRequiredProfiles(self.json_files, results, profile_key)
+        if len(results) > 1:
+            Log.i('Required profiles by the {0} profile:'.format(profile_key))
+            for result in results:
+                if result != profile_key:
+                    Log.i('- {0}'.format(result))
+
+        else:
+            Log.i('Required profiles by the {0} profile: None'.format(profile_key))
+        return results
+
+    def gatherProfileCapabilities(self, json_profile_key, json_profile_value, json_capabilities_value):
+        capabilities_list = []
+
+        for cap_key in json_profile_value['capabilities']:
+            # When we have multiple possible capabilities blocks, we load them all but effectively the API library can't effectively implement this behavior.
+            if type(cap_key).__name__ == 'list':
+                for cap_key_case in cap_key:
+                    Log.i('- {0}::{1}'.format(json_profile_key, cap_key_case))
+                    capabilities_list.append(json_capabilities_value[cap_key_case])
+            elif cap_key in json_capabilities_value:
+                capabilities_list.append(json_capabilities_value[cap_key])
+                Log.i('- {0}::{1}'.format(json_profile_key, cap_key))
+
+        return capabilities_list
+
+    def collectProfileCapabilities(self, profile_requirements):
+        Log.i('Required capabilities blocks by the {0} profile:'.format(profile_requirements[0]))
+        
+        capabilities_list = []
+        for required_profile in profile_requirements:
+            for json_file in self.json_files:
+                found = False
+                for json_profile_key, json_profile_value in json_file['profiles'].items():
+                    if required_profile == json_profile_key:
+                        capabilities = self.gatherProfileCapabilities(json_profile_key, json_profile_value, json_file['capabilities'])
+                        capabilities_list.extend(capabilities)
+                        found = True
+                    break
+                if found:
+                    break
+
+        return capabilities_list
 
 class VulkanProfilesFiles():
     def __init__(self, registry, profiles_dir, validate, schema):
         self.profiles = dict()
-        self.json_files_data = []
+        self.json_profiles_database = VulkanProfilesDatabase()
 
         dirAbsPath = os.path.abspath(profiles_dir)
         filenames = os.listdir(dirAbsPath)
@@ -3665,15 +3581,15 @@ class VulkanProfilesFiles():
                     if validate:
                         Log.i("Validating profile file: '{0}'".format(filename))
                         jsonschema.validate(json_root, schema)
-                    self.json_files_data.append(json_root)
+                    self.json_profiles_database.json_files.append(json_root)
 
-        for json_file_data in self.json_files_data:
+        for json_file_data in self.json_profiles_database.json_files:
             self.parseProfiles(registry, json_file_data['profiles'], json_file_data['capabilities'])
 
     def parseProfiles(self, registry, json_profiles, json_caps):
         for json_profile_key, json_profile_value in json_profiles.items():
             Log.i("Registering profile '{0}'".format(json_profile_key))
-            self.profiles[json_profile_key] = VulkanProfile(registry, json_profile_key, json_profile_value, json_caps)
+            self.profiles[json_profile_key] = VulkanProfile(registry, self.json_profiles_database, json_profile_key, json_profile_value, json_caps)
 
 
 class VulkanProfilesLibraryGenerator():
@@ -3752,7 +3668,7 @@ class VulkanProfilesLibraryGenerator():
             gen += '\n'
 
             # Add prerequisites
-            allRequirements = sorted(profile.versionRequirements) + sorted(profile.extensionRequirements)
+            allRequirements = sorted(profile.versionRequirements) + sorted(profile.profileRequirements) + sorted(profile.extensionRequirements)
             if allRequirements:
                 for i, requirement in enumerate(allRequirements):
                     if i == 0:
@@ -3767,10 +3683,20 @@ class VulkanProfilesLibraryGenerator():
                     else:
                         gen += '\n'
 
+            version = profile.apiVersion.split('.')
+            major = int(version[0])
+            minor = int(version[1])
+            patch = int(version[2])
+            for required_profile in profile.profileRequirements:
+                version = self.profiles_files.profiles[required_profile].apiVersion.split('.')
+                major = max(major, int(version[0]))
+                minor = max(minor, int(version[1]))
+                patch = max(patch, int(version[2]))
+
             gen += '#define {0} 1\n'.format(name)
             gen += '#define {0}_NAME "{1}"\n'.format(uname, name)
             gen += '#define {0}_SPEC_VERSION {1}\n'.format(uname, profile.version)
-            gen += '#define {0}_MIN_API_VERSION VK_MAKE_VERSION({1})\n'.format(uname, profile.apiVersion.replace(".", ", "))
+            gen += '#define {0}_MIN_API_VERSION VK_MAKE_VERSION({1}, {2}, {3})\n'.format(uname, major, minor, patch)
 
             if allRequirements:
                 gen += '#endif\n'
@@ -3824,25 +3750,25 @@ class VulkanProfilesLibraryGenerator():
                 gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.formats, 'formatStructTypes')
                 gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.formats, 'formatDesc')
                 gen += '        chainerDesc,\n'
-                gen += '    };\n'
+                gen += '    };\n\n'
 
             for capabilities_key, capabilities_value in profile_value.split_capabilities.items():
-                gen += ('namespace {0} {{\n').format(capabilities_key)
-                gen += '    static const VpVariantDesc variants[] = {\n'
-                gen += self.gen_dataArrayInfo(capabilities_value.instanceExtensions, 'instanceExtensions')
-                gen += self.gen_dataArrayInfo(capabilities_value.deviceExtensions, 'deviceExtensions')
-                gen += self.gen_dataArrayInfo(capabilities_value.features, 'featureStructTypes')
+                gen += ('    namespace {0} {{\n').format(capabilities_key)
+                gen += '        static const VpVariantDesc variants[] = {\n'
+                gen += '    ' + self.gen_dataArrayInfo(capabilities_value.instanceExtensions, 'instanceExtensions')
+                gen += '    ' + self.gen_dataArrayInfo(capabilities_value.deviceExtensions, 'deviceExtensions')
+                gen += '    ' + self.gen_dataArrayInfo(capabilities_value.features, 'featureStructTypes')
                 gen += '            featureDesc,\n'
-                gen += self.gen_dataArrayInfo(capabilities_value.properties, 'propertyStructTypes')
+                gen += '    ' + self.gen_dataArrayInfo(capabilities_value.properties, 'propertyStructTypes')
                 gen += '            propertyDesc,\n'
-                gen += self.gen_dataArrayInfo(capabilities_value.queueFamiliesProperties, 'queueFamilyStructTypes')
-                gen += self.gen_dataArrayInfo(capabilities_value.queueFamiliesProperties, 'queueFamilyDesc')
-                gen += self.gen_dataArrayInfo(capabilities_value.formats, 'formatStructTypes')
-                gen += self.gen_dataArrayInfo(capabilities_value.formats, 'formatDesc')
-                gen += '        chainerDesc,\n'
-                gen += '    };\n'
-                gen += '    static const uint32_t variantCount = static_cast<uint32_t>(std::size(variants));\n'
-                gen += ('\n}} // namespace {0}\n').format(capabilities_key)
+                gen += '    ' + self.gen_dataArrayInfo(capabilities_value.queueFamiliesProperties, 'queueFamilyStructTypes')
+                gen += '    ' + self.gen_dataArrayInfo(capabilities_value.queueFamiliesProperties, 'queueFamilyDesc')
+                gen += '    ' + self.gen_dataArrayInfo(capabilities_value.formats, 'formatStructTypes')
+                gen += '    ' + self.gen_dataArrayInfo(capabilities_value.formats, 'formatDesc')
+                gen += '            chainerDesc,\n'
+                gen += '        };\n'
+                gen += '        static const uint32_t variantCount = static_cast<uint32_t>(std::size(variants));\n'
+                gen += ('    }} // namespace {0}\n\n').format(capabilities_key)
 
             gen += '    static const VpCapabilitiesDesc capabilities[] = {\n'
             for capabilities_key, value in profile_value.split_capabilities.items():
@@ -3858,10 +3784,10 @@ class VulkanProfilesLibraryGenerator():
                 gen += ('    };\n'
                     '    static const uint32_t fallbackCount = static_cast<uint32_t>(std::size(fallbacks));\n')
 
-            if profile_value.required_profiles:
+            if profile_value.profileRequirements:
                 gen += ('\n'
                     '    static const VpProfileProperties profiles[] = {\n')
-                for profile in profile_value.required_profiles:
+                for profile in profile_value.profileRequirements:
                     gen += '        {{{0}_NAME, {0}_SPEC_VERSION}},\n'.format(profile.upper())
                 gen += ('    };\n'
                     '    static const uint32_t profileCount = static_cast<uint32_t>(std::size(profiles));\n')
@@ -3880,7 +3806,7 @@ class VulkanProfilesLibraryGenerator():
                 gen += '        nullptr,\n'
             else:
                 gen += ('        {0}::mergedCapabilities,\n').format(profile_ukey)
-            if profile_value.required_profiles:
+            if profile_value.profileRequirements:
                 gen += ('        {0}::profileCount, {0}::profiles,\n').format(profile_ukey)
             else:
                 gen += ('        0, nullptr,\n')
@@ -4532,7 +4458,7 @@ class VulkanProfilesDocGenerator():
             'Description': lambda _, profile : profile.description,
             'Version': lambda _, profile : profile.version,
             'Required API version': lambda _, profile : profile.apiVersion,
-            'Required profiles': lambda _, profile : ', '.join(profile.required_profiles) if profile.required_profiles != None else '-',
+            'Required profiles': lambda _, profile : ', '.join(profile.profileRequirements) if profile.profileRequirements != None else '-',
             'Fallback profiles': lambda _, profile : ', '.join(profile.fallbacks) if profile.fallbacks != None else '-'
         })))
 
