@@ -39,6 +39,11 @@ if (BUILD_TESTS)
     endif()
 endif()
 
+option(BUILD_TESTS_EXTRA "Build the extra tests, for developers only")
+if (BUILD_TESTS_EXTRA)
+    add_definitions(-DVKU_FORCE_EXTRA_TESTS)
+endif()
+
 set(PROFILES_SCHEMA_FILENAME "profiles-0.8-latest.json")
 
 find_package(Python3 REQUIRED)
