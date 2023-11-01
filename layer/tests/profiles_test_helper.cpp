@@ -102,8 +102,15 @@ VkResult profiles_test::VulkanInstanceBuilder::init(uint32_t apiVersion, const s
 
     VkApplicationInfo app_info{GetDefaultApplicationInfo()};
     app_info.apiVersion = apiVersion;
+    
 
     VkInstanceCreateInfo inst_create_info = {};
+
+#ifdef __APPLE__
+    _extension_names.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+    inst_create_info.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+#endif
+
     inst_create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     inst_create_info.pApplicationInfo = &app_info;
     inst_create_info.pNext = nullptr;
