@@ -172,27 +172,9 @@ static const VpFeatureDesc featureDesc = {
 
 static const VpPropertyDesc propertyDesc = {
     [](VkBaseOutStructure* p) {
-            switch (p->sType) {
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
-                    VkPhysicalDeviceProperties2KHR* s = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
-                    s->properties.limits.maxImageDimension2D = 4096;
-                    s->properties.limits.maxImageDimension3D = 4096;
-                    s->properties.limits.maxImageDimensionCube = 4096;
-                } break;
-                default: break;
-            }
     },
     [](VkBaseOutStructure* p) -> bool {
         bool ret = true;
-            switch (p->sType) {
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
-                    VkPhysicalDeviceProperties2KHR* s = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
-                    ret = ret && (s->properties.limits.maxImageDimension2D >= 4096);
-                    ret = ret && (s->properties.limits.maxImageDimension3D >= 4096);
-                    ret = ret && (s->properties.limits.maxImageDimensionCube >= 4096);
-                } break;
-                default: break;
-            }
         return ret;
     }
 };
@@ -304,6 +286,7 @@ static const VkStructureType propertyStructTypes[] = {
 
 static const VkExtensionProperties deviceExtensions[] = {
     VkExtensionProperties{ VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME, 1 },
+    VkExtensionProperties{ VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME, 1 },
 };
 
 static const VpFeatureDesc featureDesc = {
@@ -312,6 +295,7 @@ static const VpFeatureDesc featureDesc = {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR: {
                     VkPhysicalDeviceFeatures2KHR* s = static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p));
                     s->features.depthBiasClamp = VK_TRUE;
+                    s->features.depthClamp = VK_TRUE;
                     s->features.drawIndirectFirstInstance = VK_TRUE;
                 } break;
                 default: break;
@@ -323,6 +307,7 @@ static const VpFeatureDesc featureDesc = {
                 case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR: {
                     VkPhysicalDeviceFeatures2KHR* s = static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p));
                     ret = ret && (s->features.depthBiasClamp == VK_TRUE);
+                    ret = ret && (s->features.depthClamp == VK_TRUE);
                     ret = ret && (s->features.drawIndirectFirstInstance == VK_TRUE);
                 } break;
                 default: break;
@@ -333,27 +318,9 @@ static const VpFeatureDesc featureDesc = {
 
 static const VpPropertyDesc propertyDesc = {
     [](VkBaseOutStructure* p) {
-            switch (p->sType) {
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
-                    VkPhysicalDeviceProperties2KHR* s = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
-                    s->properties.limits.maxImageDimension1D = 4096;
-                    s->properties.limits.maxImageDimension2D = 8192;
-                    s->properties.limits.maxImageDimension3D = 2048;
-                } break;
-                default: break;
-            }
     },
     [](VkBaseOutStructure* p) -> bool {
         bool ret = true;
-            switch (p->sType) {
-                case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR: {
-                    VkPhysicalDeviceProperties2KHR* s = static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p));
-                    ret = ret && (s->properties.limits.maxImageDimension1D >= 4096);
-                    ret = ret && (s->properties.limits.maxImageDimension2D >= 8192);
-                    ret = ret && (s->properties.limits.maxImageDimension3D >= 2048);
-                } break;
-                default: break;
-            }
         return ret;
     }
 };
@@ -460,7 +427,7 @@ namespace VP_LUNARG_TEST_PROFILE_A {
         static_cast<uint32_t>(std::size(deviceExtensions)), deviceExtensions,
         static_cast<uint32_t>(std::size(featureStructTypes)), featureStructTypes,
             featureDesc,
-        static_cast<uint32_t>(std::size(propertyStructTypes)), propertyStructTypes,
+        0, nullptr,
             propertyDesc,
         0, nullptr,
         0, nullptr,
@@ -468,23 +435,24 @@ namespace VP_LUNARG_TEST_PROFILE_A {
         0, nullptr,
         chainerDesc,
     };
-namespace baseline {
-    static const VpVariantDesc variants[] = {
-        0, nullptr,
-        static_cast<uint32_t>(std::size(deviceExtensions)), deviceExtensions,
-        static_cast<uint32_t>(std::size(featureStructTypes)), featureStructTypes,
-            featureDesc,
-        static_cast<uint32_t>(std::size(propertyStructTypes)), propertyStructTypes,
-            propertyDesc,
-        0, nullptr,
-        0, nullptr,
-        0, nullptr,
-        0, nullptr,
-        chainerDesc,
-    };
-    static const uint32_t variantCount = static_cast<uint32_t>(std::size(variants));
 
-} // namespace baseline
+    namespace baseline {
+        static const VpVariantDesc variants[] = {
+            0, nullptr,
+            static_cast<uint32_t>(std::size(deviceExtensions)), deviceExtensions,
+            static_cast<uint32_t>(std::size(featureStructTypes)), featureStructTypes,
+            featureDesc,
+            static_cast<uint32_t>(std::size(propertyStructTypes)), propertyStructTypes,
+            propertyDesc,
+            0, nullptr,
+            0, nullptr,
+            0, nullptr,
+            0, nullptr,
+            chainerDesc,
+        };
+        static const uint32_t variantCount = static_cast<uint32_t>(std::size(variants));
+    } // namespace baseline
+
     static const VpCapabilitiesDesc capabilities[] = {
         baseline::variantCount, baseline::variants,
     };
@@ -499,7 +467,7 @@ namespace VP_LUNARG_TEST_PROFILE_B {
         static_cast<uint32_t>(std::size(deviceExtensions)), deviceExtensions,
         static_cast<uint32_t>(std::size(featureStructTypes)), featureStructTypes,
             featureDesc,
-        static_cast<uint32_t>(std::size(propertyStructTypes)), propertyStructTypes,
+        0, nullptr,
             propertyDesc,
         0, nullptr,
         0, nullptr,
@@ -507,23 +475,24 @@ namespace VP_LUNARG_TEST_PROFILE_B {
         0, nullptr,
         chainerDesc,
     };
-namespace baseline {
-    static const VpVariantDesc variants[] = {
-        0, nullptr,
-        static_cast<uint32_t>(std::size(deviceExtensions)), deviceExtensions,
-        static_cast<uint32_t>(std::size(featureStructTypes)), featureStructTypes,
-            featureDesc,
-        static_cast<uint32_t>(std::size(propertyStructTypes)), propertyStructTypes,
-            propertyDesc,
-        0, nullptr,
-        0, nullptr,
-        0, nullptr,
-        0, nullptr,
-        chainerDesc,
-    };
-    static const uint32_t variantCount = static_cast<uint32_t>(std::size(variants));
 
-} // namespace baseline
+    namespace baseline {
+        static const VpVariantDesc variants[] = {
+            0, nullptr,
+            static_cast<uint32_t>(std::size(deviceExtensions)), deviceExtensions,
+            static_cast<uint32_t>(std::size(featureStructTypes)), featureStructTypes,
+            featureDesc,
+            static_cast<uint32_t>(std::size(propertyStructTypes)), propertyStructTypes,
+            propertyDesc,
+            0, nullptr,
+            0, nullptr,
+            0, nullptr,
+            0, nullptr,
+            chainerDesc,
+        };
+        static const uint32_t variantCount = static_cast<uint32_t>(std::size(variants));
+    } // namespace baseline
+
     static const VpCapabilitiesDesc capabilities[] = {
         baseline::variantCount, baseline::variants,
     };
@@ -915,7 +884,9 @@ VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
         }
 
         if (createInfo.pApplicationInfo == nullptr) {
-            appInfo.apiVersion = profile_desc->minApiVersion;
+            if (profile_desc != nullptr) {
+                appInfo.apiVersion = profile_desc->minApiVersion;
+            }
             createInfo.pApplicationInfo = &appInfo;
         }
 
@@ -1429,161 +1400,6 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
 
     return userData.result;
 }
-
-/*
-VPAPI_ATTR VkResult vpCreateDevice2(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
-                                   const VkAllocationCallbacks *pAllocator, VkDevice *pDevice) {
-    if (physicalDevice == VK_NULL_HANDLE || pCreateInfo == nullptr || pDevice == nullptr) {
-        return vkCreateDevice(physicalDevice, pCreateInfo == nullptr ? nullptr : pCreateInfo->pCreateInfo, pAllocator, pDevice);
-    }
-
-    const detail::VpProfileDesc* pProfileDesc = detail::vpGetProfileDesc(pCreateInfo->pProfile->profileName);
-    if (pProfileDesc == nullptr) return VK_ERROR_UNKNOWN;
-
-    // Multiple variants profile, not supported
-    VkBool32 multiple_variants = VK_FALSE;
-    VkResult result = vpHasMultipleVariantsProfile(pCreateInfo->pProfile, &multiple_variants);
-    if (result != VK_SUCCESS || multiple_variants == VK_TRUE) return VK_ERROR_UNKNOWN;
-
-    VkPhysicalDeviceFeatures2KHR features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR, nullptr };
-    std::vector<const char*> extensions;
-
-    const detail::VpVariantDesc* variant = pProfileDesc->pMergedCapabilities;
-
-    struct UserData {
-        VkPhysicalDevice                physicalDevice;
-        const detail::VpVariantDesc*    variant;
-        const VpDeviceCreateInfo*       pCreateInfo;
-        VkPhysicalDeviceFeatures2KHR&   features;
-        std::vector<const char*>&       extensions;
-        const VkAllocationCallbacks*    pAllocator;
-        VkDevice*                       pDevice;
-        VkResult                        result;
-    } userData{ physicalDevice, variant, pCreateInfo, features, extensions, pAllocator, pDevice };
-
-    variant->chainers.pfnFeature(static_cast<VkBaseOutStructure*>(static_cast<void*>(&features)), &userData, [](VkBaseOutStructure* pStructure, void* pUser) {
-        UserData* pUserData = static_cast<UserData*>(pUser);
-        const detail::VpVariantDesc* variant = pUserData->variant;
-        const VpDeviceCreateInfo* pCreateInfo = pUserData->pCreateInfo;
-
-        bool merge = (pCreateInfo->flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) != 0;
-        bool override = (pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0;
-
-        if (!merge && !override && pCreateInfo->pCreateInfo->enabledExtensionCount > 0) {
-            // If neither merge nor override is used then the application must not specify its
-            // own extensions
-            pUserData->result = VK_ERROR_UNKNOWN;
-            return;
-        }
-
-        detail::vpGetExtensions(pCreateInfo->pCreateInfo->enabledExtensionCount,
-                                pCreateInfo->pCreateInfo->ppEnabledExtensionNames,
-                                variant->deviceExtensionCount,
-                                variant->pDeviceExtensions,
-                                pUserData->extensions, merge, override);
-
-        VkBaseOutStructure* p = (VkBaseOutStructure*)&pUserData->features;
-
-        VkBaseOutStructure profileStructList;
-        profileStructList.pNext = p;
-
-        std::vector<VkStructureType> features_stype;
-
-        if (variant->feature.pfnFiller != nullptr) {
-            while (p != nullptr) {
-                features_stype.push_back(p->sType);
-                variant->feature.pfnFiller(p);
-                p = p->pNext;
-            }
-        }
-
-        if (pCreateInfo->pCreateInfo->pEnabledFeatures != nullptr) {
-            pUserData->features.features = *pCreateInfo->pCreateInfo->pEnabledFeatures;
-        }
-
-        if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {
-            pUserData->features.features.robustBufferAccess = VK_FALSE;
-        }
-
-#ifdef VK_EXT_robustness2
-        VkPhysicalDeviceRobustness2FeaturesEXT* pRobustness2FeaturesEXT = static_cast<VkPhysicalDeviceRobustness2FeaturesEXT*>(
-            detail::vpGetStructure(&pUserData->features, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT));
-        if (pRobustness2FeaturesEXT != nullptr) {
-            if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {
-                pRobustness2FeaturesEXT->robustBufferAccess2 = VK_FALSE;
-            }
-            if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT) {
-                pRobustness2FeaturesEXT->robustImageAccess2 = VK_FALSE;
-            }
-        }
-#endif//VK_EXT_robustness2
-
-#ifdef VK_EXT_image_robustness
-        VkPhysicalDeviceImageRobustnessFeaturesEXT* pImageRobustnessFeaturesEXT = static_cast<VkPhysicalDeviceImageRobustnessFeaturesEXT*>(
-            detail::vpGetStructure(&pUserData->features, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT));
-        if (pImageRobustnessFeaturesEXT != nullptr && (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT)) {
-            pImageRobustnessFeaturesEXT->robustImageAccess = VK_FALSE;
-        }
-#endif//VK_EXT_image_robustness
-
-#ifdef VK_VERSION_1_3
-        VkPhysicalDeviceVulkan13Features* pVulkan13Features = static_cast<VkPhysicalDeviceVulkan13Features*>(
-            detail::vpGetStructure(&pUserData->features, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES));
-        if (pVulkan13Features != nullptr && (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT)) {
-            pVulkan13Features->robustImageAccess = VK_FALSE;
-        }
-#endif//VK_VERSION_1_3
-
-        VkBaseOutStructure* pNext = static_cast<VkBaseOutStructure*>(const_cast<void*>(pCreateInfo->pCreateInfo->pNext));
-        if ((pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT) == 0) {
-            for (uint32_t i = 0; i < variant->featureStructTypeCount; ++i) {
-                const void* pRequested = detail::vpGetStructure(pNext, variant->pFeatureStructTypes[i]);
-                if (pRequested == nullptr) {
-                    VkBaseOutStructure* pPrevStruct = &profileStructList;
-                    VkBaseOutStructure* pCurrStruct = pPrevStruct->pNext;
-                    while (pCurrStruct->sType != variant->pFeatureStructTypes[i]) {
-                        pPrevStruct = pCurrStruct;
-                        pCurrStruct = pCurrStruct->pNext;
-                    }
-                    pPrevStruct->pNext = pCurrStruct->pNext;
-                    pCurrStruct->pNext = pNext;
-                    pNext = pCurrStruct;
-                }
-            }
-        } else if ((pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT) == 0) {
-            // If override is not used then the application must not specify its
-            // own feature structure for anything that the profile defines
-            pUserData->result = VK_ERROR_UNKNOWN;
-            return;
-        }
-    });
-
-    if (userData.result != VK_SUCCESS) {
-        return userData.result;
-    }
-
-    VkBaseOutStructure* pNext = static_cast<VkBaseOutStructure*>(const_cast<void*>(pCreateInfo->pCreateInfo->pNext));
-    
-    VkDeviceCreateInfo createInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
-    createInfo.pNext = &features;
-    createInfo.queueCreateInfoCount = pCreateInfo->pCreateInfo->queueCreateInfoCount;
-    createInfo.pQueueCreateInfos = pCreateInfo->pCreateInfo->pQueueCreateInfos;
-    createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-    createInfo.ppEnabledExtensionNames = extensions.data();
-    if (pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT) {
-        createInfo.pEnabledFeatures = pCreateInfo->pCreateInfo->pEnabledFeatures;
-    }
-
-    std::vector<VkStructureType> features_stype;
-    VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(&features);
-    while (p != nullptr) {
-        features_stype.push_back(p->sType);
-        p = p->pNext;
-    }
-
-    return vkCreateDevice(physicalDevice, &createInfo, pAllocator, pDevice);
-}
-*/
 
 VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkExtensionProperties *pProperties) {
     // Multiple variants profile, not supported

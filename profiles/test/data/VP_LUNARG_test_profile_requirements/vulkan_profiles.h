@@ -39,11 +39,12 @@
 #endif
 
 #if defined(VK_VERSION_1_3) && \
+    defined(VP_LUNARG_test_profile_a) && \
     defined(VK_KHR_driver_properties)
 #define VP_LUNARG_test_profile_b 1
 #define VP_LUNARG_TEST_PROFILE_B_NAME "VP_LUNARG_test_profile_b"
 #define VP_LUNARG_TEST_PROFILE_B_SPEC_VERSION 1
-#define VP_LUNARG_TEST_PROFILE_B_MIN_API_VERSION VK_MAKE_VERSION(1, 3, 204)
+#define VP_LUNARG_TEST_PROFILE_B_MIN_API_VERSION VK_MAKE_VERSION(1, 3, 224)
 #endif
 
 #define VP_MAX_PROFILE_NAME_SIZE 256U
