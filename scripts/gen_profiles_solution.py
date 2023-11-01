@@ -3651,8 +3651,11 @@ class VulkanProfile():
 class VulkanProfilesFiles():
     def __init__(self, registry, profiles_dir, validate, schema):
         self.profiles = dict()
+        self.json_files_data = []
+
         dirAbsPath = os.path.abspath(profiles_dir)
         filenames = os.listdir(dirAbsPath)
+
         for filename in filenames:
             fileAbsPath = os.path.join(dirAbsPath, filename)
             if os.path.isfile(fileAbsPath) and os.path.splitext(filename)[-1] == '.json':
@@ -3662,7 +3665,10 @@ class VulkanProfilesFiles():
                     if validate:
                         Log.i("Validating profile file: '{0}'".format(filename))
                         jsonschema.validate(json_root, schema)
-                    self.parseProfiles(registry, json_root['profiles'], json_root['capabilities'])
+                    self.json_files_data.append(json_root)
+
+        for json_file_data in self.json_files_data:
+            self.parseProfiles(registry, json_file_data['profiles'], json_file_data['capabilities'])
 
     def parseProfiles(self, registry, json_profiles, json_caps):
         for json_profile_key, json_profile_value in json_profiles.items():
