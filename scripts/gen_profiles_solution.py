@@ -778,7 +778,9 @@ VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
         }
 
         if (createInfo.pApplicationInfo == nullptr) {
-            appInfo.apiVersion = profile_desc->minApiVersion;
+            if (profile_desc != nullptr) {
+                appInfo.apiVersion = profile_desc->minApiVersion;
+            }
             createInfo.pApplicationInfo = &appInfo;
         }
 
