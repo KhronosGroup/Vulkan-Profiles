@@ -89,9 +89,11 @@ TEST(mocked_api_get_instance_profile_support, vulkan10_unsupported_version) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
-        "Unsupported API version: 1.2.148"
+        "Unsupported Profile API version 1.2.148 on a Vulkan system with version 1.0.0"
     });
 #endif
+
+    mock.SetInstanceAPIVersion(VK_API_VERSION_1_0);
 
     mock.SetInstanceExtensions(nullptr, {
         VK_EXT(VK_KHR_SURFACE),
@@ -173,7 +175,7 @@ TEST(mocked_api_get_instance_profile_support, vulkan11_unsupported_version) {
 
 #if WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
-        "Unsupported API version: 1.3.204"
+        "Unsupported Profile API version 1.3.204 on a Vulkan system with version 1.0.0"
     });
 #endif
 

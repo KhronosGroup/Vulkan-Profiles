@@ -1,0 +1,149 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.1-204.json#",
+    "capabilities": {
+        "vulkan10requirements": {
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "robustBufferAccess": true
+                }
+            }
+        },
+        "vulkan11requirements_split": {
+            "features": {
+                "VkPhysicalDeviceMultiviewFeatures": {
+                    "multiview": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceMultiviewProperties": {
+                    "maxMultiviewViewCount": 6,
+                    "maxMultiviewInstanceIndex": 134217727
+                }
+            }
+        },
+        "vulkan11requirements": {
+            "features": {
+                "VkPhysicalDeviceVulkan11Features": {
+                    "multiview": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceVulkan11Properties": {
+                    "maxMultiviewViewCount": 6,
+                    "maxMultiviewInstanceIndex": 134217727
+                }
+            }
+        },
+        "vulkan12requirements": {
+            "features": {
+                "VkPhysicalDeviceVulkan12Features": {
+                    "uniformBufferStandardLayout": true,
+                    "subgroupBroadcastDynamicId": true,
+                    "imagelessFramebuffer": true,
+                    "separateDepthStencilLayouts": true,
+                    "hostQueryReset": true,
+                    "timelineSemaphore": true,
+                    "shaderSubgroupExtendedTypes": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceVulkan12Properties": {
+                    "maxTimelineSemaphoreValueDifference": 2147483647
+                }
+            }
+        },
+        "vulkan13requirements": {
+            "features": {
+                "VkPhysicalDeviceVulkan12Features": {
+                    "vulkanMemoryModel": true,
+                    "vulkanMemoryModelDeviceScope": true,
+                    "bufferDeviceAddress": true
+                },
+                "VkPhysicalDeviceVulkan13Features": {
+                    "robustImageAccess": true,
+                    "shaderTerminateInvocation": true,
+                    "shaderZeroInitializeWorkgroupMemory": true,
+                    "synchronization2": true,
+                    "shaderIntegerDotProduct": true,
+                    "maintenance4": true,
+                    "pipelineCreationCacheControl": true,
+                    "subgroupSizeControl": true,
+                    "computeFullSubgroups": true,
+                    "shaderDemoteToHelperInvocation": true,
+                    "inlineUniformBlock": true,
+                    "dynamicRendering": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceVulkan13Properties": {
+                    "maxBufferSize": 1073741824,
+                    "maxInlineUniformBlockSize": 256,
+                    "maxPerStageDescriptorInlineUniformBlocks": 4,
+                    "maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks": 4,
+                    "maxDescriptorSetInlineUniformBlocks": 4,
+                    "maxDescriptorSetUpdateAfterBindInlineUniformBlocks": 4,
+                    "maxInlineUniformTotalSize": 256
+                }
+            }
+        }
+    },
+    "profiles": {
+        "VP_LUNARG_minimum_requirements_1_0": {
+            "version": 1,
+            "api-version": "1.0.68",
+            "label": "Vulkan Core 1.0 Minimum Requirements",
+            "description": "Vulkan Core 1.0 Minimum Requirements.",
+            "capabilities": [
+                "vulkan10requirements"
+            ]
+        },
+        "VP_LUNARG_minimum_requirements_1_1": {
+            "version": 1,
+            "api-version": "1.1.108",
+            "label": "Vulkan Core 1.1 Minimum Requirements",
+            "description": "Vulkan Core 1.1 Minimum Requirements.",
+            "capabilities": [
+                "vulkan10requirements",
+                "vulkan11requirements_split"
+            ]
+        },
+        "VP_LUNARG_minimum_requirements_1_2": {
+            "version": 1,
+            "api-version": "1.2.131",
+            "label": "Vulkan Core 1.2 Minimum Requirements",
+            "description": "Vulkan Core 1.2 Minimum Requirements.",
+            "capabilities": [
+                "vulkan10requirements",
+                "vulkan11requirements",
+                "vulkan12requirements"
+            ]
+        },
+        "VP_LUNARG_minimum_requirements_1_3": {
+            "version": 1,
+            "api-version": "1.3.204",
+            "label": "Vulkan Core 1.3 Minimum Requirements",
+            "description": "Vulkan Core 1.3 Minimum Requirements.",
+            "capabilities": [
+                "vulkan10requirements",
+                "vulkan11requirements",
+                "vulkan12requirements",
+                "vulkan13requirements"
+            ]
+        }
+    },
+    "contributors": {
+        "Christophe Riccio": {
+            "company": "LunarG",
+            "email": "christophe@lunarg.com",
+            "contact": true
+        }
+    },
+    "history": [
+        {
+            "revision": 1,
+            "date": "2023-11-01",
+            "author": "Christophe Riccio",
+            "comment": "Initial revision"
+        }
+    ]
+}

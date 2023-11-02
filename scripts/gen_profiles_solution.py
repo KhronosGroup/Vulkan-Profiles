@@ -530,12 +530,23 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupportSingleProfile(
         }
     }
 
-    if (!detail::vpCheckVersion(api_version, pProfileDesc->minApiVersion)) {
-        VP_DEBUG_MSGF("Unsupported API version: %u.%u.%u", VK_API_VERSION_MAJOR(pProfileDesc->minApiVersion), VK_API_VERSION_MINOR(pProfileDesc->minApiVersion), VK_API_VERSION_PATCH(pProfileDesc->minApiVersion));
-        *pSupported = VK_FALSE;
+    // Required API version is built in root profile, not need to check dependent profile API versions
+    if (api_version != 0) {
+        if (!detail::vpCheckVersion(api_version, pProfileDesc->minApiVersion)) {
+            const uint32_t version_min_major = VK_API_VERSION_MAJOR(pProfileDesc->minApiVersion);
+            const uint32_t version_min_minor = VK_API_VERSION_MINOR(pProfileDesc->minApiVersion);
+            const uint32_t version_min_patch = VK_API_VERSION_PATCH(pProfileDesc->minApiVersion);
 
-        if (early_exit) {
-            return VK_SUCCESS;
+            const uint32_t version_major = VK_API_VERSION_MAJOR(api_version);
+            const uint32_t version_minor = VK_API_VERSION_MINOR(api_version);
+            const uint32_t version_patch = VK_API_VERSION_PATCH(api_version);
+
+            VP_DEBUG_MSGF("Unsupported Profile API version %u.%u.%u on a Vulkan system with version %u.%u.%u", version_min_major, version_min_minor, version_min_patch, version_major, version_minor, version_patch);
+            *pSupported = VK_FALSE;
+
+            if (early_exit) {
+                return VK_SUCCESS;
+            }
         }
     }
 
@@ -677,12 +688,13 @@ VPAPI_ATTR VkResult vpHasMultipleVariantsProfile(const VpProfileProperties *pPro
 VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const VpProfileProperties *pProfile, VkBool32 *pSupported) {
     VkResult result = VK_SUCCESS;
 
-    uint32_t api_version = VK_MAKE_VERSION(1, 0, 0);
+    uint32_t api_version = VK_MAKE_API_VERSION(0, 1, 0, 0);
     static PFN_vkEnumerateInstanceVersion pfnEnumerateInstanceVersion =
         (PFN_vkEnumerateInstanceVersion)vkGetInstanceProcAddr(VK_NULL_HANDLE, "vkEnumerateInstanceVersion");
     if (pfnEnumerateInstanceVersion != nullptr) {
         result = pfnEnumerateInstanceVersion(&api_version);
         if (result != VK_SUCCESS) {
+            *pSupported = VK_FALSE;
             return result;
         }
     }
@@ -690,6 +702,7 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const Vp
     uint32_t supported_instance_extension_count = 0;
     result = vkEnumerateInstanceExtensionProperties(pLayerName, &supported_instance_extension_count, nullptr);
     if (result != VK_SUCCESS) {
+        *pSupported = VK_FALSE;
         return result;
     }
     std::vector<VkExtensionProperties> supported_instance_extensions;
@@ -698,6 +711,7 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const Vp
     }
     result = vkEnumerateInstanceExtensionProperties(pLayerName, &supported_instance_extension_count, supported_instance_extensions.data());
     if (result != VK_SUCCESS) {
+        *pSupported = VK_FALSE;
         return result;
     }
 
@@ -742,7 +756,7 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const Vp
     }
  
     for (std::size_t i = 0; i < pProfileDesc->requiredProfileCount; ++i) {
-        result = detail::vpGetInstanceProfileSupportSingleProfile(api_version, supported_instance_extensions, &pProfileDesc->pRequiredProfiles[i], &supported);
+        result = detail::vpGetInstanceProfileSupportSingleProfile(0, supported_instance_extensions, &pProfileDesc->pRequiredProfiles[i], &supported);
         if (result != VK_SUCCESS || (supported == VK_FALSE && early_exit)) {
             *pSupported = supported;
             return result;
@@ -1451,6 +1465,7 @@ VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties 
     }
 
     const uint32_t count = static_cast<uint32_t>(results.size());
+    std::sort(results.begin(), results.end());
 
     if (pStructureTypes == nullptr) {
         *pStructureTypeCount = count;
@@ -1531,6 +1546,7 @@ VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties
     }
 
     const uint32_t count = static_cast<uint32_t>(results.size());
+    std::sort(results.begin(), results.end());
 
     if (pStructureTypes == nullptr) {
         *pStructureTypeCount = count;
@@ -2811,15 +2827,6 @@ class VulkanProfileCapabilities():
         if merge_mode:
             for json_capabilities in json_capabilities_list:
                 self.mergeCaps(registry, json_capabilities, merge_mode)
-            #for capName in json_profile_value['capabilities']:
-                # When we have multiple possible capabilities blocks, we load them all but effectively the API library can't effectively implement this behavior.
-            #    if type(capName).__name__ == 'list':
-            #        for capNameCase in capName:
-            #            self.mergeCaps(registry, json_capabilities[capNameCase])
-            #    elif capName in json_capabilities:
-            #        self.mergeCaps(registry, json_capabilities[capName])
-            #    else:
-            #        Log.f("Capability '{0}' needed by profile '{1}' is missing".format(capName, json_profile_key))
         else:
             self.mergeCaps(registry, json_capabilities_list, merge_mode)
 
@@ -3589,8 +3596,8 @@ class VulkanProfilesFiles():
     def parseProfiles(self, registry, json_profiles, json_caps):
         for json_profile_key, json_profile_value in json_profiles.items():
             Log.i("Registering profile '{0}'".format(json_profile_key))
-            self.profiles[json_profile_key] = VulkanProfile(registry, self.json_profiles_database, json_profile_key, json_profile_value, json_caps)
-
+            if json_profile_key not in self.profiles:
+                self.profiles[json_profile_key] = VulkanProfile(registry, self.json_profiles_database, json_profile_key, json_profile_value, json_caps)
 
 class VulkanProfilesLibraryGenerator():
     def __init__(self, registry, profiles_files, debugMessages = False):
@@ -3663,8 +3670,19 @@ class VulkanProfilesLibraryGenerator():
 
     def gen_profileDefs(self):
         gen = ''
-        for name, profile in sorted(self.profiles_files.profiles.items()):
-            uname = name.upper()
+        profiles_ordered = []
+
+        for profile_key, profile_data in sorted(self.profiles_files.profiles.items()):
+            for required_profile in profile_data.profileRequirements:
+                if required_profile not in profiles_ordered:
+                    profiles_ordered.append(required_profile)
+            if profile_key not in profiles_ordered:
+                profiles_ordered.append(profile_key)
+
+        for profile_key in profiles_ordered:
+            profile = self.profiles_files.profiles[profile_key]
+
+            profile_ukey = profile_key.upper()
             gen += '\n'
 
             # Add prerequisites
@@ -3693,10 +3711,10 @@ class VulkanProfilesLibraryGenerator():
                 minor = max(minor, int(version[1]))
                 patch = max(patch, int(version[2]))
 
-            gen += '#define {0} 1\n'.format(name)
-            gen += '#define {0}_NAME "{1}"\n'.format(uname, name)
-            gen += '#define {0}_SPEC_VERSION {1}\n'.format(uname, profile.version)
-            gen += '#define {0}_MIN_API_VERSION VK_MAKE_VERSION({1}, {2}, {3})\n'.format(uname, major, minor, patch)
+            gen += '#define {0} 1\n'.format(profile_key)
+            gen += '#define {0}_NAME "{1}"\n'.format(profile_ukey, profile_key)
+            gen += '#define {0}_SPEC_VERSION {1}\n'.format(profile_ukey, profile.version)
+            gen += '#define {0}_MIN_API_VERSION VK_MAKE_VERSION({1}, {2}, {3})\n'.format(profile_ukey, major, minor, patch)
 
             if allRequirements:
                 gen += '#endif\n'

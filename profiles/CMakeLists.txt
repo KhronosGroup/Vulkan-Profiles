@@ -71,7 +71,7 @@ set_target_properties(VpCreateDesktopBaseline2024 PROPERTIES FOLDER "Profiles ge
 
 add_custom_target(VpGenerated
 	COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/schema
-	COMMAND ${CMAKE_COMMAND} -E copy_directory ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/profiles ${CMAKE_CURRENT_LIST_DIR}
+	#COMMAND ${CMAKE_COMMAND} -E copy_directory ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/profiles ${CMAKE_CURRENT_LIST_DIR}
 	COMMAND Python3::Interpreter ${LAYER_PYTHON_FILES}
 		--api ${API_TYPE}
 		--registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
@@ -140,9 +140,9 @@ endif()
 
 install(
     FILES 
-        VP_ANDROID_baseline_2021.json
-        VP_ANDROID_baseline_2022.json
-        VP_KHR_roadmap_2022.json
+        VP_ANDROID_baseline.json
+		VP_LUNARG_minimum_requirements.json
+        VP_KHR_roadmap.json
         VP_LUNARG_desktop_baseline_2023.json
 		VP_LUNARG_desktop_baseline_2024.json
     DESTINATION
