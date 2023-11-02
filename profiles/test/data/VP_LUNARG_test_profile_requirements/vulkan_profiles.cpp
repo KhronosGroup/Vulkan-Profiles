@@ -640,11 +640,22 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupportSingleProfile(
         }
     }
 
-    if (!detail::vpCheckVersion(api_version, pProfileDesc->minApiVersion)) {
-        *pSupported = VK_FALSE;
+    // Required API version is built in root profile, not need to check dependent profile API versions
+    if (api_version != 0) {
+        if (!detail::vpCheckVersion(api_version, pProfileDesc->minApiVersion)) {
+            const uint32_t version_min_major = VK_API_VERSION_MAJOR(pProfileDesc->minApiVersion);
+            const uint32_t version_min_minor = VK_API_VERSION_MINOR(pProfileDesc->minApiVersion);
+            const uint32_t version_min_patch = VK_API_VERSION_PATCH(pProfileDesc->minApiVersion);
 
-        if (early_exit) {
-            return VK_SUCCESS;
+            const uint32_t version_major = VK_API_VERSION_MAJOR(api_version);
+            const uint32_t version_minor = VK_API_VERSION_MINOR(api_version);
+            const uint32_t version_patch = VK_API_VERSION_PATCH(api_version);
+
+            *pSupported = VK_FALSE;
+
+            if (early_exit) {
+                return VK_SUCCESS;
+            }
         }
     }
 
@@ -786,12 +797,13 @@ VPAPI_ATTR VkResult vpHasMultipleVariantsProfile(const VpProfileProperties *pPro
 VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const VpProfileProperties *pProfile, VkBool32 *pSupported) {
     VkResult result = VK_SUCCESS;
 
-    uint32_t api_version = VK_MAKE_VERSION(1, 0, 0);
+    uint32_t api_version = VK_MAKE_API_VERSION(0, 1, 0, 0);
     static PFN_vkEnumerateInstanceVersion pfnEnumerateInstanceVersion =
         (PFN_vkEnumerateInstanceVersion)vkGetInstanceProcAddr(VK_NULL_HANDLE, "vkEnumerateInstanceVersion");
     if (pfnEnumerateInstanceVersion != nullptr) {
         result = pfnEnumerateInstanceVersion(&api_version);
         if (result != VK_SUCCESS) {
+            *pSupported = VK_FALSE;
             return result;
         }
     }
@@ -799,6 +811,7 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const Vp
     uint32_t supported_instance_extension_count = 0;
     result = vkEnumerateInstanceExtensionProperties(pLayerName, &supported_instance_extension_count, nullptr);
     if (result != VK_SUCCESS) {
+        *pSupported = VK_FALSE;
         return result;
     }
     std::vector<VkExtensionProperties> supported_instance_extensions;
@@ -807,6 +820,7 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const Vp
     }
     result = vkEnumerateInstanceExtensionProperties(pLayerName, &supported_instance_extension_count, supported_instance_extensions.data());
     if (result != VK_SUCCESS) {
+        *pSupported = VK_FALSE;
         return result;
     }
 
@@ -848,7 +862,7 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(const char *pLayerName, const Vp
     }
  
     for (std::size_t i = 0; i < pProfileDesc->requiredProfileCount; ++i) {
-        result = detail::vpGetInstanceProfileSupportSingleProfile(api_version, supported_instance_extensions, &pProfileDesc->pRequiredProfiles[i], &supported);
+        result = detail::vpGetInstanceProfileSupportSingleProfile(0, supported_instance_extensions, &pProfileDesc->pRequiredProfiles[i], &supported);
         if (result != VK_SUCCESS || (supported == VK_FALSE && early_exit)) {
             *pSupported = supported;
             return result;
@@ -1553,6 +1567,7 @@ VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties 
     }
 
     const uint32_t count = static_cast<uint32_t>(results.size());
+    std::sort(results.begin(), results.end());
 
     if (pStructureTypes == nullptr) {
         *pStructureTypeCount = count;
@@ -1633,6 +1648,7 @@ VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties
     }
 
     const uint32_t count = static_cast<uint32_t>(results.size());
+    std::sort(results.begin(), results.end());
 
     if (pStructureTypes == nullptr) {
         *pStructureTypeCount = count;

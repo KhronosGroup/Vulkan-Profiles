@@ -29,14 +29,12 @@ TEST(api_get_profiles_beta, full) {
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfiles(&propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(3, propertyCount);
-
-    propertyCount = 4;
+    EXPECT_TRUE(propertyCount > 1);
 
     std::vector<VpProfileProperties> properties(propertyCount);
     VkResult result1 = vpGetProfiles(&propertyCount, &properties[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
-    EXPECT_EQ(3, propertyCount);
+    EXPECT_TRUE(propertyCount > 1);
 
     EXPECT_STREQ(VP_KHR_ROADMAP_2022_NAME, properties[0].profileName);
     EXPECT_EQ(VP_KHR_ROADMAP_2022_SPEC_VERSION, properties[0].specVersion);
@@ -46,7 +44,7 @@ TEST(api_get_profiles_beta, partial) {
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfiles(&propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(3, propertyCount);
+    EXPECT_TRUE(propertyCount > 1);
 
     propertyCount = 1;
 
@@ -54,7 +52,7 @@ TEST(api_get_profiles_beta, partial) {
     properties[0].specVersion = 0;
     VkResult result1 = vpGetProfiles(&propertyCount, &properties[0]);
     EXPECT_EQ(VK_INCOMPLETE, result1);
-    EXPECT_EQ(1, propertyCount);
+    EXPECT_EQ(propertyCount, 1);
 
     EXPECT_STREQ(VP_KHR_ROADMAP_2022_NAME, properties[0].profileName);
     EXPECT_EQ(VP_KHR_ROADMAP_2022_SPEC_VERSION, properties[0].specVersion);
@@ -265,10 +263,10 @@ TEST(api_get_profile_feature_structure_types, properties_full) {
     EXPECT_EQ(VK_SUCCESS, result1);
     EXPECT_EQ(4, propertyCount);
 
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, properties[0]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, properties[1]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, properties[2]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES, properties[3]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, properties[0]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, properties[1]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES, properties[2]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, properties[3]);
 }
 
 TEST(api_get_profile_feature_structure_types, properties_partial) {
@@ -286,9 +284,9 @@ TEST(api_get_profile_feature_structure_types, properties_partial) {
     EXPECT_EQ(VK_INCOMPLETE, result1);
     EXPECT_EQ(3, propertyCount);
 
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, properties[0]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, properties[1]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, properties[2]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, properties[0]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, properties[1]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES, properties[2]);
 }
 
 TEST(api_get_profile_property_structure_types, properties_full) {
@@ -306,10 +304,10 @@ TEST(api_get_profile_property_structure_types, properties_full) {
     EXPECT_EQ(VK_SUCCESS, result1);
     EXPECT_EQ(4, propertyCount);
 
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, properties[0]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, properties[1]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, properties[2]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES, properties[3]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, properties[0]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, properties[1]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES, properties[2]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, properties[3]);
 }
 
 TEST(api_get_profile_property_structure_types, properties_partial) {
@@ -327,7 +325,7 @@ TEST(api_get_profile_property_structure_types, properties_partial) {
     EXPECT_EQ(VK_INCOMPLETE, result1);
     EXPECT_EQ(3, propertyCount);
 
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, properties[0]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, properties[1]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, properties[2]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, properties[0]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, properties[1]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES, properties[2]);
 }

@@ -1,7 +1,7 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-106.json#",
     "capabilities": {
-        "baseline": {
+        "baseline_2021": {
             "extensions": {
                 "VK_KHR_surface": 1,
                 "VK_KHR_android_surface": 1,
@@ -748,6 +748,47 @@
                     }
                 }
             }
+        },
+        "baseline_2022": {
+            "extensions": {
+                "VK_ANDROID_external_memory_android_hardware_buffer": 1,
+                "VK_EXT_queue_family_foreign": 1,
+                "VK_KHR_driver_properties": 1,
+                "VK_KHR_create_renderpass2": 1,
+                "VK_KHR_sampler_mirror_clamp_to_edge": 1
+            },
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "shaderInt16": true,
+                    "shaderStorageBufferArrayDynamicIndexing": true,
+                    "largePoints": true
+                },
+                "VkPhysicalDeviceMultiviewFeatures": {
+                    "multiview": true
+                },
+                "VkPhysicalDeviceSamplerYcbcrConversionFeatures": {
+                    "samplerYcbcrConversion": true
+                },
+                "VkPhysicalDeviceShaderDrawParametersFeatures": {
+                    "shaderDrawParameters": true
+                },
+                "VkPhysicalDeviceVariablePointersFeatures": {
+                    "variablePointers": true,
+                    "variablePointersStorageBuffer": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "pointSizeRange": [ 1.0, 511 ],
+                        "standardSampleLocations": true
+                    }
+                },
+                "VkPhysicalDeviceMultiviewProperties": {
+                    "maxMultiviewInstanceIndex": 134217727,
+                    "maxMultiviewViewCount": 6
+                }
+            }
         }
     },
     "profiles": {
@@ -756,39 +797,63 @@
             "api-version": "1.0.68",
             "label": "Android Vulkan Baseline 2021 profile",
             "description": "Collection of functionality that is broadly supported on Android",
-            "contributors": {
-                "Trevor David Black": {
-                    "company": "Google",
-                    "email": "vantablack@google.com",
-                    "contact": true
-                },
-                "Ian Elliott": {
-                    "company": "Google",
-                    "email": "ianelliott@google.com",
-                    "contact": true
-                },
-                "Frank Yang": {
-                    "company": "Google",
-                    "contact": false
-                }
-            },
-            "history": [
-                {
-                    "revision": 2,
-                    "date": "2023-01-10",
-                    "author": "Trevor David Black",
-                    "comment": "Remove shaderImageGatherExtended and limits"
-                },
-                {
-                    "revision": 1,
-                    "date": "2022-01-11",
-                    "author": "Trevor David Black",
-                    "comment": "Final draft"
-                }
+            "capabilities": [
+                "baseline_2021"
+            ]
+        },
+        "VP_ANDROID_baseline_2022": {
+            "version": 1,
+            "api-version": "1.1.106",
+            "label": "Android Vulkan Baseline 2022 profile",
+            "description": "Collection of functionality that is broadly supported on Android",
+            "profiles": [
+                "VP_ANDROID_baseline_2021"
             ],
             "capabilities": [
-                "baseline"
+                "baseline_2022"
             ]
         }
-    }
+    },
+    "contributors": {
+        "Trevor David Black": {
+            "company": "Google",
+            "email": "vantablack@google.com",
+            "contact": true
+        },
+        "Ian Elliott": {
+            "company": "Google",
+            "email": "ianelliott@google.com",
+            "contact": true
+        },
+        "Frank Yang": {
+            "company": "Google",
+            "contact": false
+        }
+    },
+    "history": [
+        {
+            "revision": 4,
+            "date": "2023-08-26",
+            "author": "Christophe Riccio",
+            "comment": "Add requirements of VP_ANDROID_baseline_2021 instead of including VP_ANDROID_baseline_2021 requirements within the VP_ANDROID_baseline_2022 JSON file"
+        },
+        {
+            "revision": 3,
+            "date": "2022-12-23",
+            "author": "Trevor David Black",
+            "comment": "Final draft for Android Baseline 2022"
+        },
+        {
+            "revision": 2,
+            "date": "2023-01-10",
+            "author": "Trevor David Black",
+            "comment": "Remove shaderImageGatherExtended and limits"
+        },
+        {
+            "revision": 1,
+            "date": "2022-01-11",
+            "author": "Trevor David Black",
+            "comment": "Final draft for Android Baseline 2021"
+        }
+    ]
 }
