@@ -846,6 +846,20 @@ VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
         }
     }
 
+#ifdef __APPLE__
+    bool has_portability_ext = false;
+    for (std::size_t i = 0, n = extensions.size(); i < n; ++i) {
+        if (strcmp(extensions[i], VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME) == 0) {
+            has_portability_ext = true;
+            break;
+        }
+    }
+
+    if (pInstanceCreateInfo != nullptr && has_portability_ext) {
+        pInstanceCreateInfo->flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+    }
+#endif
+
     return vkCreateInstance(pInstanceCreateInfo, pAllocator, pInstance);
 }
 
