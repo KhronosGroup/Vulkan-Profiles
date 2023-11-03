@@ -157,6 +157,13 @@
                         "pointSizeGranularity": 0.0,
                         "lineWidthGranularity": 1.0,
                         "nonCoherentAtomSize": 256
+                    },
+                    "sparseProperties": {
+                        "residencyStandard2DBlockShape": false,
+                        "residencyStandard2DMultisampleBlockShape": false,
+                        "residencyStandard3DBlockShape": false,
+                        "residencyAlignedMipSize": true,
+                        "residencyNonResidentStrict": false
                     }
                 }
             }
