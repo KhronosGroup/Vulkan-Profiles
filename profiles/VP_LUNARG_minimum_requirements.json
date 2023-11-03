@@ -169,10 +169,20 @@
                 }
             },
             "properties": {
+                "VkPhysicalDeviceSubgroupProperties": {
+                    "subgroupSize": 1,
+                    "supportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT"],
+                    "supportedOperations": ["VK_SUBGROUP_FEATURE_BASIC_BIT"]
+                },
                 "VkPhysicalDeviceMultiviewProperties": {
                     "maxMultiviewViewCount": 6,
                     "maxMultiviewInstanceIndex": 134217727
-                }
+                },
+                "VkPhysicalDeviceMaintenance3Properties": {
+                    "maxPerSetDescriptors": 1024,
+                    "maxMemoryAllocationSize": 1073741824
+                },
+
             }
         },
         "vulkan11requirements": {
@@ -183,8 +193,13 @@
             },
             "properties": {
                 "VkPhysicalDeviceVulkan11Properties": {
+                	"subgroupSize": 1,
+                	"subgroupSupportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT"],
+                	"subgroupSupportedOperations": ["VK_SUBGROUP_FEATURE_BASIC_BIT"],
                     "maxMultiviewViewCount": 6,
-                    "maxMultiviewInstanceIndex": 134217727
+                    "maxMultiviewInstanceIndex": 134217727,
+                    "maxPerSetDescriptors": 1024,
+                    "maxMemoryAllocationSize": 1073741824
                 }
             }
         },
