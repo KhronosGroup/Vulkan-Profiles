@@ -263,35 +263,86 @@
                     ]
                 },
                 {
-                    "key": "profile_file",
-                    "label": "Profile Selection",
-                    "description": "Path of a profile file and the name of the profile to load.",
-                    "status": "STABLE",
-                    "type": "LOAD_FILE",
-                    "format": "PROFILE",
-                    "filter": "*.json",
-                    "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_portability_2022.json",
-                    "expanded": true,
-                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                    "settings": [
+                    "key": "loading_files_mode",
+                    "label": "Profiles Files Loading Mode",
+                    "flags": [
                         {
-                            "key": "profile_name",
-                            "label": "Profile",
-                            "description": "Name of the profile specified by the profile file to use. If set to ${VP_DEFAULT}, the layer will load the first profile in the file.",
-                            "type": "ENUM",
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                            "flags": [],
-                            "default": "${VP_DEFAULT}"
+                            "key": "LOADING_MODE_SINGLE_FILE",
+                            "label": "Single selected file",
+                            "description": "Let the Vulkan Loader list all the Physical Device.",
+                            "settings": [
+                                {
+                                    "key": "profile_file",
+                                    "label": "Profile Selection",
+                                    "description": "Path of a profile file and the name of the profile to load.",
+                                    "status": "STABLE",
+                                    "type": "LOAD_FILE",
+                                    "format": "PROFILE",
+                                    "filter": "*.json",
+                                    "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_baseline_2024.json",
+                                    "expanded": true,
+                                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ]
+                                }
+                            ]
                         },
                         {
-                            "key": "profile_validation",
-                            "label": "Schema Validation",
-                            "description": "Validate the profile file against the Vulkan SDK profile schema if the file is found.",
-                            "type": "BOOL",
-                            "default": false,
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ]
+                            "key": "LOADING_MODE_DIRECTORY",
+                            "label": "All profiles files in a directory",
+                            "description": "Let the Vulkan Loader list all the Physical Device."
+                        }
+                    ],
+                    "default": "LOADING_MODE_SINGLE_FILE"
+                },
+                {
+                    "key": "selecting_profiles_mode",
+                    "label": "Selected Profiles Mode",
+                    "flags": [
+                        {
+                            "key": "SELECTING_PROFILES_DISABLE",
+                            "label": "Disabled",
+                            "description": "Let the Vulkan Loader list all the Physical Device."
+                        },
+                        {
+                            "key": "SELECTING_PROFILES_SINGLE",
+                            "label": "Disabled",
+                            "description": "Let the Vulkan Loader list all the Physical Device.",
+                            "settings": [
+                                {
+                                    "key": "profile_name",
+                                    "label": "Profile",
+                                    "description": "Name of the profile specified by the profile file to use. If set to ${VP_DEFAULT}, the layer will load the first profile in the file.",
+                                    "type": "ENUM",
+                                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                                    "flags": [],
+                                    "default": "${VP_DEFAULT}"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "SELECTING_PROFILES_MULTIPLE",
+                            "label": "Disabled",
+                            "description": "Let the Vulkan Loader list all the Physical Device.",
+                            "settings": [
+                                {
+                                    "key": "profile_names",
+                                    "label": "Profile",
+                                    "description": "Name of the profile specified by the profile file to use. If set to ${VP_DEFAULT}, the layer will load the first profile in the file.",
+                                    "type": "ENUM",
+                                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                                    "flags": [],
+                                    "default": "${VP_DEFAULT}"
+                                }
+                            ]
                         }
                     ]
+                },
+                {
+                    "key": "profile_validation",
+                    "label": "Schema Validation",
+                    "description": "Validate the profile file against the Vulkan SDK profile schema if the file is found.",
+                    "type": "BOOL",
+                    "default": false,
+                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ]
                 },
                 {
                     "key": "simulate_capabilities",
