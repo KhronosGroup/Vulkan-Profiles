@@ -18,18 +18,17 @@
                 "VK_EXT_surface_maintenance1": 1,
                 "VK_EXT_swapchain_maintenance1": 1,
                 "VK_EXT_4444_formats": 1,
+                "VK_ANDROID_external_format_resolve": 1,
                 "VK_GOOGLE_surfaceless_query": 1
             },
             "features": {
                 "VkPhysicalDeviceFeatures": {
                     "drawIndirectFirstInstance": true,
-                    "geometryShader": true,
                     "shaderImageGatherExtended": true,
                     "shaderStorageImageExtendedFormats": true,
                     "shaderStorageImageReadWithoutFormat": true,
                     "shaderStorageImageWriteWithoutFormat": true,
-                    "samplerAnisotropy": true,
-                    "tessellationShader": true
+                    "samplerAnisotropy": true
                 },
                 "VkPhysicalDeviceVulkan12Features": {
                     "shaderFloat16": true,
@@ -129,16 +128,6 @@
                 }
             }
         },
-        "androidYUVtarget": {
-            "extensions": {
-                "VK_ANDROID_external_format_resolve": 1
-            }
-        },
-        "generalYUVtarget": {
-            "extensions": {
-                "VK_KHR_ycbcr_rendertarget": 1
-            }
-        },
         "swBresenhamLines": {
             "extensions": {
                 "VK_EXT_line_rasterization": 1
@@ -181,9 +170,9 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2023-10-17",
+                    "date": "2023-11-07",
                     "author": "Ian Elliott",
-                    "comment": "First draft"
+                    "comment": "First version"
                  }
             ],
             "profiles": [
@@ -193,7 +182,6 @@
                 "MUST",
                 ["DepthClipControl", "maxGeometryTotalOutputComponents"],
                 ["primitivesGeneratedQuery", "pipelineStatisticsQuery"],
-                ["androidYUVtarget", "generalYUVtarget"],
                 ["swBresenhamLines", "hwBresenhamLines"]
             ]
         }
