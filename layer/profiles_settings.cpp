@@ -125,7 +125,7 @@ void LogMessage(ProfileLayerSettings *layer_settings, DebugReportBits report, co
 
     if (layer_settings->log.debug_actions & DEBUG_ACTION_STDOUT_BIT) {
 #if defined(__ANDROID__)
-        AndroidPrintf(report, message);
+        AndroidPrintf(report, log);
 #else
         fprintf(stdout, "%s", log);
 #endif
