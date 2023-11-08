@@ -97,20 +97,6 @@
                 }
             }
         },
-        "DepthClipControl": {
-            "extensions": {
-                "VK_EXT_depth_clip_control": 1
-            },
-        },
-        "maxGeometryTotalOutputComponents": {
-            "properties": {
-                "VkPhysicalDeviceProperties": {
-                    "limits": {
-                        "maxGeometryTotalOutputComponents": 1028
-                    }
-                }
-            }
-        },
         "primitivesGeneratedQuery": {
             "extensions": {
                 "VK_EXT_primitives_generated_query": 1
@@ -170,7 +156,7 @@
             "history": [
                 {
                     "revision": 1,
-                    "date": "2023-11-07",
+                    "date": "2023-11-08",
                     "author": "Ian Elliott",
                     "comment": "First version"
                  }
@@ -180,7 +166,6 @@
              ],
              "capabilities": [
                 "MUST",
-                ["DepthClipControl", "maxGeometryTotalOutputComponents"],
                 ["primitivesGeneratedQuery", "pipelineStatisticsQuery"],
                 ["swBresenhamLines", "hwBresenhamLines"]
             ]
