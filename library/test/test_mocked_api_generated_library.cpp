@@ -19,7 +19,7 @@
  */
 
 #include "mock_vulkan_api.hpp"
-#include "../../profiles/test/data/VP_LUNARG_test_profile_requirements/vulkan_profiles.hpp"
+#include "test_vulkan_profiles.hpp"
 
 TEST(mocked_api_profile_requirements, check_support_profile_a) {
     MockVulkanAPI mock;

@@ -3614,10 +3614,11 @@ class VulkanProfilesFiles():
                 self.profiles[json_profile_key] = VulkanProfile(registry, self.json_profiles_database, json_profile_key, json_profile_value, json_caps)
 
 class VulkanProfilesLibraryGenerator():
-    def __init__(self, registry, profiles_files, debugMessages = False):
+    def __init__(self, registry, input_profiles_files, output_filename, debugMessages = False):
         self.registry = registry
-        self.profiles_files = profiles_files
+        self.profiles_files = input_profiles_files
         self.debugMessages = debugMessages
+        self.outputFilename = output_filename
 
 
     def patch_code(self, code):
@@ -3640,7 +3641,7 @@ class VulkanProfilesLibraryGenerator():
 
 
     def generate_h(self, outDir):
-        fileAbsPath = os.path.join(os.path.abspath(outDir), 'vulkan_profiles.h')
+        fileAbsPath = os.path.join(os.path.abspath(outDir), "{0}.h".format(self.outputFilename))
         Log.i("Generating '{0}'...".format(fileAbsPath))
         with open(fileAbsPath, 'w') as f:
             f.write(COPYRIGHT_HEADER)
@@ -3651,23 +3652,23 @@ class VulkanProfilesLibraryGenerator():
 
 
     def generate_cpp(self, outDir):
-        fileAbsPath = os.path.join(os.path.abspath(outDir), 'vulkan_profiles.cpp')
+        fileAbsPath = os.path.join(os.path.abspath(outDir), "{0}.cpp".format(self.outputFilename))
         Log.i("Generating '{0}'...".format(fileAbsPath))
         with open(fileAbsPath, 'w') as f:
             f.write(COPYRIGHT_HEADER)
             f.write(SHARED_INCLUDE)
             if self.debugMessages:
-                f.write('#include <vulkan/debug/vulkan_profiles.h>\n')
+                f.write('#include <vulkan/debug/{0}.h>\n'.format(self.outputFilename))
                 f.write(DEBUG_MSG_CB_DEFINE)
                 f.write(DEBUG_MSG_UTIL_IMPL)
             else:
-                f.write('#include <vulkan/vulkan_profiles.h>\n')
+                f.write('#include <vulkan/{0}.h>\n'.format(self.outputFilename))
             f.write(self.gen_privateImpl())
             f.write(self.gen_publicImpl())
 
 
     def generate_hpp(self, outDir):
-        fileAbsPath = os.path.join(os.path.abspath(outDir), 'vulkan_profiles.hpp')
+        fileAbsPath = os.path.join(os.path.abspath(outDir), '{0}.hpp'.format(self.outputFilename))
         Log.i("Generating '{0}'...".format(fileAbsPath))
         with open(fileAbsPath, 'w') as f:
             f.write(COPYRIGHT_HEADER)
@@ -5202,6 +5203,9 @@ if __name__ == '__main__':
                         help='Output include directory for profile library')
     parser.add_argument('--output-library-src', action='store',
                         help='Output source directory for profile library')
+    parser.add_argument('--output-library-filename', action='store',
+                        default='vulkan_profiles',
+                        help='Output filename for profile library, default "vulkan_profiles"')
     parser.add_argument('--output-schema', action='store',
                         help='Output file for JSON profile schema')
     parser.add_argument('--output-doc', action='store',
@@ -5249,15 +5253,15 @@ if __name__ == '__main__':
             schema = generator.schema
 
     if args.input != None:
-        profiles_files = VulkanProfilesFiles(registry, args.input, args.validate, schema)
+        input_profiles_files = VulkanProfilesFiles(registry, args.input, args.validate, schema)
 
     if args.output_library_inc != None:
-        generator = VulkanProfilesLibraryGenerator(registry, profiles_files)
+        generator = VulkanProfilesLibraryGenerator(registry, input_profiles_files, args.output_library_filename)
         generator.generate(args.output_library_inc, args.output_library_src)
         if args.debug:
-            generator = VulkanProfilesLibraryGenerator(registry, profiles_files, True)
+            generator = VulkanProfilesLibraryGenerator(registry, input_profiles_files, args.output_library_filename, True)
             generator.generate(args.output_library_inc + '/debug', args.output_library_src + '/debug')
 
     if args.output_doc != None:
-        generator = VulkanProfilesDocGenerator(registry, profiles_files)
+        generator = VulkanProfilesDocGenerator(registry, input_profiles_files)
         generator.generate(args.output_doc)

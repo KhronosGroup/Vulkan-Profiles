@@ -5,6 +5,23 @@ else()
     list(APPEND test_libraries Vulkan::Loader)
 endif()
 
+add_custom_target(VpLibrary_test_generated_library
+	COMMAND Python3::Interpreter ${LAYER_PYTHON_FILES}
+		--api ${API_TYPE}
+		--registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+		--input ${PROJECT_SOURCE_DIR}/library/test/profiles
+		--output-library-inc ${PROJECT_SOURCE_DIR}/library/test
+		--output-library-src ${PROJECT_SOURCE_DIR}/library/test
+		--output-library-filename "test_vulkan_profiles"
+		--validate
+	VERBATIM
+	SOURCES ${LAYER_PYTHON_FILES} ${CMAKE_CURRENT_LIST_DIR}/profiles
+	DEPENDS ${LAYER_PYTHON_FILES} ${CMAKE_CURRENT_LIST_DIR}/profiles)
+
+set_target_properties(VpLibrary_test_generated_library PROPERTIES FOLDER "Profiles API library")
+
+add_dependencies(VpLibrary_test_generated_library VpGenerated)
+
 # The release source is in ../source/vulkan_profiles.cpp, but the debug source (with
 # verbose messages during profile validation) is in ../source/debug/vulkan_profiles.cpp.
 set(vulkan_profiles_source ../source$<$<CONFIG:Debug>:/debug>/vulkan_profiles.cpp)
@@ -22,7 +39,7 @@ function(add_unit_test NAME)
     target_compile_definitions(${TEST_NAME_HO} PUBLIC "VK_ENABLE_BETA_EXTENSIONS=1")
     target_include_directories(${TEST_NAME_HO} PUBLIC "${vulkan-headers_SOURCE_DIR}/include")
     target_link_libraries(${TEST_NAME_HO} PRIVATE ${test_libraries})
-    add_dependencies(${TEST_NAME_HO} VpGenerated)
+    add_dependencies(${TEST_NAME_HO} VpGenerated VpLibrary_test_generated_library)
     add_test(NAME ${TEST_NAME_HO} COMMAND ${TEST_NAME_HO} --gtest_catch_exceptions=0)
     set_target_properties(${TEST_NAME_HO} PROPERTIES FOLDER "Profiles API library")
 
@@ -35,7 +52,7 @@ function(add_unit_test NAME)
     target_compile_definitions(${TEST_NAME_WS} PUBLIC "VK_ENABLE_BETA_EXTENSIONS=1")
     target_include_directories(${TEST_NAME_WS} PUBLIC "${vulkan-headers_SOURCE_DIR}/include")
     target_link_libraries(${TEST_NAME_WS} PRIVATE ${test_libraries})
-    add_dependencies(${TEST_NAME_WS} VpGenerated)
+    add_dependencies(${TEST_NAME_WS} VpGenerated VpLibrary_test_generated_library)
     add_test(NAME ${TEST_NAME_WS} COMMAND ${TEST_NAME_WS} --gtest_catch_exceptions=0)
     set_target_properties(${TEST_NAME_WS} PROPERTIES FOLDER "Profiles API library")
 endfunction(add_unit_test)
@@ -108,7 +125,7 @@ function (add_unit_test_simple_android_apk NAME)
     create_android_package(${TEST_NAME_HO})
 
     target_include_directories(${TEST_NAME_HO} PUBLIC "${vulkan-headers_SOURCE_DIR}/include")
-    add_dependencies(${TEST_NAME_HO} VpGenerated)
+    add_dependencies(${TEST_NAME_HO} VpGenerated VpLibrary_test_generated_library)
     add_test(NAME ${TEST_NAME_HO} COMMAND ${TEST_NAME_HO} --gtest_catch_exceptions=0)
     set_target_properties(${TEST_NAME_HO} PROPERTIES FOLDER "Profiles API library")
 endfunction(add_unit_test_simple_android_apk)
@@ -128,7 +145,7 @@ function(add_unit_test_simple NAME)
     endif()
     target_include_directories(${TEST_NAME_HO} PUBLIC "${vulkan-headers_SOURCE_DIR}/include")
     target_link_libraries(${TEST_NAME_HO} PRIVATE ${test_libraries})
-    add_dependencies(${TEST_NAME_HO} VpGenerated)
+    add_dependencies(${TEST_NAME_HO} VpGenerated VpLibrary_test_generated_library)
     add_test(NAME ${TEST_NAME_HO} COMMAND ${TEST_NAME_HO} --gtest_catch_exceptions=0)
     set_target_properties(${TEST_NAME_HO} PROPERTIES FOLDER "Profiles API library")
 endfunction(add_unit_test_simple)
@@ -147,7 +164,7 @@ function(add_unit_test_with_debug_messages_variant NAME)
     endif()
     target_include_directories(${TEST_NAME} PUBLIC "${vulkan-headers_SOURCE_DIR}/include")
     target_link_libraries(${TEST_NAME} PRIVATE ${test_libraries})
-    add_dependencies(${TEST_NAME} VpGenerated)
+    add_dependencies(${TEST_NAME} VpGenerated VpLibrary_test_generated_library)
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME} --gtest_catch_exceptions=0)
     set_target_properties(${TEST_NAME} PROPERTIES FOLDER "Profiles API library")
 
@@ -159,7 +176,7 @@ function(add_unit_test_with_debug_messages_variant NAME)
     target_compile_definitions(${TEST_NAME_DEBUG_MESSAGES} PUBLIC "WITH_DEBUG_MESSAGES=1")
     target_include_directories(${TEST_NAME_DEBUG_MESSAGES} PUBLIC "${vulkan-headers_SOURCE_DIR}/include")
     target_link_libraries(${TEST_NAME_DEBUG_MESSAGES} PRIVATE ${test_libraries})
-    add_dependencies(${TEST_NAME_DEBUG_MESSAGES} VpGenerated)
+    add_dependencies(${TEST_NAME_DEBUG_MESSAGES} VpGenerated VpLibrary_test_generated_library)
     add_test(NAME ${TEST_NAME_DEBUG_MESSAGES} COMMAND ${TEST_NAME_DEBUG_MESSAGES} --gtest_catch_exceptions=0)
     set_target_properties(${TEST_NAME_DEBUG_MESSAGES} PROPERTIES FOLDER "Profiles API library")
 endfunction(add_unit_test_with_debug_messages_variant)
@@ -170,6 +187,5 @@ add_unit_test_with_debug_messages_variant(test_mocked_api_get_physdev_profile_su
 add_unit_test_simple(test_mocked_api_create_device)
 
 if (NOT ANDROID)
-    add_unit_test_simple(test_mocked_api_create_device_profile_requirement)
-    add_dependencies(VpLibrary_test_mocked_api_create_device_profile_requirement VpLibrary_test_generated_ProfilesRequirements VpGenerated)
+    add_unit_test_simple(test_mocked_api_generated_library)
 endif()

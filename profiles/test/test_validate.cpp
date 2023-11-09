@@ -239,10 +239,10 @@ TEST(test_validate, VP_KHR_baseline) {
     EXPECT_TRUE(validator.Check(json_document2));
 }
 
-TEST(test_validate, VP_LUNARG_desktop_max_2023) {
+TEST(test_validate, VP_LUNARG_desktop_max_2024) {
     JsonValidator validator;
 
-    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_desktop_max_2023.json";
+    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_desktop_max_2024.json";
     const Json::Value json_document2 = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(json_document2));
 }
