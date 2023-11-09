@@ -174,6 +174,7 @@ install(
         VP_LUNARG_desktop_baseline_2022.json
         VP_LUNARG_desktop_baseline_2023.json
         VP_LUNARG_desktop_portability_2022.json
+        VP_ZINK_requirements.json
     DESTINATION
         ${json_install_dir}
 )
