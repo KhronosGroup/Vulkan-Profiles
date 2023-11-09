@@ -1,0 +1,52 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+    "capabilities": {
+        "baseline": {
+            "extensions": {
+                "VK_KHR_get_memory_requirements2": 1
+            },
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "depthBiasClamp": true,
+                    "depthClamp": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxImageDimension2D": 4096,
+                        "maxImageDimension3D": 4096,
+                        "maxImageDimensionCube": 4096
+                    }
+                }
+            }
+        }
+    },
+    "profiles": {
+        "VP_LUNARG_test_profile_a": {
+            "version": 1,
+            "api-version": "1.2.224",
+            "label": "Test Profile A",
+            "description": "Test.",
+            "contributors": {
+                "Christophe Riccio": {
+                    "company": "LunarG",
+                    "email": "christophe@lunarg.com",
+                    "github": "christophe-lunarg",
+                    "contact": true
+                }
+            },
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2023-10-31",
+                    "author": "Christophe Riccio",
+                    "comment": "Initial revision"
+                }
+            ],
+            "capabilities": [
+                "baseline"
+            ]
+        }
+    }
+}

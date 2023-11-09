@@ -2,9 +2,6 @@ if (BUILD_TESTS AND NOT ANDROID)
     add_subdirectory(test)
 endif()
 
-set(MERGE_PYTHON_FILES ${PROJECT_SOURCE_DIR}/scripts/gen_profiles_file.py)
-set(LAYER_PYTHON_FILES ${PROJECT_SOURCE_DIR}/scripts/gen_profiles_solution.py)
-
 file(GLOB PROFILES_FILES ${CMAKE_CURRENT_LIST_DIR})
 source_group("Python Files" FILES ${MERGE_PYTHON_FILES} ${LAYER_PYTHON_FILES})
 
@@ -78,6 +75,7 @@ add_custom_target(VpGenerated
 		--input ${CMAKE_CURRENT_LIST_DIR}
 		--output-library-inc ${PROJECT_SOURCE_DIR}/library/include/vulkan
 		--output-library-src ${PROJECT_SOURCE_DIR}/library/source
+		--output-library-filename "vulkan_profiles"
 		--output-schema ${PROJECT_SOURCE_DIR}/schema/${PROFILES_SCHEMA_FILENAME}
 		--output-doc ${PROJECT_SOURCE_DIR}/PROFILES.md
 		--validate
