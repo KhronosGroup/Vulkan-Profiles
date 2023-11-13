@@ -52,8 +52,6 @@ find_package(Python3 REQUIRED)
 
 # The profiles directory regenerates the Profiles source and headers.
 add_subdirectory(profiles)
-
 add_subdirectory(library)
-
 add_subdirectory(layer)
 

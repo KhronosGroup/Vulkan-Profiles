@@ -1,7 +1,27 @@
 {
     "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-266.json#",
     "capabilities": {
-        "baseline": {
+        "block": {
+            "extensions": {
+                "VK_KHR_driver_properties": 1
+            },
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "depthBiasClamp": true,
+                    "depthClamp": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxImageDimension1D": 4096,
+                        "maxImageDimension2D": 4096,
+                        "maxImageDimension3D": 2048
+                    }
+                }
+            }
+        },
+        "variant_a": {
             "extensions": {
                 "VK_KHR_driver_properties": 1
             },
@@ -14,19 +34,20 @@
             "properties": {
                 "VkPhysicalDeviceProperties": {
                     "limits": {
-                        "maxImageDimension1D": 4096,
+                        "maxImageDimension1D": 8192,
                         "maxImageDimension2D": 8192,
                         "maxImageDimension3D": 2048
                     }
                 }
             }
         },
-        "baseline_c": {
+        "variant_b": {
             "extensions": {
-                "VK_KHR_create_renderpass2": 1
+                "VK_KHR_get_memory_requirements2": 1
             },
             "features": {
                 "VkPhysicalDeviceFeatures": {
+                    "depthClamp": true,
                     "fullDrawIndexUint32": true
                 }
             },
@@ -34,18 +55,19 @@
                 "VkPhysicalDeviceProperties": {
                     "limits": {
                         "maxImageDimension1D": 4096,
-                        "maxImageDimension2D": 16384,
-                        "maxImageDimension3D": 4096
+                        "maxImageDimension2D": 8192,
+                        "maxImageDimension3D": 4096,
+                        "maxImageDimensionCube": 4096
                     }
                 }
             }
         }
     },
     "profiles": {
-        "VP_LUNARG_test_profile_b": {
+        "VP_LUNARG_test_variants": {
             "version": 1,
             "api-version": "1.3.204",
-            "label": "Test Profile B",
+            "label": "Test Profile Variants",
             "description": "Test.",
             "contributors": {
                 "Christophe Riccio": {
@@ -63,39 +85,9 @@
                     "comment": "Initial revision"
                 }
             ],
-            "profiles": [
-                "VP_LUNARG_test_profile_a"
-            ],
             "capabilities": [
-                "baseline"
-            ]
-        },
-        "VP_LUNARG_test_profile_c": {
-            "version": 1,
-            "api-version": "1.3.225",
-            "label": "Test Profile C",
-            "description": "Test.",
-            "contributors": {
-                "Christophe Riccio": {
-                    "company": "LunarG",
-                    "email": "christophe@lunarg.com",
-                    "github": "christophe-lunarg",
-                    "contact": true
-                }
-            },
-            "history": [
-                {
-                    "revision": 1,
-                    "date": "2023-10-31",
-                    "author": "Christophe Riccio",
-                    "comment": "Initial revision"
-                }
-            ],
-            "profiles": [
-                "VP_LUNARG_test_profile_b"
-            ],
-            "capabilities": [
-                "baseline_c"
+                "block",
+                [ "variant_a", "variant_b" ]
             ]
         }
     }
