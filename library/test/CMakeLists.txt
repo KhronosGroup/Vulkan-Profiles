@@ -6,17 +6,17 @@ else()
 endif()
 
 add_custom_target(VpLibrary_test_generated_library
-	COMMAND Python3::Interpreter ${LAYER_PYTHON_FILES}
-		--api ${API_TYPE}
-		--registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-		--input ${PROJECT_SOURCE_DIR}/library/test/profiles
-		--output-library-inc ${PROJECT_SOURCE_DIR}/library/test
-		--output-library-src ${PROJECT_SOURCE_DIR}/library/test
-		--output-library-filename "test_vulkan_profiles"
-		--validate
-	VERBATIM
-	SOURCES ${LAYER_PYTHON_FILES} ${CMAKE_CURRENT_LIST_DIR}/profiles
-	DEPENDS ${LAYER_PYTHON_FILES} ${CMAKE_CURRENT_LIST_DIR}/profiles)
+    COMMAND Python3::Interpreter ${LAYER_PYTHON_FILES}
+        --api ${API_TYPE}
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${PROJECT_SOURCE_DIR}/library/test/profiles
+        --output-library-inc ${PROJECT_SOURCE_DIR}/library/test
+        --output-library-src ${PROJECT_SOURCE_DIR}/library/test
+        --output-library-filename "test_vulkan_profiles"
+        --validate
+    VERBATIM
+    SOURCES ${LAYER_PYTHON_FILES} ${CMAKE_CURRENT_LIST_DIR}/profiles
+    DEPENDS ${LAYER_PYTHON_FILES} ${CMAKE_CURRENT_LIST_DIR}/profiles)
 
 set_target_properties(VpLibrary_test_generated_library PROPERTIES FOLDER "Profiles API library")
 
@@ -27,7 +27,7 @@ add_dependencies(VpLibrary_test_generated_library VpGenerated)
 set(vulkan_profiles_source ../source$<$<CONFIG:Debug>:/debug>/vulkan_profiles.cpp)
 
 function(add_unit_test NAME)
-	set(TEST_FILE ./${NAME}.cpp)
+    set(TEST_FILE ./${NAME}.cpp)
     set(TEST_NAME_HO VpLibrary_${NAME}_header_only)
     set(TEST_NAME_WS VpLibrary_${NAME}_with_source)
 
@@ -153,7 +153,7 @@ endfunction(add_unit_test_simple)
 add_unit_test_simple(test_util)
 
 function(add_unit_test_with_debug_messages_variant NAME)
-	set(TEST_FILE ./${NAME}.cpp)
+    set(TEST_FILE ./${NAME}.cpp)
     set(TEST_NAME VpLibrary_${NAME})
     set(TEST_NAME_DEBUG_MESSAGES VpLibrary_${NAME}_dbgmsg)
 
