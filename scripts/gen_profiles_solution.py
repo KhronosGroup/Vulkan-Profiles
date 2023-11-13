@@ -4004,7 +4004,7 @@ class VulkanProfilesDatabase():
         return capabilities_list
 
 class VulkanProfilesFiles():
-    def __init__(self, registry, profiles_dir, validate, schema):
+    def __init__(self, registry, profiles_dir, profiles_files, validate, schema):
         self.profiles = dict()
         self.json_profiles_database = VulkanProfilesDatabase()
 
@@ -4012,6 +4012,12 @@ class VulkanProfilesFiles():
         filenames = os.listdir(dirAbsPath)
 
         for filename in filenames:
+            skip_file = False
+            if profiles_files:
+                if filename not in profiles_files:
+                    skip_file = True
+            if skip_file:
+                continue
             fileAbsPath = os.path.join(dirAbsPath, filename)
             if os.path.isfile(fileAbsPath) and os.path.splitext(filename)[-1] == '.json':
                 Log.i("Loading profile file: '{0}'".format(filename))
@@ -5619,6 +5625,8 @@ if __name__ == '__main__':
                         help='Use specified registry file instead of vk.xml')
     parser.add_argument('--input', '-i', action='store', required=True,
                         help='Path to directory with profiles.')
+    parser.add_argument('--input-filenames', action='store',
+                        help='The optional filenames of the profiles files in the directory. If this parameter is not set, all profiles files are loaded.')
     parser.add_argument('--output-library-inc', action='store',
                         help='Output include directory for profile library')
     parser.add_argument('--output-library-src', action='store',
@@ -5672,8 +5680,12 @@ if __name__ == '__main__':
             generator.validate()
             schema = generator.schema
 
+    profiles_filenames = []
+    if args.input_filenames:
+        profiles_filenames = args.input_filenames.split(',')
+
     if args.input != None:
-        input_profiles_files = VulkanProfilesFiles(registry, args.input, args.validate, schema)
+        input_profiles_files = VulkanProfilesFiles(registry, args.input, profiles_filenames, args.validate, schema)
 
     if args.output_library_inc != None:
         generator = VulkanProfilesLibraryGenerator(registry, input_profiles_files, args.output_library_filename)
