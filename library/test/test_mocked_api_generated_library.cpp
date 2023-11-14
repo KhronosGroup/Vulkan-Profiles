@@ -258,7 +258,7 @@ TEST(mocked_api_generated_library, check_support_variants_extensions_success_2va
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
-    EXPECT_EQ(block_property_count, 3);
+    EXPECT_EQ(block_property_count, 2);
 }
 
 TEST(mocked_api_generated_library, check_support_variants_extensions_success_1variant) {
@@ -370,7 +370,7 @@ TEST(mocked_api_generated_library, check_support_variants_properties) {
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
-    /*
+
     std::vector<VpBlockProperties> block_properties(10);
     uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
@@ -379,7 +379,6 @@ TEST(mocked_api_generated_library, check_support_variants_properties) {
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(block_property_count, 1);
-    */
 }
 
 TEST(mocked_api_generated_library, create_device) {

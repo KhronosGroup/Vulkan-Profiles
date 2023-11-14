@@ -1254,6 +1254,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(VkInstance instanc
                 if (supported_variant) {
                     supported_blocks.push_back(block);
                     supported_block = true;
+                    break;
                 } else {
                     unsupported_blocks.push_back(block);
                 }
