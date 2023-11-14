@@ -23,7 +23,7 @@
         },
         "variant_a": {
             "extensions": {
-                "VK_KHR_driver_properties": 1
+                "VK_KHR_get_memory_requirements2": 1
             },
             "features": {
                 "VkPhysicalDeviceFeatures": {
@@ -43,7 +43,7 @@
         },
         "variant_b": {
             "extensions": {
-                "VK_KHR_get_memory_requirements2": 1
+                "VK_KHR_driver_properties": 1
             },
             "features": {
                 "VkPhysicalDeviceFeatures": {
