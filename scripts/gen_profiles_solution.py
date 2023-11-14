@@ -1144,7 +1144,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(VkInstance instanc
                     supported_variant = false;
                 }
 
-                for (uint32_t i = 0; i < userData.variant->formatCount; ++i) {
+                for (uint32_t i = 0; i < userData.variant->formatCount && supported_variant; ++i) {
                     userData.index = i;
                     VkFormatProperties2KHR props{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
                     userData.variant->chainers.pfnFormat(
@@ -1291,328 +1291,8 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(VkInstance instanc
 
 VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(VkInstance instance, VkPhysicalDevice physicalDevice,
                                                       const VpProfileProperties *pProfile, VkBool32 *pSupported) {
-    VkResult result = VK_SUCCESS;
-
-    uint32_t supported_device_extension_count = 0;
-    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &supported_device_extension_count, nullptr);
-    if (result != VK_SUCCESS) {
-        return result;
-    }
-    std::vector<VkExtensionProperties> supported_device_extensions;
-    if (supported_device_extension_count > 0) {
-        supported_device_extensions.resize(supported_device_extension_count);
-    }
-    result = vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &supported_device_extension_count, supported_device_extensions.data());
-    if (result != VK_SUCCESS) {
-        return result;
-    }
-
-    // Workaround old loader bug where count could be smaller on the second call to vkEnumerateDeviceExtensionProperties
-    if (supported_device_extension_count > 0) {
-        supported_device_extensions.resize(supported_device_extension_count);
-    }
-
-    const detail::VpProfileDesc* pProfileDesc = detail::vpGetProfileDesc(pProfile->profileName);
-    if (pProfileDesc == nullptr) return VK_ERROR_UNKNOWN;
-
-    struct GPDP2EntryPoints {
-        PFN_vkGetPhysicalDeviceFeatures2KHR                 pfnGetPhysicalDeviceFeatures2;
-        PFN_vkGetPhysicalDeviceProperties2KHR               pfnGetPhysicalDeviceProperties2;
-        PFN_vkGetPhysicalDeviceFormatProperties2KHR         pfnGetPhysicalDeviceFormatProperties2;
-        PFN_vkGetPhysicalDeviceQueueFamilyProperties2KHR    pfnGetPhysicalDeviceQueueFamilyProperties2;
-    };
-
-    struct UserData {
-        VkPhysicalDevice physicalDevice;
-        const detail::VpVariantDesc* variant;
-        GPDP2EntryPoints gpdp2;
-        uint32_t index;
-        uint32_t count;
-        detail::PFN_vpStructChainerCb pfnCb;
-        bool supported;
-    } userData{physicalDevice};
-
-    // Attempt to load core versions of the GPDP2 entry points
-    userData.gpdp2.pfnGetPhysicalDeviceFeatures2 =
-        (PFN_vkGetPhysicalDeviceFeatures2KHR)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceFeatures2");
-    userData.gpdp2.pfnGetPhysicalDeviceProperties2 =
-        (PFN_vkGetPhysicalDeviceProperties2KHR)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceProperties2");
-    userData.gpdp2.pfnGetPhysicalDeviceFormatProperties2 =
-        (PFN_vkGetPhysicalDeviceFormatProperties2KHR)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceFormatProperties2");
-    userData.gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2 =
-        (PFN_vkGetPhysicalDeviceQueueFamilyProperties2KHR)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceQueueFamilyProperties2");
-
-    // If not successful, try to load KHR variant
-    if (userData.gpdp2.pfnGetPhysicalDeviceFeatures2 == nullptr) {
-        userData.gpdp2.pfnGetPhysicalDeviceFeatures2 =
-            (PFN_vkGetPhysicalDeviceFeatures2KHR)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceFeatures2KHR");
-        userData.gpdp2.pfnGetPhysicalDeviceProperties2 =
-            (PFN_vkGetPhysicalDeviceProperties2KHR)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceProperties2KHR");
-        userData.gpdp2.pfnGetPhysicalDeviceFormatProperties2 =
-            (PFN_vkGetPhysicalDeviceFormatProperties2KHR)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceFormatProperties2KHR");
-        userData.gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2 =
-            (PFN_vkGetPhysicalDeviceQueueFamilyProperties2KHR)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceQueueFamilyProperties2KHR");
-    }
-
-    if (userData.gpdp2.pfnGetPhysicalDeviceFeatures2 == nullptr ||
-        userData.gpdp2.pfnGetPhysicalDeviceProperties2 == nullptr ||
-        userData.gpdp2.pfnGetPhysicalDeviceFormatProperties2 == nullptr ||
-        userData.gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2 == nullptr) {
-        return VK_ERROR_EXTENSION_NOT_PRESENT;
-    }
-
-    VP_DEBUG_MSGF("Checking device support for profile %s (%s). You may find the details of the capabilities of this device on https://vulkan.gpuinfo.org/", pProfile->profileName, detail::vpGetDeviceAndDriverInfoString(physicalDevice, userData.gpdp2.pfnGetPhysicalDeviceProperties2).c_str());
-
-#ifndef VP_DEBUG_MESSAGE_CALLBACK
-#define VP_ENABLE_EARLY_EXIT
-#endif //VP_DEBUG_MESSAGE_CALLBACK
-
-#ifdef VP_ENABLE_EARLY_EXIT
-    const bool early_exit = true;
-#else //VP_ENABLE_EARLY_EXIT
-    const bool early_exit = false;
-#endif //VP_ENABLE_EARLY_EXIT
-
-    VkBool32 supported = VK_TRUE;
-
-    const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
-
-    for (std::size_t i = 0, n = profiles.size(); i < n; ++i) {
-        const char* profile_name = profiles[i].profileName;
-
-        const detail::VpProfileDesc* pProfileDesc = detail::vpGetProfileDesc(profile_name);
-        if (pProfileDesc == nullptr) return VK_ERROR_UNKNOWN;
-
-        if (pProfileDesc->props.specVersion < pProfile->specVersion) {
-            *pSupported = VK_FALSE;
-            return VK_SUCCESS;
-        }
-
-        {
-            VkPhysicalDeviceProperties props{};
-            vkGetPhysicalDeviceProperties(physicalDevice, &props);
-            if (!detail::vpCheckVersion(props.apiVersion, pProfileDesc->minApiVersion)) {
-                VP_DEBUG_MSGF("Unsupported API version: %u.%u.%u", VK_API_VERSION_MAJOR(pProfileDesc->minApiVersion), VK_API_VERSION_MINOR(pProfileDesc->minApiVersion), VK_API_VERSION_PATCH(pProfileDesc->minApiVersion));
-                *pSupported = VK_FALSE;
-                return VK_SUCCESS;
-            }
-        }
-
-        for (uint32_t required_capability_index = 0; required_capability_index < pProfileDesc->requiredCapabilityCount; ++required_capability_index) {
-            const detail::VpCapabilitiesDesc* required_capabilities = &pProfileDesc->pRequiredCapabilities[required_capability_index];
-
-            bool block_support = required_capabilities->variantCount == 0; // If there is no variant at all, the block is supported
-
-            for (uint32_t required_variant_index = 0; required_variant_index < required_capabilities->variantCount; ++required_variant_index) {
-                const detail::VpVariantDesc* variant = &required_capabilities->pVariants[required_variant_index];
-
-                bool variant_support = true;
-
-                for (uint32_t i = 0; i < variant->deviceExtensionCount; ++i) {
-                    const char *requested_extension = variant->pDeviceExtensions[i].extensionName;
-                    if (!detail::vpCheckExtension(supported_device_extensions.data(), supported_device_extensions.size(), requested_extension)) {
-                        variant_support = false;
-                    }
-                }
-
-                if (variant_support) {
-                    block_support = true;
-                }
-            }
-
-            if (!block_support) {
-                *pSupported = VK_FALSE;
-                return VK_SUCCESS;
-            }
-        }
-
-        for (uint32_t required_capability_index = 0; required_capability_index < pProfileDesc->requiredCapabilityCount; ++required_capability_index) {
-            const detail::VpCapabilitiesDesc* required_capabilities = &pProfileDesc->pRequiredCapabilities[required_capability_index];
-
-            for (uint32_t required_variant_index = 0; required_variant_index < required_capabilities->variantCount; ++required_variant_index) {
-                userData.variant = &required_capabilities->pVariants[required_variant_index];
-
-                VkPhysicalDeviceFeatures2KHR features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR };
-                userData.variant->chainers.pfnFeature(
-                    static_cast<VkBaseOutStructure*>(static_cast<void*>(&features)), &userData,
-                    [](VkBaseOutStructure* p, void* pUser) {
-                        UserData* pUserData = static_cast<UserData*>(pUser);
-                        pUserData->gpdp2.pfnGetPhysicalDeviceFeatures2(pUserData->physicalDevice,
-                                                                        static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p)));
-                        pUserData->supported = true;
-                        while (p != nullptr) {
-                            if (!pUserData->variant->feature.pfnComparator(p)) {
-                                pUserData->supported = false;
-                            }
-                            p = p->pNext;
-                        }
-                    }
-                );
-
-                if (!userData.supported) {
-                    *pSupported = VK_FALSE;
-                    return VK_SUCCESS;
-                }
-            }
-        }
-
-        for (uint32_t required_capability_index = 0; required_capability_index < pProfileDesc->requiredCapabilityCount; ++required_capability_index) {
-            const detail::VpCapabilitiesDesc* required_capabilities = &pProfileDesc->pRequiredCapabilities[required_capability_index];
-
-            for (uint32_t required_variant_index = 0; required_variant_index < required_capabilities->variantCount; ++required_variant_index) {
-                userData.variant = &required_capabilities->pVariants[required_variant_index];
-        
-                VkPhysicalDeviceProperties2KHR props{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR };
-                userData.variant->chainers.pfnProperty(
-                    static_cast<VkBaseOutStructure*>(static_cast<void*>(&props)), &userData,
-                    [](VkBaseOutStructure* p, void* pUser) {
-                        UserData* pUserData = static_cast<UserData*>(pUser);
-                        pUserData->gpdp2.pfnGetPhysicalDeviceProperties2(pUserData->physicalDevice,
-                                                                         static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p)));
-                        pUserData->supported = true;
-                        while (p != nullptr) {
-                            if (!pUserData->variant->property.pfnComparator(p)) {
-                                pUserData->supported = false;
-                            }
-                            p = p->pNext;
-                        }
-                    }
-                );
-                if (!userData.supported) {
-                    *pSupported = VK_FALSE;
-                    return VK_SUCCESS;
-                }
-            }
-        }
-
-        for (uint32_t required_capability_index = 0; required_capability_index < pProfileDesc->requiredCapabilityCount; ++required_capability_index) {
-            const detail::VpCapabilitiesDesc* required_capabilities = &pProfileDesc->pRequiredCapabilities[required_capability_index];
-
-            for (uint32_t required_variant_index = 0; required_variant_index < required_capabilities->variantCount; ++required_variant_index) {
-                userData.variant = &required_capabilities->pVariants[required_variant_index];
-        
-                for (uint32_t i = 0; i < userData.variant->formatCount; ++i) {
-                    userData.index = i;
-                    VkFormatProperties2KHR props{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-                    userData.variant->chainers.pfnFormat(
-                        static_cast<VkBaseOutStructure*>(static_cast<void*>(&props)), &userData,
-                        [](VkBaseOutStructure* p, void* pUser) {
-                            UserData* pUserData = static_cast<UserData*>(pUser);
-                            pUserData->gpdp2.pfnGetPhysicalDeviceFormatProperties2(pUserData->physicalDevice, pUserData->variant->pFormats[pUserData->index].format,
-                                                                                   static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p)));
-                            pUserData->supported = true;
-                            while (p != nullptr) {
-                                if (!pUserData->variant->pFormats[pUserData->index].pfnComparator(p)) {
-                                    pUserData->supported = false;
-                                }
-                                p = p->pNext;
-                            }
-                        }
-                    );
-                    if (!userData.supported) {
-                        *pSupported = VK_FALSE;
-                        return VK_SUCCESS;
-                    }
-                }
-            }
-        }
-
-        for (uint32_t required_capability_index = 0; required_capability_index < pProfileDesc->requiredCapabilityCount; ++required_capability_index) {
-            const detail::VpCapabilitiesDesc* required_capabilities = &pProfileDesc->pRequiredCapabilities[required_capability_index];
-
-            for (uint32_t required_variant_index = 0; required_variant_index < required_capabilities->variantCount; ++required_variant_index) {
-                userData.variant = &required_capabilities->pVariants[required_variant_index];
-            
-                userData.gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2(physicalDevice, &userData.count, nullptr);
-                std::vector<VkQueueFamilyProperties2KHR> props(userData.count, { VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR });
-                userData.index = 0;
-
-                detail::PFN_vpStructChainerCb callback = [](VkBaseOutStructure* p, void* pUser) {
-                    UserData* pUserData = static_cast<UserData*>(pUser);
-                    VkQueueFamilyProperties2KHR* pProps = static_cast<VkQueueFamilyProperties2KHR*>(static_cast<void*>(p));
-                    if (++pUserData->index < pUserData->count) {
-                        pUserData->variant->chainers.pfnQueueFamily(static_cast<VkBaseOutStructure*>(static_cast<void*>(++pProps)),
-                                                                    pUser, pUserData->pfnCb);
-                    } else {
-                        pProps -= pUserData->count - 1;
-                        pUserData->gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2(pUserData->physicalDevice,
-                                                                                    &pUserData->count, pProps);
-                        pUserData->supported = true;
-
-                        // Check first that each queue family defined is supported by the device
-                        for (uint32_t i = 0; i < pUserData->variant->queueFamilyCount; ++i) {
-                            bool found = false;
-                            for (uint32_t j = 0; j < pUserData->count; ++j) {
-                                bool propsMatch = true;
-                                p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pProps[j]));
-                                while (p != nullptr) {
-                                    if (!pUserData->variant->pQueueFamilies[i].pfnComparator(p)) {
-                                        propsMatch = false;
-                                        break;
-                                    }
-                                    p = p->pNext;
-                                }
-                                if (propsMatch) {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if (!found) {
-                                pUserData->supported = false;
-                                return;
-                            }
-                        }
-
-                        // Then check each permutation to ensure that while order of the queue families
-                        // doesn't matter, each queue family property criteria is matched with a separate
-                        // queue family of the actual device
-                        std::vector<uint32_t> permutation(pUserData->count);
-                        for (uint32_t i = 0; i < pUserData->count; ++i) {
-                            permutation[i] = i;
-                        }
-                        bool found = false;
-                        do {
-                            bool propsMatch = true;
-                            for (uint32_t i = 0; i < pUserData->variant->queueFamilyCount && propsMatch; ++i) {
-                                p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pProps[permutation[i]]));
-                                while (p != nullptr) {
-                                    if (!pUserData->variant->pQueueFamilies[i].pfnComparator(p)) {
-                                        propsMatch = false;
-                                        break;
-                                    }
-                                    p = p->pNext;
-                                }
-                            }
-                            if (propsMatch) {
-                                found = true;
-                                break;
-                            }
-                        } while (std::next_permutation(permutation.begin(), permutation.end()));
-
-                        if (!found) {
-                            pUserData->supported = false;
-                        }
-                    }
-                };
-                userData.pfnCb = callback;
-
-                if (userData.count >= userData.variant->queueFamilyCount) {
-                    userData.variant->chainers.pfnQueueFamily(static_cast<VkBaseOutStructure*>(static_cast<void*>(props.data())),
-                                                              &userData, callback);
-                    if (!userData.supported) {
-                        *pSupported = VK_FALSE;
-                        return VK_SUCCESS;
-                    }
-                } else {
-                    *pSupported = VK_FALSE;
-                    return VK_SUCCESS;
-                }
-            }
-        }
-    }
-
-    *pSupported = VK_TRUE;
-    return VK_SUCCESS;
+    uint32_t count = 0;
+    return vpGetPhysicalDeviceProfileVariantsSupport(instance, physicalDevice, pProfile, pSupported, &count, nullptr);
 }
 
 VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDeviceCreateInfo *pCreateInfo,
@@ -1620,15 +1300,12 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
     if (physicalDevice == VK_NULL_HANDLE || pCreateInfo == nullptr || pDevice == nullptr) {
         return vkCreateDevice(physicalDevice, pCreateInfo == nullptr ? nullptr : pCreateInfo->pCreateInfo, pAllocator, pDevice);
     }
-
     const detail::VpProfileDesc* pProfileDesc = detail::vpGetProfileDesc(pCreateInfo->pProfile->profileName);
     if (pProfileDesc == nullptr) return VK_ERROR_UNKNOWN;
-
     // Multiple variants profile, not supported
     VkBool32 multiple_variants = VK_FALSE;
     VkResult result = vpHasMultipleVariantsProfile(pCreateInfo->pProfile, &multiple_variants);
     if (result != VK_SUCCESS || multiple_variants == VK_TRUE) return VK_ERROR_UNKNOWN;
-
     const detail::VpVariantDesc* variant = pProfileDesc->pMergedCapabilities;
     
     struct UserData {
@@ -1639,31 +1316,26 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
         VkDevice*                       pDevice;
         VkResult                        result;
     } userData{ physicalDevice, variant, pCreateInfo, pAllocator, pDevice };
-
     VkPhysicalDeviceFeatures2KHR features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR };
     variant->chainers.pfnFeature(static_cast<VkBaseOutStructure*>(static_cast<void*>(&features)), &userData,
         [](VkBaseOutStructure* p, void* pUser) {
             UserData* pUserData = static_cast<UserData*>(pUser);
             const detail::VpVariantDesc* variant = pUserData->variant;
             const VpDeviceCreateInfo* pCreateInfo = pUserData->pCreateInfo;
-
             bool merge = (pCreateInfo->flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) != 0;
             bool override = (pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0;
-
             if (!merge && !override && pCreateInfo->pCreateInfo->enabledExtensionCount > 0) {
                 // If neither merge nor override is used then the application must not specify its
                 // own extensions
                 pUserData->result = VK_ERROR_UNKNOWN;
                 return;
             }
-
             std::vector<const char*> extensions;
             detail::vpGetExtensions(pCreateInfo->pCreateInfo->enabledExtensionCount,
                                     pCreateInfo->pCreateInfo->ppEnabledExtensionNames,
                                     variant->deviceExtensionCount,
                                     variant->pDeviceExtensions,
                                     extensions, merge, override);
-
             VkBaseOutStructure profileStructList;
             profileStructList.pNext = p;
             VkPhysicalDeviceFeatures2KHR* pFeatures = static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p));
@@ -1673,15 +1345,12 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
                     p = p->pNext;
                 }
             }
-
             if (pCreateInfo->pCreateInfo->pEnabledFeatures != nullptr) {
                 pFeatures->features = *pCreateInfo->pCreateInfo->pEnabledFeatures;
             }
-
             if (pCreateInfo->flags & VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT) {
                 pFeatures->features.robustBufferAccess = VK_FALSE;
             }
-
 #ifdef VK_EXT_robustness2
             VkPhysicalDeviceRobustness2FeaturesEXT* pRobustness2FeaturesEXT = static_cast<VkPhysicalDeviceRobustness2FeaturesEXT*>(
                 detail::vpGetStructure(pFeatures, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT));
@@ -1694,7 +1363,6 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
                 }
             }
 #endif
-
 #ifdef VK_EXT_image_robustness
             VkPhysicalDeviceImageRobustnessFeaturesEXT* pImageRobustnessFeaturesEXT = static_cast<VkPhysicalDeviceImageRobustnessFeaturesEXT*>(
                 detail::vpGetStructure(pFeatures, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT));
@@ -1702,7 +1370,6 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
                 pImageRobustnessFeaturesEXT->robustImageAccess = VK_FALSE;
             }
 #endif
-
 #ifdef VK_VERSION_1_3
             VkPhysicalDeviceVulkan13Features* pVulkan13Features = static_cast<VkPhysicalDeviceVulkan13Features*>(
                 detail::vpGetStructure(pFeatures, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES));
@@ -1710,7 +1377,6 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
                 pVulkan13Features->robustImageAccess = VK_FALSE;
             }
 #endif
-
             VkBaseOutStructure* pNext = static_cast<VkBaseOutStructure*>(const_cast<void*>(pCreateInfo->pCreateInfo->pNext));
             if ((pCreateInfo->flags & VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT) == 0) {
                 for (uint32_t i = 0; i < variant->featureStructTypeCount; ++i) {
@@ -1734,7 +1400,6 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
                     }
                 }
             }
-
             VkDeviceCreateInfo createInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
             createInfo.pNext = pNext;
             createInfo.queueCreateInfoCount = pCreateInfo->pCreateInfo->queueCreateInfoCount;
@@ -1747,7 +1412,6 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
             pUserData->result = vkCreateDevice(pUserData->physicalDevice, &createInfo, pUserData->pAllocator, pUserData->pDevice);
         }
     );
-
     return userData.result;
 }
 
@@ -3833,8 +3497,7 @@ class VulkanProfile():
         gen += ('    },\n'
                 '    [](VkBaseOutStructure* p) -> bool {\n'
                 '        bool ret = true;\n')
-        if self.multiple_variants == False:
-            gen += self.gen_structFunc(self.structs.feature, capabilities.features, self.gen_structCompare, cmpFmtFeatures, debugMessages)
+        gen += self.gen_structFunc(self.structs.feature, capabilities.features, self.gen_structCompare, cmpFmtFeatures, debugMessages)
         gen += ('        return ret;\n'
                 '    }\n'
                 '};\n')
@@ -3852,8 +3515,7 @@ class VulkanProfile():
         gen += ('    },\n'
                 '    [](VkBaseOutStructure* p) -> bool {\n'
                 '        bool ret = true;\n')
-        if self.multiple_variants == False:
-            gen += self.gen_structFunc(self.structs.property, capabilities.properties, self.gen_structCompare, cmpFmtProperties, debugMessages)
+        gen += self.gen_structFunc(self.structs.property, capabilities.properties, self.gen_structCompare, cmpFmtProperties, debugMessages)
         gen += ('        return ret;\n'
                 '    }\n'
                 '};\n')
@@ -3869,8 +3531,7 @@ class VulkanProfile():
                 gen += ('        },\n'
                         '        [](VkBaseOutStructure* p) -> bool {\n'
                         '            bool ret = true;\n')
-                if self.multiple_variants == False:
-                    gen += self.gen_structFunc(self.structs.queueFamily, queueFamilyCaps, self.gen_structCompare, cmpFmt)
+                gen += self.gen_structFunc(self.structs.queueFamily, queueFamilyCaps, self.gen_structCompare, cmpFmt)
                 gen += ('            return ret;\n'
                         '        }\n'
                         '    },\n')
@@ -3893,8 +3554,7 @@ class VulkanProfile():
                 gen += ('        },\n'
                         '        [](VkBaseOutStructure* p) -> bool {\n'
                         '            bool ret = true;\n')
-                if self.multiple_variants == False:
-                    gen += self.gen_structFunc(self.structs.format, formatCaps, self.gen_structCompare, cmpFmtFormat, debugMessages)
+                gen += self.gen_structFunc(self.structs.format, formatCaps, self.gen_structCompare, cmpFmtFormat, debugMessages)
                 gen += ('            return ret;\n'
                         '        }\n'
                         '    },\n')
