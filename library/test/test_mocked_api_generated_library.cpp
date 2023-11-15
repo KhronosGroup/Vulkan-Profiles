@@ -21,6 +21,59 @@
 #include "mock_vulkan_api.hpp"
 #include "test_vulkan_profiles.hpp"
 
+void initProfile(MockVulkanAPI& mock, const VpProfileProperties& profile, uint32_t apiVersion = VK_API_VERSION_1_3,
+                 int profileAreas = PROFILE_AREA_ALL_BITS) {
+    mock.SetInstanceAPIVersion(apiVersion);
+    mock.SetDeviceAPIVersion(apiVersion);
+
+    if (profileAreas & PROFILE_AREA_EXTENSIONS_BIT) {
+        uint32_t extensions_count = 0;
+        vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, nullptr);
+        std::vector<VkExtensionProperties> extensions(extensions_count);
+        vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, &extensions[0]);
+        mock.SetDeviceExtensions(mock.vkPhysicalDevice, extensions);
+    }
+
+    if (profileAreas & PROFILE_AREA_FEATURES_BIT) {
+        VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
+        vpGetProfileFeatures(&profile, &features);
+        mock.SetFeatures({VK_STRUCT(features)});
+    }
+
+    if (profileAreas & PROFILE_AREA_PROPERTIES_BIT) {
+        VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
+        vpGetProfileProperties(&profile, &props);
+        mock.SetProperties({VK_STRUCT(props)});
+    }
+
+    if (profileAreas & PROFILE_AREA_FORMATS_BIT) {
+        uint32_t formatCount = 0;
+        vpGetProfileFormats(&profile, &formatCount, nullptr);
+        std::vector<VkFormat> formats(formatCount);
+        vpGetProfileFormats(&profile, &formatCount, &formats[0]);
+
+        for (std::size_t i = 0, n = formats.size(); i < n; ++i) {
+            VkFormatProperties2KHR formatProps{VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR};
+            vpGetProfileFormatProperties(&profile, formats[i], &formatProps);
+            mock.AddFormat(formats[i], {VK_STRUCT(formatProps)});
+        }
+    }
+
+    if (profileAreas & PROFILE_AREA_QUEUE_FAMILIES_BIT) {
+    }
+}
+
+void fixProperties(MockVulkanAPI& mock) {
+    mock.ClearProfileAreas(PROFILE_AREA_PROPERTIES_BIT);
+
+    VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
+    props.properties.limits.maxImageDimension1D = 8192;
+    props.properties.limits.maxImageDimension2D = 8192;
+    props.properties.limits.maxImageDimension3D = 4096;
+    props.properties.limits.maxImageDimensionCube = 4096;
+    mock.SetProperties({VK_STRUCT(props)});
+}
+
 TEST(mocked_api_generated_library, check_support_profile_a) {
     MockVulkanAPI mock;
 
@@ -41,14 +94,8 @@ TEST(mocked_api_generated_library, check_support_profile_a) {
     std::vector<VkExtensionProperties> extensions(extensions_count);
     vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, &extensions[0]);
 
-    EXPECT_STREQ(extensions[0].extensionName, "VK_KHR_get_memory_requirements2");
-
     VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
     vpGetProfileFeatures(&profile, &features);
-
-    EXPECT_EQ(features.features.depthBiasClamp, VK_TRUE);
-    EXPECT_EQ(features.features.depthClamp, VK_TRUE);
-    EXPECT_EQ(features.features.drawIndirectFirstInstance, VK_FALSE);
 
     VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
     vpGetProfileProperties(&profile, &props);
@@ -216,6 +263,7 @@ TEST(mocked_api_generated_library, check_support_variants_reflection) {
     VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
     vpGetProfileProperties(&profile, &props);
 
+    EXPECT_EQ(props.properties.limits.maxImageArrayLayers, 0);
     EXPECT_EQ(props.properties.limits.maxImageDimension1D, 4096);
     EXPECT_EQ(props.properties.limits.maxImageDimension2D, 8192);
     EXPECT_EQ(props.properties.limits.maxImageDimension3D, 4096);
@@ -224,29 +272,10 @@ TEST(mocked_api_generated_library, check_support_variants_reflection) {
 
 TEST(mocked_api_generated_library, check_support_variants_success_2variants) {
     MockVulkanAPI mock;
-
     const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
 
-    uint32_t extensions_count = 0;
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, nullptr);
-    std::vector<VkExtensionProperties> extensions(extensions_count);
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, &extensions[0]);
-
-    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
-    vpGetProfileFeatures(&profile, &features);
-
-    VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
-    vpGetProfileProperties(&profile, &props);
-    props.properties.limits.maxImageDimension1D = 8192;
-    props.properties.limits.maxImageDimension2D = 8192;
-    props.properties.limits.maxImageDimension3D = 4096;
-    props.properties.limits.maxImageDimensionCube = 4096;
-
-    mock.SetDeviceExtensions(mock.vkPhysicalDevice, extensions);
-    mock.SetInstanceAPIVersion(VK_API_VERSION_1_3);
-    mock.SetDeviceAPIVersion(VK_API_VERSION_1_3);
-    mock.SetFeatures({VK_STRUCT(features)});
-    mock.SetProperties({VK_STRUCT(props)});
+    initProfile(mock, profile);
+    fixProperties(mock);
 
     VkBool32 supported = VK_FALSE;
     VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
@@ -272,29 +301,22 @@ TEST(mocked_api_generated_library, check_support_variants_extensions_success_1va
 
     const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
 
-    uint32_t extensions_count = 0;
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, nullptr);
-    std::vector<VkExtensionProperties> extensions(extensions_count);
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, &extensions[0]);
+    initProfile(mock, profile);
+    fixProperties(mock);
 
-    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
-    vpGetProfileFeatures(&profile, &features);
+    {
+        mock.ClearProfileAreas(PROFILE_AREA_EXTENSIONS_BIT);
 
-    VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
-    vpGetProfileProperties(&profile, &props);
-    props.properties.limits.maxImageDimension1D = 8192;
-    props.properties.limits.maxImageDimension2D = 8192;
-    props.properties.limits.maxImageDimension3D = 4096;
-    props.properties.limits.maxImageDimensionCube = 4096;
+        uint32_t extensions_count = 0;
+        vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, nullptr);
+        std::vector<VkExtensionProperties> extensions(extensions_count);
+        vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, &extensions[0]);
 
-    // To discard "variant_a" variant support
-    extensions.resize(1);
+        // To discard "variant_a" variant support
+        extensions.resize(1);
 
-    mock.SetDeviceExtensions(mock.vkPhysicalDevice, extensions);
-    mock.SetInstanceAPIVersion(VK_API_VERSION_1_3);
-    mock.SetDeviceAPIVersion(VK_API_VERSION_1_3);
-    mock.SetFeatures({VK_STRUCT(features)});
-    mock.SetProperties({VK_STRUCT(props)});
+        mock.SetDeviceExtensions(mock.vkPhysicalDevice, extensions);
+    }
 
     VkBool32 supported = VK_FALSE;
     VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
@@ -320,24 +342,17 @@ TEST(mocked_api_generated_library, check_support_variants_extensions_fail) {
 
     const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
 
-    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
-    vpGetProfileFeatures(&profile, &features);
+    initProfile(mock, profile);
+    fixProperties(mock);
 
-    VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
-    vpGetProfileProperties(&profile, &props);
-    props.properties.limits.maxImageDimension1D = 8192;
-    props.properties.limits.maxImageDimension2D = 8192;
-    props.properties.limits.maxImageDimension3D = 4096;
-    props.properties.limits.maxImageDimensionCube = 4096;
+    {
+        mock.ClearProfileAreas(PROFILE_AREA_EXTENSIONS_BIT);
 
-    // To discard "variant_a" and "variant_b" variant support
-    std::vector<VkExtensionProperties> extensions;
+        // To discard "variant_a" and "variant_b" variant support
+        std::vector<VkExtensionProperties> extensions;
 
-    mock.SetDeviceExtensions(mock.vkPhysicalDevice, extensions);
-    mock.SetInstanceAPIVersion(VK_API_VERSION_1_3);
-    mock.SetDeviceAPIVersion(VK_API_VERSION_1_3);
-    mock.SetFeatures({VK_STRUCT(features)});
-    mock.SetProperties({VK_STRUCT(props)});
+        mock.SetDeviceExtensions(mock.vkPhysicalDevice, extensions);
+    }
 
     VkBool32 supported = VK_TRUE;
     VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
@@ -364,29 +379,20 @@ TEST(mocked_api_generated_library, check_support_variants_features_success_1vari
 
     const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
 
-    uint32_t extensions_count = 0;
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, nullptr);
-    std::vector<VkExtensionProperties> extensions(extensions_count);
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, &extensions[0]);
-
-    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
-    vpGetProfileFeatures(&profile, &features);
-
-    VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
-    vpGetProfileProperties(&profile, &props);
-    props.properties.limits.maxImageDimension1D = 8192;
-    props.properties.limits.maxImageDimension2D = 8192;
-    props.properties.limits.maxImageDimension3D = 4096;
-    props.properties.limits.maxImageDimensionCube = 4096;
+    initProfile(mock, profile);
+    fixProperties(mock);
 
     // To discard "variant_a" support
-    features.features.drawIndirectFirstInstance = false;
+    {
+        mock.ClearProfileAreas(PROFILE_AREA_FEATURES_BIT);
 
-    mock.SetDeviceExtensions(mock.vkPhysicalDevice, extensions);
-    mock.SetInstanceAPIVersion(VK_API_VERSION_1_3);
-    mock.SetDeviceAPIVersion(VK_API_VERSION_1_3);
-    mock.SetFeatures({VK_STRUCT(features)});
-    mock.SetProperties({VK_STRUCT(props)});
+        VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
+        vpGetProfileFeatures(&profile, &features);
+
+        features.features.drawIndirectFirstInstance = false;
+
+        mock.SetFeatures({VK_STRUCT(features)});
+    }
 
     VkBool32 supported = VK_FALSE;
     VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
@@ -413,30 +419,21 @@ TEST(mocked_api_generated_library, check_support_variants_features_fail) {
 
     const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
 
-    uint32_t extensions_count = 0;
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, nullptr);
-    std::vector<VkExtensionProperties> extensions(extensions_count);
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, &extensions[0]);
-
-    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
-    vpGetProfileFeatures(&profile, &features);
-
-    VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
-    vpGetProfileProperties(&profile, &props);
-    props.properties.limits.maxImageDimension1D = 8192;
-    props.properties.limits.maxImageDimension2D = 8192;
-    props.properties.limits.maxImageDimension3D = 4096;
-    props.properties.limits.maxImageDimensionCube = 4096;
+    initProfile(mock, profile);
+    fixProperties(mock);
 
     // To discard "variant_a" and "variant_b" support
-    features.features.drawIndirectFirstInstance = false;
-    features.features.fullDrawIndexUint32 = false;
+    {
+        mock.ClearProfileAreas(PROFILE_AREA_FEATURES_BIT);
 
-    mock.SetDeviceExtensions(mock.vkPhysicalDevice, extensions);
-    mock.SetInstanceAPIVersion(VK_API_VERSION_1_3);
-    mock.SetDeviceAPIVersion(VK_API_VERSION_1_3);
-    mock.SetFeatures({VK_STRUCT(features)});
-    mock.SetProperties({VK_STRUCT(props)});
+        VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
+        vpGetProfileFeatures(&profile, &features);
+
+        features.features.drawIndirectFirstInstance = false;
+        features.features.fullDrawIndexUint32 = false;
+
+        mock.SetFeatures({VK_STRUCT(features)});
+    }
 
     VkBool32 supported = VK_TRUE;
     VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
@@ -461,29 +458,23 @@ TEST(mocked_api_generated_library, check_support_variants_properties_success_1va
 
     const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
 
-    uint32_t extensions_count = 0;
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, nullptr);
-    std::vector<VkExtensionProperties> extensions(extensions_count);
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, &extensions[0]);
+    initProfile(mock, profile);
 
-    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
-    vpGetProfileFeatures(&profile, &features);
+    {
+        mock.ClearProfileAreas(PROFILE_AREA_PROPERTIES_BIT);
 
-    VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
-    vpGetProfileProperties(&profile, &props);
-    props.properties.limits.maxImageDimension1D = 8192;
-    props.properties.limits.maxImageDimension2D = 8192;
-    props.properties.limits.maxImageDimension3D = 4096;
-    props.properties.limits.maxImageDimensionCube = 4096;
+        VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
+        vpGetProfileProperties(&profile, &props);
+        props.properties.limits.maxImageDimension1D = 8192;
+        props.properties.limits.maxImageDimension2D = 8192;
+        props.properties.limits.maxImageDimension3D = 4096;
+        props.properties.limits.maxImageDimensionCube = 4096;
 
-    // To discard "variant_a" variant support
-    props.properties.limits.maxImageDimension1D = 4096;
+        // To discard "variant_a" variant support
+        props.properties.limits.maxImageDimension1D = 4096;
 
-    mock.SetDeviceExtensions(mock.vkPhysicalDevice, extensions);
-    mock.SetInstanceAPIVersion(VK_API_VERSION_1_3);
-    mock.SetDeviceAPIVersion(VK_API_VERSION_1_3);
-    mock.SetFeatures({VK_STRUCT(features)});
-    mock.SetProperties({VK_STRUCT(props)});
+        mock.SetProperties({VK_STRUCT(props)});
+    }
 
     VkBool32 supported = VK_FALSE;
     VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
@@ -510,30 +501,24 @@ TEST(mocked_api_generated_library, check_support_variants_properties_fail) {
 
     const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
 
-    uint32_t extensions_count = 0;
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, nullptr);
-    std::vector<VkExtensionProperties> extensions(extensions_count);
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, &extensions[0]);
+    initProfile(mock, profile);
 
-    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
-    vpGetProfileFeatures(&profile, &features);
+    {
+        mock.ClearProfileAreas(PROFILE_AREA_PROPERTIES_BIT);
 
-    VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
-    vpGetProfileProperties(&profile, &props);
-    props.properties.limits.maxImageDimension1D = 8192;
-    props.properties.limits.maxImageDimension2D = 8192;
-    props.properties.limits.maxImageDimension3D = 4096;
-    props.properties.limits.maxImageDimensionCube = 4096;
+        VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
+        vpGetProfileProperties(&profile, &props);
+        props.properties.limits.maxImageDimension1D = 8192;
+        props.properties.limits.maxImageDimension2D = 8192;
+        props.properties.limits.maxImageDimension3D = 4096;
+        props.properties.limits.maxImageDimensionCube = 4096;
 
-    // To discard "variant_a" and "variant_b" support
-    props.properties.limits.maxImageDimension1D = 4096;
-    props.properties.limits.maxImageDimensionCube = 2048;
-
-    mock.SetDeviceExtensions(mock.vkPhysicalDevice, extensions);
-    mock.SetInstanceAPIVersion(VK_API_VERSION_1_3);
-    mock.SetDeviceAPIVersion(VK_API_VERSION_1_3);
-    mock.SetFeatures({VK_STRUCT(features)});
-    mock.SetProperties({VK_STRUCT(props)});
+        // To discard "variant_a" and "variant_b" support
+        props.properties.limits.maxImageDimension1D = 4096;
+        props.properties.limits.maxImageDimensionCube = 2048;
+        
+        mock.SetProperties({VK_STRUCT(props)});
+    }
 
     VkBool32 supported = VK_TRUE;
     VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
@@ -551,6 +536,86 @@ TEST(mocked_api_generated_library, check_support_variants_properties_fail) {
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
     EXPECT_EQ(block_property_count, 2);
+}
+
+TEST(mocked_api_generated_library, check_support_variants_format_success_1variants) {
+    MockVulkanAPI mock;
+
+    const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
+
+    initProfile(mock, profile);
+    fixProperties(mock);
+
+    // To discard "variant_a" support
+    {
+        mock.ClearProfileAreas(PROFILE_AREA_FORMATS_BIT);
+
+        VkFormatProperties2KHR formatProps{VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR};
+        vpGetProfileFormatProperties(&profile, VK_FORMAT_R8G8B8A8_UNORM, &formatProps);
+        formatProps.formatProperties.linearTilingFeatures =
+            VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT;
+
+        mock.AddFormat(VK_FORMAT_R8G8B8A8_UNORM, {VK_STRUCT(formatProps)});
+    }
+
+    VkBool32 supported = VK_FALSE;
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(supported, VK_TRUE);
+
+    std::vector<VpBlockProperties> block_properties(10);
+    uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
+
+    supported = VK_FALSE;
+    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+                                                       &block_property_count, &block_properties[0]);
+
+    EXPECT_EQ(supported, VK_TRUE);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(block_property_count, 2);
+    EXPECT_STREQ(block_properties[0].blockName, "block");
+    EXPECT_STREQ(block_properties[1].blockName, "variant_b");
+}
+
+TEST(mocked_api_generated_library, check_support_variants_format_fail) {
+    MockVulkanAPI mock;
+
+    const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
+
+    initProfile(mock, profile);
+    fixProperties(mock);
+
+    // To discard "variant_a" and "variant_b" support
+    {
+        mock.ClearProfileAreas(PROFILE_AREA_FORMATS_BIT);
+
+        VkFormatProperties2KHR formatProps{VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR};
+        vpGetProfileFormatProperties(&profile, VK_FORMAT_R8G8B8A8_UNORM, &formatProps);
+        formatProps.formatProperties.linearTilingFeatures =
+            VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+
+        mock.AddFormat(VK_FORMAT_R8G8B8A8_UNORM, {VK_STRUCT(formatProps)});
+    }
+
+    VkBool32 supported = VK_TRUE;
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(supported, VK_FALSE);
+
+    std::vector<VpBlockProperties> block_properties(10);
+    uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
+
+    supported = VK_TRUE;
+    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+                                                       &block_property_count, &block_properties[0]);
+
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(supported, VK_FALSE);
+    EXPECT_EQ(block_property_count, 2);
+    EXPECT_STREQ(block_properties[0].blockName, "variant_a");
+    EXPECT_STREQ(block_properties[1].blockName, "variant_b");
 }
 
 TEST(mocked_api_generated_library, create_device) {

@@ -1723,7 +1723,9 @@ VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(const VpProfilePropert
                 const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
 
                 for (uint32_t i = 0; i < variant.queueFamilyStructTypeCount; ++i) {
-                    results.push_back(variant.pQueueFamilyStructTypes[i]);
+                    if (std::find(results.begin(), results.end(), variant.pQueueFamilyStructTypes[i]) == std::end(results)) {
+                        results.push_back(variant.pQueueFamilyStructTypes[i]);
+                    }
                 }
             }
         }
@@ -1765,7 +1767,9 @@ VPAPI_ATTR VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uin
                 const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
 
                 for (uint32_t i = 0; i < variant.formatCount; ++i) {
-                    results.push_back(variant.pFormats[i].format);
+                    if (std::find(results.begin(), results.end(), variant.pFormats[i].format) == std::end(results)) {
+                        results.push_back(variant.pFormats[i].format);
+                    }
                 }
             }
         }
@@ -1808,33 +1812,35 @@ VPAPI_ATTR VkResult vpGetProfileFormatProperties(const VpProfileProperties *pPro
                 const detail::VpVariantDesc& variant = required_capabilities.pVariants[required_variant_index];
 
                 for (uint32_t i = 0; i < variant.formatCount; ++i) {
-                    if (variant.pFormats[i].format == format) {
-                        VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(pNext));
-                        while (p != nullptr) {
-                            variant.pFormats[i].pfnFiller(p);
-                            p = p->pNext;
-                        }
-#if defined(VK_VERSION_1_3) || defined(VK_KHR_format_feature_flags2)
-                        VkFormatProperties2KHR* fp2 = static_cast<VkFormatProperties2KHR*>(
-                            detail::vpGetStructure(pNext, VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR));
-                        VkFormatProperties3KHR* fp3 = static_cast<VkFormatProperties3KHR*>(
-                            detail::vpGetStructure(pNext, VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR));
-                        if (fp3 != nullptr) {
-                            VkFormatProperties2KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-                            variant.pFormats[i].pfnFiller(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
-                            fp3->linearTilingFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->linearTilingFeatures | fp.formatProperties.linearTilingFeatures);
-                            fp3->optimalTilingFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->optimalTilingFeatures | fp.formatProperties.optimalTilingFeatures);
-                            fp3->bufferFeatures = static_cast<VkFormatFeatureFlags2KHR>(fp3->bufferFeatures | fp.formatProperties.bufferFeatures);
-                        }
-                        if (fp2 != nullptr) {
-                            VkFormatProperties3KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR };
-                            variant.pFormats[i].pfnFiller(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
-                            fp2->formatProperties.linearTilingFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.linearTilingFeatures | fp.linearTilingFeatures);
-                            fp2->formatProperties.optimalTilingFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.optimalTilingFeatures | fp.optimalTilingFeatures);
-                            fp2->formatProperties.bufferFeatures = static_cast<VkFormatFeatureFlags>(fp2->formatProperties.bufferFeatures | fp.bufferFeatures);
-                        }
-#endif
+                    if (variant.pFormats[i].format != format) {
+                        continue;
                     }
+
+                    VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(pNext));
+                    while (p != nullptr) {
+                        variant.pFormats[i].pfnFiller(p);
+                        p = p->pNext;
+                    }
+#if defined(VK_VERSION_1_3) || defined(VK_KHR_format_feature_flags2)
+                    VkFormatProperties2KHR* fp2 = static_cast<VkFormatProperties2KHR*>(
+                        detail::vpGetStructure(pNext, VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR));
+                    VkFormatProperties3KHR* fp3 = static_cast<VkFormatProperties3KHR*>(
+                        detail::vpGetStructure(pNext, VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR));
+                    if (fp3 != nullptr) {
+                        VkFormatProperties2KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
+                        variant.pFormats[i].pfnFiller(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
+                        fp3->linearTilingFeatures |= static_cast<VkFormatFeatureFlags2KHR>(fp3->linearTilingFeatures | fp.formatProperties.linearTilingFeatures);
+                        fp3->optimalTilingFeatures |= static_cast<VkFormatFeatureFlags2KHR>(fp3->optimalTilingFeatures | fp.formatProperties.optimalTilingFeatures);
+                        fp3->bufferFeatures |= static_cast<VkFormatFeatureFlags2KHR>(fp3->bufferFeatures | fp.formatProperties.bufferFeatures);
+                    }
+                    if (fp2 != nullptr) {
+                        VkFormatProperties3KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR };
+                        variant.pFormats[i].pfnFiller(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
+                        fp2->formatProperties.linearTilingFeatures |= static_cast<VkFormatFeatureFlags>(fp2->formatProperties.linearTilingFeatures | fp.linearTilingFeatures);
+                        fp2->formatProperties.optimalTilingFeatures |= static_cast<VkFormatFeatureFlags>(fp2->formatProperties.optimalTilingFeatures | fp.optimalTilingFeatures);
+                        fp2->formatProperties.bufferFeatures |= static_cast<VkFormatFeatureFlags>(fp2->formatProperties.bufferFeatures | fp.bufferFeatures);
+                    }
+#endif
                 }
             }
         }
@@ -3275,7 +3281,7 @@ class VulkanProfile():
                         isEnum = isinstance(value[0], str)
                         if isEnum:
                             # For enums we only add bits
-                            genAssign = '{0}{1} = '.format(var, member)
+                            genAssign = '{0}{1} |= '.format(var, member)
                         else:
                             genAssign = '{0}{1} = '.format(var, member)
                         genAssign += '{0}'.format(self.gen_listValue(value, isEnum))
