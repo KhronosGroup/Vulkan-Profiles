@@ -222,7 +222,7 @@ TEST(mocked_api_generated_library, check_support_variants_reflection) {
     EXPECT_EQ(props.properties.limits.maxImageDimensionCube, 4096);
 }
 
-TEST(mocked_api_generated_library, check_support_variants_extensions_success_2variants) {
+TEST(mocked_api_generated_library, check_support_variants_success_2variants) {
     MockVulkanAPI mock;
 
     const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
@@ -352,7 +352,7 @@ TEST(mocked_api_generated_library, check_support_variants_extensions_fail) {
     EXPECT_EQ(block_property_count, 3);
 }
 
-TEST(mocked_api_generated_library, check_support_variants_properties_success_2variants) {
+TEST(mocked_api_generated_library, check_support_variants_features_success_1variants) {
     MockVulkanAPI mock;
 
     const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
@@ -372,6 +372,9 @@ TEST(mocked_api_generated_library, check_support_variants_properties_success_2va
     props.properties.limits.maxImageDimension3D = 4096;
     props.properties.limits.maxImageDimensionCube = 4096;
 
+    // To discard "variant_a" support
+    features.features.drawIndirectFirstInstance = false;
+
     mock.SetDeviceExtensions(mock.vkPhysicalDevice, extensions);
     mock.SetInstanceAPIVersion(VK_API_VERSION_1_3);
     mock.SetDeviceAPIVersion(VK_API_VERSION_1_3);
@@ -387,10 +390,62 @@ TEST(mocked_api_generated_library, check_support_variants_properties_success_2va
     std::vector<VpBlockProperties> block_properties(10);
     uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
+    supported = VK_FALSE;
+    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+                                                       &block_property_count, &block_properties[0]);
+
+    EXPECT_EQ(supported, VK_TRUE);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(block_property_count, 2);
+    EXPECT_STREQ(block_properties[0].blockName, "block");
+    EXPECT_STREQ(block_properties[1].blockName, "variant_b");
+}
+
+TEST(mocked_api_generated_library, check_support_variants_features_fail) {
+    MockVulkanAPI mock;
+
+    const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
+
+    uint32_t extensions_count = 0;
+    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, nullptr);
+    std::vector<VkExtensionProperties> extensions(extensions_count);
+    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, &extensions[0]);
+
+    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
+    vpGetProfileFeatures(&profile, &features);
+
+    VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
+    vpGetProfileProperties(&profile, &props);
+    props.properties.limits.maxImageDimension1D = 8192;
+    props.properties.limits.maxImageDimension2D = 8192;
+    props.properties.limits.maxImageDimension3D = 4096;
+    props.properties.limits.maxImageDimensionCube = 4096;
+
+    // To discard "variant_a" and "variant_b" support
+    features.features.drawIndirectFirstInstance = false;
+    features.features.fullDrawIndexUint32 = false;
+
+    mock.SetDeviceExtensions(mock.vkPhysicalDevice, extensions);
+    mock.SetInstanceAPIVersion(VK_API_VERSION_1_3);
+    mock.SetDeviceAPIVersion(VK_API_VERSION_1_3);
+    mock.SetFeatures({VK_STRUCT(features)});
+    mock.SetProperties({VK_STRUCT(props)});
+
+    VkBool32 supported = VK_TRUE;
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(supported, VK_FALSE);
+
+    std::vector<VpBlockProperties> block_properties(10);
+    uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
+
+    supported = VK_TRUE;
     result = vpGetPhysicalDeviceProfileVariantsSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
                                                        &block_property_count, &block_properties[0]);
 
     EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(supported, VK_FALSE);
     EXPECT_EQ(block_property_count, 2);
 }
 
