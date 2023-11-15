@@ -51,6 +51,16 @@ struct VulkanStructData {
 #define VK_STRUCT(STRUCT) VulkanStructData(STRUCT.sType, sizeof(STRUCT), static_cast<uint8_t*>(static_cast<void*>(&STRUCT)))
 #define VK_EXT(NAME) VkExtensionProperties{ NAME##_EXTENSION_NAME, NAME##_SPEC_VERSION }
 
+enum {
+    PROFILE_AREA_EXTENSIONS_BIT = 1 << 0,
+    PROFILE_AREA_FEATURES_BIT = 1 << 1,
+    PROFILE_AREA_PROPERTIES_BIT = 1 << 2,
+    PROFILE_AREA_FORMATS_BIT = 1 << 3,
+    PROFILE_AREA_QUEUE_FAMILIES_BIT = 1 << 4,
+    PROFILE_AREA_ALL_BITS = PROFILE_AREA_EXTENSIONS_BIT | PROFILE_AREA_FEATURES_BIT | PROFILE_AREA_PROPERTIES_BIT |
+                            PROFILE_AREA_FORMATS_BIT | PROFILE_AREA_QUEUE_FAMILIES_BIT
+};
+
 class MockVulkanAPI final
 {
 private:
@@ -140,6 +150,29 @@ public:
     ~MockVulkanAPI()
     {
         sInstance = nullptr;
+    }
+
+    void ClearProfileAreas(int profileAreas) {
+        if (profileAreas & PROFILE_AREA_EXTENSIONS_BIT) {
+            this->m_instanceExtensions.clear();
+            this->m_deviceExtensions.clear();
+        }
+
+        if (profileAreas & PROFILE_AREA_FEATURES_BIT) {
+            this->m_mockedFeatures.clear();
+        }
+
+        if (profileAreas & PROFILE_AREA_PROPERTIES_BIT) {
+            this->m_mockedProperties.clear();
+        }
+
+        if (profileAreas & PROFILE_AREA_FORMATS_BIT) {
+            this->m_mockedFormats.clear();
+        }
+
+        if (profileAreas & PROFILE_AREA_QUEUE_FAMILIES_BIT) {
+            this->m_mockedQueueFamilies.clear();
+        }
     }
 
     static VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetInstanceProcAddr(
