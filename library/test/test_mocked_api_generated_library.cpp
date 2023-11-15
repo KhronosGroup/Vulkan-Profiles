@@ -263,6 +263,8 @@ TEST(mocked_api_generated_library, check_support_variants_success_2variants) {
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
     EXPECT_EQ(block_property_count, 2);
+    EXPECT_STREQ(block_properties[0].blockName, "block");
+    EXPECT_STREQ(block_properties[1].blockName, "variant_a");
 }
 
 TEST(mocked_api_generated_library, check_support_variants_extensions_success_1variant) {
@@ -309,6 +311,8 @@ TEST(mocked_api_generated_library, check_support_variants_extensions_success_1va
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
     EXPECT_EQ(block_property_count, 2);
+    EXPECT_STREQ(block_properties[0].blockName, "block");
+    EXPECT_STREQ(block_properties[1].blockName, "variant_b");
 }
 
 TEST(mocked_api_generated_library, check_support_variants_extensions_fail) {
@@ -350,6 +354,9 @@ TEST(mocked_api_generated_library, check_support_variants_extensions_fail) {
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
     EXPECT_EQ(block_property_count, 3);
+    EXPECT_STREQ(block_properties[0].blockName, "block");
+    EXPECT_STREQ(block_properties[1].blockName, "variant_a");
+    EXPECT_STREQ(block_properties[2].blockName, "variant_b");
 }
 
 TEST(mocked_api_generated_library, check_support_variants_features_success_1variants) {
