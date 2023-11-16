@@ -58,9 +58,6 @@ void initProfile(MockVulkanAPI& mock, const VpProfileProperties& profile, uint32
             mock.AddFormat(formats[i], {VK_STRUCT(formatProps)});
         }
     }
-
-    if (profileAreas & PROFILE_AREA_QUEUE_FAMILIES_BIT) {
-    }
 }
 
 void fixProperties(MockVulkanAPI& mock) {
@@ -72,6 +69,47 @@ void fixProperties(MockVulkanAPI& mock) {
     props.properties.limits.maxImageDimension3D = 4096;
     props.properties.limits.maxImageDimensionCube = 4096;
     mock.SetProperties({VK_STRUCT(props)});
+}
+
+TEST(mocked_api_generated_library, create_device) {
+    MockVulkanAPI mock;
+
+    const VpProfileProperties profile{VP_LUNARG_TEST_PROFILE_B_NAME, VP_LUNARG_TEST_PROFILE_B_SPEC_VERSION};
+
+    uint32_t extension_property_count = 0;
+    vpGetProfileDeviceExtensionProperties(&profile, &extension_property_count, nullptr);
+    std::vector<VkExtensionProperties> extension_properties(extension_property_count);
+    vpGetProfileDeviceExtensionProperties(&profile, &extension_property_count, &extension_properties[0]);
+
+    std::vector<const char*> extensions(extension_property_count);
+    for (std::size_t i = 0, n = extensions.size(); i < n; ++i) {
+        extensions[i] = extension_properties[i].extensionName;
+    }
+
+    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
+    vpGetProfileFeatures(&profile, &features);
+
+    VkDeviceQueueCreateInfo queueCreateInfo{VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO};
+    queueCreateInfo.queueFamilyIndex = 0;
+    queueCreateInfo.queueCount = 1;
+
+    VkDeviceCreateInfo inCreateInfo{VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO};
+    inCreateInfo.queueCreateInfoCount = 1;
+    inCreateInfo.pQueueCreateInfos = &queueCreateInfo;
+
+    VkDeviceCreateInfo outCreateInfo = inCreateInfo;
+    outCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+    outCreateInfo.ppEnabledExtensionNames = extensions.data();
+
+    mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {VK_STRUCT(features)});
+
+    VpDeviceCreateInfo createInfo{&inCreateInfo, &profile, 0};
+
+    VkDevice device = VK_NULL_HANDLE;
+    VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
+
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_TRUE(device == mock.vkDevice);
 }
 
 TEST(mocked_api_generated_library, check_support_profile_a) {
@@ -616,45 +654,4 @@ TEST(mocked_api_generated_library, check_support_variants_format_fail) {
     EXPECT_EQ(block_property_count, 2);
     EXPECT_STREQ(block_properties[0].blockName, "variant_a");
     EXPECT_STREQ(block_properties[1].blockName, "variant_b");
-}
-
-TEST(mocked_api_generated_library, create_device) {
-    MockVulkanAPI mock;
-
-    const VpProfileProperties profile{VP_LUNARG_TEST_PROFILE_B_NAME, VP_LUNARG_TEST_PROFILE_B_SPEC_VERSION};
-
-    uint32_t extension_property_count = 0;
-    vpGetProfileDeviceExtensionProperties(&profile, &extension_property_count, nullptr);
-    std::vector<VkExtensionProperties> extension_properties(extension_property_count);
-    vpGetProfileDeviceExtensionProperties(&profile, &extension_property_count, &extension_properties[0]);
-
-    std::vector<const char*> extensions(extension_property_count);
-    for (std::size_t i = 0, n = extensions.size(); i < n; ++i) {
-        extensions[i] = extension_properties[i].extensionName;
-    }
-
-    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
-    vpGetProfileFeatures(&profile, &features);
-
-    VkDeviceQueueCreateInfo queueCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO };
-    queueCreateInfo.queueFamilyIndex = 0;
-    queueCreateInfo.queueCount = 1;
-
-    VkDeviceCreateInfo inCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
-    inCreateInfo.queueCreateInfoCount = 1;
-    inCreateInfo.pQueueCreateInfos = &queueCreateInfo;
-
-    VkDeviceCreateInfo outCreateInfo = inCreateInfo;
-    outCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-    outCreateInfo.ppEnabledExtensionNames = extensions.data();
-
-    mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {VK_STRUCT(features)});
-
-    VpDeviceCreateInfo createInfo{ &inCreateInfo, &profile, 0 };
-
-    VkDevice device = VK_NULL_HANDLE;
-    VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
-
-    EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_TRUE(device == mock.vkDevice);
 }

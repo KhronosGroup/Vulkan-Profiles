@@ -160,6 +160,7 @@ TEST(api_get_profile_formats, unspecified) {
     EXPECT_EQ(0, formatCount);
 }
 
+/* Unsupported QueueFamily
 TEST(api_get_profile_queue_families, unspecified) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
@@ -175,6 +176,7 @@ TEST(api_get_profile_queue_families, unspecified) {
     EXPECT_EQ(VK_SUCCESS, result1);
     EXPECT_EQ(0, count);
 }
+*/
 
 TEST(api_get_profile_properties, get_properties2) {
     VkPhysicalDeviceProperties2 profileProperties2{};
