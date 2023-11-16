@@ -2597,24 +2597,28 @@ class VulkanRegistry():
 
         # TODO: We currently have to apply workarounds due to "noauto" limittypes and other bugs related to limittypes in the vk.xml
         # These can only be solved permanently if we make modifications to the registry xml itself
-        self.structs['VkPhysicalDeviceLimits'].members['subPixelPrecisionBits'].limittype = 'bits'
-        self.structs['VkPhysicalDeviceLimits'].members['subTexelPrecisionBits'].limittype = 'bits'
-        self.structs['VkPhysicalDeviceLimits'].members['mipmapPrecisionBits'].limittype = 'bits'
-        self.structs['VkPhysicalDeviceLimits'].members['viewportSubPixelBits'].limittype = 'bits'
-        self.structs['VkPhysicalDeviceLimits'].members['subPixelInterpolationOffsetBits'].limittype = 'bits'
-        self.structs['VkPhysicalDeviceLimits'].members['minMemoryMapAlignment'].limittype = 'min,pot'
-        self.structs['VkPhysicalDeviceLimits'].members['minTexelBufferOffsetAlignment'].limittype = 'min,pot'
-        self.structs['VkPhysicalDeviceLimits'].members['minUniformBufferOffsetAlignment'].limittype = 'min,pot'
-        self.structs['VkPhysicalDeviceLimits'].members['minStorageBufferOffsetAlignment'].limittype = 'min,pot'
-        self.structs['VkPhysicalDeviceLimits'].members['optimalBufferCopyOffsetAlignment'].limittype = 'min,pot'
-        self.structs['VkPhysicalDeviceLimits'].members['optimalBufferCopyRowPitchAlignment'].limittype = 'min,pot'
-        self.structs['VkPhysicalDeviceLimits'].members['nonCoherentAtomSize'].limittype = 'min,pot'
-        self.structs['VkPhysicalDeviceLimits'].members['timestampPeriod'].limittype = 'noauto'
-        self.structs['VkPhysicalDeviceLimits'].members['bufferImageGranularity'].limittype = 'min,mul'
-        self.structs['VkPhysicalDeviceLimits'].members['pointSizeGranularity'].limittype = 'min,mul'
-        self.structs['VkPhysicalDeviceLimits'].members['lineWidthGranularity'].limittype = 'min,mul'
-        self.structs['VkPhysicalDeviceLimits'].members['strictLines'].limittype = 'exact'
-        self.structs['VkPhysicalDeviceLimits'].members['standardSampleLocations'].limittype = 'exact'
+        if 'VkPhysicalDeviceLimits' in self.structs:
+            self.structs['VkPhysicalDeviceLimits'].members['subPixelPrecisionBits'].limittype = 'bits'
+            self.structs['VkPhysicalDeviceLimits'].members['subTexelPrecisionBits'].limittype = 'bits'
+            self.structs['VkPhysicalDeviceLimits'].members['mipmapPrecisionBits'].limittype = 'bits'
+            self.structs['VkPhysicalDeviceLimits'].members['viewportSubPixelBits'].limittype = 'bits'
+            self.structs['VkPhysicalDeviceLimits'].members['subPixelInterpolationOffsetBits'].limittype = 'bits'
+            self.structs['VkPhysicalDeviceLimits'].members['minMemoryMapAlignment'].limittype = 'min,pot'
+            self.structs['VkPhysicalDeviceLimits'].members['minTexelBufferOffsetAlignment'].limittype = 'min,pot'
+            self.structs['VkPhysicalDeviceLimits'].members['minUniformBufferOffsetAlignment'].limittype = 'min,pot'
+            self.structs['VkPhysicalDeviceLimits'].members['minStorageBufferOffsetAlignment'].limittype = 'min,pot'
+            self.structs['VkPhysicalDeviceLimits'].members['optimalBufferCopyOffsetAlignment'].limittype = 'min,pot'
+            self.structs['VkPhysicalDeviceLimits'].members['optimalBufferCopyRowPitchAlignment'].limittype = 'min,pot'
+            self.structs['VkPhysicalDeviceLimits'].members['nonCoherentAtomSize'].limittype = 'min,pot'
+            self.structs['VkPhysicalDeviceLimits'].members['timestampPeriod'].limittype = 'noauto'
+            self.structs['VkPhysicalDeviceLimits'].members['bufferImageGranularity'].limittype = 'min,mul'
+            self.structs['VkPhysicalDeviceLimits'].members['pointSizeGranularity'].limittype = 'min,mul'
+            self.structs['VkPhysicalDeviceLimits'].members['lineWidthGranularity'].limittype = 'min,mul'
+            self.structs['VkPhysicalDeviceLimits'].members['strictLines'].limittype = 'exact'
+            self.structs['VkPhysicalDeviceLimits'].members['standardSampleLocations'].limittype = 'exact'
+
+        if 'VkPhysicalDeviceSparseProperties' in self.structs:
+            self.structs['VkPhysicalDeviceSparseProperties'].members['residencyAlignedMipSize'].limittype = 'not'
 
         if 'VkPhysicalDeviceVulkan11Properties' in self.structs:
             self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceUUID'].limittype = 'noauto'
@@ -2801,6 +2805,9 @@ class VulkanRegistry():
 
         if 'VkPhysicalDeviceSchedulingControlsPropertiesARM' in self.structs:
             self.structs['VkPhysicalDeviceSchedulingControlsPropertiesARM'].members['schedulingControlsFlags'].limittype = 'bitmask'
+
+        if 'VkPhysicalDeviceExternalFormatResolvePropertiesANDROID' in self.structs:
+            self.structs['VkPhysicalDeviceExternalFormatResolvePropertiesANDROID'].members['nullColorAttachmentWithExternalFormatResolve'].limittype = 'not'
 
         # TODO: The registry xml is also missing limittype definitions for format and queue family properties
         # For now we just add the important ones, this needs a larger overhaul in the vk.xml
@@ -3313,7 +3320,10 @@ class VulkanProfile():
                     # Use parent's limit type
                     limittype = parentLimittype
 
-                if limittype == 'bitmask' and type == 'VkBool32':
+                if limittype == 'not':
+                    # Compare everything else with equality
+                    comparePredFmt = '{0} == {1}'
+                elif limittype == 'bitmask' and type == 'VkBool32':
                     # Compare everything else with equality
                     comparePredFmt = '{0} == {1}'
                 elif limittype == 'bitmask':

@@ -484,6 +484,12 @@ class ProfileMerger():
                         merged[member] = merged[member] or smember
                     else:
                         merged[member].append(smember)
+            elif xmlmember.limittype == 'not':
+                for smember in entry[member]:
+                    if smember in merged[member]:
+                        merged[member] = merged[member] and smember
+                    else:
+                        merged[member].append(smember)
             elif xmlmember.limittype == 'range':
                 if entry[member][0] < merged[member][0]:
                     merged[member][0] = entry[member][0]
@@ -560,6 +566,18 @@ class ProfileMerger():
                 if xmlmember.type == 'VkBool32':
                     if member in entry:
                         merged[member] = merged[member] and entry[member]
+                        if (not merged[member]):
+                            del merged[member]
+                    else:
+                        merged.remove(member)
+                else:
+                    for value in merged[member]:
+                        if value not in entry[member]:
+                            merged[member].remove(value)
+            elif xmlmember.limittype == 'not':
+                if xmlmember.type == 'VkBool32':
+                    if member in entry:
+                        merged[member] = merged[member] or entry[member]
                         if (not merged[member]):
                             del merged[member]
                     else:
