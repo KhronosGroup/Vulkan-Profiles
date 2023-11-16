@@ -34,7 +34,6 @@
       - [Query profile device extensions](#query-profile-device-extensions)
       - [Query profile features](#query-profile-features)
       - [Query profile device properties](#query-profile-device-properties)
-      - [Query profile queue family properties](#query-profile-queue-family-properties)
       - [Query profile format properties](#query-profile-format-properties)
 
 ## Overview
@@ -588,44 +587,6 @@ Where:
 * `pNext` is a `pNext` chain of Vulkan device property structures (with or without a `VkPhysicalDeviceProperties2` property structure).
 
 If the `pNext` chain contains a Vulkan device property structure for which the profile defines corresponding property/limit requirements then the structure is modified to include those properties/limits. Other fields of the Vulkan device property structure not defined by the profile will be left unmodified and structures not defined in the profile will be ignored (left unmodified as a whole).
-
-#### Query profile queue family properties
-
-In order to query the structure types of the Vulkan queue family property structures for which the profile defines requirements, use the following command:
-
-```C++
-VkResult vpGetProfileQueueFamilyStructureTypes(
-    const VpProfileProperties*      pProfile,
-    uint32_t*                       pStructureTypeCount,
-    VkStructureType*                pStructureTypes);
-```
-
-Where:
-* `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
-* `pStructureTypeCount` is a pointer to an integer related to the number of queue family property structure types available or queried, as described below.
-* `pStructureTypes` is either `NULL` or a pointer to an array of `VkStructureType` enums.
-
-If `pStructureTypes` is `NULL`, then the number of queue family property structure types defined by the profile is returned in `pStructureTypeCount`. Otherwise, `pStructureTypeCount` must point to a variable set by the user to the number of elements in the `pStructureTypes` array, and on return the variable is overwritten with the number of values actually written to `pStructureTypes`. If `pStructureTypeCount` is less than the number of queue family property structure types defined by the profile, at most `pStructureTypeCount` values will be written, and `VK_INCOMPLETE` will be returned instead of `VK_SUCCESS`, to indicate that not all the available values were returned.
-
-In order to query the queue family properties required by a profile, use the following command:
-
-```C++
-void vpGetProfileProperties(
-    const VpProfileProperties*      pProfile,
-    uint32_t*                       pPropertyCount,
-    VkQueueFamilyProperties2KHR*    pProperties);
-```
-
-Where:
-* `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
-* `pPropertyCount` is a pointer to an integer related to the number of queue families available or queried, as described below.
-* `pProperties` is either `NULL` or a pointer to an array of `VkQueueFamilyProperties2KHR` structures and corresponding `pNext` chains.
-
-The API is slightly more complex in this case as profiles may have requirements defined for multiple queue families, hence multiple queue family property structure chains may be populated.
-
-If `pProperties` is `NULL`, then the number of queue families defined by the profile is returned in `pPropertyCount`. Otherwise, `pPropertyCount` must point to a variable set by the user to the number of elements in the `pProperties` array, and on return the variable is overwritten with the number of structures actually written to `pProperties`. If `pPropertyCount` is less than the number of queue families defined by the profile, at most `pPropertyCount` structures will be written, and `VK_INCOMPLETE` will be returned instead of `VK_SUCCESS`, to indicate that not all the available properties were returned.
-
-If `pProperties` or its `pNext` chain contains a Vulkan queue family property structure for which the profile defines corresponding queue family property requirements then the structure is modified to include those properties. Other fields of the Vulkan queue family property structure not defined by the profile will be left unmodified and structures not defined in the profile will be ignored (left unmodified as a whole).
 
 #### Query profile format properties
 

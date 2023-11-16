@@ -312,14 +312,6 @@ VPAPI_ATTR VkResult vpGetProfileProperties(const VpProfileProperties *pProfile, 
 VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
                                                        VkStructureType *pStructureTypes);
 
-// Query the requirements of queue families by a profile
-VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount,
-                                                      VkQueueFamilyProperties2KHR *pProperties);
-
-// Query the list of query family structure types specified by the profile
-VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount,
-                                                          VkStructureType *pStructureTypes);
-
 // Query the list of formats with specified requirements by a profile
 VPAPI_ATTR VkResult vpGetProfileFormats(const VpProfileProperties *pProfile, uint32_t *pFormatCount, VkFormat *pFormats);
 
@@ -1166,7 +1158,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(VkInstance instanc
                         supported_variant = false;
                     }
                 }
-
+/* Unsupported queue families for now
                 userData.gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2(physicalDevice, &userData.count, nullptr);
                 std::vector<VkQueueFamilyProperties2KHR> queueFamilyProps(userData.count, { VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR });
                 userData.index = 0;
@@ -1249,7 +1241,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(VkInstance instanc
                 } else {
                     supported_variant = false;
                 }
-
+*/ // Unsupported queue families
                 memcpy(block.blockName, variant_desc.blockName, VP_MAX_PROFILE_NAME_SIZE * sizeof(char));
                 if (supported_variant) {
                     supported_blocks.push_back(block);
@@ -1645,107 +1637,6 @@ VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(const VpProfileProperties
         }
     }
 
-    return result;
-}
-
-VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(const VpProfileProperties *pProfile, uint32_t *pPropertyCount, VkQueueFamilyProperties2KHR *pProperties) {
-    VkResult result = VK_SUCCESS;
-
-    const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
-    uint32_t queue_family_count = 0;
-
-    for (std::size_t profile_index = 0, profile_count = profiles.size(); profile_index < profile_count; ++profile_index) {
-        const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(profiles[profile_index].profileName);
-        if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
-
-        for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
-            const detail::VpCapabilitiesDesc& capabilities = profile_desc->pRequiredCapabilities[capability_index];
-
-            for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
-                const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
-                queue_family_count += variant.queueFamilyCount;
-            }
-        }
-    }
-
-    if (pProperties == nullptr) {
-        *pPropertyCount = queue_family_count;
-    } else {
-        if (*pPropertyCount < queue_family_count) {
-            result = VK_INCOMPLETE;
-        } else {
-            *pPropertyCount = queue_family_count;
-        }
-
-        if (*pPropertyCount > 0) {
-            for (std::size_t profile_index = 0, profile_count = profiles.size(); profile_index < profile_count; ++profile_index) {
-                const detail::VpProfileDesc& profile_desc = *detail::vpGetProfileDesc(profiles[profile_index].profileName);
-
-                for (uint32_t capability_index = 0; capability_index < profile_desc.requiredCapabilityCount; ++capability_index) {
-                    const detail::VpCapabilitiesDesc& capabilities = profile_desc.pRequiredCapabilities[capability_index];
-
-                    for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
-                        const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
-                        queue_family_count += variant.queueFamilyCount;
-                
-                        for (uint32_t i = 0; i < *pPropertyCount; ++i) {
-                            VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pProperties[i]));
-                            while (p != nullptr) {
-                                if (variant.pQueueFamilies[i].pfnFiller == nullptr) continue;
-                                variant.pQueueFamilies[i].pfnFiller(p);
-                                p = p->pNext;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return result;
-}
-
-VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(const VpProfileProperties *pProfile, uint32_t *pStructureTypeCount, VkStructureType *pStructureTypes) {
-    VkResult result = VK_SUCCESS;
-
-    std::vector<VkStructureType> results;
-
-    const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
-
-    for (std::size_t profile_index = 0, profile_count = profiles.size(); profile_index < profile_count; ++profile_index) {
-        const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(profiles[profile_index].profileName);
-        if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
-
-        for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
-            const detail::VpCapabilitiesDesc& capabilities = profile_desc->pRequiredCapabilities[capability_index];
-
-            for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
-                const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
-
-                for (uint32_t i = 0; i < variant.queueFamilyStructTypeCount; ++i) {
-                    if (std::find(results.begin(), results.end(), variant.pQueueFamilyStructTypes[i]) == std::end(results)) {
-                        results.push_back(variant.pQueueFamilyStructTypes[i]);
-                    }
-                }
-            }
-        }
-    }
-
-    const uint32_t count = static_cast<uint32_t>(results.size());
-
-    if (pStructureTypes == nullptr) {
-        *pStructureTypeCount = count;
-    } else {
-        if (*pStructureTypeCount < count) {
-            result = VK_INCOMPLETE;
-        } else {
-            *pStructureTypeCount = count;
-        }
-
-        if (*pStructureTypeCount > 0) {
-            memcpy(pStructureTypes, &results[0], *pStructureTypeCount * sizeof(VkStructureType));
-        }
-    }
     return result;
 }
 
@@ -3526,7 +3417,7 @@ class VulkanProfile():
                 '    }\n'
                 '};\n')
 
-        # Queue family descriptor
+        # Queue family descriptor unsupported yet
         if self.structs.queueFamily:
             gen += ('\n'
                     'static const VpQueueFamilyDesc queueFamilyDesc[] = {\n')

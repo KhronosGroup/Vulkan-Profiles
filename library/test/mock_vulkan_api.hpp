@@ -56,9 +56,8 @@ enum {
     PROFILE_AREA_FEATURES_BIT = 1 << 1,
     PROFILE_AREA_PROPERTIES_BIT = 1 << 2,
     PROFILE_AREA_FORMATS_BIT = 1 << 3,
-    PROFILE_AREA_QUEUE_FAMILIES_BIT = 1 << 4,
     PROFILE_AREA_ALL_BITS = PROFILE_AREA_EXTENSIONS_BIT | PROFILE_AREA_FEATURES_BIT | PROFILE_AREA_PROPERTIES_BIT |
-                            PROFILE_AREA_FORMATS_BIT | PROFILE_AREA_QUEUE_FAMILIES_BIT
+                            PROFILE_AREA_FORMATS_BIT
 };
 
 class MockVulkanAPI final
@@ -168,10 +167,6 @@ public:
 
         if (profileAreas & PROFILE_AREA_FORMATS_BIT) {
             this->m_mockedFormats.clear();
-        }
-
-        if (profileAreas & PROFILE_AREA_QUEUE_FAMILIES_BIT) {
-            this->m_mockedQueueFamilies.clear();
         }
     }
 
