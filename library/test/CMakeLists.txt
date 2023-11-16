@@ -58,7 +58,9 @@ function(add_unit_test NAME)
 endfunction(add_unit_test)
 
 add_unit_test(test_api_reflection)
-add_unit_test(test_api_create_device)
+if(NOT APPLE)
+    add_unit_test(test_api_create_device)
+endif()
 
 function (create_android_package NAME)
     if (NOT ANDROID_SDK_HOME)

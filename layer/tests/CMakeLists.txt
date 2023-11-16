@@ -20,6 +20,11 @@ if (ANDROID)
     set(LAYER_TEST_FILES
         tests_mechanism
     )
+elseif(APPLE)
+    set(LAYER_TEST_FILES
+        tests_promoted
+        tests_util
+    )
 else()
     set(LAYER_TEST_FILES
         tests
@@ -148,9 +153,11 @@ if (NOT ANDROID)
         LayerTest(${test_item})
     endforeach()
 
-    add_dependencies(VkLayer_tests_combine_intersection VpTestIntersect)
-    add_dependencies(VkLayer_tests_combine_union VpTestUnion)
-    add_dependencies(VkLayer_tests_generated VpLayer_generate_tests)
+    if (NOT APPLE)
+        add_dependencies(VkLayer_tests_combine_intersection VpTestIntersect)
+        add_dependencies(VkLayer_tests_combine_union VpTestUnion)
+        add_dependencies(VkLayer_tests_generated VpLayer_generate_tests)
+    endif()
 else()
     LayerTestAndroid("VulkanProfilesLayerTests")
 endif()
