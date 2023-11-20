@@ -28,33 +28,33 @@ void initProfile(MockVulkanAPI& mock, const VpProfileProperties& profile, uint32
 
     if (profileAreas & PROFILE_AREA_EXTENSIONS_BIT) {
         uint32_t extensions_count = 0;
-        vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, nullptr);
+        vpGetProfileDeviceExtensionProperties(&profile, nullptr, &extensions_count, nullptr);
         std::vector<VkExtensionProperties> extensions(extensions_count);
-        vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, &extensions[0]);
+        vpGetProfileDeviceExtensionProperties(&profile, nullptr, &extensions_count, &extensions[0]);
         mock.SetDeviceExtensions(mock.vkPhysicalDevice, extensions);
     }
 
     if (profileAreas & PROFILE_AREA_FEATURES_BIT) {
         VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
-        vpGetProfileFeatures(&profile, &features);
+        vpGetProfileFeatures(&profile, nullptr, &features);
         mock.SetFeatures({VK_STRUCT(features)});
     }
 
     if (profileAreas & PROFILE_AREA_PROPERTIES_BIT) {
         VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
-        vpGetProfileProperties(&profile, &props);
+        vpGetProfileProperties(&profile, nullptr, &props);
         mock.SetProperties({VK_STRUCT(props)});
     }
 
     if (profileAreas & PROFILE_AREA_FORMATS_BIT) {
         uint32_t formatCount = 0;
-        vpGetProfileFormats(&profile, &formatCount, nullptr);
+        vpGetProfileFormats(&profile, nullptr, &formatCount, nullptr);
         std::vector<VkFormat> formats(formatCount);
-        vpGetProfileFormats(&profile, &formatCount, &formats[0]);
+        vpGetProfileFormats(&profile, nullptr, &formatCount, &formats[0]);
 
         for (std::size_t i = 0, n = formats.size(); i < n; ++i) {
             VkFormatProperties2KHR formatProps{VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR};
-            vpGetProfileFormatProperties(&profile, formats[i], &formatProps);
+            vpGetProfileFormatProperties(&profile, nullptr, formats[i], &formatProps);
             mock.AddFormat(formats[i], {VK_STRUCT(formatProps)});
         }
     }
@@ -77,9 +77,9 @@ TEST(mocked_api_generated_library, create_device) {
     const VpProfileProperties profile{VP_LUNARG_TEST_PROFILE_B_NAME, VP_LUNARG_TEST_PROFILE_B_SPEC_VERSION};
 
     uint32_t extension_property_count = 0;
-    vpGetProfileDeviceExtensionProperties(&profile, &extension_property_count, nullptr);
+    vpGetProfileDeviceExtensionProperties(&profile, nullptr, &extension_property_count, nullptr);
     std::vector<VkExtensionProperties> extension_properties(extension_property_count);
-    vpGetProfileDeviceExtensionProperties(&profile, &extension_property_count, &extension_properties[0]);
+    vpGetProfileDeviceExtensionProperties(&profile, nullptr, &extension_property_count, &extension_properties[0]);
 
     std::vector<const char*> extensions(extension_property_count);
     for (std::size_t i = 0, n = extensions.size(); i < n; ++i) {
@@ -87,7 +87,7 @@ TEST(mocked_api_generated_library, create_device) {
     }
 
     VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
-    vpGetProfileFeatures(&profile, &features);
+    vpGetProfileFeatures(&profile, nullptr, &features);
 
     VkDeviceQueueCreateInfo queueCreateInfo{VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO};
     queueCreateInfo.queueFamilyIndex = 0;
@@ -128,15 +128,15 @@ TEST(mocked_api_generated_library, check_support_profile_a) {
     EXPECT_EQ(VK_API_VERSION_PATCH(api_version), 224);
 
     uint32_t extensions_count = 0;
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, nullptr);
+    vpGetProfileDeviceExtensionProperties(&profile, nullptr, &extensions_count, nullptr);
     std::vector<VkExtensionProperties> extensions(extensions_count);
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, &extensions[0]);
+    vpGetProfileDeviceExtensionProperties(&profile, nullptr, &extensions_count, &extensions[0]);
 
     VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
-    vpGetProfileFeatures(&profile, &features);
+    vpGetProfileFeatures(&profile, nullptr, &features);
 
     VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
-    vpGetProfileProperties(&profile, &props);
+    vpGetProfileProperties(&profile, nullptr, &props);
 
     EXPECT_EQ(props.properties.limits.maxImageDimension1D, 0);
     EXPECT_EQ(props.properties.limits.maxImageDimension2D, 4096);
@@ -173,22 +173,22 @@ TEST(mocked_api_generated_library, check_support_profile_b) {
     EXPECT_EQ(VK_API_VERSION_PATCH(api_version), 224);
 
     uint32_t extensions_count = 0;
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, nullptr);
+    vpGetProfileDeviceExtensionProperties(&profile, nullptr, &extensions_count, nullptr);
     std::vector<VkExtensionProperties> extensions(extensions_count);
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, &extensions[0]);
+    vpGetProfileDeviceExtensionProperties(&profile, nullptr, &extensions_count, &extensions[0]);
 
     EXPECT_STREQ(extensions[0].extensionName, "VK_KHR_get_memory_requirements2");
     EXPECT_STREQ(extensions[1].extensionName, "VK_KHR_driver_properties");
 
     VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
-    vpGetProfileFeatures(&profile, &features);
+    vpGetProfileFeatures(&profile, nullptr, &features);
 
     EXPECT_EQ(features.features.depthBiasClamp, VK_TRUE);
     EXPECT_EQ(features.features.depthClamp, VK_TRUE);
     EXPECT_EQ(features.features.drawIndirectFirstInstance, VK_TRUE);
 
     VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
-    vpGetProfileProperties(&profile, &props);
+    vpGetProfileProperties(&profile, nullptr, &props);
 
     EXPECT_EQ(props.properties.limits.maxImageDimension1D, 4096);
     EXPECT_EQ(props.properties.limits.maxImageDimension2D, 8192);
@@ -227,16 +227,16 @@ TEST(mocked_api_generated_library, check_support_profile_c) {
     EXPECT_EQ(VK_API_VERSION_PATCH(api_version), 225);
 
     uint32_t extensions_count = 0;
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, nullptr);
+    vpGetProfileDeviceExtensionProperties(&profile, nullptr, &extensions_count, nullptr);
     std::vector<VkExtensionProperties> extensions(extensions_count);
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, &extensions[0]);
+    vpGetProfileDeviceExtensionProperties(&profile, nullptr, &extensions_count, &extensions[0]);
 
     EXPECT_STREQ(extensions[0].extensionName, "VK_KHR_get_memory_requirements2");
     EXPECT_STREQ(extensions[1].extensionName, "VK_KHR_driver_properties");
     EXPECT_STREQ(extensions[2].extensionName, "VK_KHR_create_renderpass2");
 
     VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
-    vpGetProfileFeatures(&profile, &features);
+    vpGetProfileFeatures(&profile, nullptr, &features);
 
     EXPECT_EQ(features.features.depthBiasClamp, VK_TRUE);
     EXPECT_EQ(features.features.depthClamp, VK_TRUE);
@@ -244,7 +244,7 @@ TEST(mocked_api_generated_library, check_support_profile_c) {
     EXPECT_EQ(features.features.fullDrawIndexUint32, VK_TRUE);
 
     VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
-    vpGetProfileProperties(&profile, &props);
+    vpGetProfileProperties(&profile, nullptr, &props);
 
     EXPECT_EQ(props.properties.limits.maxImageDimension1D, 4096);
     EXPECT_EQ(props.properties.limits.maxImageDimension2D, 16384);
@@ -283,29 +283,202 @@ TEST(mocked_api_generated_library, check_support_variants_reflection) {
     EXPECT_EQ(VK_API_VERSION_PATCH(api_version), 204);
 
     uint32_t extensions_count = 0;
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, nullptr);
+    result = vpGetProfileDeviceExtensionProperties(&profile, nullptr, &extensions_count, nullptr);
+    EXPECT_EQ(result, VK_SUCCESS);
     std::vector<VkExtensionProperties> extensions(extensions_count);
-    vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, &extensions[0]);
+    result = vpGetProfileDeviceExtensionProperties(&profile, nullptr, &extensions_count, &extensions[0]);
+    EXPECT_EQ(result, VK_SUCCESS);
 
     EXPECT_STREQ(extensions[0].extensionName, "VK_KHR_driver_properties");
     EXPECT_STREQ(extensions[1].extensionName, "VK_KHR_get_memory_requirements2");
 
+    // Check behavior for unknown block
+    result = vpGetProfileDeviceExtensionProperties(&profile, "pouet", &extensions_count, nullptr);
+    EXPECT_EQ(result, VK_INCOMPLETE);
+    EXPECT_EQ(extensions_count, 0);
+
     VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
-    vpGetProfileFeatures(&profile, &features);
+    vpGetProfileFeatures(&profile, nullptr, &features);
 
     EXPECT_EQ(features.features.depthBiasClamp, VK_TRUE);
     EXPECT_EQ(features.features.depthClamp, VK_TRUE);
     EXPECT_EQ(features.features.drawIndirectFirstInstance, VK_TRUE);
     EXPECT_EQ(features.features.fullDrawIndexUint32, VK_TRUE);
+}
+
+TEST(mocked_api_generated_library, check_support_variants_instance_extensions_reflection) {
+    MockVulkanAPI mock;
+
+    const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
+
+    VkResult result = VK_SUCCESS;
+
+    uint32_t extensions_count = 0;
+    result = vpGetProfileInstanceExtensionProperties(&profile, "block", &extensions_count, nullptr);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(extensions_count, 0);
+}
+
+TEST(mocked_api_generated_library, check_support_variants_device_extensions_reflection) {
+    MockVulkanAPI mock;
+
+    const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
+
+    VkResult result = VK_SUCCESS;
+
+    uint32_t extensions_count = 0;
+    result = vpGetProfileDeviceExtensionProperties(&profile, "block", &extensions_count, nullptr);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(extensions_count, 1);
+
+    std::vector<VkExtensionProperties> extensions(extensions_count);
+    result = vpGetProfileDeviceExtensionProperties(&profile, "block", &extensions_count, &extensions[0]);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(extensions_count, 1);
+
+    EXPECT_STREQ(extensions[0].extensionName, "VK_KHR_driver_properties");
+}
+
+TEST(mocked_api_generated_library, check_support_variants_feature_reflection) {
+    MockVulkanAPI mock;
+
+    const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
+
+    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
+    VkResult result = vpGetProfileFeatures(&profile, "block", &features);
+    EXPECT_EQ(result, VK_SUCCESS);
+
+    EXPECT_EQ(features.features.depthBiasClamp, VK_TRUE);
+    EXPECT_EQ(features.features.depthClamp, VK_TRUE);
+    EXPECT_EQ(features.features.drawIndirectFirstInstance, VK_FALSE);
+    EXPECT_EQ(features.features.fullDrawIndexUint32, VK_FALSE);
+}
+
+TEST(mocked_api_generated_library, check_support_variants_property_reflection) {
+    MockVulkanAPI mock;
+
+    const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
 
     VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
-    vpGetProfileProperties(&profile, &props);
+
+    const VpProfileProperties profileUnknown{"pouet", 1};
+    VkResult result = vpGetProfileProperties(&profileUnknown, nullptr, &props);
+    EXPECT_EQ(result, VK_ERROR_UNKNOWN);
+
+    result = vpGetProfileProperties(&profile, nullptr, &props);
+    EXPECT_EQ(result, VK_ERROR_UNKNOWN);
+
+    EXPECT_EQ(props.properties.limits.maxImageArrayLayers, 0);
+    EXPECT_EQ(props.properties.limits.maxImageDimension1D, 0);
+    EXPECT_EQ(props.properties.limits.maxImageDimension2D, 0);
+    EXPECT_EQ(props.properties.limits.maxImageDimension3D, 0);
+    EXPECT_EQ(props.properties.limits.maxImageDimensionCube, 0);
+
+    result = vpGetProfileProperties(&profile, "block", &props);
+    EXPECT_EQ(result, VK_SUCCESS);
+
+    EXPECT_EQ(props.properties.limits.maxImageArrayLayers, 0);
+    EXPECT_EQ(props.properties.limits.maxImageDimension1D, 4096);
+    EXPECT_EQ(props.properties.limits.maxImageDimension2D, 4096);
+    EXPECT_EQ(props.properties.limits.maxImageDimension3D, 2048);
+    EXPECT_EQ(props.properties.limits.maxImageDimensionCube, 0);
+
+    result = vpGetProfileProperties(&profile, "variant_a", &props);
+    EXPECT_EQ(result, VK_SUCCESS);
+
+    EXPECT_EQ(props.properties.limits.maxImageArrayLayers, 0);
+    EXPECT_EQ(props.properties.limits.maxImageDimension1D, 8192);
+    EXPECT_EQ(props.properties.limits.maxImageDimension2D, 8192);
+    EXPECT_EQ(props.properties.limits.maxImageDimension3D, 2048);
+    EXPECT_EQ(props.properties.limits.maxImageDimensionCube, 0);
+
+    result = vpGetProfileProperties(&profile, "variant_b", &props);
+    EXPECT_EQ(result, VK_SUCCESS);
 
     EXPECT_EQ(props.properties.limits.maxImageArrayLayers, 0);
     EXPECT_EQ(props.properties.limits.maxImageDimension1D, 4096);
     EXPECT_EQ(props.properties.limits.maxImageDimension2D, 8192);
     EXPECT_EQ(props.properties.limits.maxImageDimension3D, 4096);
     EXPECT_EQ(props.properties.limits.maxImageDimensionCube, 4096);
+
+    result = vpGetProfileProperties(&profile, "variant_unknown", &props);
+    EXPECT_EQ(result, VK_INCOMPLETE);
+}
+
+TEST(mocked_api_generated_library, check_support_variants_format_reflection) {
+    MockVulkanAPI mock;
+    VkResult result = VK_SUCCESS;
+
+    const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
+
+    uint32_t formatCount = 0;
+    result = vpGetProfileFormats(&profile, "pouet", &formatCount, nullptr);
+    EXPECT_EQ(result, VK_INCOMPLETE);
+    EXPECT_EQ(formatCount, 0);
+
+    result = vpGetProfileFormats(&profile, nullptr, &formatCount, nullptr);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(formatCount, 1);
+
+    std::vector<VkFormat> formats(formatCount);
+    result = vpGetProfileFormats(&profile, nullptr, &formatCount, &formats[0]);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(formatCount, 1);
+    EXPECT_EQ(formats[0], VK_FORMAT_R8G8B8A8_UNORM);
+
+    VkFormatProperties3KHR properties3{VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR};
+    VkFormatProperties2KHR properties2{VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR, &properties3};
+    result = vpGetProfileFormatProperties(&profile, "pouet", VK_FORMAT_R8G8B8A8_UNORM, &properties2);
+    EXPECT_EQ(result, VK_INCOMPLETE);
+
+    result = vpGetProfileFormatProperties(&profile, nullptr, VK_FORMAT_R8G8B8A8_UNORM, &properties2);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(properties2.formatProperties.bufferFeatures, 0);
+    EXPECT_EQ(properties2.formatProperties.optimalTilingFeatures, 0);
+    EXPECT_EQ(properties2.formatProperties.linearTilingFeatures,
+              VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT);
+    EXPECT_EQ(properties3.bufferFeatures, 0);
+    EXPECT_EQ(properties3.optimalTilingFeatures, 0);
+    EXPECT_EQ(properties3.linearTilingFeatures,
+              VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT);
+
+    properties2.formatProperties.linearTilingFeatures = 0;
+    properties3.linearTilingFeatures = 0;
+    result = vpGetProfileFormatProperties(&profile, "block", VK_FORMAT_R8G8B8A8_UNORM, &properties2);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(properties2.formatProperties.bufferFeatures, 0);
+    EXPECT_EQ(properties2.formatProperties.optimalTilingFeatures, 0);
+    EXPECT_EQ(properties2.formatProperties.linearTilingFeatures, VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+    EXPECT_EQ(properties3.bufferFeatures, 0);
+    EXPECT_EQ(properties3.optimalTilingFeatures, 0);
+    EXPECT_EQ(properties3.linearTilingFeatures, VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+
+    properties2.formatProperties.linearTilingFeatures = 0;
+    properties3.linearTilingFeatures = 0;
+    result = vpGetProfileFormatProperties(&profile, "variant_b", VK_FORMAT_R8G8B8A8_UNORM, &properties2);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(properties2.formatProperties.bufferFeatures, 0);
+    EXPECT_EQ(properties2.formatProperties.optimalTilingFeatures, 0);
+    EXPECT_EQ(properties2.formatProperties.linearTilingFeatures, VK_FORMAT_FEATURE_BLIT_DST_BIT);
+    EXPECT_EQ(properties3.bufferFeatures, 0);
+    EXPECT_EQ(properties3.optimalTilingFeatures, 0);
+    EXPECT_EQ(properties3.linearTilingFeatures, VK_FORMAT_FEATURE_BLIT_DST_BIT);
+
+    uint32_t structureTypeCount = 0;
+    result = vpGetProfileFormatStructureTypes(&profile, "pouet", &structureTypeCount, nullptr);
+    EXPECT_EQ(result, VK_INCOMPLETE);
+    EXPECT_EQ(structureTypeCount, 0);
+
+    result = vpGetProfileFormatStructureTypes(&profile, nullptr, &structureTypeCount, nullptr);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(structureTypeCount, 2);
+
+    std::vector<VkStructureType> structureTypes(structureTypeCount);
+    result = vpGetProfileFormatStructureTypes(&profile, nullptr, &structureTypeCount, &structureTypes[0]);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(structureTypeCount, 2);
+    EXPECT_EQ(structureTypes[0], VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2);
+    EXPECT_EQ(structureTypes[1], VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3);
 }
 
 TEST(mocked_api_generated_library, check_support_variants_success_2variants) {
@@ -346,9 +519,9 @@ TEST(mocked_api_generated_library, check_support_variants_extensions_success_1va
         mock.ClearProfileAreas(PROFILE_AREA_EXTENSIONS_BIT);
 
         uint32_t extensions_count = 0;
-        vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, nullptr);
+        vpGetProfileDeviceExtensionProperties(&profile, nullptr, &extensions_count, nullptr);
         std::vector<VkExtensionProperties> extensions(extensions_count);
-        vpGetProfileDeviceExtensionProperties(&profile, &extensions_count, &extensions[0]);
+        vpGetProfileDeviceExtensionProperties(&profile, nullptr, &extensions_count, &extensions[0]);
 
         // To discard "variant_a" variant support
         extensions.resize(1);
@@ -425,7 +598,7 @@ TEST(mocked_api_generated_library, check_support_variants_features_success_1vari
         mock.ClearProfileAreas(PROFILE_AREA_FEATURES_BIT);
 
         VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
-        vpGetProfileFeatures(&profile, &features);
+        vpGetProfileFeatures(&profile, nullptr, &features);
 
         features.features.drawIndirectFirstInstance = false;
 
@@ -465,7 +638,7 @@ TEST(mocked_api_generated_library, check_support_variants_features_fail) {
         mock.ClearProfileAreas(PROFILE_AREA_FEATURES_BIT);
 
         VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
-        vpGetProfileFeatures(&profile, &features);
+        vpGetProfileFeatures(&profile, nullptr, &features);
 
         features.features.drawIndirectFirstInstance = false;
         features.features.fullDrawIndexUint32 = false;
@@ -502,7 +675,7 @@ TEST(mocked_api_generated_library, check_support_variants_properties_success_1va
         mock.ClearProfileAreas(PROFILE_AREA_PROPERTIES_BIT);
 
         VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
-        vpGetProfileProperties(&profile, &props);
+        vpGetProfileProperties(&profile, nullptr, &props);
         props.properties.limits.maxImageDimension1D = 8192;
         props.properties.limits.maxImageDimension2D = 8192;
         props.properties.limits.maxImageDimension3D = 4096;
@@ -545,7 +718,7 @@ TEST(mocked_api_generated_library, check_support_variants_properties_fail) {
         mock.ClearProfileAreas(PROFILE_AREA_PROPERTIES_BIT);
 
         VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
-        vpGetProfileProperties(&profile, &props);
+        vpGetProfileProperties(&profile, nullptr, &props);
         props.properties.limits.maxImageDimension1D = 8192;
         props.properties.limits.maxImageDimension2D = 8192;
         props.properties.limits.maxImageDimension3D = 4096;
@@ -589,7 +762,7 @@ TEST(mocked_api_generated_library, check_support_variants_format_success_1varian
         mock.ClearProfileAreas(PROFILE_AREA_FORMATS_BIT);
 
         VkFormatProperties2KHR formatProps{VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR};
-        vpGetProfileFormatProperties(&profile, VK_FORMAT_R8G8B8A8_UNORM, &formatProps);
+        vpGetProfileFormatProperties(&profile, nullptr, VK_FORMAT_R8G8B8A8_UNORM, &formatProps);
         formatProps.formatProperties.linearTilingFeatures =
             VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT;
 
@@ -629,7 +802,7 @@ TEST(mocked_api_generated_library, check_support_variants_format_fail) {
         mock.ClearProfileAreas(PROFILE_AREA_FORMATS_BIT);
 
         VkFormatProperties2KHR formatProps{VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR};
-        vpGetProfileFormatProperties(&profile, VK_FORMAT_R8G8B8A8_UNORM, &formatProps);
+        vpGetProfileFormatProperties(&profile, nullptr, VK_FORMAT_R8G8B8A8_UNORM, &formatProps);
         formatProps.formatProperties.linearTilingFeatures =
             VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
 
