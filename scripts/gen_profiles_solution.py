@@ -1793,7 +1793,60 @@ VPAPI_ATTR VkResult vpGetProfileFormatProperties(const VpProfileProperties *pPro
         }
     }
 
-    return VK_SUCCESS;
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(const VpProfileProperties *pProfile, const char* pBlockName, uint32_t *pStructureTypeCount, VkStructureType *pStructureTypes) {
+    VkResult result = pBlockName == nullptr ? VK_SUCCESS : VK_INCOMPLETE;
+
+    std::vector<VkStructureType> results;
+
+    const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
+
+    for (std::size_t profile_index = 0, profile_count = profiles.size(); profile_index < profile_count; ++profile_index) {
+        const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(profiles[profile_index].profileName);
+        if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
+
+        for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
+            const detail::VpCapabilitiesDesc& capabilities = profile_desc->pRequiredCapabilities[capability_index];
+
+            for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
+                const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
+                if (pBlockName != nullptr) {
+                    if (strcmp(variant.blockName, pBlockName) != 0) {
+                        continue;
+                    }
+                    result = VK_SUCCESS;
+                }
+
+                for (uint32_t i = 0; i < variant.formatStructTypeCount; ++i) {
+                    const VkStructureType type = variant.pFormatStructTypes[i];
+                    if (std::find(results.begin(), results.end(), type) == std::end(results)) {
+                        results.push_back(type);
+                    }
+                }
+            }
+        }
+    }
+
+    const uint32_t count = static_cast<uint32_t>(results.size());
+    std::sort(results.begin(), results.end());
+
+    if (pStructureTypes == nullptr) {
+        *pStructureTypeCount = count;
+    } else {
+        if (*pStructureTypeCount < count) {
+            result = VK_INCOMPLETE;
+        } else {
+            *pStructureTypeCount = count;
+        }
+
+        if (*pStructureTypeCount > 0) {
+            memcpy(pStructureTypes, &results[0], *pStructureTypeCount * sizeof(VkStructureType));
+        }
+    }
+
+    return result;
 }
 '''
 

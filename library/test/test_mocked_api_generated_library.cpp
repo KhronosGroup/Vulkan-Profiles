@@ -304,11 +304,65 @@ TEST(mocked_api_generated_library, check_support_variants_reflection) {
     EXPECT_EQ(features.features.depthClamp, VK_TRUE);
     EXPECT_EQ(features.features.drawIndirectFirstInstance, VK_TRUE);
     EXPECT_EQ(features.features.fullDrawIndexUint32, VK_TRUE);
+}
+
+TEST(mocked_api_generated_library, check_support_variants_instance_extensions_reflection) {
+    MockVulkanAPI mock;
+
+    const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
+
+    VkResult result = VK_SUCCESS;
+
+    uint32_t extensions_count = 0;
+    result = vpGetProfileInstanceExtensionProperties(&profile, "block", &extensions_count, nullptr);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(extensions_count, 0);
+}
+
+TEST(mocked_api_generated_library, check_support_variants_device_extensions_reflection) {
+    MockVulkanAPI mock;
+
+    const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
+
+    VkResult result = VK_SUCCESS;
+
+    uint32_t extensions_count = 0;
+    result = vpGetProfileDeviceExtensionProperties(&profile, "block", &extensions_count, nullptr);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(extensions_count, 1);
+
+    std::vector<VkExtensionProperties> extensions(extensions_count);
+    result = vpGetProfileDeviceExtensionProperties(&profile, "block", &extensions_count, &extensions[0]);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(extensions_count, 1);
+
+    EXPECT_STREQ(extensions[0].extensionName, "VK_KHR_driver_properties");
+}
+
+TEST(mocked_api_generated_library, check_support_variants_feature_reflection) {
+    MockVulkanAPI mock;
+
+    const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
+
+    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
+    VkResult result = vpGetProfileFeatures(&profile, "block", &features);
+    EXPECT_EQ(result, VK_SUCCESS);
+
+    EXPECT_EQ(features.features.depthBiasClamp, VK_TRUE);
+    EXPECT_EQ(features.features.depthClamp, VK_TRUE);
+    EXPECT_EQ(features.features.drawIndirectFirstInstance, VK_FALSE);
+    EXPECT_EQ(features.features.fullDrawIndexUint32, VK_FALSE);
+}
+
+TEST(mocked_api_generated_library, check_support_variants_property_reflection) {
+    MockVulkanAPI mock;
+
+    const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
 
     VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
 
     const VpProfileProperties profileUnknown{"pouet", 1};
-    result = vpGetProfileProperties(&profileUnknown, nullptr, &props);
+    VkResult result = vpGetProfileProperties(&profileUnknown, nullptr, &props);
     EXPECT_EQ(result, VK_ERROR_UNKNOWN);
 
     result = vpGetProfileProperties(&profile, nullptr, &props);
@@ -349,6 +403,82 @@ TEST(mocked_api_generated_library, check_support_variants_reflection) {
 
     result = vpGetProfileProperties(&profile, "variant_unknown", &props);
     EXPECT_EQ(result, VK_INCOMPLETE);
+}
+
+TEST(mocked_api_generated_library, check_support_variants_format_reflection) {
+    MockVulkanAPI mock;
+    VkResult result = VK_SUCCESS;
+
+    const VpProfileProperties profile{VP_LUNARG_TEST_VARIANTS_NAME, VP_LUNARG_TEST_VARIANTS_SPEC_VERSION};
+
+    uint32_t formatCount = 0;
+    result = vpGetProfileFormats(&profile, "pouet", &formatCount, nullptr);
+    EXPECT_EQ(result, VK_INCOMPLETE);
+    EXPECT_EQ(formatCount, 0);
+
+    result = vpGetProfileFormats(&profile, nullptr, &formatCount, nullptr);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(formatCount, 1);
+
+    std::vector<VkFormat> formats(formatCount);
+    result = vpGetProfileFormats(&profile, nullptr, &formatCount, &formats[0]);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(formatCount, 1);
+    EXPECT_EQ(formats[0], VK_FORMAT_R8G8B8A8_UNORM);
+
+    VkFormatProperties3KHR properties3{VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR};
+    VkFormatProperties2KHR properties2{VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR, &properties3};
+    result = vpGetProfileFormatProperties(&profile, "pouet", VK_FORMAT_R8G8B8A8_UNORM, &properties2);
+    EXPECT_EQ(result, VK_INCOMPLETE);
+
+    result = vpGetProfileFormatProperties(&profile, nullptr, VK_FORMAT_R8G8B8A8_UNORM, &properties2);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(properties2.formatProperties.bufferFeatures, 0);
+    EXPECT_EQ(properties2.formatProperties.optimalTilingFeatures, 0);
+    EXPECT_EQ(properties2.formatProperties.linearTilingFeatures,
+              VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT);
+    EXPECT_EQ(properties3.bufferFeatures, 0);
+    EXPECT_EQ(properties3.optimalTilingFeatures, 0);
+    EXPECT_EQ(properties3.linearTilingFeatures,
+              VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT | VK_FORMAT_FEATURE_BLIT_DST_BIT);
+
+    properties2.formatProperties.linearTilingFeatures = 0;
+    properties3.linearTilingFeatures = 0;
+    result = vpGetProfileFormatProperties(&profile, "block", VK_FORMAT_R8G8B8A8_UNORM, &properties2);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(properties2.formatProperties.bufferFeatures, 0);
+    EXPECT_EQ(properties2.formatProperties.optimalTilingFeatures, 0);
+    EXPECT_EQ(properties2.formatProperties.linearTilingFeatures, VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+    EXPECT_EQ(properties3.bufferFeatures, 0);
+    EXPECT_EQ(properties3.optimalTilingFeatures, 0);
+    EXPECT_EQ(properties3.linearTilingFeatures, VK_FORMAT_FEATURE_TRANSFER_SRC_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT);
+
+    properties2.formatProperties.linearTilingFeatures = 0;
+    properties3.linearTilingFeatures = 0;
+    result = vpGetProfileFormatProperties(&profile, "variant_b", VK_FORMAT_R8G8B8A8_UNORM, &properties2);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(properties2.formatProperties.bufferFeatures, 0);
+    EXPECT_EQ(properties2.formatProperties.optimalTilingFeatures, 0);
+    EXPECT_EQ(properties2.formatProperties.linearTilingFeatures, VK_FORMAT_FEATURE_BLIT_DST_BIT);
+    EXPECT_EQ(properties3.bufferFeatures, 0);
+    EXPECT_EQ(properties3.optimalTilingFeatures, 0);
+    EXPECT_EQ(properties3.linearTilingFeatures, VK_FORMAT_FEATURE_BLIT_DST_BIT);
+
+    uint32_t structureTypeCount = 0;
+    result = vpGetProfileFormatStructureTypes(&profile, "pouet", &structureTypeCount, nullptr);
+    EXPECT_EQ(result, VK_INCOMPLETE);
+    EXPECT_EQ(structureTypeCount, 0);
+
+    result = vpGetProfileFormatStructureTypes(&profile, nullptr, &structureTypeCount, nullptr);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(structureTypeCount, 2);
+
+    std::vector<VkStructureType> structureTypes(structureTypeCount);
+    result = vpGetProfileFormatStructureTypes(&profile, nullptr, &structureTypeCount, &structureTypes[0]);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(structureTypeCount, 2);
+    EXPECT_EQ(structureTypes[0], VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2);
+    EXPECT_EQ(structureTypes[1], VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3);
 }
 
 TEST(mocked_api_generated_library, check_support_variants_success_2variants) {
