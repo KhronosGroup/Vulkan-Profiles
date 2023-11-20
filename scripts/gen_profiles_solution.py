@@ -1568,28 +1568,19 @@ VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(const VpProfileProperties 
 }
 
 VPAPI_ATTR VkResult vpGetProfileProperties(const VpProfileProperties *pProfile, void *pNext) {
-    const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
+    const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(pProfile->profileName);
+    if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
 
-    for (std::size_t profile_index = 0, profile_count = profiles.size(); profile_index < profile_count; ++profile_index) {
-        const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(profiles[profile_index].profileName);
-        if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
+    const detail::VpVariantDesc* variant = profile_desc->pMergedCapabilities;
 
-        for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
-            const detail::VpCapabilitiesDesc& capabilities = profile_desc->pRequiredCapabilities[capability_index];
-
-            for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
-                const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
-                if (variant.property.pfnFiller == nullptr) continue;
-                
-                VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
-                while (p != nullptr) {
-                    variant.property.pfnFiller(p);
-                    p = p->pNext;
-                }
-            }
+    if (variant->property.pfnFiller != nullptr) {
+        VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
+        while (p != nullptr) {
+            variant->property.pfnFiller(p);
+            p = p->pNext;
         }
     }
-    
+
     return VK_SUCCESS;
 }
 
