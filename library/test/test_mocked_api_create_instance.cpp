@@ -26,7 +26,7 @@
 TEST(mocked_api_create_instance, vulkan10_no_app_info) {
     MockVulkanAPI mock;
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
+    const VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
 
     std::vector<const char*> dummyLayerNames{ "VK_DUMMY_layer1", "VK_DUMMY_layer2" };
 
@@ -34,7 +34,7 @@ TEST(mocked_api_create_instance, vulkan10_no_app_info) {
     inCreateInfo.enabledLayerCount = static_cast<uint32_t>(dummyLayerNames.size());
     inCreateInfo.ppEnabledLayerNames = dummyLayerNames.data();
 
-    std::vector<const char*> outExtensions{ VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME };
+    std::vector<const char*> outExtensions{VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME};
 
     VkApplicationInfo outAppInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
     outAppInfo.apiVersion = VP_ANDROID_BASELINE_2021_MIN_API_VERSION;
@@ -58,7 +58,7 @@ TEST(mocked_api_create_instance, vulkan10_no_app_info) {
 TEST(mocked_api_create_instance, vulkan10_with_app_info) {
     MockVulkanAPI mock;
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
+    const VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
 
     std::vector<const char*> dummyLayerNames{ "VK_DUMMY_layer1" };
 
@@ -74,7 +74,7 @@ TEST(mocked_api_create_instance, vulkan10_with_app_info) {
     inCreateInfo.enabledLayerCount = static_cast<uint32_t>(dummyLayerNames.size());
     inCreateInfo.ppEnabledLayerNames = dummyLayerNames.data();
 
-    std::vector<const char*> outExtensions{ VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME };
+    std::vector<const char*> outExtensions{VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME};
 
     VkInstanceCreateInfo outCreateInfo = inCreateInfo;
     outCreateInfo.enabledExtensionCount = static_cast<uint32_t>(outExtensions.size());
@@ -94,7 +94,7 @@ TEST(mocked_api_create_instance, vulkan10_with_app_info) {
 TEST(mocked_api_create_instance, vulkan11) {
     MockVulkanAPI mock;
 
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
+    const VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
 
     std::vector<const char*> dummyLayerNames{ "VK_DUMMY_layer1", "VK_DUMMY_layer2", "VK_DUMMY_layer3" };
 

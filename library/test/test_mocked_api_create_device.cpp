@@ -49,7 +49,7 @@ TEST(mocked_api_create_device, default_extensions) {
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
     VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, &outFeatures);
+    vpGetProfileFeatures(&profile, nullptr, &outFeatures);
 
     mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
         VK_STRUCT(outFeatures),
@@ -101,7 +101,7 @@ TEST(mocked_api_create_device, default_extensions_negative) {
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
     VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, &outFeatures);
+    vpGetProfileFeatures(&profile, nullptr, &outFeatures);
 
     mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
         VK_STRUCT(outFeatures),
@@ -148,7 +148,7 @@ TEST(mocked_api_create_device, override_extensions) {
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
     VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, &outFeatures);
+    vpGetProfileFeatures(&profile, nullptr, &outFeatures);
 
     mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
         VK_STRUCT(outFeatures),
@@ -200,7 +200,7 @@ TEST(mocked_api_create_device, merge_extensions) {
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
     VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, &outFeatures);
+    vpGetProfileFeatures(&profile, nullptr, &outFeatures);
 
     mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
         VK_STRUCT(outFeatures),
@@ -244,7 +244,7 @@ TEST(mocked_api_create_device, default_features) {
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
     VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, &outFeatures);
+    vpGetProfileFeatures(&profile, nullptr, &outFeatures);
 
     mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
         VK_STRUCT(outFeatures),
@@ -292,7 +292,7 @@ TEST(mocked_api_create_device, default_features_negative) {
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
     VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, &outFeatures);
+    vpGetProfileFeatures(&profile, nullptr, &outFeatures);
 
     mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
         VK_STRUCT(outFeatures),
@@ -345,7 +345,7 @@ TEST(mocked_api_create_device, override_features) {
 
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES };
     VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures12 };
-    vpGetProfileFeatures(&profile, &outFeatures);
+    vpGetProfileFeatures(&profile, nullptr, &outFeatures);
 
     mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
         VK_STRUCT(outFeatures),
@@ -443,7 +443,7 @@ TEST(mocked_api_create_device, legacy_enabled_features) {
     VkPhysicalDeviceVulkan13Features outFeatures13{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES };
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
-    vpGetProfileFeatures(&profile, &outFeatures11);
+    vpGetProfileFeatures(&profile, nullptr, &outFeatures11);
 
     mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
         VK_STRUCT(inFeatures),
@@ -535,7 +535,7 @@ TEST(mocked_api_create_device, disable_robust_buffer_access) {
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
     VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, &outFeatures);
+    vpGetProfileFeatures(&profile, nullptr, &outFeatures);
 
     outFeatures.features.robustBufferAccess = VK_FALSE;
 
@@ -583,7 +583,7 @@ TEST(mocked_api_create_device, disable_robust_image_access) {
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
     VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, &outFeatures);
+    vpGetProfileFeatures(&profile, nullptr, &outFeatures);
 
     outFeatures13.robustImageAccess = VK_FALSE;
 
@@ -629,7 +629,7 @@ TEST(mocked_api_create_device, disable_robust_access) {
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
     VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, &outFeatures);
+    vpGetProfileFeatures(&profile, nullptr, &outFeatures);
 
     outFeatures.features.robustBufferAccess = VK_FALSE;
     outFeatures13.robustImageAccess = VK_FALSE;
