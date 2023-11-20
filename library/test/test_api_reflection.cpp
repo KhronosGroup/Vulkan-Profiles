@@ -86,14 +86,14 @@ TEST(api_get_profile_device_extension_properties, full) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t propertyCount = 0;
-    VkResult result0 = vpGetProfileDeviceExtensionProperties(&profile, &propertyCount, nullptr);
+    VkResult result0 = vpGetProfileDeviceExtensionProperties(&profile, nullptr, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(1, propertyCount);
 
     propertyCount = 2;
 
     std::vector<VkExtensionProperties> properties(propertyCount);
-    VkResult result1 = vpGetProfileDeviceExtensionProperties(&profile, &propertyCount, &properties[0]);
+    VkResult result1 = vpGetProfileDeviceExtensionProperties(&profile, nullptr, &propertyCount, &properties[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
     EXPECT_EQ(1, propertyCount);
 
@@ -104,14 +104,14 @@ TEST(api_get_profile_device_extension_properties, partial) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, 1};
 
     uint32_t propertyCount = 0;
-    VkResult result0 = vpGetProfileDeviceExtensionProperties(&profile, &propertyCount, nullptr);
+    VkResult result0 = vpGetProfileDeviceExtensionProperties(&profile, nullptr, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(41, propertyCount);
 
     propertyCount = 5;
 
     std::vector<VkExtensionProperties> properties(propertyCount);
-    VkResult result1 = vpGetProfileDeviceExtensionProperties(&profile, &propertyCount, &properties[0]);
+    VkResult result1 = vpGetProfileDeviceExtensionProperties(&profile, nullptr, &propertyCount, &properties[0]);
     EXPECT_EQ(VK_INCOMPLETE, result1);
     EXPECT_EQ(5, propertyCount);
 
@@ -123,14 +123,14 @@ TEST(api_get_profile_instance_extension_properties, full) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, 1};
 
     uint32_t propertyCount = 0;
-    VkResult result0 = vpGetProfileInstanceExtensionProperties(&profile, &propertyCount, nullptr);
+    VkResult result0 = vpGetProfileInstanceExtensionProperties(&profile, nullptr, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(0, propertyCount);
 
     propertyCount = 2;
 
     std::vector<VkExtensionProperties> properties(propertyCount);
-    VkResult result1 = vpGetProfileInstanceExtensionProperties(&profile, &propertyCount, &properties[0]);
+    VkResult result1 = vpGetProfileInstanceExtensionProperties(&profile, nullptr, &propertyCount, &properties[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
     EXPECT_EQ(0, propertyCount);
 }
@@ -155,7 +155,7 @@ TEST(api_get_profile_formats, unspecified) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t formatCount = 0;
-    VkResult result0 = vpGetProfileFormats(&profile, &formatCount, nullptr);
+    VkResult result0 = vpGetProfileFormats(&profile, nullptr, &formatCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(0, formatCount);
 }
@@ -185,7 +185,7 @@ TEST(api_get_profile_properties, get_properties2) {
 
     const VpProfileProperties Profile = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, 1};
 
-    vpGetProfileProperties(&Profile, &profileProperties2);
+    vpGetProfileProperties(&Profile, nullptr, &profileProperties2);
 
     EXPECT_EQ(16384, profileProperties2.properties.limits.maxImageDimension1D);
     EXPECT_EQ(16384, profileProperties2.properties.limits.maxImageDimension2D);
@@ -206,7 +206,7 @@ TEST(api_get_profile_structures, get_properties_chain) {
 
     const VpProfileProperties Profile = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, 1};
 
-    vpGetProfileProperties(&Profile, &properties0);
+    vpGetProfileProperties(&Profile, nullptr, &properties0);
 
     EXPECT_EQ(1048576, properties1.maxUpdateAfterBindDescriptorsInAllPools);
     EXPECT_EQ(16, properties1.maxPerStageDescriptorUpdateAfterBindSamplers);
@@ -225,7 +225,7 @@ TEST(api_get_profile_structures, get_features) {
 
     const VpProfileProperties Profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
-    vpGetProfileFeatures(&Profile, &deviceFeatures2);
+    vpGetProfileFeatures(&Profile, nullptr, &deviceFeatures2);
 
     EXPECT_EQ(VK_TRUE, deviceVulkan12Features.samplerMirrorClampToEdge);
     EXPECT_EQ(VK_FALSE, deviceVulkan12Features.drawIndirectCount);
@@ -254,14 +254,14 @@ TEST(api_get_profile_feature_structure_types, properties_full) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t propertyCount = 0;
-    VkResult result0 = vpGetProfileFeatureStructureTypes(&profile, &propertyCount, nullptr);
+    VkResult result0 = vpGetProfileFeatureStructureTypes(&profile, nullptr, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(4, propertyCount);
 
     propertyCount = 5;
 
     std::vector<VkStructureType> properties(propertyCount);
-    VkResult result1 = vpGetProfileFeatureStructureTypes(&profile, &propertyCount, &properties[0]);
+    VkResult result1 = vpGetProfileFeatureStructureTypes(&profile, nullptr, &propertyCount, &properties[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
     EXPECT_EQ(4, propertyCount);
 
@@ -275,14 +275,14 @@ TEST(api_get_profile_feature_structure_types, properties_partial) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t propertyCount = 0;
-    VkResult result0 = vpGetProfileFeatureStructureTypes(&profile, &propertyCount, nullptr);
+    VkResult result0 = vpGetProfileFeatureStructureTypes(&profile, nullptr, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(4, propertyCount);
 
     propertyCount = 3;
 
     std::vector<VkStructureType> properties(propertyCount);
-    VkResult result1 = vpGetProfileFeatureStructureTypes(&profile, &propertyCount, &properties[0]);
+    VkResult result1 = vpGetProfileFeatureStructureTypes(&profile, nullptr, &propertyCount, &properties[0]);
     EXPECT_EQ(VK_INCOMPLETE, result1);
     EXPECT_EQ(3, propertyCount);
 
@@ -295,14 +295,14 @@ TEST(api_get_profile_property_structure_types, properties_full) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t propertyCount = 0;
-    VkResult result0 = vpGetProfilePropertyStructureTypes(&profile, &propertyCount, nullptr);
+    VkResult result0 = vpGetProfilePropertyStructureTypes(&profile, nullptr, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(4, propertyCount);
 
     propertyCount = 5;
 
     std::vector<VkStructureType> properties(propertyCount);
-    VkResult result1 = vpGetProfilePropertyStructureTypes(&profile, &propertyCount, &properties[0]);
+    VkResult result1 = vpGetProfilePropertyStructureTypes(&profile, nullptr, &propertyCount, &properties[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
     EXPECT_EQ(4, propertyCount);
 
@@ -316,14 +316,14 @@ TEST(api_get_profile_property_structure_types, properties_partial) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
 
     uint32_t propertyCount = 0;
-    VkResult result0 = vpGetProfilePropertyStructureTypes(&profile, &propertyCount, nullptr);
+    VkResult result0 = vpGetProfilePropertyStructureTypes(&profile, nullptr, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(4, propertyCount);
 
     propertyCount = 3;
 
     std::vector<VkStructureType> properties(propertyCount);
-    VkResult result1 = vpGetProfilePropertyStructureTypes(&profile, &propertyCount, &properties[0]);
+    VkResult result1 = vpGetProfilePropertyStructureTypes(&profile, nullptr, &propertyCount, &properties[0]);
     EXPECT_EQ(VK_INCOMPLETE, result1);
     EXPECT_EQ(3, propertyCount);
 
