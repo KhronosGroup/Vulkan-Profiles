@@ -1605,7 +1605,7 @@ VPAPI_ATTR VkResult vpGetProfileFormatProperties(const VpProfileProperties *pPro
     VkResult result = pBlockName == nullptr ? VK_SUCCESS : VK_INCOMPLETE;
 
     const std::vector<VpProfileProperties>& profiles = detail::GatherProfiles(*pProfile);
-    
+
     for (std::size_t i = 0, n = profiles.size(); i < n; ++i) {
         const char* profile_name = profiles[i].profileName;
 
@@ -3009,15 +3009,16 @@ class VulkanProfile():
         uname = self.key.upper()
         gen = ('#ifdef {0}\n'
                'namespace {1} {{\n').format(self.key, uname)
-        
+
+        gen += self.gen_featureChain()
         gen += self.gen_structTypeData()
-        
+
         if not self.multiple_variants:
             gen += self.gen_extensionData(self.merge_capabilities, 'instance')
             gen += self.gen_extensionData(self.merge_capabilities, 'device')
             gen += self.gen_structDesc(self.merge_capabilities, debugMessages)
         gen += '\n'
-        
+
         for key, value in self.split_capabilities.items():
             gen += ('namespace {0} {{').format(key)
             gen += self.gen_extensionData(value, 'instance')
@@ -3040,6 +3041,18 @@ class VulkanProfile():
                 foundExt = True
         gen += '};\n'
         return gen if foundExt else ''
+
+    def gen_featureChain(self):
+        feature = []
+        #self.eliminateAliases(feature)
+
+        gen = ''
+        #self.registry
+        gen += ('\n')
+        gen += ('struct Features {\n    ')
+        #gen += self.gen_structChainerFunc(feature, 'VkPhysicalDeviceFeatures2KHR')
+        gen += ('};\n')
+        return gen
 
     def gen_structTypeData(self, structDefs = None, name = None):
         gen = ''

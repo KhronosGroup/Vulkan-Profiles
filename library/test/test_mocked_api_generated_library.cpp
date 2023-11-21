@@ -19,7 +19,7 @@
  */
 
 #include "mock_vulkan_api.hpp"
-#include "test_vulkan_profiles.hpp"
+#include "wip_vulkan_profiles.hpp"
 
 void initProfile(MockVulkanAPI& mock, const VpProfileProperties& profile, uint32_t apiVersion = VK_API_VERSION_1_3,
                  int profileAreas = PROFILE_AREA_ALL_BITS) {
@@ -69,6 +69,28 @@ void fixProperties(MockVulkanAPI& mock) {
     props.properties.limits.maxImageDimension3D = 4096;
     props.properties.limits.maxImageDimensionCube = 4096;
     mock.SetProperties({VK_STRUCT(props)});
+}
+
+TEST(mocked_api_generated_library, internal_code) {
+    detail::FeaturesChain features;
+
+    VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT physicalDeviceVertexAttributeDivisorFeaturesEXT{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT, nullptr};
+    VkPhysicalDeviceVulkan11Features physicalDeviceVulkan11Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &physicalDeviceVertexAttributeDivisorFeaturesEXT};
+    VkPhysicalDeviceVulkan12Features physicalDeviceVulkan12Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &physicalDeviceVulkan11Features};
+    VkPhysicalDeviceFeatures2KHR physicalDeviceFeatures2KHR{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR, &physicalDeviceVulkan12Features};
+
+    VkBaseOutStructure* structure = detail::vpExtractStructure(&physicalDeviceFeatures2KHR, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES);
+    EXPECT_EQ(structure->sType, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES);
+    EXPECT_EQ(physicalDeviceVulkan12Features.pNext, &physicalDeviceVertexAttributeDivisorFeaturesEXT);
+
+    std::vector<VkStructureType> types;
+    types.push_back(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT);
+    types.push_back(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT);
+    types.push_back(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES);
+
+    features.Build(types);
+
+    std::string Log = features.Log();
 }
 
 TEST(mocked_api_generated_library, create_device) {
