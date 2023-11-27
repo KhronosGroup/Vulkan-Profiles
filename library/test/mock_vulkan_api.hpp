@@ -84,7 +84,7 @@ private:
 
     static MockVulkanAPI*   sInstance;
 
-    const void* GetStructure(const void* pNext, VkStructureType type)
+    const VkBaseOutStructure* GetStructure(const void* pNext, VkStructureType type)
     {
         const VkBaseOutStructure *p = static_cast<const VkBaseOutStructure*>(pNext);
         while (p != nullptr) {
@@ -97,11 +97,11 @@ private:
     void CheckChainedStructs(const void* pNext, const std::vector<VulkanStructData>& expectedStructs)
     {
         for (auto& VulkanStructData : expectedStructs) {
-            const void* pActualStructData = GetStructure(pNext, VulkanStructData.sType);
+            const VkBaseOutStructure* pActualStructData = GetStructure(pNext, VulkanStructData.sType);
             EXPECT_NE(pActualStructData, nullptr) << "Chained struct is missing";
             if (pActualStructData != nullptr) {
                 EXPECT_TRUE(memcmp(VulkanStructData.contents.data(),
-                                   static_cast<const uint8_t*>(pActualStructData) + sizeof(VkBaseInStructure),
+                                   reinterpret_cast<const uint8_t*>(pActualStructData) + sizeof(VkBaseInStructure),
                                    VulkanStructData.contents.size()) == 0) << "Chained struct data mismatch";
             }
         }

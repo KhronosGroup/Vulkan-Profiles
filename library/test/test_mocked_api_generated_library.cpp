@@ -83,14 +83,53 @@ TEST(mocked_api_generated_library, internal_code) {
     EXPECT_EQ(structure->sType, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES);
     EXPECT_EQ(physicalDeviceVulkan12Features.pNext, &physicalDeviceVertexAttributeDivisorFeaturesEXT);
 
-    std::vector<VkStructureType> types;
-    types.push_back(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT);
-    types.push_back(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT);
-    types.push_back(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES);
+    std::vector<VkStructureType> structureTypes;
+    structureTypes.push_back(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT);
+    structureTypes.push_back(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT);
+    structureTypes.push_back(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES);
 
-    features.Build(types);
+    VkPhysicalDeviceVulkan13Features outFeatures13{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES};
+    VkPhysicalDeviceVulkan12Features outFeatures12{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13};
+    VkPhysicalDeviceVulkan11Features outFeatures11{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12};
+    VkPhysicalDeviceFeatures2 outFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11};
+    VkBaseOutStructure* additionalFeatures = reinterpret_cast<VkBaseOutStructure*>(&outFeatures);
 
-    std::string Log = features.Log();
+    outFeatures.features.drawIndirectFirstInstance = VK_TRUE;
+    outFeatures.features.fullDrawIndexUint32 = VK_TRUE;
+    outFeatures.features.depthClamp = VK_TRUE;
+    outFeatures11.storageBuffer16BitAccess = VK_TRUE;
+    outFeatures11.shaderDrawParameters = VK_TRUE;
+
+    detail::GatherStructureTypes(structureTypes, additionalFeatures);
+    EXPECT_EQ(structureTypes[0], VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INLINE_UNIFORM_BLOCK_FEATURES_EXT);
+    EXPECT_EQ(structureTypes[1], VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_FEATURES_EXT);
+    EXPECT_EQ(structureTypes[2], VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES);
+    EXPECT_EQ(structureTypes[3], VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2);
+    EXPECT_EQ(structureTypes[4], VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES);
+    EXPECT_EQ(structureTypes[5], VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES);
+
+    features.Build(structureTypes);
+
+    const std::size_t size = sizeof(VkPhysicalDeviceFeatures) / sizeof(VkBool32);
+
+    features.requiredFeaturesChain.features.depthClamp = VK_TRUE;
+    features.requiredFeaturesChain.features.depthBiasClamp = VK_TRUE;
+    features.physicalDeviceVulkan11Features.storageBuffer16BitAccess = VK_TRUE;
+    features.physicalDeviceVulkan11Features.uniformAndStorageBuffer16BitAccess = VK_TRUE;
+
+    VkDeviceCreateInfo VkCreateInfo{VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO, &outFeatures};
+    VpDeviceCreateInfo VpCreateInfo{&VkCreateInfo, 0};
+
+    features.ApplyFeatures(&VpCreateInfo);
+
+    EXPECT_EQ(features.requiredFeaturesChain.features.drawIndirectFirstInstance, VK_TRUE);
+    EXPECT_EQ(features.requiredFeaturesChain.features.fullDrawIndexUint32, VK_TRUE);
+    EXPECT_EQ(features.requiredFeaturesChain.features.depthClamp, VK_TRUE);
+    EXPECT_EQ(features.requiredFeaturesChain.features.depthBiasClamp, VK_TRUE);
+
+    EXPECT_EQ(features.physicalDeviceVulkan11Features.storageBuffer16BitAccess, VK_TRUE);
+    EXPECT_EQ(features.physicalDeviceVulkan11Features.shaderDrawParameters, VK_TRUE);
+    EXPECT_EQ(features.physicalDeviceVulkan11Features.uniformAndStorageBuffer16BitAccess, VK_TRUE);
 }
 
 TEST(mocked_api_generated_library, create_device) {
@@ -125,7 +164,7 @@ TEST(mocked_api_generated_library, create_device) {
 
     mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {VK_STRUCT(features)});
 
-    VpDeviceCreateInfo createInfo{&inCreateInfo, &profile, 0};
+    VpDeviceCreateInfo createInfo{&inCreateInfo, 0, 1, &profile};
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
