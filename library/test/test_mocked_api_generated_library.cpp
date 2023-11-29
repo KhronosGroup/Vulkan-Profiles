@@ -19,7 +19,7 @@
  */
 
 #include "mock_vulkan_api.hpp"
-#include "wip_vulkan_profiles.hpp"
+#include "test_vulkan_profiles.hpp"
 
 void initProfile(MockVulkanAPI& mock, const VpProfileProperties& profile, uint32_t apiVersion = VK_API_VERSION_1_3,
                  int profileAreas = PROFILE_AREA_ALL_BITS) {

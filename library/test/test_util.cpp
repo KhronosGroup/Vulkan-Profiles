@@ -202,11 +202,11 @@ TEST(test_library_util, CheckExtension) {
                                                       VkExtensionProperties{"VK_KHR_shader_terminate_invocation", 1},
                                                       VkExtensionProperties{"VK_KHR_imageless_framebuffer", 1}};
 
-    EXPECT_TRUE(detail::vpCheckExtension(test_data, ARRAY_SIZE(test_data), "VK_KHR_synchronization2"));
+    EXPECT_TRUE(detail::CheckExtension(test_data, ARRAY_SIZE(test_data), "VK_KHR_synchronization2"));
 
-    EXPECT_TRUE(!detail::vpCheckExtension(test_data, ARRAY_SIZE(test_data), "VK_KHR_synchronization"));
-    EXPECT_TRUE(!detail::vpCheckExtension(test_data, ARRAY_SIZE(test_data), "KHR_synchronization2"));
-    EXPECT_TRUE(!detail::vpCheckExtension(test_data, ARRAY_SIZE(test_data), "VK_EXT_synchronization2"));
+    EXPECT_TRUE(!detail::CheckExtension(test_data, ARRAY_SIZE(test_data), "VK_KHR_synchronization"));
+    EXPECT_TRUE(!detail::CheckExtension(test_data, ARRAY_SIZE(test_data), "KHR_synchronization2"));
+    EXPECT_TRUE(!detail::CheckExtension(test_data, ARRAY_SIZE(test_data), "VK_EXT_synchronization2"));
 }
 
 TEST(test_library_util, GetDeviceExtensions) {
@@ -226,70 +226,19 @@ TEST(test_library_util, GetDeviceExtensions) {
 
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
-    profileInfo.pProfile = &profile;
+    profileInfo.enabledFullProfileCount = 1;
+    profileInfo.pEnabledFullProfiles = &profile;
 
     {
         info.enabledExtensionCount = 0;
         info.ppEnabledExtensionNames = nullptr;
-        profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
+        profileInfo.flags = 0;
 
         std::vector<const char *> extensions;
-        detail::vpGetExtensions(profileInfo.pCreateInfo->enabledExtensionCount,
-                                profileInfo.pCreateInfo->ppEnabledExtensionNames,
-                                ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions),
+        detail::GetExtensions(ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions),
                                 detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions,
-                                extensions,
-                                (profileInfo.flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) != 0,
-                                (profileInfo.flags & VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0);
+                                extensions);
         EXPECT_EQ(ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions), extensions.size());
-    }
-
-    {
-        info.enabledExtensionCount = ARRAY_SIZE(EXTENSIONS);
-        info.ppEnabledExtensionNames = EXTENSIONS;
-        profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
-
-        std::vector<const char *> extensions;
-        detail::vpGetExtensions(profileInfo.pCreateInfo->enabledExtensionCount,
-                                profileInfo.pCreateInfo->ppEnabledExtensionNames,
-                                ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions),
-                                detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions,
-                                extensions,
-                                (profileInfo.flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) != 0,
-                                (profileInfo.flags & VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0);
-        EXPECT_EQ(ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions) + 1, extensions.size());
-    }
-
-    {
-        info.enabledExtensionCount = ARRAY_SIZE(EXTENSIONS);
-        info.ppEnabledExtensionNames = EXTENSIONS;
-        profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
-
-        std::vector<const char *> extensions;
-        detail::vpGetExtensions(profileInfo.pCreateInfo->enabledExtensionCount,
-                                profileInfo.pCreateInfo->ppEnabledExtensionNames,
-                                ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions),
-                                detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions,
-                                extensions,
-                                (profileInfo.flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) != 0,
-                                (profileInfo.flags & VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0);
-        EXPECT_EQ(ARRAY_SIZE(EXTENSIONS), extensions.size());
-    }
-
-    {
-        info.enabledExtensionCount = 0;
-        info.ppEnabledExtensionNames = nullptr;
-        profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
-
-        std::vector<const char *> extensions;
-        detail::vpGetExtensions(profileInfo.pCreateInfo->enabledExtensionCount,
-                                profileInfo.pCreateInfo->ppEnabledExtensionNames,
-                                ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions),
-                                detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions,
-                                extensions,
-                                (profileInfo.flags & VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT) != 0,
-                                (profileInfo.flags & VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT) != 0);
-        EXPECT_EQ(0, extensions.size());
     }
 }
 
@@ -304,7 +253,7 @@ TEST(test_library_util, check_extension_not_found) {
     info.ppEnabledExtensionNames = EXTENSIONS;
 
     for (std::size_t i = 0, n = info.enabledExtensionCount; i < n; ++i) {
-        EXPECT_FALSE(detail::vpCheckExtension(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions,
+        EXPECT_FALSE(detail::CheckExtension(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions,
                                               ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions),
                                               info.ppEnabledExtensionNames[i]));
     }
@@ -321,7 +270,7 @@ TEST(test_library_util, check_extension_found) {
     info.ppEnabledExtensionNames = EXTENSIONS;
 
     for (std::size_t i = 0, n = info.enabledExtensionCount; i < n; ++i) {
-        EXPECT_TRUE(detail::vpCheckExtension(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions,
+        EXPECT_TRUE(detail::CheckExtension(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions,
                                              ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions),
                                              info.ppEnabledExtensionNames[i]));
     }
