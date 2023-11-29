@@ -46,7 +46,7 @@ TEST(mocked_api_create_instance, vulkan10_no_app_info) {
 
     mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {});
 
-    VpInstanceCreateInfo createInfo{ &inCreateInfo, &profile, VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT };
+    VpInstanceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
 
     VkInstance instance = VK_NULL_HANDLE;
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
@@ -82,7 +82,7 @@ TEST(mocked_api_create_instance, vulkan10_with_app_info) {
 
     mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {});
 
-    VpInstanceCreateInfo createInfo{ &inCreateInfo, &profile, VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT };
+    VpInstanceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
 
     VkInstance instance = VK_NULL_HANDLE;
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
@@ -114,7 +114,7 @@ TEST(mocked_api_create_instance, vulkan11) {
 
     mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {});
 
-    VpInstanceCreateInfo createInfo{ &inCreateInfo, &profile, VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT };
+    VpInstanceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
 
     VkInstance instance = VK_NULL_HANDLE;
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
@@ -146,7 +146,7 @@ TEST(mocked_api_create_instance, default_extensions) {
 
     mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {});
 
-    VpInstanceCreateInfo createInfo{ &inCreateInfo, &profile, 0 };
+    VpInstanceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
 
     VkInstance instance = VK_NULL_HANDLE;
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
@@ -186,7 +186,7 @@ TEST(mocked_api_create_instance, default_extensions_negative) {
 
     mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {});
 
-    VpInstanceCreateInfo createInfo{ &inCreateInfo, &profile, 0 };
+    VpInstanceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
 
     VkInstance instance = VK_NULL_HANDLE;
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
@@ -221,7 +221,7 @@ TEST(mocked_api_create_instance, override_extensions) {
 
     mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {});
 
-    VpInstanceCreateInfo createInfo{ &inCreateInfo, &profile, VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT };
+    VpInstanceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
 
     VkInstance instance = VK_NULL_HANDLE;
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
@@ -262,7 +262,7 @@ TEST(mocked_api_create_instance, merge_extensions) {
 
     mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {});
 
-    VpInstanceCreateInfo createInfo{ &inCreateInfo, &profile, VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT };
+    VpInstanceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
 
     VkInstance instance = VK_NULL_HANDLE;
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
@@ -302,7 +302,7 @@ TEST(mocked_api_create_instance, retain_chained_structs) {
         VK_STRUCT(debugReportCallback),
     });
 
-    VpInstanceCreateInfo createInfo{ &inCreateInfo, &profile, VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT };
+    VpInstanceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
 
     VkInstance instance = VK_NULL_HANDLE;
     VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);

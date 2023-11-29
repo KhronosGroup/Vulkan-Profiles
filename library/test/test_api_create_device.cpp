@@ -220,8 +220,9 @@ TEST(api_create_device_profile, overrite_with_unsupported_extensions) {
 
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
-    profileInfo.pProfile = &profile;
-    profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
+    profileInfo.enabledFullProfileCount = 1;
+    profileInfo.pEnabledFullProfiles = &profile;
+    profileInfo.flags = 0;
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
