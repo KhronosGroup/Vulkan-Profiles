@@ -164,10 +164,12 @@ HPP_HEADER = '''
 SHARED_INCLUDE = '''
 #include <cstddef>
 #include <cstdarg>
+#include <cstdio>
 #include <cstring>
 #include <cstdint>
 #include <cassert>
 #include <cmath>
+#include <string>
 #include <vector>
 #include <algorithm>
 #include <memory>
@@ -504,14 +506,17 @@ VPAPI_ATTR bool HasExtension(const std::vector<VkExtensionProperties>& list, con
 }
 
 VPAPI_ATTR bool CheckExtension(const VkExtensionProperties* supportedProperties, size_t supportedSize, const char *requestedExtension) {
+    bool found = false;
     for (size_t i = 0, n = supportedSize; i < n; ++i) {
         if (strcmp(supportedProperties[i].extensionName, requestedExtension) == 0) {
-            return true;
+            found = true;
+            break;
             // Drivers don't actually update their spec version, so we cannot rely on this
             // if (supportedProperties[i].specVersion >= expectedVersion) found = true;
         }
     }
-    return false;
+    VP_DEBUG_COND_MSGF(!found, "Unsupported extension: %s", requestedExtension);
+    return found;
 }
 
 VPAPI_ATTR bool CheckExtension(const std::vector<const char*>& extensions, const char* extension) {
@@ -582,6 +587,8 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupportSingleProfile(
             const uint32_t version_minor = VK_API_VERSION_MINOR(api_version);
             const uint32_t version_patch = VK_API_VERSION_PATCH(api_version);
 
+            VP_DEBUG_MSGF("Unsupported Profile API version %u.%u.%u on a Vulkan system with version %u.%u.%u", version_min_major, version_min_minor, version_min_patch, version_major, version_minor, version_patch);
+            
             *pSupported = VK_FALSE;
             unsupportedBlocks.push_back(block);
         }
@@ -733,6 +740,7 @@ VPAPI_ATTR VkResult vpGetProfileExtensionProperties(const VpProfileProperties *p
                             if (detail::HasExtension(results, variant.pInstanceExtensions[i])) {
                                 continue;
                             }
+                            results.push_back(variant.pInstanceExtensions[i]);
                         }
                         break;
                     case EXTENSION_DEVICE:
@@ -983,7 +991,7 @@ VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
             for (std::size_t v = 0, q = pCapsDesc->variantCount; v < q; ++v) {
                 const detail::VpVariantDesc* variant = &pCapsDesc->pVariants[v];
 
-                if (blocks[i].blockName != nullptr) {
+                if (strcmp(blocks[i].blockName, "") != 0) {
                     if (strcmp(variant->blockName, blocks[i].blockName) != 0) {
                         continue;
                     }
@@ -994,17 +1002,15 @@ VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
         }
     }
 
-    VkInstanceCreateInfo createInfo{ VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO, nullptr };
-    VkApplicationInfo appInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
-
-    createInfo.pApplicationInfo = &appInfo;
-
-    for (size_t i = 0; i < extensions.size(); ++i) {
-        if (strcmp(extensions[i], VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME) == 0) {
-            createInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
-            break;
-        }
+    VkApplicationInfo appInfo{VK_STRUCTURE_TYPE_APPLICATION_INFO};
+    if (pCreateInfo->pCreateInfo->pApplicationInfo != nullptr) {
+        appInfo = *pCreateInfo->pCreateInfo->pApplicationInfo;
+    } else if (!blocks.empty()) {
+        appInfo.apiVersion = vpGetProfileAPIVersion(&blocks[0].profiles);
     }
+
+    VkInstanceCreateInfo createInfo = *pCreateInfo->pCreateInfo;
+    createInfo.pApplicationInfo = &appInfo;
 
     // Need to include VK_KHR_get_physical_device_properties2 if we are on Vulkan 1.0
     if (createInfo.pApplicationInfo->apiVersion < VK_API_VERSION_1_1) {
@@ -1019,6 +1025,22 @@ VPAPI_ATTR VkResult vpCreateInstance(const VpInstanceCreateInfo *pCreateInfo,
             extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
         }
     }
+
+#ifdef __APPLE__
+    bool has_portability_ext = false;
+    for (std::size_t i = 0, n = extensions.size(); i < n; ++i) {
+        if (strcmp(extensions[i], VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME) == 0) {
+            has_portability_ext = true;
+            break;
+        }
+    }
+
+    if (!has_portability_ext) {
+        extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+    }
+
+    createInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+#endif
 
     if (!extensions.empty()) {
         createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
@@ -1105,6 +1127,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(VkInstance instanc
         return VK_ERROR_EXTENSION_NOT_PRESENT;
     }
 
+    VP_DEBUG_MSGF("Checking device support for profile %s (%s). You may find the details of the capabilities of this device on https://vulkan.gpuinfo.org/", pProfile->profileName, detail::vpGetDeviceAndDriverInfoString(physicalDevice, userData.gpdp2.pfnGetPhysicalDeviceProperties2).c_str());
 
     bool supported = true;
 
@@ -1128,6 +1151,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(VkInstance instanc
         VkPhysicalDeviceProperties props{};
         vkGetPhysicalDeviceProperties(physicalDevice, &props);
         if (!detail::vpCheckVersion(props.apiVersion, pProfileDesc->minApiVersion)) {
+            VP_DEBUG_MSGF("Unsupported API version: %u.%u.%u", VK_API_VERSION_MAJOR(pProfileDesc->minApiVersion), VK_API_VERSION_MINOR(pProfileDesc->minApiVersion), VK_API_VERSION_PATCH(pProfileDesc->minApiVersion));
             supported_profile = false;
         }
 

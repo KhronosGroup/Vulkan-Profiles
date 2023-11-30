@@ -23,18 +23,35 @@
 #include <vulkan/vulkan_android.h>
 #include <vulkan/vulkan_profiles.hpp>
 
+static void initInstanceExtensions(const VpProfileProperties& profile, std::vector<VkExtensionProperties>& properties,
+                                   std::vector<const char*>& outExtensions) {
+    uint32_t propertyCount = 0;
+    VkResult result0 = vpGetProfileInstanceExtensionProperties(&profile, nullptr, &propertyCount, nullptr);
+    EXPECT_EQ(VK_SUCCESS, result0);
+
+    properties.resize(propertyCount);
+    VkResult result1 = vpGetProfileInstanceExtensionProperties(&profile, nullptr, &propertyCount, &properties[0]);
+    EXPECT_EQ(VK_SUCCESS, result1);
+
+    for (std::size_t i = 0, n = properties.size(); i < n; ++i) {
+        outExtensions.push_back(properties[i].extensionName);
+    }
+}
+
 TEST(mocked_api_create_instance, vulkan10_no_app_info) {
     MockVulkanAPI mock;
 
     const VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
+
+    std::vector<VkExtensionProperties> properties;
+    std::vector<const char*> outExtensions;
+    initInstanceExtensions(profile, properties, outExtensions);
 
     std::vector<const char*> dummyLayerNames{ "VK_DUMMY_layer1", "VK_DUMMY_layer2" };
 
     VkInstanceCreateInfo inCreateInfo{ VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
     inCreateInfo.enabledLayerCount = static_cast<uint32_t>(dummyLayerNames.size());
     inCreateInfo.ppEnabledLayerNames = dummyLayerNames.data();
-
-    std::vector<const char*> outExtensions{VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME};
 
     VkApplicationInfo outAppInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
     outAppInfo.apiVersion = VP_ANDROID_BASELINE_2021_MIN_API_VERSION;
@@ -60,6 +77,10 @@ TEST(mocked_api_create_instance, vulkan10_with_app_info) {
 
     const VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
 
+    std::vector<VkExtensionProperties> properties;
+    std::vector<const char*> outExtensions;
+    initInstanceExtensions(profile, properties, outExtensions);
+
     std::vector<const char*> dummyLayerNames{ "VK_DUMMY_layer1" };
 
     VkApplicationInfo inAppInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
@@ -73,8 +94,6 @@ TEST(mocked_api_create_instance, vulkan10_with_app_info) {
     inCreateInfo.pApplicationInfo = &inAppInfo;
     inCreateInfo.enabledLayerCount = static_cast<uint32_t>(dummyLayerNames.size());
     inCreateInfo.ppEnabledLayerNames = dummyLayerNames.data();
-
-    std::vector<const char*> outExtensions{VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME};
 
     VkInstanceCreateInfo outCreateInfo = inCreateInfo;
     outCreateInfo.enabledExtensionCount = static_cast<uint32_t>(outExtensions.size());
@@ -96,6 +115,10 @@ TEST(mocked_api_create_instance, vulkan11) {
 
     const VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
 
+    std::vector<VkExtensionProperties> properties;
+    std::vector<const char*> outExtensions;
+    initInstanceExtensions(profile, properties, outExtensions);
+
     std::vector<const char*> dummyLayerNames{ "VK_DUMMY_layer1", "VK_DUMMY_layer2", "VK_DUMMY_layer3" };
 
     VkApplicationInfo inAppInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
@@ -111,6 +134,8 @@ TEST(mocked_api_create_instance, vulkan11) {
     inCreateInfo.ppEnabledLayerNames = dummyLayerNames.data();
 
     VkInstanceCreateInfo outCreateInfo = inCreateInfo;
+    outCreateInfo.enabledExtensionCount = static_cast<uint32_t>(outExtensions.size());
+    outCreateInfo.ppEnabledExtensionNames = outExtensions.data();
 
     mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {});
 
@@ -143,81 +168,6 @@ TEST(mocked_api_create_instance, default_extensions) {
     VkInstanceCreateInfo outCreateInfo = inCreateInfo;
     outCreateInfo.enabledExtensionCount = static_cast<uint32_t>(outExtensions.size());
     outCreateInfo.ppEnabledExtensionNames = outExtensions.data();
-
-    mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {});
-
-    VpInstanceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
-
-    VkInstance instance = VK_NULL_HANDLE;
-    VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
-
-    EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_TRUE(instance == mock.vkInstance);
-}
-
-TEST(mocked_api_create_instance, default_extensions_negative) {
-    MockVulkanAPI mock;
-
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
-
-    VkApplicationInfo inAppInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
-    inAppInfo.apiVersion = VK_API_VERSION_1_1;
-
-    std::vector<const char*> inExtensions{
-        VK_KHR_SURFACE_EXTENSION_NAME,
-        VK_KHR_DISPLAY_EXTENSION_NAME,
-        VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME
-    };
-
-    VkInstanceCreateInfo inCreateInfo{ VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
-    inCreateInfo.pApplicationInfo = &inAppInfo;
-    inCreateInfo.enabledExtensionCount = static_cast<uint32_t>(inExtensions.size());
-    inCreateInfo.ppEnabledExtensionNames = inExtensions.data();
-
-    std::vector<const char*> outExtensions(sizeof(detail::VP_ANDROID_BASELINE_2021::baseline_2021::instanceExtensions) /
-                                           sizeof(detail::VP_ANDROID_BASELINE_2021::baseline_2021::instanceExtensions[0]));
-    for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_ANDROID_BASELINE_2021::baseline_2021::instanceExtensions[i].extensionName;
-    }
-
-    VkInstanceCreateInfo outCreateInfo = inCreateInfo;
-    outCreateInfo.enabledExtensionCount = static_cast<uint32_t>(outExtensions.size());
-    outCreateInfo.ppEnabledExtensionNames = outExtensions.data();
-
-    mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {});
-
-    VpInstanceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
-
-    VkInstance instance = VK_NULL_HANDLE;
-    VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
-
-    // Currently application must not specify its own extension list if no override or merge
-    // flag is used. This leaves us the door open to use merge behavior as the default in
-    // the future if we ever decide to do so.
-    EXPECT_EQ(result, VK_ERROR_UNKNOWN);
-    EXPECT_TRUE(instance == VK_NULL_HANDLE);
-}
-
-TEST(mocked_api_create_instance, override_extensions) {
-    MockVulkanAPI mock;
-
-    VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
-
-    VkApplicationInfo inAppInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
-    inAppInfo.apiVersion = VK_API_VERSION_1_1;
-
-    std::vector<const char*> inExtensions{
-        VK_KHR_SURFACE_EXTENSION_NAME,
-        VK_KHR_DISPLAY_EXTENSION_NAME,
-        VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME
-    };
-
-    VkInstanceCreateInfo inCreateInfo{ VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
-    inCreateInfo.pApplicationInfo = &inAppInfo;
-    inCreateInfo.enabledExtensionCount = static_cast<uint32_t>(inExtensions.size());
-    inCreateInfo.ppEnabledExtensionNames = inExtensions.data();
-
-    VkInstanceCreateInfo outCreateInfo = inCreateInfo;
 
     mock.SetExpectedInstanceCreateInfo(&outCreateInfo, {});
 
@@ -277,6 +227,10 @@ TEST(mocked_api_create_instance, retain_chained_structs) {
 
     VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
 
+    std::vector<VkExtensionProperties> properties;
+    std::vector<const char*> outExtensions;
+    initInstanceExtensions(profile, properties, outExtensions);
+
     int dummyData;
     VkValidationFlagsEXT validationFlags{ VK_STRUCTURE_TYPE_VALIDATION_FLAGS_EXT };
     VkValidationFeaturesEXT validationFeatures{ VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT, &validationFlags };
@@ -285,8 +239,6 @@ TEST(mocked_api_create_instance, retain_chained_structs) {
     debugReportCallback.pUserData = &dummyData;
 
     VkInstanceCreateInfo inCreateInfo{ VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO, &debugReportCallback };
-
-    std::vector<const char*> outExtensions{ VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME };
 
     VkApplicationInfo outAppInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
     outAppInfo.apiVersion = VP_ANDROID_BASELINE_2021_MIN_API_VERSION;

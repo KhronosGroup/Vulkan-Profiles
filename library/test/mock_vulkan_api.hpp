@@ -319,7 +319,11 @@ public:
             EXPECT_EQ(pAllocator, &sInstance->vkAllocator) << "Unexpected allocator callbacks";
 
             EXPECT_EQ(pCreateInfo->sType, VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO);
-            EXPECT_EQ(pCreateInfo->flags, sInstance->m_pInstanceCreateInfo->flags);
+            VkInstanceCreateFlags flags = sInstance->m_pInstanceCreateInfo->flags;
+#ifdef __APPLE__
+            flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+#endif
+            EXPECT_EQ(pCreateInfo->flags, flags);
 
             EXPECT_EQ(pCreateInfo->pApplicationInfo != nullptr, sInstance->m_pInstanceCreateInfo->pApplicationInfo != nullptr) << "Presence of pApplicationInfo must match";
             if (pCreateInfo->pApplicationInfo != nullptr && sInstance->m_pInstanceCreateInfo->pApplicationInfo != nullptr) {
@@ -336,7 +340,8 @@ public:
                 uint32_t matches = 0;
                 for (uint32_t i = 0; i < sInstance->m_pInstanceCreateInfo->enabledLayerCount; ++i) {
                     for (uint32_t j = 0; j < pCreateInfo->enabledLayerCount; ++j) {
-                        if (strcmp(sInstance->m_pInstanceCreateInfo->ppEnabledLayerNames[i], pCreateInfo->ppEnabledLayerNames[j]) == 0) {
+                        if (strcmp(sInstance->m_pInstanceCreateInfo->ppEnabledLayerNames[i], pCreateInfo->ppEnabledLayerNames[j]) ==
+                            0) {
                             matches++;
                         }
                     }
@@ -344,17 +349,25 @@ public:
                 EXPECT_EQ(matches, sInstance->m_pInstanceCreateInfo->enabledLayerCount) << "Layer list does not match";
             }
 
-            EXPECT_EQ(pCreateInfo->enabledExtensionCount, sInstance->m_pInstanceCreateInfo->enabledExtensionCount);
+            std::vector<const char*> extensions;
+            for (uint32_t i = 0; i < sInstance->m_pInstanceCreateInfo->enabledExtensionCount; ++i) {
+                extensions.push_back(sInstance->m_pInstanceCreateInfo->ppEnabledExtensionNames[i]);
+            }
+#ifdef __APPLE__
+            extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+#endif
+
+            EXPECT_EQ(pCreateInfo->enabledExtensionCount, static_cast<uint32_t>(extensions.size()));
             {
                 uint32_t matches = 0;
-                for (uint32_t i = 0; i < sInstance->m_pInstanceCreateInfo->enabledExtensionCount; ++i) {
+                for (uint32_t i = 0; i < static_cast<uint32_t>(extensions.size()); ++i) {
                     for (uint32_t j = 0; j < pCreateInfo->enabledExtensionCount; ++j) {
-                        if (strcmp(sInstance->m_pInstanceCreateInfo->ppEnabledExtensionNames[i], pCreateInfo->ppEnabledExtensionNames[j]) == 0) {
+                        if (strcmp(extensions[i], pCreateInfo->ppEnabledExtensionNames[j]) == 0) {
                             matches++;
                         }
                     }
                 }
-                EXPECT_EQ(matches, sInstance->m_pInstanceCreateInfo->enabledExtensionCount) << "Extension list does not match";
+                EXPECT_EQ(matches, static_cast<uint32_t>(extensions.size())) << "Extension list does not match";
             }
 
             sInstance->CheckChainedStructs(pCreateInfo->pNext, sInstance->m_instanceCreateStructs);

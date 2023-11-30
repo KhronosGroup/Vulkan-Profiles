@@ -63,7 +63,8 @@ TEST(api_create_device_profile, overrite_with_profile_only) {
 
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
-    profileInfo.pProfile = &profile;
+    profileInfo.enabledFullProfileCount = 1;
+    profileInfo.pEnabledFullProfiles = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
@@ -87,8 +88,8 @@ TEST(api_create_device_profile, overrite_with_supported_extensions) {
 
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
-    profileInfo.pProfile = &profile;
-    profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
+    profileInfo.enabledFullProfileCount = 1;
+    profileInfo.pEnabledFullProfiles = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
@@ -113,7 +114,8 @@ TEST(api_create_device_profile, overrite_with_enabled_features) {
 
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
-    profileInfo.pProfile = &profile;
+    profileInfo.enabledFullProfileCount = 1;
+    profileInfo.pEnabledFullProfiles = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
@@ -141,7 +143,8 @@ TEST(api_create_device_profile, overrite_with_pnext_features) {
 
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
-    profileInfo.pProfile = &profile;
+    profileInfo.enabledFullProfileCount = 1;
+    profileInfo.pEnabledFullProfiles = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
     VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
@@ -163,25 +166,13 @@ TEST(api_create_device_profile, with_extensions_flag) {
 
     VpDeviceCreateInfo profileInfo = {};
     profileInfo.pCreateInfo = &info;
-    profileInfo.pProfile = &profile;
-
-    // override profile extensions
-    {
-        info.enabledExtensionCount = countof(extensions);
-        info.ppEnabledExtensionNames = extensions;
-        profileInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
-
-        VkDevice device = VK_NULL_HANDLE;
-        VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
-        EXPECT_TRUE(res == VK_SUCCESS);
-        EXPECT_TRUE(device != VK_NULL_HANDLE);
-    }
+    profileInfo.enabledFullProfileCount = 1;
+    profileInfo.pEnabledFullProfiles = &profile;
 
     // add extensions to the profile extension list
     {
         info.enabledExtensionCount = countof(extensions);
         info.ppEnabledExtensionNames = extensions;
-        profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
 
         VkDevice device = VK_NULL_HANDLE;
         VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
@@ -193,7 +184,6 @@ TEST(api_create_device_profile, with_extensions_flag) {
     {
         info.enabledExtensionCount = 0;
         info.ppEnabledExtensionNames = nullptr;
-        profileInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
 
         VkDevice device = VK_NULL_HANDLE;
         VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
