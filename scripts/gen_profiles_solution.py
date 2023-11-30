@@ -1269,8 +1269,12 @@ VPAPI_ATTR VkResult vpCreateDevice(VkPhysicalDevice physicalDevice, const VpDevi
         pCreateInfo->enabledProfileBlockCount, pCreateInfo->pEnabledProfileBlocks);
 
     std::unique_ptr<detail::FeaturesChain> chain = std::make_unique<detail::FeaturesChain>();
-    std::vector<const char*> extensions;
     std::vector<VkStructureType> structureTypes;
+
+    std::vector<const char*> extensions;
+    for (std::uint32_t i = 0, n = pCreateInfo->pCreateInfo->enabledExtensionCount; i < n; ++i) {
+        extensions.push_back(pCreateInfo->pCreateInfo->ppEnabledExtensionNames[i]);
+    }
 
     for (std::size_t i = 0, n = blocks.size(); i < n; ++i) {
         const detail::VpProfileDesc* pProfileDesc = detail::vpGetProfileDesc(blocks[i].profiles.profileName);
