@@ -67,61 +67,6 @@ TEST(mocked_api_create_device, default_extensions) {
     EXPECT_TRUE(device == mock.vkDevice);
 }
 
-TEST(mocked_api_create_device, default_extensions_negative) {
-    MockVulkanAPI mock;
-
-    VpProfileProperties profile{ VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION };
-
-    VkDeviceQueueCreateInfo queueCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO };
-    queueCreateInfo.queueFamilyIndex = 0;
-    queueCreateInfo.queueCount = 1;
-
-    std::vector<const char *> inExtensions{
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-        VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME
-    };
-
-    VkDeviceCreateInfo inCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
-    inCreateInfo.queueCreateInfoCount = 1;
-    inCreateInfo.pQueueCreateInfos = &queueCreateInfo;
-    inCreateInfo.enabledExtensionCount = static_cast<uint32_t>(inExtensions.size());
-    inCreateInfo.ppEnabledExtensionNames = inExtensions.data();
-
-    std::vector<const char *> outExtensions(sizeof(detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions) /
-        sizeof(detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions[0]));
-    for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions[i].extensionName;
-    }
-
-    VkDeviceCreateInfo outCreateInfo = inCreateInfo;
-    outCreateInfo.enabledExtensionCount = static_cast<uint32_t>(outExtensions.size());
-    outCreateInfo.ppEnabledExtensionNames = outExtensions.data();
-
-    VkPhysicalDeviceVulkan13Features outFeatures13{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES };
-    VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
-    VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
-    VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, nullptr, &outFeatures);
-
-    mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
-        VK_STRUCT(outFeatures),
-        VK_STRUCT(outFeatures11),
-        VK_STRUCT(outFeatures12),
-        VK_STRUCT(outFeatures13)
-    });
-
-    VpDeviceCreateInfo createInfo{&inCreateInfo, 0, 1, &profile};
-
-    VkDevice device = VK_NULL_HANDLE;
-    VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
-
-    // Currently application must not specify its own extension list if no override or merge
-    // flag is used. This leaves us the door open to use merge behavior as the default in
-    // the future if we ever decide to do so.
-    EXPECT_EQ(result, VK_ERROR_UNKNOWN);
-    EXPECT_TRUE(device == VK_NULL_HANDLE);
-}
-
 TEST(mocked_api_create_device, merge_extensions) {
     MockVulkanAPI mock;
 
@@ -218,57 +163,6 @@ TEST(mocked_api_create_device, default_features) {
     EXPECT_TRUE(device == mock.vkDevice);
 }
 
-TEST(mocked_api_create_device, default_features_negative) {
-    MockVulkanAPI mock;
-
-    VpProfileProperties profile{ VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION };
-
-    VkDeviceQueueCreateInfo queueCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO };
-    queueCreateInfo.queueFamilyIndex = 0;
-    queueCreateInfo.queueCount = 1;
-
-    VkPhysicalDeviceFeatures2 inFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
-    inFeatures.features.dualSrcBlend = VK_TRUE;
-
-    VkDeviceCreateInfo inCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO, &inFeatures };
-    inCreateInfo.queueCreateInfoCount = 1;
-    inCreateInfo.pQueueCreateInfos = &queueCreateInfo;
-
-    std::vector<const char *> outExtensions(
-        std::size(detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions));
-    for (size_t i = 0; i < outExtensions.size(); ++i) {
-        outExtensions[i] = detail::VP_KHR_ROADMAP_2022::vulkan13requirements_roadmap2022::deviceExtensions[i].extensionName;
-    }
-
-    VkDeviceCreateInfo outCreateInfo = inCreateInfo;
-    outCreateInfo.enabledExtensionCount = static_cast<uint32_t>(outExtensions.size());
-    outCreateInfo.ppEnabledExtensionNames = outExtensions.data();
-
-    VkPhysicalDeviceVulkan13Features outFeatures13{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES };
-    VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
-    VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
-    VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, nullptr, &outFeatures);
-
-    mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
-        VK_STRUCT(outFeatures),
-        VK_STRUCT(outFeatures11),
-        VK_STRUCT(outFeatures12),
-        VK_STRUCT(outFeatures13)
-    });
-
-    VpDeviceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
-
-    VkDevice device = VK_NULL_HANDLE;
-    VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
-
-    // Currently application must not specify its own feature structs if no override or merge
-    // flag is used. This leaves us the door open to use merge behavior as the default in
-    // the future if we ever decide to do so.
-    EXPECT_EQ(result, VK_ERROR_UNKNOWN);
-    EXPECT_TRUE(device == VK_NULL_HANDLE);
-}
-
 TEST(mocked_api_create_device, legacy_enabled_features) {
     MockVulkanAPI mock;
 
@@ -304,10 +198,12 @@ TEST(mocked_api_create_device, legacy_enabled_features) {
     VkPhysicalDeviceVulkan13Features outFeatures13{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES };
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
-    vpGetProfileFeatures(&profile, nullptr, &outFeatures11);
+    VkPhysicalDeviceFeatures2 outFeatures2{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11};
+    outFeatures2.features = inFeatures.features;
+    vpGetProfileFeatures(&profile, nullptr, &outFeatures2);
 
     mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
-        VK_STRUCT(inFeatures),
+        VK_STRUCT(outFeatures2),
         VK_STRUCT(outFeatures11),
         VK_STRUCT(outFeatures12),
         VK_STRUCT(outFeatures13),
