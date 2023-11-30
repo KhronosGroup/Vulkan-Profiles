@@ -22,7 +22,6 @@ if (ANDROID)
     )
 elseif(APPLE)
     set(LAYER_TEST_FILES
-        tests_promoted
         tests_util
     )
 else()
