@@ -19,6 +19,7 @@
 
 #include "profiles.h"
 #include "profiles_interface.h"
+#include "vulkan/vk_layer.h"
 #include <cassert>
 
 uint32_t loader_layer_iface_version = CURRENT_LOADER_LAYER_INTERFACE_VERSION;

@@ -2635,6 +2635,10 @@ class VulkanRegistry():
         if 'VkPhysicalDeviceExternalFormatResolvePropertiesANDROID' in self.structs:
             self.structs['VkPhysicalDeviceExternalFormatResolvePropertiesANDROID'].members['nullColorAttachmentWithExternalFormatResolve'].limittype = 'not'
 
+        if 'VkPhysicalDeviceRenderPassStripedPropertiesARM' in self.structs:
+            self.structs['VkPhysicalDeviceRenderPassStripedPropertiesARM'].members['renderPassStripeGranularity'].limittype = 'min'
+            self.structs['VkPhysicalDeviceRenderPassStripedPropertiesARM'].members['maxRenderPassStripes'].limittype = 'max'
+
         # TODO: The registry xml is also missing limittype definitions for format and queue family properties
         # For now we just add the important ones, this needs a larger overhaul in the vk.xml
         self.structs['VkFormatProperties'].members['linearTilingFeatures'].limittype = 'bitmask'
