@@ -275,6 +275,34 @@ Where:
 * `profileName` is the name of the profile
 * `specVersion` is the version of the profile specification
 
+When a profile supports multiple variants, it might be useful to know what capabilities blocks where used to verify the profile or what capabilities blocks are not supported when the profile is not verified on the platform. This is done using the following command:
+
+```C++
+VkResult vpGetInstanceProfileVariantsSupport(
+    const char*                     pLayerName,
+    const VpProfileProperties*      pProfile,
+    VkBool32*                       pSupported,
+    uint32_t*                       pPropertyCount,
+    VpBlockProperties*              pProperties);
+```
+
+Where:
+* `pLayerName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming the layer to retrieve extensions from (analogous to the corresponding parameter of `vkEnumerateInstanceExtensionProperties`).
+* `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile to check support for.
+* `pSupported` is a pointer to a `VkBool32`, which is set to `VK_TRUE` to indicate support, and `VK_FALSE` otherwise.
+* `pPropertyCount` is a pointer to an integer related to the number of `VpBlockProperties`. If `pSupported` is set to `VK_TRUE`, then the value 
+* `pProperties` is a pointer to an array of `VpBlockProperties` structures. If `pSupported` is set to `VK_TRUE`, then the array of blocks contains the blocks used to validate the profile. It `pSupported` is set to `VK_FALSE`, then the array contains the blocks not supported on the platform.
+
+The `VpBlockProperties` structure is defined as follows:
+
+```C++
+typedef struct VpBlockProperties {
+    VpProfileProperties             profiles;
+    uint32_t                        apiVersion;
+    char                            blockName[VP_MAX_PROFILE_NAME_SIZE];
+} VpBlockProperties;
+```
+
 #### Creating instance with profile
 
 The Vulkan Profiles library provides the following helper function that enables easier adoption of profiles by automatically including profile requirements in the Vulkan instance creation process:
@@ -310,7 +338,7 @@ Where:
 * `enabledFullProfileCount` an integer related to the number of profiles to enable listed in `pEnabledFullProfiles`.
 * `pEnabledFullProfiles` is a pointer to an array of `VpProfileProperties` structure specifying the profiles to enable. If not profiles is enabled, the value is nullptr.
 * `enabledProfileBlockCount` an integer related to the number of profile capabilities blocks to enable listed in `pEnabledProfileBlocks`.
-* `pEnabledProfileBlocks` is a pointer to an array of `VpBlockProperties` structure specifying the profiles capabilities blocks to enable. If not capabilities block is enabled, the value is nullptr.
+* `pEnabledProfileBlocks` is a pointer to an array of `VpBlockProperties` structure specifying the profiles capabilities blocks to enable. If not capabilities block is enabled, the value is `NULL`.
 
 The behavior of `vpCreateInstance` is to enable all extensions and features listed by the profiles, the capabilities blocks and in the `pNext` chain of `VkInstanceCreateInfo`.
 
@@ -334,6 +362,15 @@ Where:
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile to check support for.
 * `pSupported` is a pointer to a `VkBool32`, which is set to `VK_TRUE` to indicate support, and `VK_FALSE` otherwise.
 
+The `VpProfileProperties` structure is defined as follows:
+
+```C++
+typedef struct VpProfileProperties {
+    char                            profileName[VP_MAX_PROFILE_NAME_SIZE];
+    uint32_t                        specVersion;
+} VpProfileProperties;
+```
+
 When a profile supports multiple variants, it might be useful to know what capabilities blocks where used to verify the profile or what capabilities blocks are not supported when the profile is not verified on the platform. This is done using the following command:
 
 ```C++
@@ -353,6 +390,16 @@ Where:
 * `pSupported` is a pointer to a `VkBool32`, which is set to `VK_TRUE` to indicate support, and `VK_FALSE` otherwise.
 * `pPropertyCount` is a pointer to an integer related to the number of `VpBlockProperties`. If `pSupported` is set to `VK_TRUE`, then the value 
 * `pProperties` is a pointer to an array of `VpBlockProperties` structures. If `pSupported` is set to `VK_TRUE`, then the array of blocks contains the blocks used to validate the profile. It `pSupported` is set to `VK_FALSE`, then the array contains the blocks not supported on the platform.
+
+The `VpBlockProperties` structure is defined as follows:
+
+```C++
+typedef struct VpBlockProperties {
+    VpProfileProperties             profiles;
+    uint32_t                        apiVersion;
+    char                            blockName[VP_MAX_PROFILE_NAME_SIZE];
+} VpBlockProperties;
+```
 
 #### Creating device with profile
 
@@ -389,9 +436,9 @@ Where:
 * `pCreateInfo` is a pointer to the `VkDeviceCreateInfo` structure specifying the usual Vulkan device creation info.
 * `flags` is a bitmask of `VpDeviceCreateFlagBits` indicating the behavior of the instance.
 * `enabledFullProfileCount` an integer related to the number of profiles to enable listed in `pEnabledFullProfiles`.
-* `pEnabledFullProfiles` is a pointer to an array of `VpProfileProperties` structure specifying the profiles to enable. If not profiles is enabled, the value is nullptr.
+* `pEnabledFullProfiles` is a pointer to an array of `VpProfileProperties` structure specifying the profiles to enable. If not profiles is enabled, the value is `NULL`.
 * `enabledProfileBlockCount` an integer related to the number of profile capabilities blocks to enable listed in `pEnabledProfileBlocks`.
-* `pEnabledProfileBlocks` is a pointer to an array of `VpBlockProperties` structure specifying the profiles capabilities blocks to enable. If not capabilities block is enabled, the value is nullptr.
+* `pEnabledProfileBlocks` is a pointer to an array of `VpBlockProperties` structure specifying the profiles capabilities blocks to enable. If not capabilities block is enabled, the value is `NULL`.
 
 The `VpDeviceCreateFlagBits` enumeration is defined as follows:
 
@@ -460,8 +507,8 @@ In order to query whether a Vulkan profile has multiple variants, use the follow
 
 ```C++
 VkResult vpHasMultipleVariantsProfile(
-    const VpProfileProperties *pProfile,
-    VkBool32 *pHasMultipleVariants);
+    const VpProfileProperties*      pProfile,
+    VkBool32*                       pHasMultipleVariants);
 ```
 
 Where:
@@ -509,15 +556,18 @@ In order to query the list of instance extensions required by a profile, use the
 ```C++
 VkResult vpGetProfileInstanceExtensionProperties(
     const VpProfileProperties*      pProfile,
+    const char*                     pBlockName,
     uint32_t*                       pPropertyCount,
     VkExtensionProperties*          pProperties);
 ```
 
 Where:
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
+* `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pPropertyCount` is a pointer to an integer related to the number of instance extensions available or queried, as described below.
 * `pProperties` is either `NULL` or a pointer to an array of `VkExtensionProperties` structures.
 
+If `pBlockName` is `NULL`, then the query returns the list of `VkExtensionProperties` of all capabilities blocks referenced by the profile `pProfile`. Otherwise the query returns the list of `VkExtensionProperties` referenced by the `pBlockName` capabilities block.
 If `pProperties` is `NULL`, then the number of instance extensions required by the profile is returned in `pPropertyCount`. Otherwise, `pPropertyCount` must point to a variable set by the user to the number of elements in the `pProperties` array, and on return the variable is overwritten with the number of structures actually written to `pProperties`. If `pPropertyCount` is less than the number of instance extensions required by the profile, at most `pPropertyCount` structures will be written, and `VK_INCOMPLETE` will be returned instead of `VK_SUCCESS`, to indicate that not all the available properties were returned.
 
 #### Query profile device extensions
@@ -527,15 +577,18 @@ In order to query the list of device extensions required by a profile, use the f
 ```C++
 VkResult vpGetProfileDeviceExtensionProperties(
     const VpProfileProperties*      pProfile,
+    const char*                     pBlockName,
     uint32_t*                       pPropertyCount,
     VkExtensionProperties*          pProperties);
 ```
 
 Where:
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
+* `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pPropertyCount` is a pointer to an integer related to the number of device extensions available or queried, as described below.
 * `pProperties` is either `NULL` or a pointer to an array of `VkExtensionProperties` structures.
 
+If `pBlockName` is `NULL`, then the query returns the list of `VkExtensionProperties` of all capabilities blocks referenced by the profile `pProfile`. Otherwise the query returns the list of `VkExtensionProperties` referenced by the `pBlockName` capabilities block.
 If `pProperties` is `NULL`, then the number of device extensions required by the profile is returned in `pPropertyCount`. Otherwise, `pPropertyCount` must point to a variable set by the user to the number of elements in the `pProperties` array, and on return the variable is overwritten with the number of structures actually written to `pProperties`. If `pPropertyCount` is less than the number of device extensions required by the profile, at most `pPropertyCount` structures will be written, and `VK_INCOMPLETE` will be returned instead of `VK_SUCCESS`, to indicate that not all the available properties were returned.
 
 #### Query profile features
@@ -545,29 +598,35 @@ In order to query the structure types of the Vulkan device feature structures fo
 ```C++
 VkResult vpGetProfileFeatureStructureTypes(
     const VpProfileProperties*      pProfile,
+    const char*                     pBlockName,
     uint32_t*                       pStructureTypeCount,
     VkStructureType*                pStructureTypes);
 ```
 
 Where:
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
+* `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pStructureTypeCount` is a pointer to an integer related to the number of device feature structure types available or queried, as described below.
 * `pStructureTypes` is either `NULL` or a pointer to an array of `VkStructureType` values.
 
+If `pBlockName` is `NULL`, then the query returns the list of feature `VkStructureType` of all capabilities blocks referenced by the profile `pProfile`. Otherwise the query returns the list of `VkExtensionProperties` referenced by the `pBlockName` capabilities block.
 If `pStructureTypes` is `NULL`, then the number of device feature structure types defined by the profile is returned in `pStructureTypeCount`. Otherwise, `pStructureTypeCount` must point to a variable set by the user to the number of elements in the `pStructureTypes` array, and on return the variable is overwritten with the number of values actually written to `pStructureTypes`. If `pStructureTypeCount` is less than the number of device feature structure types defined by the profile, at most `pStructureTypeCount` values will be written, and `VK_INCOMPLETE` will be returned instead of `VK_SUCCESS`, to indicate that not all the available values were returned.
 
 In order to query the device features required by a profile, use the following command:
 
 ```C++
-void vpGetProfileFeatures(
+VkResult vpGetProfileFeatures(
     const VpProfileProperties*      pProfile,
+    const char*                     pBlockName,
     void*                           pNext);
 ```
 
 Where:
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
+* `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pNext` is a `pNext` chain of Vulkan device feature structures (with or without a `VkPhysicalDeviceFeatures2` feature structure).
 
+If `pBlockName` is `NULL`, then the query fills the structures in `pNext` chain of all capabilities blocks referenced by the profile `pProfile`. Otherwise the query fills the structures in `pNext` chain referenced by the `pBlockName` capabilities block.
 If the `pNext` chain contains a Vulkan device feature structure for which the profile defines corresponding feature requirements, then the structure is modified to include those features. Other fields of the Vulkan device feature structure not defined by the profile will be left unmodified, and structures not defined in the profile will be ignored (left unmodified as a whole).
 
 #### Query profile device properties
@@ -577,29 +636,36 @@ In order to query the structure types of the Vulkan device property structures f
 ```C++
 VkResult vpGetProfilePropertyStructureTypes(
     const VpProfileProperties*      pProfile,
+    const char*                     pBlockName,
     uint32_t*                       pStructureTypeCount,
     VkStructureType*                pStructureTypes);
 ```
 
 Where:
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
+* `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pStructureTypeCount` is a pointer to an integer related to the number of device property structure types available or queried, as described below.
 * `pStructureTypes` is either `NULL` or a pointer to an array of `VkStructureType` enums.
 
+If `pBlockName` is `NULL`, then the query returns the list of property `VkStructureType` of all capabilities blocks referenced by the profile `pProfile`. Otherwise the query returns the list of `VkStructureType` referenced by the `pBlockName` capabilities block.
 If `pStructureTypes` is `NULL`, then the number of device property structure types defined by the profile is returned in `pStructureTypeCount`. Otherwise, `pStructureTypeCount` must point to a variable set by the user to the number of elements in the `pStructureTypes` array, and on return the variable is overwritten with the number of values actually written to `pStructureTypes`. If `pStructureTypeCount` is less than the number of device property structure types defined by the profile, at most `pStructureTypeCount` values will be written, and `VK_INCOMPLETE` will be returned instead of `VK_SUCCESS`, to indicate that not all the available values were returned.
 
 In order to query the device properties required by a profile, use the following command:
 
 ```C++
-void vpGetProfileProperties(
+VkResult vpGetProfileProperties(
     const VpProfileProperties*      pProfile,
+    const char*                     pBlockName,
     void*                           pNext);
 ```
 
 Where:
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
+* `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pNext` is a `pNext` chain of Vulkan device property structures (with or without a `VkPhysicalDeviceProperties2` property structure).
 
+If `pBlockName` is `NULL` and the `pProfile` referenced a profile with multiple variants, the execution of the function fail and return `VK_ERROR_UNKNOWN`.
+If `pBlockName` is `NULL`, then the query fills the structures in `pNext` chain of all capabilities blocks referenced by the profile `pProfile`. Otherwise the query fills the structures in `pNext` chain referenced by the `pBlockName` capabilities block.
 If the `pNext` chain contains a Vulkan device property structure for which the profile defines corresponding property/limit requirements then the structure is modified to include those properties/limits. Other fields of the Vulkan device property structure not defined by the profile will be left unmodified and structures not defined in the profile will be ignored (left unmodified as a whole).
 
 #### Query profile format properties
@@ -609,15 +675,18 @@ In order to query the structure types of the Vulkan format property structures f
 ```C++
 VkResult vpGetProfileFormatStructureTypes(
     const VpProfileProperties*      pProfile,
+    const char*                     pBlockName,
     uint32_t*                       pStructureTypeCount,
     VkStructureType*                pStructureTypes);
 ```
 
 Where:
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
+* `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pStructureTypeCount` is a pointer to an integer related to the number of format property structure types available or queried, as described below.
 * `pStructureTypes` is either `NULL` or a pointer to an array of `VkStructureType` enums.
 
+If `pBlockName` is `NULL`, then the query returns the list of format property `VkStructureType` of all capabilities blocks referenced by the profile `pProfile`. Otherwise the query returns the list of `VkStructureType` referenced by the `pBlockName` capabilities block.
 If `pStructureTypes` is `NULL`, then the number of format property structure types defined by the profile is returned in `pStructureTypeCount`. Otherwise, `pStructureTypeCount` must point to a variable set by the user to the number of elements in the `pStructureTypes` array, and on return the variable is overwritten with the number of values actually written to `pStructureTypes`. If `pStructureTypeCount` is less than the number of format property structure types defined by the profile, at most `pStructureTypeCount` values will be written, and `VK_INCOMPLETE` will be returned instead of `VK_SUCCESS`, to indicate that not all the available values were returned.
 
 In order to query the list of formats required by a profile, use the following command:
@@ -625,29 +694,35 @@ In order to query the list of formats required by a profile, use the following c
 ```C++
 VkResult vpGetProfileFormats(
     const VpProfileProperties*      pProfile,
+    const char*                     pBlockName,
     uint32_t*                       pFormatCount,
     VkFormat*                       pFormats);
 ```
 
 Where:
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
+* `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pFormatCount` is a pointer to an integer related to the number of formats available or queried, as described below.
 * `pFormats` is either `NULL` or a pointer to an array of `VkFormat` values.
 
+If `pBlockName` is `NULL`, then the query returns the formats of all capabilities blocks referenced by the profile `pProfile`. Otherwise the query returns the formats referenced by the `pBlockName` capabilities block of the profile.
 If `pFormats` is `NULL`, then the number of formats required by the profile is returned in `pFormatCount`. Otherwise, `pFormatCount` must point to a variable set by the user to the number of elements in the `pFormats` array, and on return the variable is overwritten with the number of values actually written to `pProperties`. If `pPropertyCount` is less than the number of device extensions required by the profile, at most `pPropertyCount` values will be written, and `VK_INCOMPLETE` will be returned instead of `VK_SUCCESS`, to indicate that not all the available values were returned.
 
 In order to query the format properties required by a profile for a specific format, use the following command:
 
 ```C++
-void vpGetProfileFormatProperties(
+VkResult vpGetProfileFormatProperties(
     const VpProfileProperties*      pProfile,
+    const char*                     pBlockName,
     VkFormat                        format,
     void*                           pNext);
 ```
 
 Where:
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
+* `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `format` is the format for which required properties are queried.
 * `pNext` is a `pNext` chain of Vulkan device property structures (with or without `VkPhysicalDeviceFormatProperties2` or `VkPhysicalDeviceFormatProperties3` property structures).
 
+If `pBlockName` is `NULL`, then the query fills the structures in `pNext` chain of all capabilities blocks referenced by the profile `pProfile`. Otherwise the query fills the structures in `pNext` chain referenced by the `pBlockName` capabilities block.
 If the `pNext` chain contains a Vulkan format property structure for which the profile defines corresponding requirements then the structure is modified to include those properties. Other fields of the Vulkan format property structure not defined by the profile will be left unmodified and structures not defined in the profile will be ignored (left unmodified as a whole).
