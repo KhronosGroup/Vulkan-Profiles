@@ -12,23 +12,25 @@
 - [Vulkan Profiles library](#vulkan-profiles-library)
   - [Overview](#overview)
   - [Building](#building)
+    - [Generating the library with a custom set of Vulkan Profiles](#generating-the-library-with-a-custom-set-of-vulkan-profiles)
   - [Basic usage](#basic-usage)
-  - [Advanced usage](#advanced-usage)
-    - [Overriding API version](#overriding-api-version)
-    - [Overriding extensions](#overriding-extensions)
-    - [Merging extensions](#merging-extensions)
-    - [Overriding features](#overriding-features)
-    - [Merging/overriding individual features](#mergingoverriding-individual-features)
+  - [Advanced usages](#advanced-usage)
+    - [Specifying the API version](#specifying-the-api-version)
+    - [Specifying additional extensions](#specifying-additional-extensions)
+    - [Specifying additional features](#specifying-additional-features)
     - [Disabling robust access](#disabling-robust-access)
   - [API reference](#api-reference)
     - [Preprocessor definitions](#preprocessor-definitions)
     - [Profile support and usage](#profile-support-and-usage)
-      - [Check instance level support](#check-instance-level-support)
-      - [Create instance with profile](#create-instance-with-profile)
-      - [Check device level support](#check-device-level-support)
-      - [Create device with profile](#create-device-with-profile)
+      - [Checking instance level support](#checking-instance-level-support)
+      - [Creating instance with profile](#creating-instance-with-profile)
+      - [Checking device level support](#checking-device-level-support)
+      - [Creating device with profile](#creating-device-with-profile)
     - [Profile queries](#profile-queries)
       - [Query profiles](#query-profiles)
+      - [Query profile with multiple variants](#query-profile-with-multiple-variants)
+      - [Query profile required profiles](#query-profile-required-profiles)
+      - [Query profile Vulkan API version](#query-profile-vulkan-api-version)
       - [Query profile fallbacks](#query-profile-fallbacks)
       - [Query profile instance extensions](#query-profile-instance-extensions)
       - [Query profile device extensions](#query-profile-device-extensions)
@@ -40,19 +42,35 @@
 
 The Vulkan Profiles library is a helper library that provides the following set of convenience APIs to developers:
 
-* Capability introspection APIs to query the extensions, features, properties, formats, and queue families required by a particular Vulkan profile.
-* APIs to verify instance-level and device-level support for a particular Vulkan profile.
-* Instance and device creation APIs that automatically enable the extensions and features required by a particular Vulkan profile.
+* Capability introspection APIs to query the extensions, features, properties, and formats required by a particular Vulkan profile.
+* APIs to verify instance-level and device-level support for a particular Vulkan profile or a set of capabilities blocks of a Vulkan Profile.
+* Instance and device creation APIs that automatically enable the extensions and features required by selected Vulkan Profiles and selected specific Vulkan Profiles capabilities blocks. Enabling a Vulkan Profile can be thought as explicitly elevating the minimum Vulkan capabilities requirements for the user system.
 
 ## Building
 
-The Vulkan Profiles library is provided as a header-only C++ library (`vulkan/vulkan_profiles.hpp`) that is bundled with the Vulkan SDK. C++ applications thus can simply use the Vulkan Profiles library by including this header-only C++ library.
+The Vulkan Profiles library is provided as a generated header-only C++ library (`vulkan/vulkan_profiles.hpp`) that is bundled with the Vulkan SDK. C++ applications thus can simply use the Vulkan Profiles library by including this header-only C++ library.
 
 The library is primarily designed to be dynamically linked to the Vulkan implementation (loader or ICD). If applications want to dynamically load Vulkan then they have to make sure (one way or another) that the Vulkan API symbols seen by the Vulkan Profiles header-only library are valid and correspond to the dynamically loaded entry points.
 
 In order to enable support for other language bindings, the library is also available in a header + source pair (`vulkan/vulkan_profiles.h` and `vulkan_profiles.cpp`). There is no build configuration for this variant of the library as it's not meant to be used as a standalone static or dynamic library. Instead, developers can drop the files into their own project to build the Vulkan profiles library into it. This may also come handy if the developer would like to optimize compilation times by not having to include the rather large header-only library in multiple source files.
 
 The profile definitions are enabled depending on the pre-processor definitions coming from the Vulkan headers; thus the application has to make sure to configure the right set of pre-processor definitions. As an example, the `VP_ANDROID_baseline_2021` profile depends on the `VK_KHR_android_surface` instance extension; thus in order to use this profile the application must define `VK_USE_PLATFORM_ANDROID_KHR`.
+
+### Generating the library with a custom set of Vulkan Profiles
+
+For many use cases, existing Vulkan Profiles are not very useful, a Vulkan application may require to create it's own Vulkan Profiles to better represent the ecosystem devices the Vulkan application is designed to run on and the rendering code paths.
+
+For this purpose, the Vulkan SDK ships with the `gen_profiles_solution.py` python script in the `share/vulkan/registry` directory. To use this script, simply copy your Vulkan Profiles in a `profiles` directory and use the command:
+
+```
+    python gen_profiles_solution.py --registry ./vk.xml --input ./profiles --output-library-inc . --output-library-src .
+```
+
+For more information about the Vulkan Profiles library generation, use the command:
+
+```
+    python gen_profiles_solution.py --help
+```
 
 ## Basic usage
 
@@ -95,7 +113,8 @@ If the profile is supported by the Vulkan implementation at the instance level, 
 
     VpInstanceCreateInfo vpCreateInfo{};
     vpCreateInfo.pCreateInfo = &vkCreateInfo;
-    vpCreateInfo.pProfile = &profile;
+    vpCreateInfo.enabledFullProfileCount = 1;
+    vpCreateInfo.pEnabledFullProfiles = &profile;
 
     VkInstance instance = VK_NULL_HANDLE;
     result = vpCreateInstance(&vpCreateInfo, nullptr, &instance);
@@ -134,7 +153,8 @@ Finally, once a physical device supporting the profile is selected, a Vulkan dev
 
     VpDeviceCreateInfo vpCreateInfo{};
     vpCreateInfo.pCreateInfo = &vkCreateInfo;
-    vpCreateInfo.pProfile = &profile;
+    vpCreateInfo.enabledFullProfileCount = 1;
+    vpCreateInfo.pEnabledFullProfiles = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
     result = vpCreateDevice(physicalDevice, &vpCreateInfo, nullptr, &device);
@@ -144,55 +164,19 @@ Finally, once a physical device supporting the profile is selected, a Vulkan dev
     }
 ```
 
-## Advanced usage
+## Advanced usages
 
-### Overriding API version
+### Specifying the API version
 
-By default it's expected that the application either does not provide its own `VkApplicationInfo` when calling `vpCreateInstance` or it sets its `apiVersion` to the minimum API version required by the profile as defined by the corresponding `<VP_VENDOR_NAME>_MIN_API_VERSION` preprocessor definition.
+By default, it's expected that the application either does not provide its own `VkApplicationInfo` when calling `vpCreateInstance` or it sets its `apiVersion` to the minimum API version required by the profile as defined by the corresponding `<VP_VENDOR_NAME>_MIN_API_VERSION` preprocessor definition.
 
 If the application would like to use a different API version, then it should use its own `apiVersion` in `VkApplicationInfo` at instance creation time instead (e.g. to request a newer API version).
 
 Using an older version than the one required by the profile may result in unexpected behavior if any of the features required by the profile are not present in the specified version of the Vulkan API.
 
-### Overriding extensions
+### Specifying additional extensions
 
-By default the application must not provide its own set of instance and/or device extensions when using `vpCreateDevice` and/or `vpCreateInstance`, as the list of enabled extensions comes from the profile definition.
-
-If the application needs to provide its own set of instance or device extensions, then the `VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT` and/or `VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT` flags can be used, as in the examples below:
-
-```C++
-    VkInstanceCreateInfo vkCreateInfo{ VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
-    ...
-    // Specify extension list to use, overriding profile extension list
-    vkCreateInfo.enabledExtensionCount = ...
-    vkCreateInfo.ppEnabledExtensionNames = ...
-
-    VpInstanceCreateInfo vpCreateInfo{};
-    vpCreateInfo.pCreateInfo = &vkCreateInfo;
-    vpCreateInfo.pProfile = &profile;
-    // Use extension override flag
-    vpCreateInfo.flags = VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT;
-    ...
-```
-
-```C++
-    VkDeviceCreateInfo vkCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
-    ...
-    // Specify extension list to use, overriding profile extension list
-    vkCreateInfo.enabledExtensionCount = ...
-    vkCreateInfo.ppEnabledExtensionNames = ...
-
-    VpDeviceCreateInfo vpCreateInfo{};
-    vpCreateInfo.pCreateInfo = &vkCreateInfo;
-    vpCreateInfo.pProfile = &profile;
-    // Use extension override flag
-    vpCreateInfo.flags = VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT;
-    ...
-```
-
-### Merging extensions
-
-If the application would like to specify additional extensions besides the ones defined by the profile, then the `VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT` and/or `VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT` flags can be used to request the merging of the application-provided extension list with the profile extensions, as in the examples below:
+If the application would like to specify additional extensions besides the ones defined by the profile, the Vulkan application developers can continue using the `enabledExtensionCount` and `ppEnabledExtensionNames`:
 
 ```C++
     VkInstanceCreateInfo vkCreateInfo{ VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
@@ -203,36 +187,20 @@ If the application would like to specify additional extensions besides the ones 
 
     VpInstanceCreateInfo vpCreateInfo{};
     vpCreateInfo.pCreateInfo = &vkCreateInfo;
-    vpCreateInfo.pProfile = &profile;
-    // Use extension merge flag
-    vpCreateInfo.flags = VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT;
+    vpCreateInfo.enabledFullProfileCount = 1;
+    vpCreateInfo.pEnabledFullProfiles = &profile;
     ...
 ```
 
-```C++
-    VkDeviceCreateInfo vkCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
-    ...
-    // Specify additional extensions to use beyond the profile-defined ones
-    vkCreateInfo.enabledExtensionCount = ...
-    vkCreateInfo.ppEnabledExtensionNames = ...
-
-    VpDeviceCreateInfo vpCreateInfo{};
-    vpCreateInfo.pCreateInfo = &vkCreateInfo;
-    vpCreateInfo.pProfile = &profile;
-    // Use extension merge flag
-    vpCreateInfo.flags = VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT;
-    ...
-```
-
-### Overriding features
+### Specifying additional features
 
 By default, profile-defined feature structures must not be specified as part of the `pNext` chain of `VkDeviceCreateInfo` when using `vpCreateDevice`, as the profile-defined feature structures are automatically added to the `pNext` chain, and duplicate feature structures would otherwise result in undefined behavior.
 
-If the application needs to override any subset of the feature structures otherwise defined by the profile, then the `VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT` flag can be used, as in the example below:
+If the application needs to specify additional features, the feature structures must be specified as part of the `pNext` chain of `VkDeviceCreateInfo` and the additional enabled features will be merged to the required profile features:
 
 ```C++
     // We want to use our own VkPhysicalDeviceVulkan11Features structure,
-    // overriding any feature enablement in that structure as defined by
+    // merging any feature enablement in that structure as defined by
     // the profile
     VkPhysicalDeviceVulkan11Features overriddenVulkan11Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES };
     ...
@@ -244,62 +212,8 @@ If the application needs to override any subset of the feature structures otherw
 
     VpDeviceCreateInfo vpCreateInfo{};
     vpCreateInfo.pCreateInfo = &vkCreateInfo;
-    vpCreateInfo.pProfile = &profile;
-    // Use feature override flag
-    vpCreateInfo.flags = VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT;
-    ...
-```
-
-In this case feature structures from the profile are only included in the final `pNext` chain passed to `vkCreateDevice` if a corresponding overriding feature structure isn't provided by the application.
-
-Sometimes the application needs to override all feature structures with its own, i.e. no feature defined in the profile should be automatically enabled. This can be requested using the `VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT` flag, as in the example below:
-
-```C++
-    VpDeviceCreateInfo vpCreateInfo{};
-    vpCreateInfo.pCreateInfo = &vkCreateInfo;
-    vpCreateInfo.pProfile = &profile;
-    // We want to enable only the features we specify, so we override
-    // all profile-defined features
-    vpCreateInfo.flags = VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT;
-    ...
-```
-
-### Merging/overriding individual features
-
-> **NOTE:** Currently there is no `VP_DEVICE_CREATE_MERGE_FEATURES_BIT` that could allow merging individual feature enablement within feature structures due to the constness of the `pNext` chain of `VkDeviceCreateInfo`, as reconstructing the `pNext` chain entirely would preclude supporting any structures in the `pNext` chain unknown to the Vulkan Profiles library.
-
-While currently there's no way to request the automatic merging of individual feature enablements within feature structures, the application can merge features on its own, potentially disabling features that would be otherwise enabled by the profile, or enabling features that wouldn't be enabled by the profile.
-
-In order to achieve this, any feature structure that the application intends to provide on its own can be pre-populated with the feature data of the profile using the `vpGetProfileFeatures` API, as in the example below:
-
-```C++
-    // We intend to enable/disable some features in the following feature 
-    // structures but otherwise we want to keep the rest of the features
-    // enabled/disabled according to the profile
-    VkPhysicalDeviceVulkan11Features vulkan11Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES };
-    VkPhysicalDeviceVulkan12Features vulkan12Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES };
-
-    // We pre-populate the structures with the feature data of the profile
-    // by passing all structures as a pNext chain to vpGetProfileFeatures
-    vulkan11Features.pNext = &vulkan12Features;
-    vpGetProfileFeatures(&profile, &vulkan11Features);
-
-    // We then set/override any features as we wish
-    vulkan11Features.multiview = VK_FALSE;
-    vulkan12Features.drawIndirectCount = VK_TRUE;
-    ...
-
-    VkDeviceCreateInfo vkCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
-    // We add our own feature structures to the pNext chain
-    vkCreateInfo.pNext = &vulkan11Features;
-    ...
-
-    VpDeviceCreateInfo vpCreateInfo{};
-    vpCreateInfo.pCreateInfo = &vkCreateInfo;
-    vpCreateInfo.pProfile = &profile;
-    // Finally, we specify the feature override flag so that the feature
-    // structures provided will be used instead of the profile defaults
-    vpCreateInfo.flags = VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT;
+    vpCreateInfo.enabledFullProfileCount = 1;
+    vpCreateInfo.pEnabledFullProfiles = &profile;
     ...
 ```
 
@@ -332,7 +246,7 @@ Where:
 
 The Vulkan Profile library offers a set of APIs to verify support for a particular Vulkan profile and to create Vulkan instances and devices using the extensions and features required by the profile.
 
-#### Check instance level support
+#### Checking instance level support
 
 In order to query whether the Vulkan implementation supports the necessary instance level requirements (API version and instance extensions) of a particular profile, use the following command:
 
@@ -361,7 +275,7 @@ Where:
 * `profileName` is the name of the profile
 * `specVersion` is the version of the profile specification
 
-#### Create instance with profile
+#### Creating instance with profile
 
 The Vulkan Profiles library provides the following helper function that enables easier adoption of profiles by automatically including profile requirements in the Vulkan instance creation process:
 
@@ -382,25 +296,27 @@ The `VpInstanceCreateInfo` structure is defined as follows:
 ```C++
 typedef struct VpInstanceCreateInfo {
     const VkInstanceCreateInfo*     pCreateInfo;
-    const VpProfileProperties*      pProfile;
     VpInstanceCreateFlags           flags;
+    uint32_t                        enabledFullProfileCount;
+    const VpProfileProperties*      pEnabledFullProfiles;
+    uint32_t                        enabledProfileBlockCount;
+    const VpBlockProperties*        pEnabledProfileBlocks;
 } VpInstanceCreateInfo;
 ```
 
 Where:
 * `pCreateInfo` is a pointer to the `VkInstanceCreateInfo` structure specifying the usual Vulkan instance creation info.
-* `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile to enable.
-* `flags` contains zero or more of the `VpInstanceCreateFlagBits` values, as described below.
+* `flags` is reserved for future use.
+* `enabledFullProfileCount` an integer related to the number of profiles to enable listed in `pEnabledFullProfiles`.
+* `pEnabledFullProfiles` is a pointer to an array of `VpProfileProperties` structure specifying the profiles to enable. If not profiles is enabled, the value is nullptr.
+* `enabledProfileBlockCount` an integer related to the number of profile capabilities blocks to enable listed in `pEnabledProfileBlocks`.
+* `pEnabledProfileBlocks` is a pointer to an array of `VpBlockProperties` structure specifying the profiles capabilities blocks to enable. If not capabilities block is enabled, the value is nullptr.
 
-The default behavior of `vpCreateInstance` is to enable only the instance extensions that are required by the profile; the `VkInstanceCreateInfo` provided by the application must not enable any instance extensions itself.
-
-If the application specifies the `VP_INSTANCE_CREATE_OVERRIDE_EXTENSIONS_BIT` then only the extensions enabled in the `VkInstanceCreateInfo` provided by the application will be used.
-
-If the application specifies the `VP_INSTANCE_CREATE_MERGE_EXTENSIONS_BIT` then the extension lists are merged and both the extensions required by the profile and those enabled by the application in the `VkInstanceCreateInfo` structure will be enabled.
+The behavior of `vpCreateInstance` is to enable all extensions and features listed by the profiles, the capabilities blocks and in the `pNext` chain of `VkInstanceCreateInfo`.
 
 If the application-provided `VkInstanceCreateInfo` does not specify a `VkApplicationInfo` structure then a `VkApplicationInfo` with an `apiVersion` field equaling the minimum required API version of the profile will be added. If the application does provide a `VkApplicationInfo` it has to make sure that its `apiVersion` field is greater than or equal to the minimum required API version of the profile (e.g. by using the corresponding preprocessor definition).
 
-#### Check device level support
+#### Checking device level support
 
 In order to query whether a Vulkan physical device supports the necessary device level requirements (API version, device extensions, device features and properties/limits) of a particular profile, use the following command:
 
@@ -418,7 +334,27 @@ Where:
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile to check support for.
 * `pSupported` is a pointer to a `VkBool32`, which is set to `VK_TRUE` to indicate support, and `VK_FALSE` otherwise.
 
-#### Create device with profile
+When a profile supports multiple variants, it might be useful to know what capabilities blocks where used to verify the profile or what capabilities blocks are not supported when the profile is not verified on the platform. This is done using the following command:
+
+```C++
+VkResult vpGetPhysicalDeviceProfileVariantsSupport(
+    VkInstance                      instance,
+    VkPhysicalDevice                physicalDevice,
+    const VpProfileProperties*      pProfile,
+    VkBool32*                       pSupported,
+    uint32_t*                       pPropertyCount,
+    VpBlockProperties*              pProperties);
+```
+
+Where:
+* `instance` is the Vulkan instance.
+* `physicalDevice` is the physical device to check support on.
+* `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile to check support for.
+* `pSupported` is a pointer to a `VkBool32`, which is set to `VK_TRUE` to indicate support, and `VK_FALSE` otherwise.
+* `pPropertyCount` is a pointer to an integer related to the number of `VpBlockProperties`. If `pSupported` is set to `VK_TRUE`, then the value 
+* `pProperties` is a pointer to an array of `VpBlockProperties` structures. If `pSupported` is set to `VK_TRUE`, then the array of blocks contains the blocks used to validate the profile. It `pSupported` is set to `VK_FALSE`, then the array contains the blocks not supported on the platform.
+
+#### Creating device with profile
 
 The Vulkan Profiles library provides the following helper function that enables easier adoption of profiles by automatically including profile requirements in the Vulkan device creation process:
 
@@ -436,19 +372,47 @@ Where:
 * `pAllocator` controls host memory allocation and is analogous to the corresponding parameter of `vkCreateDevice`.
 * `pDevice` points to a `VkDevice` handle in which the resulting device is returned.
 
-The default behavior of `vpCreateDevice` is to enable only the device extensions that are required by the profile and the `VkInstanceCreateInfo` provided by the application must not enable any instance extensions itself.
+The `VpDeviceCreateInfo` structure is defined as follows:
 
-Similarly, the default behavior of `vpCreateDevice` is to enable features that are required by the profile and the `pNext` chain of `VkDeviceCreateInfo` must not contain any feature structures that are defined by the profile itself.
+```C++
+typedef struct VpDeviceCreateInfo {
+    const VkDeviceCreateInfo*   pCreateInfo;
+    VpDeviceCreateFlags         flags;
+    uint32_t                    enabledFullProfileCount;
+    const VpProfileProperties*  pEnabledFullProfiles;
+    uint32_t                    enabledProfileBlockCount;
+    const VpBlockProperties*    pEnabledProfileBlocks;
+} VpDeviceCreateInfo;
+```
 
-If the application specifies the `VP_DEVICE_CREATE_OVERRIDE_EXTENSIONS_BIT`, then only the extensions enabled in the `VkDeviceCreateInfo` provided by the application will be used.
+Where:
+* `pCreateInfo` is a pointer to the `VkDeviceCreateInfo` structure specifying the usual Vulkan device creation info.
+* `flags` is a bitmask of `VpDeviceCreateFlagBits` indicating the behavior of the instance.
+* `enabledFullProfileCount` an integer related to the number of profiles to enable listed in `pEnabledFullProfiles`.
+* `pEnabledFullProfiles` is a pointer to an array of `VpProfileProperties` structure specifying the profiles to enable. If not profiles is enabled, the value is nullptr.
+* `enabledProfileBlockCount` an integer related to the number of profile capabilities blocks to enable listed in `pEnabledProfileBlocks`.
+* `pEnabledProfileBlocks` is a pointer to an array of `VpBlockProperties` structure specifying the profiles capabilities blocks to enable. If not capabilities block is enabled, the value is nullptr.
 
-If the application specifies the `VP_DEVICE_CREATE_MERGE_EXTENSIONS_BIT`, then the extension lists are merged and both the extensions required by the profile and those enabled by the application in the `VkDeviceCreateInfo` structure will be enabled.
+The `VpDeviceCreateFlagBits` enumeration is defined as follows:
 
-If the application specifies the `VP_DEVICE_CREATE_OVERRIDE_FEATURES_BIT` and if a feature structure is defined by both the profile and the `pNext` chain of `VkDeviceCreateInfo`, then the one provided by the application is used, overriding the enable state of any feature that otherwise would come from the profile.
+```C++
+typedef enum VpDeviceCreateFlagBits {
+    VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT = 0x0000001,
+    VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT = 0x0000002,
+    VP_DEVICE_CREATE_DISABLE_ROBUST_ACCESS = VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT | VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT,
 
-If the application specifies the `VP_DEVICE_CREATE_OVERRIDE_ALL_FEATURES_BIT`, then only the feature structures provided by the application in the `pNext` chain of `VkDeviceCreateInfo` are used, overriding all profile feature data.
+    VP_DEVICE_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+} VpDeviceCreateFlagBits;
+typedef VkFlags VpDeviceCreateFlags;
+```
 
-> **NOTE:** Currently there is no `VP_DEVICE_CREATE_MERGE_FEATURES_BIT` that could allow merging individual feature enablement within feature structures due to the constness of the `pNext` chain of `VkDeviceCreateInfo`, as reconstructing the `pNext` chain entirely would preclude supporting any structures in the `pNext` chain unknown to the Vulkan Profiles library.
+The behavior of `vpCreateDevice` is to enable all extensions and features listed by the profiles, the capabilities blocks and in the `pNext` chain of `VkDeviceCreateInfo`.
+
+If the application specifies the `VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT`, then the implement will disable buffer robustness.
+
+If the application specifies the `VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT`, then the implement will disable image robustness.
+
+If the application specifies the `VP_DEVICE_CREATE_DISABLE_ROBUST_ACCESS`, then the implement will disable all robustness features.
 
 ### Profile queries
 
@@ -469,6 +433,56 @@ Where:
 * `pProperties` is either `NULL` or a pointer to an array of `VpProfileProperties` structures.
 
 If `pProperties` is `NULL`, then the number of profiles available is returned in `pPropertyCount`. Otherwise, `pPropertyCount` must point to a variable set by the user to the number of elements in the `pProperties` array, and on return the variable is overwritten with the number of structures actually written to `pProperties`. If `pPropertyCount` is less than the number of profiles available, at most `pPropertyCount` structures will be written, and `VK_INCOMPLETE` will be returned instead of `VK_SUCCESS`, to indicate that not all the available properties were returned.
+
+#### Query profile required profiles
+
+Some profiles require other profiles. In order to query the list of required profiles for a given profile, use the following command:
+
+```C++
+VkResult vpGetProfileRequiredProfiles(
+    const VpProfileProperties*      pProfile,
+    uint32_t*                       pPropertyCount,
+    VpProfileProperties*            pProperties);
+```
+
+Where:
+* `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile whose required profiles are queried.
+* `pPropertyCount` is a pointer to an integer related to the number of required profiles available or queried, as described below.
+* `pProperties` is either `NULL` or a pointer to an array of `VpProfileProperties` structures.
+
+If `pProperties` is `NULL`, then the number of required profiles available for the specified profile is returned in `pPropertyCount`. Otherwise, `pPropertyCount` must point to a variable set by the user to the number of elements in the `pProperties` array, and on return the variable is overwritten with the number of structures actually written to `pProperties`. If `pPropertyCount` is less than the number of required profiles available for the specified profile, at most `pPropertyCount` structures will be written, and `VK_INCOMPLETE` will be returned instead of `VK_SUCCESS`, to indicate that not all the available properties were returned.
+
+#### Query profile with multiple variants
+
+There are two types of profiles: monolithic profiles which represents a single set of capabilities and profiles with multiple variants which can be supported using differents set of Vulkan capabilities.
+
+In order to query whether a Vulkan profile has multiple variants, use the following command:
+
+```C++
+VkResult vpHasMultipleVariantsProfile(
+    const VpProfileProperties *pProfile,
+    VkBool32 *pHasMultipleVariants);
+```
+
+Where:
+* `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile whose property is queried.
+* `pHasMultipleVariants` is a pointer to a `VkBook32` indicating whether the profiles has multiple variants.
+
+#### Query profile Vulkan API version
+
+A profile requires a specific Vulkan API version. The minimum valid Vulkan API version of a profile, is the version of the Vulkan Header in which all the Vulkan capabilities specified in the profile were defined. However, a Vulkan Profile may require a newer Vulkan API version to explicitly not support Vulkan drivers considered too old, for example.
+
+In order to query the required Vulkan API version for a given profile, use the following command:
+
+```C++
+uint32_t vpGetProfileAPIVersion(
+    const VpProfileProperties*      pProfile);
+```
+
+Where:
+* `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile whose required Vulkan API version is queried.
+
+If a profile requires other profiles, `vpGetProfileAPIVersion` will look for the required Vulkan API version of each profile and return the newest Vulkan API version among all the profiles.
 
 #### Query profile fallbacks
 
