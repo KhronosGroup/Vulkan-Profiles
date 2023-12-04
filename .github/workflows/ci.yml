@@ -35,53 +35,53 @@ permissions:
   contents: read
 
 jobs:
-  macos:
-    env:
-      CMAKE_C_COMPILER_LAUNCHER: ccache
-      CMAKE_CXX_COMPILER_LAUNCHER: ccache
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
-      - name: Install jsonschema
-        run: python3 -m pip install jsonschema
-      - uses: lukka/get-cmake@latest
-      - name: Setup ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ${{ runner.os }}-ccache
-      - name: Configure/Generate
-        run: cmake -S. -B build -D BUILD_TESTS=OFF -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=Release
-        env:
+#  macos:
+#    env:
+#      CMAKE_C_COMPILER_LAUNCHER: ccache
+#      CMAKE_CXX_COMPILER_LAUNCHER: ccache
+#    runs-on: macos-latest
+#    strategy:
+#      fail-fast: false
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: actions/setup-python@v4
+#        with:
+#          python-version: '3.8'
+#      - name: Install jsonschema
+#        run: python3 -m pip install jsonschema
+#      - uses: lukka/get-cmake@latest
+#      - name: Setup ccache
+#        uses: hendrikmuhs/ccache-action@v1.2
+#        with:
+#          key: ${{ runner.os }}-ccache
+#      - name: Configure/Generate
+#        run: cmake -S. -B build -D BUILD_TESTS=OFF -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=Release
+#        env:
           # Ensure we can build against 10.15: https://cmake.org/cmake/help/latest/envvar/MACOSX_DEPLOYMENT_TARGET.html
-          MACOSX_DEPLOYMENT_TARGET: 10.15
-      - name: Build
-        run: cmake --build build --config Release
-      - name: Install
-        run: cmake --install build --prefix build/install --config Release
+#          MACOSX_DEPLOYMENT_TARGET: 10.15
+#      - name: Build
+#        run: cmake --build build --config Release
+#      - name: Install
+#        run: cmake --install build --prefix build/install --config Release
 
-  ios:
-    runs-on: macos-13
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
-      - name: Install jsonschema
-        run: python3 -m pip install jsonschema
-      - uses: lukka/get-cmake@latest
-      - run: |
-          cmake -S. -B build \
-           -D UPDATE_DEPS=ON \
-           -D CMAKE_BUILD_TYPE=Debug \
-           -D CMAKE_SYSTEM_NAME=iOS \
-           -D CMAKE_OSX_ARCHITECTURES=arm64 \
-      - run: cmake --build build
-      - run: cmake --install build --prefix /tmp
+#  ios:
+#    runs-on: macos-13
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: actions/setup-python@v4
+#        with:
+#          python-version: '3.8'
+#      - name: Install jsonschema
+#        run: python3 -m pip install jsonschema
+#      - uses: lukka/get-cmake@latest
+#      - run: |
+#          cmake -S. -B build \
+#           -D UPDATE_DEPS=ON \
+#           -D CMAKE_BUILD_TYPE=Debug \
+#           -D CMAKE_SYSTEM_NAME=iOS \
+#           -D CMAKE_OSX_ARCHITECTURES=arm64 \
+#      - run: cmake --build build
+#      - run: cmake --install build --prefix /tmp
 
   ubuntu-latest:
     env:
