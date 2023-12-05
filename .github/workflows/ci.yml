@@ -35,25 +35,6 @@ permissions:
   contents: read
 
 jobs:
-  ios:
-    runs-on: macos-13
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
-      - name: Install jsonschema
-        run: python3 -m pip install jsonschema
-      - uses: lukka/get-cmake@latest
-      - run: |
-          cmake -S. -B build \
-           -D UPDATE_DEPS=ON \
-           -D CMAKE_BUILD_TYPE=Debug \
-           -D CMAKE_SYSTEM_NAME=iOS \
-           -D CMAKE_OSX_ARCHITECTURES=arm64 \
-      - run: cmake --build build
-      - run: cmake --install build --prefix /tmp
-
   ubuntu-latest:
     env:
       CMAKE_C_COMPILER_LAUNCHER: ccache
