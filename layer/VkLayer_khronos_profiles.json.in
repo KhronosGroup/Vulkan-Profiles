@@ -125,7 +125,7 @@
                         },
                         {
                             "key": "profile_file",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_KHR_roadmap_2022.json"
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_KHR_roadmap.json"
                         },
                         {
                             "key": "profile_name",
@@ -153,7 +153,7 @@
                         },
                         {
                             "key": "profile_file",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_ANDROID_baseline_2022.json"
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_ANDROID_baseline.json"
                         },
                         {
                             "key": "profile_name",
@@ -181,7 +181,7 @@
                         },
                         {
                             "key": "profile_file",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_ANDROID_baseline_2021.json"
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_ANDROID_baseline.json"
                         },
                         {
                             "key": "profile_name",
@@ -270,7 +270,7 @@
                     "type": "LOAD_FILE",
                     "format": "PROFILE",
                     "filter": "*.json",
-                    "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_portability_2022.json",
+                    "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_baseline_2023.json",
                     "expanded": true,
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
                     "settings": [
