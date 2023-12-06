@@ -18,7 +18,7 @@ set(PROFILES_FILES_FOR_INSTALL
 )
 
 set(PROFILES_FILES_FOR_API_LIBRARY
-	"VP_ANDROID_baseline.json,VP_KHR_roadmap.json,VP_LUNARG_desktop_baseline_2023.json,VP_LUNARG_desktop_baseline_2024.json"
+	"VP_LUNARG_minimum_requirements.json,VP_ANDROID_baseline.json,VP_KHR_roadmap.json,VP_LUNARG_desktop_baseline_2023.json,VP_LUNARG_desktop_baseline_2024.json"
 )
 
 add_custom_target(VpCreateDesktopMax2024 ALL
@@ -52,6 +52,7 @@ add_custom_target(VpCreateDesktopBaseline2023 ALL
         --profile-desc ${PROFILE_DESKTOP_BASELINE_2023_DESC}
         --profile-date 2023-01-30
         --profile-api-version ${PROFILE_DESKTOP_BASELINE_2023_API_VERSION}
+        --profile-required-profiles "VP_LUNARG_minimum_requirements_1_2"
     VERBATIM
     SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
     DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
@@ -72,6 +73,7 @@ add_custom_target(VpCreateDesktopBaseline2024 ALL
         --profile-desc ${PROFILE_DESKTOP_BASELINE_2024_DESC}
         --profile-date 2023-11-01
         --profile-api-version ${PROFILE_DESKTOP_BASELINE_2024_API_VERSION}
+        --profile-required-profiles "VP_LUNARG_minimum_requirements_1_2"
     VERBATIM
     SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
     DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})

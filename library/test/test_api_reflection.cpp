@@ -64,14 +64,13 @@ TEST(api_get_profile_required_profiles, empty) {
     uint32_t count = 0;
     VkResult result0 = vpGetProfileRequiredProfiles(&profile, &count, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(0, count);
-
-    count = 1;
+    EXPECT_EQ(1, count);
 
     std::vector<VpProfileProperties> data(count);
     VkResult result1 = vpGetProfileRequiredProfiles(&profile, &count, &data[0]);
+    EXPECT_STREQ(VP_LUNARG_MINIMUM_REQUIREMENTS_1_2_NAME, data[0].profileName);
     EXPECT_EQ(VK_SUCCESS, result1);
-    EXPECT_EQ(0, count);
+    EXPECT_EQ(1, count);
 }
 
 TEST(api_get_profile_api_version, get) {
