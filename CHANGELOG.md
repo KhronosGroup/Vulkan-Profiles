@@ -22,6 +22,7 @@
 - Add `vpGetProfileRequiredProfiles` profile API library and support of profiles with required profiles
 - Add `VP_LUNARG_desktop_baseline_2024` profile
 - Add `VP_LUNARG_minimum_requirements_1_3`, `VP_LUNARG_minimum_requirements_1_2`, `VP_LUNARG_minimum_requirements_1_1` and `VP_LUNARG_minimum_requirements_1_0` profiles
+- Add `VP_ANDROID_15_minimums` profile
 - Add `VP_HEADER_VERSION_COMPLETE` to identify the API library version
 
 ### Deprecation:
