@@ -231,10 +231,10 @@ TEST(test_validate, VP_LUNARG_test_formats) {
     EXPECT_TRUE(validator.Check(document));
 }
 
-TEST(test_validate, VP_KHR_baseline) {
+TEST(test_validate, VP_LUNARG_minimum_requirements) {
     JsonValidator validator;
 
-    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_KHR_baseline.json";
+    const std::string path = std::string(PROFILE_FILES_PATH) + "VP_LUNARG_minimum_requirements.json";
     const Json::Value json_document2 = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(json_document2));
 }
@@ -263,7 +263,7 @@ TEST(test_validate, VP_LUNARG_desktop_baseline_2024) {
     EXPECT_TRUE(validator.Check(json_document2));
 }
 
-TEST(test_validate, VP_KHR_roadmap_2022) {
+TEST(test_validate, VP_KHR_roadmap) {
     JsonValidator validator;
 
     const std::string path = std::string(PROFILE_FILES_PATH) + "VP_KHR_roadmap.json";
