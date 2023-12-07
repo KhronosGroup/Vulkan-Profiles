@@ -177,6 +177,8 @@ SHARED_INCLUDE = '''
 '''
 
 API_DEFS = '''
+#define VP_HEADER_VERSION_COMPLETE VK_MAKE_API_VERSION(0, 2, 0, VK_HEADER_VERSION)
+
 #define VP_MAX_PROFILE_NAME_SIZE 256U
 
 typedef struct VpProfileProperties {

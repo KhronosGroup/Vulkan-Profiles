@@ -41,17 +41,16 @@ The *Vulkan Profiles Toolset* includes the following components:
 - [***The Vulkan Profiles Layer***](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_layer.html)
   - A layer used during application development to ensure adherence to the requirements of a chosen *Vulkan Profile*.
   - [It simulates but doesn't emulate](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_layer.html#technical-details) Vulkan capabilities. Hence, it is used with the [Validation layer](https://github.com/KhronosGroup/Vulkan-ValidationLayers) to clamp available capabilities on the Vulkan developer system.
-  - The layer requires a Vulkan 1.0 driver that supports `VK_KHR_get_physical_device_properties2` extension.
+  - The layer requires a Vulkan 1.1 driver.
 - [***The Vulkan Profiles Comparison Table***](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_definitions.html)
   - Human-readable format of *Vulkan Profiles* in a table to enable comparison.
 
 Furthermore, the *Vulkan SDK* includes implementations of some *Vulkan Profiles* using the *Vulkan Profiles JSON Schema*:
 - [VP_KHR_roadmap_2022](https://github.com/KhronosGroup/Vulkan-Headers/blob/main/registry/profiles/VP_KHR_roadmap_2022.json) (Vulkan 1.3)
-- [VP_ANDROID_baseline_2022](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_ANDROID_baseline_2022.json) (Vulkan 1.1)
-- [VP_ANDROID_baseline_2021](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_ANDROID_baseline_2021.json) (Vulkan 1.0)
+- [VP_ANDROID_baseline_2022](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_ANDROID_baseline.json) (Vulkan 1.1)
+- [VP_ANDROID_baseline_2021](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_ANDROID_baseline.json) (Vulkan 1.0)
+- VP_LUNARG_desktop_baseline_2024 (Vulkan 1.2)
 - VP_LUNARG_desktop_baseline_2023 (Vulkan 1.2)
-- VP_LUNARG_desktop_baseline_2022 (Vulkan 1.1)
-- VP_LUNARG_desktop_portability_2022 (Vulkan 1.1)
 
 Within the *Vulkan SDK*, the Vulkan Profiles files are located at `$(VULKAN_SDK)/Config/VK_LAYER_KHRONOS_profiles`.
 
@@ -145,6 +144,7 @@ Each entry in `profiles` includes a reference name and a dictionary containing t
 * `description` - Required. The description of the profile.
 * `contributors` - Required. The list of contributors of the profile.
 * `history` - Required. The version history of the profile file.
+* `profiles` - Optional. The list of profiles required by the profile.
 * `capabilities` - Required. The list of capability sets that can be referenced by a profile.
 * `fallback` - Optional. The list of profiles recommended if the checked profile is not supported by the platform.
 
@@ -158,7 +158,12 @@ The *Vulkan Profiles Toolset* includes a `Python` script to generate a profiles 
 
 [GPUInfo.org](https://vulkan.gpuinfo.org/) allows us downloading `device` profiles in the form of JSON files. We can use these files to create *platform* profiles.
 
-This is the approach used to create the `VP_LUNARG_desktop_baseline_2022` and `VP_LUNARG_desktop_portability_2022` profiles part of this repository.
+This is the approach used to create the `VP_LUNARG_desktop_baseline_2024` profiles part of this repository.
+
+Example:
+```
+python gen_profiles_file.py --registry vk.xml --input ./VP_LUNARG_desktop_baseline_2024
+```
 
 For more information about the command line arguments, please use the `--help` argument :
 ```

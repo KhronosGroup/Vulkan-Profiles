@@ -14,15 +14,23 @@
 ## [Vulkan Profiles Toolset 1.3.XXX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - January 2024
 
 ### Features:
+- Add API library merging of additional application features and extensions
 - Add API library support of checking the support of profiles with multiple variants
+- Add API library support of creating VkDevice and VkInstance with multiple variants
 - Add `vpGetProfileAPIVersion` profile API library
+- Add `vpHasMultipleVariantsProfile` profile API library
+- Add `vpGetProfileRequiredProfiles` profile API library and support of profiles with required profiles
 - Add `VP_LUNARG_desktop_baseline_2024` profile
+- Add `VP_LUNARG_minimum_requirements_1_3`, `VP_LUNARG_minimum_requirements_1_2`, `VP_LUNARG_minimum_requirements_1_1` and `VP_LUNARG_minimum_requirements_1_0` profiles
+- Add `VP_HEADER_VERSION_COMPLETE` to identify the API library version
 
 ### Deprecation:
+- Refactor API library to support profiles with multiple variants
+- Remove API library overriding features and extensions modes
 - Remove `VP_LUNARG_desktop_portability_2022` profile
 - Remove `VP_LUNARG_desktop_baseline_2022` profile
 
-## [Vulkan Profiles Toolset 1.3.261](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - August 2023
+## [Vulkan Profiles Toolset 1.3.261](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.261.0) - August 2023
 
 ### Bugfixes:
 - Fix query of capabilities of aliased extensions
