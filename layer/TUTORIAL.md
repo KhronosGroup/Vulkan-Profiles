@@ -25,7 +25,7 @@ The role of the *Profiles layer* is to "simulate" a Vulkan implementation by mod
 For an overview of how to configure layers, refer to the [Layers Overview and Configuration](https://vulkan.lunarg.com/doc/sdk/latest/windows/layer_configuration.html) document.
 
 The Profiles Layer settings are documented in detail in the
-[VK_LAYER_KHRONOS_validation](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_layer.html#user-content-layer-details) document.
+[VK_LAYER_KHRONOS_profiless](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_layer.html#user-content-layer-details) document.
 
 The Profiles Layer can also be enabled and configured using *Vulkan Configurator*. See the [*Vulkan Configurator*](https://vulkan.lunarg.com/doc/sdk/latest/windows/vkconfig.html) documentation for more information.
 
