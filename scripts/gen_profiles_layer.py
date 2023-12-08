@@ -2985,6 +2985,8 @@ class VulkanProfilesLayerGenerator():
         first = True
         count = 0
         for name, value  in registry.structs.items():
+            if name == 'VkPhysicalDeviceHostImageCopyPropertiesEXT' or name == 'VkPhysicalDeviceHostImageCopyFeaturesEXT':
+                continue
             if (extends in value.extends and value.isAlias == False) or (name in additional):
                 aliases = value.aliases.copy()
                 count += 1
@@ -3143,7 +3145,7 @@ class VulkanProfilesLayerGenerator():
 
     def generate_fill_physical_device_pnext_chain(self):
         gen = '\nvoid FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {\n'
-        gen += '    ProfileLayerSettings *layer_settings = &JsonLoader::Find(physicalDeviceData->instance())->layer_settings;'
+        gen += '    ProfileLayerSettings *layer_settings = &JsonLoader::Find(physicalDeviceData->instance())->layer_settings;\n'
         gen += '    while (place) {\n'
         gen += '        VkBaseOutStructure *structure = (VkBaseOutStructure *)place;\n\n'
         gen += '        // These switch statements check which struct is in the pNext chain and, if the physical device has the proper extension,\n'
@@ -3767,11 +3769,11 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    registryPath  = './external/Vulkan-Headers/build/install/share/vulkan/registry/vk.xml'
+    registryPath  = '../external/Debug/Vulkan-Headers/build/install/share/vulkan/registry/vk.xml'
     if args.registry is not None:
         registryPath = args.registry
 
-    outputPath = "./layer/profiles.cpp"
+    outputPath = "../layer/profiles_generated.cpp"
     if args.out_layer is not None:
         outputPath = args.out_layer
 
