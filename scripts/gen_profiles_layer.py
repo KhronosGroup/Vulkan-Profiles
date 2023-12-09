@@ -3600,6 +3600,7 @@ class VulkanProfilesLayerGenerator():
     def create_var_name(self, struct):
         nv = struct.endswith("NV")
         arm = struct.endswith("ARM")
+        ext = struct.endswith("EXT")
         var_name = ''
         while struct[-1].isupper():
             struct = struct[:-1]
@@ -3628,6 +3629,8 @@ class VulkanProfilesLayerGenerator():
             var_name += 'nv_'
         if (var_name == 'physical_device_shader_core_properties_' and arm):
             var_name += 'arm_'
+        if (var_name == 'physical_device_vertex_attribute_divisor_properties_' and ext):
+            var_name += 'ext_'
         return var_name
 
     def get_non_aliased_list(self, list, aliases):
