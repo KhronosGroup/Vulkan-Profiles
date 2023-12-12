@@ -263,33 +263,81 @@
                     ]
                 },
                 {
-                    "key": "profile_file",
-                    "label": "Profile Selection",
-                    "description": "Path of a profile file and the name of the profile to load.",
+                    "key": "select_profiles_loading_mode",
+                    "label": "Select Profiles Loading Mode",
+                    "description": "Select how to load Vulkan Profiles",
                     "status": "STABLE",
-                    "type": "LOAD_FILE",
-                    "format": "PROFILE",
-                    "filter": "*.json",
-                    "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_baseline_2024.json",
-                    "expanded": true,
-                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                    "settings": [
+                    "type": "ENUM",
+                    "default": "PROFILE_LOADING_DIRS",
+                    "flags": [
                         {
-                            "key": "profile_name",
-                            "label": "Profile",
-                            "description": "Name of the profile specified by the profile file to use. If set to ${VP_DEFAULT}, the layer will load the first profile in the file.",
-                            "type": "ENUM",
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                            "flags": [],
-                            "default": "${VP_DEFAULT}"
+                            "key": "PROFILE_LOADING_DISABLED",
+                            "label": "Disabled",
+                            "description": "No physical Device capabilities emulation."
                         },
                         {
-                            "key": "profile_validation",
-                            "label": "Schema Validation",
-                            "description": "Validate the profile file against the Vulkan SDK profile schema if the file is found.",
-                            "type": "BOOL",
-                            "default": false,
-                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ]
+                            "key": "PROFILE_LOADING_FILE",
+                            "label": "Load a Single Profiles file",
+                            "description": "Select a profile file and a profile.",
+                            "settings": [
+                                {
+                                    "key": "profile_file",
+                                    "label": "Profiles File",
+                                    "description": "Path of a profile file and the name of the profile to load.",
+                                    "status": "STABLE",
+                                    "type": "LOAD_FILE",
+                                    "format": "PROFILE",
+                                    "filter": "*.json",
+                                    "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_baseline_2024.json",
+                                    "expanded": true
+                                },
+                                {
+                                    "key": "profile_name",
+                                    "label": "Profile Name",
+                                    "description": "Name of the profile specified by the profile file to use. If set to ${VP_DEFAULT}, the layer will load the first profile in the file.",
+                                    "type": "ENUM",
+                                    "flags": [],
+                                    "default": "${VP_DEFAULT}"
+                                },
+                                {
+                                    "key": "profile_validation",
+                                    "label": "Schema Validation",
+                                    "description": "Validate the profile files against the Vulkan SDK profile schema if the file is found.",
+                                    "type": "BOOL",
+                                    "default": false,
+                                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ]
+                                }
+                            ]
+                        },
+                        {
+                            "key": "PROFILE_LOADING_DIRS",
+                            "label": "Load all profiles in directories",
+                            "description": "Let the Vulkan Loader list all the Physical Device.",
+                            "settings": [
+                                {
+                                    "key": "profile_dirs",
+                                    "label": "Profiles Directories",
+                                    "description": "Select the location all the profiles.",
+                                    "type": "LIST",
+                                    "default": [ ]
+                                },
+                                {
+                                    "key": "profile_name",
+                                    "label": "Profile Name",
+                                    "description": "Name of the profile specified by the profile file to use. If set to ${VP_DEFAULT}, the layer will load the first profile in the file.",
+                                    "type": "ENUM",
+                                    "flags": [],
+                                    "default": "${VP_DEFAULT}"
+                                },
+                                {
+                                    "key": "profile_validation",
+                                    "label": "Schema Validation",
+                                    "description": "Validate the profile files against the Vulkan SDK profile schema if the file is found.",
+                                    "type": "BOOL",
+                                    "default": false,
+                                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ]
+                                }
+                            ]
                         }
                     ]
                 },
@@ -299,7 +347,6 @@
                     "description": "Control of the simulated capabilities of the Vulkan physical device from the selected Vulkan Profile.",
                     "status": "STABLE",
                     "type": "FLAGS",
-                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
                     "flags": [
                         {
                             "key": "SIMULATE_API_VERSION_BIT",

@@ -140,6 +140,12 @@ enum ForceDevice {
     FORCE_DEVICE_WITH_NAME
 };
 
+enum ProfileLoadingMode {
+    PROFILE_LOADING_DISABLED,
+    PROFILE_LOADING_FILE,
+    PROFILE_LOADING_DIRS
+};
+
 struct ProfileLayerSettings {
     ~ProfileLayerSettings() {
         if (log.profiles_log_file != nullptr) {
@@ -149,7 +155,9 @@ struct ProfileLayerSettings {
     }
 
     struct Simulate {
+        ProfileLoadingMode profile_mode;
         std::string profile_file{};
+        std::vector<std::string> profile_dirs;
         std::string profile_name{"${VP_DEFAULT}"};
         bool profile_validation{false};
         SimulateCapabilityFlags capabilities{SIMULATE_API_VERSION_BIT | SIMULATE_FEATURES_BIT | SIMULATE_PROPERTIES_BIT};
