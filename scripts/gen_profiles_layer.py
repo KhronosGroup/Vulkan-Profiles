@@ -249,7 +249,6 @@ class JsonLoader {
         : layer_settings{},
           pdd_(nullptr),
           profile_filename_(),
-          root_(Json::nullValue),
           profile_api_version_(0),
           excluded_extensions_(),
           excluded_formats_()
@@ -293,7 +292,7 @@ class JsonLoader {
     PhysicalDeviceData *pdd_;
 
     std::string profile_filename_;
-    Json::Value root_;
+    std::map<std::string, Json::Value> profiles_file_roots_;
 
     std::uint32_t profile_api_version_;
     std::vector<std::string> excluded_extensions_;
@@ -1544,18 +1543,37 @@ VkResult JsonLoader::LoadFile(std::string filename) {
     Json::Value root = Json::nullValue;
     Json::CharReaderBuilder builder;
     std::string errs;
-    bool success = Json::parseFromStream(builder, json_file, &root_, &errs);
+    bool success = Json::parseFromStream(builder, json_file, &root, &errs);
     if (!success) {
         LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "Fail to parse file \\"%s\\" {\\n%s}\\n", filename.c_str(), errs.c_str());
         return layer_settings.log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
     json_file.close();
 
-    if (root_.type() != Json::objectValue) {
+    if (root.type() != Json::objectValue) {
         LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "Json document root is not an object in file \\"%s\\"\\n", filename.c_str());
         return layer_settings.log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
     }
 
+    if (layer_settings.simulate.profile_validation) {
+        JsonValidator validator;
+        if (!validator.Init()) {
+            LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
+                "%s could not find the profile schema file to validate filename. This operation requires the Vulkan SDK to be installed. Skipping profile file validation.",
+                kLayerName, profile_filename_.c_str());
+        } else if (!validator.Check(root)) {
+            LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT,
+                "%s is not a valid JSON profile file.", profile_filename_.c_str());
+            if (layer_settings.log.debug_fail_on_error) {
+                return VK_ERROR_INITIALIZATION_FAILED;
+            } else {
+                return VK_SUCCESS;
+            }
+        }
+    }
+
+    this->profiles_file_roots_.insert(std::pair(filename, root));
+    
     ReadProfileApiVersion();
 
     return VK_SUCCESS;
@@ -1563,7 +1581,7 @@ VkResult JsonLoader::LoadFile(std::string filename) {
 
 void JsonLoader::ReadProfileApiVersion() {
     const std::string &profile_name = layer_settings.simulate.profile_name;
-    const Json::Value &profiles = root_["profiles"];
+    const Json::Value &profiles = profiles_file_roots_[profile_filename_]["profiles"];
     bool found_profile = false;
     for (const auto &profile : profiles.getMemberNames()) {
         if (profile_name.empty() || profile_name == "${VP_DEFAULT}" || profile == profile_name) {
@@ -1605,7 +1623,7 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
     pdd_ = pdd;
 
     const std::string &profile_name = layer_settings.simulate.profile_name;
-    const Json::Value &profiles = root_["profiles"];
+    const Json::Value &profiles = profiles_file_roots_[profile_filename_]["profiles"];
     std::vector<std::vector<std::string>> capabilities;
 
     bool found_profile = false;
@@ -1658,7 +1676,7 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
         return VK_SUCCESS;
     }
 
-    const Json::Value schema_value = root_["$schema"];
+    const Json::Value schema_value = profiles_file_roots_[profile_filename_]["$schema"];
     if (!schema_value.isString()) {
         LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "JSON element \\"$schema\\" is not a string\\n");
         return layer_settings.log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
@@ -1685,21 +1703,6 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
                           "Header %d.\\n\\t- All newer capabilities in the "
                           "profile will be ignored by the layer.\\n",
                           kLayerName, VK_HEADER_VERSION, version_patch);
-    } else if (layer_settings.simulate.profile_validation) {
-        JsonValidator validator;
-        if (!validator.Init()) {
-            LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
-                       "%s could not find the profile schema file to validate filename.\\n\\t- This "
-                              "operation requires the Vulkan SDK to be installed.\\n\\t- Skipping profile file validation.",
-                              kLayerName, profile_filename_.c_str());
-        } else if (!validator.Check(root_)) {
-            LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "%s is not a valid JSON profile file.\\n", profile_filename_.c_str());
-            if (layer_settings.log.debug_fail_on_error) {
-                return VK_ERROR_INITIALIZATION_FAILED;
-            } else {
-                return VK_SUCCESS;
-            }
-        }
     }
 
     VkResult result = VK_SUCCESS;
@@ -1707,7 +1710,7 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
         pdd_->simulation_extensions_.clear();
     }
 
-    result = ReadProfile(device_name, root_, capabilities);
+    result = ReadProfile(device_name, profiles_file_roots_[profile_filename_], capabilities);
 
     return result;
 }
