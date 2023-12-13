@@ -3507,8 +3507,12 @@ class VulkanProfilesFiles():
                 with open(fileAbsPath, 'r') as f:
                     json_root = json.load(f)
                     if validate:
-                        Log.i("Validating profile file: '{0}'".format(filename))
-                        jsonschema.validate(json_root, schema)
+                        try:
+                            import jsonschema
+                            Log.i("Validating profile file: '{0}'".format(filename))
+                            jsonschema.validate(json_root, schema)
+                        except ModuleNotFoundError:
+                            Log.w("`jsonschema` module is not installed, schema validation skip")
                     self.json_profiles_database.json_files.append(json_root)
 
         for json_file_data in self.json_profiles_database.json_files:
@@ -3914,9 +3918,12 @@ class VulkanProfilesSchemaGenerator():
 
 
     def validate(self):
-        Log.i("Validating JSON profiles schema...")
-        jsonschema.Draft7Validator.check_schema(self.schema)
-
+        try:
+            import jsonschema
+            Log.i("Validating JSON profiles schema...")
+            jsonschema.Draft7Validator.check_schema(self.schema)
+        except ModuleNotFoundError:
+            Log.w("`jsonschema` module is not installed, schema validation skip")
 
     def generate(self, outSchema):
         Log.i("Generating '{0}'...".format(outSchema))
