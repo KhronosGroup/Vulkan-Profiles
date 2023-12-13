@@ -4787,7 +4787,7 @@ class VulkanProfilesDocGenerator():
                 return '-'
             elif type(value[0]) == str:
                 # Bitmask, match the Vulkan Specification's formatting
-                return '({0})'.format(' \| '.join(value))
+                return '({0})'.format(' | '.join(value))
             else:
                 # Array, match the Vulkan Specification's formatting
                 return '({0})'.format(','.join(str(el) for el in value))
