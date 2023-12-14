@@ -27,7 +27,6 @@ import argparse
 from typing import OrderedDict
 import xml.etree.ElementTree as etree
 import json
-import jsonschema
 from collections import deque
 from string import Template
 
