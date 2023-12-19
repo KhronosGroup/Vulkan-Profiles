@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-274.json#",
     "capabilities": {
         "baseline": {
             "extensions": {
@@ -34,8 +34,8 @@
                         "videoCodecOperations": [
                             "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_KHR",
                             "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_KHR",
-                            "VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_EXT",
-                            "VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT"
+                            "VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_KHR",
+                            "VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_KHR"
                         ]
                     },
                     "VkQueueFamilyCheckpointPropertiesNV": {
@@ -76,8 +76,8 @@
                         "videoCodecOperations": [
                             "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_KHR",
                             "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_KHR",
-                            "VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_EXT",
-                            "VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_EXT"
+                            "VK_VIDEO_CODEC_OPERATION_ENCODE_H264_BIT_KHR",
+                            "VK_VIDEO_CODEC_OPERATION_ENCODE_H265_BIT_KHR"
                         ]
                     },
                     "VkQueueFamilyCheckpointPropertiesNV": {

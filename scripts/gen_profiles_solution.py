@@ -2638,6 +2638,9 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceRenderPassStripedPropertiesARM'].members['renderPassStripeGranularity'].limittype = 'min'
             self.structs['VkPhysicalDeviceRenderPassStripedPropertiesARM'].members['maxRenderPassStripes'].limittype = 'max'
 
+        if 'VkPhysicalDeviceMaintenance6PropertiesKHR' in self.structs:
+            self.structs['VkPhysicalDeviceMaintenance6PropertiesKHR'].members['maxCombinedImageSamplerDescriptorCount'].limittype = 'max'
+
         # TODO: The registry xml is also missing limittype definitions for format and queue family properties
         # For now we just add the important ones, this needs a larger overhaul in the vk.xml
         self.structs['VkFormatProperties'].members['linearTilingFeatures'].limittype = 'bitmask'
