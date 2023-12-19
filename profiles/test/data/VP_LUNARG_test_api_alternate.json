@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-274.json#",
     "capabilities": {
         "baseline": {
             "extensions": {
@@ -187,8 +187,8 @@
                 "VK_EXT_vertex_input_dynamic_state": 2,
                 "VK_KHR_video_decode_h264": 3,
                 "VK_KHR_video_decode_h265": 1,
-                "VK_EXT_video_encode_h264": 2,
-                "VK_EXT_video_encode_h265": 2,
+                "VK_KHR_video_encode_h264": 2,
+                "VK_KHR_video_encode_h265": 2,
                 "VK_EXT_ycbcr_2plane_444_formats": 1,
                 "VK_EXT_ycbcr_image_arrays": 1,
                 "VK_AMD_buffer_marker": 1,
