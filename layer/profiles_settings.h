@@ -146,6 +146,18 @@ enum ProfileLoadingMode {
     PROFILE_LOADING_DIRS
 };
 
+static ProfileLoadingMode GetProfileLoadingMode(const std::string &value) {
+    if (value == "PROFILE_LOADING_DISABLED") {
+        return PROFILE_LOADING_DISABLED;
+    } else if (value == "PROFILE_LOADING_FILE") {
+        return PROFILE_LOADING_FILE;
+    } else if (value == "PROFILE_LOADING_DIRS") {
+        return PROFILE_LOADING_DIRS;
+    }
+
+    return PROFILE_LOADING_FILE;
+}
+
 struct ProfileLayerSettings {
     ~ProfileLayerSettings() {
         if (log.profiles_log_file != nullptr) {
