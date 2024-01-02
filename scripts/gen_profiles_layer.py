@@ -76,6 +76,9 @@ INCLUDES_HEADER = '''
 #include "profiles_json.h"
 #include "profiles_settings.h"
 #include <algorithm>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 '''
 
 GLOBAL_CONSTANTS = '''
@@ -248,7 +251,6 @@ class JsonLoader {
     JsonLoader()
         : layer_settings{},
           pdd_(nullptr),
-          profile_filename_(),
           profile_api_version_(0),
           excluded_extensions_(),
           excluded_formats_()
@@ -280,7 +282,9 @@ class JsonLoader {
         profile_map().erase(instance);
     }
 
-    VkResult LoadFile(std::string filename);
+    const Json::Value& FindRootFromProfileName(const std::string& profile_name);
+    VkResult LoadProfilesDatabase();
+    VkResult LoadFile(const std::string& filename);
     void ReadProfileApiVersion();
     VkResult LoadDevice(const char* device_name, PhysicalDeviceData *pdd);
     VkResult ReadProfile(const char* device_name, const Json::Value& root, const std::vector<std::vector<std::string>> &capabilities);
@@ -291,7 +295,6 @@ class JsonLoader {
    private:
     PhysicalDeviceData *pdd_;
 
-    std::string profile_filename_;
     std::map<std::string, Json::Value> profiles_file_roots_;
 
     std::uint32_t profile_api_version_;
@@ -1522,16 +1525,10 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
     return VK_SUCCESS;
 }
 
-VkResult JsonLoader::LoadFile(std::string filename) {
+VkResult JsonLoader::LoadFile(const std::string& filename) {
     LogMessage(&layer_settings, DEBUG_REPORT_DEBUG_BIT, "JsonLoader::LoadFile(\\"%s\\")\\n", filename.c_str());
 
-    profile_filename_ = filename;
     if (filename.empty()) {
-        if (!layer_settings.simulate.profile_name.empty()) {
-            LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
-                "Profile name is set to \\"%s\\", but profile_file is unset. The profile will not be loaded.\\n",
-                layer_settings.simulate.profile_name.c_str());
-        }
         return VK_SUCCESS;
     }
     std::ifstream json_file(filename);
@@ -1560,10 +1557,10 @@ VkResult JsonLoader::LoadFile(std::string filename) {
         if (!validator.Init()) {
             LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
                 "%s could not find the profile schema file to validate filename. This operation requires the Vulkan SDK to be installed. Skipping profile file validation.",
-                kLayerName, profile_filename_.c_str());
+                kLayerName, filename.c_str());
         } else if (!validator.Check(root)) {
             LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT,
-                "%s is not a valid JSON profile file.", profile_filename_.c_str());
+                "%s is not a valid JSON profile file.", filename.c_str());
             if (layer_settings.log.debug_fail_on_error) {
                 return VK_ERROR_INITIALIZATION_FAILED;
             } else {
@@ -1573,15 +1570,52 @@ VkResult JsonLoader::LoadFile(std::string filename) {
     }
 
     this->profiles_file_roots_.insert(std::pair(filename, root));
-    
+
+    return VK_SUCCESS;
+}
+
+VkResult JsonLoader::LoadProfilesDatabase() {
+    if (!layer_settings.simulate.profile_file.empty()) {
+        VkResult result = this->LoadFile(layer_settings.simulate.profile_file);
+        if (result != VK_SUCCESS) {
+            return result;
+        }
+    }
+
+    for (std::size_t i = 0, n = layer_settings.simulate.profile_dirs.size(); i < n; ++i) {
+        const std::string& path = layer_settings.simulate.profile_dirs[i];
+
+      for (const auto& entry : fs::directory_iterator(path)) {
+          VkResult result = this->LoadFile(entry.path().generic_string());
+          if (result != VK_SUCCESS) {
+              continue;
+          }
+      }
+    }
+
     ReadProfileApiVersion();
 
     return VK_SUCCESS;
 }
 
+const Json::Value& JsonLoader::FindRootFromProfileName(const std::string& profile_name) {
+    for (const auto& root : this->profiles_file_roots_) {
+        const Json::Value &profiles = root.second["profiles"];
+
+        bool found_profile = false;
+        for (const auto &profile : profiles.getMemberNames()) {
+            if (profile_name.empty() || profile_name == "${VP_DEFAULT}" || profile == profile_name) {
+                return root.second;
+            }
+        }
+    }
+
+    return Json::Value::nullSingleton();
+}
+
 void JsonLoader::ReadProfileApiVersion() {
     const std::string &profile_name = layer_settings.simulate.profile_name;
-    const Json::Value &profiles = profiles_file_roots_[profile_filename_]["profiles"];
+    const Json::Value &profiles = FindRootFromProfileName(profile_name)["profiles"];
     bool found_profile = false;
     for (const auto &profile : profiles.getMemberNames()) {
         if (profile_name.empty() || profile_name == "${VP_DEFAULT}" || profile == profile_name) {
@@ -1623,96 +1657,101 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
     pdd_ = pdd;
 
     const std::string &profile_name = layer_settings.simulate.profile_name;
-    const Json::Value &profiles = profiles_file_roots_[profile_filename_]["profiles"];
-    std::vector<std::vector<std::string>> capabilities;
 
-    bool found_profile = false;
-    for (const auto &profile : profiles.getMemberNames()) {
-        if (profile_name.empty() || profile_name == "${VP_DEFAULT}" || profile == profile_name) {
-            const auto &caps = profiles[profile]["capabilities"];
+    for (const auto& root : this->profiles_file_roots_) {
+        const Json::Value &profiles = root.second["profiles"];
+        std::vector<std::vector<std::string>> capabilities;
 
-            for (const auto &cap : caps) {
-                std::vector<std::string> cap_variants;
-                if (cap.isArray()) {
-                    for (const auto &cap_variant : cap) {
-                        cap_variants.push_back(cap_variant.asString());
-                    }
-                } else {
-                    cap_variants.push_back(cap.asString());
-                }
-                capabilities.push_back(cap_variants);
-            }
-
-            found_profile = true;
-            LogMessage(&layer_settings, DEBUG_REPORT_NOTIFICATION_BIT, "Overriding device capabilities with \\"%s\\" profile capabilities.\\n", profile.c_str());
-            break;  // load a single profile
-        }
-    }
-    if (!found_profile) {
+        bool found_profile = false;
         for (const auto &profile : profiles.getMemberNames()) {
-            const auto &caps = profiles[profile]["capabilities"];
+            if (profile_name.empty() || profile_name == "${VP_DEFAULT}" || profile == profile_name) {
+                const auto &caps = profiles[profile]["capabilities"];
 
-            for (const auto &cap : caps) {
-                std::vector<std::string> cap_variants;
-                if (cap.isArray()) {
-                    for (const auto &cap_variant : cap) {
-                        cap_variants.push_back(cap_variant.asString());
+                for (const auto &cap : caps) {
+                    std::vector<std::string> cap_variants;
+                    if (cap.isArray()) {
+                        for (const auto &cap_variant : cap) {
+                            cap_variants.push_back(cap_variant.asString());
+                        }
+                    } else {
+                        cap_variants.push_back(cap.asString());
                     }
-                } else {
-                    cap_variants.push_back(cap.asString());
+                    capabilities.push_back(cap_variants);
                 }
-                capabilities.push_back(cap_variants);
+
+                found_profile = true;
+                LogMessage(&layer_settings, DEBUG_REPORT_NOTIFICATION_BIT, "Overriding device capabilities with \\"%s\\" profile capabilities.\\n", profile.c_str());
+                break;  // load a single profile
             }
-
-            LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
-                "\\"%s\\" profile could not be found in \\"%s\\" file. Loading the default \\"%s\\" profile of the file.\\n",
-                    layer_settings.simulate.profile_name.c_str(), layer_settings.simulate.profile_file.c_str(), profile.c_str());
-
-            break; // Systematically load the first and default profile
         }
+        if (!found_profile) {
+            for (const auto &profile : profiles.getMemberNames()) {
+                const auto &caps = profiles[profile]["capabilities"];
+
+                for (const auto &cap : caps) {
+                    std::vector<std::string> cap_variants;
+                    if (cap.isArray()) {
+                        for (const auto &cap_variant : cap) {
+                            cap_variants.push_back(cap_variant.asString());
+                        }
+                    } else {
+                        cap_variants.push_back(cap.asString());
+                    }
+                    capabilities.push_back(cap_variants);
+                }
+
+                LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
+                    "\\"%s\\" profile could not be found in \\"%s\\" file. Loading the default \\"%s\\" profile of the file.\\n",
+                        layer_settings.simulate.profile_name.c_str(), layer_settings.simulate.profile_file.c_str(), profile.c_str());
+
+                break; // Systematically load the first and default profile
+            }
+        }
+
+        if (capabilities.empty()) {
+            return VK_SUCCESS;
+        }
+
+        const Json::Value schema_value = root.second["$schema"];
+        if (!schema_value.isString()) {
+            LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "JSON element \\"$schema\\" is not a string\\n");
+            return layer_settings.log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
+        }
+
+        const std::string schema = schema_value.asCString();
+        if (schema.find(SCHEMA_URI_BASE) == std::string::npos) {
+            LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "Document schema \\"%s\\" not supported by %s\\n", schema.c_str(), kLayerName);
+            return layer_settings.log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
+        }
+
+        const std::size_t size_schema = schema.size();
+        const std::size_t size_base = std::strlen(SCHEMA_URI_BASE);
+        const std::size_t size_version = std::strlen(".json#");
+        const std::string version = schema.substr(size_base, size_schema - size_base - size_version);
+
+        uint32_t version_major = 0;
+        uint32_t version_minor = 0;
+        uint32_t version_patch = 0;
+        std::sscanf(version.c_str(), "%d.%d.%d", &version_major, &version_minor, &version_patch);
+        if (VK_HEADER_VERSION < version_patch) {
+            LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
+                       "%s is built against Vulkan Header %d but the profile is written against Vulkan "
+                              "Header %d.\\n\\t- All newer capabilities in the "
+                              "profile will be ignored by the layer.\\n",
+                              kLayerName, VK_HEADER_VERSION, version_patch);
+        }
+
+        VkResult result = VK_SUCCESS;
+        if (layer_settings.simulate.capabilities & SIMULATE_EXTENSIONS_BIT) {
+            pdd_->simulation_extensions_.clear();
+        }
+
+        result = ReadProfile(device_name, root.second, capabilities);
+
+        return result;
     }
 
-    if (capabilities.empty()) {
-        return VK_SUCCESS;
-    }
-
-    const Json::Value schema_value = profiles_file_roots_[profile_filename_]["$schema"];
-    if (!schema_value.isString()) {
-        LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "JSON element \\"$schema\\" is not a string\\n");
-        return layer_settings.log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
-    }
-
-    const std::string schema = schema_value.asCString();
-    if (schema.find(SCHEMA_URI_BASE) == std::string::npos) {
-        LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "Document schema \\"%s\\" not supported by %s\\n", schema.c_str(), kLayerName);
-        return layer_settings.log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
-    }
-
-    const std::size_t size_schema = schema.size();
-    const std::size_t size_base = std::strlen(SCHEMA_URI_BASE);
-    const std::size_t size_version = std::strlen(".json#");
-    const std::string version = schema.substr(size_base, size_schema - size_base - size_version);
-
-    uint32_t version_major = 0;
-    uint32_t version_minor = 0;
-    uint32_t version_patch = 0;
-    std::sscanf(version.c_str(), "%d.%d.%d", &version_major, &version_minor, &version_patch);
-    if (VK_HEADER_VERSION < version_patch) {
-        LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
-                   "%s is built against Vulkan Header %d but the profile is written against Vulkan "
-                          "Header %d.\\n\\t- All newer capabilities in the "
-                          "profile will be ignored by the layer.\\n",
-                          kLayerName, VK_HEADER_VERSION, version_patch);
-    }
-
-    VkResult result = VK_SUCCESS;
-    if (layer_settings.simulate.capabilities & SIMULATE_EXTENSIONS_BIT) {
-        pdd_->simulation_extensions_.clear();
-    }
-
-    result = ReadProfile(device_name, profiles_file_roots_[profile_filename_], capabilities);
-
-    return result;
+    return VK_ERROR_UNKNOWN;
 }
 '''
 
@@ -1779,7 +1818,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
     LogMessage(layer_settings, DEBUG_REPORT_NOTIFICATION_BIT, "%s version %d.%d.%d\\n", kLayerName, kVersionProfilesMajor,
                                                        kVersionProfilesMinor, kVersionProfilesPatch);
 
-    VkResult result = json_loader.LoadFile(layer_settings->simulate.profile_file);
+    VkResult result = json_loader.LoadProfilesDatabase();
     if (result != VK_SUCCESS) {
         return result;
     }

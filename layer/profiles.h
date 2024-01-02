@@ -40,7 +40,9 @@ std::string GetSimulateCapabilitiesLog(SimulateCapabilityFlags flags);
 std::string GetDebugReportsLog(DebugActionFlags flags);
 
 #define kLayerName "VK_LAYER_KHRONOS_profiles"
+#define kLayerSettingsProfileMode "select_profiles_loading_mode"
 #define kLayerSettingsProfileFile "profile_file"
+#define kLayerSettingsProfileDirs "profile_dirs"
 #define kLayerSettingsProfileName "profile_name"
 #define kLayerSettingsProfileValidation "profile_validation"
 #define kLayerSettingsEmulatePortability "emulate_portability"

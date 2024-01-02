@@ -188,7 +188,9 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
 
     // Check if there is unknown settings if API settings are set
     if (create_info != nullptr) {
-        static const char *setting_names[] = {kLayerSettingsProfileFile,
+        static const char *setting_names[] = {kLayerSettingsProfileMode,
+                                              kLayerSettingsProfileFile,
+                                              kLayerSettingsProfileDirs,
                                               kLayerSettingsProfileName,
                                               kLayerSettingsProfileValidation,
                                               kLayerSettingsEmulatePortability,
@@ -232,9 +234,31 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
         }
     }
 
-    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileFile)) {
-        vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileFile, layer_settings->simulate.profile_file);
+    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileMode)) {
+        std::string mode;
+        vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileMode, mode);
+        layer_settings->simulate.profile_mode = GetProfileLoadingMode(mode);
 
+        switch (layer_settings->simulate.profile_mode) { 
+            default:
+                break;
+            case PROFILE_LOADING_FILE:
+                if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileFile)) {
+                    vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileFile, layer_settings->simulate.profile_file);
+                }
+                break;
+            case PROFILE_LOADING_DIRS:
+                if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileDirs)) {
+                    vkuGetLayerSettingValues(layerSettingSet, kLayerSettingsProfileDirs, layer_settings->simulate.profile_dirs);
+                }
+                break;
+        }
+    } else if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileFile)) {
+        vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileFile, layer_settings->simulate.profile_file);
+        layer_settings->simulate.profile_mode = PROFILE_LOADING_FILE;
+    }
+
+    if (layer_settings->simulate.profile_mode != PROFILE_LOADING_DISABLED) {
         if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileName)) {
             vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileName, layer_settings->simulate.profile_name);
         }
