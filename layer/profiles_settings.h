@@ -140,36 +140,6 @@ enum ForceDevice {
     FORCE_DEVICE_WITH_NAME
 };
 
-enum ProfileLoadingMode {
-    PROFILE_LOADING_DISABLED,
-    PROFILE_LOADING_FILE,
-    PROFILE_LOADING_DIRS
-};
-
-static ProfileLoadingMode GetProfileLoadingMode(const std::string &value) {
-    if (value == "PROFILE_LOADING_DISABLED") {
-        return PROFILE_LOADING_DISABLED;
-    } else if (value == "PROFILE_LOADING_FILE") {
-        return PROFILE_LOADING_FILE;
-    } else if (value == "PROFILE_LOADING_DIRS") {
-        return PROFILE_LOADING_DIRS;
-    }
-
-    return PROFILE_LOADING_FILE;
-}
-
-static std::string GetProfileLoadingModeString(ProfileLoadingMode value) {
-    if (value == PROFILE_LOADING_DISABLED) {
-        return "PROFILE_LOADING_DISABLED";
-    } else if (value == PROFILE_LOADING_FILE) {
-        return "PROFILE_LOADING_FILE";
-    } else if (value == PROFILE_LOADING_DIRS) {
-        return "PROFILE_LOADING_DIRS";
-    }
-
-    return "PROFILE_LOADING_FILE";
-}
-
 struct ProfileLayerSettings {
     ~ProfileLayerSettings() {
         if (log.profiles_log_file != nullptr) {
@@ -179,7 +149,6 @@ struct ProfileLayerSettings {
     }
 
     struct Simulate {
-        ProfileLoadingMode profile_mode;
         std::string profile_file{};
         std::vector<std::string> profile_dirs;
         std::string profile_name{"${VP_DEFAULT}"};

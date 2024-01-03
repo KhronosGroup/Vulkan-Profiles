@@ -188,8 +188,7 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
 
     // Check if there is unknown settings if API settings are set
     if (create_info != nullptr) {
-        static const char *setting_names[] = {kLayerSettingsProfileMode,
-                                              kLayerSettingsProfileFile,
+        static const char *setting_names[] = {kLayerSettingsProfileFile,
                                               kLayerSettingsProfileDirs,
                                               kLayerSettingsProfileName,
                                               kLayerSettingsProfileValidation,
@@ -234,31 +233,15 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
         }
     }
 
-    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileMode)) {
-        std::string mode;
-        vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileMode, mode);
-        layer_settings->simulate.profile_mode = GetProfileLoadingMode(mode);
-
-        switch (layer_settings->simulate.profile_mode) { 
-            default:
-                break;
-            case PROFILE_LOADING_FILE:
-                if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileFile)) {
-                    vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileFile, layer_settings->simulate.profile_file);
-                }
-                break;
-            case PROFILE_LOADING_DIRS:
-                if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileDirs)) {
-                    vkuGetLayerSettingValues(layerSettingSet, kLayerSettingsProfileDirs, layer_settings->simulate.profile_dirs);
-                }
-                break;
-        }
-    } else if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileFile)) {
-        vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileFile, layer_settings->simulate.profile_file);
-        layer_settings->simulate.profile_mode = PROFILE_LOADING_FILE;
+    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileDirs)) {
+        vkuGetLayerSettingValues(layerSettingSet, kLayerSettingsProfileDirs, layer_settings->simulate.profile_dirs);
     }
 
-    if (layer_settings->simulate.profile_mode != PROFILE_LOADING_DISABLED) {
+    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileFile)) {
+        vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileFile, layer_settings->simulate.profile_file);
+    }
+
+    if (!layer_settings->simulate.profile_dirs.empty() || !layer_settings->simulate.profile_file.empty()) {
         if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileName)) {
             vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileName, layer_settings->simulate.profile_name);
         }
@@ -434,7 +417,6 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
                    layer_settings->log.debug_filename.c_str());
     }
 
-    const std::string profile_mode = GetProfileLoadingModeString(layer_settings->simulate.profile_mode);
     const std::string profile_dirs = GetString(layer_settings->simulate.profile_dirs);
     const std::string simulation_capabilities_log = GetSimulateCapabilitiesLog(layer_settings->simulate.capabilities);
     const std::string default_feature_values = GetDefaultFeatureValuesString(layer_settings->simulate.default_feature_values);
@@ -442,7 +424,6 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
     const std::string debug_reports_log = GetDebugReportsLog(layer_settings->log.debug_reports);
 
     std::string settings_log;
-    settings_log += format("\t%s: %s\n", kLayerSettingsProfileMode, profile_mode.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileFile, layer_settings->simulate.profile_file.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileDirs, profile_dirs.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileName, layer_settings->simulate.profile_name.c_str());
