@@ -1502,17 +1502,17 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
 
     if (properties_api_version != 0) {
         LogMessage(&layer_settings, DEBUG_REPORT_NOTIFICATION_BIT,
-            "VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 ". Using the API version specified by the profile VkPhysicalDeviceProperties structure.\\n",
+            "- VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 ". Using the API version specified by the profile VkPhysicalDeviceProperties structure.\\n",
             VK_API_VERSION_MAJOR(properties_api_version), VK_API_VERSION_MINOR(properties_api_version), VK_API_VERSION_PATCH(properties_api_version));
     } else if (layer_settings.simulate.capabilities & SIMULATE_API_VERSION_BIT) {
         LogMessage(&layer_settings, DEBUG_REPORT_NOTIFICATION_BIT,
-            "VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32". Using the API version specified by the profile.\\n",
+            "- VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32". Using the API version specified by the profile.\\n",
             VK_API_VERSION_MAJOR(this->profile_api_version_), VK_API_VERSION_MINOR(this->profile_api_version_), VK_API_VERSION_PATCH(this->profile_api_version_));
 
         pdd_->physical_device_properties_.apiVersion = this->profile_api_version_;
     } else {
         LogMessage(&layer_settings, DEBUG_REPORT_NOTIFICATION_BIT,
-            "VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 ". Using the device version.\\n",
+            "- VkPhysicalDeviceProperties API version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 ". Using the device version.\\n",
                 VK_API_VERSION_MAJOR(pdd_->physical_device_properties_.apiVersion),
                 VK_API_VERSION_MINOR(pdd_->physical_device_properties_.apiVersion),
                 VK_API_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion));
@@ -1658,6 +1658,10 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
 
     const std::string &profile_name = layer_settings.simulate.profile_name;
 
+    if (this->profiles_file_roots_.empty() && (profile_name.empty() || profile_name == "${VP_DEFAULT}")) {
+        return VK_SUCCESS;
+    }
+
     for (const auto& root : this->profiles_file_roots_) {
         const Json::Value &profiles = root.second["profiles"];
         std::vector<std::vector<std::string>> capabilities;
@@ -1680,7 +1684,7 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
                 }
 
                 found_profile = true;
-                LogMessage(&layer_settings, DEBUG_REPORT_NOTIFICATION_BIT, "Overriding device capabilities with \\"%s\\" profile capabilities.\\n", profile.c_str());
+                LogMessage(&layer_settings, DEBUG_REPORT_NOTIFICATION_BIT, "- Overriding device capabilities with \\"%s\\" profile capabilities.\\n", profile.c_str());
                 break;  // load a single profile
             }
         }
@@ -3130,7 +3134,7 @@ class VulkanProfilesLayerGenerator():
         gen += '\tconst uint32_t minor = VK_API_VERSION_MINOR(api_version);\n'
         gen += '\tconst uint32_t major = VK_API_VERSION_MAJOR(api_version);\n'
         gen += '\tLogMessage(&layer_settings, DEBUG_REPORT_NOTIFICATION_BIT,\n'
-        gen += '\t\"Adding promoted extensions to core in Vulkan (%" PRIu32 ".%" PRIu32 ").\\n", major, minor);\n\n'
+        gen += '\t\"- Adding promoted extensions to core in Vulkan (%" PRIu32 ".%" PRIu32 ").\\n", major, minor);\n\n'
 
         for i in range(registry.headerVersionNumber.major):
             major = str(i + 1)

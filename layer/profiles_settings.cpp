@@ -434,13 +434,17 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
                    layer_settings->log.debug_filename.c_str());
     }
 
+    const std::string profile_mode = GetProfileLoadingModeString(layer_settings->simulate.profile_mode);
+    const std::string profile_dirs = GetString(layer_settings->simulate.profile_dirs);
     const std::string simulation_capabilities_log = GetSimulateCapabilitiesLog(layer_settings->simulate.capabilities);
     const std::string default_feature_values = GetDefaultFeatureValuesString(layer_settings->simulate.default_feature_values);
     const std::string debug_actions_log = GetDebugActionsLog(layer_settings->log.debug_actions);
     const std::string debug_reports_log = GetDebugReportsLog(layer_settings->log.debug_reports);
 
     std::string settings_log;
+    settings_log += format("\t%s: %s\n", kLayerSettingsProfileMode, profile_mode.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileFile, layer_settings->simulate.profile_file.c_str());
+    settings_log += format("\t%s: %s\n", kLayerSettingsProfileDirs, profile_dirs.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileName, layer_settings->simulate.profile_name.c_str());
     settings_log +=
         format("\t%s: %s\n", kLayerSettingsProfileValidation, layer_settings->simulate.profile_validation ? "true" : "false");
