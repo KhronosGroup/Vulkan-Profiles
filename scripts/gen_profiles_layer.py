@@ -1662,8 +1662,10 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
         return VK_SUCCESS;
     }
 
-    for (const auto& root : this->profiles_file_roots_) {
-        const Json::Value &profiles = root.second["profiles"];
+    const auto& root = FindRootFromProfileName(profile_name);
+
+    if (root != Json::Value::nullSingleton()) {
+        const Json::Value &profiles = root["profiles"];
         std::vector<std::vector<std::string>> capabilities;
 
         bool found_profile = false;
@@ -1716,7 +1718,7 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
             return VK_SUCCESS;
         }
 
-        const Json::Value schema_value = root.second["$schema"];
+        const Json::Value schema_value = root["$schema"];
         if (!schema_value.isString()) {
             LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "JSON element \\"$schema\\" is not a string\\n");
             return layer_settings.log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
@@ -1750,7 +1752,7 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
             pdd_->simulation_extensions_.clear();
         }
 
-        result = ReadProfile(device_name, root.second, capabilities);
+        result = ReadProfile(device_name, root, capabilities);
 
         return result;
     }
@@ -1841,7 +1843,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
     }
 
     bool changed_version = false;
-    if (!layer_settings->simulate.profile_file.empty()) {
+    if (!layer_settings->simulate.profile_file.empty() || layer_settings->simulate.profile_dirs.empty()) {
         const uint32_t profile_api_version = json_loader.GetProfileApiVersion();
         if (VK_API_VERSION_MAJOR(requested_version) < VK_API_VERSION_MAJOR(profile_api_version) ||
             VK_API_VERSION_MINOR(requested_version) < VK_API_VERSION_MINOR(profile_api_version)) {
