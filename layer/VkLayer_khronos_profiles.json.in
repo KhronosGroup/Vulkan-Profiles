@@ -32,12 +32,8 @@
                             "value": "FORCE_DEVICE_WITH_NAME"
                         },
                         {
-                            "key": "profile_file",
-                            "value": ""
-                        },
-                        {
-                            "key": "profile_name",
-                            "value": ""
+                            "key": "profile_emulation",
+                            "value": false
                         },
                         {
                             "key": "simulate_capabilities",
@@ -50,8 +46,8 @@
                     ]
                 },
                 {
-                    "label": "LunarG Desktop Portability 2023",
-                    "description": "Check the Vulkan 1.2 application will run on Windows, Linux and macOS platforms without exceeding ecosystem effective devices capabilities",
+                    "label": "Emulate a Vulkan Conformant Profile",
+                    "description": "Emulate a Conformant Vulkan Profile",
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
                     "status": "STABLE",
                     "settings": [
@@ -60,8 +56,44 @@
                             "value": "FORCE_DEVICE_OFF"
                         },
                         {
-                            "key": "profile_file",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_baseline_2023.json"
+                            "key": "profile_emulation",
+                            "value": true
+                        },
+                        {
+                            "key": "profile_dirs",
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles"
+                        },
+                        {
+                            "key": "profile_name",
+                            "value": "VP_LUNARG_desktop_baseline_2023"
+                        },
+                        {
+                            "key": "simulate_capabilities",
+                            "value": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT" ]
+                        },
+                        {
+                            "key": "emulate_portability",
+                            "value": false
+                        }
+                    ]
+                },
+                {
+                    "label": "Emulate a Vulkan Portability Profile",
+                    "description": "Emulate a Vulkan Profile with Vulkan Portability",
+                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                    "status": "STABLE",
+                    "settings": [
+                        {
+                            "key": "force_device",
+                            "value": "FORCE_DEVICE_OFF"
+                        },
+                        {
+                            "key": "profile_emulation",
+                            "value": true
+                        },
+                        {
+                            "key": "profile_dirs",
+                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles"
                         },
                         {
                             "key": "profile_name",
@@ -106,90 +138,6 @@
                         {
                             "key": "constantAlphaColorBlendFactors",
                             "value": true
-                        }
-                    ]
-                },
-                {
-                    "label": "Khronos Roadmap 2022",
-                    "description": "Check the Vulkan 1.3 application will run on the Khronos Roadmap 2022 Profile devices",
-                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                    "status": "STABLE",
-                    "settings": [
-                        {
-                            "key": "force_device",
-                            "value": "FORCE_DEVICE_OFF"
-                        },
-                        {
-                            "key": "emulate_portability",
-                            "value": false
-                        },
-                        {
-                            "key": "profile_file",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_KHR_roadmap.json"
-                        },
-                        {
-                            "key": "profile_name",
-                            "value": "VP_KHR_roadmap_2022"
-                        },
-                        {
-                            "key": "simulate_capabilities",
-                            "value": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT" ]
-                        }
-                    ]
-                },
-                {
-                    "label": "Android Baseline 2022",
-                    "description": "Check the Vulkan 1.1 application will run on the Android Baseline 2022 Profile devices",
-                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                    "status": "STABLE",
-                    "settings": [
-                        {
-                            "key": "force_device",
-                            "value": "FORCE_DEVICE_OFF"
-                        },
-                        {
-                            "key": "emulate_portability",
-                            "value": false
-                        },
-                        {
-                            "key": "profile_file",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_ANDROID_baseline.json"
-                        },
-                        {
-                            "key": "profile_name",
-                            "value": "VP_ANDROID_baseline_2022"
-                        },
-                        {
-                            "key": "simulate_capabilities",
-                            "value": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT", "SIMULATE_FORMATS_BIT" ]
-                        }
-                    ]
-                },
-                {
-                    "label": "Android Baseline 2021",
-                    "description": "Check the Vulkan 1.0 application will run on the Android Baseline 2021 Profile devices",
-                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                    "status": "STABLE",
-                    "settings": [
-                        {
-                            "key": "force_device",
-                            "value": "FORCE_DEVICE_OFF"
-                        },
-                        {
-                            "key": "emulate_portability",
-                            "value": false
-                        },
-                        {
-                            "key": "profile_file",
-                            "value": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_ANDROID_baseline.json"
-                        },
-                        {
-                            "key": "profile_name",
-                            "value": "VP_ANDROID_baseline_2021"
-                        },
-                        {
-                            "key": "simulate_capabilities",
-                            "value": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT", "SIMULATE_FORMATS_BIT" ]
                         }
                     ]
                 }
@@ -263,135 +211,63 @@
                     ]
                 },
                 {
-                    "key": "select_profiles_loading_mode",
-                    "label": "Select Profiles Loading Mode",
-                    "description": "Select how to load Vulkan Profiles",
+                    "key": "profile_emulation",
+                    "label": "Emulate a Vulkan Profile",
+                    "description": "Emulate a Vulkan Profile on the Developer System",
                     "status": "STABLE",
-                    "type": "ENUM",
-                    "default": "PROFILE_LOADING_DIRS",
-                    "flags": [
+                    "type": "BOOL",
+                    "default": true,
+                    "settings": [
                         {
-                            "key": "PROFILE_LOADING_DISABLED",
-                            "label": "Disabled",
-                            "description": "No physical Device capabilities emulation."
+                            "key": "profile_dirs",
+                            "label": "Profiles Directories",
+                            "description": "Select the location all the profiles.",
+                            "type": "LOAD_FOLDER",
+                            "format": "PROFILE",
+                            "default": "",
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "profile_emulation",
+                                        "value": true
+                                    }
+                                ]
+                            }
                         },
                         {
-                            "key": "PROFILE_LOADING_FILE",
-                            "label": "Load a Single Profiles file",
-                            "description": "Select a profile file and a profile.",
-                            "settings": [
-                                {
-                                    "key": "profile_file",
-                                    "label": "Profiles File",
-                                    "description": "Path of a profile file and the name of the profile to load.",
-                                    "status": "STABLE",
-                                    "type": "LOAD_FILE",
-                                    "format": "PROFILE",
-                                    "filter": "*.json",
-                                    "default": "${VULKAN_CONTENT}/VK_LAYER_KHRONOS_profiles/VP_LUNARG_desktop_baseline_2024.json",
-                                    "expanded": true,
-                                    "dependence": {
-                                        "mode": "ALL",
-                                        "settings": [
-                                            {
-                                                "key": "select_profiles_loading_mode",
-                                                "value": "PROFILE_LOADING_FILE"
-                                            }
-                                        ]
+                            "key": "profile_name",
+                            "label": "Profile Name",
+                            "description": "Name of the profile specified by the profile file to use. If set to ${VP_DEFAULT}, the layer will load the first profile in the file.",
+                            "type": "ENUM",
+                            "flags": [],
+                            "default": "${VP_DEFAULT}",
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "profile_emulation",
+                                        "value": true
                                     }
-                                },
-                                {
-                                    "key": "profile_name",
-                                    "label": "Profile Name",
-                                    "description": "Name of the profile specified by the profile file to use. If set to ${VP_DEFAULT}, the layer will load the first profile in the file.",
-                                    "type": "ENUM",
-                                    "flags": [],
-                                    "default": "${VP_DEFAULT}",
-                                    "dependence": {
-                                        "mode": "ALL",
-                                        "settings": [
-                                            {
-                                                "key": "select_profiles_loading_mode",
-                                                "value": "PROFILE_LOADING_FILE"
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    "key": "profile_validation",
-                                    "label": "Schema Validation",
-                                    "description": "Validate the profile files against the Vulkan SDK profile schema if the file is found.",
-                                    "type": "BOOL",
-                                    "default": false,
-                                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                                    "dependence": {
-                                        "mode": "ALL",
-                                        "settings": [
-                                            {
-                                                "key": "select_profiles_loading_mode",
-                                                "value": "PROFILE_LOADING_FILE"
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
+                                ]
+                            }
                         },
                         {
-                            "key": "PROFILE_LOADING_DIRS",
-                            "label": "Load all profiles in directories",
-                            "description": "Let the Vulkan Loader list all the Physical Device.",
-                            "settings": [
-                                {
-                                    "key": "profile_dirs",
-                                    "label": "Profiles Directories",
-                                    "description": "Select the location all the profiles.",
-                                    "type": "LOAD_FOLDER",
-                                    "default": "",
-                                    "dependence": {
-                                        "mode": "ALL",
-                                        "settings": [
-                                            {
-                                                "key": "select_profiles_loading_mode",
-                                                "value": "PROFILE_LOADING_DIRS"
-                                            }
-                                        ]
+                            "key": "profile_validation",
+                            "label": "Schema Validation",
+                            "description": "Validate the profile files against the Vulkan SDK profile schema if the file is found.",
+                            "type": "BOOL",
+                            "default": false,
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "profile_emulation",
+                                        "value": true
                                     }
-                                },
-                                {
-                                    "key": "profile_name",
-                                    "label": "Profile Name",
-                                    "description": "Name of the profile specified by the profile file to use. If set to ${VP_DEFAULT}, the layer will load the first profile in the file.",
-                                    "type": "ENUM",
-                                    "flags": [],
-                                    "default": "${VP_DEFAULT}",
-                                    "dependence": {
-                                        "mode": "ALL",
-                                        "settings": [
-                                            {
-                                                "key": "select_profiles_loading_mode",
-                                                "value": "PROFILE_LOADING_DIRS"
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    "key": "profile_validation",
-                                    "label": "Schema Validation",
-                                    "description": "Validate the profile files against the Vulkan SDK profile schema if the file is found.",
-                                    "type": "BOOL",
-                                    "default": false,
-                                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                                    "dependence": {
-                                        "mode": "ALL",
-                                        "settings": [
-                                            {
-                                                "key": "select_profiles_loading_mode",
-                                                "value": "PROFILE_LOADING_DIRS"
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
+                                ]
+                            }
                         }
                     ]
                 },
@@ -1387,6 +1263,7 @@
                         }
                     ],
                     "default": [
+                        "DEBUG_REPORT_NOTIFICATION_BIT",
                         "DEBUG_REPORT_WARNING_BIT",
                         "DEBUG_REPORT_ERROR_BIT"
                     ]
