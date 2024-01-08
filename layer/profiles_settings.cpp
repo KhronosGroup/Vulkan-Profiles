@@ -188,7 +188,8 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
 
     // Check if there is unknown settings if API settings are set
     if (create_info != nullptr) {
-        static const char *setting_names[] = {kLayerSettingsProfileFile,
+        static const char *setting_names[] = {kLayerSettingsProfileEmulation,
+                                              kLayerSettingsProfileFile,
                                               kLayerSettingsProfileDirs,
                                               kLayerSettingsProfileName,
                                               kLayerSettingsProfileValidation,
@@ -233,12 +234,19 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
         }
     }
 
-    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileDirs)) {
-        vkuGetLayerSettingValues(layerSettingSet, kLayerSettingsProfileDirs, layer_settings->simulate.profile_dirs);
+    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileEmulation)) {
+        vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileEmulation, layer_settings->simulate.profile_emulation);
     }
 
-    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileFile)) {
-        vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileFile, layer_settings->simulate.profile_file);
+    if (layer_settings->simulate.profile_emulation) {
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileDirs)) {
+            vkuGetLayerSettingValues(layerSettingSet, kLayerSettingsProfileDirs, layer_settings->simulate.profile_dirs);
+        }
+
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileFile)) {
+            LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT, "'%s' setting is deprecated, please use '%s' instead.\n", kLayerSettingsProfileFile, kLayerSettingsProfileDirs);
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileFile, layer_settings->simulate.profile_file);
+        }
     }
 
     if (!layer_settings->simulate.profile_dirs.empty() || !layer_settings->simulate.profile_file.empty()) {
@@ -424,6 +432,7 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
     const std::string debug_reports_log = GetDebugReportsLog(layer_settings->log.debug_reports);
 
     std::string settings_log;
+    settings_log += format("\t%s: %s\n", kLayerSettingsProfileEmulation, layer_settings->simulate.profile_emulation ? "true" : "false");
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileFile, layer_settings->simulate.profile_file.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileDirs, profile_dirs.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileName, layer_settings->simulate.profile_name.c_str());
