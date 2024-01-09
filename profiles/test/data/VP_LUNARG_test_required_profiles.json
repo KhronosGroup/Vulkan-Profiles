@@ -1,18 +1,18 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-204.json#",
     "capabilities": {
         "baseline": {
             "properties": {
                 "VkPhysicalDeviceProperties": {
                     "limits": {
-                        "maxImageDimension1D": 4096
+                        "maxImageDimension2D": 4096
                     }
                 }
             }
         }
     },
     "profiles": {
-        "VP_LUNARG_test_api_version_profile": {
+        "VP_LUNARG_test_required_profiles": {
             "version": 1,
             "api-version": "1.1.142",
             "label": "LunarG Vulkan Desktop Portability 2021 profile",
@@ -32,6 +32,9 @@
                     "author": "Christophe Riccio",
                     "comment": "Initial revision"
                 }
+            ],
+            "profiles": [
+                "VP_LUNARG_test_api_version_profile"
             ],
             "capabilities": [
                 "baseline"
