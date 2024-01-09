@@ -243,6 +243,53 @@ TEST_F(TestsMechanism, selecting_profile_dirs) {
     }
 }
 
+TEST_F(TestsMechanism, selecting_profile_with_required_profiles) {
+    TEST_DESCRIPTION("Test loading a profile with a required profiles");
+
+    VkResult err = VK_SUCCESS;
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    {
+        const char* profile_dirs_data = JSON_TEST_FILES_PATH;
+        const char* profile_name_data = "VP_LUNARG_test_required_profiles2";
+        VkBool32 emulate_portability_data = VK_FALSE;
+        const std::vector<const char*> simulate_capabilities = {"SIMULATE_MAX_ENUM"};
+        const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
+
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsProfileDirs, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_dirs_data},
+            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
+            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT,
+             static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
+
+        err = inst_builder.init(settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            inst_builder.reset();
+            return;
+        }
+
+        VkResult result = VK_SUCCESS;
+
+        VkPhysicalDeviceProperties2 gpu_props2{};
+        gpu_props2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+        gpu_props2.pNext = nullptr;
+        vkGetPhysicalDeviceProperties2(gpu, &gpu_props2);
+
+        EXPECT_EQ(2048, gpu_props2.properties.limits.maxImageDimension1D);
+        EXPECT_EQ(4096, gpu_props2.properties.limits.maxImageDimension2D);
+
+        inst_builder.reset();
+    }
+}
+
 TEST_F(TestsMechanism, profile_variants_all) {
     VkResult err = VK_SUCCESS;
 
