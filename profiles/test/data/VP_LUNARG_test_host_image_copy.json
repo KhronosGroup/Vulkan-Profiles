@@ -589,26 +589,6 @@
                     ],
                     "sampleLocationSubPixelBits": 4
                 },
-                "VkPhysicalDeviceSubgroupProperties": {
-                    "subgroupSize": 64,
-                    "supportedStages": [
-                        "VK_SHADER_STAGE_VERTEX_BIT",
-                        "VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT",
-                        "VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT",
-                        "VK_SHADER_STAGE_GEOMETRY_BIT",
-                        "VK_SHADER_STAGE_FRAGMENT_BIT",
-                        "VK_SHADER_STAGE_COMPUTE_BIT"
-                    ],
-                    "supportedOperations": [
-                        "VK_SUBGROUP_FEATURE_BASIC_BIT",
-                        "VK_SUBGROUP_FEATURE_VOTE_BIT",
-                        "VK_SUBGROUP_FEATURE_ARITHMETIC_BIT",
-                        "VK_SUBGROUP_FEATURE_BALLOT_BIT",
-                        "VK_SUBGROUP_FEATURE_SHUFFLE_BIT",
-                        "VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT",
-                        "VK_SUBGROUP_FEATURE_QUAD_BIT"
-                    ]
-                },
                 "VkPhysicalDeviceTransformFeedbackPropertiesEXT": {
                     "maxTransformFeedbackStreams": 4,
                     "maxTransformFeedbackBuffers": 4,
@@ -3018,7 +2998,7 @@
         }
     },
     "profiles": {
-        "VP_LUNARG_merged_2024_01_10_13_18": {
+        "VP_LUNARG_merged_2024_01_10_17_47": {
             "version": 1,
             "api-version": "1.3.255",
             "label": null,
