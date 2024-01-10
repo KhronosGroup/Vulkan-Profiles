@@ -148,6 +148,19 @@ set_target_properties(VpTestGeneratedName PROPERTIES FOLDER "Profiles generator/
 
 add_dependencies(VpTestGeneratedName VpGenerated)
 
+add_custom_target(VpTestHostImageCopy ALL
+    COMMAND Python3::Interpreter ${MERGE_PYTHON_FILES}
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_host_image_copy
+        --output-path ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_host_image_copy.json
+    VERBATIM
+    SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
+    DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})
+
+set_target_properties(VpTestHostImageCopy PROPERTIES FOLDER "Profiles generator/Tests")
+
+add_dependencies(VpTestHostImageCopy VpGenerated)
+
 set(json_install_dir "${CMAKE_INSTALL_DATADIR}/vulkan/config/VK_LAYER_KHRONOS_profiles")
 if (WIN32)
     set(json_install_dir "Config/VK_LAYER_KHRONOS_profiles")

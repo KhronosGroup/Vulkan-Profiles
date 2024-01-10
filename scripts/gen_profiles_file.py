@@ -404,6 +404,10 @@ class ProfileMerger():
                     else:
                         merged[member] = entry[member]
             else:
+                # VK_EXT_host_image_copy is unsupported
+                if property == 'VkPhysicalDeviceHostImageCopyPropertiesEXT':
+                    continue
+
                 # Merge properties
                 xmlmember = self.registry.structs[property].members[member]
                 if xmlmember.limittype == 'struct':
