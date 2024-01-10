@@ -1166,7 +1166,7 @@ bool JsonLoader::GetQueueFamilyProperties(const char* device_name, const Json::V
             for (const auto &feature : props["checkpointExecutionStageMask"]) {
                 dest->checkpoint_properties_.checkpointExecutionStageMask |= StringToVkPipelineStageFlags(feature.asString());
             }
-        } else if (name == "VkQueueFamilyQueryResultStatusProperties2KHR") {
+        } else if (name == "VkQueueFamilyQueryResultStatusPropertiesKHR") {
             dest->query_result_status_properties_.queryResultStatusSupport = props["queryResultStatusSupport"].asBool() ? VK_TRUE : VK_FALSE;
         }
     }
@@ -1236,7 +1236,7 @@ bool JsonLoader::GetQueueFamilyProperties(const char* device_name, const Json::V
                               string_VkPipelineStageFlags2(dest->checkpoint_properties_2_.checkpointExecutionStageMask).c_str());
         }
         if (dest->query_result_status_properties_.queryResultStatusSupport) {
-            message += format(", VkQueueFamilyQueryResultStatusProperties2KHR [queryResultStatusSupport: VK_TRUE]");
+            message += format(", VkQueueFamilyQueryResultStatusPropertiesKHR [queryResultStatusSupport: VK_TRUE]");
         }
         message += ".\\n";
         LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT, message.c_str());
