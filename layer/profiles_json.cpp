@@ -126,8 +126,8 @@ bool WarnDuplicated(ProfileLayerSettings *layer_settings, const Json::Value &par
     }
 
     for (uint32_t i = 1; i < set.size(); ++i) {
-        LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT, "Profile sets variables for %s while also using %s\n", set[0].c_str(),
-                   set[i].c_str());
+        LogMessage(layer_settings, DEBUG_REPORT_NOTIFICATION_BIT,
+                   "Profile sets variables for %s while also using %s. Both must match.\n", set[0].c_str(), set[i].c_str());
     }
     return set.size() <= 1;
 }
