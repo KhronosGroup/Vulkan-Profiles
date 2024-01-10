@@ -250,7 +250,43 @@ class ProfileMerger():
                     del merged_properties[property]
 
             sorted_properties = collections.OrderedDict(sorted(merged_properties.items()))
+
+            if 'VkPhysicalDeviceVulkan11Properties' in sorted_properties:
+                if 'VkPhysicalDeviceIDPropertiesKHR' in sorted_properties:
+                    del sorted_properties['VkPhysicalDeviceIDPropertiesKHR']
+                if 'VkPhysicalDeviceSubgroupProperties' in sorted_properties:
+                    del sorted_properties['VkPhysicalDeviceSubgroupProperties']
+                if 'VkPhysicalDevicePointClippingPropertiesKHR' in sorted_properties:
+                    del sorted_properties['VkPhysicalDevicePointClippingPropertiesKHR']
+                if 'VkPhysicalDeviceMultiviewPropertiesKHR' in sorted_properties:
+                    del sorted_properties['VkPhysicalDeviceMultiviewPropertiesKHR']
+                if 'VkPhysicalDeviceProtectedMemoryProperties' in sorted_properties:
+                    del sorted_properties['VkPhysicalDeviceProtectedMemoryProperties']
+                if 'VkPhysicalDeviceMaintenance3PropertiesKHR' in sorted_properties:
+                    del sorted_properties['VkPhysicalDeviceMaintenance3PropertiesKHR']
+
+            if 'VkPhysicalDeviceVulkan12Properties' in sorted_properties:
+                if 'VkPhysicalDeviceDriverPropertiesKHR' in sorted_properties:
+                    del sorted_properties['VkPhysicalDeviceDriverPropertiesKHR']
+                if 'VkPhysicalDeviceFloatControlsPropertiesKHR ' in sorted_properties:
+                    del sorted_properties['VkPhysicalDeviceFloatControlsPropertiesKHR ']
+                if 'VkPhysicalDeviceDescriptorIndexingPropertiesEXT' in sorted_properties:
+                    del sorted_properties['VkPhysicalDeviceDescriptorIndexingPropertiesEXT']
+                if 'VkPhysicalDeviceDepthStencilResolvePropertiesKHR' in sorted_properties:
+                    del sorted_properties['VkPhysicalDeviceDepthStencilResolvePropertiesKHR']
+                if 'VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT' in sorted_properties:
+                    del sorted_properties['VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT']
+                if 'VkPhysicalDeviceTimelineSemaphorePropertiesKHR' in sorted_properties:
+                    del sorted_properties['VkPhysicalDeviceTimelineSemaphorePropertiesKHR']
+
+            if 'VkPhysicalDeviceVulkan13Properties' in sorted_properties:
+                if 'VkPhysicalDeviceInlineUniformBlockPropertiesEXT' in sorted_properties:
+                    del sorted_properties['VkPhysicalDeviceInlineUniformBlockPropertiesEXT']
+                if 'VkPhysicalDeviceSubgroupSizeControlPropertiesEXT' in sorted_properties:
+                    del sorted_properties['VkPhysicalDeviceSubgroupSizeControlPropertiesEXT']
+
             capabilities['baseline']['properties'] = dict(sorted_properties)
+
         if merged_formats:
             sorted_formats = collections.OrderedDict(sorted(merged_formats.items()))
             capabilities['baseline']['formats'] = dict(sorted_formats)
