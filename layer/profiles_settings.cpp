@@ -177,6 +177,27 @@ static ForceDevice GetForceDevice(const std::string &value) {
     return FORCE_DEVICE_OFF;
 }
 
+static std::vector<std::string> Split(const std::string &value, const std::string &delimiter) {
+    std::vector<std::string> result;
+
+    std::string parse = value;
+
+    std::size_t start = 0;
+    std::size_t end = parse.find(delimiter);
+    while (end != std::string::npos) {
+        result.push_back(parse.substr(start, end - start));
+        start = end + delimiter.length();
+        end = parse.find(delimiter, start);
+    }
+
+    const std::string last = parse.substr(start, end);
+    if (!last.empty()) {
+        result.push_back(last);
+    }
+
+    return result;
+}
+
 void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
                                ProfileLayerSettings *layer_settings) {
     assert(layer_settings != nullptr);
@@ -240,11 +261,18 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
 
     if (layer_settings->simulate.profile_emulation) {
         if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileDirs)) {
-            vkuGetLayerSettingValues(layerSettingSet, kLayerSettingsProfileDirs, layer_settings->simulate.profile_dirs);
+            layer_settings->simulate.profile_dirs.clear();
+
+            std::vector<std::string> profile_dirs_list;
+            vkuGetLayerSettingValues(layerSettingSet, kLayerSettingsProfileDirs, profile_dirs_list);
+            for (std::size_t i = 0, n = profile_dirs_list.size(); i < n; ++i) {
+                std::vector<std::string> profile_dirs = Split(profile_dirs_list[i], ",");
+                layer_settings->simulate.profile_dirs.insert(
+                    layer_settings->simulate.profile_dirs.end(), profile_dirs.begin(), profile_dirs.end());
+            }
         }
 
         if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileFile)) {
-            LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT, "'%s' setting is deprecated, please use '%s' instead.\n", kLayerSettingsProfileFile, kLayerSettingsProfileDirs);
             vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileFile, layer_settings->simulate.profile_file);
         }
     }
