@@ -803,7 +803,7 @@ if __name__ == '__main__':
     else:
         profile_label = 'Generated profile'
 
-    if args.strip_duplicate_structs is True:
+    if args.strip_duplicate_structs:
         gen_profiles_solution.Log.i('Stripping duplicated structures. `--strip-duplicate-structs` is set. Eg the output profiles file will contain VkPhysicalDeviceVulkan11Properties not VkPhysicalDeviceMultiviewPropertiesKHR.')
         strip_duplicate_struct = True
     else:

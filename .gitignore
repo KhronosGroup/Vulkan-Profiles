@@ -41,6 +41,7 @@ profiles/test/data/VP_LUNARG_test_combine_intersect.json
 profiles/test/data/VP_LUNARG_test_combine_union.json
 profiles/test/data/VP_LUNARG_desktop_max_2024.json
 profiles/VP_KHR_roadmap_2022.json
+profiles/VP_LUNARG_desktop_baseline_2022.json
 profiles/VP_LUNARG_desktop_baseline_2023.json
 profiles/VP_LUNARG_desktop_baseline_2024.json
 PROFILES.md
