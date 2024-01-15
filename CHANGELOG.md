@@ -29,7 +29,6 @@
 - Refactor API library to support profiles with multiple variants
 - Remove API library overriding features and extensions modes
 - Remove `VP_LUNARG_desktop_portability_2022` profile
-- Remove `VP_LUNARG_desktop_baseline_2022` profile
 
 ## [Vulkan Profiles Toolset 1.3.261](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.261.0) - August 2023
 
