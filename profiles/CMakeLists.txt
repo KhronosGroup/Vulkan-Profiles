@@ -76,6 +76,7 @@ add_custom_target(VpCreateDesktopBaseline2024 ALL
         --profile-date 2023-11-01
         --profile-api-version ${PROFILE_DESKTOP_BASELINE_2024_API_VERSION}
         --profile-required-profiles "VP_LUNARG_minimum_requirements_1_2"
+        --strip-duplicate-structs
     VERBATIM
     SOURCES ${MERGE_PYTHON_FILES} ${PROFILES_FILES}
     DEPENDS ${MERGE_PYTHON_FILES} ${PROFILES_FILES})

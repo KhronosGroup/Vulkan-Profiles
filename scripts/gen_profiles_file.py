@@ -28,7 +28,7 @@ class ProfileMerger():
     def __init__(self, registry):
         self.registry = registry
 
-    def merge(self, jsons, profiles, profile_names, merged_path, merged_profile, profile_label, profile_description, profile_api_version, profile_stage, profile_date, required_profiles, mode):
+    def merge(self, jsons, profiles, profile_names, merged_path, merged_profile, profile_label, profile_description, profile_api_version, profile_stage, profile_date, required_profiles, mode, strip_duplicate_struct):
         self.mode = mode
 
         # Find the api version to use
@@ -42,14 +42,14 @@ class ProfileMerger():
         # Begin constructing merged profile
         merged = dict()
         merged['$schema'] = 'https://schema.khronos.org/vulkan/profiles-0.8.0-' + self.api_version[2] + '.json#'
-        merged['capabilities'] = self.merge_capabilities(jsons, profile_names, self.api_version)
+        merged['capabilities'] = self.merge_capabilities(jsons, profile_names, self.api_version, strip_duplicate_struct)
         merged['profiles'] = self.get_profiles(merged_profile, self.api_version, profile_label, profile_description, profile_stage, profile_date, required_profiles)
 
         # Wite new merged profile
         with open(merged_path, 'w') as file:
             json.dump(merged, file, indent = 4)
 
-    def merge_capabilities(self, jsons, profile_names, api_version):
+    def merge_capabilities(self, jsons, profile_names, api_version, strip_duplicate_struct):
         merged_extensions = dict()
         merged_features = dict()
         merged_properties = dict()
@@ -250,6 +250,42 @@ class ProfileMerger():
                     del merged_properties[property]
 
             sorted_properties = collections.OrderedDict(sorted(merged_properties.items()))
+
+            if strip_duplicate_struct:
+                if 'VkPhysicalDeviceVulkan11Properties' in sorted_properties:
+                    if 'VkPhysicalDeviceIDPropertiesKHR' in sorted_properties:
+                        del sorted_properties['VkPhysicalDeviceIDPropertiesKHR']
+                    if 'VkPhysicalDeviceSubgroupProperties' in sorted_properties:
+                        del sorted_properties['VkPhysicalDeviceSubgroupProperties']
+                    if 'VkPhysicalDevicePointClippingPropertiesKHR' in sorted_properties:
+                        del sorted_properties['VkPhysicalDevicePointClippingPropertiesKHR']
+                    if 'VkPhysicalDeviceMultiviewPropertiesKHR' in sorted_properties:
+                        del sorted_properties['VkPhysicalDeviceMultiviewPropertiesKHR']
+                    if 'VkPhysicalDeviceProtectedMemoryProperties' in sorted_properties:
+                        del sorted_properties['VkPhysicalDeviceProtectedMemoryProperties']
+                    if 'VkPhysicalDeviceMaintenance3PropertiesKHR' in sorted_properties:
+                        del sorted_properties['VkPhysicalDeviceMaintenance3PropertiesKHR']
+
+                if 'VkPhysicalDeviceVulkan12Properties' in sorted_properties:
+                    if 'VkPhysicalDeviceDriverPropertiesKHR' in sorted_properties:
+                        del sorted_properties['VkPhysicalDeviceDriverPropertiesKHR']
+                    if 'VkPhysicalDeviceFloatControlsPropertiesKHR ' in sorted_properties:
+                        del sorted_properties['VkPhysicalDeviceFloatControlsPropertiesKHR ']
+                    if 'VkPhysicalDeviceDescriptorIndexingPropertiesEXT' in sorted_properties:
+                        del sorted_properties['VkPhysicalDeviceDescriptorIndexingPropertiesEXT']
+                    if 'VkPhysicalDeviceDepthStencilResolvePropertiesKHR' in sorted_properties:
+                        del sorted_properties['VkPhysicalDeviceDepthStencilResolvePropertiesKHR']
+                    if 'VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT' in sorted_properties:
+                        del sorted_properties['VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT']
+                    if 'VkPhysicalDeviceTimelineSemaphorePropertiesKHR' in sorted_properties:
+                        del sorted_properties['VkPhysicalDeviceTimelineSemaphorePropertiesKHR']
+
+                if 'VkPhysicalDeviceVulkan13Properties' in sorted_properties:
+                    if 'VkPhysicalDeviceInlineUniformBlockPropertiesEXT' in sorted_properties:
+                        del sorted_properties['VkPhysicalDeviceInlineUniformBlockPropertiesEXT']
+                    if 'VkPhysicalDeviceSubgroupSizeControlPropertiesEXT' in sorted_properties:
+                        del sorted_properties['VkPhysicalDeviceSubgroupSizeControlPropertiesEXT']
+
             capabilities['baseline']['properties'] = dict(sorted_properties)
         if merged_formats:
             sorted_formats = collections.OrderedDict(sorted(merged_formats.items()))
@@ -729,7 +765,9 @@ if __name__ == '__main__':
                         help='Comma separated list of required profiles by the generated profile.')
     parser.add_argument('--mode', '-m', action='store', choices=['union', 'intersection'], default='intersection',
                         help='Mode of profile combination. If the argument is not set, the value is set to "intersection".')
-          
+    parser.add_argument('--strip-duplicate-structs', action='store_true',
+                        help='Strip the duplicated structures in the generated profiles file.')
+
     parser.set_defaults(mode='intersection')
 
     args = parser.parse_args()
@@ -764,6 +802,12 @@ if __name__ == '__main__':
         profile_label = args.profile_label
     else:
         profile_label = 'Generated profile'
+
+    if args.strip_duplicate_structs is True:
+        gen_profiles_solution.Log.i('Stripping duplicated structures. `--strip-duplicate-structs` is set. Eg the output profiles file will contain VkPhysicalDeviceVulkan11Properties not VkPhysicalDeviceMultiviewPropertiesKHR.')
+        strip_duplicate_struct = True
+    else:
+        strip_duplicate_struct = False
 
     # Open file and load json
     jsons = list()
@@ -821,5 +865,5 @@ if __name__ == '__main__':
         now = datetime.now()
         profile_date = str(now.year) + '-' + str(now.month).zfill(2) + '-' + str(now.day).zfill(2)
 
-    profile_merger.merge(jsons, profiles, profile_names, args.output_path, args.output_profile, args.profile_label, args.profile_desc, args.profile_api_version, profile_stage, profile_date, required_profiles, args.mode)
+    profile_merger.merge(jsons, profiles, profile_names, args.output_path, args.output_profile, args.profile_label, args.profile_desc, args.profile_api_version, profile_stage, profile_date, required_profiles, args.mode, strip_duplicate_struct)
     
