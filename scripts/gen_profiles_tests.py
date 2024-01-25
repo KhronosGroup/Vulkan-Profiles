@@ -152,7 +152,7 @@ class ProfileGenerator():
     i = 1
     skipped_features = []
     skipped_members = ["sType", "pNext", "physicalDevices", "driverID"]
-    skipped_properties_structs = ["VkPhysicalDeviceHostImageCopyPropertiesEXT"]
+    skipped_properties_structs = ["VkPhysicalDeviceHostImageCopyPropertiesEXT", "VkPhysicalDeviceLineRasterizationPropertiesEXT"]
 
     def generate_profile(self, outProfile, registry):
         with open(outProfile, 'w') as f:
@@ -283,9 +283,9 @@ class ProfileGenerator():
         self.test_values = dict()
         for name, value  in registry.structs.items():
             if ('VkPhysicalDeviceProperties2' in value.extends and value.definedByExtensions):
-                self.test_values[name] = dict()
                 if (name in self.skipped_properties_structs):
                     continue
+                self.test_values[name] = dict()
                 if first:
                     first = False
                 else:
