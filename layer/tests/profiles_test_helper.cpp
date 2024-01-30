@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2021-2023 Valve Corporation
- * Copyright (c) 2021-2023 LunarG, Inc.
+ * Copyright (c) 2021-2024 Valve Corporation
+ * Copyright (c) 2021-2024 LunarG, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,9 @@
  * limitations under the License.
  *
  * Authors:
- * - Jeremy Kniager <jeremyk@lunarg.com>
+ * - Christophe Riccio <christophe@lunarg.com>
  * - Mark Lobodzinski <mark@lunarg.com>
+ * - Jeremy Kniager
  */
 
 #include <sstream>
