@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #
-# Copyright (c) 2021-2023 LunarG, Inc.
-# Copyright (c) 2023-2023 RasterGrid Kft.
+# Copyright (c) 2021-2024 LunarG, Inc.
+# Copyright (c) 2023-2024 RasterGrid Kft.
 #
 # Licensed under the Apache License, Version 2.0 (the "License")
 # you may not use this file except in compliance with the License.
@@ -71,8 +71,8 @@ def stripNonmatchingAPIs(tree, apiName, actuallyDelete = True):
 
 COPYRIGHT_HEADER = '''
 /*
- * Copyright (C) 2021-2023 Valve Corporation
- * Copyright (C) 2021-2023 LunarG, Inc.
+ * Copyright (C) 2021-2024 Valve Corporation
+ * Copyright (C) 2021-2024 LunarG, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -4438,7 +4438,7 @@ class VulkanProfilesSchemaGenerator():
 DOC_MD_HEADER = '''
 <!-- markdownlint-disable MD041 -->
 <p align="left"><img src="https://vulkan.lunarg.com/img/NewLunarGLogoBlack.png" alt="LunarG" width=263 height=113 /></p>
-<p align="left">Copyright (c) 2021-2023 LunarG, Inc.</p>
+<p align="left">Copyright (c) 2021-2024 LunarG, Inc.</p>
 
 <p align="center"><img src="./images/logo.png" width=400 /></p>
 

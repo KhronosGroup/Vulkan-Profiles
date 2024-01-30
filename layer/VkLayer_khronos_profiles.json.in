@@ -147,7 +147,7 @@
                     "key": "force_device",
                     "label": "Force Device",
                     "description": "On system with multiple physical devices, force the use of one specific physical device.",
-                    "status": "BETA",
+                    "status": "STABLE",
                     "type": "ENUM",
                     "default": "FORCE_DEVICE_OFF",
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],

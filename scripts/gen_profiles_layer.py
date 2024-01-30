@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #
-# Copyright (c) 2021-2023 LunarG, Inc.
-# Copyright (c) 2023-2023 RasterGrid Kft.
+# Copyright (c) 2021-2024 LunarG, Inc.
+# Copyright (c) 2023-2024 RasterGrid Kft.
 #
 # Licensed under the Apache License, Version 2.0 (the "License")
 # you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ import argparse
 
 COPYRIGHT_HEADER = '''
 /*
- * Copyright (C) 2015-2023 Valve Corporation
- * Copyright (C) 2015-2023 LunarG, Inc.
+ * Copyright (C) 2015-2024 Valve Corporation
+ * Copyright (C) 2015-2024 LunarG, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,13 +39,14 @@ COPYRIGHT_HEADER = '''
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Author: Mike Weiblen <mikew@lunarg.com>
- * Author: Arda Coskunses <arda@lunarg.com>
- * Author: Jeremy Kniager <jeremyk@lunarg.com>
- * Author: Ziga Markus <ziga@lunarg.com>
- * Author: Christophe Riccio <christophe@lunarg.com>
- * Author: Mark Lobodzinski <mark@lunarg.com>
-
+ * Authors:
+ * - Ziga Markus <ziga@lunarg.com>
+ * - Christophe Riccio <christophe@lunarg.com>
+ * - Mark Lobodzinski <mark@lunarg.com>
+ * - Mike Weiblen
+ * - Arda Coskunses
+ * - Jeremy Kniager
+ 
  * This file is ***GENERATED***.  Do Not Edit.
  * See scripts/gen_profiles_layer.py for modifications.
  */

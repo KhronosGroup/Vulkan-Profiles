@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2021-2023 Valve Corporation
- * Copyright (C) 2021-2023 LunarG, Inc.
+ * Copyright (C) 2021-2024 Valve Corporation
+ * Copyright (C) 2021-2024 LunarG, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Author: Ziga Markus <ziga@lunarg.com>
- * Author: Christophe Riccio <christophe@lunarg.com>
- * Author: Mark Lobodzinski <mark@lunarg.com>
+ * Authors:
+ * - Ziga Markus <ziga@lunarg.com>
+ * - Christophe Riccio <christophe@lunarg.com>
+ * - Mark Lobodzinski <mark@lunarg.com>
  */
 
 #include <vulkan/vulkan_core.h>

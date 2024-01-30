@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-# Copyright (c) 2021-2022 LunarG, Inc.
+# Copyright (c) 2021-2024 LunarG, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License")
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Author: Ziga Markus <ziga@lunarg.com>
+# Authors:
+# - Ziga Markus <ziga@lunarg.com>
+# - Christophe Riccio <christophe@lunarg.com>
 
 import gen_profiles_solution
 import gen_profiles_layer
@@ -59,8 +61,8 @@ PROFILES = '''
 
 TESTS_HEADER = '''
 /*
- * Copyright (C) 2021-2023 Valve Corporation
- * Copyright (C) 2021-2023 LunarG, Inc.
+ * Copyright (C) 2021-2024 Valve Corporation
+ * Copyright (C) 2021-2024 LunarG, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,9 +76,10 @@ TESTS_HEADER = '''
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Author: Ziga Markus <ziga@lunarg.com>
- * Author: Christophe Riccio <christophe@lunarg.com>
- * Author: Mark Lobodzinski <mark@lunarg.com>
+ * Authors:
+ * - Christophe Riccio <christophe@lunarg.com>
+ * - Daniel Rakos <daniel.rakos@rastergrid.com>
+ * - Mark Lobodzinski <mark@lunarg.com>
  *
  * This file is ***GENERATED***.  Do Not Edit.
  * See scripts/gen_profiles_tests.py for modifications.
