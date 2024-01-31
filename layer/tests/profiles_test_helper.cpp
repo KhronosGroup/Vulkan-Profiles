@@ -103,7 +103,6 @@ VkResult profiles_test::VulkanInstanceBuilder::init(uint32_t apiVersion, const s
 
     VkApplicationInfo app_info{GetDefaultApplicationInfo()};
     app_info.apiVersion = apiVersion;
-    
 
     VkInstanceCreateInfo inst_create_info = {};
 
@@ -120,17 +119,24 @@ VkResult profiles_test::VulkanInstanceBuilder::init(uint32_t apiVersion, const s
     inst_create_info.enabledExtensionCount = _extension_names.empty() ? 0 : static_cast<uint32_t>(_extension_names.size());
     inst_create_info.ppEnabledExtensionNames = _extension_names.empty() ? nullptr : _extension_names.data();
 
+    _instances[MODE_NATIVE] = VK_NULL_HANDLE;
     VkResult result = vkCreateInstance(&inst_create_info, nullptr, &_instances[MODE_NATIVE]);
     if (result != VK_SUCCESS) return result;
+
+    this->addExtension(VK_EXT_LAYER_SETTINGS_EXTENSION_NAME);
 
     VkLayerSettingsCreateInfoEXT layer_settings_create_info{
         VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT, nullptr,
         settings.empty() ? 0 : static_cast<uint32_t>(settings.size()),
         settings.empty() ? nullptr : &settings[0]};
 
+    inst_create_info.enabledExtensionCount = static_cast<uint32_t>(_extension_names.size());
+    inst_create_info.ppEnabledExtensionNames = _extension_names.data();
     inst_create_info.enabledLayerCount = static_cast<uint32_t>(_layer_names.size());
     inst_create_info.ppEnabledLayerNames = _layer_names.data();
     inst_create_info.pNext = settings.empty() ? nullptr : &layer_settings_create_info;
+
+    _instances[MODE_PROFILE] = VK_NULL_HANDLE;
     return vkCreateInstance(&inst_create_info, nullptr, &_instances[MODE_PROFILE]);
 }
 

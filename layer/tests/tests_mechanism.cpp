@@ -37,6 +37,60 @@ class TestsMechanism : public VkTestFramework {
     static void TearDownTestSuite(){};
 };
 
+TEST_F(TestsMechanism, check_extension) {
+    VkResult err = VK_SUCCESS;
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", TEST_BINARY_PATH);
+
+    // Check Profiles layer is loaded
+    {
+        uint32_t layer_count = 0;
+        vkEnumerateInstanceLayerProperties(&layer_count, nullptr);
+
+        std::vector<VkLayerProperties> layer_names(layer_count);
+        vkEnumerateInstanceLayerProperties(&layer_count, &layer_names[0]);
+
+        EXPECT_TRUE(layer_count >= 1);
+
+        bool layer_found = false;
+        for (std::size_t i = 0, n = layer_names.size(); i < n; ++i) {
+            if (layer_names[i].layerName == std::string("VK_LAYER_KHRONOS_profiles")) {
+                layer_found = true;
+                break;
+            }
+        }
+
+        EXPECT_TRUE(layer_found);
+    }
+
+    // Check VK_EXT_layer_settings is exposed
+    {
+        uint32_t extCount = 0;
+        VkResult result = vkEnumerateInstanceExtensionProperties("VK_LAYER_KHRONOS_profiles", &extCount, nullptr);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        EXPECT_TRUE(extCount >= 1);
+
+        std::vector<VkExtensionProperties> ext(extCount);
+        result = vkEnumerateInstanceExtensionProperties("VK_LAYER_KHRONOS_profiles", &extCount, ext.data());
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        bool found_ext = false;
+        for (std::size_t i = 0, n = ext.size(); i < n; ++i) {
+            if (ext[i].extensionName == std::string(VK_EXT_LAYER_SETTINGS_EXTENSION_NAME)) {
+                found_ext = true;
+                break;
+            }
+        }
+
+        EXPECT_TRUE(found_ext);
+    }
+
+    err = inst_builder.init();
+    ASSERT_EQ(err, VK_SUCCESS);
+}
+
 TEST_F(TestsMechanism, selecting_profile_file) {
     TEST_DESCRIPTION("Test selecting profile from a profiles file with multiple profiles");
 
