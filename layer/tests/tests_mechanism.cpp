@@ -42,8 +42,7 @@ TEST_F(TestsMechanism, selecting_profile_file) {
     VkResult err = VK_SUCCESS;
 
     profiles_test::VulkanInstanceBuilder inst_builder;
-    inst_builder.init();
-    inst_builder.reset();
+    profiles_test::setEnvironmentSetting("VK_LAYER_PATH", TEST_BINARY_PATH);
 
     // Check Profiles layer is loaded
     {
