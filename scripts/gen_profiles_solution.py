@@ -580,16 +580,8 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupportSingleProfile(
     // Required API version is built in root profile, not need to check dependent profile API versions
     if (api_version != 0) {
         if (!vpCheckVersion(api_version, pProfileDesc->minApiVersion)) {
-            const uint32_t version_min_major = VK_API_VERSION_MAJOR(pProfileDesc->minApiVersion);
-            const uint32_t version_min_minor = VK_API_VERSION_MINOR(pProfileDesc->minApiVersion);
-            const uint32_t version_min_patch = VK_API_VERSION_PATCH(pProfileDesc->minApiVersion);
+            VP_DEBUG_MSGF("Unsupported Profile API version %u.%u.%u on a Vulkan system with version %u.%u.%u", VK_API_VERSION_MAJOR(pProfileDesc->minApiVersion), VK_API_VERSION_MINOR(pProfileDesc->minApiVersion), VK_API_VERSION_PATCH(pProfileDesc->minApiVersion), VK_API_VERSION_MAJOR(api_version), VK_API_VERSION_MINOR(api_version), VK_API_VERSION_PATCH(api_version));
 
-            const uint32_t version_major = VK_API_VERSION_MAJOR(api_version);
-            const uint32_t version_minor = VK_API_VERSION_MINOR(api_version);
-            const uint32_t version_patch = VK_API_VERSION_PATCH(api_version);
-
-            VP_DEBUG_MSGF("Unsupported Profile API version %u.%u.%u on a Vulkan system with version %u.%u.%u", version_min_major, version_min_minor, version_min_patch, version_major, version_minor, version_patch);
-            
             *pSupported = VK_FALSE;
             unsupportedBlocks.push_back(block);
         }
@@ -3340,10 +3332,10 @@ class VulkanProfile():
 
         gen += ('\n'
                 'static const VpFeatureDesc featureDesc = {\n'
-                '    [](VkBaseOutStructure* p) {\n')
+                '    [](VkBaseOutStructure* p) { (void)p;\n')
         gen += self.gen_structFunc(self.structs.feature, capabilities.features, self.gen_structFill, fillFmt)
         gen += ('    },\n'
-                '    [](VkBaseOutStructure* p) -> bool {\n'
+                '    [](VkBaseOutStructure* p) -> bool { (void)p;\n'
                 '        bool ret = true;\n')
         gen += self.gen_structFunc(self.structs.feature, capabilities.features, self.gen_structCompare, cmpFmtFeatures, debugMessages)
         gen += ('        return ret;\n'
@@ -3358,10 +3350,10 @@ class VulkanProfile():
 
         gen += ('\n'
                 'static const VpPropertyDesc propertyDesc = {\n'
-                '    [](VkBaseOutStructure* p) {\n')
+                '    [](VkBaseOutStructure* p) { (void)p;\n')
         gen += self.gen_structFunc(self.structs.property, capabilities.properties, self.gen_structFill, fillFmt)
         gen += ('    },\n'
-                '    [](VkBaseOutStructure* p) -> bool {\n'
+                '    [](VkBaseOutStructure* p) -> bool { (void)p;\n'
                 '        bool ret = true;\n')
         gen += self.gen_structFunc(self.structs.property, capabilities.properties, self.gen_structCompare, cmpFmtProperties, debugMessages)
         gen += ('        return ret;\n'
@@ -3374,10 +3366,10 @@ class VulkanProfile():
                     'static const VpQueueFamilyDesc queueFamilyDesc[] = {\n')
             for queueFamilyCaps in capabilities.queueFamiliesProperties:
                 gen += ('    {\n'
-                        '        [](VkBaseOutStructure* p) {\n')
+                        '        [](VkBaseOutStructure* p) { (void)p;\n')
                 gen += self.gen_structFunc(self.structs.queueFamily, queueFamilyCaps, self.gen_structFill, fillFmt)
                 gen += ('        },\n'
-                        '        [](VkBaseOutStructure* p) -> bool {\n'
+                        '        [](VkBaseOutStructure* p) -> bool { (void)p;\n'
                         '            bool ret = true;\n')
                 gen += self.gen_structFunc(self.structs.queueFamily, queueFamilyCaps, self.gen_structCompare, cmpFmt)
                 gen += ('            return ret;\n'
@@ -3397,10 +3389,10 @@ class VulkanProfile():
 
                 gen += ('    {{\n'
                         '        {0},\n'
-                        '        [](VkBaseOutStructure* p) {{\n').format(formatName)
+                        '        [](VkBaseOutStructure* p) {{ (void)p;\n').format(formatName)
                 gen += self.gen_structFunc(self.structs.format, formatCaps, self.gen_structFill, fillFmt)
                 gen += ('        },\n'
-                        '        [](VkBaseOutStructure* p) -> bool {\n'
+                        '        [](VkBaseOutStructure* p) -> bool { (void)p;\n'
                         '            bool ret = true;\n')
                 gen += self.gen_structFunc(self.structs.format, formatCaps, self.gen_structCompare, cmpFmtFormat, debugMessages)
                 gen += ('            return ret;\n'
