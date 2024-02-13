@@ -2724,7 +2724,7 @@ class VulkanRegistry():
 
 
 class VulkanProfileCapabilities():
-    def __init__(self, registry, json_profile_key, json_profile_value, json_capability_key, json_capabilities_list, merge_mode):
+    def __init__(self, registry, json_profile_key, json_profile_value, json_capability_key, json_capabilities_list, merge_mode, doc_mode):
         self.blockName = json_capability_key
         self.extensions = dict()
         self.instanceExtensions = dict()
@@ -2735,7 +2735,10 @@ class VulkanProfileCapabilities():
         self.queueFamiliesProperties = []
         if merge_mode:
             for json_capabilities in json_capabilities_list:
-                self.mergeCaps(registry, json_capabilities, merge_mode)
+                self.mergeCaps(registry, json_capabilities, True)
+        elif doc_mode:
+            for json_capabilities in json_capabilities_list:
+                self.mergeCaps(registry, json_capabilities, False)
         else:
             self.mergeCaps(registry, json_capabilities_list, merge_mode)
 
@@ -2922,15 +2925,16 @@ class VulkanProfile():
         collected_json_capabilities = []
         collected_json_capabilities.extend(json_profiles_database.collectProfileCapabilities(profile_list))
 
-        self.merge_capabilities = VulkanProfileCapabilities(registry, json_profile_key, json_profile_value, '"MERGED"', collected_json_capabilities, True)
+        self.merge_capabilities = VulkanProfileCapabilities(registry, json_profile_key, json_profile_value, '"MERGED"', collected_json_capabilities, True, False)
+        self.doc_capabilities = VulkanProfileCapabilities(registry, json_profile_key, json_profile_value, '"DOC"', collected_json_capabilities, False, True)
         self.split_capabilities = dict()
         for referenced_capability in json_profile_value['capabilities']:
             # When we have multiple possible capabilities blocks, we load them all but effectively the API library can't effectively implement this behavior.
             if type(referenced_capability).__name__ == 'list':
                 for capability_key in referenced_capability:
-                    self.split_capabilities[capability_key] = VulkanProfileCapabilities(registry, json_profile_key, json_profile_value, capability_key, json_capabilities[capability_key], False)
+                    self.split_capabilities[capability_key] = VulkanProfileCapabilities(registry, json_profile_key, json_profile_value, capability_key, json_capabilities[capability_key], False, False)
             elif referenced_capability in json_capabilities:
-                self.split_capabilities[referenced_capability] = VulkanProfileCapabilities(registry, json_profile_key, json_profile_value, referenced_capability, json_capabilities[referenced_capability], False)
+                self.split_capabilities[referenced_capability] = VulkanProfileCapabilities(registry, json_profile_key, json_profile_value, referenced_capability, json_capabilities[referenced_capability], False, False)
 
         self.structs = VulkanProfileStructs(registry, self.split_capabilities)
         self.multiple_variants = self.checkMultipleVariants(json_profile_value)
@@ -2961,24 +2965,24 @@ class VulkanProfile():
 
 
     def validate(self):
-        self.validateStructDependencies(self.merge_capabilities)
+        self.validateStructDependencies('MERGE', self.merge_capabilities)
         for capabilities_key, capabilities_value in self.split_capabilities.items():
-            self.validateStructDependencies(capabilities_value)
+            self.validateStructDependencies(capabilities_key, capabilities_value)
 
 
-    def validateStructDependencies(self, capabilities):
-        for feature in capabilities.features:
-            self.validateStructDependency(capabilities, feature)
+    def validateStructDependencies(self, capabilities_key, capabilities_value):
+        for feature in capabilities_value.features:
+            self.validateStructDependency(capabilities_key, capabilities_value, feature)
 
-        for prop in capabilities.properties:
-            self.validateStructDependency(capabilities, prop)
+        for prop in capabilities_value.properties:
+            self.validateStructDependency(capabilities_key, capabilities_value, prop)
 
-        for queueFamilyData in capabilities.queueFamiliesProperties:
+        for queueFamilyData in capabilities_value.queueFamiliesProperties:
             for queueFamilyProp in queueFamilyData:
-                self.validateStructDependency(capabilities, queueFamilyProp)
+                self.validateStructDependency(capabilities_key, capabilities_value, queueFamilyProp)
 
 
-    def validateStructDependency(self, capabilities, structName):
+    def validateStructDependency(self, capabilities_key, capabilities_value, structName):
         if structName in self.registry.structs:
             structDef = self.registry.structs[structName]
             depFound = False
@@ -2989,12 +2993,19 @@ class VulkanProfile():
 
             # Check if any required extension defines this struct
             for definedByExtension in structDef.definedByExtensions:
-                if definedByExtension in capabilities.extensions:
+                if definedByExtension in capabilities_value.extensions:
                     depFound = True
                     break
 
             if not depFound:
-                Log.f("Unexpected required struct '{0}' in profile '{1}'".format(structName, self.key))
+                if structDef.definedByExtensions and structDef.definedByVersion:
+                    Log.f("Unexpected required struct '{0}' in profile '{1}', this struct requires API version '{2}' or an extension '{3}' which are not required in the capabilities block '{4}'.\n".format(structName, self.key, structDef.definedByVersion, ', '.join(structDef.definedByExtensions), capabilities_key))
+                elif structDef.definedByExtensions:
+                    Log.f("Unexpected required struct '{0}' in profile '{1}', this struct requires an extension '{2}' which is not required in the capabilities block '{3}'.\n".format(structName, self.key, ', '.join(structDef.definedByExtensions), capabilities_key))
+                elif structDef.definedByVersion:
+                    Log.f("Unexpected required struct '{0}' in profile '{1}', this struct requires API version '{2}' which is not required in the capabilities block '{3}'.\n".format(structName, self.key, structDef.definedByVersion, capabilities_key))
+                else:
+                    Log.f("Unexpected required struct '{0}' in capabilities block '{1}' of profile '{2}'.\n".format(structName, capabilities_key, self.key))
         else:
             Log.f("Struct '{0}' in profile '{1}' does not exist in the registry".format(structName, self.key))
 
@@ -4667,8 +4678,8 @@ class VulkanProfilesDocGenerator():
                                         member)
 
         # If this feature struct member is defined in the profile as is, consider it supported
-        if struct in profile.merge_capabilities.features:
-            featureStruct = profile.merge_capabilities.features[struct]
+        if struct in profile.doc_capabilities.features:
+            featureStruct = profile.doc_capabilities.features[struct]
             if member in featureStruct:
                 return self.formatFeatureSupport(featureStruct[member], struct, section)
 
@@ -4677,16 +4688,16 @@ class VulkanProfilesDocGenerator():
         # consider it supported
         if struct == 'VkPhysicalDeviceFeatures':
             for wrapperStruct in [ 'VkPhysicalDeviceFeatures2', 'VkPhysicalDeviceFeatures2KHR' ]:
-                if wrapperStruct in profile.merge_capabilities.features:
-                    featureStruct = profile.merge_capabilities.features[wrapperStruct]['features']
+                if wrapperStruct in profile.doc_capabilities.features:
+                    featureStruct = profile.doc_capabilities.features[wrapperStruct]['features']
                     if member in featureStruct:
                         return self.formatFeatureSupport(featureStruct[member], struct, section)
 
         # If the struct has aliases and the feature struct member is defined in the profile in
         # one of those, consider it supported
         for alias in self.getFeatureStructSynonyms(struct, member):
-            if alias in profile.merge_capabilities.features:
-                featureStruct = profile.merge_capabilities.features[alias]
+            if alias in profile.doc_capabilities.features:
+                featureStruct = profile.doc_capabilities.features[alias]
                 if member in featureStruct:
                     return self.formatFeatureSupport(featureStruct[member], alias, section)
 
@@ -4717,7 +4728,7 @@ class VulkanProfilesDocGenerator():
         # Merge all feature references across the profiles to collect the relevant features to look at
         definedFeatures = dict()
         for profile in self.profiles:
-            for featureStructName, features in profile.merge_capabilities.features.items():
+            for featureStructName, features in profile.doc_capabilities.features.items():
                 # VkPhysicalDeviceFeatures2 is an exception, as it contains a nested structure
                 # No other structure is allowed to have this
                 if featureStructName in [ 'VkPhysicalDeviceFeatures2', 'VkPhysicalDeviceFeatures2KHR' ]:
@@ -4826,6 +4837,8 @@ class VulkanProfilesDocGenerator():
             return member
         elif limittype == 'exact':
             return member + ' (exact)'
+        elif limittype == 'not':
+            return member + ' (not)'
         elif limittype == 'max':
             return member + ' (max)'
         elif limittype == 'max,pot' or limittype == 'pot,max':
@@ -4895,8 +4908,8 @@ class VulkanProfilesDocGenerator():
                                         self.formatLimitName(struct, member))
 
         # If this limit/property struct member is defined in the profile as is, include it
-        if struct in profile.merge_capabilities.properties:
-            limitStruct = profile.merge_capabilities.properties[struct]
+        if struct in profile.doc_capabilities.properties:
+            limitStruct = profile.doc_capabilities.properties[struct]
             if member in limitStruct:
                 return self.formatProperty(limitStruct[member], struct, section)
 
@@ -4910,13 +4923,13 @@ class VulkanProfilesDocGenerator():
             else:
                 memberStruct = 'sparseProperties'
             propertyStruct = None
-            if 'VkPhysicalDeviceProperties' in profile.merge_capabilities.properties:
+            if 'VkPhysicalDeviceProperties' in profile.doc_capabilities.properties:
                 propertyStructName = 'VkPhysicalDeviceProperties'
-                propertyStruct = profile.merge_capabilities.properties[propertyStructName]
+                propertyStruct = profile.doc_capabilities.properties[propertyStructName]
             for wrapperStruct in [ 'VkPhysicalDeviceProperties2', 'VkPhysicalDeviceProperties2KHR' ]:
-                if wrapperStruct in profile.merge_capabilities.properties:
+                if wrapperStruct in profile.doc_capabilities.properties:
                     propertyStructName = wrapperStruct
-                    propertyStruct = profile.merge_capabilities.properties[wrapperStruct]['properties']
+                    propertyStruct = profile.doc_capabilities.properties[wrapperStruct]['properties']
             if propertyStruct != None: # and memberStruct != 'sparseProperties':
                 if memberStruct in propertyStruct:
                     limitStruct = propertyStruct[memberStruct]
@@ -4926,8 +4939,8 @@ class VulkanProfilesDocGenerator():
         # If the struct has aliases and the limit/property struct member is defined in the profile
         # in one of those then include it
         for alias in self.getLimitStructSynonyms(struct, member):
-            if alias in profile.merge_capabilities.properties:
-                limitStruct = profile.merge_capabilities.properties[alias]
+            if alias in profile.doc_capabilities.properties:
+                limitStruct = profile.doc_capabilities.properties[alias]
                 if member in limitStruct and limitStruct[member]:
                     return self.formatProperty(limitStruct[member], alias, section)
 
@@ -4958,7 +4971,7 @@ class VulkanProfilesDocGenerator():
         # Merge all limit/property references across the profiles to collect the relevant limits to look at
         definedLimits = dict()
         for profile in self.profiles:
-            for propertyStructName, properties in profile.merge_capabilities.properties.items():
+            for propertyStructName, properties in profile.doc_capabilities.properties.items():
                 # VkPhysicalDeviceProperties and VkPhysicalDeviceProperties2 are exceptions,
                 # need custom handling due to only using their nested structures
                 if propertyStructName in [ 'VkPhysicalDeviceProperties2', 'VkPhysicalDeviceProperties2KHR' ]:
@@ -5030,12 +5043,12 @@ class VulkanProfilesDocGenerator():
             return self.gen_manPageLink(struct, self.formatLimitName(struct, member))
 
         # If this profile doesn't even define this queue family index then early out
-        if len(profile.capabilities.queueFamiliesProperties) <= index:
+        if len(profile.doc_capabilities.queueFamiliesProperties) <= index:
             return ''
 
         # If this queue family property struct member is defined in the profile as is, include it
-        if struct in profile.capabilities.queueFamiliesProperties[index]:
-            propertyStruct = profile.capabilities.queueFamiliesProperties[index][struct]
+        if struct in profile.doc_capabilities.queueFamiliesProperties[index]:
+            propertyStruct = profile.doc_capabilities.queueFamiliesProperties[index][struct]
             if member in propertyStruct:
                 return self.formatProperty(propertyStruct[member], struct)
 
@@ -5044,8 +5057,8 @@ class VulkanProfilesDocGenerator():
         # for the profile and then include it
         if struct == 'VkPhysicalDeviceQueueFamilyProperties':
             for wrapperStruct in [ 'VkPhysicalDeviceQueueFamilyProperties2', 'VkPhysicalDeviceQueueFamilyProperties2KHR' ]:
-                if wrapperStruct in profile.capabilities.queueFamiliesProperties[index]:
-                    propertyStruct = profile.capabilities.queueFamiliesProperties[index][wrapperStruct]['queueFamilyProperties']
+                if wrapperStruct in profile.doc_capabilities.queueFamiliesProperties[index]:
+                    propertyStruct = profile.doc_capabilities.queueFamiliesProperties[index][wrapperStruct]['queueFamilyProperties']
                     if member in propertyStruct and propertyStruct[member]:
                         return self.formatProperty(propertyStruct[member], wrapperStruct)
 
@@ -5053,8 +5066,8 @@ class VulkanProfilesDocGenerator():
         # in one of those then include it
         structDef = self.registry.structs[struct]
         for alias in structDef.aliases:
-            if alias in profile.capabilities.queueFamiliesProperties[index]:
-                propertyStruct = profile.capabilities.queueFamiliesProperties[index][alias]
+            if alias in profile.doc_capabilities.queueFamiliesProperties[index]:
+                propertyStruct = profile.doc_capabilities.queueFamiliesProperties[index][alias]
                 if member in propertyStruct and propertyStruct[member]:
                     return self.formatProperty(propertyStruct[member], alias)
 
@@ -5066,7 +5079,7 @@ class VulkanProfilesDocGenerator():
         # properties to look at for each queue family definition index
         definedQueueFamilies = []
         for profile in self.profiles:
-            for index, queueFamily in enumerate(profile.merge_capabilities.queueFamiliesProperties):
+            for index, queueFamily in enumerate(profile.doc_capabilities.queueFamiliesProperties):
                 definedQueueFamilyProperties = OrderedDict()
                 for structName, properties in queueFamily.items():
                     # VkPhysicalDeviceQueueFamilies2 is an exception, as it contains a nested structure
@@ -5129,16 +5142,16 @@ class VulkanProfilesDocGenerator():
                                         self.formatLimitName(struct, member))
 
         # If this profile doesn't even define this format then early out
-        if not format in profile.merge_capabilities.formats:
+        if not format in profile.doc_capabilities.formats:
             # Before doing so, though, we have to check whether any of the aliases of the format
             # are defined by the profile
             formatAliases = self.registry.enums['VkFormat'].aliasValues
-            if not format in formatAliases or not formatAliases[format] in profile.merge_capabilities.formats:
+            if not format in formatAliases or not formatAliases[format] in profile.doc_capabilities.formats:
                 return ''
 
         # If this format property struct member is defined in the profile as is, include it
-        if struct in profile.merge_capabilities.formats[format]:
-            propertyStruct = profile.merge_capabilities.formats[format][struct]
+        if struct in profile.doc_capabilities.formats[format]:
+            propertyStruct = profile.doc_capabilities.formats[format][struct]
             if member in propertyStruct:
                 return self.formatProperty(propertyStruct[member], struct)
 
@@ -5146,8 +5159,8 @@ class VulkanProfilesDocGenerator():
         # the flag bit to check for, so we check for that, or any of its aliases
         if struct == 'VkFormatProperties':
             for alternative in [ 'VkFormatProperties', 'VkFormatProperties2', 'VkFormatProperties2KHR', 'VkFormatProperties3', 'VkFormatProperties3KHR' ]:
-                if alternative in profile.merge_capabilities.formats[format]:
-                    propertyStruct = profile.merge_capabilities.formats[format][alternative]
+                if alternative in profile.doc_capabilities.formats[format]:
+                    propertyStruct = profile.doc_capabilities.formats[format][alternative]
                     # VkFormatProperties2[KHR] wrap the real structure in a member
                     if 'formatProperties' in propertyStruct:
                         propertyStruct = propertyStruct['formatProperties']
@@ -5158,8 +5171,8 @@ class VulkanProfilesDocGenerator():
         # in one of those then include it
         structDef = self.registry.structs[struct]
         for alias in structDef.aliases:
-            if alias in profile.merge_capabilities.formats[format]:
-                propertyStruct = profile.merge_capabilities.formats[format][alias]
+            if alias in profile.doc_capabilities.formats[format]:
+                propertyStruct = profile.doc_capabilities.formats[format][alias]
                 if member in propertyStruct and propertyStruct[member]:
                     return self.formatProperty(propertyStruct[member], alias)
 
@@ -5171,7 +5184,7 @@ class VulkanProfilesDocGenerator():
         # properties to look at for each format
         definedFormats = dict()
         for profile in self.profiles:
-            for format, formatProperties in profile.merge_capabilities.formats.items():
+            for format, formatProperties in profile.doc_capabilities.formats.items():
                 # This may be an alias of a format name, so get the real name
                 formatAliases = self.registry.enums['VkFormat'].aliasValues
                 format = formatAliases[format] if format in formatAliases else format

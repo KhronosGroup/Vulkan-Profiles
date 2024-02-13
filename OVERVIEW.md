@@ -46,11 +46,13 @@ The *Vulkan Profiles Toolset* includes the following components:
   - Human-readable format of *Vulkan Profiles* in a table to enable comparison.
 
 Furthermore, the *Vulkan SDK* includes implementations of some *Vulkan Profiles* using the *Vulkan Profiles JSON Schema*:
-- [VP_KHR_roadmap_2022](https://github.com/KhronosGroup/Vulkan-Headers/blob/main/registry/profiles/VP_KHR_roadmap_2022.json) (Vulkan 1.3)
-- [VP_ANDROID_baseline_2022](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_ANDROID_baseline.json) (Vulkan 1.1)
-- [VP_ANDROID_baseline_2021](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_ANDROID_baseline.json) (Vulkan 1.0)
+- [VP_KHR_roadmap_2024](https://github.com/KhronosGroup/Vulkan-Headers/blob/main/registry/profiles/VP_KHR_roadmap.json) (Vulkan 1.3)
+- [VP_KHR_roadmap_2022](https://github.com/KhronosGroup/Vulkan-Headers/blob/main/registry/profiles/VP_KHR_roadmap.json) (Vulkan 1.3)
+- [VP_ANDROID_baseline_2022](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_ANDROID_baseline_2022.json) (Vulkan 1.1)
+- [VP_ANDROID_baseline_2021](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_ANDROID_baseline_2021.json) (Vulkan 1.0)
 - VP_LUNARG_desktop_baseline_2024 (Vulkan 1.2)
 - VP_LUNARG_desktop_baseline_2023 (Vulkan 1.2)
+- VP_LUNARG_desktop_baseline_2022 (Vulkan 1.1)
 
 Within the *Vulkan SDK*, the Vulkan Profiles files are located at `$(VULKAN_SDK)/Config/VK_LAYER_KHRONOS_profiles`.
 

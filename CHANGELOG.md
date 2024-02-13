@@ -17,6 +17,15 @@
 - Force device selection is not BETA anymore
 - Add Khronos Roadmap 2024 profile
 
+### Improvements:
+- Split generated documentation in three differents files:
+  - PROFILES.md for profiles in Vulkan-Headers
+  - PROFILES_ANDROID.md for profiles for Android platform
+  - PROFILES_ALL.md for all profiles in the repository
+
+### Bugfixes:
+- Fix features, properties and formats not listed in generated profiles table documentation
+
 ## [Vulkan Profiles Toolset 1.3.275](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.275.0) - January 2024
 
 ### Features:

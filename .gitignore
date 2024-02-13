@@ -46,6 +46,8 @@ profiles/VP_LUNARG_desktop_baseline_2022.json
 profiles/VP_LUNARG_desktop_baseline_2023.json
 profiles/VP_LUNARG_desktop_baseline_2024.json
 PROFILES.md
+PROFILES_ALL.md
+PROFILES_ANDROID.md
 schema/profiles-0.8-latest.json
 library/include/
 library/source/
