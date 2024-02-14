@@ -491,9 +491,12 @@ VPAPI_ATTR std::vector<VpProfileProperties> GatherProfiles(const VpProfileProper
 VPAPI_ATTR bool vpCheckVersion(uint32_t actual, uint32_t expected) {
     uint32_t actualMajor = VK_API_VERSION_MAJOR(actual);
     uint32_t actualMinor = VK_API_VERSION_MINOR(actual);
+    uint32_t actualPatch = VK_API_VERSION_PATCH(actual);
     uint32_t expectedMajor = VK_API_VERSION_MAJOR(expected);
     uint32_t expectedMinor = VK_API_VERSION_MINOR(expected);
-    return actualMajor > expectedMajor || (actualMajor == expectedMajor && actualMinor >= expectedMinor);
+    uint32_t expectedPatch = VK_API_VERSION_PATCH(expected);
+
+    return actualMajor == expectedMajor && actualMinor >= expectedMinor && actualPatch >= expectedPatch;
 }
 
 VPAPI_ATTR bool HasExtension(const std::vector<VkExtensionProperties>& list, const VkExtensionProperties& element) {
