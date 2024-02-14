@@ -25,8 +25,7 @@ set(PROFILES_FILES_FOR_API_LIBRARY
 )
 
 set(PROFILES_FILES_FOR_VULKAN_HEADER_DOC
-#    "VP_KHR_roadmap.json,VP_LUNARG_minimum_requirements.json"
-    "VP_D3D12_VKD3D_PROTON_profile.json"
+    "VP_KHR_roadmap.json,VP_LUNARG_minimum_requirements.json"
 )
 
 set(PROFILES_FILES_FOR_ANDROID_DOC
