@@ -154,7 +154,7 @@
                             1.0,
                             1.0
                         ],
-                        "pointSizeGranularity": 0.0,
+                        "pointSizeGranularity": 1.0,
                         "lineWidthGranularity": 1.0,
                         "nonCoherentAtomSize": 256
                     },
@@ -162,7 +162,6 @@
                         "residencyStandard2DBlockShape": false,
                         "residencyStandard2DMultisampleBlockShape": false,
                         "residencyStandard3DBlockShape": false,
-                        "residencyAlignedMipSize": true,
                         "residencyNonResidentStrict": false
                     }
                 }
@@ -282,15 +281,12 @@
                 "VkPhysicalDeviceVulkan13Features": {
                     "robustImageAccess": true,
                     "inlineUniformBlock": true,
-                    "descriptorBindingInlineUniformBlockUpdateAfterBind": false,
                     "pipelineCreationCacheControl": true,
-                    "privateData": false,
                     "shaderDemoteToHelperInvocation": true,
                     "shaderTerminateInvocation": true,
                     "subgroupSizeControl": true,
                     "computeFullSubgroups": true,
                     "synchronization2": true,
-                    "textureCompressionASTC_HDR": false,
                     "shaderZeroInitializeWorkgroupMemory": true,
                     "dynamicRendering": true,
                     "shaderIntegerDotProduct": true,
@@ -299,8 +295,6 @@
             },
             "properties": {
                 "VkPhysicalDeviceVulkan13Properties": {
-                    "minSubgroupSize": 0,
-                    "maxSubgroupSize": 0,
                     "maxComputeWorkgroupSubgroups": 0,
                     "requiredSubgroupSizeStages": [],
                     "maxInlineUniformBlockSize": 256,
