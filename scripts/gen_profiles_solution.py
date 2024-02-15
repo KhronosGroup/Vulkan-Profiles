@@ -3485,7 +3485,7 @@ class VulkanProfilesDatabase():
                         capabilities = self.gatherProfileCapabilities(json_profile_key, json_profile_value, json_file['capabilities'])
                         capabilities_list.extend(capabilities)
                         found = True
-                    break
+                        break
                 if found:
                     break
 
