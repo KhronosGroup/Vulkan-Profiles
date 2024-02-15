@@ -2767,8 +2767,15 @@ class VulkanProfileCapabilities():
 
                 else:
                     if key in dst and type(dst[key]) != type(val):
-                        Log.f("Data type confict during profile capability data merge (src is '{0}', dst is '{1}')".format(type(val), type(dst[key])))
-                    dst[key] = val
+                        # For some cases where float value are written as integer in JSON files, eg: pointSizeGranularity and lineWidthGranularity
+                        if type(val) is int and type(dst[key]) is float:
+                            dst[key] = float(val)
+                        elif type(val) is float and type(dst[key]) is int:
+                            dst[key] = float(val)
+                        else:
+                            Log.f("'{0}' data type conflict during profile capability data merge (src is '{1}', dst is '{2}')".format(key, type(val), type(dst[key])))
+                    else:
+                        dst[key] = val
         else:
             Log.f("Unexpected data type during profile capability data merge (src is '{0}', dst is '{1}')".format(type(src), type(dst)))
 
