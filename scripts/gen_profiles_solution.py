@@ -1867,6 +1867,9 @@ class VulkanExtension(VulkanDefinitionScope):
         self.parseAliases(xml)
 
 
+# Dynamic arrays are ill-formed, but some of them still have a maximum size that can be used
+struct_with_valid_dynamic_array = ["VkQueueFamilyGlobalPriorityPropertiesKHR"]
+
 class VulkanRegistry():
     def __init__(self, registryFile, api = 'vulkan'):
         Log.i("Loading registry file: '{0}'".format(registryFile))
@@ -2024,7 +2027,7 @@ class VulkanRegistry():
 
             # If any of the members is a dynamic array then we should remove the corresponding count member
             for member in list(structDef.members.values()):
-                if member.isArray and member.arraySizeMember != None:
+                if member.isArray and member.arraySizeMember != None and struct.get('name') not in struct_with_valid_dynamic_array:
                     structDef.members.pop(member.arraySizeMember, None)
 
             # Store struct definition
@@ -4375,7 +4378,7 @@ class VulkanProfilesSchemaGenerator():
                 continue
 
             if memberDef.isArray:
-                if memberDef.arraySizeMember != None:
+                if memberDef.arraySizeMember != None and name not in struct_with_valid_dynamic_array:
                     # This array is a dynamic one (count + pointer to array) which is not allowed
                     # for return structures. Such structures hence are ill-formed and shouldn't
                     # be included in the schema
