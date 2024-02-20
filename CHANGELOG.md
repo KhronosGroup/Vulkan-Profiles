@@ -28,7 +28,7 @@
 - Fix merge script change of behavior with limit outputed when all profiles don't support a capability
 - Fix 'not' limitype not handle correctly by merge script
 - Fix `VP_LUNARG_desktop_baseline_2024` profile, tweaked incorrect input files
-- Fix `sparseProperties` support
+- Fix merge script `sparseProperties` support
 
 ## [Vulkan Profiles Toolset 1.3.275](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.275.0) - January 2024
 
