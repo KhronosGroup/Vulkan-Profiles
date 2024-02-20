@@ -362,7 +362,7 @@ VPAPI_ATTR void GatherStructureTypes(std::vector<VkStructureType>& structureType
 
 VPAPI_ATTR bool isMultiple(double source, double multiple) {
     double mod = std::fmod(source, multiple);
-    return std::abs(mod) < 0.0001; 
+    return std::abs(mod) < 0.0001;
 }
 
 VPAPI_ATTR bool isPowerOfTwo(double source) {
@@ -446,7 +446,7 @@ struct VpProfileDesc {
     uint32_t                        minApiVersion;
 
     const detail::VpVariantDesc*    pMergedCapabilities;
-    
+
     uint32_t                        requiredProfileCount;
     const VpProfileProperties*      pRequiredProfiles;
 
@@ -925,7 +925,7 @@ VPAPI_ATTR VkResult vpGetInstanceProfileVariantsSupport(const char *pLayerName, 
         *pSupported = supported;
         return result;
     }
- 
+
     for (std::size_t i = 0; i < pProfileDesc->requiredProfileCount; ++i) {
         result = detail::vpGetInstanceProfileSupportSingleProfile(0, supported_instance_extensions, &pProfileDesc->pRequiredProfiles[i], &supported, supported_blocks, unsupported_blocks);
         if (result != VK_SUCCESS) {
@@ -1441,7 +1441,7 @@ VPAPI_ATTR VkResult vpGetProfileProperties(const VpProfileProperties *pProfile, 
                 }
 
                 if (variant.property.pfnFiller == nullptr) continue;
-                
+
                 VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
                 while (p != nullptr) {
                     variant.property.pfnFiller(p);
@@ -1642,7 +1642,7 @@ PRIVATE_IMPL_FEATURES_CHAIN_IMPL = '''
         this->ApplyRobustness(pCreateInfo);
     }
 
-    void PushBack(VkBaseOutStructure* found) { 
+    void PushBack(VkBaseOutStructure* found) {
         VkBaseOutStructure* last = reinterpret_cast<VkBaseOutStructure*>(&requiredFeaturesChain);
         while (last->pNext != nullptr) {
             last = last->pNext;
