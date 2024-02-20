@@ -103,7 +103,7 @@ add_custom_target(VpCreateDesktopBaseline2024 ALL
         --output-profile VP_LUNARG_desktop_baseline_2024
         --profile-label ${PROFILE_DESKTOP_BASELINE_2024_LABEL}
         --profile-desc ${PROFILE_DESKTOP_BASELINE_2024_DESC}
-        --profile-date 2023-11-01
+        --profile-date 2024-02-20
         --profile-api-version ${PROFILE_DESKTOP_BASELINE_2024_API_VERSION}
         --profile-required-profiles "VP_LUNARG_minimum_requirements_1_2"
         --strip-duplicate-structs

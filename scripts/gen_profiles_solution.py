@@ -2463,8 +2463,8 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceVulkan13Properties'].members['storageTexelBufferOffsetSingleTexelAlignment'].limittype = 'exact'
             self.structs['VkPhysicalDeviceVulkan13Properties'].members['uniformTexelBufferOffsetAlignmentBytes'].limittype = 'min,pot'
             self.structs['VkPhysicalDeviceVulkan13Properties'].members['uniformTexelBufferOffsetSingleTexelAlignment'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceVulkan13Properties'].members['minSubgroupSize'].limittype = 'min,pot'
-            self.structs['VkPhysicalDeviceVulkan13Properties'].members['maxSubgroupSize'].limittype = 'max,pot'
+            self.structs['VkPhysicalDeviceVulkan13Properties'].members['minSubgroupSize'].limittype = 'exact'
+            self.structs['VkPhysicalDeviceVulkan13Properties'].members['maxSubgroupSize'].limittype = 'exact'
 
         if 'VkPhysicalDeviceTexelBufferAlignmentProperties' in self.structs:
             self.structs['VkPhysicalDeviceTexelBufferAlignmentProperties'].members['storageTexelBufferOffsetAlignmentBytes'].limittype = 'min,pot'
@@ -3009,13 +3009,13 @@ class VulkanProfile():
 
             if not depFound:
                 if structDef.definedByExtensions and structDef.definedByVersion:
-                    Log.f("Unexpected required struct '{0}' in profile '{1}', this struct requires API version '{2}' or an extension '{3}' which are not required in the capabilities block '{4}'.\n".format(structName, self.key, structDef.definedByVersion, ', '.join(structDef.definedByExtensions), capabilities_key))
+                    Log.e("Unexpected required struct '{0}' in profile '{1}', this struct requires API version '{2}' or an extension '{3}' which are not required in the capabilities block '{4}'.\n".format(structName, self.key, structDef.definedByVersion, ', '.join(structDef.definedByExtensions), capabilities_key))
                 elif structDef.definedByExtensions:
-                    Log.f("Unexpected required struct '{0}' in profile '{1}', this struct requires an extension '{2}' which is not required in the capabilities block '{3}'.\n".format(structName, self.key, ', '.join(structDef.definedByExtensions), capabilities_key))
+                    Log.e("Unexpected required struct '{0}' in profile '{1}', this struct requires an extension '{2}' which is not required in the capabilities block '{3}'.\n".format(structName, self.key, ', '.join(structDef.definedByExtensions), capabilities_key))
                 elif structDef.definedByVersion:
-                    Log.f("Unexpected required struct '{0}' in profile '{1}', this struct requires API version '{2}' which is not required in the capabilities block '{3}'.\n".format(structName, self.key, structDef.definedByVersion, capabilities_key))
+                    Log.e("Unexpected required struct '{0}' in profile '{1}', this struct requires API version '{2}' which is not required in the capabilities block '{3}'.\n".format(structName, self.key, structDef.definedByVersion, capabilities_key))
                 else:
-                    Log.f("Unexpected required struct '{0}' in capabilities block '{1}' of profile '{2}'.\n".format(structName, capabilities_key, self.key))
+                    Log.e("Unexpected required struct '{0}' in capabilities block '{1}' of profile '{2}'.\n".format(structName, capabilities_key, self.key))
         else:
             Log.f("Struct '{0}' in profile '{1}' does not exist in the registry".format(structName, self.key))
 

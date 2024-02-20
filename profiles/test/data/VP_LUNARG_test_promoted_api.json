@@ -153,7 +153,7 @@
                 },
                 "VkPhysicalDeviceVulkan13Properties": {
                     "minSubgroupSize": 32,
-                    "maxSubgroupSize": 128,
+                    "maxSubgroupSize": 32,
                     "maxComputeWorkgroupSubgroups": 340,
                     "requiredSubgroupSizeStages": [ "VK_SHADER_STAGE_VERTEX_BIT", "VK_SHADER_STAGE_FRAGMENT_BIT" ],
                     "maxInlineUniformBlockSize": 271,

@@ -70,12 +70,12 @@ class ProfileMerger():
                     else:
                         merged_features.clear()
 
-#                    if 'properties' in capability:
-#                        for property in dict(merged_properties):
-#                            if property not in capability['properties'] or property == 'VkPhysicalDeviceSparseProperties' or property == 'sparseProperties':
-#                                del merged_properties[property]
-#                    else:
-#                        merged_properties.clear()
+                    if 'properties' in capability:
+                        for property in dict(merged_properties):
+                            if property not in capability['properties']:
+                                del merged_properties[property]
+                    else:
+                        merged_properties.clear()
 
                 if 'extensions' in capability:
                     if self.mode == 'union' or self.first:
@@ -427,7 +427,7 @@ class ProfileMerger():
                     continue
 
                 xmlmember = self.registry.structs[property].members[member]
-                if xmlmember.limittype == 'noauto':
+                if xmlmember.limittype == 'exact' or xmlmember.limittype == 'noauto':
                     del merged[member]
                 #elif 'mul'  in xmlmember.limittype and xmlmember.type == 'float':
                 #    del merged[member]
@@ -437,7 +437,7 @@ class ProfileMerger():
                     merged[member] = entry[member]
             elif not member in merged:
                 xmlmember = self.registry.structs[property].members[member]
-                if xmlmember.limittype == 'noauto':
+                if xmlmember.limittype == 'exact' or xmlmember.limittype == 'noauto':
                     continue
                 elif self.mode == 'union' or self.first is True:
                     if xmlmember.type == 'uint64_t' or xmlmember.type == 'VkDeviceSize':
@@ -457,8 +457,8 @@ class ProfileMerger():
                         if smember in merged[member]:
                             if smember in entry[member]:
                                 self.merge_members(merged[member], smember, entry[member], s[smember])
-                        #elif self.mode == 'union' and smember in entry[member]:
-                        elif smember in entry[member]:
+                        # only add member in union mode or first
+                        elif (self.mode == 'union' or self.first is True) and (smember in entry[member]):
                             if xmlmember.type == 'uint64_t' or xmlmember.type == 'VkDeviceSize':
                                 merged[member][smember] = int(entry[member][smember])
                             else:
@@ -467,10 +467,7 @@ class ProfileMerger():
                     self.merge_members(merged, member, entry, xmlmember)
 
     def merge_members(self, merged, member, entry, xmlmember):
-        if xmlmember.limittype == 'exact':
-            #if merged[member] != entry[member]:
-            del merged[member]
-        elif xmlmember.limittype == 'noauto':
+        if xmlmember.limittype == 'exact' or xmlmember.limittype == 'noauto':
             del merged[member]
         elif self.mode == 'union':
             #if xmlmember.limittype == 'exact':
@@ -622,9 +619,12 @@ class ProfileMerger():
                     else:
                         merged.remove(member)
                 else:
+                    remove_list = []
                     for value in merged[member]:
                         if value not in entry[member]:
-                            merged[member].remove(value)
+                            remove_list.append(value)
+                    for value in remove_list:
+                        merged[member].remove(value)
             elif xmlmember.limittype == 'not':
                 if xmlmember.type == 'VkBool32':
                     if member in entry:
@@ -857,6 +857,7 @@ if __name__ == '__main__':
         exit()
 
     registry = gen_profiles_solution.VulkanRegistry(args.registry)
+    
     profile_merger = ProfileMerger(registry)
 
     if args.profile_desc is not None:
