@@ -1,10 +1,12 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-154.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-156.json#",
     "capabilities": {
         "baseline": {
             "extensions": {
                 "VK_KHR_maintenance2": 1,
-                "VK_KHR_maintenance3": 1
+                "VK_KHR_maintenance3": 1,
+                "VK_KHR_variable_pointers": 1,
+                "VK_EXT_extended_dynamic_state": 1
             },
             "features": {
                 "VkPhysicalDeviceFeatures": {
@@ -36,7 +38,11 @@
                         "maxTexelOffset": 7,
                         "framebufferColorSampleCounts": [ "VK_SAMPLE_COUNT_2_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
                         "pointSizeRange": [ 2.0, 64.0 ],
-                        "pointSizeGranularity": 2.0
+                        "pointSizeGranularity": 2.0,
+                        "strictLines": true
+                    },
+                    "sparseProperties": {
+                        "residencyAlignedMipSize": false
                     },
                     "deviceID": 7676,
                     "deviceName": "LunarG Toolset"

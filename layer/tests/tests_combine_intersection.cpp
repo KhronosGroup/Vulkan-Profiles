@@ -81,6 +81,7 @@ TEST_F(TestsIntersection, Feature) {
 
     EXPECT_EQ(gpu_features.depthBiasClamp, VK_TRUE);
     EXPECT_EQ(gpu_features.depthClamp, VK_FALSE);
+    EXPECT_EQ(gpu_features.largePoints, VK_TRUE);
 }
 
 TEST_F(TestsIntersection, Properties) {
@@ -102,6 +103,8 @@ TEST_F(TestsIntersection, Properties) {
     EXPECT_EQ(gpu_props.limits.pointSizeRange[0], 4.0);
     EXPECT_EQ(gpu_props.limits.pointSizeRange[1], 32.0);
     EXPECT_EQ(gpu_props.limits.pointSizeGranularity, 4.0);
+
+    EXPECT_EQ(gpu_props.sparseProperties.residencyAlignedMipSize, VK_FALSE);
 }
 
 // Noauto limittype member should not be modified

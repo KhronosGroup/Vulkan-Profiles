@@ -1,10 +1,12 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-154.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-155.json#",
     "capabilities": {
         "baseline": {
             "extensions": {
                 "VK_KHR_maintenance1": 1,
-                "VK_KHR_maintenance3": 1
+                "VK_KHR_maintenance3": 1,
+                "VK_KHR_imageless_framebuffer": 1,
+                "VK_EXT_shader_demote_to_helper_invocation": 1
             },
             "features": {
                 "VkPhysicalDeviceFeatures": {
@@ -13,7 +15,8 @@
                     "drawIndirectFirstInstance": true,
                     "multiDrawIndirect": false,
                     "sampleRateShading": true,
-                    "shaderClipDistance": false
+                    "shaderClipDistance": false,
+                    "largePoints": false
                 },
                 "VkPhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT": {
                     "shaderDemoteToHelperInvocation": true
@@ -36,7 +39,11 @@
                         "maxTexelOffset": 3,
                         "framebufferColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
                         "pointSizeRange": [ 4.0, 32.0 ],
-                        "pointSizeGranularity": 4.0
+                        "pointSizeGranularity": 4.0,
+                        "strictLines": true
+                    },
+                    "sparseProperties": {
+                        "residencyAlignedMipSize": false
                     },
                     "vendorID": 4098,
                     "deviceType": "VK_PHYSICAL_DEVICE_TYPE_OTHER"

@@ -70,12 +70,12 @@ class ProfileMerger():
                     else:
                         merged_features.clear()
 
-                    if 'properties' in capability:
-                        for property in dict(merged_properties):
-                            if property not in capability['properties'] or property == 'VkPhysicalDeviceSparseProperties' or property == 'sparseProperties':
-                                del merged_properties[property]
-                    else:
-                        merged_properties.clear()
+#                    if 'properties' in capability:
+#                        for property in dict(merged_properties):
+#                            if property not in capability['properties'] or property == 'VkPhysicalDeviceSparseProperties' or property == 'sparseProperties':
+#                                del merged_properties[property]
+#                    else:
+#                        merged_properties.clear()
 
                 if 'extensions' in capability:
                     if self.mode == 'union' or self.first:
@@ -84,10 +84,13 @@ class ProfileMerger():
                             # Check if the extension was not promoted in the version used
                             # if vk_version is None or (vk_version[0] > api_version[0]) or (vk_version[0] == api_version[0] and vk_version[1] > api_version[1]):
                             merged_extensions[extension] = capability['extensions'][extension]
-                    else:
+                    elif self.mode == 'intersection':
                         for extension in list(merged_extensions):
                             if not extension in capability['extensions']:
                                 del merged_extensions[extension]
+                    else:
+                        print("ERROR: Unknown combination mode: " + self.mode)
+                        
                 if 'features' in capability:
                     for feature in capability['features']:
                         # Feature already exists, add or overwrite members
@@ -126,9 +129,7 @@ class ProfileMerger():
                 if 'properties' in capability:
                     for property in capability['properties']:
                         # Property already exists, add or overwrite members
-                        if property == 'sparseProperties':
-                            continue
-                        elif property in merged_properties:
+                        if property in merged_properties:
                             self.add_members(merged_properties[property], capability['properties'][property], property)
                         else:
                             # Check if the promoted struct of current property was already added
@@ -154,6 +155,7 @@ class ProfileMerger():
                                             self.add_members(merged_properties[alias], capability['properties'][property])
                                         break
                                 self.add_struct(property, capability['properties'][property], merged_properties)
+
                 if 'formats' in capability:
                     for format in capability['formats']:
                         if (format not in merged_formats) and (self.mode == 'union' or self.first):
@@ -369,6 +371,10 @@ class ProfileMerger():
 
     def get_promoted_struct_name(self, struct, feature):
         # Workaround, because Vulkan11 structs were added in vulkan 1.2
+        if struct == 'VkPhysicalDeviceFeatures':
+            return 'VkPhysicalDeviceFeatures'
+        if struct == 'VkPhysicalDeviceProperties':
+            return 'VkPhysicalDeviceProperties'
         if struct == 'VkPhysicalDeviceVulkan11Features':
             return 'VkPhysicalDeviceVulkan11Features'
         if struct == 'VkPhysicalDeviceVulkan11Properties':
@@ -388,9 +394,7 @@ class ProfileMerger():
         return 'VkPhysicalDeviceVulkan' + str(version.major) + str(version.minor) + 'Features' if feature else 'Properties'
 
     def add_struct(self, struct_name, struct, merged):
-        if struct_name == 'VkPhysicalDeviceSparseProperties':
-            return
-        elif struct_name in merged:
+        if struct_name in merged:
             # Union
             if self.mode == 'union':
                 for member in struct:
@@ -528,7 +532,7 @@ class ProfileMerger():
             elif xmlmember.limittype == 'not':
                 for smember in entry[member]:
                     if smember in merged[member]:
-                        merged[member] = merged[member] and smember
+                        merged[member] = (not merged[member]) or (not smember)
                     else:
                         merged[member].append(smember)
             elif xmlmember.limittype == 'range':
@@ -625,7 +629,7 @@ class ProfileMerger():
                 if xmlmember.type == 'VkBool32':
                     if member in entry:
                         merged[member] = merged[member] or entry[member]
-                        if (not merged[member]):
+                        if (merged[member]):
                             del merged[member]
                     else:
                         merged.remove(member)
