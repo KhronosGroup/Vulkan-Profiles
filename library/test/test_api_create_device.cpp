@@ -48,6 +48,35 @@ int main(int argc, char** argv) {
     return result;
 }
 
+#ifdef VKU_FORCE_EXTRA_TESTS
+TEST(api_create_device_profile, check_support_desktop_2022) {
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
+
+    VkBool32 supported = VK_FALSE;
+    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    EXPECT_TRUE(result == VK_SUCCESS);
+    EXPECT_TRUE(supported == VK_TRUE);
+}
+
+TEST(api_create_device_profile, check_support_desktop_2023) {
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, VP_LUNARG_DESKTOP_BASELINE_2023_SPEC_VERSION};
+
+    VkBool32 supported = VK_FALSE;
+    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    EXPECT_TRUE(result == VK_SUCCESS);
+    EXPECT_TRUE(supported == VK_TRUE);
+}
+
+TEST(api_create_device_profile, check_support_desktop_2024) {
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2024_NAME, VP_LUNARG_DESKTOP_BASELINE_2024_SPEC_VERSION};
+
+    VkBool32 supported = VK_FALSE;
+    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    EXPECT_TRUE(result == VK_SUCCESS);
+    EXPECT_TRUE(supported == VK_TRUE);
+}
+#endif  // VKU_FORCE_EXTRA_TESTS
+
 TEST(api_create_device_profile, check_support_vulkan_1_0) {
     const VpProfileProperties profile = {VP_LUNARG_MINIMUM_REQUIREMENTS_1_0_NAME, VP_LUNARG_MINIMUM_REQUIREMENTS_1_0_SPEC_VERSION};
 
