@@ -1135,7 +1135,8 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(VkInstance instanc
         bool supported_profile = true;
 
 
-        if (pProfileDesc->props.specVersion < pProfile->specVersion) {
+        if (pProfileDesc->props.specVersion < profiles[i].specVersion) {
+            VP_DEBUG_MSGF("Unsupported requested %s profile version: %u, profile supported at version %u", profile_name, pProfileDesc->props.specVersion, pProfile->specVersion);
             supported_profile = false;
         }
 

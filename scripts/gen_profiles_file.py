@@ -28,7 +28,7 @@ class ProfileMerger():
     def __init__(self, registry):
         self.registry = registry
 
-    def merge(self, jsons, profiles, profile_names, merged_path, merged_profile, profile_label, profile_description, profile_api_version, profile_stage, profile_date, required_profiles, mode, strip_duplicate_struct):
+    def merge(self, jsons, profiles, profile_names, merged_path, merged_profile, profile_version, profile_label, profile_description, profile_api_version, profile_stage, profile_date, required_profiles, mode, strip_duplicate_struct):
         self.mode = mode
 
         # Find the api version to use
@@ -43,7 +43,7 @@ class ProfileMerger():
         merged = dict()
         merged['$schema'] = 'https://schema.khronos.org/vulkan/profiles-0.8.0-' + self.api_version[2] + '.json#'
         merged['capabilities'] = self.merge_capabilities(jsons, profile_names, self.api_version, strip_duplicate_struct)
-        merged['profiles'] = self.get_profiles(merged_profile, self.api_version, profile_label, profile_description, profile_stage, profile_date, required_profiles)
+        merged['profiles'] = self.get_profiles(merged_profile, profile_version, self.api_version, profile_label, profile_description, profile_stage, profile_date, required_profiles)
 
         # Wite new merged profile
         with open(merged_path, 'w') as file:
@@ -689,10 +689,10 @@ class ProfileMerger():
         minor = version[underscore+1:]
         return [major, minor]
 
-    def get_profiles(self, profile_name, api_version, label, description, stage, date, required_profiles):
+    def get_profiles(self, profile_name, profile_version, api_version, label, description, stage, date, required_profiles):
         profiles = dict()
         profiles[profile_name] = dict()
-        profiles[profile_name]['version'] = 1
+        profiles[profile_name]['version'] = profile_version
         if stage != 'STABLE':
             profiles[profile_name]['status'] = stage
         profiles[profile_name]['api-version'] = '.'.join(api_version)
@@ -762,6 +762,8 @@ if __name__ == '__main__':
                         help='Path to output profile.')
     parser.add_argument('--output-profile', action='store',
                         help='Profile name of the output profile. If the argument is not set, the value is generated.')
+    parser.add_argument('--profile-version', action='store',
+                        help='Override the Profile version of the generated profile. If the argument is not set, the value is 1.')
     parser.add_argument('--profile-label', action='store',
                         help='Override the Label of the generated profile. If the argument is not set, the value is generated.')
     parser.add_argument('--profile-desc', action='store',
@@ -813,6 +815,11 @@ if __name__ == '__main__':
         profile_label = args.profile_label
     else:
         profile_label = 'Generated profile'
+
+    if args.profile_version is not None:
+        profile_version = int(args.profile_version)
+    else:
+        profile_version = 1
 
     if args.strip_duplicate_structs:
         gen_profiles_solution.Log.i('Stripping duplicated structures. `--strip-duplicate-structs` is set. Eg the output profiles file will contain VkPhysicalDeviceVulkan11Properties not VkPhysicalDeviceMultiviewPropertiesKHR.')
@@ -877,5 +884,19 @@ if __name__ == '__main__':
         now = datetime.now()
         profile_date = str(now.year) + '-' + str(now.month).zfill(2) + '-' + str(now.day).zfill(2)
 
-    profile_merger.merge(jsons, profiles, profile_names, args.output_path, args.output_profile, args.profile_label, args.profile_desc, args.profile_api_version, profile_stage, profile_date, required_profiles, args.mode, strip_duplicate_struct)
-    
+    profile_merger.merge(
+        jsons,
+        profiles,
+        profile_names,
+        args.output_path,
+        args.output_profile,
+        profile_version,
+        profile_label,
+        profile_description,
+        args.profile_api_version,
+        profile_stage,
+        profile_date,
+        required_profiles,
+        args.mode,
+        strip_duplicate_struct)
+
