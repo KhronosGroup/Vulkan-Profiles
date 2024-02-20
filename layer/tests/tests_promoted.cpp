@@ -290,7 +290,7 @@ TEST_F(TestsPromoted, TestVulkan13Properties) {
     vkGetPhysicalDeviceProperties2(gpu_profile, &gpu_props);
 
     EXPECT_EQ(vulkan_13_properties.minSubgroupSize, 32);
-    EXPECT_EQ(vulkan_13_properties.maxSubgroupSize, 128);
+    EXPECT_EQ(vulkan_13_properties.maxSubgroupSize, 32);
     EXPECT_EQ(vulkan_13_properties.maxComputeWorkgroupSubgroups, 340);
     EXPECT_EQ(vulkan_13_properties.requiredSubgroupSizeStages & (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT),
               VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
