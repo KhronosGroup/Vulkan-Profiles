@@ -235,10 +235,12 @@ TEST(test_library_util, GetDeviceExtensions) {
         profileInfo.flags = 0;
 
         std::vector<const char *> extensions;
-        detail::GetExtensions(ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions),
-                                detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions,
+        detail::GetExtensions(
+            ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2023::VP_LUNARG_desktop_baseline_2023_block::deviceExtensions),
+            detail::VP_LUNARG_DESKTOP_BASELINE_2023::VP_LUNARG_desktop_baseline_2023_block::deviceExtensions,
                                 extensions);
-        EXPECT_EQ(ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions), extensions.size());
+        EXPECT_EQ(ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2023::VP_LUNARG_desktop_baseline_2023_block::deviceExtensions),
+                  extensions.size());
     }
 }
 
@@ -253,8 +255,9 @@ TEST(test_library_util, check_extension_not_found) {
     info.ppEnabledExtensionNames = EXTENSIONS;
 
     for (std::size_t i = 0, n = info.enabledExtensionCount; i < n; ++i) {
-        EXPECT_FALSE(detail::CheckExtension(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions,
-                                              ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions),
+        EXPECT_FALSE(detail::CheckExtension(
+            detail::VP_LUNARG_DESKTOP_BASELINE_2023::VP_LUNARG_desktop_baseline_2023_block::deviceExtensions,
+            ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2023::VP_LUNARG_desktop_baseline_2023_block::deviceExtensions),
                                               info.ppEnabledExtensionNames[i]));
     }
 }
@@ -270,8 +273,9 @@ TEST(test_library_util, check_extension_found) {
     info.ppEnabledExtensionNames = EXTENSIONS;
 
     for (std::size_t i = 0, n = info.enabledExtensionCount; i < n; ++i) {
-        EXPECT_TRUE(detail::CheckExtension(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions,
-                                             ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2023::baseline::deviceExtensions),
+        EXPECT_TRUE(detail::CheckExtension(
+            detail::VP_LUNARG_DESKTOP_BASELINE_2023::VP_LUNARG_desktop_baseline_2023_block::deviceExtensions,
+            ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2023::VP_LUNARG_desktop_baseline_2023_block::deviceExtensions),
                                              info.ppEnabledExtensionNames[i]));
     }
 }
