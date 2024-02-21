@@ -3562,8 +3562,9 @@ class VulkanProfilesLibraryGenerator():
 
 
     def generate(self, outIncDir, outSrcDir):
-        self.generate_h(outIncDir)
-        self.generate_cpp(outSrcDir)
+        if outSrcDir != None:
+            self.generate_h(outIncDir)
+            self.generate_cpp(outSrcDir)
         self.generate_hpp(outIncDir)
 
 
@@ -5262,16 +5263,16 @@ class VulkanProfilesDocGenerator():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--api', action='store',
-                        default='vulkan',
-                        choices=['vulkan'],
-                        help="Target API")
     parser.add_argument('--registry', '-r', action='store', required=True,
                         help='Use specified registry file instead of vk.xml')
     parser.add_argument('--input', '-i', action='store', required=True,
                         help='Path to directory with profiles.')
     parser.add_argument('--input-filenames', action='store',
                         help='The optional filenames of the profiles files in the directory. If this parameter is not set, all profiles files are loaded.')
+    parser.add_argument('--api', action='store',
+                        default='vulkan',
+                        choices=['vulkan'],
+                        help="Target API")
     parser.add_argument('--output-library-inc', action='store',
                         help='Output include directory for profile library')
     parser.add_argument('--output-library-src', action='store',
@@ -5287,6 +5288,12 @@ if __name__ == '__main__':
                         help='Validate generated JSON profile schema and JSON profiles against the schema')
     parser.add_argument('--debug', '-d', action='store_true',
                         help='Also generate library variant with debug messages')
+    parser.add_argument('--config', '-c', action='store',
+                        default='release',
+                        choices=['release', 'debug'],
+                        help='Select the build configuration, either "Release" or "Debug" for the API Library to generate debug messages')
+
+    parser.set_defaults(config='Release')
 
     args = parser.parse_args()
 
@@ -5333,7 +5340,7 @@ if __name__ == '__main__':
         input_profiles_files = VulkanProfilesFiles(registry, args.input, profiles_filenames, args.validate, schema)
 
     if args.output_library_inc != None:
-        generator = VulkanProfilesLibraryGenerator(registry, input_profiles_files, args.output_library_filename)
+        generator = VulkanProfilesLibraryGenerator(registry, input_profiles_files, args.output_library_filename, args.config == 'Debug')
         generator.generate(args.output_library_inc, args.output_library_src)
         if args.debug:
             generator = VulkanProfilesLibraryGenerator(registry, input_profiles_files, args.output_library_filename, True)

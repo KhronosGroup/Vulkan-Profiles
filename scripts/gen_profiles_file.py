@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-# Copyright (c) 2022 LunarG, Inc.
+# Copyright (c) 2022-2024 LunarG, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License")
 # you may not use this file except in compliance with the License.
@@ -14,40 +14,165 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Author: Ziga Markus <ziga@lunarg.com>
+# Authors: 
+# - Ziga Markus <ziga@lunarg.com>
+# - Christophe Riccio <christophe@lunarg.com>
 
 from datetime import datetime
 import argparse
 import json
+from typing import Self
 import gen_profiles_solution
 import re
 import os
 import collections
 
+class ProfileFile():
+    def __init__(self):
+        self.json_output = dict()
+        self.json_output['$schema'] = 'https://schema.khronos.org/vulkan/profiles-0.8-latest.json#'
+        self.json_output['capabilities'] = dict()
+        self.json_output['profiles'] = dict()
+        self.json_output['contributors'] = dict()
+        self.json_output['history'] = list()
+
+        # Get current time
+        now = datetime.now()
+
+        revision = dict()
+        revision['revision'] = 1
+        revision['date'] = str(now.year) + '-' + str(now.month).zfill(2) + '-' + str(now.day).zfill(2)
+        revision['author'] = 'LunarG Profiles Merge Script'
+        revision['comment'] = 'Generated profiles file'
+        self.json_output['history'].append(revision)
+
+    def add_capabilities(self, json_capabilities_key, json_capabilities_value):
+        self.json_output['capabilities'][json_capabilities_key] = json_capabilities_value
+
+    def add_profile(self, json_profile_key, json_profile_value):
+        self.json_output['profiles'][json_profile_key] = json_profile_value
+
+    def dump(self, path):
+        # Wite new merged profile
+        with open(path, 'w') as file:
+            json.dump(self.json_output, file, indent = 4)
+
+class ProfileConfig():
+    def __init__(self, input_dir, input_profile_names, profile_api_version, merge_mode):
+        self.input_paths = list()
+        self.input_jsons = list()
+        self.input_profile_values = list()
+        self.input_profile_names = input_profile_names
+
+        self.load_jsons(input_dir)
+
+        self.name = "VP_LUNARG_generated_profile"
+        self.version = 1
+        self.label = 'Generated profile'
+        self.description = self.get_profile_description(self.input_profile_names, merge_mode)
+        self.status = "STABLE"
+
+        # Get current time
+        now = datetime.now()
+        self.date = str(now.year) + '-' + str(now.month).zfill(2) + '-' + str(now.day).zfill(2)
+        
+        # Find the api version to use
+        if profile_api_version is not None:
+            self.api_version = self.get_api_version_list(profile_api_version)
+        else:
+            self.api_version = self.get_api_version(self.input_profile_values, merge_mode)
+
+        self.required_profiles = list()
+
+    def load_jsons(self, input_dir):
+        if input_dir is not None:
+            profiles_not_found = self.input_profile_names.copy()
+            # Find all jsons in the folder
+            paths = [input_dir + '/' + pos_json for pos_json in os.listdir(input_dir) if pos_json.endswith('.json')]
+            json_files = list()
+            for i in range(len(paths)):
+                print('Opening: ' + paths[i])
+                file = open(paths[i], "r")
+                json_files.append(json.load(file))
+            # We need to iterate through profile names first, so the indices of jsons and profiles lists will match
+            if (len(input_profile_names) > 0):
+                for profile_name in input_profile_names:
+                    for json_file in json_files:
+                        if 'profiles' in json_file and profile_name in json_file['profiles']:
+                            self.input_jsons.append(json_file)
+                            # Select profiles and capabilities
+                            self.input_profile_values.append(json_file['profiles'][profile_name])
+                            profiles_not_found.remove(profile_name)
+                            break
+                if profiles_not_found:
+                    print('Profiles: ' + ' '.join(profiles_not_found) + ' not found in directory ' + args.input)
+                    exit()
+            else:
+                for json_file in json_files:
+                    if 'profiles' in json_file:
+                        for profile in json_file['profiles']:
+                            self.input_jsons.append(json_file)
+                            self.input_profile_values.append(json_file['profiles'][profile])
+                            self.input_profile_names.append(profile)
+        else:
+            print('ERROR: Not input directory set, use --input')
+            exit()
+
+    def get_api_version(self, profiles, merge_mode):
+        api_version = self.get_api_version_list(profiles[0]['api-version'])
+        for profile in profiles:
+            current_api_version = self.get_api_version_list(profile['api-version'])
+            if merge_mode == 'union':
+                for i in range(len(api_version)):
+                    if (api_version[i] > current_api_version[i]):
+                        break
+                    elif (api_version[i] < current_api_version[i]):
+                        api_version = current_api_version
+                        break
+            elif merge_mode == 'intersection':
+                for i in range(len(api_version)):
+                    if (api_version[i] < current_api_version[i]):
+                        break
+                    elif (api_version[i] > current_api_version[i]):
+                        api_version = current_api_version
+                        break
+            else:
+                print('ERROR: Unknown mode when computing api-version')
+        return api_version
+
+    def get_api_version_list(self, ver):
+        version = ver.split('.')
+        return version
+
+    def get_profile_description(self, profile_names, mode):
+        desc = 'Generated profile doing an ' + mode + ' between profiles: '
+        count = len(profile_names)
+        for i in range(count):
+            desc += profile_names[i]
+            if i == count - 2:
+                desc += ' and '
+            elif i < count - 2:
+                desc += ', '
+        return desc
+
 class ProfileMerger():
     def __init__(self, registry):
         self.registry = registry
 
-    def merge(self, jsons, profiles, profile_names, merged_path, merged_profile, profile_version, profile_label, profile_description, profile_api_version, profile_stage, profile_date, required_profiles, mode, strip_duplicate_struct):
+    def merge(self, profile_config, profile_file, mode, strip_duplicate_struct):
         self.mode = mode
 
-        # Find the api version to use
-        if args.profile_api_version is not None:
-            self.api_version = self.get_api_version_list(profile_api_version)
-        else:
-            self.api_version = self.get_api_version(profiles)
+        print('Building a Vulkan ' + '.'.join(profile_config.api_version) + ' profile')
 
-        print('Building a Vulkan ' + '.'.join(self.api_version) + ' profile')
+        capabilities_key = profile_config.name + "_block"
 
-        # Begin constructing merged profile
-        merged = dict()
-        merged['$schema'] = 'https://schema.khronos.org/vulkan/profiles-0.8.0-' + self.api_version[2] + '.json#'
-        merged['capabilities'] = self.merge_capabilities(jsons, profile_names, self.api_version, strip_duplicate_struct)
-        merged['profiles'] = self.get_profiles(merged_profile, profile_version, self.api_version, profile_label, profile_description, profile_stage, profile_date, required_profiles)
+        profile_file.add_capabilities(
+            capabilities_key,
+            self.merge_capabilities(profile_config.input_jsons, profile_config.input_profile_names, profile_config.api_version, strip_duplicate_struct))
 
-        # Wite new merged profile
-        with open(merged_path, 'w') as file:
-            json.dump(merged, file, indent = 4)
+        profile_file.add_profile(
+            profile_config.name,
+            self.get_profile(profile_config, capabilities_key))
 
     def merge_capabilities(self, jsons, profile_names, api_version, strip_duplicate_struct):
         merged_extensions = dict()
@@ -235,17 +360,16 @@ class ProfileMerger():
                         print("ERROR: Unknown combination mode: " + self.mode)
 
         capabilities = dict()
-        capabilities['baseline'] = dict()
         if merged_extensions:
             sorted_extensions = collections.OrderedDict(sorted(merged_extensions.items()))
-            capabilities['baseline']['extensions'] = dict(sorted_extensions)
+            capabilities['extensions'] = dict(sorted_extensions)
         if merged_features:
             for feature in dict(merged_features):
                 if not merged_features[feature]:
                     del merged_features[feature]
 
             sorted_features = collections.OrderedDict(sorted(merged_features.items()))
-            capabilities['baseline']['features'] = dict(sorted_features)
+            capabilities['features'] = dict(sorted_features)
         if merged_properties:
             for property in dict(merged_properties):
                 if not merged_properties[property]:
@@ -288,32 +412,32 @@ class ProfileMerger():
                     if 'VkPhysicalDeviceSubgroupSizeControlPropertiesEXT' in sorted_properties:
                         del sorted_properties['VkPhysicalDeviceSubgroupSizeControlPropertiesEXT']
 
-            capabilities['baseline']['properties'] = dict(sorted_properties)
+            capabilities['properties'] = dict(sorted_properties)
 
         if merged_formats:
             sorted_formats = collections.OrderedDict(sorted(merged_formats.items()))
-            capabilities['baseline']['formats'] = dict(sorted_formats)
+            capabilities['formats'] = dict(sorted_formats)
 
             # remove all empty elements
             formatsToRemove = list()
 
-            for format in capabilities['baseline']['formats']:
+            for format in capabilities['formats']:
                 for prop_name in ['VkFormatProperties', 'VkFormatProperties3', 'VkFormatProperties3KHR']:
                     for features in ['linearTilingFeatures', 'optimalTilingFeatures', 'bufferFeatures']:
-                        if features in capabilities['baseline']['formats'][format][prop_name]:
-                            if not capabilities['baseline']['formats'][format][prop_name][features]:
-                                del capabilities['baseline']['formats'][format][prop_name][features]
-                    if prop_name in capabilities['baseline']['formats'][format]:
-                        if not capabilities['baseline']['formats'][format][prop_name]:
-                            del capabilities['baseline']['formats'][format][prop_name]
-                if not capabilities['baseline']['formats'][format]:
+                        if features in capabilities['formats'][format][prop_name]:
+                            if not capabilities['formats'][format][prop_name][features]:
+                                del capabilities['formats'][format][prop_name][features]
+                    if prop_name in capabilities['formats'][format]:
+                        if not capabilities['formats'][format][prop_name]:
+                            del capabilities['formats'][format][prop_name]
+                if not capabilities['formats'][format]:
                     formatsToRemove.append(format)
 
             for format in formatsToRemove:
-                del capabilities['baseline']['formats'][format]
+                del capabilities['formats'][format]
 
         if merged_qfp:
-            capabilities['baseline']['queueFamiliesProperties'] = merged_qfp
+            capabilities['queueFamiliesProperties'] = merged_qfp
 
         return capabilities
 
@@ -689,65 +813,20 @@ class ProfileMerger():
         minor = version[underscore+1:]
         return [major, minor]
 
-    def get_profiles(self, profile_name, profile_version, api_version, label, description, stage, date, required_profiles):
-        profiles = dict()
-        profiles[profile_name] = dict()
-        profiles[profile_name]['version'] = profile_version
-        if stage != 'STABLE':
-            profiles[profile_name]['status'] = stage
-        profiles[profile_name]['api-version'] = '.'.join(api_version)
-        profiles[profile_name]['label'] = label
-        profiles[profile_name]['description'] = description
-        profiles[profile_name]['contributors'] = dict()
-        profiles[profile_name]['history'] = list()
-        revision = dict()
-        revision['revision'] = 1
-        revision['date'] = date
-        revision['author'] = 'LunarG Profiles Generation'
-        revision['comment'] = 'Generated profile'
-        profiles[profile_name]['history'].append(revision)
-        if required_profiles:
-            profiles[profile_name]['profiles'] = required_profiles
-        profiles[profile_name]['capabilities'] = list()
-        profiles[profile_name]['capabilities'].append('baseline')
-        return profiles
+    def get_profile(self, profile_config, capabilities_key):
+        profile = dict()
+        profile['version'] = profile_config.version
+        if profile_config.status != 'STABLE':
+            profile['status'] = profile_config.status
+        profile['api-version'] = '.'.join(profile_config.api_version)
+        profile['label'] = profile_config.label
+        profile['description'] = profile_config.description
 
-    def get_api_version(self, profiles):
-        api_version = self.get_api_version_list(profiles[0]['api-version'])
-        for profile in profiles:
-            current_api_version = self.get_api_version_list(profile['api-version'])
-            if self.mode == 'union':
-                for i in range(len(api_version)):
-                    if (api_version[i] > current_api_version[i]):
-                        break
-                    elif (api_version[i] < current_api_version[i]):
-                        api_version = current_api_version
-                        break
-            elif self.mode == 'intersection':
-                for i in range(len(api_version)):
-                    if (api_version[i] < current_api_version[i]):
-                        break
-                    elif (api_version[i] > current_api_version[i]):
-                        api_version = current_api_version
-                        break
-            else:
-                print('ERROR: Unknown mode when computing api-version')
-        return api_version
-
-    def get_api_version_list(self, ver):
-        version = ver.split('.')
-        return version
-
-    def get_profile_description(self, profile_names, mode):
-        desc = 'Generated profile doing an ' + mode + ' between profiles: '
-        count = len(profile_names)
-        for i in range(count):
-            desc += profile_names[i]
-            if i == count - 2:
-                desc += ' and '
-            elif i < count - 2:
-                desc += ', '
-        return desc
+        if len(profile_config.required_profiles) > 0:
+            profile['profiles'] = profile_config.required_profiles
+        profile['capabilities'] = list()
+        profile['capabilities'].append(capabilities_key)
+        return profile
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate Vulkan profile JSON files')
@@ -761,6 +840,8 @@ if __name__ == '__main__':
     parser.add_argument('--output-path', '-o', action='store', required=True,
                         help='Path to output profile.')
     parser.add_argument('--output-profile', action='store',
+                        help='Profile name of the output profile. Deprecated, replaced by `--profile-name`.')
+    parser.add_argument('--profile-name', action='store',
                         help='Profile name of the output profile. If the argument is not set, the value is generated.')
     parser.add_argument('--profile-version', action='store',
                         help='Override the Profile version of the generated profile. If the argument is not set, the value is 1.')
@@ -785,41 +866,19 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    profile_configs = list()
+
     if args.registry is None:
         gen_profiles_solution.Log.e('Merging the profiles requires specifying --registry')
         parser.print_help()
         exit()
 
+    registry = gen_profiles_solution.VulkanRegistry(args.registry)
+
     if (args.mode.lower() != 'union' and args.mode.lower() != 'intersection'):
         gen_profiles_solution.Log.e('Mode must be either union or intersection')
         parser.print_help()
         exit()
-
-    if args.output_profile is None:
-        args.output_profile = 'VP_LUNARG_merged_' + datetime.now().strftime('%Y_%m_%d_%H_%M')
-    elif not re.match('^VP_[A-Z0-9]+[A-Za-z0-9]+', args.output_profile):
-        gen_profiles_solution.Log.e('Invalid output_profile, must follow regex pattern ^VP_[A-Z0-9]+[A-Za-z0-9]+')
-        exit()
-
-    if args.input_profiles is not None:
-        profile_names = args.input_profiles.split(',')
-    else:
-        profile_names = list()
-
-    if args.profile_required_profiles is not None:
-        required_profiles = args.profile_required_profiles.split(',')
-    else:
-        required_profiles = list()
-
-    if args.profile_label is not None:
-        profile_label = args.profile_label
-    else:
-        profile_label = 'Generated profile'
-
-    if args.profile_version is not None:
-        profile_version = int(args.profile_version)
-    else:
-        profile_version = 1
 
     if args.strip_duplicate_structs:
         gen_profiles_solution.Log.i('Stripping duplicated structures. `--strip-duplicate-structs` is set. Eg the output profiles file will contain VkPhysicalDeviceVulkan11Properties not VkPhysicalDeviceMultiviewPropertiesKHR.')
@@ -827,76 +886,56 @@ if __name__ == '__main__':
     else:
         strip_duplicate_struct = False
 
-    # Open file and load json
-    jsons = list()
-    profiles = list()
-    if args.input is not None:
-        profiles_not_found = profile_names.copy()
-        # Find all jsons in the folder
-        paths = [args.input + '/' + pos_json for pos_json in os.listdir(args.input) if pos_json.endswith('.json')]
-        json_files = list()
-        for i in range(len(paths)):
-            print('Opening: ' + paths[i])
-            file = open(paths[i], "r")
-            json_files.append(json.load(file))
-        # We need to iterate through profile names first, so the indices of jsons and profiles lists will match
-        if (len(profile_names) > 0):
-            for profile_name in profile_names:
-                for json_file in json_files:
-                    if 'profiles' in json_file and profile_name in json_file['profiles']:
-                        jsons.append(json_file)
-                        # Select profiles and capabilities
-                        profiles.append(json_file['profiles'][profile_name])
-                        profiles_not_found.remove(profile_name)
-                        break
-            if profiles_not_found:
-                print('Profiles: ' + ' '.join(profiles_not_found) + ' not found in directory ' + args.input)
-                exit()
-        else:
-            for json_file in json_files:
-                if 'profiles' in json_file:
-                    for profile in json_file['profiles']:
-                        jsons.append(json_file)
-                        profiles.append(json_file['profiles'][profile])
-                        profile_names.append(profile)
+    if args.input_profiles is not None:
+        input_profile_names = args.input_profiles.split(',')
     else:
-        print('ERROR: Not input directory set, use --input')
-        exit()
+        input_profile_names = list()
 
-    registry = gen_profiles_solution.VulkanRegistry(args.registry)
-    
-    profile_merger = ProfileMerger(registry)
+    profile_config = ProfileConfig(args.input, input_profile_names, args.profile_api_version, args.mode)
+
+    if args.profile_name is not None:
+        if not re.match('^VP_[A-Z0-9]+[A-Za-z0-9]+', args.profile_name):
+            gen_profiles_solution.Log.e('Invalid profile_name, must follow regex pattern ^VP_[A-Z0-9]+[A-Za-z0-9]+')
+            exit()
+        else:
+            profile_config.name = args.profile_name
+    elif args.output_profile is not None:
+        if not re.match('^VP_[A-Z0-9]+[A-Za-z0-9]+', args.output_profile):
+            gen_profiles_solution.Log.e('Invalid output_profile, must follow regex pattern ^VP_[A-Z0-9]+[A-Za-z0-9]+')
+            exit()
+        else:
+            profile_config.name = args.output_profile
+
+    if args.profile_version is not None:
+        profile_config.version = int(args.profile_version)
+
+    if args.profile_label is not None:
+        profile_config.label = args.profile_label
 
     if args.profile_desc is not None:
-        profile_description = args.profile_desc
-    else:
-        profile_description = profile_merger.get_profile_description(profile_names, args.mode)
+        profile_config.description = args.profile_desc
 
     if args.profile_stage is not None:
-        profile_stage = args.profile_stage
-    else:
-        profile_stage = 'STABLE'
+        profile_config.stage = args.profile_stage
 
     if args.profile_date is not None:
-        profile_date = args.profile_date
-    else:
-        # Get current time
-        now = datetime.now()
-        profile_date = str(now.year) + '-' + str(now.month).zfill(2) + '-' + str(now.day).zfill(2)
+        profile_config.date = args.profile_date
 
-    profile_merger.merge(
-        jsons,
-        profiles,
-        profile_names,
-        args.output_path,
-        args.output_profile,
-        profile_version,
-        profile_label,
-        profile_description,
-        args.profile_api_version,
-        profile_stage,
-        profile_date,
-        required_profiles,
-        args.mode,
-        strip_duplicate_struct)
+    if args.profile_required_profiles is not None:
+        profile_config.required_profiles = args.profile_required_profiles.split(',')
+
+    profile_configs.append(profile_config)
+
+    profile_file = ProfileFile()
+
+    for config in profile_configs:
+        profile_merger = ProfileMerger(registry)
+        profile_merger.merge(
+            config,
+            profile_file,
+            args.mode,
+            strip_duplicate_struct)
+
+    profile_file.dump(args.output_path)
+
 

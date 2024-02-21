@@ -6,7 +6,7 @@ else()
 endif()
 
 add_custom_target(VpLibrary_test_generated_library
-    COMMAND Python3::Interpreter ${LAYER_PYTHON_FILES}
+    COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${PROJECT_SOURCE_DIR}/library/test/profiles
@@ -15,8 +15,8 @@ add_custom_target(VpLibrary_test_generated_library
         --output-library-filename "test_vulkan_profiles"
         --validate
     VERBATIM
-    SOURCES ${LAYER_PYTHON_FILES} ${CMAKE_CURRENT_LIST_DIR}/profiles
-    DEPENDS ${LAYER_PYTHON_FILES} ${CMAKE_CURRENT_LIST_DIR}/profiles)
+    SOURCES ${SOLUTION_SCRIPT} ${CMAKE_CURRENT_LIST_DIR}/profiles
+    DEPENDS ${SOLUTION_SCRIPT} ${CMAKE_CURRENT_LIST_DIR}/profiles)
 
 set_target_properties(VpLibrary_test_generated_library PROPERTIES FOLDER "Profiles API library")
 
