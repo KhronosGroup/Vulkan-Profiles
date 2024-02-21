@@ -86,7 +86,7 @@ function(LayerTestAndroid NAME)
     lunarg_target_compiler_configurations(${ANDROID_APK_NAME} ${BUILD_TESTS})
 
     add_test(NAME ${ANDROID_APK_NAME} COMMAND profiles_${NAME})
-    add_dependencies(${ANDROID_APK_NAME} ProfilesLayer VpCreateDesktopBaseline2022 VpCreateDesktopBaseline2023 VpCreateDesktopBaseline2024)
+    add_dependencies(${ANDROID_APK_NAME} ProfilesLayer VpCreateDesktopBaseline)
 
     if (NOT ANDROID_SDK_HOME)
         set(ANDROID_SDK_HOME $ENV{ANDROID_SDK_HOME})

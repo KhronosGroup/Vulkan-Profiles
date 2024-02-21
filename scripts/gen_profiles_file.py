@@ -45,6 +45,15 @@ class ProfileFile():
         revision['comment'] = 'Generated profiles file'
         self.json_output['history'].append(revision)
 
+    def set_schema(self, schema):
+        self.json_output['$schema'] = "https://schema.khronos.org/vulkan/{0}.json#".format(schema)
+
+    def set_contributors(self, contributors):
+        self.json_output['contributors'] = contributors
+
+    def set_history(self, history):
+        self.json_output['history'] = history
+
     def add_capabilities(self, json_capabilities_key, json_capabilities_value):
         self.json_output['capabilities'][json_capabilities_key] = json_capabilities_value
 
@@ -58,6 +67,8 @@ class ProfileFile():
 
 class ProfileConfig():
     def __init__(self, input_dir, input_profile_names, profile_api_version, merge_mode):
+        self.merge_mode = merge_mode
+        
         self.input_paths = list()
         self.input_jsons = list()
         self.input_profile_values = list()
@@ -69,7 +80,7 @@ class ProfileConfig():
         self.version = 1
         self.label = 'Generated profile'
         self.description = self.get_profile_description(self.input_profile_names, merge_mode)
-        self.status = "STABLE"
+        self.stage = "STABLE"
 
         # Get current time
         now = datetime.now()
@@ -82,6 +93,19 @@ class ProfileConfig():
             self.api_version = self.get_api_version(self.input_profile_values, merge_mode)
 
         self.required_profiles = list()
+
+    def apply_json_value(self, profile_name, json_profile_value):
+        self.name = profile_name
+        self.version = json_profile_value["version"]
+        self.label = json_profile_value["label"]
+        self.description = json_profile_value["description"]
+        self.date = json_profile_value["date"]
+        self.stage = json_profile_value["stage"]
+        if json_profile_value["api-version"] is not None:
+            self.api_version = self.get_api_version_list(json_profile_value["api-version"])
+        else:
+            self.api_version = self.get_api_version(self.input_profile_values, self.merge_mode)
+        self.required_profiles = json_profile_value["required-profiles"].split(',')
 
     def load_jsons(self, input_dir):
         if input_dir is not None:
@@ -815,8 +839,8 @@ class ProfileMerger():
     def get_profile(self, profile_config, capabilities_key):
         profile = dict()
         profile['version'] = profile_config.version
-        if profile_config.status != 'STABLE':
-            profile['status'] = profile_config.status
+        if profile_config.stage != 'STABLE':
+            profile['status'] = profile_config.stage
         profile['api-version'] = '.'.join(profile_config.api_version)
         profile['label'] = profile_config.label
         profile['description'] = profile_config.description
@@ -832,7 +856,9 @@ if __name__ == '__main__':
 
     parser.add_argument('--registry', '-r', action='store', required=True,
                         help='Use specified registry file instead of vk.xml.')
-    parser.add_argument('--input', '-i', action='store', required=True,
+    parser.add_argument('--config', '-c', action='store',
+                        help='Use specified a JSON merge config file path instead of using individual arguments.')
+    parser.add_argument('--input', '-i', action='store',
                         help='Path to directory with profiles.')
     parser.add_argument('--input-profiles', action='store',
                         help='Comma separated list of profiles.')
@@ -890,42 +916,62 @@ if __name__ == '__main__':
     else:
         input_profile_names = list()
 
-    profile_config = ProfileConfig(args.input, input_profile_names, args.profile_api_version, args.mode)
-
-    if args.profile_name is not None:
-        if not re.match('^VP_[A-Z0-9]+[A-Za-z0-9]+', args.profile_name):
-            gen_profiles_solution.Log.e('Invalid profile_name, must follow regex pattern ^VP_[A-Z0-9]+[A-Za-z0-9]+')
-            exit()
-        else:
-            profile_config.name = args.profile_name
-    elif args.output_profile is not None:
-        if not re.match('^VP_[A-Z0-9]+[A-Za-z0-9]+', args.output_profile):
-            gen_profiles_solution.Log.e('Invalid output_profile, must follow regex pattern ^VP_[A-Z0-9]+[A-Za-z0-9]+')
-            exit()
-        else:
-            profile_config.name = args.output_profile
-
-    if args.profile_version is not None:
-        profile_config.version = int(args.profile_version)
-
-    if args.profile_label is not None:
-        profile_config.label = args.profile_label
-
-    if args.profile_desc is not None:
-        profile_config.description = args.profile_desc
-
-    if args.profile_stage is not None:
-        profile_config.stage = args.profile_stage
-
-    if args.profile_date is not None:
-        profile_config.date = args.profile_date
-
-    if args.profile_required_profiles is not None:
-        profile_config.required_profiles = args.profile_required_profiles.split(',')
-
-    profile_configs.append(profile_config)
-
     profile_file = ProfileFile()
+
+    if args.config is None:
+        profile_config = ProfileConfig(args.input, input_profile_names, args.profile_api_version, args.mode)
+
+        if args.profile_name is not None:
+            if not re.match('^VP_[A-Z0-9]+[A-Za-z0-9]+', args.profile_name):
+                gen_profiles_solution.Log.e('Invalid profile_name, must follow regex pattern ^VP_[A-Z0-9]+[A-Za-z0-9]+')
+                exit()
+            else:
+                profile_config.name = args.profile_name
+        elif args.output_profile is not None:
+            if not re.match('^VP_[A-Z0-9]+[A-Za-z0-9]+', args.output_profile):
+                gen_profiles_solution.Log.e('Invalid output_profile, must follow regex pattern ^VP_[A-Z0-9]+[A-Za-z0-9]+')
+                exit()
+            else:
+                profile_config.name = args.output_profile
+
+        if args.profile_version is not None:
+            profile_config.version = int(args.profile_version)
+
+        if args.profile_label is not None:
+            profile_config.label = args.profile_label
+
+        if args.profile_desc is not None:
+            profile_config.description = args.profile_desc
+
+        if args.profile_stage is not None:
+            profile_config.stage = args.profile_stage
+
+        if args.profile_date is not None:
+            profile_config.date = args.profile_date
+
+        if args.profile_required_profiles is not None:
+            profile_config.required_profiles = args.profile_required_profiles.split(',')
+
+        profile_configs.append(profile_config)
+
+    else:
+        currentdir = os.path.dirname(args.config)
+        
+        json_file = open(args.config, "r")
+        json_data = json.load(json_file)
+
+        if json_data["schema"]:
+            profile_file.set_schema(json_data["schema"])
+        if json_data["contributors"]:
+            profile_file.set_contributors(json_data["contributors"])
+        if json_data["history"]:
+            profile_file.set_history(json_data["history"])
+
+        for profile_name in json_data["profiles"]:
+            profile_value = json_data["profiles"][profile_name]
+            profile_config = ProfileConfig(currentdir + "/" +  profile_value["input"], list(), profile_value["api-version"], args.mode)
+            profile_config.apply_json_value(profile_name, profile_value)
+            profile_configs.append(profile_config)
 
     for config in profile_configs:
         profile_merger = ProfileMerger(registry)
