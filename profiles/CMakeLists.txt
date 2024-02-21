@@ -121,7 +121,18 @@ set_target_properties(VpCreateDesktopBaseline2024 PROPERTIES FOLDER "Profiles ge
 
 add_custom_target(VpGenerated
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/schema
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/library/include/vulkan
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/library/include/vulkan/debug
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/library/source
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/library/source/debug
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/profiles ${CMAKE_CURRENT_LIST_DIR}
+    COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
+        --api ${API_TYPE}
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_LIST_DIR}
+        --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY}
+        --output-schema ${PROJECT_SOURCE_DIR}/schema/${PROFILES_SCHEMA_FILENAME}
+        --validate
     COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
@@ -130,10 +141,22 @@ add_custom_target(VpGenerated
         --output-library-inc ${PROJECT_SOURCE_DIR}/library/include/vulkan
         --output-library-src ${PROJECT_SOURCE_DIR}/library/source
         --output-library-filename "vulkan_profiles"
-        --output-schema ${PROJECT_SOURCE_DIR}/schema/${PROFILES_SCHEMA_FILENAME}
+        --config release
+    COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
+        --api ${API_TYPE}
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_LIST_DIR}
+        --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY}
+        --output-library-inc ${PROJECT_SOURCE_DIR}/library/include/vulkan/debug
+        --output-library-src ${PROJECT_SOURCE_DIR}/library/source/debug
+        --output-library-filename "vulkan_profiles"
+        --config debug
+    COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
+        --api ${API_TYPE}
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_LIST_DIR}
+        --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY}
         --output-doc ${PROJECT_SOURCE_DIR}/PROFILES_ALL.md
-        --validate
-        --debug
     VERBATIM
     SOURCES ${SOLUTION_SCRIPT} ${PROFILES_FILES}
     DEPENDS ${SOLUTION_SCRIPT} ${PROFILES_FILES})
