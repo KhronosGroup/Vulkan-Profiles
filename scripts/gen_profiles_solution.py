@@ -5340,7 +5340,7 @@ if __name__ == '__main__':
         input_profiles_files = VulkanProfilesFiles(registry, args.input, profiles_filenames, args.validate, schema)
 
     if args.output_library_inc != None:
-        generator = VulkanProfilesLibraryGenerator(registry, input_profiles_files, args.output_library_filename, args.config == 'debug')
+        generator = VulkanProfilesLibraryGenerator(registry, input_profiles_files, args.output_library_filename, str.lower(args.config) == 'debug')
         generator.generate(args.output_library_inc, args.output_library_src)
         if args.debug:
             generator = VulkanProfilesLibraryGenerator(registry, input_profiles_files, args.output_library_filename, True)
