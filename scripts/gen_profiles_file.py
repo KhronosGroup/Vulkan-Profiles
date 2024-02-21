@@ -21,7 +21,6 @@
 from datetime import datetime
 import argparse
 import json
-from typing import Self
 import gen_profiles_solution
 import re
 import os
