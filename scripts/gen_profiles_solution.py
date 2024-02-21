@@ -5301,9 +5301,9 @@ if __name__ == '__main__':
         parser.print_help()
         exit()
 
-    if args.output_library_inc != None or args.output_library_src != None:
-        if args.registry is None or args.input is None or args.output_library_inc is None or args.output_library_src is None:
-            Log.e("Generating the profile library requires specifying --registry, --input, --output-library-inc and --output-library-src arguments")
+    if args.output_library_inc != None:
+        if args.registry is None or args.input is None or args.output_library_inc is None:
+            Log.e("Generating the profile library requires specifying --registry, --input and --output-library-inc arguments")
             parser.print_help()
             exit()
 

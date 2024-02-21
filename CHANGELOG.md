@@ -23,6 +23,7 @@
   - PROFILES_ANDROID.md for profiles for Android platform
   - PROFILES_ALL.md for all profiles in the repository
 - Add `--config` to `gen_profiles_solution.py` to select the API library generation configuration `Debug` (with debug message) or `Release`
+- Make `--output-library-src` optional, when missing only the header-only library will be generated
 
 ### Bugfixes:
 - Fix features, properties and formats not listed in generated profiles table documentation
