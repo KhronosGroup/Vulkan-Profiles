@@ -119,6 +119,24 @@ TEST(api_create_device_profile, check_support_desktop_2024) {
     EXPECT_TRUE(result == VK_SUCCESS);
     EXPECT_TRUE(supported == VK_TRUE);
 }
+
+TEST(api_create_device_profile, check_support_roadmap_2022) {
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
+
+    VkBool32 supported = VK_FALSE;
+    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    EXPECT_TRUE(result == VK_SUCCESS);
+    EXPECT_TRUE(supported == VK_TRUE);
+}
+
+TEST(api_create_device_profile, check_support_roadmap_2024) {
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2024_NAME, VP_KHR_ROADMAP_2024_SPEC_VERSION};
+
+    VkBool32 supported = VK_FALSE;
+    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    EXPECT_TRUE(result == VK_SUCCESS);
+    EXPECT_TRUE(supported == VK_TRUE);
+}
 #endif  // VKU_FORCE_EXTRA_TESTS
 
 #ifdef VKU_FORCE_EXTRA_TESTS
