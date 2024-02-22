@@ -1588,7 +1588,12 @@ VkResult JsonLoader::LoadProfilesDatabase() {
         const std::string& path = layer_settings.simulate.profile_dirs[i];
 
       for (const auto& entry : fs::directory_iterator(path)) {
-          VkResult result = this->LoadFile(entry.path().generic_string());
+          if (fs::is_directory(entry.path())) {
+              continue;
+          }
+
+          const std::string& path = entry.path().generic_string();
+          VkResult result = this->LoadFile(path);
           if (result != VK_SUCCESS) {
               continue;
           }
