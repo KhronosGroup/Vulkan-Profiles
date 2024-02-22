@@ -466,6 +466,7 @@ TEST_F(TestsMechanismApiVersion, api_versions) {
     }
 
     // Vulkan 1.3
+#ifndef __APPLE__
     {
         const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_3.json";
         const char* profile_name_data = "VP_LUNARG_test_api_1_3";
@@ -586,4 +587,5 @@ TEST_F(TestsMechanismApiVersion, api_versions) {
 
         inst_builder.reset();
     }
+#endif//__APPLE__
 }
