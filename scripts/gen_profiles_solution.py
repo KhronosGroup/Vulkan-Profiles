@@ -3310,11 +3310,15 @@ class VulkanProfile():
                 varName = 's'
 
             if paramList:
+                hasLocalCastPtr = False # track if we have defined local pointer yet
                 gen += '                case {0}: {{\n'.format(structDef.sType)
-                gen += '                    {0}* {1} = static_cast<{0}*>(static_cast<void*>(p));\n'.format(structDef.name, varName)
                 for params in paramList:
                     genAssign = func('                    ' + fmt, params[0], varName + params[1], params[2])
                     if genAssign != '':
+                        if hasLocalCastPtr == False: 
+                            # only define pointer in the event that it has data
+                            gen += '                    {0}* {1} = static_cast<{0}*>(static_cast<void*>(p));\n'.format(structDef.name, varName)
+                            hasLocalCastPtr = True
                         hasData = True
                         gen += genAssign
                 gen += '                } break;\n'
@@ -3727,6 +3731,7 @@ class VulkanProfilesLibraryGenerator():
 
             if not profile_value.multiple_variants:
                 gen += '    static const VpVariantDesc mergedCapabilities[] = {\n'
+                gen += '        {\n'  # <- new open curly
                 gen += ('        {0},\n').format(profile_value.merge_capabilities.blockName)
                 gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.instanceExtensions, 'instanceExtensions')
                 gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.deviceExtensions, 'deviceExtensions')
@@ -3739,6 +3744,7 @@ class VulkanProfilesLibraryGenerator():
                 gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.formats, 'formatStructTypes')
                 gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.formats, 'formatDesc')
                 gen += '        chainerDesc,\n'
+                gen += '        },\n' # <- new closing curly
                 gen += '    };\n\n'
 
             for capability_keys in profile_value.referencedCapabilities:
@@ -3759,7 +3765,7 @@ class VulkanProfilesLibraryGenerator():
 
             gen += '    static const VpCapabilitiesDesc capabilities[] = {\n'
             for capability_keys in profile_value.referencedCapabilities:
-                gen += ('        {0}::variantCount, {0}::variants,\n').format(self.get_blockName(capability_keys))
+                gen += ('        {{ {0}::variantCount, {0}::variants }},\n').format(self.get_blockName(capability_keys))
             gen += '    };\n'
             gen += '    static const uint32_t capabilityCount = static_cast<uint32_t>(std::size(capabilities));\n'
 
