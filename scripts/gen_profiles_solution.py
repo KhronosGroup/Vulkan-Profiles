@@ -97,7 +97,7 @@ DEBUG_MSG_CB_DEFINE = '''
 #ifndef VP_DEBUG_MESSAGE_CALLBACK
 #if defined(ANDROID) || defined(__ANDROID__)
 #include <android/log.h>
-#define VP_DEBUG_MESSAGE_CALLBACK(MSG) \
+#define VP_DEBUG_MESSAGE_CALLBACK(MSG) \\
     __android_log_print(ANDROID_LOG_ERROR, "Profiles ERROR", "%s", MSG); \\
     __android_log_print(ANDROID_LOG_DEBUG, "Profiles WARNING", "%s", MSG)
 #else
@@ -107,10 +107,10 @@ DEBUG_MSG_CB_DEFINE = '''
 void VP_DEBUG_MESSAGE_CALLBACK(const char*);
 #endif
 
-#define VP_DEBUG_MSG(MSG) VP_DEBUG_MESSAGE_CALLBACK(MSG)
+#define VP_DEBUG_MSG(MSG) VP_DEBUG_MESSAGE_CALLBACK((MSG))
 #define VP_DEBUG_MSGF(MSGFMT, ...) { char msg[1024]; snprintf(msg, sizeof(msg) - 1, (MSGFMT), __VA_ARGS__); VP_DEBUG_MESSAGE_CALLBACK(msg); }
-#define VP_DEBUG_COND_MSG(COND, MSG) if (COND) VP_DEBUG_MSG(MSG)
-#define VP_DEBUG_COND_MSGF(COND, MSGFMT, ...) if (COND) VP_DEBUG_MSGF(MSGFMT, __VA_ARGS__)
+#define VP_DEBUG_COND_MSG(COND, MSG) if ((COND)) { VP_DEBUG_MSG((MSG)); }
+#define VP_DEBUG_COND_MSGF(COND, MSGFMT, ...) if ((COND)) { VP_DEBUG_MSGF((MSGFMT), __VA_ARGS__); }
 '''
 
 DEBUG_MSG_UTIL_IMPL = '''
