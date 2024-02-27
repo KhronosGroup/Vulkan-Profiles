@@ -17,6 +17,7 @@
 - Force device selection is not BETA anymore
 - Add Khronos Roadmap 2024 profile
 - Add merge script JSON config file using the new `--config` argument
+- Add BETA implementation of `VULKAN_PROFILES_OBJECT` API enabling providing external Vulkan functions
 
 ### Improvements:
 - Split generated documentation in three differents files:

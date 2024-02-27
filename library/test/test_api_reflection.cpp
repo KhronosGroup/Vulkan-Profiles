@@ -160,24 +160,6 @@ TEST(api_get_profile_formats, unspecified) {
     EXPECT_EQ(0, formatCount);
 }
 
-/* Unsupported QueueFamily
-TEST(api_get_profile_queue_families, unspecified) {
-    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
-
-    uint32_t count = 0;
-    VkResult result0 = vpGetProfileQueueFamilyProperties(&profile, &count, nullptr);
-    EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(0, count);
-
-    count = 1;
-
-    std::vector<VkQueueFamilyProperties2KHR> data(count, {VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR});
-    VkResult result1 = vpGetProfileQueueFamilyProperties(&profile, &count, &data[0]);
-    EXPECT_EQ(VK_SUCCESS, result1);
-    EXPECT_EQ(0, count);
-}
-*/
-
 TEST(api_get_profile_properties, get_properties2) {
     VkPhysicalDeviceProperties2 profileProperties2{};
     profileProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
