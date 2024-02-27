@@ -11,7 +11,6 @@ add_custom_target(VpLibrary_test_generated_library
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${PROJECT_SOURCE_DIR}/library/test/profiles
         --output-library-inc ${PROJECT_SOURCE_DIR}/library/test
-        --output-library-src ${PROJECT_SOURCE_DIR}/library/test
         --output-library-filename "test_vulkan_profiles"
         --validate
     VERBATIM
@@ -57,8 +56,42 @@ function(add_unit_test NAME)
     set_target_properties(${TEST_NAME_WS} PROPERTIES FOLDER "Profiles API library")
 endfunction(add_unit_test)
 
+function(add_unit_test_object NAME)
+    set(TEST_FILE ./${NAME}.cpp)
+    set(TEST_NAME_HO VpLibrary_${NAME}_header_only)
+    set(TEST_NAME_WS VpLibrary_${NAME}_with_source)
+
+    add_executable(${TEST_NAME_HO} ${TEST_FILE})
+    lunarg_target_compiler_configurations(${TEST_NAME_HO} ${BUILD_TESTS})
+    if(MSVC)
+        target_compile_options(${TEST_NAME_HO} PRIVATE /bigobj)
+    endif()
+    target_compile_definitions(${TEST_NAME_HO} PUBLIC "VK_ENABLE_BETA_EXTENSIONS=1")
+    target_compile_definitions(${TEST_NAME_HO} PUBLIC "VULKAN_PROFILES_OBJECT=1")
+    target_include_directories(${TEST_NAME_HO} PUBLIC "${vulkan-headers_SOURCE_DIR}/include")
+    target_link_libraries(${TEST_NAME_HO} PRIVATE ${test_libraries})
+    add_dependencies(${TEST_NAME_HO} VpGenerated VpLibrary_test_generated_library)
+    add_test(NAME ${TEST_NAME_HO} COMMAND ${TEST_NAME_HO} --gtest_catch_exceptions=0)
+    set_target_properties(${TEST_NAME_HO} PROPERTIES FOLDER "Profiles API library")
+
+    add_executable(${TEST_NAME_WS} ${TEST_FILE} ${vulkan_profiles_source})
+    lunarg_target_compiler_configurations(${TEST_NAME_WS} ${BUILD_TESTS})
+    if(MSVC)
+        target_compile_options(${TEST_NAME_WS} PRIVATE /bigobj)
+    endif()
+    target_compile_definitions(${TEST_NAME_WS} PUBLIC "VULKAN_PROFILES_HEADER_ONLY=1")
+    target_compile_definitions(${TEST_NAME_WS} PUBLIC "VK_ENABLE_BETA_EXTENSIONS=1")
+    target_compile_definitions(${TEST_NAME_WS} PUBLIC "VULKAN_PROFILES_OBJECT=1")
+    target_include_directories(${TEST_NAME_WS} PUBLIC "${vulkan-headers_SOURCE_DIR}/include")
+    target_link_libraries(${TEST_NAME_WS} PRIVATE ${test_libraries})
+    add_dependencies(${TEST_NAME_WS} VpGenerated VpLibrary_test_generated_library)
+    add_test(NAME ${TEST_NAME_WS} COMMAND ${TEST_NAME_WS} --gtest_catch_exceptions=0)
+    set_target_properties(${TEST_NAME_WS} PROPERTIES FOLDER "Profiles API library")
+endfunction(add_unit_test_object)
+
 add_unit_test(test_api_reflection)
 if(NOT APPLE)
+    add_unit_test_object(test_api_profile_object)
     add_unit_test(test_api_create_device)
 endif()
 
