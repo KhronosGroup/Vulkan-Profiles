@@ -211,7 +211,7 @@ install(
 
 install(
     FILES
-        ${MERGE_PYTHON_FILES}
+        ${MERGE_SCRIPT}
         ${SOLUTION_SCRIPT}
         ${PROJECT_SOURCE_DIR}/schema/${PROFILES_SCHEMA_FILENAME}
     DESTINATION
