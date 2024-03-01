@@ -20,8 +20,6 @@
 
 #define VK_ENABLE_BETA_EXTENSIONS 1
 
-#define VP_USE_PROFILE_OBJECT
-
 #include "test.hpp"
 #ifndef VULKAN_PROFILES_HEADER_ONLY
 #include <vulkan/vulkan_profiles.hpp>
@@ -50,10 +48,10 @@ int main(int argc, char** argv) {
     return result;
 }
 
-struct ProfileObject {
-    VpProfile handle = VK_NULL_HANDLE;
+struct Capabilities {
+    VpCapabilities handle = VK_NULL_HANDLE;
 
-    ProfileObject() {
+    Capabilities() {
         VpVulkanFunctions vulkanFunctions;
         vulkanFunctions.GetInstanceProcAddr = vkGetInstanceProcAddr;
         vulkanFunctions.GetDeviceProcAddr = vkGetDeviceProcAddr;
@@ -67,20 +65,21 @@ struct ProfileObject {
         vulkanFunctions.CreateInstance = vkCreateInstance;
         vulkanFunctions.CreateDevice = vkCreateDevice;
 
-        VpProfileCreateInfo createInfo;
+        VpCapabilitiesCreateInfo createInfo;
         createInfo.apiVersion = VK_API_VERSION_1_1;
+        createInfo.flags = VP_PROFILE_CREATE_STATIC_BIT;
         createInfo.pVulkanFunctions = &vulkanFunctions;
 
-        vpCreateProfile(&createInfo, nullptr, &handle);
+        vpCreateCapabilities(&createInfo, nullptr, &handle);
     }
 
-    ~ProfileObject() {
-        vpDestroyProfile(handle, nullptr);
+    ~Capabilities() {
+        vpDestroyCapabilities(handle, nullptr);
     }
 };
 
-TEST(api_profile_object, check_support_vulkan_1_1) {
-    ProfileObject object;
+TEST(api_capabilities_object, check_support_vulkan_1_1) {
+    Capabilities object;
 
     const VpProfileProperties profileProperties = {VP_LUNARG_MINIMUM_REQUIREMENTS_1_1_NAME, VP_LUNARG_MINIMUM_REQUIREMENTS_1_1_SPEC_VERSION};
 
@@ -91,8 +90,8 @@ TEST(api_profile_object, check_support_vulkan_1_1) {
     EXPECT_TRUE(supported == VK_TRUE);
 }
 
-TEST(api_profile_object, overrite_with_unsupported_extensions) {
-    ProfileObject object;
+TEST(api_capabilities_object, overrite_with_unsupported_extensions) {
+    Capabilities object;
 
     const VpProfileProperties profileProperties = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, VP_LUNARG_DESKTOP_BASELINE_2023_SPEC_VERSION};
 
@@ -121,8 +120,8 @@ TEST(api_profile_object, overrite_with_unsupported_extensions) {
     EXPECT_TRUE(device == VK_NULL_HANDLE);
 }
 
-TEST(api_profile_object, get_profiles) {
-    ProfileObject object;
+TEST(api_capabilities_object, get_profiles) {
+    Capabilities object;
 
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfiles(object.handle, &propertyCount, nullptr);
@@ -138,8 +137,8 @@ TEST(api_profile_object, get_profiles) {
     EXPECT_EQ(VP_KHR_ROADMAP_2022_SPEC_VERSION, properties[0].specVersion);
 }
 
-TEST(api_profile_object, get_api_version) {
-    ProfileObject object;
+TEST(api_capabilities_object, get_api_version) {
+    Capabilities object;
 
     const VpProfileProperties profileProperties = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, 1};
 
@@ -148,8 +147,8 @@ TEST(api_profile_object, get_api_version) {
     EXPECT_EQ(VK_MAKE_API_VERSION(0, 1, 2, 148), version);
 }
 
-TEST(api_profile_object, get_required_profiles) {
-    ProfileObject object;
+TEST(api_capabilities_object, get_required_profiles) {
+    Capabilities object;
 
     const VpProfileProperties profileProperties = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, 1};
 
@@ -159,8 +158,8 @@ TEST(api_profile_object, get_required_profiles) {
     EXPECT_TRUE(propertyCount == 2);
 }
 
-TEST(api_profile_object, get_profile_fallback) {
-    ProfileObject object;
+TEST(api_capabilities_object, get_profile_fallback) {
+    Capabilities object;
 
     const VpProfileProperties profileProperties = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, 1};
 
@@ -170,8 +169,8 @@ TEST(api_profile_object, get_profile_fallback) {
     EXPECT_TRUE(propertyCount == 0);
 }
 
-TEST(api_profile_object, has_multiple_variants_profile) {
-    ProfileObject object;
+TEST(api_capabilities_object, has_multiple_variants_profile) {
+    Capabilities object;
 
     const VpProfileProperties profileProperties = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, 1};
 
@@ -180,8 +179,8 @@ TEST(api_profile_object, has_multiple_variants_profile) {
     EXPECT_EQ(VK_FALSE, has_multiple_variants);
 }
 
-TEST(api_profile_object, get_profile_device_extension_properties) {
-    ProfileObject object;
+TEST(api_capabilities_object, get_profile_device_extension_properties) {
+    Capabilities object;
 
     const VpProfileProperties profileProperties = {VP_KHR_ROADMAP_2022_NAME, 1};
 
@@ -202,8 +201,8 @@ TEST(api_profile_object, get_profile_device_extension_properties) {
     EXPECT_STREQ(VK_KHR_GLOBAL_PRIORITY_EXTENSION_NAME, properties[0].extensionName);
 }
 
-TEST(api_profile_object, get_profile_instance_extension_properties) {
-    ProfileObject object;
+TEST(api_capabilities_object, get_profile_instance_extension_properties) {
+    Capabilities object;
 
     const VpProfileProperties profileProperties = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, 1};
 
@@ -222,8 +221,8 @@ TEST(api_profile_object, get_profile_instance_extension_properties) {
     EXPECT_EQ(0, propertyCount);
 }
 
-TEST(api_profile_object, get_profile_fallbacks) {
-    ProfileObject object;
+TEST(api_capabilities_object, get_profile_fallbacks) {
+    Capabilities object;
 
     const VpProfileProperties profileProperties = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, 1};
 
@@ -240,8 +239,8 @@ TEST(api_profile_object, get_profile_fallbacks) {
     EXPECT_EQ(0, count);
 }
 
-TEST(api_profile_object, get_profile_formats) {
-    ProfileObject object;
+TEST(api_capabilities_object, get_profile_formats) {
+    Capabilities object;
 
     const VpProfileProperties profileProperties = {VP_KHR_ROADMAP_2022_NAME, 1};
 
@@ -251,8 +250,8 @@ TEST(api_profile_object, get_profile_formats) {
     EXPECT_EQ(0, formatCount);
 }
 
-TEST(api_profile_object, get_profile_properties) {
-    ProfileObject object;
+TEST(api_capabilities_object, get_profile_properties) {
+    Capabilities object;
 
     VkPhysicalDeviceProperties2 profileProperties2{};
     profileProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
@@ -270,8 +269,8 @@ TEST(api_profile_object, get_profile_properties) {
     EXPECT_EQ(8, profileProperties2.properties.limits.maxColorAttachments);
 }
 
-TEST(api_profile_object, get_profile_features) {
-    ProfileObject object;
+TEST(api_capabilities_object, get_profile_features) {
+    Capabilities object;
 
     VkPhysicalDeviceVulkan12Features deviceVulkan12Features = {};
     deviceVulkan12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
@@ -308,8 +307,8 @@ TEST(api_profile_object, get_profile_features) {
     EXPECT_EQ(VK_FALSE, deviceVulkan12Features.shaderOutputLayer);
 }
 
-TEST(api_profile_object, get_profile_feature_structure_types) {
-    ProfileObject object;
+TEST(api_capabilities_object, get_profile_feature_structure_types) {
+    Capabilities object;
 
     const VpProfileProperties profileProperties = {VP_KHR_ROADMAP_2022_NAME, 1};
 
@@ -333,8 +332,8 @@ TEST(api_profile_object, get_profile_feature_structure_types) {
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, properties[3]);
 }
 
-TEST(api_profile_object, get_profile_Property_structure_types) {
-    ProfileObject object;
+TEST(api_capabilities_object, get_profile_Property_structure_types) {
+    Capabilities object;
 
     const VpProfileProperties profileProperties = {VP_KHR_ROADMAP_2022_NAME, 1};
 
