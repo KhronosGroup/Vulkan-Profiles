@@ -1609,7 +1609,6 @@ const Json::Value& JsonLoader::FindRootFromProfileName(const std::string& profil
     for (const auto& root : this->profiles_file_roots_) {
         const Json::Value &profiles = root.second["profiles"];
 
-        bool found_profile = false;
         for (const auto &profile : profiles.getMemberNames()) {
             if (profile_name.empty() || profile_name == "${VP_DEFAULT}" || profile == profile_name) {
                 return root.second;
@@ -1667,7 +1666,6 @@ void JsonLoader::CollectProfiles(const std::string& profile_name, std::vector<st
         const Json::Value &profiles = root["profiles"];
         std::vector<std::vector<std::string>> capabilities;
 
-        bool found_profile = false;
         for (const auto &profile : profiles.getMemberNames()) {
             if (profile == profile_name) {
                 const auto &required_profiles = profiles[profile]["profiles"];
