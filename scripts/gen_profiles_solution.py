@@ -2452,6 +2452,7 @@ class VulkanDefinitions():
                 self.types.add(type.get('name'))
 
     def addDependencies(self, xml, targetApi):
+        # Add types that are required by required types as dependency
         for type in xml.findall("./types/type[@requires]"):
             apiList = type.get('api')
 
@@ -2462,6 +2463,17 @@ class VulkanDefinitions():
             name = type.find('./name')
             if name is not None and name.text in self.types:
                 self.types.add(type.get('requires'))
+
+        # Add types that contain the definition of required alias types as dependency
+        for type in xml.findall("./types/type[@alias]"):
+
+            # Skip dependency if it does not apply to the target API
+            if apiList is not None and not targetApi in apiList.split(','):
+                continue
+
+            name = type.get('name')
+            if name in self.types:
+                self.types.add(type.get('alias'))
 
 
 class VulkanDefinitionScope():
@@ -2804,6 +2816,13 @@ class VulkanRegistry():
                     aliasStructDef.members = baseStructDef.members
                     aliasStructDef.aliases = baseStructDef.aliases
                     aliasStructDef.aliases.append(name)
+
+                    # Use alias structure dependencies as the structure dependencies if the latter has none
+                    # This is needed to handle the case when the structure is not part of the target API
+                    # but is a dependency of the alias
+                    if baseStructDef.definedByVersion is None and len(baseStructDef.definedByExtensions) == 0:
+                        baseStructDef.definedByVersion = aliasStructDef.definedByVersion
+                        baseStructDef.definedByExtensions = aliasStructDef.definedByExtensions
 
                     if baseStructDef.sType != None:
                         sTypeAlias = None
