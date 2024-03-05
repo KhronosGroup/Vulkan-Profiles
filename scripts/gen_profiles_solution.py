@@ -1646,9 +1646,9 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
         VpBlockProperties block{gathered_profiles[profile_index], profile_desc->minApiVersion};
 
         {
-            VkPhysicalDeviceProperties props{};
-            vkGetPhysicalDeviceProperties(physicalDevice, &props);
-            if (!detail::vpCheckVersion(props.apiVersion, profile_desc->minApiVersion)) {
+            VkPhysicalDeviceProperties device_properties{};
+            vkGetPhysicalDeviceProperties(physicalDevice, &device_properties);
+            if (!detail::vpCheckVersion(device_properties.apiVersion, profile_desc->minApiVersion)) {
                 VP_DEBUG_MSGF("Unsupported API version: %u.%u.%u", VK_API_VERSION_MAJOR(profile_desc->minApiVersion), VK_API_VERSION_MINOR(profile_desc->minApiVersion), VK_API_VERSION_PATCH(profile_desc->minApiVersion));
                 supported_profile = false;
             }
@@ -1695,9 +1695,9 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
                     supported_variant = false;
                 }
 
-                VkPhysicalDeviceProperties2KHR props{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR };
+                VkPhysicalDeviceProperties2KHR device_properties2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR };
                 userData.variant->chainers.pfnProperty(
-                    static_cast<VkBaseOutStructure*>(static_cast<void*>(&props)), &userData,
+                    static_cast<VkBaseOutStructure*>(static_cast<void*>(&device_properties2)), &userData,
                     [](VkBaseOutStructure* p, void* pUser) {
                         UserData* pUserData = static_cast<UserData*>(pUser);
                         pUserData->gpdp2.pfnGetPhysicalDeviceProperties2(
@@ -1719,9 +1719,9 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
 
                 for (uint32_t format_index = 0; format_index < userData.variant->formatCount && supported_variant; ++format_index) {
                     userData.index = format_index;
-                    VkFormatProperties2KHR props{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
+                    VkFormatProperties2KHR format_properties2{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
                     userData.variant->chainers.pfnFormat(
-                        static_cast<VkBaseOutStructure*>(static_cast<void*>(&props)), &userData,
+                        static_cast<VkBaseOutStructure*>(static_cast<void*>(&format_properties2)), &userData,
                         [](VkBaseOutStructure* p, void* pUser) {
                             UserData* pUserData = static_cast<UserData*>(pUser);
                             pUserData->gpdp2.pfnGetPhysicalDeviceFormatProperties2(
