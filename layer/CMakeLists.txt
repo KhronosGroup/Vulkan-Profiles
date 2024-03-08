@@ -54,7 +54,12 @@ add_definitions(-DVK_ENABLE_BETA_EXTENSIONS)
 source_group("JSON Manifest" FILES ${LAYER_NAME}.json.in)
 source_group("Export Files" FILES ${LAYER_NAME}.def ${LAYER_NAME}.map)
 
-add_library(ProfilesLayer MODULE)
+if(IOS)
+    add_library(ProfilesLayer SHARED)
+else()
+    add_library(ProfilesLayer MODULE)
+endif()
+
 set_target_properties(ProfilesLayer PROPERTIES FOLDER "Profiles layer")
 set_target_properties(ProfilesLayer PROPERTIES OUTPUT_NAME ${LAYER_NAME})
 lunarg_target_compiler_configurations(ProfilesLayer ${BUILD_TESTS})
@@ -69,7 +74,18 @@ elseif(MINGW)
     target_sources(ProfilesLayer PRIVATE ${LAYER_NAME}.def)
 elseif(APPLE)
     message(DEBUG "Functions are exported via PROFILES_EXPORT")
+
+if(IOS)
+      set_target_properties(ProfilesLayer PROPERTIES
+	FRAMEWORK			TRUE
+        MACOSX_FRAMEWORK_BUNDLE_VERSION "${VulkanHeaders_VERSION}"
+        MACOSX_FRAMEWORK_SHORT_VERSION_STRING "${VulkanHeaders_VERSION}"
+	MACOSX_FRAMEWORK_IDENTIFIER 	com.khronos.VkLayer_khronos_profiles
+        )
+else()
     set_target_properties(ProfilesLayer PROPERTIES SUFFIX ".dylib")
+endif()
+
 elseif(ANDROID)
     message(DEBUG "Functions are exported via PROFILES_EXPORT")
 else()
