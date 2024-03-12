@@ -66,7 +66,11 @@ static DebugActionFlags GetDebugActionFlags(const std::vector<std::string> &valu
 
 static std::vector<std::string> GetDebugActionStrings(DebugActionFlags flags) {
     static const char *table[] = {
-        "DEBUG_ACTION_FILE_BIT", "DEBUG_ACTION_STDOUT_BIT", "DEBUG_ACTION_OUTPUT_BIT", "DEBUG_ACTION_BREAKPOINT_BIT"};
+        "DEBUG_ACTION_FILE_BIT",
+        "DEBUG_ACTION_STDOUT_BIT",
+        "DEBUG_ACTION_OUTPUT_BIT",
+        "DEBUG_ACTION_BREAKPOINT_BIT"
+    };
 
     std::vector<std::string> result;
 
@@ -78,6 +82,7 @@ static std::vector<std::string> GetDebugActionStrings(DebugActionFlags flags) {
 
     return result;
 }
+
 std::string GetDebugActionsLog(DebugActionFlags flags);
 
 enum DebugReportBits {
@@ -113,6 +118,7 @@ enum DefaultFeatureValues {
     DEFAULT_FEATURE_VALUES_FALSE = 0,
     DEFAULT_FEATURE_VALUES_DEVICE
 };
+
 
 static DefaultFeatureValues GetDefaultFeatureValues(const std::string &value) {
     if (value == "DEFAULT_FEATURE_VALUES_FALSE") {

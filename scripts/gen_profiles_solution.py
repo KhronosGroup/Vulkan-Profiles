@@ -816,10 +816,10 @@ VPAPI_ATTR VkResult vpGetProfileStructureTypes(
         if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
 
         for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
-            const detail::VpCapabilitiesDesc& capabilities = profile_desc->pRequiredCapabilities[capability_index];
+            const detail::VpCapabilitiesDesc& cap_desc = profile_desc->pRequiredCapabilities[capability_index];
 
-            for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
-                const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
+            for (uint32_t variant_index = 0; variant_index < cap_desc.variantCount; ++variant_index) {
+                const detail::VpVariantDesc& variant = cap_desc.pVariants[variant_index];
                 if (pBlockName != nullptr) {
                     if (strcmp(variant.blockName, pBlockName) != 0) {
                         continue;
@@ -907,10 +907,10 @@ VPAPI_ATTR VkResult vpGetProfileExtensionProperties(
         }
 
         for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
-            const detail::VpCapabilitiesDesc& capabilities = profile_desc->pRequiredCapabilities[capability_index];
+            const detail::VpCapabilitiesDesc& cap_desc = profile_desc->pRequiredCapabilities[capability_index];
 
-            for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
-                const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
+            for (uint32_t variant_index = 0; variant_index < cap_desc.variantCount; ++variant_index) {
+                const detail::VpVariantDesc& variant = cap_desc.pVariants[variant_index];
                 if (pBlockName != nullptr) {
                     if (strcmp(variant.blockName, pBlockName) != 0) {
                         continue;
@@ -1957,10 +1957,10 @@ VPAPI_ATTR VkResult vpGetProfileFeatures(
         if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
 
         for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
-            const detail::VpCapabilitiesDesc& capabilities = profile_desc->pRequiredCapabilities[capability_index];
+            const detail::VpCapabilitiesDesc& cap_desc = profile_desc->pRequiredCapabilities[capability_index];
 
-            for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
-                const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
+            for (uint32_t variant_index = 0; variant_index < cap_desc.variantCount; ++variant_index) {
+                const detail::VpVariantDesc& variant = cap_desc.pVariants[variant_index];
                 if (pBlockName != nullptr) {
                     if (strcmp(variant.blockName, pBlockName) != 0) {
                         continue;
@@ -2011,10 +2011,10 @@ VPAPI_ATTR VkResult vpGetProfileProperties(
         if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
 
         for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
-            const detail::VpCapabilitiesDesc& capabilities = profile_desc->pRequiredCapabilities[capability_index];
+            const detail::VpCapabilitiesDesc& cap_desc = profile_desc->pRequiredCapabilities[capability_index];
 
-            for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
-                const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
+            for (uint32_t variant_index = 0; variant_index < cap_desc.variantCount; ++variant_index) {
+                const detail::VpVariantDesc& variant = cap_desc.pVariants[variant_index];
                 if (pBlockName != nullptr) {
                     if (strcmp(variant.blockName, pBlockName) != 0) {
                         continue;
@@ -2059,10 +2059,10 @@ VPAPI_ATTR VkResult vpGetProfileFormats(
         if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
 
         for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
-            const detail::VpCapabilitiesDesc& capabilities = profile_desc->pRequiredCapabilities[capability_index];
+            const detail::VpCapabilitiesDesc& cap_desc = profile_desc->pRequiredCapabilities[capability_index];
 
-            for (uint32_t variant_index = 0; variant_index < capabilities.variantCount; ++variant_index) {
-                const detail::VpVariantDesc& variant = capabilities.pVariants[variant_index];
+            for (uint32_t variant_index = 0; variant_index < cap_desc.variantCount; ++variant_index) {
+                const detail::VpVariantDesc& variant = cap_desc.pVariants[variant_index];
                 if (pBlockName != nullptr) {
                     if (strcmp(variant.blockName, pBlockName) != 0) {
                         continue;

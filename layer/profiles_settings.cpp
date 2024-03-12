@@ -48,6 +48,8 @@ void WarnMissingFormatFeatures2(ProfileLayerSettings *layer_settings, const char
                format_device_support_string(device_features).c_str(), features.c_str());
 }
 
+
+
 std::string GetDebugActionsLog(DebugActionFlags flags) {
     std::string result = {};
 

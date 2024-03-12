@@ -165,7 +165,7 @@ TEST_F(TestsMechanismApiVersion, api_versions) {
 
         uint32_t extCount = 0;
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
-        ASSERT_EQ(err, VK_SUCCESS);
+        ASSERT_EQ(result, VK_SUCCESS);
 
         EXPECT_EQ(0, extCount);
 
@@ -202,13 +202,13 @@ TEST_F(TestsMechanismApiVersion, api_versions) {
 
         uint32_t extCount = 0;
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
-        ASSERT_EQ(err, VK_SUCCESS);
+        ASSERT_EQ(result, VK_SUCCESS);
 
         EXPECT_EQ(1, extCount);
 
         std::vector<VkExtensionProperties> ext(extCount);
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
-        ASSERT_EQ(err, VK_SUCCESS);
+        ASSERT_EQ(result, VK_SUCCESS);
 
         EXPECT_STREQ(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, ext[0].extensionName);
 
@@ -245,13 +245,13 @@ TEST_F(TestsMechanismApiVersion, api_versions) {
 
         uint32_t extCount = 0;
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
-        ASSERT_EQ(err, VK_SUCCESS);
+        ASSERT_EQ(result, VK_SUCCESS);
 
         EXPECT_EQ(23, extCount);
 
         std::vector<VkExtensionProperties> ext(extCount);
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
-        ASSERT_EQ(err, VK_SUCCESS);
+        ASSERT_EQ(result, VK_SUCCESS);
         ASSERT_EQ(ext.size(), extCount);
         std::array expected_extensions = {VK_KHR_MULTIVIEW_EXTENSION_NAME,
                                           VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
@@ -320,13 +320,13 @@ TEST_F(TestsMechanismApiVersion, api_versions) {
 
         uint32_t extCount = 0;
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
-        ASSERT_EQ(err, VK_SUCCESS);
+        ASSERT_EQ(result, VK_SUCCESS);
 
         EXPECT_EQ(24, extCount);
 
         std::vector<VkExtensionProperties> ext(extCount);
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
-        ASSERT_EQ(err, VK_SUCCESS);
+        ASSERT_EQ(result, VK_SUCCESS);
         ASSERT_EQ(ext.size(), extCount);
         std::array expected_extensions = {VK_KHR_MULTIVIEW_EXTENSION_NAME,
                                           VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
@@ -396,13 +396,13 @@ TEST_F(TestsMechanismApiVersion, api_versions) {
 
         uint32_t extCount = 0;
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
-        ASSERT_EQ(err, VK_SUCCESS);
+        ASSERT_EQ(result, VK_SUCCESS);
 
         EXPECT_EQ(47, extCount);
 
         std::vector<VkExtensionProperties> ext(extCount);
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
-        ASSERT_EQ(err, VK_SUCCESS);
+        ASSERT_EQ(result, VK_SUCCESS);
         ASSERT_EQ(ext.size(), extCount);
         std::array expected_extensions = {VK_KHR_MULTIVIEW_EXTENSION_NAME,
                                           VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
@@ -496,13 +496,13 @@ TEST_F(TestsMechanismApiVersion, api_versions) {
 
         uint32_t extCount = 0;
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
-        ASSERT_EQ(err, VK_SUCCESS);
+        ASSERT_EQ(result, VK_SUCCESS);
 
         EXPECT_EQ(70, extCount);
 
         std::vector<VkExtensionProperties> ext(extCount);
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
-        ASSERT_EQ(err, VK_SUCCESS);
+        ASSERT_EQ(result, VK_SUCCESS);
         ASSERT_EQ(ext.size(), extCount);
         std::array expected_extensions = {VK_KHR_MULTIVIEW_EXTENSION_NAME,
                                           VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,

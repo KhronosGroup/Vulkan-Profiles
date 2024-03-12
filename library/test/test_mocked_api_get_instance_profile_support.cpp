@@ -23,7 +23,7 @@
 #include "mock_debug_message_callback.hpp"
 #include <vulkan/vulkan_android.h>
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
 #include <vulkan/debug/vulkan_profiles.hpp>
 #else
 #include <vulkan/vulkan_profiles.hpp>
@@ -59,7 +59,7 @@ TEST(mocked_api_get_instance_profile_support, vulkan10_supported) {
 TEST(mocked_api_get_instance_profile_support, vulkan10_no_gpdp2) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
         "Unsupported mandatory extension VK_KHR_get_physical_device_properties2 on Vulkan 1.0",
         "Unsupported extension: VK_KHR_get_physical_device_properties2"
@@ -92,7 +92,7 @@ TEST(mocked_api_get_instance_profile_support, vulkan10_no_gpdp2) {
 TEST(mocked_api_get_instance_profile_support, vulkan10_unsupported_version) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
         "Unsupported Profile API version 1.2.148 on a Vulkan system with version 1.0.0"
     });
@@ -121,7 +121,7 @@ TEST(mocked_api_get_instance_profile_support, vulkan10_unsupported_version) {
 TEST(mocked_api_get_instance_profile_support, vulkan10_unsupported_extension) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
         "Unsupported extension: VK_KHR_get_surface_capabilities2"
     });
@@ -178,7 +178,7 @@ TEST(mocked_api_get_instance_profile_support, vulkan11_supported) {
 TEST(mocked_api_get_instance_profile_support, vulkan11_unsupported_version) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
         "Unsupported Profile API version 1.3.204 on a Vulkan system with version 1.1.0"
     });
@@ -207,7 +207,7 @@ TEST(mocked_api_get_instance_profile_support, vulkan11_unsupported_version) {
 TEST(mocked_api_get_instance_profile_support, vulkan11_unsupported_extension) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
         "Unsupported extension: VK_KHR_android_surface"
     });
@@ -266,7 +266,7 @@ TEST(mocked_api_get_instance_profile_support, layer_supported) {
 TEST(mocked_api_get_instance_profile_support, layer_unsupported) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
         "Unsupported extension: VK_EXT_swapchain_colorspace",
         "Unsupported extension: VK_KHR_android_surface",
