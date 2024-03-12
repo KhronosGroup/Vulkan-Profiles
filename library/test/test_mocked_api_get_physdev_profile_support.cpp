@@ -23,7 +23,7 @@
 #include "mock_debug_message_callback.hpp"
 #include <vulkan/vulkan_android.h>
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
 #include <vulkan/debug/vulkan_profiles.hpp>
 #else
 #include <vulkan/vulkan_profiles.hpp>
@@ -32,7 +32,7 @@
 TEST(mocked_api_get_physdev_profile_support, vulkan10_supported) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
     });
 #endif
@@ -207,7 +207,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_no_gpdp2) {
 TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_version) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
         "Unsupported API version: 1.3.204"
     });
@@ -284,7 +284,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_version) {
 TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_extension) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
         "Unsupported extension: VK_GOOGLE_display_timing"
     });
@@ -375,7 +375,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_extension) {
 TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_feature) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
         "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.sampleRateShading == VK_TRUE"
     });
@@ -467,7 +467,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_feature) {
 TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_property) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
         "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageDimension2D >= 4096"
     });
@@ -558,7 +558,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_property) {
 TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_format) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
         "Unsupported format condition for VK_FORMAT_E5B9G9R9_UFLOAT_PACK32: "
             "VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains "
@@ -643,7 +643,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_format) {
 TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_version) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
          "Unsupported API version: 1.3.204"});
 #endif
@@ -715,7 +715,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_version) {
 TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_extension) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
         "Unsupported extension: VK_KHR_global_priority"
     });
@@ -756,7 +756,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_extension) {
 TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_feature) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
         "Unsupported feature condition: VkPhysicalDeviceFeatures2KHR::features.fullDrawIndexUint32 == VK_TRUE"
     });
@@ -799,7 +799,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_feature) {
 TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_property) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
         "Unsupported properties condition: VkPhysicalDeviceProperties2KHR::properties.limits.maxImageDimensionCube >= 8192"
     });
@@ -844,7 +844,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_property) {
 TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_format) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
         "Unsupported format condition for VK_FORMAT_E5B9G9R9_UFLOAT_PACK32: "
             "VkFormatProperties2KHR::formatProperties.optimalTilingFeatures contains "
@@ -904,7 +904,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_format) {
 TEST(mocked_api_get_physdev_profile_support, vulkan13_supported_queue_family) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
     });
 #endif
@@ -976,7 +976,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_supported_queue_family) {
 TEST(mocked_api_get_physdev_profile_support, vulkan13_supported_version) {
     MockVulkanAPI mock;
 
-#if WITH_DEBUG_MESSAGES
+#ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
     });
 #endif

@@ -210,30 +210,7 @@ TEST(test_library_util, CheckExtension) {
 }
 
 TEST(test_library_util, GetDeviceExtensions) {
-    static const char *EXTENSIONS[] = {
-        VK_EXT_PIPELINE_CREATION_CACHE_CONTROL_EXTENSION_NAME,  // Not in VP_LUNARG_DESKTOP_BASELINE_2023_NAME
-        VK_KHR_MAINTENANCE_3_EXTENSION_NAME,                    // In VP_LUNARG_DESKTOP_BASELINE_2023_NAME
-        VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME,              // In VP_LUNARG_DESKTOP_BASELINE_2023_NAME
-        VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME                 // In VP_LUNARG_DESKTOP_BASELINE_2023_NAME
-    };
-
-    VkDeviceCreateInfo info = {};
-    info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    info.pNext = nullptr;
-    info.pEnabledFeatures = nullptr;
-
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, VP_LUNARG_DESKTOP_BASELINE_2023_SPEC_VERSION};
-
-    VpDeviceCreateInfo profileInfo = {};
-    profileInfo.pCreateInfo = &info;
-    profileInfo.enabledFullProfileCount = 1;
-    profileInfo.pEnabledFullProfiles = &profile;
-
     {
-        info.enabledExtensionCount = 0;
-        info.ppEnabledExtensionNames = nullptr;
-        profileInfo.flags = 0;
-
         std::vector<const char *> extensions;
         detail::GetExtensions(
             ARRAY_SIZE(detail::VP_LUNARG_DESKTOP_BASELINE_2023::VP_LUNARG_desktop_baseline_2023_block::deviceExtensions),

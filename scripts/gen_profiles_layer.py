@@ -479,6 +479,8 @@ WARN_FUNCTIONS = '''
     }
 
     static bool WarnIfGreater(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const uint64_t new_value, const uint64_t old_value, const bool not_modifiable) {
+        (void)not_modifiable;
+
         if (new_value > old_value) {
             LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                 "'%s' profile value (%" PRIu64 ") is greater than device (%s) value (%" PRIu64 ")\\n", cap_name, new_value, device_name, old_value);
@@ -488,6 +490,8 @@ WARN_FUNCTIONS = '''
     }
 
     static bool WarnIfGreaterSizet(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const size_t new_value, const size_t old_value, const bool not_modifiable) {
+        (void)not_modifiable;
+
         if (new_value > old_value) {
             LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                 "'%s' profile value (%" PRIuLEAST64 ") is greater than device (%s) value (%" PRIuLEAST64 ")\\n", cap_name, new_value, device_name, old_value);
@@ -497,6 +501,8 @@ WARN_FUNCTIONS = '''
     }
 
     static bool WarnIfGreaterFloat(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const float new_value, const float old_value, const bool not_modifiable) {
+        (void)not_modifiable;
+
         if (new_value > old_value) {
             LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                 "'%s' profile value (%3.2f) is greater than device (%s) value (%3.2f)\\n", cap_name, new_value, device_name, old_value);
@@ -506,6 +512,8 @@ WARN_FUNCTIONS = '''
     }
 
     static bool WarnIfLesser(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const uint64_t new_value, const uint64_t old_value, const bool not_modifiable) {
+        (void)not_modifiable;
+
         if (new_value < old_value) {
             LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                 "'%s' profile value (%" PRIu64 ") is lesser than device (%s) value (%" PRIu64 ")\\n", cap_name, new_value, device_name, old_value);
@@ -515,6 +523,8 @@ WARN_FUNCTIONS = '''
     }
 
     static bool WarnIfLesserSizet(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const size_t new_value, const size_t old_value, const bool not_modifiable) {
+        (void)not_modifiable;
+
         if (new_value < old_value) {
             LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                 "'%s' profile value (%" PRIuLEAST64 ") is lesser than device (%s) value (%" PRIuLEAST64 ")\\n", cap_name, new_value, device_name, old_value);
@@ -524,6 +534,8 @@ WARN_FUNCTIONS = '''
     }
 
     static bool WarnIfLesserFloat(ProfileLayerSettings *layer_settings, const char* device_name, const char *cap_name, const float new_value, const float old_value, const bool not_modifiable) {
+        (void)not_modifiable;
+
         if (new_value < old_value) {
             LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
                 "'%s' profile value (%3.2f) is lesser than device (%s) value (%3.2f)\\n", cap_name, new_value, device_name, old_value);
@@ -781,7 +793,7 @@ GET_VALUE_FUNCTIONS = '''
             GET_VALUE_WARN(prop, height, not_modifiable, warn_func);
             GET_VALUE_WARN(prop, depth, not_modifiable, warn_func);
         }
-        return true;
+        return valid;
     }
 
     bool GetValueSizet(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, size_t *dest, bool not_modifiable,
@@ -875,7 +887,10 @@ GET_VALUE_FUNCTIONS = '''
         return valid;
     }
 
-    int GetArray(const Json::Value &parent, const std::string &member, const char *name, uint8_t *dest, bool not_modifiable) {
+    int GetArray(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, uint8_t *dest, bool not_modifiable) {
+        (void)not_modifiable;
+        (void)device_name;
+
         if (member != name) {
             return -1;
         }
@@ -891,7 +906,10 @@ GET_VALUE_FUNCTIONS = '''
         return count;
     }
 
-    int GetArray(const Json::Value &parent, const std::string &member, const char *name, uint32_t *dest, bool not_modifiable) {
+    int GetArray(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, uint32_t *dest, bool not_modifiable) {
+        (void)not_modifiable;
+        (void)device_name;
+
         if (member != name) {
             return -1;
         }
@@ -907,7 +925,10 @@ GET_VALUE_FUNCTIONS = '''
         return count;
     }
 
-    int GetArray(const Json::Value &parent, const std::string &member, const char *name, float *dest, bool not_modifiable) {
+    int GetArray(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, float *dest, bool not_modifiable) {
+        (void)not_modifiable;
+        (void)device_name;
+
         if (member != name) {
             return -1;
         }
@@ -923,7 +944,10 @@ GET_VALUE_FUNCTIONS = '''
         return count;
     }
 
-    int GetArray(const Json::Value &parent, const std::string &member, const char *name, char *dest, bool not_modifiable) {
+    int GetArray(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, char *dest, bool not_modifiable) {
+        (void)not_modifiable;
+        (void)device_name;
+
         if (member != name) {
             return -1;
         }
@@ -942,7 +966,10 @@ GET_VALUE_FUNCTIONS = '''
         return count;
     }
 
-    int GetArray(const Json::Value &parent, const std::string &member, const char *name, VkImageLayout *dest, bool not_modifiable) {
+    int GetArray(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, VkImageLayout *dest, bool not_modifiable) {
+        (void)not_modifiable;
+        (void)device_name;
+
         if (member != name) {
             return -1;
         }
@@ -1126,7 +1153,7 @@ bool JsonLoader::GetQueueFamilyProperties(const char* device_name, const Json::V
             for (const auto &feature : props["queueFlags"]) {
                 dest->properties_2.queueFamilyProperties.queueFlags |= StringToVkQueueFlags(feature.asString());
             }
-            dest->properties_2.queueFamilyProperties.queueCount = props["queueCount"].asInt();
+            dest->properties_2.queueFamilyProperties.queueCount = static_cast<uint32_t>(props["queueCount"].asInt());
             dest->properties_2.queueFamilyProperties.timestampValidBits = props["timestampValidBits"].asUInt();
             const auto &minImagetransferGranularity = props["minImageTransferGranularity"];
             dest->properties_2.queueFamilyProperties.minImageTransferGranularity.width =
@@ -1140,7 +1167,7 @@ bool JsonLoader::GetQueueFamilyProperties(const char* device_name, const Json::V
             for (const auto &feature : props2["queueFlags"]) {
                 dest->properties_2.queueFamilyProperties.queueFlags |= StringToVkQueueFlags(feature.asString());
             }
-            dest->properties_2.queueFamilyProperties.queueCount = props2["queueCount"].asInt();
+            dest->properties_2.queueFamilyProperties.queueCount = static_cast<uint32_t>(props2["queueCount"].asInt());
             dest->properties_2.queueFamilyProperties.timestampValidBits = props2["timestampValidBits"].asUInt();
             const auto &minImagetransferGranularity = props2["minImageTransferGranularity"];
             dest->properties_2.queueFamilyProperties.minImageTransferGranularity.width =
@@ -1204,8 +1231,9 @@ bool JsonLoader::GetQueueFamilyProperties(const char* device_name, const Json::V
     }
     if (!supported) {
         std::string message =
-            format("Device has no queue family that supports VkQueueFamilyProperties [queueFlags: %s, queueCount: %" PRIu32
+            format("Device (%s) has no queue family that supports VkQueueFamilyProperties [queueFlags: %s, queueCount: %" PRIu32
                    ", timestampValidBits: %" PRIu32 ", minImageTransferGranularity: [%" PRIu32 ", %" PRIu32 ", %" PRIu32 "]]",
+                   device_name,
                    GetQueueFlagsToString(dest->properties_2.queueFamilyProperties.queueFlags).c_str(),
                    dest->properties_2.queueFamilyProperties.queueCount, dest->properties_2.queueFamilyProperties.timestampValidBits,
                    dest->properties_2.queueFamilyProperties.minImageTransferGranularity.width,
@@ -1364,7 +1392,7 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
 
             const auto &properties = cap_definision["properties"];
             if (properties.isMember("VkPhysicalDeviceProperties") && properties["VkPhysicalDeviceProperties"].isMember("apiVersion")) {
-                properties_api_version = properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt();
+                properties_api_version = static_cast<uint32_t>(properties["VkPhysicalDeviceProperties"]["apiVersion"].asInt());
                 simulated_version = properties_api_version;
             } else if (layer_settings.simulate.capabilities & SIMULATE_API_VERSION_BIT) {
                 simulated_version = profile_api_version_;
@@ -1398,7 +1426,7 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
                 for (const auto &e : extensions.getMemberNames()) {
                     VkExtensionProperties extension;
                     strcpy(extension.extensionName, e.c_str());
-                    extension.specVersion = extensions[e].asInt();
+                    extension.specVersion = static_cast<uint32_t>(extensions[e].asInt());
 
                     bool found = pdd_->map_of_extension_properties_.count(e) > 0;
 
@@ -1592,8 +1620,8 @@ VkResult JsonLoader::LoadProfilesDatabase() {
               continue;
           }
 
-          const std::string& path = entry.path().generic_string();
-          VkResult result = this->LoadFile(path);
+          const std::string& file_path = entry.path().generic_string();
+          VkResult result = this->LoadFile(file_path);
           if (result != VK_SUCCESS) {
               continue;
           }
@@ -2670,9 +2698,9 @@ ENUMERATE_PHYSICAL_DEVICES_MIDDLE = '''
                 pdd.physical_device_memory_properties_ = memory_chain.memoryProperties;
             }
 
-            ::device_has_astc = pdd.physical_device_features_.textureCompressionASTC_LDR;
-            ::device_has_bc = pdd.physical_device_features_.textureCompressionBC;
-            ::device_has_etc2 = pdd.physical_device_features_.textureCompressionETC2;
+            ::device_has_astc = pdd.physical_device_features_.textureCompressionASTC_LDR == VK_TRUE;
+            ::device_has_bc = pdd.physical_device_features_.textureCompressionBC == VK_TRUE;
+            ::device_has_etc2 = pdd.physical_device_features_.textureCompressionETC2 == VK_TRUE;
 
             if (layer_settings->simulate.capabilities & SIMULATE_FORMATS_BIT) {
                 LoadDeviceFormats(instance, &pdd, physical_device, &pdd.device_formats_, &pdd.device_formats_3_);
@@ -2774,8 +2802,8 @@ bool JsonLoader::GetStruct(const char* device_name, const Json::Value &parent, V
         GET_VALUE(prop, vendorID, true);
         GET_VALUE(prop, deviceID, true);
         GET_VALUE_ENUM_WARN(prop, deviceType, true, WarnIfNotEqualEnum);
-        GetArray(parent, prop, "deviceName", dest->deviceName, true);         // size < VK_MAX_PHYSICAL_DEVICE_NAME_SIZE
-        GetArray(parent, prop, "pipelineCacheUUID", dest->pipelineCacheUUID, true);  // size == VK_UUID_SIZE*/
+        GetArray(device_name, parent, prop, "deviceName", dest->deviceName, true);         // size < VK_MAX_PHYSICAL_DEVICE_NAME_SIZE
+        GetArray(device_name, parent, prop, "pipelineCacheUUID", dest->pipelineCacheUUID, true);  // size == VK_UUID_SIZE*/
     }
     return valid;
 }
@@ -2925,7 +2953,7 @@ class VulkanProfilesLayerGenerator():
 
         gen += self.generate_string_to_uint(('VkToolPurposeFlagBits', 'VkSampleCountFlagBits', 'VkResolveModeFlagBits', 'VkShaderStageFlagBits', 'VkSubgroupFeatureFlagBits', 'VkShaderFloatControlsIndependence', 'VkPointClippingBehavior', 'VkOpticalFlowGridSizeFlagBitsNV', 'VkQueueFlagBits', 'VkMemoryDecompressionMethodFlagBitsNV', 'VkLayeredDriverUnderlyingApiMSFT', 'VkImageUsageFlagBits', 'VkBufferUsageFlagBits', 'VkPhysicalDeviceSchedulingControlsFlagBitsARM'), registry.enums)
 
-        gen += self.generate_string_to_flag_functions(('VkToolPurposeFlags', 'VkFormatFeatureFlags', 'VkQueueFlags', 'VkQueueGlobalPriorityKHR', 'VkVideoCodecOperationFlagsKHR', 'VkPipelineStageFlags', 'VkPipelineStageFlags2', 'VkFormatFeatureFlags2'))
+        gen += self.generate_string_to_flag_functions(('VkFormatFeatureFlags', 'VkQueueFlags', 'VkQueueGlobalPriorityKHR', 'VkVideoCodecOperationFlagsKHR', 'VkPipelineStageFlags', 'VkPipelineStageFlags2', 'VkFormatFeatureFlags2'))
 
         return gen
 
@@ -3503,7 +3531,7 @@ class VulkanProfilesLayerGenerator():
             member = registry.structs[structure].members[member_name]
             not_modifiable = str(member.limittype == 'exact' or member.limittype == 'noauto').lower()
             if member.isArray:
-                gen += '        GetArray(parent, member, "' + member_name + '", dest->' + member_name + ', ' + not_modifiable + ');\n'
+                gen += '        GetArray(device_name, parent, member, "' + member_name + '", dest->' + member_name + ', ' + not_modifiable + ');\n'
             elif member.type in registry.enums:
                 gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ', ' + not_modifiable + ', WarnIfNotEqualEnum);\n'
             elif member.type == 'VkConformanceVersion' or member.type == 'VkToolPurposeFlags':

@@ -40,7 +40,7 @@ void CopyAssets(android_app *app) {
         AAsset *asset = AAssetManager_open(assetManager, filename, AASSET_MODE_BUFFER);
         if (asset != nullptr) {
           const void* file_buffer = AAsset_getBuffer(asset);
-          off_t file_length = AAsset_getLength(asset);
+          size_t file_length = static_cast<size_t>(AAsset_getLength(asset));
           std::string dst_filename = JSON_TEST_FILES_PATH;
           dst_filename += filename;
           if (int(dst_filename.back() == 0xa) ) {
