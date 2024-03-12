@@ -110,8 +110,6 @@ TEST(mocked_api_generated_library, internal_code) {
 
     features.Build(structureTypes);
 
-    const std::size_t size = sizeof(VkPhysicalDeviceFeatures) / sizeof(VkBool32);
-
     features.requiredFeaturesChain.features.depthClamp = VK_TRUE;
     features.requiredFeaturesChain.features.depthBiasClamp = VK_TRUE;
     features.physicalDeviceVulkan11Features.storageBuffer16BitAccess = VK_TRUE;

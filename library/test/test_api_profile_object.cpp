@@ -176,6 +176,7 @@ TEST(api_capabilities_object, has_multiple_variants_profile) {
 
     VkBool32 has_multiple_variants = VK_TRUE;
     VkResult result0 = vpHasMultipleVariantsProfile(object.handle, &profileProperties, &has_multiple_variants);
+    EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(VK_FALSE, has_multiple_variants);
 }
 
