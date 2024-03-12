@@ -1133,6 +1133,7 @@ VPAPI_ATTR VkResult vpCreateCapabilities(
     const VpCapabilitiesCreateInfo*             pCreateInfo,
     const VkAllocationCallbacks*                pAllocator,
     VpCapabilities*                             pCapabilities) {
+    (void)pAllocator;
 
     VpCapabilities_T* capabilities = new VpCapabilities_T();
     VkResult result = capabilities->init(pCreateInfo);
@@ -1145,7 +1146,8 @@ VPAPI_ATTR VkResult vpCreateCapabilities(
 VPAPI_ATTR void vpDestroyCapabilities(
     VpCapabilities                              capabilities,
     const VkAllocationCallbacks*                pAllocator) {
-
+    (void)pAllocator;
+    
     delete capabilities;
 }
 
