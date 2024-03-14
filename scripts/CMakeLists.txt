@@ -119,65 +119,47 @@ if (UPDATE_DEPS)
     endif()
 endif()
 
+add_library(VulkanCompilerConfigurationExtra INTERFACE)
+add_library(Vulkan::CompilerConfigurationExtra ALIAS VulkanCompilerConfigurationExtra)
+
 # Configure compiler build options common to all targets
-function(lunarg_target_compiler_configurations TARGET_NAME WERROR_OPTION)
-    if (${WERROR_OPTION})
-        if (MSVC)
-            target_compile_options(${TARGET_NAME} PRIVATE /WX)
-        else()
-            target_compile_options(${TARGET_NAME} PRIVATE -Werror)
-        endif()
+if (${WERROR_OPTION})
+    if (MSVC)
+        target_compile_options(VulkanCompilerConfigurationExtra INTERFACE /WX)
+    else()
+        target_compile_options(VulkanCompilerConfigurationExtra INTERFACE -Werror)
     endif()
+endif()
 
-    if(${CMAKE_CXX_COMPILER_ID} MATCHES "(GNU|Clang)")
-        target_compile_options(${TARGET_NAME} PRIVATE
-            -Wall
-            -Wpointer-arith
-            #-Wpedantic
-            #-Wextra
-            -Wno-unused-function
-            -Wno-missing-field-initializers
-        )
-        if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
-            target_compile_options(${TARGET_NAME} PRIVATE
-                -Wconversion
-                -Wimplicit-fallthrough
-                -Wstring-conversion
-                -Wno-braced-scalar-init
-            )
-        endif()
-    elseif(MSVC)
-        target_compile_options(${TARGET_NAME} PRIVATE
-            /Wall
-            /we5038 # Enable warning about MIL ordering in constructors
-            /wd5045 # Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
-            /wd4702 # Disable warning C4702: unreachable code
-            /wd4505 # Disable warning C4505: unreferenced function with internal linkage has been removed
-            /wd4820 # Disable warning bytes padding added after data member
-            /wd4061 # Disable warning enumerator in switch of enum is not explicitly handled by a case label
-            /wd4296 # Disable warning '>=': expression is always true
-            /wd4191 # Disable warning 'type cast': unsafe conversion from 'PFN_vkVoidFunction' to 'PFN_vkEnumerateInstanceVersion'
-            /wd4623 # Disable warning C4623: default constructor was implicitly defined as deleted
-            /wd4625 # Disable warning C4625: copy constructor was implicitly defined as deleted
-            /wd4626 # Disable warning C4626: assignment operator was implicitly defined as deleted
-            /wd5026 # Disable warning C5026: move constructor was implicitly defined as deleted 
-            /wd5027 # Disable warning C5027: move assignment operator was implicitly defined as deleted
-            /wd4514 # Disable warning C4514: unreferenced inline function has been removed
-            /wd4464 # Disable warning C4464: relative include path contains '..'
-            /wd4668 # Disable warning C4668: is not defined as a preprocessor macro, replacing with '0' for '#if/#elif'
-            /wd4711 # Disable warning C4711: selected for automatic inline expansion
-            /wd4710 # Disable warning C4711: function not inlined 
-        )
+if(${CMAKE_CXX_COMPILER_ID} MATCHES "(GNU|Clang)")
+    target_compile_options(VulkanCompilerConfigurationExtra INTERFACE
+        -Wno-unused-function
+        -Wno-missing-field-initializers
+    )
+elseif(MSVC)
+    target_compile_options(VulkanCompilerConfigurationExtra INTERFACE
+        /wd5045 # Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
+        /wd4702 # Disable warning C4702: unreachable code
+        /wd4505 # Disable warning C4505: unreferenced function with internal linkage has been removed
+        /wd4820 # Disable warning bytes padding added after data member
+        /wd4061 # Disable warning enumerator in switch of enum is not explicitly handled by a case label
+        /wd4296 # Disable warning '>=': expression is always true
+        /wd4191 # Disable warning 'type cast': unsafe conversion from 'PFN_vkVoidFunction' to 'PFN_vkEnumerateInstanceVersion'
+        /wd4623 # Disable warning C4623: default constructor was implicitly defined as deleted
+        /wd4625 # Disable warning C4625: copy constructor was implicitly defined as deleted
+        /wd4626 # Disable warning C4626: assignment operator was implicitly defined as deleted
+        /wd5026 # Disable warning C5026: move constructor was implicitly defined as deleted 
+        /wd5027 # Disable warning C5027: move assignment operator was implicitly defined as deleted
+        /wd4514 # Disable warning C4514: unreferenced inline function has been removed
+        /wd4464 # Disable warning C4464: relative include path contains '..'
+        /wd4668 # Disable warning C4668: is not defined as a preprocessor macro, replacing with '0' for '#if/#elif'
+        /wd4711 # Disable warning C4711: selected for automatic inline expansion
+        /wd4710 # Disable warning C4711: function not inlined 
+    )
 
-        # Enforce stricter ISO C++
-        target_compile_options(${TARGET_NAME} PRIVATE /permissive-)
-
-        target_compile_options(${TARGET_NAME} PRIVATE $<$<BOOL:${MSVC_IDE}>:/MP>) # Speed up Visual Studio builds
-
-        # Allow usage of unsafe CRT functions and minimize what Windows.h leaks
-        target_compile_definitions(${TARGET_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS NOMINMAX WIN32_LEAN_AND_MEAN)
-    endif()
-endfunction()
+    # Allow usage of unsafe CRT functions
+    target_compile_definitions(VulkanCompilerConfigurationExtra INTERFACE _CRT_SECURE_NO_WARNINGS)
+endif()
 
 if (JSONCPP_INSTALL_DIR)
     list(APPEND CMAKE_PREFIX_PATH ${JSONCPP_INSTALL_DIR})

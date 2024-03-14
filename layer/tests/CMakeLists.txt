@@ -17,6 +17,7 @@
 # Authors:
 # - Christophe Riccio <christophe@lunarg.com>
 # ~~~
+
 execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_SOURCE_DIR}/layer/profiles.cpp)
 
 if (ANDROID)
@@ -63,11 +64,10 @@ function(LayerTest NAME)
                    layer_tests_main.cpp
                    vktestframework.cpp)
     add_dependencies(${TEST_NAME} ProfilesLayer ${TEST_JSON_FILES})
-    target_link_libraries(${TEST_NAME} Vulkan::Headers Vulkan::Loader GTest::gtest GTest::gtest_main Vulkan::LayerSettings)
+    target_link_libraries(${TEST_NAME} Vulkan::CompilerConfiguration Vulkan::CompilerConfigurationExtra Vulkan::Headers Vulkan::Loader GTest::gtest GTest::gtest_main Vulkan::LayerSettings)
     target_compile_definitions(${TEST_NAME} PUBLIC JSON_TEST_FILES_PATH="${CMAKE_SOURCE_DIR}/profiles/test/data/")
     target_compile_definitions(${TEST_NAME} PUBLIC JSON_PROFILES_PATH="${CMAKE_SOURCE_DIR}/profiles/")
     target_compile_definitions(${TEST_NAME} PUBLIC TEST_BINARY_PATH="$<TARGET_FILE_DIR:ProfilesLayer>")
-    lunarg_target_compiler_configurations(${TEST_NAME} ${BUILD_TESTS})
 
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
@@ -90,7 +90,6 @@ function(LayerTestAndroid NAME)
                 profiles_test_helper.cpp
                 layer_tests_main.cpp
                 vktestframework.cpp)
-    lunarg_target_compiler_configurations(${ANDROID_APK_NAME} ${BUILD_TESTS})
 
     add_test(NAME ${ANDROID_APK_NAME} COMMAND profiles_${NAME})
     add_dependencies(${ANDROID_APK_NAME} ProfilesLayer VpCreateDesktopBaseline)
@@ -137,7 +136,7 @@ function(LayerTestAndroid NAME)
     target_sources(${ANDROID_APK_NAME} PRIVATE ${_app_glue_dir}/android_native_app_glue.c)
     target_link_libraries(${ANDROID_APK_NAME} "-u ANativeActivity_onCreate")
     target_link_libraries(${ANDROID_APK_NAME} log android dl vulkan)
-    target_link_libraries(${ANDROID_APK_NAME} Vulkan::Headers GTest::gtest GTest::gtest_main Vulkan::LayerSettings)
+    target_link_libraries(${ANDROID_APK_NAME} Vulkan::Headers GTest::gtest GTest::gtest_main Vulkan::LayerSettings Vulkan::CompilerConfiguration Vulkan::CompilerConfigurationExtra)
 
     set(_android_jar ${ANDROID_SDK_HOME}/platforms/android-${ANDROID_PLATFORM}/android.jar)
     set(_aapt ${ANDROID_SDK_HOME}/build-tools/${ANDROID_BUILD_TOOLS}/aapt)
