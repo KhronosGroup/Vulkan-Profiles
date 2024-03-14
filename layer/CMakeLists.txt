@@ -64,7 +64,6 @@ endif()
 
 set_target_properties(ProfilesLayer PROPERTIES FOLDER "Profiles layer")
 set_target_properties(ProfilesLayer PROPERTIES OUTPUT_NAME ${LAYER_NAME})
-lunarg_target_compiler_configurations(ProfilesLayer ${BUILD_TESTS})
 
 if (MSVC)
     target_compile_options(ProfilesLayer PRIVATE "$<$<CONFIG:Release>:/Zi>")
@@ -82,8 +81,8 @@ if(IOS)
       FRAMEWORK TRUE
         MACOSX_FRAMEWORK_BUNDLE_VERSION "${VulkanHeaders_VERSION}"
         MACOSX_FRAMEWORK_SHORT_VERSION_STRING "${VulkanHeaders_VERSION}"
-      MACOSX_FRAMEWORK_IDENTIFIER com.khronos.VkLayer_khronos_profiles
-        )
+        MACOSX_FRAMEWORK_IDENTIFIER com.khronos.VkLayer_khronos_profiles
+      )
 else()
     set_target_properties(ProfilesLayer PROPERTIES SUFFIX ".dylib")
 endif()
@@ -124,6 +123,8 @@ target_sources(ProfilesLayer PRIVATE
 )
 
 target_link_libraries(ProfilesLayer PRIVATE
+    Vulkan::CompilerConfiguration 
+    Vulkan::CompilerConfigurationExtra
     Vulkan::LayerSettings
     Vulkan::Headers
     Vulkan::UtilityHeaders
