@@ -58,28 +58,27 @@ TEST(api_get_profiles_beta, partial) {
     EXPECT_EQ(VP_KHR_ROADMAP_2022_SPEC_VERSION, properties[0].specVersion);
 }
 
-TEST(api_get_profile_required_profiles, empty) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, 1};
+TEST(api_get_profile_required_profiles, full) {
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2024_NAME, VP_KHR_ROADMAP_2024_SPEC_VERSION};
 
     uint32_t count = 0;
     VkResult result0 = vpGetProfileRequiredProfiles(&profile, &count, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(2, count);
+    EXPECT_EQ(1, count);
 
     std::vector<VpProfileProperties> data(count);
     VkResult result1 = vpGetProfileRequiredProfiles(&profile, &count, &data[0]);
-    EXPECT_STREQ(VP_LUNARG_MINIMUM_REQUIREMENTS_1_1_NAME, data[0].profileName);
-    EXPECT_STREQ(VP_LUNARG_MINIMUM_REQUIREMENTS_1_2_NAME, data[1].profileName);
+    EXPECT_STREQ(VP_KHR_ROADMAP_2022_NAME, data[0].profileName);
     EXPECT_EQ(VK_SUCCESS, result1);
-    EXPECT_EQ(2, count);
+    EXPECT_EQ(1, count);
 }
 
 TEST(api_get_profile_api_version, get) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
 
     uint32_t version = vpGetProfileAPIVersion(&profile);
 
-    EXPECT_EQ(VK_MAKE_API_VERSION(0, 1, 2, 148), version);
+    EXPECT_EQ(VK_MAKE_API_VERSION(0, 1, 3, 204), version);
 }
 
 TEST(api_get_profile_device_extension_properties, full) {

@@ -25,7 +25,7 @@
 #include "profiles_settings.h"
 
 struct JsonValidator {
-    JsonValidator(){};
+    JsonValidator(){}
     ~JsonValidator();
 
     bool Init();

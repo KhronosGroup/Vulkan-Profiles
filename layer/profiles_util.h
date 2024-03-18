@@ -50,6 +50,8 @@ std::string format(const char *message, ...);
 std::string GetString(const std::vector<std::string> &strings);
 std::string GetUUIDString(const uint8_t deviceUUID[VK_UUID_SIZE]);
 
+bool EndsWith(std::string const &value, std::string const &ending);
+
 std::string format_device_support_string(VkFormatFeatureFlags format_features);
 std::string format_device_support_string(VkFormatFeatureFlags2 format_features);
 

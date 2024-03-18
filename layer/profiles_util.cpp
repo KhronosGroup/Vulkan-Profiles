@@ -28,7 +28,7 @@ std::string format(const char *message, ...) {
     std::size_t const STRING_BUFFER(4096);
 
     assert(message != nullptr);
-    assert(strlen(message) >= 0 && strlen(message) < STRING_BUFFER);
+    assert(strlen(message) < STRING_BUFFER);
 
     char buffer[STRING_BUFFER];
     va_list list;
@@ -72,6 +72,11 @@ std::string GetString(const std::vector<std::string> &strings) {
         if (i < n - 1) result += ", ";
     }
     return result;
+}
+
+bool EndsWith(std::string const &value, std::string const &ending) {
+    if (ending.size() > value.size()) return false;
+    return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
 std::string GetUUIDString(const uint8_t deviceUUID[VK_UUID_SIZE]) {
