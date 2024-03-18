@@ -101,11 +101,12 @@ class ProfileConfig():
         self.description = json_profile_value["description"]
         self.date = json_profile_value["date"]
         self.stage = json_profile_value["stage"]
-        if json_profile_value["api-version"] is not None:
+        if json_profile_value["api-version"]:
             self.api_version = self.get_api_version_list(json_profile_value["api-version"])
         else:
             self.api_version = self.get_api_version(self.input_profile_values, self.merge_mode)
-        self.required_profiles = json_profile_value["required-profiles"].split(',')
+        if json_profile_value["required-profiles"]:
+            self.required_profiles = json_profile_value["required-profiles"].split(',')
 
     def load_jsons(self, input_dir):
         if input_dir is not None:
@@ -960,8 +961,8 @@ if __name__ == '__main__':
         json_file = open(args.config, "r")
         json_data = json.load(json_file)
 
-        if json_data["schema"]:
-            profile_file.set_schema(json_data["schema"])
+        if json_data["$schema"]:
+            profile_file.set_schema(json_data["$schema"])
         if json_data["contributors"]:
             profile_file.set_contributors(json_data["contributors"])
         if json_data["history"]:

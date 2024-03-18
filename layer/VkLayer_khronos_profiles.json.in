@@ -5,7 +5,7 @@
         "type": "GLOBAL",
         "library_path": "@JSON_LIBRARY_PATH@",
         "api_version": "@JSON_API_VERSION@",
-        "implementation_version": "1.2.0",
+        "implementation_version": "1.3.0",
         "status": "STABLE",
         "description": "Khronos Profiles layer",
         "introduction": "The Khronos Profiles layer helps test across a wide range of hardware capabilities without requiring a physical copy of every device.",

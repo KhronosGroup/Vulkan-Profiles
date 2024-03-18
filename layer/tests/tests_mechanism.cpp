@@ -427,7 +427,7 @@ TEST_F(TestsMechanism, default_feature_values) {
         const char* default_feature_values_data = "DEFAULT_FEATURE_VALUES_FALSE";
         const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
-        std::vector<VkLayerSettingEXT> settings = {
+        const std::vector<VkLayerSettingEXT> settings = {
             {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
             {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
             {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
