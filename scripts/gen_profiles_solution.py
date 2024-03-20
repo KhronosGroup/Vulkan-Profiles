@@ -158,6 +158,21 @@ SHARED_INCLUDE = '''
 '''
 
 API_DEFS = '''
+#if defined(__ANDROID__) && defined(VK_NO_PROTOTYPES)
+    extern PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr;
+    extern PFN_vkGetDeviceProcAddr vkGetDeviceProcAddr;
+    extern PFN_vkEnumerateInstanceVersion vkEnumerateInstanceVersion;
+    extern PFN_vkEnumerateInstanceExtensionProperties vkEnumerateInstanceExtensionProperties;
+    extern PFN_vkEnumerateDeviceExtensionProperties vkEnumerateDeviceExtensionProperties;
+    extern PFN_vkGetPhysicalDeviceProperties vkGetPhysicalDeviceProperties;
+    extern PFN_vkGetPhysicalDeviceFeatures2 vkGetPhysicalDeviceFeatures2;
+    extern PFN_vkGetPhysicalDeviceProperties2 vkGetPhysicalDeviceProperties2;
+    extern PFN_vkGetPhysicalDeviceFormatProperties2 vkGetPhysicalDeviceFormatProperties2;
+    extern PFN_vkGetPhysicalDeviceQueueFamilyProperties2 vkGetPhysicalDeviceQueueFamilyProperties2;
+    extern PFN_vkCreateInstance vkCreateInstance;
+    extern PFN_vkCreateDevice vkCreateDevice;
+#endif // defined(__ANDROID__) && VK_NO_PROTOTYPES
+
 #define VP_HEADER_VERSION_COMPLETE VK_MAKE_API_VERSION(0, 2, 0, VK_HEADER_VERSION)
 
 #define VP_MAX_PROFILE_NAME_SIZE 256U
@@ -227,6 +242,7 @@ typedef struct VpVulkanFunctions {
     PFN_vkEnumerateInstanceVersion EnumerateInstanceVersion;
     PFN_vkEnumerateInstanceExtensionProperties EnumerateInstanceExtensionProperties;
     PFN_vkEnumerateDeviceExtensionProperties EnumerateDeviceExtensionProperties;
+    PFN_vkGetPhysicalDeviceProperties GetPhysicalDeviceProperties;
     PFN_vkGetPhysicalDeviceFeatures2 GetPhysicalDeviceFeatures2;
     PFN_vkGetPhysicalDeviceProperties2 GetPhysicalDeviceProperties2;
     PFN_vkGetPhysicalDeviceFormatProperties2 GetPhysicalDeviceFormatProperties2;
@@ -980,6 +996,7 @@ struct VpCapabilities_T : public VpVulkanFunctions {
         this->EnumerateInstanceVersion = nullptr;
         this->EnumerateInstanceExtensionProperties = nullptr;
         this->EnumerateDeviceExtensionProperties = nullptr;
+        this->GetPhysicalDeviceProperties = nullptr;
         this->GetPhysicalDeviceFeatures2 = nullptr;
         this->GetPhysicalDeviceProperties2 = nullptr;
         this->GetPhysicalDeviceFormatProperties2 = nullptr;
@@ -1019,6 +1036,7 @@ struct VpCapabilities_T : public VpVulkanFunctions {
         this->EnumerateInstanceExtensionProperties = (PFN_vkEnumerateInstanceExtensionProperties)vkEnumerateInstanceExtensionProperties;
         this->EnumerateDeviceExtensionProperties = (PFN_vkEnumerateDeviceExtensionProperties)vkEnumerateDeviceExtensionProperties;
 
+        this->GetPhysicalDeviceProperties = (PFN_vkGetPhysicalDeviceProperties)vkGetPhysicalDeviceProperties;
         this->GetPhysicalDeviceFeatures2 = (PFN_vkGetPhysicalDeviceFeatures2)vkGetPhysicalDeviceFeatures2;
         this->GetPhysicalDeviceProperties2 = (PFN_vkGetPhysicalDeviceProperties2)vkGetPhysicalDeviceProperties2;
         this->GetPhysicalDeviceFormatProperties2 = (PFN_vkGetPhysicalDeviceFormatProperties2)vkGetPhysicalDeviceFormatProperties2;
@@ -1039,6 +1057,7 @@ struct VpCapabilities_T : public VpVulkanFunctions {
         VP_COPY_IF_NOT_NULL(EnumerateInstanceExtensionProperties);
         VP_COPY_IF_NOT_NULL(EnumerateDeviceExtensionProperties);
 
+        VP_COPY_IF_NOT_NULL(GetPhysicalDeviceProperties);
         VP_COPY_IF_NOT_NULL(GetPhysicalDeviceFeatures2);
         VP_COPY_IF_NOT_NULL(GetPhysicalDeviceProperties2);
         VP_COPY_IF_NOT_NULL(GetPhysicalDeviceFormatProperties2);
@@ -1069,6 +1088,7 @@ struct VpCapabilities_T : public VpVulkanFunctions {
         VP_FETCH_INSTANCE_FUNC(EnumerateInstanceExtensionProperties, "vkEnumerateInstanceExtensionProperties");
         VP_FETCH_DEVICE_FUNC(EnumerateDeviceExtensionProperties, "vkEnumerateDeviceExtensionProperties");
 
+        VP_FETCH_DEVICE_FUNC(GetPhysicalDeviceProperties, "vkGetPhysicalDeviceProperties");
         VP_FETCH_DEVICE_FUNC(GetPhysicalDeviceFeatures2, "vkGetPhysicalDeviceFeatures2");
         VP_FETCH_DEVICE_FUNC(GetPhysicalDeviceProperties2, "vkGetPhysicalDeviceProperties2");
         VP_FETCH_DEVICE_FUNC(GetPhysicalDeviceFormatProperties2, "vkGetPhysicalDeviceFormatProperties2");
@@ -1101,6 +1121,10 @@ struct VpCapabilities_T : public VpVulkanFunctions {
             return VK_ERROR_INITIALIZATION_FAILED;
         }
 
+        if (this->GetPhysicalDeviceProperties == nullptr) {
+            return VK_ERROR_INITIALIZATION_FAILED;
+        }
+        
         if (this->GetPhysicalDeviceFeatures2 == nullptr) {
             return apiVersion >= VK_API_VERSION_1_1 ? VK_ERROR_INITIALIZATION_FAILED : VK_ERROR_EXTENSION_NOT_PRESENT;
         }
@@ -1649,7 +1673,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
 
         {
             VkPhysicalDeviceProperties device_properties{};
-            vkGetPhysicalDeviceProperties(physicalDevice, &device_properties);
+            vp.GetPhysicalDeviceProperties(physicalDevice, &device_properties);
             if (!detail::vpCheckVersion(device_properties.apiVersion, profile_desc->minApiVersion)) {
                 VP_DEBUG_MSGF("Unsupported API version: %u.%u.%u", VK_API_VERSION_MAJOR(profile_desc->minApiVersion), VK_API_VERSION_MINOR(profile_desc->minApiVersion), VK_API_VERSION_PATCH(profile_desc->minApiVersion));
                 supported_profile = false;

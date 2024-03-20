@@ -20,12 +20,13 @@
 
 #define VK_ENABLE_BETA_EXTENSIONS 1
 
-#include "test.hpp"
 #ifndef VULKAN_PROFILES_HEADER_ONLY
 #include <vulkan/vulkan_profiles.hpp>
 #else
 #include <vulkan/debug/vulkan_profiles.h>
 #endif
+
+#include "test.hpp"
 
 #include <cstdio>
 #include <memory>
@@ -52,12 +53,13 @@ struct Capabilities {
     VpCapabilities handle = VK_NULL_HANDLE;
 
     Capabilities() {
-        VpVulkanFunctions vulkanFunctions;
+        VpVulkanFunctions vulkanFunctions{};
         vulkanFunctions.GetInstanceProcAddr = vkGetInstanceProcAddr;
         vulkanFunctions.GetDeviceProcAddr = vkGetDeviceProcAddr;
         vulkanFunctions.EnumerateInstanceVersion = vkEnumerateInstanceVersion;
         vulkanFunctions.EnumerateInstanceExtensionProperties = vkEnumerateInstanceExtensionProperties;
         vulkanFunctions.EnumerateDeviceExtensionProperties = vkEnumerateDeviceExtensionProperties;
+        vulkanFunctions.GetPhysicalDeviceProperties = vkGetPhysicalDeviceProperties;
         vulkanFunctions.GetPhysicalDeviceFeatures2 = vkGetPhysicalDeviceFeatures2;
         vulkanFunctions.GetPhysicalDeviceProperties2 = vkGetPhysicalDeviceProperties2;
         vulkanFunctions.GetPhysicalDeviceFormatProperties2 = vkGetPhysicalDeviceFormatProperties2;
