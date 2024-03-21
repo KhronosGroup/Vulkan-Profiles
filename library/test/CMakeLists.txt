@@ -154,7 +154,7 @@ function (add_unit_test_simple_android_apk NAME)
     add_library(${TEST_NAME_HO} SHARED ${TEST_FILE} ${vulkan_profiles_source})
     create_android_package(${TEST_NAME_HO})
 
-    target_compile_definitions(${TEST_NAME_HO} PRIVATE VK_NO_PROTOTYPES)
+#    target_compile_definitions(${TEST_NAME_HO} PRIVATE VK_NO_PROTOTYPES)
     target_include_directories(${TEST_NAME_HO} PUBLIC "${vulkan-headers_SOURCE_DIR}/include")
     add_dependencies(${TEST_NAME_HO} VpGenerated VpLibrary_test_generated_library)
     add_test(NAME ${TEST_NAME_HO} COMMAND ${TEST_NAME_HO} --gtest_catch_exceptions=0)
