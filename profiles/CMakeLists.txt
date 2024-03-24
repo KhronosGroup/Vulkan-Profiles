@@ -15,7 +15,7 @@ set(PROFILES_FILES_FOR_INSTALL
 )
 
 set(PROFILES_FILES_FOR_API_LIBRARY
-    "VP_KHR_roadmap.json,VP_LUNARG_minimum_requirements.json,VP_LUNARG_desktop_baseline.json,VP_ANDROID_baseline_2021.json,VP_ANDROID_baseline_2022.json,VP_ANDROID_15_minimums.json"
+    "VP_KHR_roadmap.json,VP_LUNARG_minimum_requirements.json,VP_ANDROID_baseline_2021.json,VP_ANDROID_baseline_2022.json,VP_ANDROID_15_minimums.json"
 )
 
 set(PROFILES_FILES_FOR_VULKAN_HEADER_DOC

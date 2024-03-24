@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2021-2023 Valve Corporation
- * Copyright (c) 2021-2023 LunarG, Inc.
+ * Copyright (c) 2021-2024 Valve Corporation
+ * Copyright (c) 2021-2024 LunarG, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  *
  * Authors:
  * - Christophe Riccio <christophe@lunarg.com>
- *   Mark Lobodzinski <mark@lunarg.com>
+ * - Mark Lobodzinski <mark@lunarg.com>
  */
 
 #define VK_ENABLE_BETA_EXTENSIONS 1
@@ -29,11 +29,11 @@ bool IsShieldTv(VkPhysicalDevice pdev) {
     // This identifier should cover ShieldTV and ShieldTVb devices, but not other Tegra devices
     std::string shield_tv_identifier = "(nvgpu)";
 
-    VkPhysicalDeviceProperties pdev_props{};
-    vkGetPhysicalDeviceProperties(pdev, &pdev_props);
+    VkPhysicalDeviceProperties2 pdev_props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
+    vkGetPhysicalDeviceProperties2(pdev, &pdev_props);
 
     bool result = false;
-    std::string device_name = pdev_props.deviceName;
+    std::string device_name = pdev_props.properties.deviceName;
     if (device_name.find(shield_tv_identifier) != std::string::npos) {
         result = true;
     }
@@ -100,7 +100,7 @@ class LogcatPrinter : public ::testing::EmptyTestEventListener {
         }
 
         __android_log_print(ANDROID_LOG_INFO, appTag, "%s", result.c_str());
-    };
+    }
 };
 
 // Convert Intents to argv

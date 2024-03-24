@@ -37,7 +37,7 @@ The *Vulkan Profiles Toolset* includes the following components:
 - [***The Vulkan Profiles API library***](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_api_library.html)
   - A header-only C++ library to use *Vulkan Profiles* in Vulkan applications.
   - The library allows checking Profiles support on a device and creating a `VkDevice` instance with the profile features and extensions enabled.
-  - The library requires a Vulkan 1.0 driver that supports `VK_KHR_get_physical_device_properties2` extension.
+  - The library requires a Vulkan 1.1 driver.
 - [***The Vulkan Profiles Layer***](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_layer.html)
   - A layer used during application development to ensure adherence to the requirements of a chosen *Vulkan Profile*.
   - [It simulates but doesn't emulate](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_layer.html#technical-details) Vulkan capabilities. Hence, it is used with the [Validation layer](https://github.com/KhronosGroup/Vulkan-ValidationLayers) to clamp available capabilities on the Vulkan developer system.
@@ -53,6 +53,8 @@ Furthermore, the *Vulkan SDK* includes implementations of some *Vulkan Profiles*
 - VP_LUNARG_desktop_baseline_2024 (Vulkan 1.2)
 - VP_LUNARG_desktop_baseline_2023 (Vulkan 1.2)
 - VP_LUNARG_desktop_baseline_2022 (Vulkan 1.1)
+
+The `VP_LUNARG_desktop_baseline` profiles are created as examples of *Platform* profiles. Vulkan application developers should create *Platform* profiles dedicated to their Vulkan applications that match the ecosystem of devices they want the Vulkan applications to run on.
 
 Within the *Vulkan SDK*, the Vulkan Profiles files are located at `$(VULKAN_SDK)/Config/VK_LAYER_KHRONOS_profiles`.
 
@@ -79,7 +81,7 @@ The Profiles layer builds its internal data tables by querying the capabilities 
 
 ```json
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.204.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-280.json#",
     "capabilities": {
         "baseline": {
             "extensions": {},
@@ -102,27 +104,27 @@ The Profiles layer builds its internal data tables by querying the capabilities 
             "status": "STABLE",
             "label": "LunarG Example Profile",
             "description": "An example profile used for the overview documentation",
-            "contributors": {
-                "A Person": {
-                    "company": "LunarG",
-                    "email": "a.person@lunarg.com",
-                    "github": "lunarg",
-                    "contact": true
-                }
-            },
-            "history": [
-                {
-                    "revision": 1,
-                    "date": "2021-12-08",
-                    "author": "A Person",
-                    "comment": "Initial revision"
-                }
-            ],
             "capabilities": [
                 "baseline"
             ]
         }
-    }
+    },
+    "contributors": {
+        "A Person": {
+            "company": "LunarG",
+            "email": "a.person@lunarg.com",
+            "github": "lunarg",
+            "contact": true
+        }
+    },
+    "history": [
+        {
+            "revision": 1,
+            "date": "2021-12-08",
+            "author": "A Person",
+            "comment": "Initial revision"
+        }
+    ]
 }
 ```
 
@@ -130,7 +132,9 @@ The top-level sections of such profiles files are processed as follows:
 * `$schema` - Required. Must be the `URI` string referencing the JSON schema.
 * `capabilities` - Required. Specifies the list of capabilities sets.
 * `profiles` - Required. Specifies the list of profile definitions.
-
+* `contributors` - Optional. The list of contributors of the profile file.
+* `history` - Optional. The version history of the profile file.
+* 
 Each entry in `capabilities` includes a reference name and a dictionary containing the following sections:
 * `extensions` - Optional. List of all required extensions.
 * `features` - Optional. List of all required features.
@@ -144,8 +148,8 @@ Each entry in `profiles` includes a reference name and a dictionary containing t
 * `status` - Optional. The development stage of the profile. It can be either `ALPHA`, `BETA`, `STABLE` or `DEPRECATED`.
 * `label` - Required. The label used to present the profile to the Vulkan developer.
 * `description` - Required. The description of the profile.
-* `contributors` - Required. The list of contributors of the profile.
-* `history` - Required. The version history of the profile file.
+* `contributors` - Optional. The list of contributors of the profile.
+* `history` - Optional. The version history of the profile.
 * `profiles` - Optional. The list of profiles required by the profile.
 * `capabilities` - Required. The list of capability sets that can be referenced by a profile.
 * `fallback` - Optional. The list of profiles recommended if the checked profile is not supported by the platform.
