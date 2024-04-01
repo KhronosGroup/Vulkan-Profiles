@@ -30,11 +30,11 @@
 
 class TestsMechanism : public VkTestFramework {
    public:
-    TestsMechanism(){};
-    ~TestsMechanism(){};
+    TestsMechanism(){}
+    ~TestsMechanism(){}
 
-    static void SetUpTestSuite() {}
-    static void TearDownTestSuite(){};
+    static void SetUpTestSuite(){}
+    static void TearDownTestSuite(){}
 };
 
 TEST_F(TestsMechanism, check_extension) {
