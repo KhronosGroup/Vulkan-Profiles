@@ -1648,9 +1648,9 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
         VpBlockProperties block{gathered_profiles[profile_index], profile_desc->minApiVersion};
 
         {
-            VkPhysicalDeviceProperties device_properties{};
-            vkGetPhysicalDeviceProperties(physicalDevice, &device_properties);
-            if (!detail::vpCheckVersion(device_properties.apiVersion, profile_desc->minApiVersion)) {
+            VkPhysicalDeviceProperties2KHR properties2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR };
+            userData.gpdp2.pfnGetPhysicalDeviceProperties2(physicalDevice, &properties2);
+            if (!detail::vpCheckVersion(properties2.properties.apiVersion, profile_desc->minApiVersion)) {
                 VP_DEBUG_MSGF("Unsupported API version: %u.%u.%u", VK_API_VERSION_MAJOR(profile_desc->minApiVersion), VK_API_VERSION_MINOR(profile_desc->minApiVersion), VK_API_VERSION_PATCH(profile_desc->minApiVersion));
                 supported_profile = false;
             }

@@ -444,6 +444,9 @@ public:
                 }
                 p = p->pNext;
             }
+            if (sInstance->m_deviceAPIVersion != 0) {
+                pProperties->properties.apiVersion = sInstance->m_deviceAPIVersion;
+            }
         }
     }
 
