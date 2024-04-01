@@ -82,7 +82,7 @@ TEST(api_get_profile_api_version, get) {
 }
 
 TEST(api_get_profile_device_extension_properties, full) {
-    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
 
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfileDeviceExtensionProperties(&profile, nullptr, &propertyCount, nullptr);
@@ -100,12 +100,12 @@ TEST(api_get_profile_device_extension_properties, full) {
 }
 
 TEST(api_get_profile_device_extension_properties, partial) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2024_NAME, VP_KHR_ROADMAP_2024_SPEC_VERSION};
 
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfileDeviceExtensionProperties(&profile, nullptr, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(41, propertyCount);
+    EXPECT_EQ(15, propertyCount);
 
     propertyCount = 5;
 
@@ -114,12 +114,12 @@ TEST(api_get_profile_device_extension_properties, partial) {
     EXPECT_EQ(VK_INCOMPLETE, result1);
     EXPECT_EQ(5, propertyCount);
 
-    EXPECT_STREQ(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME, properties[0].extensionName);
-    EXPECT_STREQ(VK_EXT_HOST_QUERY_RESET_EXTENSION_NAME, properties[1].extensionName);
+    EXPECT_STREQ(VK_KHR_GLOBAL_PRIORITY_EXTENSION_NAME, properties[0].extensionName);
+    EXPECT_STREQ(VK_KHR_DYNAMIC_RENDERING_LOCAL_READ_EXTENSION_NAME, properties[1].extensionName);
 }
 
 TEST(api_get_profile_instance_extension_properties, full) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2024_NAME, VP_KHR_ROADMAP_2024_SPEC_VERSION};
 
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfileInstanceExtensionProperties(&profile, nullptr, &propertyCount, nullptr);
@@ -135,7 +135,7 @@ TEST(api_get_profile_instance_extension_properties, full) {
 }
 
 TEST(api_get_profile_fallbacks, empty) {
-    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
 
     uint32_t count = 0;
     VkResult result0 = vpGetProfileFallbacks(&profile, &count, nullptr);
@@ -151,7 +151,7 @@ TEST(api_get_profile_fallbacks, empty) {
 }
 
 TEST(api_get_profile_formats, unspecified) {
-    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
 
     uint32_t formatCount = 0;
     VkResult result0 = vpGetProfileFormats(&profile, nullptr, &formatCount, nullptr);
@@ -164,33 +164,34 @@ TEST(api_get_profile_properties, get_properties2) {
     profileProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
     profileProperties2.pNext = nullptr;
 
-    const VpProfileProperties Profile = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
 
-    vpGetProfileProperties(&Profile, nullptr, &profileProperties2);
+    vpGetProfileProperties(&profile, nullptr, &profileProperties2);
 
-    EXPECT_EQ(16384, profileProperties2.properties.limits.maxImageDimension1D);
-    EXPECT_EQ(16384, profileProperties2.properties.limits.maxImageDimension2D);
-    EXPECT_EQ(2048, profileProperties2.properties.limits.maxImageDimension3D);
-    EXPECT_EQ(16384, profileProperties2.properties.limits.maxImageDimensionCube);
+    EXPECT_EQ(8192, profileProperties2.properties.limits.maxImageDimension1D);
+    EXPECT_EQ(8192, profileProperties2.properties.limits.maxImageDimension2D);
+    EXPECT_EQ(0, profileProperties2.properties.limits.maxImageDimension3D);
+    EXPECT_EQ(8192, profileProperties2.properties.limits.maxImageDimensionCube);
     EXPECT_EQ(2048, profileProperties2.properties.limits.maxImageArrayLayers);
-    EXPECT_EQ(8, profileProperties2.properties.limits.maxColorAttachments);
+    EXPECT_EQ(7, profileProperties2.properties.limits.maxColorAttachments);
 }
 
 TEST(api_get_profile_structures, get_properties_chain) {
-    VkPhysicalDeviceVulkan12Properties properties1{};
-    properties1.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES;
+    VkPhysicalDeviceVulkan13Properties properties1{};
+    properties1.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES;
     properties1.pNext = nullptr;
 
     VkPhysicalDeviceVulkan11Properties properties0{};
     properties0.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES;
     properties0.pNext = &properties1;
 
-    const VpProfileProperties Profile = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
 
-    vpGetProfileProperties(&Profile, nullptr, &properties0);
+    vpGetProfileProperties(&profile, nullptr, &properties0);
 
-    EXPECT_EQ(1048576, properties1.maxUpdateAfterBindDescriptorsInAllPools);
-    EXPECT_EQ(16, properties1.maxPerStageDescriptorUpdateAfterBindSamplers);
+    EXPECT_EQ(1073741824, properties1.maxBufferSize);
+    EXPECT_EQ(256, properties1.maxInlineUniformBlockSize);
+    EXPECT_EQ(4, properties1.maxPerStageDescriptorInlineUniformBlocks);
     EXPECT_EQ(134217727, properties0.maxMultiviewInstanceIndex);
     EXPECT_EQ(6, properties0.maxMultiviewViewCount);
 }
@@ -204,9 +205,9 @@ TEST(api_get_profile_structures, get_features) {
     deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     deviceFeatures2.pNext = &deviceVulkan12Features;
 
-    const VpProfileProperties Profile = {VP_KHR_ROADMAP_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
 
-    vpGetProfileFeatures(&Profile, nullptr, &deviceFeatures2);
+    vpGetProfileFeatures(&profile, nullptr, &deviceFeatures2);
 
     EXPECT_EQ(VK_TRUE, deviceVulkan12Features.samplerMirrorClampToEdge);
     EXPECT_EQ(VK_FALSE, deviceVulkan12Features.drawIndirectCount);
@@ -232,7 +233,7 @@ TEST(api_get_profile_structures, get_features) {
 }
 
 TEST(api_get_profile_feature_structure_types, properties_full) {
-    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
 
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfileFeatureStructureTypes(&profile, nullptr, &propertyCount, nullptr);
@@ -253,7 +254,7 @@ TEST(api_get_profile_feature_structure_types, properties_full) {
 }
 
 TEST(api_get_profile_feature_structure_types, properties_partial) {
-    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
 
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfileFeatureStructureTypes(&profile, nullptr, &propertyCount, nullptr);
@@ -273,7 +274,7 @@ TEST(api_get_profile_feature_structure_types, properties_partial) {
 }
 
 TEST(api_get_profile_property_structure_types, properties_full) {
-    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
 
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfilePropertyStructureTypes(&profile, nullptr, &propertyCount, nullptr);
@@ -294,7 +295,7 @@ TEST(api_get_profile_property_structure_types, properties_full) {
 }
 
 TEST(api_get_profile_property_structure_types, properties_partial) {
-    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, 1};
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
 
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfilePropertyStructureTypes(&profile, nullptr, &propertyCount, nullptr);
