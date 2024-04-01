@@ -11,7 +11,15 @@
 
 # Release Notes
 
-## [Vulkan Profiles Toolset 1.3.XXX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - March 2024
+## [Vulkan Profiles Tools 1.3.XXX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - May 2024
+
+### Bugfixes:
+- Fix use of vkGetPhysicalDeviceProperties that could not be externally loaded
+
+### Deprecation:
+- Remove `VP_LUNARG_desktop_baseline_XXXX` profiles from default generated library
+
+## [Vulkan Profiles Tools 1.3.280](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.280.0) - March 2024
 
 ### Features:
 - Force device selection is not BETA anymore
@@ -40,7 +48,7 @@
 ### Deprecation:
 - Remove `VP_LUNARG_desktop_baseline_2024.json`, `VP_LUNARG_desktop_baseline_2023.json` and `VP_LUNARG_desktop_baseline_2022.json`
 
-## [Vulkan Profiles Toolset 1.3.275](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.275.0) - January 2024
+## [Vulkan Profiles Tools 1.3.275](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.275.0) - January 2024
 
 ### Features:
 - Add API library merging of additional application features and extensions
@@ -59,14 +67,14 @@
 - Remove API library overriding features and extensions modes
 - Remove `VP_LUNARG_desktop_portability_2022` profile
 
-## [Vulkan Profiles Toolset 1.3.261](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.261.0) - August 2023
+## [Vulkan Profiles Tools 1.3.261](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.261.0) - August 2023
 
 ### Bugfixes:
 - Fix query of capabilities of aliased extensions
 - Fix error message typo
 - Fix library generation when using profiles with multiple variants #464
 
-## [Vulkan Profiles Toolset 1.3.250](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.250.0) - June 2023
+## [Vulkan Profiles Tools 1.3.250](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.250.0) - June 2023
 
 ### Features:
 - Add a setting to control how layer features are initialized when a feature is not specified in a selected profile.
@@ -78,13 +86,13 @@
 ### Bugfixes:
 - Fix invalid message when trying to override a supported capability to unsupported #393
 
-## [Vulkan Profiles Toolset 1.3.243](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.243.0) - April 2023
+## [Vulkan Profiles Tools 1.3.243](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.243.0) - April 2023
 
 ### Features:
 - Add LunarG Desktop Baseline 2023 profile (Vulkan 1.2)
 - Update LunarG Desktop Baseline 2022 profile (Vulkan 1.1) to match updated MoltenVK support.
 
-## [Vulkan Profiles Toolset 1.3.239](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.239.0) - February 2023
+## [Vulkan Profiles Tools 1.3.239](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.239.0) - February 2023
 
 ### Features:
 - Add Android Baseline 2022 profile
@@ -92,7 +100,7 @@
 ### Improvements:
 - Improve handling of `VkFormatProperties*` from profile data which can be query with any Vulkan functions
 
-## [Vulkan Profiles Toolset 1.3.236](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.236.0) - December 2022
+## [Vulkan Profiles Tools 1.3.236](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.236.0) - December 2022
 
 ### Features:
 - Add merge script support of `VkFormatProperties3` #304 #237
@@ -103,7 +111,7 @@
 ### Bugfixes:
 - Fix warning when emulating `VK_EXT_portability_subset`
 
-## [Vulkan Profiles Toolset 1.3.231](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.231.0) - October 2022
+## [Vulkan Profiles Tools 1.3.231](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.231.0) - October 2022
 
 ### Features:
 - Add layer settings to override portability subset. #295
@@ -118,7 +126,7 @@
 - Fix handling of 64 bits properties by the merge tool. #294
 - Fix float build warnings. #291
 
-## [Vulkan Profiles Toolset 1.3.224](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.224.0) - August 2022
+## [Vulkan Profiles Tools 1.3.224](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.224.0) - August 2022
 
 ### Features:
 - Add script to merge (union and intersection) multiple profiles
@@ -138,7 +146,7 @@
 - Remove `VP_LUNARG_desktop_portability_2021` profile
 - Remove `VP_LUNARG_desktop_portability_2021_subset` profile
 
-## [Vulkan Profiles Toolset 1.3.216](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.216.0) - June 2022
+## [Vulkan Profiles Tools 1.3.216](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.216.0) - June 2022
 
 ### Features:
 - Add `VK_KHR_portability_enumeration` support
@@ -146,12 +154,12 @@
 ### Bugfixes:
 - Fix Roadmap 2022 JSON file definision
 
-## [Vulkan Profiles Toolset 1.3.211](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.211.0) - April 2022
+## [Vulkan Profiles Tools 1.3.211](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.211.0) - April 2022
 
 ### Improvements:
 - Add *Profiles layer* is generated with Python code
 
-## [Vulkan Profiles Toolset 1.3.204](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.204.1) - February 2022
+## [Vulkan Profiles Tools 1.3.204](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.204.1) - February 2022
 
 ### Features:
 - Add *Vulkan Profiles schema*
