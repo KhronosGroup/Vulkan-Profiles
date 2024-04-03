@@ -115,7 +115,6 @@
                         "maxViewports": 1,
                         "maxViewportDimensions": [ 4096, 4096 ],
                         "viewportBoundsRange": [ -8192, 8191 ],
-                        "minMemoryMapAlignment": 4096,
                         "minTexelBufferOffsetAlignment": 256,
                         "minUniformBufferOffsetAlignment": 256,
                         "minStorageBufferOffsetAlignment": 256,
@@ -778,7 +777,7 @@
     },
     "profiles": {
         "VP_ANDROID_baseline_2022": {
-            "version": 1,
+            "version": 2,
             "api-version": "1.1.106",
             "label": "Android Vulkan Baseline 2022 profile",
             "description": "Collection of functionality that is broadly supported on Android",
@@ -795,6 +794,12 @@
                 }
             },
             "history": [
+                {
+                    "revision": 2,
+                    "date": "2024-04-03",
+                    "author": "Ian Elliott",
+                    "comment": "Remove minMemoryMapAlignment, which was incorrectly specified"
+                },
                 {
                     "revision": 1,
                     "date": "2022-12-23",
