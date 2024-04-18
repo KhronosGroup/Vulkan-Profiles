@@ -226,8 +226,8 @@
                     "settings": [
                         {
                             "key": "profile_dirs",
-                            "label": "Profiles Directories",
-                            "description": "Select the location all the profiles.",
+                            "label": "Profiles Directory",
+                            "description": "Select the location of all the profiles.",
                             "type": "LOAD_FOLDER",
                             "format": "PROFILE",
                             "default": "",
@@ -1272,6 +1272,213 @@
                         "DEBUG_REPORT_NOTIFICATION_BIT",
                         "DEBUG_REPORT_WARNING_BIT",
                         "DEBUG_REPORT_ERROR_BIT"
+                    ]
+                },
+                {
+                    "key": "generate_profile",
+                    "label": "Generate Profile File",
+                    "description": "Force the Physical Device identified by the device UUID.",
+                    "status": "STATUS",
+                    "type": "COMMAND",
+                    "command": "${PYTHON} ${gen_profile_file} --registry ${registry} --input ${gen_profile_input_dir} --output-path ${gen_profile_output_dir} --output-profile ${gen_profile_output_name} --profile-label ${gen_profile_label} --profile-desc ${gen_profile_desc} --profile-date ${gen_profile_date} --profile-stage ${gen_profile_stage} --profile-api-version ${gen_profile_api_version}",
+                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                    "settings": [
+                        {
+                            "key": "gen_profile_file",
+                            "label": "Vulkan Profile Merge Script",
+                            "description": "Select the location of the Vulkan profiles merge script.",
+                            "type": "LOAD_FILE",
+                            "default": "${VULKAN_SDK}/share/vulkan/registry/gen_profiles_file.py"
+                        },
+                        {
+                            "key": "registry",
+                            "label": "Vulkan Profile Merge Script",
+                            "description": "Select the location of the Vulkan profiles merge script.",
+                            "type": "LOAD_FILE",
+                            "default": "${VULKAN_SDK}/share/vulkan/registry/vk.xml"
+                        },
+                        {
+                            "key": "gen_profile_input_dir",
+                            "label": "Profiles Input Directory",
+                            "description": "Select the location of the source profiles.",
+                            "type": "LOAD_FOLDER",
+                            "default": ""
+                        },
+                        {
+                            "key": "gen_profile_output_dir",
+                            "label": "Profiles Output Directory",
+                            "description": "Select the location of the source profiles.",
+                            "type": "SAVE_FOLDER",
+                            "default": ""
+                        },
+                        {
+                            "key": "gen_profile_output_name",
+                            "label": "Label",
+                            "description": "Select the location of the source profiles.",
+                            "type": "STRING",
+                            "default": "VP_LUNARG_my_generated_profile"
+                        },
+                        {
+                            "key": "gen_profile_label",
+                            "label": "Label",
+                            "description": "Select the location of the source profiles.",
+                            "type": "STRING",
+                            "default": ""
+                        },
+                        {
+                            "key": "gen_profile_desc",
+                            "label": "Description",
+                            "description": "Select the location of the source profiles.",
+                            "type": "STRING",
+                            "default": ""
+                        },
+                        {
+                            "key": "gen_profile_date",
+                            "label": "Release Date",
+                            "description": "Select the location of the source profiles.",
+                            "type": "DATE",
+                            "default": ""
+                        },
+                        {
+                            "key": "gen_profile_stage",
+                            "label": "Development Stage",
+                            "description": "Select the location of the source profiles.",
+                            "type": "ENUM",
+                            "default": "STABLE",
+                            "flags": [
+                                {
+                                    "key": "PROFILE_STABLE",
+                                    "label": "STABLE",
+                                    "description": "Stable Development Stage."
+                                },
+                                {
+                                    "key": "PROFILE_BETA",
+                                    "label": "BETA",
+                                    "description": "Beta Development Stage."
+                                },
+                                {
+                                    "key": "PROFILE_ALPHA",
+                                    "label": "ALPHA",
+                                    "description": "Alpha Development Stage."
+                                },
+                                {
+                                    "key": "PROFILE_DEPRECATED",
+                                    "label": "DEPRECATED",
+                                    "description": "Deprecated Development Stage."
+                                }
+                            ]
+                        },
+                        {
+                            "key": "gen_profile_api_version",
+                            "label": "API version",
+                            "description": "Select the location of the source profiles.",
+                            "type": "STRING",
+                            "default": ""
+                        }
+                    ]
+                },
+                {
+                    "key": "generate_library",
+                    "label": "Generate Profile API Library",
+                    "description": "Force the Physical Device identified by the device UUID.",
+                    "status": "STATUS",
+                    "type": "COMMAND",
+                    "command": "${PYTHON} ${gen_profile_solution} --registry ${registry} --input ${gen_profile_input_dir} --output-library-inc ${gen_profile_library_output} --config ${gen_profile_config}",
+                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                    "settings": [
+                        {
+                            "key": "gen_profile_solution",
+                            "label": "Vulkan Profile API library script",
+                            "description": "Select the location of the Vulkan profiles merge script.",
+                            "type": "LOAD_FILE",
+                            "default": "${VULKAN_SDK}/share/vulkan/registry/gen_profiles_solution.py"
+                        },
+                        {
+                            "key": "registry",
+                            "label": "Vulkan Profile Merge Script",
+                            "description": "Select the location of the Vulkan profiles merge script.",
+                            "type": "LOAD_FILE",
+                            "default": "${VULKAN_SDK}/share/vulkan/registry/vk.xml"
+                        },
+                        {
+                            "key": "gen_profile_input_dir",
+                            "label": "Profiles Input Directory",
+                            "description": "Select the location of the source profiles.",
+                            "type": "LOAD_FOLDER",
+                            "default": ""
+                        },
+                        {
+                            "key": "gen_profile_library_output",
+                            "label": "Profiles Output Directory",
+                            "description": "Select the location of the source profiles.",
+                            "type": "SAVE_FOLDER",
+                            "default": ""
+                        },
+                        {
+                            "key": "gen_profile_config",
+                            "label": "Generation Configuration",
+                            "description": "Select the location of the source profiles.",
+                            "type": "ENUM",
+                            "default": "RELEASE",
+                            "flags": [
+                                {
+                                    "key": "PROFILE_CONFIG_RELEASE",
+                                    "label": "RELEASE",
+                                    "description": "Release Build."
+                                },
+                                {
+                                    "key": "PROFILE_CONFIG_DEBUG",
+                                    "label": "DEBUG",
+                                    "description": "Debug Build."
+                                }
+                            ]
+                        },
+                        {
+                            "key": "gen_profile_api_version",
+                            "label": "API version",
+                            "description": "Select the location of the source profiles.",
+                            "type": "STRING",
+                            "default": ""
+                        }
+                    ]
+                },
+                {
+                    "key": "generate_documentation",
+                    "label": "Generate Profile Documentation",
+                    "description": "Force the Physical Device identified by the device UUID.",
+                    "status": "STATUS",
+                    "type": "COMMAND",
+                    "command": "${PYTHON} ${gen_profile_solution} --registry ${registry} --input ${gen_profile_input_dir} --output-doc ${gen_profile_doc_output}",
+                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                    "settings": [
+                        {
+                            "key": "gen_profile_solution",
+                            "label": "Vulkan Profile API library script",
+                            "description": "Select the location of the Vulkan profiles merge script.",
+                            "type": "LOAD_FILE",
+                            "default": "${VULKAN_SDK}/share/vulkan/registry/gen_profiles_solution.py"
+                        },
+                        {
+                            "key": "registry",
+                            "label": "Vulkan Profile Merge Script",
+                            "description": "Select the location of the Vulkan profiles merge script.",
+                            "type": "LOAD_FILE",
+                            "default": "${VULKAN_SDK}/share/vulkan/registry/vk.xml"
+                        },
+                        {
+                            "key": "gen_profile_input_dir",
+                            "label": "Profiles Input Directory",
+                            "description": "Select the location of the source profiles.",
+                            "type": "LOAD_FOLDER",
+                            "default": "${VULKAN_SDK}/Config/VK_LAYER_KHRONOS_profiles"
+                        },
+                        {
+                            "key": "gen_profile_doc_output",
+                            "label": "Profiles Output Directory",
+                            "description": "Select the location of the source profiles.",
+                            "type": "SAVE_FILE",
+                            "default": "/PROFILES_ALL.md"
+                        }
                     ]
                 }
             ]
