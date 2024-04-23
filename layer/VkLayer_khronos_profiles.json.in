@@ -226,7 +226,7 @@
                     "settings": [
                         {
                             "key": "profile_dirs",
-                            "label": "Profiles Directories",
+                            "label": "Loading Directory",
                             "description": "Select the location all the profiles.",
                             "type": "LOAD_FOLDER",
                             "format": "PROFILE",
@@ -243,8 +243,8 @@
                         },
                         {
                             "key": "profile_name",
-                            "label": "Profile Name",
-                            "description": "Name of the profile specified by the profile file to use. If set to ${VP_DEFAULT}, the layer will load the first profile in the file.",
+                            "label": "Name",
+                            "description": "Name of the profile specified by the profile file to use.",
                             "type": "ENUM",
                             "flags": [],
                             "default": "${VP_DEFAULT}",
