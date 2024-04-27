@@ -3534,8 +3534,17 @@ class VulkanProfilesLayerGenerator():
     def generate_physical_device_chain_case(self, ext, version, property_names, feature_names):
         gen = self.generate_platform_protect_begin(ext)
         if ext:
-            ext_name = registry.extensions[ext].upperCaseName
-            gen += '\n                if (PhysicalDeviceData::HasExtension(&pdd, ' + ext_name + '_EXTENSION_NAME)) {\n'
+            gen += '\n                if ('
+            first = True
+            for promotedTo in [ext] + registry.getExtensionPromotedToExtensionList(ext):
+                if first:
+                    first = False
+                else:
+                    gen += ' || '
+                gen += 'PhysicalDeviceData::HasExtension(&pdd, '
+                gen += registry.extensions[promotedTo].upperCaseName + '_EXTENSION_NAME'
+                gen += ')'
+            gen += ') {\n'
         else:
             gen += '\n                if (api_version_above_' + str(version.major) + '_' + str(version.minor) + ') {\n'
         for property_name in property_names:
