@@ -184,6 +184,7 @@ class PhysicalDeviceData {
     uint32_t GetEffectiveVersion() {
         return requested_version < physical_device_properties_.apiVersion ? requested_version
                                                                           : physical_device_properties_.apiVersion;
+
     }
 
     VkInstance instance() const { return instance_; }
@@ -1984,8 +1985,9 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
         }
     }
 
+
     bool changed_version = false;
-    if (!layer_settings->simulate.profile_file.empty() || layer_settings->simulate.profile_dirs.empty()) {
+    if (!layer_settings->simulate.profile_file.empty() || !layer_settings->simulate.profile_dirs.empty()) {
         const uint32_t profile_api_version = json_loader.GetProfileApiVersion();
         if (VK_API_VERSION_MAJOR(requested_version) < VK_API_VERSION_MAJOR(profile_api_version) ||
             VK_API_VERSION_MINOR(requested_version) < VK_API_VERSION_MINOR(profile_api_version)) {
