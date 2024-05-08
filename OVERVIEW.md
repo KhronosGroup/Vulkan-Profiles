@@ -70,11 +70,6 @@ The following diagram shows the Vulkan Profiles Toolset generation pipeline with
 
 Note: The *Profiles layer* is not yet code-generated but it will be in the future.
 
-## Future Work:
-  - [GPUInfo.org](https://gpuinfo.org/) will allow downloading profiles JSON files for any Vulkan driver report.
-  - [`vulkaninfo`](https://vulkan.lunarg.com/doc/view/latest/windows/vulkaninfo.html) will allow generating profiles JSON files.
-  - The [Khronos Vulkan-Samples](https://github.com/KhronosGroup/Vulkan-Samples) repository will include a sample that uses the *Vulkan Profiles API Library*.
-
 ## The Vulkan Profiles JSON Schema
 
 The Profiles layer builds its internal data tables by querying the capabilities of the underlying actual device, then applying the selected Vulkan Profile "on top of" of those tables. Therefore we only need to specify the features we wish to modify from the actual device; tweaking a single feature is easy. Here's an example of a valid *Vulkan Profiles* file for changing only the maximum permitted viewport size:
