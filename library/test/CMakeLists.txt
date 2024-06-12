@@ -139,8 +139,8 @@ function (create_android_package NAME)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${apk_test_target}> ${PROJECT_BINARY_DIR}/apk/out/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:${apk_test_target}>
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${NAME}> ${PROJECT_BINARY_DIR}/apk/out/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:${NAME}>
         COMMAND ${_aapt} package -f -M ${CMAKE_CURRENT_SOURCE_DIR}/platforms/android/AndroidManifest.xml -I ${_android_jar} -F ${PROJECT_BINARY_DIR}/apk/out/${apk_test_target}-unaligned.apk ${PROJECT_BINARY_DIR}/apk/out
-        COMMAND jarsigner -verbose -keystore $ENV{HOME}/.android/debug.keystore -storepass android -keypass android ${PROJECT_BINARY_DIR}/apk/out/${apk_test_target}-unaligned.apk androiddebugkey
         COMMAND ${_zipalign} -f 4 ${PROJECT_BINARY_DIR}/apk/out/${apk_test_target}-unaligned.apk ${PROJECT_BINARY_DIR}/apk/out/${apk_test_target}.apk
+        COMMAND apksigner sign --verbose --ks $ENV{HOME}/.android/debug.keystore --ks-pass pass:android ${PROJECT_BINARY_DIR}/apk/out/${apk_test_target}.apk
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/..)
 endfunction(create_android_package)
 
