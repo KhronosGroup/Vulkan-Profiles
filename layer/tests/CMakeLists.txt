@@ -148,8 +148,8 @@ function(LayerTestAndroid NAME)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${ANDROID_APK_NAME}> ${PROJECT_BINARY_DIR}/apk/out/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:${ANDROID_APK_NAME}>
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:ProfilesLayer> ${PROJECT_BINARY_DIR}/apk/out/lib/${ANDROID_ABI}/$<TARGET_FILE_NAME:ProfilesLayer>
         COMMAND ${_aapt} package -f -M ${CMAKE_CURRENT_SOURCE_DIR}/platforms/android/AndroidManifest.xml -I ${_android_jar} -A ${PROJECT_BINARY_DIR}/apk/assets -F ${PROJECT_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}-unaligned.apk ${PROJECT_BINARY_DIR}/apk/out
-        COMMAND jarsigner -verbose -keystore $ENV{HOME}/.android/debug.keystore -storepass android -keypass android ${PROJECT_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}-unaligned.apk androiddebugkey
         COMMAND ${_zipalign} -f 4 ${PROJECT_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}-unaligned.apk ${PROJECT_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}.apk
+        COMMAND apksigner sign --verbose --ks $ENV{HOME}/.android/debug.keystore --ks-pass pass:android ${PROJECT_BINARY_DIR}/apk/out/${ANDROID_APK_NAME}.apk
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
     set_tests_properties(${TEST_NAME} PROPERTIES ENVIRONMENT "${run_environment}")
