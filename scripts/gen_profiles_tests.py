@@ -155,7 +155,7 @@ class ProfileGenerator():
     i = 1
     skipped_features = []
     skipped_members = ["sType", "pNext", "physicalDevices", "driverID"]
-    skipped_properties_structs = ["VkPhysicalDeviceHostImageCopyPropertiesEXT", "VkPhysicalDeviceLineRasterizationPropertiesEXT"]
+    skipped_properties_structs = ["VkPhysicalDeviceHostImageCopyPropertiesEXT", "VkPhysicalDeviceLineRasterizationPropertiesEXT", "VkPhysicalDeviceLayeredApiPropertiesListKHR"]
 
     def generate_profile(self, outProfile, registry):
         with open(outProfile, 'w') as f:
