@@ -1664,21 +1664,26 @@ VkResult JsonLoader::LoadProfilesDatabase() {
     for (std::size_t i = 0, n = layer_settings.simulate.profile_dirs.size(); i < n; ++i) {
         const std::string& path = layer_settings.simulate.profile_dirs[i];
 
-      for (const auto& entry : fs::directory_iterator(path)) {
-          if (fs::is_directory(entry.path())) {
-              continue;
-          }
+        if (fs::is_regular_file(path)) {
+            this->LoadFile(path);
+            continue;
+        }
+        
+        for (const auto& entry : fs::directory_iterator(path)) {
+            if (fs::is_directory(entry.path())) {
+                continue;
+            }
 
-          const std::string& file_path = entry.path().generic_string();
-          if (!EndsWith(file_path, ".json")) {
-              continue;
-          }
+            const std::string& file_path = entry.path().generic_string();
+            if (!EndsWith(file_path, ".json")) {
+                continue;
+            }
 
-          VkResult result = this->LoadFile(file_path);
-          if (result != VK_SUCCESS) {
-              continue;
-          }
-      }
+            VkResult result = this->LoadFile(file_path);
+            if (result != VK_SUCCESS) {
+                continue;
+            }
+        }
     }
 
     LogFoundProfiles();

@@ -248,6 +248,44 @@ TEST_F(TestsMechanism, selecting_profile_file) {
     }
 }
 
+TEST_F(TestsMechanism, selecting_profile_file_not_found) {
+    TEST_DESCRIPTION("Test selecting profile from a profiles file which is not found");
+
+    VkResult err = VK_SUCCESS;
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    // Only override extensions
+    {
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_not_found.json";
+        const char* profile_name_data = "VP_LUNARG_test_not_found";
+        VkBool32 emulate_portability_data = VK_FALSE;
+        const std::vector<const char*> simulate_capabilities = {"SIMULATE_EXTENSIONS_BIT"};
+        const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
+
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
+            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT,
+             static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
+
+        err = inst_builder.init(settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            inst_builder.reset();
+            return;
+        }
+
+        inst_builder.reset();
+    }
+}
+
 TEST_F(TestsMechanism, selecting_profile_dirs) {
     TEST_DESCRIPTION("Test selecting profile from a profiles file with multiple profiles");
 
@@ -267,6 +305,57 @@ TEST_F(TestsMechanism, selecting_profile_dirs) {
             {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
             {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
             {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
+
+        err = inst_builder.init(settings);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        VkPhysicalDevice gpu;
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+        if (err != VK_SUCCESS) {
+            printf("Profile not supported on device, skipping test.\n");
+            inst_builder.reset();
+            return;
+        }
+
+        VkResult result = VK_SUCCESS;
+
+        uint32_t extCount = 0;
+        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
+        ASSERT_EQ(result, VK_SUCCESS);
+
+        EXPECT_EQ(1, extCount);
+
+        std::vector<VkExtensionProperties> ext(extCount);
+        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
+        ASSERT_EQ(result, VK_SUCCESS);
+
+        EXPECT_STREQ("VK_KHR_maintenance3", ext[0].extensionName);
+
+        inst_builder.reset();
+    }
+}
+
+TEST_F(TestsMechanism, selecting_profile_dirs_not_found) {
+    TEST_DESCRIPTION("Test selecting profile from a profiles dir using a profile file path");
+
+    VkResult err = VK_SUCCESS;
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    {
+        const char* profile_dirs_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_device_extensions.json"; // Not a dir!
+        const char* profile_name_data = "VP_LUNARG_test_device_extensions";
+        VkBool32 emulate_portability_data = VK_FALSE;
+        const std::vector<const char*> simulate_capabilities = {"SIMULATE_MAX_ENUM"};
+        const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
+
+        std::vector<VkLayerSettingEXT> settings = {
+            {kLayerName, kLayerSettingsProfileDirs, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_dirs_data},
+            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
+            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT,
+             static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
             {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
 
         err = inst_builder.init(settings);
