@@ -286,3 +286,11 @@ TEST(test_validate, VP_ANDROID_15_minimums) {
     const Json::Value json_document3 = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(json_document3));
 }
+
+TEST(test_validate, VP_ANDROID_16_minimums) {
+    JsonValidator validator;
+
+    const std::string path = std::string(PROFILE_FILES_PATH) + "VP_ANDROID_16_minimums.json";
+    const Json::Value json_document3 = ParseJsonFile(path.c_str());
+    EXPECT_TRUE(validator.Check(json_document3));
+}
