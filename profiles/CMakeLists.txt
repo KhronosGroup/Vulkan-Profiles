@@ -50,7 +50,7 @@ set_target_properties(VpCreateDesktopMax2024 PROPERTIES FOLDER "Profiles generat
 add_custom_target(VpCreateDesktopBaseline ALL
     COMMAND Python3::Interpreter ${MERGE_SCRIPT}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-        --config ${CMAKE_CURRENT_LIST_DIR}/VP_LUNARG_desktop_baseline_config.json
+        --config ${CMAKE_CURRENT_LIST_DIR}/config/VP_LUNARG_desktop_baseline_config.json
         --output-path ${CMAKE_CURRENT_LIST_DIR}/VP_LUNARG_desktop_baseline.json
         --strip-duplicate-structs
     VERBATIM
