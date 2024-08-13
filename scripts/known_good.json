@@ -68,7 +68,10 @@
             "sub_dir": "valijson",
             "build_dir": "valijson/build",
             "install_dir": "valijson/build/install",
-            "commit": "v1.0.1"
+            "commit": "v1.0.1",
+            "cmake_options": [
+                "-DCMAKE_POLICY_DEFAULT_CMP0057=NEW"
+            ]
         },
         {
             "name": "googletest",
