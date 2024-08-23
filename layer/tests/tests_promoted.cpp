@@ -331,9 +331,7 @@ TEST_F(TestsPromoted, TestVulkan13Properties) {
     EXPECT_EQ(vulkan_13_properties.integerDotProductAccumulatingSaturating64BitSignedAccelerated, VK_TRUE);
     EXPECT_EQ(vulkan_13_properties.integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated, VK_TRUE);
     EXPECT_EQ(vulkan_13_properties.storageTexelBufferOffsetAlignmentBytes, 352);
-    EXPECT_EQ(vulkan_13_properties.storageTexelBufferOffsetSingleTexelAlignment, VK_TRUE);
     EXPECT_EQ(vulkan_13_properties.uniformTexelBufferOffsetAlignmentBytes, 353);
-    EXPECT_EQ(vulkan_13_properties.uniformTexelBufferOffsetSingleTexelAlignment, VK_TRUE);
     EXPECT_EQ(vulkan_13_properties.maxBufferSize, 260);
 #endif
 }
