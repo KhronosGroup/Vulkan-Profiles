@@ -3033,7 +3033,7 @@ class VulkanProfilesLayerGenerator():
 
         gen += self.generate_string_to_image_layout(registry.enums['VkImageLayout'].values)
 
-        gen += self.generate_string_to_uint(('VkToolPurposeFlagBits', 'VkSampleCountFlagBits', 'VkResolveModeFlagBits', 'VkShaderStageFlagBits', 'VkSubgroupFeatureFlagBits', 'VkShaderFloatControlsIndependence', 'VkPointClippingBehavior', 'VkOpticalFlowGridSizeFlagBitsNV', 'VkQueueFlagBits', 'VkMemoryDecompressionMethodFlagBitsNV', 'VkLayeredDriverUnderlyingApiMSFT', 'VkImageUsageFlagBits', 'VkBufferUsageFlagBits', 'VkPhysicalDeviceSchedulingControlsFlagBitsARM'), registry.enums)
+        gen += self.generate_string_to_uint(('VkToolPurposeFlagBits', 'VkSampleCountFlagBits', 'VkResolveModeFlagBits', 'VkShaderStageFlagBits', 'VkSubgroupFeatureFlagBits', 'VkShaderFloatControlsIndependence', 'VkPointClippingBehavior', 'VkOpticalFlowGridSizeFlagBitsNV', 'VkQueueFlagBits', 'VkMemoryDecompressionMethodFlagBitsNV', 'VkLayeredDriverUnderlyingApiMSFT', 'VkImageUsageFlagBits', 'VkBufferUsageFlagBits', 'VkPhysicalDeviceSchedulingControlsFlagBitsARM', 'VkIndirectCommandsInputModeFlagBitsEXT'), registry.enums)
 
         gen += self.generate_string_to_flag_functions(('VkFormatFeatureFlags', 'VkQueueFlags', 'VkQueueGlobalPriorityKHR', 'VkVideoCodecOperationFlagsKHR', 'VkPipelineStageFlags', 'VkPipelineStageFlags2', 'VkFormatFeatureFlags2'))
 
