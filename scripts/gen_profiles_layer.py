@@ -204,6 +204,12 @@ class PhysicalDeviceData {
     MapOfVkExtensionProperties map_of_extension_properties_;
     ArrayOfVkQueueFamilyProperties arrayof_queue_family_properties_;
 
+    // Space for array queries:
+    //
+    // - From VkPhysicalDeviceHostImageCopyPropertiesEXT
+    std::vector<VkImageLayout> pCopySrcLayouts_;
+    std::vector<VkImageLayout> pCopyDstLayouts_;
+
     bool vulkan_1_1_properties_written_;
     bool vulkan_1_2_properties_written_;
     bool vulkan_1_3_properties_written_;
@@ -1004,7 +1010,7 @@ GET_VALUE_FUNCTIONS = '''
         return count;
     }
 
-    int GetArray(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, VkImageLayout *dest, bool not_modifiable) {
+    int GetArray(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, VkImageLayout *dest, uint32_t *destCount, bool not_modifiable) {
         (void)device_name;
 
         if (member != name) {
@@ -1017,6 +1023,7 @@ GET_VALUE_FUNCTIONS = '''
         }
         const int count = static_cast<int>(value.size());
         if (!not_modifiable) {
+            *destCount = count;
             for (int i = 0; i < count; ++i) {
                 dest[i] = StringToImageLayout(value[i].asCString());
             }
@@ -2951,9 +2958,7 @@ class VulkanProfilesLayerGenerator():
     emulated_extensions = ['VK_KHR_portability_subset']
     additional_features = ['VkPhysicalDeviceFeatures', 'VkPhysicalDevicePortabilitySubsetFeaturesKHR']
     additional_properties = ['VkPhysicalDeviceProperties', 'VkPhysicalDeviceLimits', 'VkPhysicalDeviceSparseProperties', 'VkPhysicalDeviceToolProperties', 'VkPhysicalDevicePortabilitySubsetPropertiesKHR']
-    # VkPhysicalDeviceHostImageCopyFeaturesEXT is not ignored to allow the people using the MockICD to still have the feature enabled,
-    # but use the properties in the MockICD until HostImageCopyPropertiesEXT is fixed.
-    ignored_structs = ['VkPhysicalDeviceHostImageCopyPropertiesEXT', 'VkPhysicalDeviceLayeredApiPropertiesListKHR']
+    ignored_structs = ['VkPhysicalDeviceLayeredApiPropertiesListKHR']
 
     def generate(self, path, registry):
         self.registry = registry
@@ -3233,6 +3238,13 @@ class VulkanProfilesLayerGenerator():
                         gen += '        return GetStruct(device_name, requested_profile, ' + struct + ', &pdd_->physical_device_properties_.limits);\n'
                     elif current == 'VkPhysicalDeviceSparseProperties':
                         gen += '        return GetStruct(device_name, requested_profile, ' + struct + ', &pdd_->physical_device_properties_.sparseProperties);\n'
+                    elif current.startswith('VkPhysicalDeviceHostImageCopyProperties'):
+                        # Initialize memory for src/dst layout arrays with a size that's way too big to be exceeded.
+                        gen += '        pdd_->pCopySrcLayouts_.resize(64);\n'
+                        gen += '        pdd_->pCopyDstLayouts_.resize(64);\n'
+                        gen += '        pdd_->' + self.create_var_name(current) + '.pCopySrcLayouts = pdd_->pCopySrcLayouts_.data();\n'
+                        gen += '        pdd_->' + self.create_var_name(current) + '.pCopyDstLayouts = pdd_->pCopyDstLayouts_.data();\n'
+                        gen += '        return GetStruct(device_name, requested_profile, ' + struct + ', &pdd_->' + self.create_var_name(current) + ');\n'
                     else:
                         gen += '        return GetStruct(device_name, requested_profile, ' + struct + ', &pdd_->' + self.create_var_name(current) + ');\n'
 
@@ -3630,9 +3642,10 @@ class VulkanProfilesLayerGenerator():
         gen += '    for (const auto &member : parent.getMemberNames()) {\n'
         for member_name in registry.structs[structure].members:
             member = registry.structs[structure].members[member_name]
-            not_modifiable = str(member.limittype == 'exact' or member.limittype == 'noauto').lower()
+            not_modifiable = str((member.limittype == 'exact' or member.limittype == 'noauto') and not member.isDynamicallySizedArrayWithCap()).lower()
             if member.isArray:
-                gen += '        GetArray(device_name, parent, member, "' + member_name + '", dest->' + member_name + ', ' + not_modifiable + ');\n'
+                gen += ('        GetArray(device_name, parent, member, "' + member_name + '", dest->' + member_name + ', ' +
+                        ('&dest->' + member.arraySizeMember + ', ' if member.isDynamicallySizedArrayWithCap() else '') + not_modifiable + ');\n')
             elif member.type in registry.enums:
                 gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ', ' + not_modifiable + ', requested_profile, WarnIfNotEqualEnum);\n'
             elif member.type == 'VkConformanceVersion' or member.type == 'VkToolPurposeFlags':

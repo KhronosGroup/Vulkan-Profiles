@@ -533,7 +533,11 @@ VPAPI_ATTR bool isPowerOfTwo(double source) {
     return !(value & (value - static_cast<std::uint64_t>(1)));
 }
 
-using PFN_vpStructFiller = void(*)(VkBaseOutStructure* p);
+using PFN_vpStructFiller = void(*)(
+#ifdef VP_USE_OBJECT
+    VpCapabilities capabilities,
+#endif//VP_USE_OBJECT
+    VkBaseOutStructure* p);
 using PFN_vpStructComparator = bool(*)(VkBaseOutStructure* p);
 using PFN_vpStructChainerCb =  void(*)(VkBaseOutStructure* p, void* pUser);
 using PFN_vpStructChainer = void(*)(VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb);
@@ -620,6 +624,17 @@ struct VpProfileDesc {
 template <typename T>
 VPAPI_ATTR bool vpCheckFlags(const T& actual, const uint64_t expected) {
     return (actual & expected) == expected;
+}
+
+template <typename T>
+VPAPI_ATTR bool vpCheckList(const T* data, uint32_t count, const T expected) {
+    for (uint32_t i = 0; i < count; ++i) {
+        if (data[i] == expected)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 '''
 
@@ -964,6 +979,12 @@ PUBLIC_IMPL_BODY = '''
 struct VpCapabilities_T : public VpVulkanFunctions {
     bool singleton = false;
     uint32_t apiVersion = VK_API_VERSION_1_0;
+
+    // Space for multi-pass queries:
+    //
+    // - From VkPhysicalDeviceHostImageCopyPropertiesEXT
+    std::vector<VkImageLayout> pCopySrcLayouts;
+    std::vector<VkImageLayout> pCopyDstLayouts;
 
     static VpCapabilities_T& Get() {
         static VpCapabilities_T instance;
@@ -1883,7 +1904,11 @@ VPAPI_ATTR VkResult vpCreateDevice(
                 VkBaseOutStructure* base_ptr = reinterpret_cast<VkBaseOutStructure*>(pFeatures);
                 if (variant->feature.pfnFiller != nullptr) {
                     while (base_ptr != nullptr) {
-                        variant->feature.pfnFiller(base_ptr);
+                        variant->feature.pfnFiller(
+#ifdef VP_USE_OBJECT
+                                                   capabilities,
+#endif//VP_USE_OBJECT
+                                                   base_ptr);
                         base_ptr = base_ptr->pNext;
                     }
                 }
@@ -1972,7 +1997,11 @@ VPAPI_ATTR VkResult vpGetProfileFeatures(
 
                 VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
                 while (p != nullptr) {
-                    variant.feature.pfnFiller(p);
+                    variant.feature.pfnFiller(
+#ifdef VP_USE_OBJECT
+                                              capabilities,
+#endif//VP_USE_OBJECT
+                                              p);
                     p = p->pNext;
                 }
             }
@@ -2026,7 +2055,11 @@ VPAPI_ATTR VkResult vpGetProfileProperties(
 
                 VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(pNext);
                 while (p != nullptr) {
-                    variant.property.pfnFiller(p);
+                    variant.property.pfnFiller(
+#ifdef VP_USE_OBJECT
+                                               capabilities,
+#endif//VP_USE_OBJECT
+                                               p);
                     p = p->pNext;
                 }
             }
@@ -2139,7 +2172,11 @@ VPAPI_ATTR VkResult vpGetProfileFormatProperties(
 
                     VkBaseOutStructure* base_ptr = static_cast<VkBaseOutStructure*>(static_cast<void*>(pNext));
                     while (base_ptr != nullptr) {
-                        variant.pFormats[format_index].pfnFiller(base_ptr);
+                        variant.pFormats[format_index].pfnFiller(
+#ifdef VP_USE_OBJECT
+                                                                 capabilities,
+#endif//VP_USE_OBJECT
+                                                                 base_ptr);
                         base_ptr = base_ptr->pNext;
                     }
 #if defined(VK_VERSION_1_3) || defined(VK_KHR_format_feature_flags2)
@@ -2149,14 +2186,22 @@ VPAPI_ATTR VkResult vpGetProfileFormatProperties(
                         detail::vpGetStructure(pNext, VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR));
                     if (fp3 != nullptr) {
                         VkFormatProperties2KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-                        variant.pFormats[format_index].pfnFiller(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
+                        variant.pFormats[format_index].pfnFiller(
+#ifdef VP_USE_OBJECT
+                                                                 capabilities,
+#endif//VP_USE_OBJECT
+                                                                 static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
                         fp3->linearTilingFeatures |= static_cast<VkFormatFeatureFlags2KHR>(fp3->linearTilingFeatures | fp.formatProperties.linearTilingFeatures);
                         fp3->optimalTilingFeatures |= static_cast<VkFormatFeatureFlags2KHR>(fp3->optimalTilingFeatures | fp.formatProperties.optimalTilingFeatures);
                         fp3->bufferFeatures |= static_cast<VkFormatFeatureFlags2KHR>(fp3->bufferFeatures | fp.formatProperties.bufferFeatures);
                     }
                     if (fp2 != nullptr) {
                         VkFormatProperties3KHR fp{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3_KHR };
-                        variant.pFormats[format_index].pfnFiller(static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
+                        variant.pFormats[format_index].pfnFiller(
+#ifdef VP_USE_OBJECT
+                                                                 capabilities,
+#endif//VP_USE_OBJECT
+                                                                 static_cast<VkBaseOutStructure*>(static_cast<void*>(&fp)));
                         fp2->formatProperties.linearTilingFeatures |= static_cast<VkFormatFeatureFlags>(fp2->formatProperties.linearTilingFeatures | fp.linearTilingFeatures);
                         fp2->formatProperties.optimalTilingFeatures |= static_cast<VkFormatFeatureFlags>(fp2->formatProperties.optimalTilingFeatures | fp.optimalTilingFeatures);
                         fp2->formatProperties.bufferFeatures |= static_cast<VkFormatFeatureFlags>(fp2->formatProperties.bufferFeatures | fp.bufferFeatures);
@@ -2334,6 +2379,10 @@ class VulkanStructMember():
         self.arraySizeMember = None
         self.nullTerminated = False
         self.arraySize = None
+        self.arraySizeCap = None
+
+    def isDynamicallySizedArrayWithCap(self):
+        return self.isArray and self.arraySizeCap is not None
 
 
 class VulkanStruct():
@@ -2517,7 +2566,7 @@ class VulkanExtension(VulkanDefinitionScope):
 
 
 # Dynamic arrays are ill-formed, but some of them still have a maximum size that can be used
-struct_with_valid_dynamic_array = ["VkQueueFamilyGlobalPriorityPropertiesKHR"]
+struct_with_valid_dynamic_array = ["VkQueueFamilyGlobalPriorityPropertiesKHR", "VkPhysicalDeviceHostImageCopyPropertiesEXT"]
 
 class VulkanRegistry():
     def __init__(self, registryFile, api = 'vulkan'):
@@ -2673,6 +2722,11 @@ class VulkanRegistry():
                                 # This is a pointer to an array with a corresponding count member
                                 structDef.members[name].isArray = True
                                 structDef.members[name].arraySizeMember = len
+
+                                # Some arrays have a natural maximum size even if they are dynamic.  For example, a list
+                                # of VkImageLayouts, because that enum itself is limited.
+                                if structDef.members[name].type == 'VkImageLayout':
+                                    structDef.members[name].arraySizeCap = 64;
 
             # If any of the members is a dynamic array then we should remove the corresponding count member
             for member in list(structDef.members.values()):
@@ -3779,17 +3833,34 @@ class VulkanProfile():
                         continue
                     if structDef.members[member].isArray:
                         if not isinstance(self.registry.evalArraySize(structDef.members[member].arraySize), int):
-                            Log.f("Unsupported array member '{0}' in structure '{1}'".format(member, structDef.name) +
-                                  "(currently only 1D non-dynamic arrays are supported in this context)")
-                        # If it's an array we have to generate per-element assignment code
-                        for i, v in enumerate(value):
-                            if type(v) == float:
-                                if structDef.members[member].type == 'double':
-                                    gen += fmt.format('{0}{1}[{2}] = {3}'.format(var, member, i, v))
-                                else:
-                                    gen += fmt.format('{0}{1}[{2}] = {3}f'.format(var, member, i, v))
+                            if structDef.members[member].arraySizeCap:
+                                # If it is a dynamically sized array (with a cap), point it to the pre-allocated array
+                                # created for this purpose.
+                                array_alloc = '#ifdef VP_USE_OBJECT\n'
+                                array_alloc += fmt.format('capabilities->{0}.resize({1})'.format(member,
+                                                                                        structDef.members[member].arraySizeCap))
+                                array_alloc += '#endif//VP_USE_OBJECT\n'
+                                gen = array_alloc + gen
+
+                                # Note: support for these arrays is only present with VP_USE_OBJECT.
+                                gen += '#ifdef VP_USE_OBJECT\n'
+                                gen += fmt.format('{0}{1} = {2}'.format(var, structDef.members[member].arraySizeMember,
+                                                                        structDef.members[member].arraySizeCap))
+                                gen += fmt.format('{0}{1} = capabilities->{2}.data()'.format(var, member, member))
+                                gen += '#endif//VP_USE_OBJECT\n'
                             else:
-                                gen += fmt.format('{0}{1}[{2}] = {3}'.format(var, member, i, v))
+                                Log.f("Unsupported array member '{0}' in structure '{1}'".format(member, structDef.name) +
+                                      "(currently only 1D non-dynamic arrays are supported in this context)")
+                        else:
+                            # If it's an array we have to generate per-element assignment code
+                            for i, v in enumerate(value):
+                                if type(v) == float:
+                                    if structDef.members[member].type == 'double':
+                                        gen += fmt.format('{0}{1}[{2}] = {3}'.format(var, member, i, v))
+                                    else:
+                                        gen += fmt.format('{0}{1}[{2}] = {3}f'.format(var, member, i, v))
+                                else:
+                                    gen += fmt.format('{0}{1}[{2}] = {3}'.format(var, member, i, v))
                     else:
                         # For enums and struct initialization, most of the code can be shared
                         isEnum = isinstance(value[0], str)
@@ -3897,14 +3968,23 @@ class VulkanProfile():
                         continue
                     if structDef.members[member].isArray:
                         if not isinstance(self.registry.evalArraySize(structDef.members[member].arraySize), int):
-                            Log.f("Unsupported array member '{0}' in structure '{1}'".format(member, structDef.name) +
-                                  "(currently only 1D non-dynamic arrays are supported in this context)")
-                        # If it's an array we have to generate per-element comparison code
-                        for i in range(len(value)):
-                            if limittype == 'range':
-                                gen += fmt.format(comparePredFmt[i].format('{0}{1}[{2}]'.format(var, member, i), value[i]))
+                            if structDef.members[member].arraySizeCap:
+                                # If it is a dynamically sized array (with a cap), check that the required elements are
+                                # present anywhere in the returned list.
+                                for i in range(len(value)):
+                                    gen += fmt.format('vpCheckList({0}{1}, {0}{2}, {3})'.format(var, member,
+                                                                                                structDef.members[member].arraySizeMember,
+                                                                                                value[i]))
                             else:
-                                gen += fmt.format(comparePredFmt.format('{0}{1}[{2}]'.format(var, member, i), value[i]))
+                                Log.f("Unsupported array member '{0}' in structure '{1}'".format(member, structDef.name) +
+                                      "(currently only 1D non-dynamic arrays are supported in this context)")
+                        else:
+                            # If it's an array we have to generate per-element comparison code
+                            for i in range(len(value)):
+                                if limittype == 'range':
+                                    gen += fmt.format(comparePredFmt[i].format('{0}{1}[{2}]'.format(var, member, i), value[i]))
+                                else:
+                                    gen += fmt.format(comparePredFmt.format('{0}{1}[{2}]'.format(var, member, i), value[i]))
                     else:
                         # Enum flags and basic structs can be compared directly
                         isEnum = isinstance(value[0], str)
@@ -4019,7 +4099,14 @@ class VulkanProfile():
 
         gen += ('\n'
                 'static const VpFeatureDesc featureDesc = {\n'
-                '    [](VkBaseOutStructure* p) { (void)p;\n')
+                '    [](\n'
+                '#ifdef VP_USE_OBJECT\n'
+                '       VpCapabilities capabilities,\n'
+                '#endif//VP_USE_OBJECT\n'
+                '       VkBaseOutStructure* p) { (void)p;\n'
+                '#ifdef VP_USE_OBJECT\n'
+                '           (void)capabilities;\n'
+                '#endif//VP_USE_OBJECT\n')
         gen += self.gen_structFunc(self.structs.feature, capabilities.features, self.gen_structFill, fillFmt)
         gen += ('    },\n'
                 '    [](VkBaseOutStructure* p) -> bool { (void)p;\n'
@@ -4037,7 +4124,14 @@ class VulkanProfile():
 
         gen += ('\n'
                 'static const VpPropertyDesc propertyDesc = {\n'
-                '    [](VkBaseOutStructure* p) { (void)p;\n')
+                '    [](\n'
+                '#ifdef VP_USE_OBJECT\n'
+                '       VpCapabilities capabilities,\n'
+                '#endif//VP_USE_OBJECT\n'
+                '       VkBaseOutStructure* p) { (void)p;\n'
+                '#ifdef VP_USE_OBJECT\n'
+                '           (void)capabilities;\n'
+                '#endif//VP_USE_OBJECT\n')
         gen += self.gen_structFunc(self.structs.property, capabilities.properties, self.gen_structFill, fillFmt)
         gen += ('    },\n'
                 '    [](VkBaseOutStructure* p) -> bool { (void)p;\n'
@@ -4053,7 +4147,14 @@ class VulkanProfile():
                     'static const VpQueueFamilyDesc queueFamilyDesc[] = {\n')
             for queueFamilyCaps in capabilities.queueFamiliesProperties:
                 gen += ('    {\n'
-                        '        [](VkBaseOutStructure* p) { (void)p;\n')
+                        '        [](\n'
+                        '#ifdef VP_USE_OBJECT\n'
+                        '        VpCapabilities capabilities,\n'
+                        '#endif//VP_USE_OBJECT\n'
+                        '       VkBaseOutStructure* p) { (void)p;\n'
+                        '#ifdef VP_USE_OBJECT\n'
+                        '           (void)capabilities;\n'
+                        '#endif//VP_USE_OBJECT\n')
                 gen += self.gen_structFunc(self.structs.queueFamily, queueFamilyCaps, self.gen_structFill, fillFmt)
                 gen += ('        },\n'
                         '        [](VkBaseOutStructure* p) -> bool { (void)p;\n'
@@ -4076,7 +4177,14 @@ class VulkanProfile():
 
                 gen += ('    {{\n'
                         '        {0},\n'
-                        '        [](VkBaseOutStructure* p) {{ (void)p;\n').format(formatName)
+                        '        [](\n'
+                        '#ifdef VP_USE_OBJECT\n'
+                        '           VpCapabilities capabilities,\n'
+                        '#endif//VP_USE_OBJECT\n'
+                        '           VkBaseOutStructure* p) {{ (void)p;\n'
+                        '#ifdef VP_USE_OBJECT\n'
+                        '               (void)capabilities;\n'
+                        '#endif//VP_USE_OBJECT\n').format(formatName)
                 gen += self.gen_structFunc(self.structs.format, formatCaps, self.gen_structFill, fillFmt)
                 gen += ('        },\n'
                         '        [](VkBaseOutStructure* p) -> bool { (void)p;\n'
@@ -4956,7 +5064,7 @@ class VulkanProfilesSchemaGenerator():
         return gen
 
 
-    def gen_array(self, type, size, definitions):
+    def gen_array(self, type, size, sizeCap, definitions):
         arraySize = self.registry.evalArraySize(size)
         if isinstance(arraySize, list) and len(arraySize) == 1:
             # This is the last dimension of a multi-dimensional array
@@ -4975,7 +5083,7 @@ class VulkanProfilesSchemaGenerator():
             # Multi-dimensional array
             return OrderedDict({
                 "type": "array",
-                "items": self.gen_array(type, arraySize[1:], definitions),
+                "items": self.gen_array(type, arraySize[1:], None, definitions),
                 "uniqueItems": False,
                 # We don't have information from vk.xml to be able to tell what's the minimum
                 # number of items that may need to be specified
@@ -4991,7 +5099,7 @@ class VulkanProfilesSchemaGenerator():
                 # We don't have information from vk.xml to be able to tell what's the minimum
                 # number of items that may need to be specified
                 # "minItems": arraySize,
-                "maxItems": arraySize
+                "maxItems": arraySize if arraySize is not None else sizeCap
             })
 
 
@@ -5051,7 +5159,7 @@ class VulkanProfilesSchemaGenerator():
                     # be included in the schema
                     Log.w("Ignoring member '{0}' in struct '{1}' containing ill-formed pointer to array".format(memberName, name))
                 else:
-                    members[memberDef.name] = self.gen_array(memberDef.type, memberDef.arraySize, definitions)
+                    members[memberDef.name] = self.gen_array(memberDef.type, memberDef.arraySize, memberDef.arraySizeCap, definitions)
             else:
                 members[memberDef.name] = self.gen_type(memberDef.type, definitions)
 
