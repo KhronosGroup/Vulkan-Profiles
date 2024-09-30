@@ -922,7 +922,6 @@ GET_VALUE_FUNCTIONS = '''
     }
 
     int GetArray(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, uint8_t *dest, bool not_modifiable) {
-        (void)not_modifiable;
         (void)device_name;
 
         if (member != name) {
@@ -934,14 +933,15 @@ GET_VALUE_FUNCTIONS = '''
             return -1;
         }
         const int count = static_cast<int>(value.size());
-        for (int i = 0; i < count; ++i) {
-            dest[i] = static_cast<uint8_t>(value[i].asUInt());
+        if (!not_modifiable) {
+            for (int i = 0; i < count; ++i) {
+                dest[i] = static_cast<uint8_t>(value[i].asUInt());
+            }
         }
         return count;
     }
 
     int GetArray(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, uint32_t *dest, bool not_modifiable) {
-        (void)not_modifiable;
         (void)device_name;
 
         if (member != name) {
@@ -953,14 +953,15 @@ GET_VALUE_FUNCTIONS = '''
             return -1;
         }
         const int count = static_cast<int>(value.size());
-        for (int i = 0; i < count; ++i) {
-            dest[i] = static_cast<uint32_t>(value[i].asUInt());
+        if (!not_modifiable) {
+            for (int i = 0; i < count; ++i) {
+                dest[i] = static_cast<uint32_t>(value[i].asUInt());
+            }
         }
         return count;
     }
 
     int GetArray(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, float *dest, bool not_modifiable) {
-        (void)not_modifiable;
         (void)device_name;
 
         if (member != name) {
@@ -972,14 +973,15 @@ GET_VALUE_FUNCTIONS = '''
             return -1;
         }
         const int count = static_cast<int>(value.size());
-        for (int i = 0; i < count; ++i) {
-            dest[i] = value[i].asFloat();
+        if (!not_modifiable) {
+            for (int i = 0; i < count; ++i) {
+                dest[i] = value[i].asFloat();
+            }
         }
         return count;
     }
 
     int GetArray(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, char *dest, bool not_modifiable) {
-        (void)not_modifiable;
         (void)device_name;
 
         if (member != name) {
@@ -992,16 +994,17 @@ GET_VALUE_FUNCTIONS = '''
         }
         const char *new_value = value.asCString();
         int count = 0;
-        dest[0] = '\\0';
-        if (new_value) {
-            count = static_cast<int>(strlen(new_value));
-            strcpy(dest, new_value);
+        if (!not_modifiable) {
+            dest[0] = '\\0';
+            if (new_value) {
+                count = static_cast<int>(strlen(new_value));
+                strcpy(dest, new_value);
+            }
         }
         return count;
     }
 
     int GetArray(const char* device_name, const Json::Value &parent, const std::string &member, const char *name, VkImageLayout *dest, bool not_modifiable) {
-        (void)not_modifiable;
         (void)device_name;
 
         if (member != name) {
@@ -1013,8 +1016,10 @@ GET_VALUE_FUNCTIONS = '''
             return -1;
         }
         const int count = static_cast<int>(value.size());
-        for (int i = 0; i < count; ++i) {
-            dest[i] = StringToImageLayout(value[i].asCString());
+        if (!not_modifiable) {
+            for (int i = 0; i < count; ++i) {
+                dest[i] = StringToImageLayout(value[i].asCString());
+            }
         }
         return count;
     }
