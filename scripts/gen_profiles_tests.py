@@ -624,7 +624,7 @@ class ProfileGenerator():
         for ext in value.definedByExtensions:
             gen += '#ifdef ' + registry.extensions[ext].name + '\n'
 
-        gen += '    bool supported = false;\n'
+        gen += '    bool supported = true;\n'
         for ext in value.definedByExtensions:
             gen += '    supported = supported && IsSupported(gpu_profile, "' + registry.extensions[ext].name + '");\n\n'
 
@@ -655,7 +655,7 @@ class ProfileGenerator():
                         if 'VkConformanceVersion' in member_type:
                             continue
 
-                        gen += '    if (supported) {\n'
+                        gen += '    if (!supported) {\n'
                         if type(property_value) is list:
                             if (len(property_value) > 1):
                                 for i in range(len(property_value)):
