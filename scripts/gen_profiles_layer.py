@@ -2074,21 +2074,6 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
         }
     }
 
-    // Add VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
-    VkApplicationInfo new_app_info;
-    if (app_info) {
-        new_app_info.sType = app_info->sType;
-        new_app_info.pNext = app_info->pNext;
-        new_app_info.pApplicationName = app_info->pApplicationName;
-        new_app_info.applicationVersion = app_info->applicationVersion;
-        new_app_info.pEngineName = app_info->pEngineName;
-        new_app_info.engineVersion = app_info->engineVersion;
-        new_app_info.apiVersion = requested_version;
-    } else {
-        new_app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        new_app_info.apiVersion = requested_version;
-    }
-
     VkInstanceCreateInfo create_info;
     create_info.sType = pCreateInfo->sType;
     create_info.pNext = pCreateInfo->pNext;
@@ -2097,13 +2082,29 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
         create_info.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
     }
 
+    VkApplicationInfo new_app_info;
     if (changed_version) {
+        if (app_info) {
+            new_app_info.sType = app_info->sType;
+            new_app_info.pNext = app_info->pNext;
+            new_app_info.pApplicationName = app_info->pApplicationName;
+            new_app_info.applicationVersion = app_info->applicationVersion;
+            new_app_info.pEngineName = app_info->pEngineName;
+            new_app_info.engineVersion = app_info->engineVersion;
+            new_app_info.apiVersion = requested_version;
+        } else {
+            new_app_info = {VK_STRUCTURE_TYPE_APPLICATION_INFO};
+            new_app_info.apiVersion = requested_version;
+        }
+
         create_info.pApplicationInfo = &new_app_info;
     } else {
         create_info.pApplicationInfo = app_info;
     }
     create_info.enabledLayerCount = pCreateInfo->enabledLayerCount;
     create_info.ppEnabledLayerNames = pCreateInfo->ppEnabledLayerNames;
+
+    // Add VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
     std::vector<const char *> extension_names;
     if (!get_physical_device_properties2_active) {
         create_info.enabledExtensionCount = pCreateInfo->enabledExtensionCount + 1;
