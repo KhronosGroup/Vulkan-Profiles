@@ -4,16 +4,13 @@
         "MUST": {
             "extensions": {
                 "VK_KHR_8bit_storage": 1,
-                "VK_KHR_global_priority": 1,
                 "VK_KHR_load_store_op_none": 1,
                 "VK_KHR_maintenance6": 1,
                 "VK_KHR_map_memory2": 1,
                 "VK_KHR_push_descriptor": 1,
                 "VK_KHR_shader_expect_assume": 1,
                 "VK_KHR_shader_float_controls2": 1,
-                "VK_KHR_shader_maximal_reconvergence": 1,
                 "VK_KHR_shader_subgroup_rotate": 1,
-                "VK_KHR_shader_subgroup_uniform_control_flow": 1,
                 "VK_KHR_swapchain_mutable_format": 1,
                 "VK_EXT_host_image_copy": 1,
                 "VK_EXT_image_2d_view_of_3d": 1,
@@ -23,7 +20,6 @@
             },
             "features": {
                 "VkPhysicalDeviceFeatures": {
-                    "depthClamp": true,
                     "fullDrawIndexUint32": true,
                     "shaderInt16": true
                 },
@@ -35,9 +31,6 @@
                     "samplerMirrorClampToEdge": true,
                     "scalarBlockLayout": true,
                     "runtimeDescriptorArray": true
-                },
-                "VkPhysicalDeviceProtectedMemoryFeatures": {
-                    "protectedMemory": true
                 },
                 "VkPhysicalDeviceShaderIntegerDotProductFeatures": {
                     "shaderIntegerDotProduct": true
