@@ -40,9 +40,6 @@
                 },
                 "VkPhysicalDeviceImage2DViewOf3DFeaturesEXT": {
                     "image2DViewOf3D": true
-                },
-                "VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR": {
-                    "shaderSubgroupUniformControlFlow": true
                 }
             },
             "properties": {
