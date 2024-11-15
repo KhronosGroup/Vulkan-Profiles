@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-276.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-301.json#",
     "capabilities": {
         "MUST": {
             "extensions": {
@@ -7,11 +7,13 @@
                 "VK_KHR_load_store_op_none": 1,
                 "VK_KHR_maintenance6": 1,
                 "VK_KHR_map_memory2": 1,
-                "VK_KHR_push_descriptor": 1,
                 "VK_KHR_shader_expect_assume": 1,
                 "VK_KHR_shader_float_controls2": 1,
+                "VK_KHR_shader_maximal_reconvergence": 1,
                 "VK_KHR_shader_subgroup_rotate": 1,
+                "VK_KHR_shader_subgroup_uniform_control_flow": 1,
                 "VK_KHR_swapchain_mutable_format": 1,
+                "VK_EXT_device_fault": 1,
                 "VK_EXT_host_image_copy": 1,
                 "VK_EXT_image_2d_view_of_3d": 1,
                 "VK_EXT_pipeline_protected_access": 1,
@@ -24,13 +26,11 @@
                     "shaderInt16": true
                 },
                 "VkPhysicalDeviceVulkan12Features": {
-                    "descriptorIndexing": true,
-                    "descriptorBindingUpdateUnusedWhilePending": true,
-                    "descriptorBindingPartiallyBound": true,
-                    "descriptorBindingVariableDescriptorCount": true,
                     "samplerMirrorClampToEdge": true,
-                    "scalarBlockLayout": true,
-                    "runtimeDescriptorArray": true
+                    "scalarBlockLayout": true
+                },
+                "VkPhysicalDeviceProtectedMemoryFeatures": {
+                    "protectedMemory": true
                 },
                 "VkPhysicalDeviceShaderIntegerDotProductFeatures": {
                     "shaderIntegerDotProduct": true
@@ -40,6 +40,9 @@
                 },
                 "VkPhysicalDeviceImage2DViewOf3DFeaturesEXT": {
                     "image2DViewOf3D": true
+                },
+                "VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR": {
+                    "shaderSubgroupUniformControlFlow": true
                 }
             },
             "properties": {
@@ -56,7 +59,6 @@
                         "maxImageDimension2D": 8192,
                         "maxImageDimensionCube": 8192,
                         "maxDescriptorSetStorageBuffers": 96,
-                        "maxDescriptorSetStorageImages": 144,
                         "maxDescriptorSetUniformBuffers": 90,
                         "maxFragmentCombinedOutputResources": 16,
                         "maxPerStageDescriptorUniformBuffers": 15,
@@ -116,7 +118,13 @@
                     "revision": 2,
                     "date": "2024-07-22",
                     "author": "Ian Elliott",
-                    "comment": "Added proposed future Vulkan scope"
+                    "comment": "Added proposed Vulkan 1.4 scope"
+                },
+                {
+                    "revision": 3,
+                    "date": "2024-11-15",
+                    "author": "Ian Elliott",
+                    "comment": "Delay some requirements that Mali Bifrost chipsets cannot do"
                 }
             ],
             "profiles": [
