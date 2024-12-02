@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2022-2023 Valve Corporation
  * Copyright (C) 2022-2023 LunarG, Inc.
+ * Copyright (c) 2024 RasterGrid Kft.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +32,8 @@ enum SimulateCapabilityBits {
     SIMULATE_EXTENSIONS_BIT = 1 << 3,
     SIMULATE_FORMATS_BIT = 1 << 4,
     SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT = 1 << 5,
+    SIMULATE_VIDEO_CAPABILITIES_BIT = 1 << 6,
+    SIMULATE_VIDEO_FORMATS_BIT = 1 << 7,
     SIMULATE_MAX_ENUM = 0x7FFFFFFF
 };
 typedef int SimulateCapabilityFlags;

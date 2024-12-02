@@ -1,0 +1,87 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-266.json#",
+    "capabilities": {
+        "block": {
+            "extensions": {
+                "VK_KHR_video_queue": 1,
+                "VK_KHR_video_decode_queue": 1,
+                "VK_KHR_video_decode_h264": 1,
+                "VK_KHR_video_decode_h265": 1,
+                "VK_KHR_video_encode_queue": 1
+            },
+            "queueFamiliesProperties": [
+                {
+                    "VkQueueFamilyProperties": {
+                        "queueFlags": [
+                            "VK_QUEUE_GRAPHICS_BIT",
+                            "VK_QUEUE_COMPUTE_BIT",
+                            "VK_QUEUE_TRANSFER_BIT"
+                        ],
+                        "queueCount": 1
+                    }
+                },
+                {
+                    "VkQueueFamilyProperties": {
+                        "queueFlags": [
+                            "VK_QUEUE_VIDEO_DECODE_BIT_KHR"
+                        ],
+                        "queueCount": 1
+                    },
+                    "VkQueueFamilyVideoPropertiesKHR": {
+                        "videoCodecOperations": [
+                            "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_KHR"
+                        ]
+                    }
+                },
+                {
+                    "VkQueueFamilyProperties": {
+                        "queueFlags": [
+                            "VK_QUEUE_VIDEO_DECODE_BIT_KHR"
+                        ],
+                        "queueCount": 1
+                    },
+                    "VkQueueFamilyVideoPropertiesKHR": {
+                        "videoCodecOperations": [
+                            "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_KHR"
+                        ]
+                    }
+                },
+                {
+                    "VkQueueFamilyProperties": {
+                        "queueFlags": [
+                            "VK_QUEUE_VIDEO_ENCODE_BIT_KHR"
+                        ],
+                        "queueCount": 1
+                    }
+                }
+            ]
+        }
+    },
+    "profiles": {
+        "VP_RASTERGRID_test_queue_families": {
+            "version": 1,
+            "api-version": "1.3.225",
+            "label": "Test Profile Variants",
+            "description": "Test.",
+            "contributors": {
+                "Daniel Rakos": {
+                    "company": "RasterGrid",
+                    "email": "daniel.rakos@rastergrid.com",
+                    "github": "aqnuep",
+                    "contact": true
+                }
+            },
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2024-08-26",
+                    "author": "Daniel Rakos",
+                    "comment": "Initial revision"
+                }
+            ],
+            "capabilities": [
+                "block"
+            ]
+        }
+    }
+}

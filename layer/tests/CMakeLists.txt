@@ -1,6 +1,7 @@
 # ~~~
 # Copyright (c) 2021-2024 Valve Corporation
 # Copyright (c) 2021-2024 LunarG, Inc.
+# Copyright (c) 2024 RasterGrid Kft.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,6 +46,7 @@ else()
         tests_mechanism_api_version
         tests_mechanism_check_values
         tests_mechanism_physical_device_selection
+        tests_mechanism_video_profiles
         tests_combine_union
         tests_combine_intersection
         tests_util

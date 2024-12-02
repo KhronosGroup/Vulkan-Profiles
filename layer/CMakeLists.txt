@@ -144,7 +144,8 @@ add_custom_target(VpLayer_generate ALL
         --out-layer ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp
     VERBATIM
     SOURCES ${LAYER_PYTHON_SCRIPT}
-    DEPENDS ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml)
+    DEPENDS ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+            ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/video.xml)
 set_target_properties(VpLayer_generate PROPERTIES FOLDER "Profiles layer")
 add_dependencies(ProfilesLayer VpLayer_generate)
 

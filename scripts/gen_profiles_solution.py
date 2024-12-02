@@ -21,6 +21,7 @@
 
 import os
 import re
+import copy
 import itertools
 import functools
 import argparse
@@ -172,6 +173,10 @@ typedef struct VpBlockProperties {
     uint32_t apiVersion;
     char blockName[VP_MAX_PROFILE_NAME_SIZE];
 } VpBlockProperties;
+
+typedef struct VpVideoProfileProperties {
+    char name[VP_MAX_PROFILE_NAME_SIZE];
+} VpVideoProfileProperties;
 
 typedef enum VpInstanceCreateFlagBits {
     VP_INSTANCE_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
@@ -414,6 +419,26 @@ VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(
     uint32_t*                                   pStructureTypeCount,
     VkStructureType*                            pStructureTypes);
 
+// Fill the queue family property structures with the requirements of a profile
+VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t*                                   pPropertyCount,
+    VkQueueFamilyProperties2KHR*                pProperties);
+
+// Query the list of queue family property structure types specified by the profile
+VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t*                                   pStructureTypeCount,
+    VkStructureType*                            pStructureTypes);
+
 // Query the list of formats with specified requirements by a profile
 VPAPI_ATTR VkResult vpGetProfileFormats(
 #ifdef VP_USE_OBJECT
@@ -443,6 +468,82 @@ VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(
     const char*                                 pBlockName,
     uint32_t*                                   pStructureTypeCount,
     VkStructureType*                            pStructureTypes);
+
+#ifdef VK_KHR_video_queue
+// Query the list of video profiles specified by the profile
+VPAPI_ATTR VkResult vpGetProfileVideoProfiles(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t*                                   pVideoProfileCount,
+    VpVideoProfileProperties*                   pVideoProfiles);
+
+// Query the video profile info structures for a video profile defined by a profile
+VPAPI_ATTR VkResult vpGetProfileVideoProfileInfo(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t                                    videoProfileIndex,
+    VkVideoProfileInfoKHR*                      pVideoProfileInfo);
+
+// Query the list of video profile info structure types specified by the profile for a video profile
+VPAPI_ATTR VkResult vpGetProfileVideoProfileInfoStructureTypes(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t                                    videoProfileIndex,
+    uint32_t*                                   pStructureTypeCount,
+    VkStructureType*                            pStructureTypes);
+
+// Query the video capabilities requirements for a video profile defined by a profile
+VPAPI_ATTR VkResult vpGetProfileVideoCapabilities(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t                                    videoProfileIndex,
+    void*                                       pNext);
+
+// Query the list of video capability structure types specified by the profile for a video profile
+VPAPI_ATTR VkResult vpGetProfileVideoCapabilityStructureTypes(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t                                    videoProfileIndex,
+    uint32_t*                                   pStructureTypeCount,
+    VkStructureType*                            pStructureTypes);
+
+// Query the video format property requirements for a video profile defined by a profile
+VPAPI_ATTR VkResult vpGetProfileVideoFormatProperties(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t                                    videoProfileIndex,
+    uint32_t*                                   pPropertyCount,
+    VkVideoFormatPropertiesKHR*                 pProperties);
+
+// Query the list of video format property structure types specified by the profile for a video profile
+VPAPI_ATTR VkResult vpGetProfileVideoFormatStructureTypes(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t                                    videoProfileIndex,
+    uint32_t*                                   pStructureTypeCount,
+    VkStructureType*                            pStructureTypes);
+#endif  // VK_KHR_video_queue
 '''
 
 PRIVATE_DEFS = '''
@@ -535,8 +636,10 @@ VPAPI_ATTR bool isPowerOfTwo(double source) {
 
 using PFN_vpStructFiller = void(*)(VkBaseOutStructure* p);
 using PFN_vpStructComparator = bool(*)(VkBaseOutStructure* p);
-using PFN_vpStructChainerCb =  void(*)(VkBaseOutStructure* p, void* pUser);
+using PFN_vpStructChainerCb = void(*)(VkBaseOutStructure* p, void* pUser);
 using PFN_vpStructChainer = void(*)(VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb);
+using PFN_vpStructArrayChainerCb = void(*)(uint32_t count, VkBaseOutStructure* p, void* pUser);
+using PFN_vpStructArrayChainer = void(*)(uint32_t count, VkBaseOutStructure* p, void* pUser, PFN_vpStructArrayChainerCb pfnCb);
 
 struct VpFeatureDesc {
     PFN_vpStructFiller              pfnFiller;
@@ -562,8 +665,48 @@ struct VpFormatDesc {
 struct VpStructChainerDesc {
     PFN_vpStructChainer             pfnFeature;
     PFN_vpStructChainer             pfnProperty;
-    PFN_vpStructChainer             pfnQueueFamily;
+    PFN_vpStructArrayChainer        pfnQueueFamily;
     PFN_vpStructChainer             pfnFormat;
+};
+
+struct VpVideoProfileInfoDesc {
+    PFN_vpStructFiller              pfnFiller;
+    PFN_vpStructComparator          pfnComparator;
+};
+
+struct VpVideoCapabilityDesc {
+    PFN_vpStructFiller              pfnFiller;
+    PFN_vpStructComparator          pfnComparator;
+};
+
+struct VpVideoFormatDesc {
+    PFN_vpStructFiller              pfnFiller;
+    PFN_vpStructComparator          pfnComparator;
+};
+
+struct VpVideoProfileStructChainerDesc {
+    PFN_vpStructChainer             pfnInfo;
+    PFN_vpStructChainer             pfnCapability;
+    PFN_vpStructArrayChainer        pfnFormat;
+};
+
+struct VpVideoProfileDesc {
+    VpVideoProfileProperties properties;
+
+    uint32_t infoStructTypeCount;
+    const VkStructureType* pInfoStructTypes;
+    VpVideoProfileInfoDesc info;
+
+    uint32_t capabilityStructTypeCount;
+    const VkStructureType* pCapabilityStructTypes;
+    VpVideoCapabilityDesc capability;
+
+    uint32_t formatStructTypeCount;
+    const VkStructureType* pFormatStructTypes;
+    uint32_t formatCount;
+    const VpVideoFormatDesc* pFormats;
+
+    VpVideoProfileStructChainerDesc chainers;
 };
 
 struct VpVariantDesc {
@@ -594,6 +737,9 @@ struct VpVariantDesc {
     const VpFormatDesc* pFormats;
 
     VpStructChainerDesc chainers;
+
+    uint32_t videoProfileCount;
+    const VpVideoProfileDesc* pVideoProfiles;
 };
 
 struct VpCapabilitiesDesc {
@@ -789,6 +935,7 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupportSingleProfile(
 enum structure_type {
     STRUCTURE_FEATURE = 0,
     STRUCTURE_PROPERTY,
+    STRUCTURE_QUEUE_FAMILY,
     STRUCTURE_FORMAT
 };
 
@@ -839,6 +986,10 @@ VPAPI_ATTR VkResult vpGetProfileStructureTypes(
                     case STRUCTURE_PROPERTY:
                         count = variant.propertyStructTypeCount;
                         data = variant.pPropertyStructTypes;
+                        break;
+                    case STRUCTURE_QUEUE_FAMILY:
+                        count = variant.queueFamilyStructTypeCount;
+                        data = variant.pQueueFamilyStructTypes;
                         break;
                     case STRUCTURE_FORMAT:
                         count = variant.formatStructTypeCount;
@@ -957,6 +1108,47 @@ VPAPI_ATTR VkResult vpGetProfileExtensionProperties(
     }
 
     return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileVideoProfileDesc(
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t                                    videoProfileIndex,
+    const detail::VpVideoProfileDesc**          ppVideoProfileDesc) {
+    VkResult result = pBlockName == nullptr ? VK_SUCCESS : VK_INCOMPLETE;
+
+    uint32_t curr_base_video_profile_index = 0;
+
+    const std::vector<VpProfileProperties>& gathered_profiles = detail::GatherProfiles(*pProfile);
+
+    for (std::size_t profile_index = 0, profile_count = gathered_profiles.size(); profile_index < profile_count; ++profile_index) {
+        const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(gathered_profiles[profile_index].profileName);
+        if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
+
+        for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
+            const detail::VpCapabilitiesDesc& cap_desc = profile_desc->pRequiredCapabilities[capability_index];
+
+            for (uint32_t variant_index = 0; variant_index < cap_desc.variantCount; ++variant_index) {
+                const detail::VpVariantDesc& variant = cap_desc.pVariants[variant_index];
+                if (pBlockName != nullptr) {
+                    if (strcmp(variant.blockName, pBlockName) != 0) {
+                        continue;
+                    }
+                    result = VK_SUCCESS;
+                }
+
+                if (videoProfileIndex < curr_base_video_profile_index + variant.videoProfileCount) {
+                    *ppVideoProfileDesc = &variant.pVideoProfiles[videoProfileIndex - curr_base_video_profile_index];
+                    return result;
+                } else {
+                    curr_base_video_profile_index += variant.videoProfileCount;
+                }
+            }
+        }
+    }
+
+    *ppVideoProfileDesc = nullptr;
+    return VK_ERROR_UNKNOWN;
 }
 '''
 
@@ -1573,6 +1765,18 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
         PFN_vkGetPhysicalDeviceQueueFamilyProperties2KHR    pfnGetPhysicalDeviceQueueFamilyProperties2;
     };
 
+#ifdef VK_KHR_video_queue
+    struct VideoInfo {
+        PFN_vkGetPhysicalDeviceVideoCapabilitiesKHR         pfnGetPhysicalDeviceVideoCapabilitiesKHR;
+        PFN_vkGetPhysicalDeviceVideoFormatPropertiesKHR     pfnGetPhysicalDeviceVideoFormatPropertiesKHR;
+        const detail::VpVideoProfileDesc*                   pProfileDesc;
+        VkVideoProfileInfoKHR                               profileInfo;
+        VkPhysicalDeviceVideoFormatInfoKHR                  formatInfo;
+        bool                                                supportedProfile;
+        uint32_t                                            matchingProfiles;
+    };
+#endif  // VK_KHR_video_queue
+
     std::vector<VpBlockProperties> supported_blocks;
     std::vector<VpBlockProperties> unsupported_blocks;
 
@@ -1582,8 +1786,10 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
         std::vector<VpBlockProperties>& unsupported_blocks;
         const detail::VpVariantDesc* variant;
         GPDP2EntryPoints gpdp2;
+#ifdef VK_KHR_video_queue
+        VideoInfo video;
+#endif  // VK_KHR_video_queue
         uint32_t index;
-        uint32_t count;
         detail::PFN_vpStructChainerCb pfnCb;
         bool supported;
     } userData{physicalDevice, supported_blocks, unsupported_blocks};
@@ -1625,6 +1831,14 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
         userData.gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2 == nullptr) {
         return VK_ERROR_EXTENSION_NOT_PRESENT;
     }
+
+#ifdef VK_KHR_video_queue
+    PFN_vkGetInstanceProcAddr gipa = vp.singleton ? vkGetInstanceProcAddr : vp.GetInstanceProcAddr;
+    userData.video.pfnGetPhysicalDeviceVideoCapabilitiesKHR =
+        (PFN_vkGetPhysicalDeviceVideoCapabilitiesKHR)gipa(instance, "vkGetPhysicalDeviceVideoCapabilitiesKHR");
+    userData.video.pfnGetPhysicalDeviceVideoFormatPropertiesKHR =
+        (PFN_vkGetPhysicalDeviceVideoFormatPropertiesKHR)gipa(instance, "vkGetPhysicalDeviceVideoFormatPropertiesKHR");
+#endif  // VK_KHR_video_queue
 
     bool supported = true;
 
@@ -1719,6 +1933,45 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
                     supported_variant = false;
                 }
 
+                if (userData.variant->queueFamilyCount > 0) {
+                    uint32_t queue_family_count = 0;
+                    userData.gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2(physicalDevice, &queue_family_count, nullptr);
+                    std::vector<VkQueueFamilyProperties2KHR> queueFamilyProps(queue_family_count, { VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR });
+                    userData.variant->chainers.pfnQueueFamily(
+                        queue_family_count, static_cast<VkBaseOutStructure*>(static_cast<void*>(queueFamilyProps.data())), &userData,
+                        [](uint32_t queue_family_count, VkBaseOutStructure* pBaseArray, void* pUser) {
+                            UserData* pUserData = static_cast<UserData*>(pUser);
+                            VkQueueFamilyProperties2KHR* pArray = static_cast<VkQueueFamilyProperties2KHR*>(static_cast<void*>(pBaseArray));
+                            pUserData->gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2(pUserData->physicalDevice, &queue_family_count, pArray);
+                            pUserData->supported = true;
+                            for (uint32_t profile_qf_idx = 0; profile_qf_idx < pUserData->variant->queueFamilyCount; ++profile_qf_idx) {
+                                bool found_matching = false;
+                                for (uint32_t queue_family_index = 0; queue_family_index < queue_family_count; ++queue_family_index) {
+                                    bool this_matches = true;
+                                    VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pArray[queue_family_index]));
+                                    while (p != nullptr) {
+                                        if (!pUserData->variant->pQueueFamilies[profile_qf_idx].pfnComparator(p)) {
+                                            this_matches = false;
+                                        }
+                                        p = p->pNext;
+                                    }
+                                    if (this_matches) {
+                                        found_matching = true;
+                                        break;
+                                    }
+                                }
+                                if (!found_matching) {
+                                    pUserData->supported = false;
+                                    break;
+                                }
+                            }
+                        }
+                    );
+                    if (!userData.supported) {
+                        supported_variant = false;
+                    }
+                }
+
                 for (uint32_t format_index = 0; format_index < userData.variant->formatCount && supported_variant; ++format_index) {
                     userData.index = format_index;
                     VkFormatProperties2KHR format_properties2{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
@@ -1743,6 +1996,113 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
                         supported_variant = false;
                     }
                 }
+
+#ifdef VK_KHR_video_queue
+                if (userData.variant->videoProfileCount > 0) {
+                    VkVideoProfileListInfoKHR profile_list{ VK_STRUCTURE_TYPE_VIDEO_PROFILE_LIST_INFO_KHR };
+                    profile_list.profileCount = 1;
+                    profile_list.pProfiles = &userData.video.profileInfo;
+                    userData.video.formatInfo.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VIDEO_FORMAT_INFO_KHR;
+                    userData.video.formatInfo.pNext = &profile_list;
+
+                    if (userData.video.pfnGetPhysicalDeviceVideoCapabilitiesKHR != nullptr &&
+                        userData.video.pfnGetPhysicalDeviceVideoFormatPropertiesKHR != nullptr) {
+                        for (uint32_t video_profile_index = 0; video_profile_index < userData.variant->videoProfileCount; ++video_profile_index) {
+                            userData.video.profileInfo = VkVideoProfileInfoKHR{ VK_STRUCTURE_TYPE_VIDEO_PROFILE_INFO_KHR };
+                            userData.video.pProfileDesc = &userData.variant->pVideoProfiles[video_profile_index];
+                            userData.supported = true;
+                            userData.video.matchingProfiles = 0;
+
+                            detail::vpForEachMatchingVideoProfiles(&userData.video.profileInfo, &userData,
+                                [](VkBaseOutStructure* p, void* pUser) {
+                                    UserData* pUserData = static_cast<UserData*>(pUser);
+                                    while (p != nullptr) {
+                                        if (!pUserData->video.pProfileDesc->info.pfnComparator(p)) {
+                                            return;
+                                        }
+                                        p = p->pNext;
+                                    }
+
+                                    pUserData->video.supportedProfile = true;
+
+                                    VkVideoCapabilitiesKHR capabilities{ VK_STRUCTURE_TYPE_VIDEO_CAPABILITIES_KHR };
+                                    pUserData->video.pProfileDesc->chainers.pfnCapability(
+                                        static_cast<VkBaseOutStructure*>(static_cast<void*>(&capabilities)), pUserData,
+                                        [](VkBaseOutStructure* p, void* pUser) {
+                                            UserData* pUserData = static_cast<UserData*>(pUser);
+                                            VkResult result = pUserData->video.pfnGetPhysicalDeviceVideoCapabilitiesKHR(
+                                                pUserData->physicalDevice,
+                                                &pUserData->video.profileInfo,
+                                                static_cast<VkVideoCapabilitiesKHR*>(static_cast<void*>(p)));
+                                            if (result != VK_SUCCESS) {
+                                                pUserData->video.supportedProfile = false;
+                                                return;
+                                            }
+                                            while (p != nullptr) {
+                                                if (!pUserData->video.pProfileDesc->capability.pfnComparator(p)) {
+                                                    pUserData->supported = false;
+                                                }
+                                                p = p->pNext;
+                                            }
+                                        }
+                                    );
+
+                                    if (pUserData->video.supportedProfile) {
+                                        pUserData->video.matchingProfiles++;
+                                    } else {
+                                        return;
+                                    }
+
+                                    std::vector<VkVideoFormatPropertiesKHR> format_props;
+                                    for (uint32_t format_index = 0; format_index < pUserData->video.pProfileDesc->formatCount; ++format_index) {
+                                        pUserData->index = format_index;
+                                        {
+                                            VkVideoFormatPropertiesKHR tmp_props{ VK_STRUCTURE_TYPE_VIDEO_FORMAT_PROPERTIES_KHR };
+                                            pUserData->video.pProfileDesc->pFormats[format_index].pfnFiller(static_cast<VkBaseOutStructure*>(static_cast<void*>(&tmp_props)));
+                                            pUserData->video.formatInfo.imageUsage = tmp_props.imageUsageFlags;
+                                        }
+
+                                        uint32_t format_count = 0;
+                                        pUserData->video.pfnGetPhysicalDeviceVideoFormatPropertiesKHR(pUserData->physicalDevice, &pUserData->video.formatInfo, &format_count, nullptr);
+                                        format_props.resize(format_count, { VK_STRUCTURE_TYPE_VIDEO_FORMAT_PROPERTIES_KHR });
+                                        pUserData->video.pProfileDesc->chainers.pfnFormat(
+                                            format_count, static_cast<VkBaseOutStructure*>(static_cast<void*>(format_props.data())), pUserData,
+                                            [](uint32_t format_count, VkBaseOutStructure* pBaseArray, void* pUser) {
+                                                UserData* pUserData = static_cast<UserData*>(pUser);
+                                                VkVideoFormatPropertiesKHR* pArray = static_cast<VkVideoFormatPropertiesKHR*>(static_cast<void*>(pBaseArray));
+                                                pUserData->video.pfnGetPhysicalDeviceVideoFormatPropertiesKHR(pUserData->physicalDevice, &pUserData->video.formatInfo, &format_count, pArray);
+                                                bool found_matching = false;
+                                                for (uint32_t i = 0; i < format_count; ++i) {
+                                                    bool this_matches = true;
+                                                    VkBaseOutStructure* p = static_cast<VkBaseOutStructure*>(static_cast<void*>(&pArray[i]));
+                                                    while (p != nullptr) {
+                                                        if (!pUserData->video.pProfileDesc->pFormats[pUserData->index].pfnComparator(p)) {
+                                                            this_matches = false;
+                                                        }
+                                                        p = p->pNext;
+                                                    }
+                                                    if (this_matches) {
+                                                        found_matching = true;
+                                                        break;
+                                                    }
+                                                }
+                                                if (!found_matching) {
+                                                    pUserData->supported = false;
+                                                }
+                                            }
+                                        );
+                                    }
+                                }
+                            );
+                            if (!userData.supported || userData.video.matchingProfiles == 0) {
+                                supported_variant = false;
+                            }
+                        }
+                    } else {
+                        supported_variant = false;
+                    }
+                }
+#endif  // VK_KHR_video_queue
 
                 memcpy(block.blockName, variant_desc.blockName, VP_MAX_PROFILE_NAME_SIZE * sizeof(char));
                 if (supported_variant) {
@@ -2036,6 +2396,71 @@ VPAPI_ATTR VkResult vpGetProfileProperties(
     return result;
 }
 
+VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t*                                   pPropertyCount,
+    VkQueueFamilyProperties2KHR*                pProperties) {
+#ifdef VP_USE_OBJECT
+    (void)capabilities;
+#endif//VP_USE_OBJECT
+
+    if (pPropertyCount == nullptr) return VK_ERROR_UNKNOWN;
+
+    VkResult result = pBlockName == nullptr ? VK_SUCCESS : VK_INCOMPLETE;
+
+    const std::vector<VpProfileProperties>& gathered_profiles = detail::GatherProfiles(*pProfile);
+
+    uint32_t total_queue_family_count = 0;
+
+    for (std::size_t profile_index = 0, profile_count = gathered_profiles.size(); profile_index < profile_count; ++profile_index) {
+        const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(gathered_profiles[profile_index].profileName);
+        if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
+
+        for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
+            const detail::VpCapabilitiesDesc& cap_desc = profile_desc->pRequiredCapabilities[capability_index];
+
+            for (uint32_t variant_index = 0; variant_index < cap_desc.variantCount; ++variant_index) {
+                const detail::VpVariantDesc& variant = cap_desc.pVariants[variant_index];
+                if (pBlockName != nullptr) {
+                    if (strcmp(variant.blockName, pBlockName) != 0) {
+                        continue;
+                    }
+                    result = VK_SUCCESS;
+                }
+
+                if (pProperties != nullptr) {
+                    for (uint32_t i = 0; i < variant.queueFamilyCount; ++i) {
+                        if (total_queue_family_count < *pPropertyCount) {
+                            if (variant.pQueueFamilies[i].pfnFiller == nullptr) continue;
+
+                            VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(pProperties);
+                            while (p != nullptr) {
+                                variant.pQueueFamilies[i].pfnFiller(p);
+                                p = p->pNext;
+                            }
+
+                            total_queue_family_count++;
+                            pProperties++;
+                        } else {
+                            result = VK_INCOMPLETE;
+                            break;
+                        }
+                    }
+                } else {
+                    total_queue_family_count += variant.queueFamilyCount;
+                }
+            }
+        }
+    }
+
+    *pPropertyCount = total_queue_family_count;
+    return result;
+}
+
 VPAPI_ATTR VkResult vpGetProfileFormats(
 #ifdef VP_USE_OBJECT
     VpCapabilities                              capabilities,
@@ -2200,6 +2625,21 @@ VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(
         pProfile, pBlockName, detail::STRUCTURE_PROPERTY, pStructureTypeCount, pStructureTypes);
 }
 
+VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t*                                   pStructureTypeCount,
+    VkStructureType*                            pStructureTypes) {
+    return detail::vpGetProfileStructureTypes(
+#ifdef VP_USE_OBJECT
+        capabilities,
+#endif//VP_USE_OBJECT
+        pProfile, pBlockName, detail::STRUCTURE_QUEUE_FAMILY, pStructureTypeCount, pStructureTypes);
+}
+
 VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(
 #ifdef VP_USE_OBJECT
     VpCapabilities                              capabilities,
@@ -2214,6 +2654,260 @@ VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(
 #endif//VP_USE_OBJECT
         pProfile, pBlockName, detail::STRUCTURE_FORMAT, pStructureTypeCount, pStructureTypes);
 }
+
+#ifdef VK_KHR_video_queue
+// Query the list of video profiles specified by the profile
+VPAPI_ATTR VkResult vpGetProfileVideoProfiles(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t*                                   pVideoProfileCount,
+    VpVideoProfileProperties*                   pVideoProfiles) {
+#ifdef VP_USE_OBJECT
+    (void)capabilities;
+#endif//VP_USE_OBJECT
+    if (pVideoProfileCount == nullptr) return VK_ERROR_UNKNOWN;
+
+    VkResult result = pBlockName == nullptr ? VK_SUCCESS : VK_INCOMPLETE;
+
+    uint32_t total_video_profile_count = 0;
+
+    const std::vector<VpProfileProperties>& gathered_profiles = detail::GatherProfiles(*pProfile);
+
+    for (std::size_t profile_index = 0, profile_count = gathered_profiles.size(); profile_index < profile_count; ++profile_index) {
+        const detail::VpProfileDesc* profile_desc = detail::vpGetProfileDesc(gathered_profiles[profile_index].profileName);
+        if (profile_desc == nullptr) return VK_ERROR_UNKNOWN;
+
+        for (uint32_t capability_index = 0; capability_index < profile_desc->requiredCapabilityCount; ++capability_index) {
+            const detail::VpCapabilitiesDesc& cap_desc = profile_desc->pRequiredCapabilities[capability_index];
+
+            for (uint32_t variant_index = 0; variant_index < cap_desc.variantCount; ++variant_index) {
+                const detail::VpVariantDesc& variant = cap_desc.pVariants[variant_index];
+                if (pBlockName != nullptr) {
+                    if (strcmp(variant.blockName, pBlockName) != 0) {
+                        continue;
+                    }
+                    result = VK_SUCCESS;
+                }
+
+                if (pVideoProfiles != nullptr) {
+                    for (uint32_t i = 0; i < variant.videoProfileCount; ++i) {
+                        if (total_video_profile_count < *pVideoProfileCount) {
+                            *pVideoProfiles = variant.pVideoProfiles[i].properties;
+                            total_video_profile_count++;
+                            pVideoProfiles++;
+                        } else {
+                            result = VK_INCOMPLETE;
+                            break;
+                        }
+                    }
+                } else {
+                    total_video_profile_count += variant.videoProfileCount;
+                }
+            }
+        }
+    }
+
+    *pVideoProfileCount = total_video_profile_count;
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileVideoProfileInfo(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t                                    videoProfileIndex,
+    VkVideoProfileInfoKHR*                      pVideoProfileInfo) {
+#ifdef VP_USE_OBJECT
+    (void)capabilities;
+#endif//VP_USE_OBJECT
+
+    const detail::VpVideoProfileDesc* pVideoProfileDesc = nullptr;
+    VkResult result = detail::vpGetProfileVideoProfileDesc(pProfile, pBlockName, videoProfileIndex, &pVideoProfileDesc);
+
+    if (pVideoProfileDesc != nullptr) {
+        VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(pVideoProfileInfo);
+        while (p != nullptr) {
+            pVideoProfileDesc->info.pfnFiller(p);
+            p = p->pNext;
+        }
+    }
+
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileVideoCapabilities(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t                                    videoProfileIndex,
+    void*                                       pNext) {
+#ifdef VP_USE_OBJECT
+    (void)capabilities;
+#endif//VP_USE_OBJECT
+
+    const detail::VpVideoProfileDesc* pVideoProfileDesc = nullptr;
+    VkResult result = detail::vpGetProfileVideoProfileDesc(pProfile, pBlockName, videoProfileIndex, &pVideoProfileDesc);
+
+    if (pVideoProfileDesc != nullptr) {
+        VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(pNext);
+        while (p != nullptr) {
+            pVideoProfileDesc->capability.pfnFiller(p);
+            p = p->pNext;
+        }
+    }
+
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileVideoFormatProperties(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t                                    videoProfileIndex,
+    uint32_t*                                   pPropertyCount,
+    VkVideoFormatPropertiesKHR*                 pProperties) {
+#ifdef VP_USE_OBJECT
+    (void)capabilities;
+#endif//VP_USE_OBJECT
+
+    const detail::VpVideoProfileDesc* pVideoProfileDesc = nullptr;
+    VkResult result = detail::vpGetProfileVideoProfileDesc(pProfile, pBlockName, videoProfileIndex, &pVideoProfileDesc);
+
+    uint32_t property_count = 0;
+    if (pVideoProfileDesc != nullptr) {
+        if (pProperties != nullptr) {
+            for (; property_count < pVideoProfileDesc->formatCount; ++property_count) {
+                if (property_count < *pPropertyCount) {
+                    VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(&pProperties[property_count]);
+                    while (p != nullptr) {
+                        pVideoProfileDesc->pFormats[property_count].pfnFiller(p);
+                        p = p->pNext;
+                    }
+                } else {
+                    result = VK_INCOMPLETE;
+                    break;
+                }
+            }
+        } else {
+            property_count = pVideoProfileDesc->formatCount;
+        }
+    }
+
+    *pPropertyCount = property_count;
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileVideoProfileInfoStructureTypes(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t                                    videoProfileIndex,
+    uint32_t*                                   pStructureTypeCount,
+    VkStructureType*                            pStructureTypes) {
+#ifdef VP_USE_OBJECT
+    (void)capabilities;
+#endif//VP_USE_OBJECT
+
+    const detail::VpVideoProfileDesc* pVideoProfileDesc = nullptr;
+    VkResult result = detail::vpGetProfileVideoProfileDesc(pProfile, pBlockName, videoProfileIndex, &pVideoProfileDesc);
+
+    if (pVideoProfileDesc != nullptr) {
+        if (pStructureTypes != nullptr) {
+            if (*pStructureTypeCount < pVideoProfileDesc->infoStructTypeCount) {
+                result = VK_INCOMPLETE;
+            } else {
+                *pStructureTypeCount = pVideoProfileDesc->infoStructTypeCount;
+            }
+            if (*pStructureTypeCount > 0) {
+                memcpy(pStructureTypes, pVideoProfileDesc->pInfoStructTypes, *pStructureTypeCount * sizeof(VkStructureType));
+            }
+        } else {
+            *pStructureTypeCount = pVideoProfileDesc->infoStructTypeCount;
+        }
+    }
+
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileVideoCapabilityStructureTypes(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t                                    videoProfileIndex,
+    uint32_t*                                   pStructureTypeCount,
+    VkStructureType*                            pStructureTypes) {
+#ifdef VP_USE_OBJECT
+    (void)capabilities;
+#endif//VP_USE_OBJECT
+
+    const detail::VpVideoProfileDesc* pVideoProfileDesc = nullptr;
+    VkResult result = detail::vpGetProfileVideoProfileDesc(pProfile, pBlockName, videoProfileIndex, &pVideoProfileDesc);
+
+    if (pVideoProfileDesc != nullptr) {
+        if (pStructureTypes != nullptr) {
+            if (*pStructureTypeCount < pVideoProfileDesc->capabilityStructTypeCount) {
+                result = VK_INCOMPLETE;
+            } else {
+                *pStructureTypeCount = pVideoProfileDesc->capabilityStructTypeCount;
+            }
+            if (*pStructureTypeCount > 0) {
+                memcpy(pStructureTypes, pVideoProfileDesc->pCapabilityStructTypes, *pStructureTypeCount * sizeof(VkStructureType));
+            }
+        } else {
+            *pStructureTypeCount = pVideoProfileDesc->capabilityStructTypeCount;
+        }
+    }
+
+    return result;
+}
+
+VPAPI_ATTR VkResult vpGetProfileVideoFormatStructureTypes(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpProfileProperties*                  pProfile,
+    const char*                                 pBlockName,
+    uint32_t                                    videoProfileIndex,
+    uint32_t*                                   pStructureTypeCount,
+    VkStructureType*                            pStructureTypes) {
+#ifdef VP_USE_OBJECT
+    (void)capabilities;
+#endif//VP_USE_OBJECT
+
+    const detail::VpVideoProfileDesc* pVideoProfileDesc = nullptr;
+    VkResult result = detail::vpGetProfileVideoProfileDesc(pProfile, pBlockName, videoProfileIndex, &pVideoProfileDesc);
+
+    if (pVideoProfileDesc != nullptr) {
+        if (pStructureTypes != nullptr) {
+            if (*pStructureTypeCount < pVideoProfileDesc->formatStructTypeCount) {
+                result = VK_INCOMPLETE;
+            } else {
+                *pStructureTypeCount = pVideoProfileDesc->formatStructTypeCount;
+            }
+            if (*pStructureTypeCount > 0) {
+                memcpy(pStructureTypes, pVideoProfileDesc->pFormatStructTypes, *pStructureTypeCount * sizeof(VkStructureType));
+            }
+        } else {
+            *pStructureTypeCount = pVideoProfileDesc->formatStructTypeCount;
+        }
+    }
+
+    return result;
+}
+#endif  // VK_KHR_video_queue
 '''
 
 PRIVATE_IMPL_FEATURES_CHAIN_IMPL = '''
@@ -2304,6 +2998,71 @@ PRIVATE_IMPL_FEATURES_CHAIN_IMPL = '''
     }
 '''
 
+
+# Evaluates that a condition is satisfied per the specified list of values
+# e.g.:
+#   condition = '(A+B),C'
+#   evaluates to True for values = [ 'A', 'B' ]
+#   evaluates to True for values = [ 'C' ]
+#   evaluates to False for values = [ 'A' ]
+#   evaluates to False for values = [ 'B' ]
+def evalConditionFromList(condition, values):
+    evalstr = ""
+    value = ""
+
+    def genExpressionFromValue(value):
+        return value if value == "" else "('{0}' in values)".format(value)
+
+    for char in condition:
+        if char in ['(', ')', '+', ',']:
+            evalstr += genExpressionFromValue(value)
+            value = ""
+            if char == '+':
+                # '+' means AND
+                evalstr += ' and '
+            elif char == ',':
+                # ',' means OR
+                evalstr += ' or '
+            else:
+                evalstr += char
+        else:
+            value += char
+    evalstr += genExpressionFromValue(value)
+
+    return eval(evalstr)
+
+
+# Generates a C/C++ condition verifying flags
+# e.g.:
+#   condition = '(A+B),C'
+#   variable = 'myFlags'
+#   generates '((myFlags & A && myFlags & B) || myFlags & C)"
+def genCConditionForFlags(condition, variable):
+    c_cond = ""
+    value = ""
+
+    def genExpressionFromValue(variable, value):
+        return value if value == "" else "{0} & {1}".format(variable, value)
+
+    for char in condition:
+        if char in ['(', ')', '+', ',']:
+            c_cond += genExpressionFromValue(variable, value)
+            value = ""
+            if char == '+':
+                # '+' means AND
+                c_cond += ' && '
+            elif char == ',':
+                # ',' means OR
+                c_cond += ' || '
+            else:
+                c_cond += char
+        else:
+            value += char
+    c_cond += genExpressionFromValue(variable, value)
+
+    return c_cond
+
+
 class Log():
     def f(msg):
         print('FATAL: ' + msg)
@@ -2376,6 +3135,112 @@ class VulkanLimit():
     def __init__(self, name):
         self.name = name
         self.structs = set()
+
+
+class VulkanVideoRequiredCapabilities():
+    def __init__(self, struct, member, value):
+        self.struct = struct
+        self.member = member
+        self.value = value
+
+
+class VulkanVideoFormat():
+    def __init__(self, name, usage):
+        self.name = name
+        self.usage = usage
+        self.properties = OrderedDict()
+        self.requiredCaps = list()
+        super().__init__()
+
+    def matchesImageUsageFlags(self, flags):
+        # Check if the specified list of VkImageUsageFlags matches the usage criteria
+        # for this video format category
+        return evalConditionFromList(self.usage, flags)
+
+    def hasRequiredCapabilities(self, videoCapabilities, registry):
+        hasAllRequiredCaps = True
+        for requiredCap in self.requiredCaps:
+            capabilitiesData = None
+            if requiredCap.struct in videoCapabilities:
+                capabilitiesData = videoCapabilities[requiredCap.struct]
+            else:
+                # Check also for possible aliases
+                for alias in registry.structs[requiredCap.struct].aliases:
+                    if alias in videoCapabilities:
+                        capabilitiesData = videoCapabilities[alias]
+
+            if capabilitiesData is not None:
+                if requiredCap.member in capabilitiesData:
+                    value = capabilitiesData[requiredCap.member]
+                    if isinstance(value, list):
+                        hasAllRequiredCaps = evalConditionFromList(requiredCap.value, value)
+                    else:
+                        hasAllRequiredCaps = (requiredCap.value == value)
+                else:
+                    # Required capability structure member is missing
+                    hasAllRequiredCaps = False
+            else:
+                # Entire required capability structure is missing
+                hasAllRequiredCaps = False
+        return hasAllRequiredCaps
+
+
+class VulkanVideoProfileStructMember():
+    def __init__(self, name):
+        self.name = name
+        self.values = OrderedDict()
+
+
+class VulkanVideoProfileStruct():
+    def __init__(self, struct):
+        self.struct = struct
+        self.members = OrderedDict()
+
+
+class VulkanVideoCodec():
+    def __init__(self, name, extend = None, value = None):
+        self.name = name
+        self.value = value
+        self.profileStructs = OrderedDict()
+        self.capabilities = OrderedDict()
+        self.formats = OrderedDict()
+        if extend is not None:
+            self.profileStructs = copy.deepcopy(extend.profileStructs)
+            self.capabilities = copy.deepcopy(extend.capabilities)
+            self.formats = copy.deepcopy(extend.formats)
+
+    def isSpecific(self):
+        return self.value is not None
+
+    def getVideoFormatCategoriesForFormat(self, videoFormat, videoCapabilities, registry):
+        result = list()
+
+        baseProps = registry.getBaseVideoFormatPropertiesFromVideoFormat(videoFormat)
+
+        # Find the the video format categories the video format belongs to
+        if 'imageUsageFlags' in baseProps:
+            foundVideoFormatCategory = False
+            hadMatchWithMissingPrerequisities = None
+            for videoFormatCategory in self.formats.values():
+                # Check if the video format matches the image usage requirements of the video format category
+                if not videoFormatCategory.matchesImageUsageFlags(baseProps['imageUsageFlags']):
+                    continue
+                # Make sure that the video profile has the required capabilites for this video format category
+                if not videoFormatCategory.hasRequiredCapabilities(videoCapabilities, registry):
+                    hadMatchWithMissingPrerequisities = videoFormatCategory
+                    continue
+                # This video format does indeed fall into this video format category
+                foundVideoFormatCategory = True
+                result.append(videoFormatCategory)
+            if not foundVideoFormatCategory:
+                if hadMatchWithMissingPrerequisities is not None:
+                    Log.e("Video format from category {0} with missing prerequisites:\n{1}".format(hadMatchWithMissingPrerequisities.name, json.dumps(videoFormat, indent=4)))
+                else:
+                    Log.e("Unrecognized video format category for imageUsageFlags in video format:\n{0}".format(json.dumps(videoFormat, indent=4)))
+        else:
+            Log.f("Missing imageUsageFlags from video format:\n{0}".format(json.dumps(videoFormat, indent=4)))
+
+        return result
 
 
 class VulkanVersionNumber():
@@ -2525,6 +3390,14 @@ class VulkanRegistry():
         xml = etree.parse(registryFile)
         stripNonmatchingAPIs(xml.getroot(), api, actuallyDelete = True)
 
+        videoRegistryFile = registryFile.replace('vk.xml', 'video.xml')
+        if os.path.isfile(videoRegistryFile):
+            Log.i("Loading video registry file: '{0}'".format(videoRegistryFile))
+            videoxml = etree.parse(videoRegistryFile)
+        else:
+            Log.w("Video registry file '{0}' does not exist, building without video support".format(videoRegistryFile))
+            videoxml = None
+
         self.api = api
         self.require = VulkanDefinitions()
         self.remove = VulkanDefinitions()
@@ -2546,6 +3419,7 @@ class VulkanRegistry():
         self.parseFeatures(xml)
         self.parseLimits(xml)
         self.parseHeaderVersion(xml)
+        self.parseVideoCodecs(xml, videoxml)
         self.applyWorkarounds()
 
     def findAllFeatures(self, xml, xpath = None):
@@ -3067,6 +3941,268 @@ class VulkanRegistry():
                 self.headerVersionNumber.patch = int(name.tail.lstrip())
                 return
 
+    def parseVideoConstants(self, videoxml):
+        for constant in videoxml.findall("./extensions/extension/require/enum[@value]"):
+            self.constants[constant.get('name')] = constant.get('value')
+
+    def parseVideoEnums(self, videoxml):
+        # Find enum definitions
+        for enum in videoxml.findall("./enums[@name]"):
+            name = enum.get('name')
+
+            # Only add video enum type if it is a required external type
+            if name in self.externalTypes:
+                # Create enum type
+                enumDef = VulkanEnum(name)
+
+                # First collect base values
+                for value in enum.findall("./enum"):
+                    if value.get('alias') is None:
+                        enumDef.values.append(value.get('name'))
+
+                # Store video enum type in the registry
+                self.enums[name] = enumDef
+
+                # Remove video enum type from the set of external types
+                self.externalTypes.remove(name)
+
+    def parseVideoCodecs(self, xml, videoxml):
+        if videoxml is None:
+            return
+
+        self.videoCodecs = dict()
+
+        # Used to look up video codecs based on the video codec op value
+        self.videoCodecsByValue = dict()
+
+        # Used to reverse look up video codecs by the defined structure names if no video codec op value is available
+        self.videoCodecsByStructName = dict()
+
+        self.parseVideoConstants(videoxml)
+        self.parseVideoEnums(videoxml)
+
+        xmlVideoCodecs = xml.find("./videocodecs")
+        for xmlVideoCodec in xmlVideoCodecs.findall("./videocodec"):
+            name = xmlVideoCodec.get('name')
+            extend = xmlVideoCodec.get('extend')
+            value = xmlVideoCodec.get('value')
+            if value is None:
+                # Video codec category
+                self.videoCodecs[name] = VulkanVideoCodec(name)
+            else:
+                # Specific video codec
+                self.videoCodecs[name] = VulkanVideoCodec(name, self.videoCodecs[extend], value)
+                self.videoCodecsByValue[value] = self.videoCodecs[name]
+            videoCodec = self.videoCodecs[name]
+
+            for xmlVideoProfiles in xmlVideoCodec.findall("./videoprofiles"):
+                videoProfileStructName = xmlVideoProfiles.get('struct')
+                videoCodec.profileStructs[videoProfileStructName] = VulkanVideoProfileStruct(videoProfileStructName)
+                videoProfileStruct = videoCodec.profileStructs[videoProfileStructName]
+                self.videoCodecsByStructName[videoProfileStructName] = videoCodec
+
+                for xmlVideoProfileMember in xmlVideoProfiles.findall("./videoprofilemember"):
+                    memberName = xmlVideoProfileMember.get('name')
+                    videoProfileStruct.members[memberName] = VulkanVideoProfileStructMember(memberName)
+                    videoProfileStructMember = videoProfileStruct.members[memberName]
+
+                    for xmlVideoProfile in xmlVideoProfileMember.findall("./videoprofile"):
+                        videoProfileStructMember.values[xmlVideoProfile.get('value')] = xmlVideoProfile.get('name')
+
+            for xmlVideoCapabilities in xmlVideoCodec.findall("./videocapabilities"):
+                capabilityStructName = xmlVideoCapabilities.get('struct')
+                videoCodec.capabilities[capabilityStructName] = capabilityStructName
+                self.videoCodecsByStructName[capabilityStructName] = videoCodec
+
+            for xmlVideoFormat in xmlVideoCodec.findall("./videoformat"):
+                videoFormatName = xmlVideoFormat.get('name')
+                videoFormatExtend = xmlVideoFormat.get('extend')
+                if videoFormatName is not None:
+                    # This is a new video format category
+                    videoFormatUsage = xmlVideoFormat.get('usage')
+                    videoCodec.formats[videoFormatName] = VulkanVideoFormat(videoFormatName, videoFormatUsage)
+                    videoFormat = videoCodec.formats[videoFormatName]
+                elif videoFormatExtend is not None:
+                    # This is an extension to an already defined video format category
+                    if videoFormatExtend in videoCodec.formats:
+                        videoFormat = videoCodec.formats[videoFormatExtend]
+                    else:
+                        Log.f("Video format category '{0}' not found but it is attempted to be extended".format(videoFormatExtend))
+                else:
+                    Log.f('"name" or "extend" is attribute is required for "videoformat" element')
+
+                for xmlVideoFormatProperties in xmlVideoFormat.findall("./videoformatproperties"):
+                    propertiesStructName = xmlVideoFormatProperties.get('struct')
+                    videoFormat.properties[propertiesStructName] = propertiesStructName
+                    self.videoCodecsByStructName[propertiesStructName] = videoCodec
+
+                for xmlVideoFormatRequiredCap in xmlVideoFormat.findall("./videorequirecapabilities"):
+                    requiredCapStruct = xmlVideoFormatRequiredCap.get('struct')
+                    requiredCapMember = xmlVideoFormatRequiredCap.get('member')
+                    requiredCapValue = xmlVideoFormatRequiredCap.get('value')
+                    videoFormat.requiredCaps.append(VulkanVideoRequiredCapabilities(requiredCapStruct, requiredCapMember, requiredCapValue))
+
+    def getBaseVideoProfileInfoFromVideoProfile(self, videoProfile):
+        if not 'profile' in videoProfile:
+            return None
+        profile = videoProfile['profile']
+        if 'VkVideoProfileInfoKHR' in profile:
+            return profile['VkVideoProfileInfoKHR']
+        else:
+            # Check also for possible aliases
+            for alias in self.structs['VkVideoProfileInfoKHR'].aliases:
+                if alias in profile:
+                    return profile[alias]
+            return None
+
+    def getBaseVideoFormatPropertiesFromVideoFormat(self, format):
+        if 'VkVideoFormatPropertiesKHR' in format:
+            return format['VkVideoFormatPropertiesKHR']
+        else:
+            # Check also for possible aliases
+            for alias in self.structs['VkVideoFormatPropertiesKHR'].aliases:
+                if alias in format:
+                    return format[alias]
+            Log.f("Did not find base video format properties in video format:\n{0}".format(json.dumps(format, indent=4)))
+            return None
+
+    def getVideoCodecFromVideoProfile(self, videoProfile):
+        base = self.getBaseVideoProfileInfoFromVideoProfile(videoProfile)
+        if base is not None and 'videoCodecOperation' in base:
+            if base['videoCodecOperation'] not in self.videoCodecsByValue:
+                Log.f("Unrecognized videoCodecOperation in video profile:\n{0}".format(json.dumps(videoProfile['profile'], indent=4)))
+            return self.videoCodecsByValue[base['videoCodecOperation']]
+        else:
+            # No VkVideoProfileInfoKHR in the profile definition or no videoCodecOperation specified
+            # We do a reverse lookup based on the defined structures
+            videoCodec = None
+            structNames = set()
+            if 'profile' in videoProfile:
+                structNames = structNames.union(set(videoProfile['profile'].keys()))
+            if 'capabilities' in videoProfile:
+                structNames = structNames.union(set(videoProfile['capabilities'].keys()))
+            if 'formats' in videoProfile:
+                for videoFormat in videoProfile['formats']:
+                    structNames = structNames.union(set(videoFormat.keys()))
+            for structName in structNames:
+                if structName in self.videoCodecsByStructName:
+                    newMatchingVideoCodec = self.videoCodecsByStructName[structName]
+                    if videoCodec is None or not videoCodec.isSpecific():
+                        videoCodec = newMatchingVideoCodec
+            if videoCodec is None:
+                # No match found, create an empty video codec to represent general requirements
+                videoCodec = VulkanVideoCodec("General")
+            return videoCodec
+
+
+    def getVideoProfileNameFromVideoProfile(self, videoProfile):
+        videoCodec = self.getVideoCodecFromVideoProfile(videoProfile)
+        base = self.getBaseVideoProfileInfoFromVideoProfile(videoProfile)
+
+        # Video profile name always contains the codec name which is either the specific codec name,
+        # "General" to indicate no specific codec profile, or one of the codec categories like "Decode" and "Encode"
+        profileName = videoCodec.name
+
+        if base is not None:
+            profile = videoProfile['profile']
+
+            # Helper function populating lookup tables with alias values
+            def genAliasValues(flagBitsTypeName, map):
+                flagBitsTypeName = self.enums[self.getNonAliasTypeName(flagBitsTypeName, self.enums)]
+                for alias, value in flagBitsTypeName.aliasValues.items():
+                    if alias in map:
+                        map[value] = map[alias]
+                    elif value in map:
+                        map[value] = map[alias]
+                return map
+
+            formatModifiers = []
+
+            chromaSubsamplingMap = genAliasValues('VkVideoChromaSubsamplingFlagBitsKHR', {
+                "VK_VIDEO_CHROMA_SUBSAMPLING_420_BIT_KHR": "4:2:0",
+                "VK_VIDEO_CHROMA_SUBSAMPLING_422_BIT_KHR": "4:2:2",
+                "VK_VIDEO_CHROMA_SUBSAMPLING_444_BIT_KHR": "4:4:4",
+                "VK_VIDEO_CHROMA_SUBSAMPLING_MONOCHROME_BIT_KHR": "monochrome"
+            })
+            if 'chromaSubsampling' in base:
+                # Include chroma subsampling info in the name as it is present
+                if len(base['chromaSubsampling']) != 1:
+                    Log.f("Expected chromaSubsampling to only contain a single value in video profile:\n{0}".format(json.dumps(profile, indent=4)))
+                if base['chromaSubsampling'][0] not in chromaSubsamplingMap:
+                    Log.f("Unrecognized chromaSubsampling in video profile:\n%s".format(json.dumps(profile, indent=4)))
+                chromaSubsampling = chromaSubsamplingMap[base['chromaSubsampling'][0]]
+            else:
+                chromaSubsampling = None
+
+            if chromaSubsampling is not None:
+                formatModifiers.append(chromaSubsampling)
+
+            bitDepthMap = genAliasValues('VkVideoComponentBitDepthFlagBitsKHR', {
+                "VK_VIDEO_COMPONENT_BIT_DEPTH_8_BIT_KHR": 8,
+                "VK_VIDEO_COMPONENT_BIT_DEPTH_10_BIT_KHR": 10,
+                "VK_VIDEO_COMPONENT_BIT_DEPTH_12_BIT_KHR": 12
+            })
+            if 'lumaBitDepth' in base:
+                if len(base['lumaBitDepth']) != 1:
+                    Log.f("Expected lumaBitDepth to only contain a single value in video profile:\n{0}".format(json.dumps(profile, indent=4)))
+                if base['lumaBitDepth'][0] not in bitDepthMap:
+                    Log.f("Unrecognized lumaBitDepth in profile:\n{0}".format(json.dumps(profile, indent=4)))
+                lumaBitDepth = bitDepthMap[base['lumaBitDepth'][0]]
+            else:
+                lumaBitDepth = None
+
+            if chromaSubsampling != 'monochrome' and 'chromaBitDepth' in base:
+                if len(base['chromaBitDepth']) != 1:
+                    Log.f("Expected chromaBitDepth to only contain a single value in video profile:\n{0}".format(json.dumps(profile, indent=4)))
+                if base['chromaBitDepth'][0] not in bitDepthMap:
+                    Log.f("Unrecognized chromaBitDepth in profile:\n{0}".format(json.dumps(profile, indent=4)))
+                chromaBitDepth = bitDepthMap[base['chromaBitDepth'][0]]
+            else:
+                # For monochrome chromaBitDepth is ignored
+                # This case works also if lumaBitDepth is None because it was not present
+                chromaBitDepth = lumaBitDepth
+
+            if lumaBitDepth == chromaBitDepth:
+                if lumaBitDepth is not None:
+                    formatModifiers.append("{0}-bit".format(lumaBitDepth))
+            else:
+                formatModifiers.append("{0}:{1}-bit".format(lumaBitDepth if lumaBitDepth is not None else "*",
+                                                            chromaBitDepth if chromaBitDepth is not None else "*"))
+
+            # If there is format information, then include it in the video profile name in parantheses
+            if len(formatModifiers) > 0:
+                profileName += " ({0})".format(" ".join(formatModifiers))
+
+        for profileStruct in videoCodec.profileStructs.values():
+            profileStructData = None
+            if profileStruct.struct in profile:
+                profileStructData = profile[profileStruct.struct]
+            else:
+                # Check also for possible aliases
+                for alias in self.structs[profileStruct.struct].aliases:
+                    if alias in profile:
+                        profileStructData = profile[alias]
+
+            if profileStructData is None:
+                # Profile struct is not present, this is a "wildcard" video profile definition
+                continue
+
+            for profileStructMember in profileStruct.members.values():
+                if not profileStructMember.name in profileStructData:
+                    # Profile struct member is not present, this is a "wildcard" video profile definition
+                    continue
+
+                profileStructMemberValue = profileStructData[profileStructMember.name]
+                if isinstance(profileStructMemberValue, bool):
+                    profileStructMemberValue = 'VK_TRUE' if profileStructMemberValue else 'VK_FALSE'
+                if profileStructMemberValue not in profileStructMember.values:
+                    Log.f("Unrecognized profile struct member value for '{0}::{1}' in video profile:\n{2}".format(profileStruct.struct, profileStructMember.name, json.dumps(profile, indent=4)))
+
+                # Append codec-specific profile information to the profile name
+                profileName += " {0}".format(profileStructMember.values[profileStructMemberValue])
+
+        return profileName
+
     def applyWorkarounds(self):
         if self.headerVersionNumber.patch < 207: # vk.xml declares maxColorAttachments with 'bitmask' limittype before header 207
             self.structs['VkPhysicalDeviceLimits'].members['maxColorAttachments'].limittype = 'max'
@@ -3398,6 +4534,8 @@ class VulkanProfileCapabilities():
         self.properties = dict()
         self.formats = dict()
         self.queueFamiliesProperties = []
+        self.videoProfiles = []
+        self.videoProfilesByName = OrderedDict()
         if merge_mode:
             for json_capabilities in json_capabilities_list:
                 self.mergeCaps(registry, json_capabilities, True)
@@ -3414,6 +4552,7 @@ class VulkanProfileCapabilities():
             self.mergeProfileProperties(caps)
             self.mergeProfileFormats(caps)
             self.mergeProfileQueueFamiliesProperties(caps)
+            self.mergeProfileVideoProfiles(registry, caps)
 
     def mergeProfileCapData(self, dst, src):
         if type(src) != type(dst):
@@ -3474,6 +4613,22 @@ class VulkanProfileCapabilities():
     def mergeProfileQueueFamiliesProperties(self, data):
         if data.get('queueFamiliesProperties') != None:
             self.queueFamiliesProperties.extend(data['queueFamiliesProperties'])
+
+    def mergeProfileVideoProfiles(self, registry, data):
+        if data.get('videoProfiles') != None:
+            for videoProfile in data.get('videoProfiles'):
+                videoProfileName = registry.getVideoProfileNameFromVideoProfile(videoProfile)
+                if not videoProfileName in self.videoProfilesByName:
+                    self.videoProfilesByName[videoProfileName] = {
+                        'profile': videoProfile['profile'] if 'profile' in videoProfile else dict(),
+                        'capabilities': dict(),
+                        'formats': list()
+                    }
+                    self.videoProfiles.append(self.videoProfilesByName[videoProfileName])
+                if 'capabilities' in videoProfile:
+                    self.mergeProfileCapData(self.videoProfilesByName[videoProfileName]['capabilities'], videoProfile['capabilities'])
+                if 'formats' in videoProfile:
+                    self.videoProfilesByName[videoProfileName]['formats'].extend(videoProfile['formats'])
 
 
 class VulkanProfileStructs():
@@ -3559,6 +4714,40 @@ class VulkanProfileStructs():
                         self.format.append(registry.getChainableStructDef(name, 'VkFormatProperties2'))
         self.eliminateAliases(self.format)
 
+        # Video profile struct types
+        self.videoProfileInfo = OrderedDict()
+        self.videoCapability = OrderedDict()
+        self.videoFormat = OrderedDict()
+
+        for value in caps.values():
+            for videoProfileName, videoProfile in value.videoProfilesByName.items():
+                # Video profile info struct types
+                videoProfileInfo = self.videoProfileInfo[videoProfileName] = []
+                for name in videoProfile['profile']:
+                    structDef = registry.getChainableStructDef(name, 'VkVideoProfileInfoKHR')
+                    if structDef not in videoProfileInfo:
+                        videoProfileInfo.append(structDef)
+                self.eliminateAliases(videoProfileInfo)
+
+                # Video capability struct types
+                videoCapability = self.videoCapability[videoProfileName] = []
+                if 'capabilities' in videoProfile:
+                    for name in videoProfile['capabilities']:
+                        structDef = registry.getChainableStructDef(name, 'VkVideoCapabilitiesKHR')
+                        if structDef not in videoCapability:
+                            videoCapability.append(structDef)
+                self.eliminateAliases(videoCapability)
+
+                # Video format property struct types
+                videoFormat = self.videoFormat[videoProfileName] = []
+                if 'formats' in videoProfile:
+                    for format in videoProfile['formats']:
+                        for name in format:
+                            structDef = registry.getChainableStructDef(name, 'VkVideoFormatPropertiesKHR')
+                            if structDef not in videoFormat:
+                                videoFormat.append(structDef)
+                self.eliminateAliases(videoFormat)
+
 
     def eliminateAliases(self, structs):
         structNames = []
@@ -3640,6 +4829,7 @@ class VulkanProfile():
         self.validateStructDependencies('MERGE', self.merge_capabilities)
         for capabilities_key, capabilities_value in self.split_capabilities.items():
             self.validateStructDependencies(capabilities_key, capabilities_value)
+            self.validateVideoProfiles(capabilities_key, capabilities_value)
 
 
     def validateStructDependencies(self, capabilities_key, capabilities_value):
@@ -3652,6 +4842,17 @@ class VulkanProfile():
         for queueFamilyData in capabilities_value.queueFamiliesProperties:
             for queueFamilyProp in queueFamilyData:
                 self.validateStructDependency(capabilities_key, capabilities_value, queueFamilyProp)
+
+        for videoProfile in capabilities_value.videoProfiles:
+            for videoProfileInfoStruct in videoProfile['profile']:
+                self.validateStructDependency(capabilities_key, capabilities_value, videoProfileInfoStruct)
+            if 'capabilities' in videoProfile:
+                for videoCapabilityStruct in videoProfile['capabilities']:
+                    self.validateStructDependency(capabilities_key, capabilities_value, videoCapabilityStruct)
+            if 'formats' in videoProfile:
+                for videoFormat in videoProfile['formats']:
+                    for videoFormatPropStruct in videoFormat:
+                        self.validateStructDependency(capabilities_key, capabilities_value, videoFormatPropStruct)
 
 
     def validateStructDependency(self, capabilities_key, capabilities_value, structName):
@@ -3682,6 +4883,45 @@ class VulkanProfile():
             Log.f("Struct '{0}' in profile '{1}' does not exist in the registry".format(structName, self.key))
 
 
+    def validateVideoProfiles(self, capabilities_key, capabilities_value):
+        def isStructInList(structName, structList):
+            if structName in structList:
+                return True
+            else:
+                # Check also for possible aliases
+                for alias in self.registry.structs[structName].aliases:
+                    if alias in structList:
+                        return True
+            return False
+
+        for videoProfile in capabilities_value.videoProfiles:
+            # This already validates that the video profile description is valid
+            videoCodec = self.registry.getVideoCodecFromVideoProfile(videoProfile)
+            videoProfileName = self.registry.getVideoProfileNameFromVideoProfile(videoProfile)
+
+            # Validate that the video profile description contains only video profile info structures allowed by the video codec
+            if 'profile' in videoProfile:
+                for videoProfileInfoStruct in videoProfile['profile']:
+                    if not isStructInList(videoProfileInfoStruct, ['VkVideoProfileInfoKHR'] + list(videoCodec.profileStructs.keys())):
+                        Log.e("Unexpected video profile info structure '{0}' in video profile '{1}' in profile '{2}'.".format(videoProfileInfoStruct, videoProfileName, self.key))
+
+            # Validate that the video capabilities contain only video capability structures allowed by the video codec
+            if 'capabilities' in videoProfile:
+                for videoCapabilityStruct in videoProfile['capabilities']:
+                    if not isStructInList(videoCapabilityStruct, ['VkVideoCapabilitiesKHR'] + list(videoCodec.capabilities.keys())):
+                        Log.e("Unexpected video capability structure '{0}' in video profile '{1}' in profile '{2}'.".format(videoCapabilityStruct, videoProfileName, self.key))
+
+            # Validate that the video format properties of all video formats contain only video format properties structures allowed by
+            # the video format categories of the video codec that the video format falls into
+            if 'formats' in videoProfile:
+                for videoFormat in videoProfile['formats']:
+                    videoFormatCategories = videoCodec.getVideoFormatCategoriesForFormat(videoFormat, videoProfile['capabilities'] if 'capabilities' in videoProfile else {}, self.registry)
+                    for videoFormatCategory in videoFormatCategories:
+                        for videoFormatPropStruct in videoFormat:
+                            if not isStructInList(videoFormatPropStruct, ['VkVideoFormatPropertiesKHR'] + list(videoFormatCategory.properties.keys())):
+                                Log.e("Unexpected video format properties structure '{0}' for video format category '{1}' in video profile '{2}' in profile '{3}'.".format(videoFormatPropStruct, videoFormatCategory.name, videoProfileName, self.key))
+
+
     def generatePrivateImpl(self, debugMessages):
         uname = self.key.upper()
         gen = ('#ifdef {0}\n'
@@ -3693,14 +4933,18 @@ class VulkanProfile():
             gen += self.gen_extensionData(self.merge_capabilities, 'instance')
             gen += self.gen_extensionData(self.merge_capabilities, 'device')
             gen += self.gen_structDesc(self.merge_capabilities, debugMessages)
+            gen += self.gen_videoProfileStructDesc(self.merge_capabilities, debugMessages)
         gen += '\n'
 
+        gen += 'namespace blocks {\n'
         for key, value in self.split_capabilities.items():
-            gen += ('namespace {0} {{').format(key)
+            gen += ('namespace {0} {{\n').format(key)
             gen += self.gen_extensionData(value, 'instance')
             gen += self.gen_extensionData(value, 'device')
             gen += self.gen_structDesc(value, debugMessages)
-            gen += ('}} //namespace {0}\n').format(key)
+            gen += self.gen_videoProfileStructDesc(value, debugMessages)
+            gen += ('}} // namespace {0}\n').format(key)
+        gen += '} // namespace blocks\n'
 
         gen += ('}} // namespace {1}\n'
                 '#endif // {0}\n\n').format(self.key, uname)
@@ -4005,6 +5249,34 @@ class VulkanProfile():
         return gen
 
 
+    def gen_structArrayChainerFunc(self, structDefs, baseStruct):
+        gen = '    [](uint32_t count, VkBaseOutStructure* p, void* pUser, PFN_vpStructArrayChainerCb pfnCb) {\n'
+        if len(structDefs) > 0:
+            gen += '        struct ExtStructs {\n'
+            for structDef in structDefs:
+                if structDef.name != baseStruct:
+                    varName = structDef.name[2].lower() + structDef.name[3:]
+                    gen += '            {0} {1};\n'.format(structDef.name, varName)
+            gen += '        };\n'
+            gen += '        std::vector<ExtStructs> ext_structs{};\n'
+            gen += '        if (count > 0) {\n'
+            gen += '            ext_structs.resize(count);\n'
+            gen += '            {0}* pArray = static_cast<{0}*>(static_cast<void*>(p));\n'.format(baseStruct)
+            gen += '            for (uint32_t i = 0; i < count; ++i) {\n'
+            pNext = 'nullptr'
+            for structDef in structDefs:
+                if structDef.name != baseStruct:
+                    varName = structDef.name[2].lower() + structDef.name[3:]
+                    gen += '                ext_structs[i].{0} = {1}{{ {2}, {3} }};\n'.format(varName, structDef.name, structDef.sType, pNext)
+                    pNext = '&ext_structs[i].' + varName
+            gen += '                pArray[i].pNext = static_cast<VkBaseOutStructure*>(static_cast<void*>({0}));\n'.format(pNext)
+            gen += '            }\n'
+            gen += '        }\n'
+        gen += ('        pfnCb(count, p, pUser);\n'
+                '    },\n')
+        return gen
+
+
     def gen_structDesc(self, capabilities, debugMessages):
         gen = ''
 
@@ -4047,8 +5319,8 @@ class VulkanProfile():
                 '    }\n'
                 '};\n')
 
-        # Queue family descriptor unsupported yet
-        if self.structs.queueFamily:
+        # Queue family descriptor
+        if self.structs.queueFamily and capabilities.queueFamiliesProperties:
             gen += ('\n'
                     'static const VpQueueFamilyDesc queueFamilyDesc[] = {\n')
             for queueFamilyCaps in capabilities.queueFamiliesProperties:
@@ -4092,7 +5364,7 @@ class VulkanProfile():
                 'static const VpStructChainerDesc chainerDesc = {\n')
         gen += self.gen_structChainerFunc(self.structs.feature, 'VkPhysicalDeviceFeatures2KHR')
         gen += self.gen_structChainerFunc(self.structs.property, 'VkPhysicalDeviceProperties2KHR')
-        gen += self.gen_structChainerFunc(self.structs.queueFamily, 'VkQueueFamilyProperties2KHR')
+        gen += self.gen_structArrayChainerFunc(self.structs.queueFamily, 'VkQueueFamilyProperties2KHR')
         gen += self.gen_structChainerFunc(self.structs.format, 'VkFormatProperties2KHR')
         gen += '};\n'
 
@@ -4102,6 +5374,113 @@ class VulkanProfile():
             gen = re.sub(r"(VP_DEBUG_COND_MSG\([^,]+[^:]+: )prettify_Vk([^\-]+)\->([^\)]+\))", r"\1Vk\2::\3", gen)
             # Prettify bitmask comparisons
             gen = re.sub(r"(VP_DEBUG_COND_MSG\([^,]+[^:]+: )vpCheckFlags\(prettify_Vk([^\-]+)\->([^,]+), ([^\)]+)\)", r"\1Vk\2::\3 contains \4", gen)
+
+        return gen
+
+    def gen_videoProfileStructDesc(self, capabilities, debugMessages):
+        if len(capabilities.videoProfiles) == 0:
+            return ''
+
+        gen = ''
+
+        fillFmt = '{0};\n'
+        cmpFmt = 'ret = ret && ({0});\n'
+
+        videoProfileIndex = 0
+        for videoProfileName, videoProfile in capabilities.videoProfilesByName.items():
+            videoProfileIndex += 1
+
+            gen += '\nnamespace video_profile_{0} {{\n'.format(videoProfileIndex)
+
+            gen += self.gen_structTypeData(self.structs.videoProfileInfo[videoProfileName], 'info')
+            gen += self.gen_structTypeData(self.structs.videoCapability[videoProfileName], 'capability')
+            gen += self.gen_structTypeData(self.structs.videoFormat[videoProfileName], 'format')
+
+            # Video profile info descriptor
+            gen += ('\n'
+                    'static const VpVideoProfileInfoDesc infoDesc = {\n'
+                    '    [](VkBaseOutStructure* p) { (void)p;\n')
+            gen += self.gen_structFunc(self.structs.videoProfileInfo[videoProfileName], videoProfile['profile'], self.gen_structFill, fillFmt)
+            gen += ('    },\n'
+                    '    [](VkBaseOutStructure* p) -> bool { (void)p;\n'
+                    '        bool ret = true;\n')
+            gen += self.gen_structFunc(self.structs.videoProfileInfo[videoProfileName], videoProfile['profile'], self.gen_structCompare, cmpFmt)
+            gen += ('        return ret;\n'
+                    '    }\n'
+                    '};\n')
+
+            # Video capability descriptor
+            if debugMessages:
+                cmpFmtCapabilities = 'ret = ret && ({0}); VP_DEBUG_COND_MSG(!({0}), "Unsupported video capability condition: {0}");\n'
+            else:
+                cmpFmtCapabilities = cmpFmt
+
+            gen += ('\n'
+                    'static const VpVideoCapabilityDesc capabilityDesc = {\n'
+                    '    [](VkBaseOutStructure* p) { (void)p;\n')
+            gen += self.gen_structFunc(self.structs.videoCapability[videoProfileName], videoProfile['capabilities'], self.gen_structFill, fillFmt)
+            gen += ('    },\n'
+                    '    [](VkBaseOutStructure* p) -> bool { (void)p;\n'
+                    '        bool ret = true;\n')
+            gen += self.gen_structFunc(self.structs.videoCapability[videoProfileName], videoProfile['capabilities'], self.gen_structCompare, cmpFmtCapabilities, debugMessages)
+            gen += ('        return ret;\n'
+                    '    }\n'
+                    '};\n')
+
+            # Video format descriptor
+            if 'formats' in videoProfile and len(videoProfile['formats']) > 0:
+                gen += ('\n'
+                        'static const VpVideoFormatDesc formatDesc[] = {\n')
+                for format in videoProfile['formats']:
+                    gen += ('    {\n'
+                            '        [](VkBaseOutStructure* p) { (void)p;\n')
+                    gen += self.gen_structFunc(self.structs.videoFormat[videoProfileName], format, self.gen_structFill, fillFmt)
+                    gen += ('        },\n'
+                            '        [](VkBaseOutStructure* p) -> bool { (void)p;\n'
+                            '            bool ret = true;\n')
+                    gen += self.gen_structFunc(self.structs.videoFormat[videoProfileName], format, self.gen_structCompare, cmpFmt)
+                    gen += ('            return ret;\n'
+                            '        }\n'
+                            '    },\n')
+                gen += '};\n'
+
+            # Structure chaining descriptors
+            gen += ('\n'
+                    'static const VpVideoProfileStructChainerDesc chainerDesc = {\n')
+            gen += self.gen_structChainerFunc(self.structs.videoProfileInfo[videoProfileName], 'VkVideoProfileInfoKHR')
+            gen += self.gen_structChainerFunc(self.structs.videoCapability[videoProfileName], 'VkVideoCapabilitiesKHR')
+            gen += self.gen_structArrayChainerFunc(self.structs.videoFormat[videoProfileName], 'VkVideoFormatPropertiesKHR')
+            gen += '};\n'
+
+            gen += '}} // namespace video_profile_{0}\n'.format(videoProfileIndex)
+
+        # Video profile descriptor
+        gen += ('\n'
+                'static const VpVideoProfileDesc videoProfileDesc[] = {\n')
+
+        def gen_dataArrayInfo(condition, namespace, name):
+            if condition:
+                return 'static_cast<uint32_t>(std::size({0}::{1})), {0}::{1},\n'.format(namespace, name)
+            else:
+                return '0, nullptr,\n'
+
+        videoProfileIndex = 0
+        for videoProfileName, videoProfile in capabilities.videoProfilesByName.items():
+            videoProfileIndex += 1
+            namespace = 'video_profile_{0}'.format(videoProfileIndex)
+
+            gen += ('    {{\n'
+                    '        {{ "{0}" }},\n').format(videoProfileName)
+            gen += '        ' + gen_dataArrayInfo(self.structs.videoProfileInfo[videoProfileName], namespace, 'infoStructTypes')
+            gen += '        {0}::infoDesc,\n'.format(namespace)
+            gen += '        ' + gen_dataArrayInfo(self.structs.videoCapability[videoProfileName], namespace, 'capabilityStructTypes')
+            gen += '        {0}::capabilityDesc,\n'.format(namespace)
+            gen += '        ' + gen_dataArrayInfo(self.structs.videoFormat[videoProfileName], namespace, 'formatStructTypes')
+            gen += '        ' + gen_dataArrayInfo('formats' in videoProfile and len(videoProfile['formats']) > 0, namespace, 'formatDesc')
+            gen += '        {0}::chainerDesc,\n'.format(namespace)
+            gen += '    },\n'
+
+        gen += '};\n'
 
         return gen
 
@@ -4332,6 +5711,7 @@ class VulkanProfilesLibraryGenerator():
         gen = '\n'
         gen += 'namespace detail {\n\n'
         gen += PRIVATE_DEFS
+        gen += self.gen_videoProfileEnumerator()
         gen += self.gen_profilePrivateImpl()
         gen += self.gen_profileDescTable()
         gen += self.gen_profileFeatureChain()
@@ -4354,20 +5734,21 @@ class VulkanProfilesLibraryGenerator():
             return '        0, nullptr,\n'
 
     def gen_variants(self, capabilities_key, capabilities_value):
-        gen = '            {\n'
-        gen += '        ' + ('        "{0}",\n').format(capabilities_value.blockName)
-        gen += '        ' + self.gen_dataArrayInfo(capabilities_value.instanceExtensions, '{0}::instanceExtensions'.format(capabilities_key))
-        gen += '        ' + self.gen_dataArrayInfo(capabilities_value.deviceExtensions, '{0}::deviceExtensions'.format(capabilities_key))
-        gen += '        ' + self.gen_dataArrayInfo(capabilities_value.features, 'featureStructTypes')
-        gen += '                {0}::featureDesc,\n'.format(capabilities_key)
-        gen += '        ' + self.gen_dataArrayInfo(capabilities_value.properties, 'propertyStructTypes')
-        gen += '                {0}::propertyDesc,\n'.format(capabilities_key)
-        gen += '        ' + self.gen_dataArrayInfo(capabilities_value.queueFamiliesProperties, 'queueFamilyStructTypes')
-        gen += '        ' + self.gen_dataArrayInfo(capabilities_value.queueFamiliesProperties, '{0}::queueFamilyDesc'.format(capabilities_key))
-        gen += '        ' + self.gen_dataArrayInfo(capabilities_value.formats, 'formatStructTypes')
-        gen += '        ' + self.gen_dataArrayInfo(capabilities_value.formats, '{0}::formatDesc'.format(capabilities_key))
-        gen += '                {0}::chainerDesc,\n'.format(capabilities_key)
-        gen += '            },\n'
+        gen = '                {\n'
+        gen += '            ' + ('        "{0}",\n').format(capabilities_value.blockName)
+        gen += '            ' + self.gen_dataArrayInfo(capabilities_value.instanceExtensions, 'blocks::{0}::instanceExtensions'.format(capabilities_key))
+        gen += '            ' + self.gen_dataArrayInfo(capabilities_value.deviceExtensions, 'blocks::{0}::deviceExtensions'.format(capabilities_key))
+        gen += '            ' + self.gen_dataArrayInfo(capabilities_value.features, 'featureStructTypes')
+        gen += '                    blocks::{0}::featureDesc,\n'.format(capabilities_key)
+        gen += '            ' + self.gen_dataArrayInfo(capabilities_value.properties, 'propertyStructTypes')
+        gen += '                    blocks::{0}::propertyDesc,\n'.format(capabilities_key)
+        gen += '            ' + self.gen_dataArrayInfo(capabilities_value.queueFamiliesProperties, 'queueFamilyStructTypes')
+        gen += '            ' + self.gen_dataArrayInfo(capabilities_value.queueFamiliesProperties, 'blocks::{0}::queueFamilyDesc'.format(capabilities_key))
+        gen += '            ' + self.gen_dataArrayInfo(capabilities_value.formats, 'formatStructTypes')
+        gen += '            ' + self.gen_dataArrayInfo(capabilities_value.formats, 'blocks::{0}::formatDesc'.format(capabilities_key))
+        gen += '                    blocks::{0}::chainerDesc,\n'.format(capabilities_key)
+        gen += '            ' + self.gen_dataArrayInfo(capabilities_value.videoProfiles, 'blocks::{0}::videoProfileDesc'.format(capabilities_key))
+        gen += '                },\n'
         return gen
 
     def get_blockName(self, capability_keys):
@@ -4403,28 +5784,31 @@ class VulkanProfilesLibraryGenerator():
                 gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.formats, 'formatStructTypes')
                 gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.formats, 'formatDesc')
                 gen += '        chainerDesc,\n'
+                gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.videoProfiles, 'videoProfileDesc')
                 gen += '        },\n' # <- new closing curly
                 gen += '    };\n\n'
 
+            gen += '    namespace blocks {'
             for capability_keys in profile_value.referencedCapabilities:
                 blockName = self.get_blockName(capability_keys)
-                gen += ('    namespace {0} {{\n').format(blockName)
+                gen += ('\n        namespace {0} {{\n').format(blockName)
                 if type(capability_keys).__name__ == 'list':
-                    gen += '        static const VpVariantDesc variants[] = {\n'
+                    gen += '            static const VpVariantDesc variants[] = {\n'
                     for capability_key in capability_keys:
                         gen += self.gen_variants(capability_key, profile_value.split_capabilities[capability_key])
-                    gen += '        };\n'
-                    gen += '        static const uint32_t variantCount = static_cast<uint32_t>(std::size(variants));\n'
+                    gen += '            };\n'
+                    gen += '            static const uint32_t variantCount = static_cast<uint32_t>(std::size(variants));\n'
                 else:
-                    gen += '        static const VpVariantDesc variants[] = {\n'
+                    gen += '            static const VpVariantDesc variants[] = {\n'
                     gen += self.gen_variants(capability_keys, profile_value.split_capabilities[capability_keys])
-                    gen += '        };\n'
-                    gen += '        static const uint32_t variantCount = static_cast<uint32_t>(std::size(variants));\n'
-                gen += ('    }} // namespace {0}\n\n').format(blockName)
+                    gen += '            };\n'
+                    gen += '            static const uint32_t variantCount = static_cast<uint32_t>(std::size(variants));\n'
+                gen += ('        }} // namespace {0}\n').format(blockName)
+            gen += '    } // namespace blocks\n\n'
 
             gen += '    static const VpCapabilitiesDesc capabilities[] = {\n'
             for capability_keys in profile_value.referencedCapabilities:
-                gen += ('        {{ {0}::variantCount, {0}::variants }},\n').format(self.get_blockName(capability_keys))
+                gen += ('        {{ blocks::{0}::variantCount, blocks::{0}::variants }},\n').format(self.get_blockName(capability_keys))
             gen += '    };\n'
             gen += '    static const uint32_t capabilityCount = static_cast<uint32_t>(std::size(capabilities));\n'
 
@@ -4588,6 +5972,85 @@ struct FeaturesChain {
         Template(gen).substitute(genStructureSize=genStructureSize, genStructureFeatures=genStructureFeatures)
         return gen
 
+    def gen_videoProfileEnumerator(self):
+        # Generates an enumerator function that goes through all supportable video profiles
+        # Used to handle "wildcard" video profiles where only partial video profile info is specified
+        # in the JSON and the defined capabilities and video format properties apply to all video profiles
+        # that match the "wildcard".
+        gen = '\n'
+        gen += '''
+#ifdef VK_KHR_video_queue
+VPAPI_ATTR void vpForEachMatchingVideoProfiles(
+    VkVideoProfileInfoKHR*                      pVideoProfileInfo,
+    void*                                       pUser,
+    PFN_vpStructChainerCb                       pfnCb) {
+    const VkVideoChromaSubsamplingFlagsKHR chroma_subsampling_list[] = {
+        VK_VIDEO_CHROMA_SUBSAMPLING_420_BIT_KHR,
+        VK_VIDEO_CHROMA_SUBSAMPLING_422_BIT_KHR,
+        VK_VIDEO_CHROMA_SUBSAMPLING_444_BIT_KHR,
+        VK_VIDEO_CHROMA_SUBSAMPLING_MONOCHROME_BIT_KHR
+    };
+    const VkVideoComponentBitDepthFlagsKHR bit_depth_list[] = {
+        VK_VIDEO_COMPONENT_BIT_DEPTH_8_BIT_KHR,
+        VK_VIDEO_COMPONENT_BIT_DEPTH_10_BIT_KHR,
+        VK_VIDEO_COMPONENT_BIT_DEPTH_12_BIT_KHR
+    };
+    for (size_t chromaSubsampling_idx = 0; chromaSubsampling_idx < std::size(chroma_subsampling_list); ++chromaSubsampling_idx) {
+        pVideoProfileInfo->chromaSubsampling = chroma_subsampling_list[chromaSubsampling_idx];
+        for (size_t lumaBitDepth_idx = 0; lumaBitDepth_idx < std::size(bit_depth_list); ++lumaBitDepth_idx) {
+            pVideoProfileInfo->lumaBitDepth = bit_depth_list[lumaBitDepth_idx];
+            for (size_t chromaBitDepth_idx = 0; chromaBitDepth_idx < std::size(bit_depth_list); ++chromaBitDepth_idx) {
+                pVideoProfileInfo->chromaBitDepth = bit_depth_list[chromaBitDepth_idx];
+'''
+
+        for videoCodecOp, videoCodec in self.registry.videoCodecsByValue.items():
+            gen += '{0}{{\n'.format(' ' * 16)
+            indent = ' ' * 20
+            gen += '{0}pVideoProfileInfo->pNext = nullptr;\n'.format(indent)
+            gen += '{0}pVideoProfileInfo->videoCodecOperation = {1};\n'.format(indent, videoCodecOp)
+            for profileStruct in videoCodec.profileStructs:
+                profileStructDef = self.registry.structs[profileStruct]
+                gen += '{0}{1} var_{2} = {{ {3} }};\n'.format(indent, profileStruct, profileStruct[2:], profileStructDef.sType)
+                gen += '{0}var_{1}.pNext = pVideoProfileInfo->pNext;\n'.format(indent, profileStruct[2:])
+                gen += '{0}pVideoProfileInfo->pNext = &var_{1};\n'.format(indent, profileStruct[2:])
+
+            # Permute profiles for each profile struct member value
+            profiles = OrderedDict({'': []})
+            lastValue = dict()
+            for profileStruct in videoCodec.profileStructs.values():
+                lastValue[profileStruct.struct] = dict()
+                for profileStructMember in profileStruct.members.values():
+                    lastValue[profileStruct.struct][profileStructMember.name] = None
+                    newProfiles = {}
+                    for profileStructMemberValue, profileStructMemberName in profileStructMember.values.items():
+                        for profileName, profile in profiles.items():
+                            newProfileName = f'{profileName} {profileStructMemberName}'
+                            newProfiles[newProfileName] = profile + [{
+                                "struct": profileStruct.struct,
+                                "member": profileStructMember.name,
+                                "value": profileStructMemberValue
+                            }]
+                    profiles = newProfiles
+
+            for profile in profiles.values():
+                for profileStruct in videoCodec.profileStructs:
+                    for elem in profile:
+                        if elem['struct'] == profileStruct:
+                            if lastValue[elem['struct']][elem['member']] != elem['value']:
+                                gen += '{0}var_{1}.{2} = {3};\n'.format(indent, elem['struct'][2:], elem['member'], elem['value'])
+                                lastValue[elem['struct']][elem['member']] = elem['value']
+                gen += '{0}pfnCb(reinterpret_cast<VkBaseOutStructure*>(pVideoProfileInfo), pUser);\n'.format(indent)
+
+            gen += '{0}}}\n'.format(' ' * 16)
+
+        gen += '''            }
+        }
+    }
+}
+#endif  // VK_KHR_video_queue
+'''
+        return gen
+
     def gen_publicImpl(self):
         gen = PUBLIC_IMPL_BODY
         return self.patch_code(gen)
@@ -4620,6 +6083,9 @@ class VulkanProfilesSchemaGenerator():
         properties = self.gen_properties(definitions)
         formats = self.gen_formats(definitions)
         queueFamilies = self.gen_queueFamilies(definitions)
+        videoProfiles = self.gen_videoProfiles(definitions)
+        videoCapabilities = self.gen_videoCapabilities(definitions)
+        videoFormats = self.gen_videoFormats(definitions)
         versionStr = str(self.registry.headerVersionNumber)
 
         return OrderedDict({
@@ -4671,6 +6137,35 @@ class VulkanProfilesSchemaGenerator():
                                     "type": "object",
                                     "additionalProperties": False,
                                     "properties": queueFamilies
+                                })
+                            }),
+                            "videoProfiles": OrderedDict({
+                                "type": "array",
+                                "uniqueItems": True,
+                                "items": OrderedDict({
+                                    "type": "object",
+                                    "additionalProperties": False,
+                                    "properties": OrderedDict({
+                                        "profile": OrderedDict({
+                                            "type": "object",
+                                            "additionalProperties": False,
+                                            "properties": videoProfiles
+                                        }),
+                                        "capabilities": OrderedDict({
+                                            "type": "object",
+                                            "addationalProperties": False,
+                                            "properties": videoCapabilities
+                                        }),
+                                        "formats": OrderedDict({
+                                            "type": "array",
+                                            "uniqueItems": True,
+                                            "items": OrderedDict({
+                                                "type": "object",
+                                                "additionalProperties": False,
+                                                "properties": videoFormats
+                                            })
+                                        })
+                                    })
                                 })
                             })
                         })
@@ -5064,11 +6559,16 @@ class VulkanProfilesSchemaGenerator():
 
 
     def gen_structChainDefinitions(self, basename, definitions):
+        structNames = [ basename ]
+        if basename + '2' in self.registry.structs:
+            # Structure has version 2 which is extensible
+            basename += '2'
+            structNames.append(basename)
+
         # Collect unique chainable structures (ignoring aliases)
-        structNames = [ basename, basename + '2' ]
         for structName in sorted(self.registry.structs.keys()):
             structDef = self.registry.structs[structName]
-            if not structDef.isAlias and basename + '2' in structDef.extends:
+            if not structDef.isAlias and basename in structDef.extends:
                 structNames.append(structName)
 
         # Generate structure definitions and references
@@ -5113,6 +6613,34 @@ class VulkanProfilesSchemaGenerator():
 
     def gen_queueFamilies(self, definitions):
         return self.gen_structChainDefinitions("VkQueueFamilyProperties", definitions)
+
+
+    def gen_videoProfiles(self, definitions):
+        # We do not want to include usage hint structures in the schema
+        # as those are only usage scenario customizations and do not affect capabilities
+        excludedSet = {
+            "VkVideoDecodeUsageInfoKHR",
+            "VkVideoEncodeUsageInfoKHR"
+        }
+        videoProfiles = self.gen_structChainDefinitions("VkVideoProfileInfoKHR", definitions)
+        for excluded in excludedSet:
+            excluded = self.registry.getNonAliasTypeName(excluded, self.registry.structs)
+            if excluded in videoProfiles:
+                del videoProfiles[excluded]
+            # Check also any aliases
+            for alias in self.registry.structs[excluded].aliases:
+                if alias in videoProfiles:
+                    del videoProfiles[excluded]
+
+        return videoProfiles
+
+
+    def gen_videoCapabilities(self, definitions):
+        return self.gen_structChainDefinitions("VkVideoCapabilitiesKHR", definitions)
+
+
+    def gen_videoFormats(self, definitions):
+        return self.gen_structChainDefinitions("VkVideoFormatPropertiesKHR", definitions)
 
 
 DOC_MD_HEADER = '''
@@ -5183,6 +6711,7 @@ class VulkanProfilesDocGenerator():
         gen += self.gen_limits()
         gen += self.gen_queueFamilies()
         gen += self.gen_formats()
+        gen += self.gen_videoProfiles()
         return gen
 
 
@@ -5925,11 +7454,290 @@ class VulkanProfilesDocGenerator():
         return '\n## Vulkan Profile Formats\n\n{0}\n\n{1}\n{2}\n'.format(disclaimer, legend, table)
 
 
+    def gen_videoProfile(self, videoProfilesPerProfileKey, videoProfileName, profile = None):
+        if videoProfileName in videoProfilesPerProfileKey[profile.key]:
+            # Video profile is supported by the given profile
+            return ':heavy_check_mark:'
+        else:
+            # Video profile is NOT supported by the given profile
+            return ':x:'
+
+
+    def gen_videoProfiles(self):
+        if self.registry.videoCodecs is None:
+            return ""
+
+        definedVideoProfiles = OrderedDict()
+        videoProfilesPerProfileKey = OrderedDict()
+
+        # Merge all defined video profile names
+        for profile in self.profiles:
+            videoProfilesPerProfileKey[profile.key] = OrderedDict()
+            for videoProfileName, videoProfile in profile.doc_capabilities.videoProfilesByName.items():
+                videoProfilesPerProfileKey[profile.key][videoProfileName] = videoProfile
+                if not videoProfileName in definedVideoProfiles:
+                    definedVideoProfiles[videoProfileName] = videoProfile
+
+        # Construct table data
+        tableData = OrderedDict()
+        for videoProfileName in sorted(definedVideoProfiles.keys()):
+            tableData[videoProfileName] = functools.partial(self.gen_videoProfile, videoProfilesPerProfileKey)
+
+        # Generate table legend
+        legend = (
+            'The table below lists the video profiles (or class of video profiles) that any profile defines requirements for.\n'
+            'Video profile names take the following form:\n'
+            '> `"(General|[<codec>] <category>) [([<subsampling>] [<bits>])] [<codecSpecificProfileInfo>]"`\n'
+            '* "General" refers to general requirements for all video profiles.\n'
+            '* `<category>` is the category of the video profile requirements (e.g. "Decode" or "Encode").\n'
+            '* `<codec>` identifies the specific codec (e.g. H.264, H.265, AV1) the requirements apply to. If not indicated, '
+            'the requirements apply to all supported video profiles falling in the specified category.\n'
+            '* `<subsampling>` indicates the chroma subsampling (e.g. 4:2:0, 4:2:2, 4:4:4, or monochrome). If not indicated, '
+            'the requirements apply to all supported chroma subsampling modes.\n'
+            '* `<bits>` indicates the luma and chroma bit depth (e.g. 8-bit, 10-bit, or e.g. 10:8-bit for mixed bit depths). '
+            'If not indicated, the requirements apply to all supported bit depths. Partial, luma-only or chroma-only "wildcard" '
+            'requirements are indicated with an asterisk in place of the corresponding bit depth (e.g. 10:\\*-bit or \\*:8-bit).\n'
+            '* `<codecSpecificProfileInfo>` indicates additional codec-specific video profile information (e.g. "Main", "High"). '
+            'If not indicated, the requirements apply to all video profiles of the codec.\n'
+            '* :heavy_check_mark: indicates that the profile defines requirements for the video profile (or class of video profiles)\n'
+            '* :x: indicates that that the profile does not define requirements for the video profile (or class of video profiles)\n'
+        )
+
+        # Generate per video profile sections
+        videoProfileSections = ""
+        for videoProfileName in sorted(definedVideoProfiles.keys()):
+            videoProfile = definedVideoProfiles[videoProfileName]
+            videoCodec = self.registry.getVideoCodecFromVideoProfile(videoProfile)
+
+            videoProfileSections += "\n### {0}\n\n".format(videoProfileName)
+            videoProfileSections += self.gen_videoProfileDefinition(videoProfile, videoCodec)
+            videoProfileSections += self.gen_videoCapabilities(videoProfileName, videoCodec)
+            videoProfileSections += self.gen_videoFormats(videoProfileName, videoCodec)
+
+        # Generate table
+        table = self.gen_table(tableData)
+        return '\n## Vulkan Profile Video Profiles\n\n{0}\n{1}\n{2}'.format(legend, table, videoProfileSections)
+
+
+    def gen_videoProfileDefinition(self, videoProfile, videoCodec):
+        base = self.registry.getBaseVideoProfileInfoFromVideoProfile(videoProfile)
+        baseStructName = self.registry.getNonAliasTypeName('VkVideoProfileInfoKHR', self.registry.structs)
+
+        # Construct table data
+        table = '| Profile member | Value |\n'
+        table += '|----------------|-------|\n'
+        table += '| **{0}** |\n'.format(baseStructName)
+        for member in self.registry.structs[baseStructName].members:
+            # Asterisk marks unspecified members (wildcard members)
+            value = base[member] if base is not None and member in base else "*"
+            table += '| {0} | {1} |\n'.format(self.gen_manPageLink(baseStructName, member), value)
+
+        if 'profile' in videoProfile:
+            videoProfileDesc = videoProfile['profile']
+        else:
+            videoProfileDesc = dict()
+
+        for profileStruct in videoCodec.profileStructs.values():
+            extStructName = self.registry.getNonAliasTypeName(profileStruct.struct, self.registry.structs)
+            table += '| **{0}** |\n'.format(extStructName)
+
+            videoProfileStruct = None
+            if extStructName in videoProfileDesc:
+                videoProfileStruct = videoProfileDesc[extStructName]
+            else:
+                # Check also for possible aliases
+                for alias in self.registry.structs[extStructName].aliases:
+                    if alias in videoProfileDesc:
+                        videoProfileStruct = videoProfileDesc[alias]
+
+            for profileStructMember in profileStruct.members.values():
+                # Asterisk marks unspecified members (wildcard members)
+                value = videoProfileStruct[profileStructMember.name] if videoProfileStruct is not None and profileStructMember.name in videoProfileStruct else "*"
+                table += '| {0} | {1} |\n'.format(self.gen_manPageLink(extStructName, profileStructMember.name), value)
+
+        return '\n#### Video Profile Definition\n\n{0}'.format(table)
+
+
+    def formatVideoProfileProperty(self, value, struct):
+        structDef = self.registry.structs[struct]
+        if structDef.definedByVersion != None:
+            where = 'Vulkan {0}'.format(str(structDef.definedByVersion))
+        elif len(structDef.definedByExtensions) > 0:
+            where = '/'.join(structDef.definedByExtensions)
+        return '<span title="defined in {0} ({1})">{2}</span>'.format(struct, where, self.formatValue(value))
+
+
+    def gen_videoCapability(self, videoProfileName, struct, member, profile = None):
+        # If no profile was specified then this is the first column so return the member name
+        # decorated with the corresponding limittype specific info and a link to the
+        # encompassing capability structure's manual page
+        if profile is None:
+            return self.gen_manPageLink(struct, self.formatLimitName(struct, member))
+
+        # Check if the capability is defined in the profile
+        if videoProfileName in profile.doc_capabilities.videoProfilesByName:
+            videoProfile = profile.doc_capabilities.videoProfilesByName[videoProfileName]
+            capabilityStruct = None
+            capabilityStructName = None
+            if struct in videoProfile['capabilities']:
+                capabilityStruct = videoProfile['capabilities'][struct]
+                capabilityStructName = struct
+            else:
+                # Check also for possible aliases
+                for alias in self.registry.structs[struct].aliases:
+                    if alias in videoProfile['capabilities']:
+                        capabilityStruct = videoProfile['capabilities'][alias]
+                        capabilityStructName = alias
+                        break
+
+            if capabilityStruct is not None and member in capabilityStruct:
+                return self.formatVideoProfileProperty(capabilityStruct[member], capabilityStructName)
+
+        return '-'
+
+
+    def gen_videoCapabilities(self, videoProfileName, videoCodec):
+        # Merge all capability references across the profiles to collect the relevant capabilities to look at
+        definedCapabilities = dict()
+        for profile in self.profiles:
+            for videoProfile in profile.doc_capabilities.videoProfiles:
+                if videoProfileName != self.registry.getVideoProfileNameFromVideoProfile(videoProfile):
+                    continue
+                if not 'capabilities' in videoProfile:
+                    continue
+                for capabilityStructName, capabilities in videoProfile['capabilities'].items():
+                    # If this is an alias structure then find the non-alias one and use that
+                    capabilityStructName = self.registry.getNonAliasTypeName(capabilityStructName, self.registry.structs)
+                    # Copy defined capability structure data
+                    if not capabilityStructName in definedCapabilities:
+                        definedCapabilities[capabilityStructName] = []
+                    definedCapabilities[capabilityStructName].extend(capabilities.keys())
+
+        # Construct table
+        tableData = OrderedDict()
+        for capabilityStructName in ['VkVideoCapabilitiesKHR'] + list(videoCodec.capabilities.keys()):
+            capabilityStruct = self.registry.structs[self.registry.getNonAliasTypeName(capabilityStructName, self.registry.structs)]
+            if not capabilityStruct.name in definedCapabilities:
+                continue
+            tableData[capabilityStruct.name] = OrderedDict()
+            for capability in capabilityStruct.members:
+                if not capability in definedCapabilities[capabilityStruct.name]:
+                    continue
+                # Capability is defined, add it to the table
+                tableData[capabilityStruct.name][capability] = functools.partial(self.gen_videoCapability, videoProfileName)
+
+        # Generate table
+        table = self.gen_sectionedTable(tableData)
+        return '\n#### Video Capabilities\n\n{0}'.format(table)
+
+
+    def gen_videoFormat(self, definedVideoFormatsPerProfile, videoProfileName, videoFormatCategory, index, struct, section, member, profile = None):
+        # If no profile was specified then this is the first column so return the member name
+        # decorated with the corresponding limittype specific info and a link to the
+        # encompassing structure's manual page
+        if profile is None:
+            return self.gen_manPageLink(struct, self.formatLimitName(struct, member))
+
+        # If this profile doesn't even define this video format category or this video format index then early out
+        if not profile.key in definedVideoFormatsPerProfile:
+            return ''
+        if not videoFormatCategory.name in definedVideoFormatsPerProfile[profile.key]:
+            return ''
+        if len(definedVideoFormatsPerProfile[profile.key][videoFormatCategory.name]) <= index:
+            return ''
+        
+        videoFormatProps = definedVideoFormatsPerProfile[profile.key][videoFormatCategory.name][index]
+
+        # Find the video format properties structure data in the profile, if it exists
+        videoFormatPropsStruct = None
+        videoFormatPropsStructName = None
+        if struct in videoFormatProps:
+            videoFormatPropsStruct = videoFormatProps[struct]
+            videoFormatPropsStructName = struct
+        else:
+            # Check also for alises
+            for alias in self.registry.structs[struct].aliases:
+                if alias in videoFormatProps:
+                    videoFormatPropsStruct = videoFormatProps[alias]
+                    videoFormatPropsStructName = alias
+
+        if videoFormatPropsStruct is not None and member in videoFormatPropsStruct:
+            return self.formatVideoProfileProperty(videoFormatPropsStruct[member], videoFormatPropsStructName)
+
+        return '-'
+
+
+    def gen_videoFormats(self, videoProfileName, videoCodec):
+        # Merge all video format categories across the profiles to collect the relevant video format categories to look at
+        # Also collect the video format properties that have the necessary prerequisites at least in one Vulkan profile
+        # Finally, Collect for each video format category the maximum number of video formats per Vulkan profile
+        definedVideoFormats = dict()
+        definedVideoFormatProps = set()
+        definedVideoFormatsPerProfile = dict()
+        for profile in self.profiles:
+            definedVideoFormatsCount = dict()
+            definedVideoFormatsPerProfile[profile.key] = dict()
+            for videoProfile in profile.doc_capabilities.videoProfiles:
+                if videoProfileName != self.registry.getVideoProfileNameFromVideoProfile(videoProfile):
+                    continue
+                if not 'formats' in videoProfile:
+                    continue
+                for videoFormat in videoProfile['formats']:
+                    # Collect the video format properties structures that have their prerequisites met
+                    for videoFormatProps in videoFormat:
+                        nonAliasStructName = self.registry.getNonAliasTypeName(videoFormatProps, self.registry.structs)
+                        if nonAliasStructName in definedVideoFormatProps:
+                            continue
+                        # Check also for aliases
+                        for structName in [ videoFormatProps ] + self.registry.structs[videoFormatProps].aliases:
+                            structDef = self.registry.structs[structName]
+                            if structDef.definedByVersion is not None and structDef.definedByVersion < profile.apiVersionNumber:
+                                definedVideoFormatProps.add(nonAliasStructName)
+                            for definedByExtension in structDef.definedByExtensions:
+                                if definedByExtension in profile.doc_capabilities.extensions:
+                                    definedVideoFormatProps.add(nonAliasStructName)
+
+                    for videoFormatCategory in videoCodec.getVideoFormatCategoriesForFormat(videoFormat, videoProfile['capabilities'] if 'capabilities' in videoProfile else {}, self.registry):
+                        # Include the video format in the defined list for the video format category
+                        if not videoFormatCategory.name in definedVideoFormatsCount:
+                            definedVideoFormatsCount[videoFormatCategory.name] = 0
+                            definedVideoFormatsPerProfile[profile.key][videoFormatCategory.name] = []
+                        definedVideoFormatsCount[videoFormatCategory.name] += 1
+                        definedVideoFormatsPerProfile[profile.key][videoFormatCategory.name].append(videoFormat)
+
+            # Check if this profile increased the maximum format counts per video format category
+            for videoFormatCategoryName, count in definedVideoFormatsCount.items():
+                if not videoFormatCategoryName in definedVideoFormats or count > definedVideoFormats[videoFormatCategoryName]:
+                    definedVideoFormats[videoFormatCategoryName] = count
+
+        # Construct table
+        tableData = OrderedDict()
+        for videoFormatCategory in videoCodec.formats.values():
+            if videoFormatCategory.name in definedVideoFormats:
+                # There are formats falling in this video format category
+                for index in range(definedVideoFormats[videoFormatCategory.name]):
+                    section = tableData["{0} Format #{1}".format(videoFormatCategory.name, index + 1)] = OrderedDict()
+                    # Include all video format properties that apply to this video format category
+                    for videoFormatProps in [ 'VkVideoFormatPropertiesKHR' ] + list(videoFormatCategory.properties.keys()):
+                        propsStruct = self.registry.structs[self.registry.getNonAliasTypeName(videoFormatProps, self.registry.structs)]
+                        # Skip video format properties not defined by profile prequisites
+                        if not propsStruct.name in definedVideoFormatProps:
+                            continue
+
+                        # Setup row handler function and add rows for each property
+                        rowHandler = functools.partial(self.gen_videoFormat, definedVideoFormatsPerProfile, videoProfileName, videoFormatCategory, index, propsStruct.name)
+                        section.update({ row: rowHandler for row in propsStruct.members.keys()})
+
+        # Generate table
+        table = self.gen_sectionedTable(tableData)
+        return '\n#### Video Formats\n\n{0}'.format(table)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--registry', '-r', action='store', required=True,
-                        help='Use specified registry file instead of vk.xml')
+                        help='Use specified registry file instead of vk.xml (video.xml must be present in the same directory for video support).')
     parser.add_argument('--input', '-i', action='store', required=True,
                         help='Path to directory with profiles.')
     parser.add_argument('--input-filenames', action='store',

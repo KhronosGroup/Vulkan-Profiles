@@ -34,6 +34,9 @@
 #include <fstream>
 #include <mutex>
 #include <sstream>
+#include <optional>
+#include <algorithm>
+#include <limits>
 
 #include "vulkan/vk_layer.h"
 #include "vulkan/vulkan_beta.h"
@@ -60,6 +63,92 @@ inline bool IsFormatSupported(const VkFormatProperties &props) {
     // "... if no format feature flags are supported, the format itself is not supported ..."
     return !(!props.linearTilingFeatures && !props.optimalTilingFeatures && !props.bufferFeatures);
 }
+
+template <typename T>
+struct LimitBase {
+    std::optional<T> limit{};
+
+    // Combines two limit values
+    // - returns true if successful
+    // - returns false if combining is not possible
+    virtual bool Combine(const T &with) = 0;
+
+    // Overrides the target limit value
+    // - returns true if the override is within the target limit
+    //   (e.g. overriding a minimum with a larger minimum)
+    // - returns false if the override is outside the target limit
+    //   (e.g. overriding a minimum with a smaller minimum)
+    virtual bool Override(T &what) const = 0;
+};
+
+template <typename T>
+struct LimitExact final : public LimitBase<T> {
+    bool Combine(const T &with) override {
+        bool result = !LimitBase<T>::limit.has_value() || LimitBase<T>::limit.value() == with;
+        LimitBase<T>::limit = with;
+        return result;
+    }
+
+    bool Override(T &what) const override {
+        bool result = !LimitBase<T>::limit.has_value() || what == LimitBase<T>::limit.value();
+        if (LimitBase<T>::limit.has_value()) what = LimitBase<T>::limit.value();
+        return result;
+    }
+};
+
+template <typename T>
+struct LimitMin final : public LimitBase<T> {
+    bool Combine(const T &with) override {
+        if (LimitBase<T>::limit.has_value()) {
+            LimitBase<T>::limit = std::min(LimitBase<T>::limit.value(), with);
+        } else {
+            LimitBase<T>::limit = with;
+        }
+        return true;
+    }
+
+    bool Override(T &what) const override {
+        bool result = !LimitBase<T>::limit.has_value() || std::min(what, LimitBase<T>::limit.value()) == what;
+        if (LimitBase<T>::limit.has_value()) what = LimitBase<T>::limit.value();
+        return result;
+    }
+};
+
+template <typename T>
+struct LimitMax final : public LimitBase<T> {
+    bool Combine(const T &with) override {
+        if (LimitBase<T>::limit.has_value()) {
+            LimitBase<T>::limit = std::max(LimitBase<T>::limit.value(), with);
+        } else {
+            LimitBase<T>::limit = with;
+        }
+        return true;
+    }
+
+    bool Override(T &what) const override {
+        bool result = !LimitBase<T>::limit.has_value() || std::max(what, LimitBase<T>::limit.value()) == what;
+        if (LimitBase<T>::limit.has_value()) what = LimitBase<T>::limit.value();
+        return result;
+    }
+};
+
+template <typename T>
+struct LimitFlags final : public LimitBase<T> {
+    bool Combine(const T &with) override {
+        if (LimitBase<T>::limit.has_value()) {
+            LimitBase<T>::limit = LimitBase<T>::limit.value() | with;
+        } else {
+            LimitBase<T>::limit = with;
+        }
+        return true;
+    }
+
+    bool Override(T &what) const override {
+        bool result = !LimitBase<T>::limit.has_value() || (what & LimitBase<T>::limit.value()) == LimitBase<T>::limit.value();
+        if (LimitBase<T>::limit.has_value()) what = LimitBase<T>::limit.value();
+        return result;
+    }
+};
 
 typedef std::unordered_map<uint32_t /*VkFormat*/, VkFormatProperties> MapOfVkFormatProperties;
 typedef std::unordered_map<uint32_t /*VkFormat*/, VkFormatProperties3> MapOfVkFormatProperties3;

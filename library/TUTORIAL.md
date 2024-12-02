@@ -9,12 +9,12 @@
 
 # Vulkan Profiles API library
 
-- [Vulkan Profiles library](#vulkan-profiles-library)
+- [Vulkan Profiles API library](#vulkan-profiles-api-library)
   - [Overview](#overview)
   - [Building](#building)
     - [Generating the library with a custom set of Vulkan Profiles](#generating-the-library-with-a-custom-set-of-vulkan-profiles)
   - [Basic usage](#basic-usage)
-  - [Advanced usages](#advanced-usage)
+  - [Advanced usages](#advanced-usages)
     - [Specifying the API version](#specifying-the-api-version)
     - [Specifying additional extensions](#specifying-additional-extensions)
     - [Specifying additional features](#specifying-additional-features)
@@ -28,15 +28,17 @@
       - [Creating device with profile](#creating-device-with-profile)
     - [Profile queries](#profile-queries)
       - [Query profiles](#query-profiles)
-      - [Query profile with multiple variants](#query-profile-with-multiple-variants)
       - [Query profile required profiles](#query-profile-required-profiles)
+      - [Query profile with multiple variants](#query-profile-with-multiple-variants)
       - [Query profile Vulkan API version](#query-profile-vulkan-api-version)
       - [Query profile fallbacks](#query-profile-fallbacks)
       - [Query profile instance extensions](#query-profile-instance-extensions)
       - [Query profile device extensions](#query-profile-device-extensions)
       - [Query profile features](#query-profile-features)
       - [Query profile device properties](#query-profile-device-properties)
+      - [Query profile queue family properties](#query-profile-queue-family-properties)
       - [Query profile format properties](#query-profile-format-properties)
+      - [Query profile video profiles](#query-profile-video-profiles)
 
 ## Overview
 
@@ -718,6 +720,51 @@ If `pBlockName` is `NULL` and the `pProfile` referenced a profile with multiple 
 If `pBlockName` is `NULL`, then the query fills the structures in `pNext` chain of all capabilities blocks referenced by the profile `pProfile`. Otherwise the query fills the structures in `pNext` chain referenced by the `pBlockName` capabilities block.
 If the `pNext` chain contains a Vulkan device property structure for which the profile defines corresponding property/limit requirements then the structure is modified to include those properties/limits. Other fields of the Vulkan device property structure not defined by the profile will be left unmodified and structures not defined in the profile will be ignored (left unmodified as a whole).
 
+#### Query profile queue family properties
+
+In order to query the structure types of the Vulkan queue family property structures for which the profile defines requirements, use the following command:
+```C++
+VkResult vpGetProfileQueueFamilyStructureTypes(
+    VpCapabilities                  capabilities,
+    const VpProfileProperties*      pProfile,
+    const char*                     pBlockName,
+    uint32_t*                       pStructureTypeCount,
+    VkStructureType*                pStructureTypes);
+```
+
+Where:
+* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
+* `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
+* `pStructureTypeCount` is a pointer to an integer related to the number of queue family property structure types available or queried, as described below.
+* `pStructureTypes` is either `NULL` or a pointer to an array of `VkStructureType` enums.
+
+If `pBlockName` is `NULL`, then the query returns the list of queue family property `VkStructureType` of all capabilities blocks referenced by the profile `pProfile`. Otherwise the query returns the list of `VkStructureType` referenced by the `pBlockName` capabilities block.
+If `pStructureTypes` is `NULL`, then the number of queue family property structure types defined by the profile is returned in `pStructureTypeCount`. Otherwise, `pStructureTypeCount` must point to a variable set by the user to the number of elements in the `pStructureTypes` array, and on return the variable is overwritten with the number of values actually written to `pStructureTypes`. If `pStructureTypeCount` is less than the number of queue family property structure types defined by the profile, at most `pStructureTypeCount` values will be written, and `VK_INCOMPLETE` will be returned instead of `VK_SUCCESS`, to indicate that not all the available values were returned.
+
+In order to query the queue family properties required by a profile, use the following command:
+
+```C++
+VkResult vpGetProfileQueueFamilyProperties(
+    VpCapabilities                  capabilities,
+    const VpProfileProperties*      pProfile,
+    const char*                     pBlockName,
+    uint32_t*                       pPropertyCount,
+    VkQueueFamilyProperties2KHR*    pProperties);
+```
+
+Where:
+* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
+* `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
+* `pPropertyCount` is a pointer to an integer related to the number of queue family properties available or queried, as described below.
+* `pProperties` is either `NULL` or a pointer to an array of `VkQueueFamilyProperties2KHR` structures and corresponding `pNext` chains.
+
+If `pBlockName` is `NULL` and the `pProfile` referenced a profile with multiple variants, the execution of the function fail and return `VK_ERROR_UNKNOWN`.
+If `pBlockName` is `NULL`, then the query fills the structures in `pNext` chain of all capabilities blocks referenced by the profile `pProfile`. Otherwise the query fills the structures in `pNext` chain referenced by the `pBlockName` capabilities block.
+If `pProperties` is `NULL`, then the number of queue families defined by the profile is returned in `pPropertyCount`. Otherwise, `pPropertyCount` must point to a variable set by the user to the number of elements in the `pProperties` array, and on return the variable is overwritten with the number of structures actually written to `pProperties`. If `pPropertyCount` is less than the number of queue families defined by the profile, at most `pPropertyCount` structures will be written, and `VK_INCOMPLETE` will be returned instead of `VK_SUCCESS`, to indicate that not all the available properties were returned.
+If any element of `pProperties` or its `pNext` chain contains a Vulkan queue family property structure for which the profile defines corresponding queue family property requirements then the structure is modified to include those properties. Other fields of the Vulkan queue family property structure not defined by the profile will be left unmodified and structures not defined in the profile will be ignored (left unmodified as a whole).
+
 #### Query profile format properties
 
 In order to query the structure types of the Vulkan format property structures for which the profile defines requirements, use the following command:
@@ -760,7 +807,7 @@ Where:
 * `pFormats` is either `NULL` or a pointer to an array of `VkFormat` values.
 
 If `pBlockName` is `NULL`, then the query returns the formats of all capabilities blocks referenced by the profile `pProfile`. Otherwise the query returns the formats referenced by the `pBlockName` capabilities block of the profile.
-If `pFormats` is `NULL`, then the number of formats required by the profile is returned in `pFormatCount`. Otherwise, `pFormatCount` must point to a variable set by the user to the number of elements in the `pFormats` array, and on return the variable is overwritten with the number of values actually written to `pProperties`. If `pPropertyCount` is less than the number of device extensions required by the profile, at most `pPropertyCount` values will be written, and `VK_INCOMPLETE` will be returned instead of `VK_SUCCESS`, to indicate that not all the available values were returned.
+If `pFormats` is `NULL`, then the number of formats required by the profile is returned in `pFormatCount`. Otherwise, `pFormatCount` must point to a variable set by the user to the number of elements in the `pFormats` array, and on return the variable is overwritten with the number of values actually written to `pFormats`. If `pFormatCount` is less than the number of formats required by the profile, at most `pFormatCount` values will be written, and `VK_INCOMPLETE` will be returned instead of `VK_SUCCESS`, to indicate that not all the available values were returned.
 
 In order to query the format properties required by a profile for a specific format, use the following command:
 
@@ -778,7 +825,170 @@ Where:
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `format` is the format for which required properties are queried.
-* `pNext` is a `pNext` chain of Vulkan device property structures (with or without `VkPhysicalDeviceFormatProperties2` or `VkPhysicalDeviceFormatProperties3` property structures).
+* `pNext` is a `pNext` chain of Vulkan format property structures (with or without `VkPhysicalDeviceFormatProperties2` or `VkPhysicalDeviceFormatProperties3` property structures).
 
 If `pBlockName` is `NULL`, then the query fills the structures in `pNext` chain of all capabilities blocks referenced by the profile `pProfile`. Otherwise the query fills the structures in `pNext` chain referenced by the `pBlockName` capabilities block.
 If the `pNext` chain contains a Vulkan format property structure for which the profile defines corresponding requirements then the structure is modified to include those properties. Other fields of the Vulkan format property structure not defined by the profile will be left unmodified and structures not defined in the profile will be ignored (left unmodified as a whole).
+
+#### Query profile video profiles
+
+In order to query the list of video profile names required by a profile, use the following command:
+
+```C++
+VkResult vpGetProfileVideoProfiles(
+    VpCapabilities                  capabilities,
+    const VpProfileProperties*      pProfile,
+    const char*                     pBlockName,
+    uint32_t*                       pVideoProfileCount,
+    VpVideoProfileProperties*       pVideoProfiles);
+```
+
+Where:
+* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
+* `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
+* `pVideoProfileCount` is a pointer to an integer related to the number of video profiles available or queried, as described below.
+* `pVideoProfiles` is either `NULL` or a pointer to an array of `VpVideoProfileProperties` structures.
+
+If `pBlockName` is `NULL`, then the query returns the list of video profiles of all capabilities blocks referenced by the profile `pProfile`. Otherwise the query returns the list of video profiles defined by the `pBlockName` capabilities block.
+If `pVideoProfiles` is `NULL`, then the number of video profiles defined by the profile is returned in `pVideoProfileCount`. Otherwise, `pVideoProfileCount` must point to a variable set by the user to the number of elements in the `pVideoProfiles` array, and on return the variable is overwritten with the number of structures actually written to `pVideoProfiles`. If `pVideoProfileCount` is less than the number of video profiles defined by the profile, at most `pVideoProfileCount` structures will be written, and `VK_INCOMPLETE` will be returned instead of `VK_SUCCESS`, to indicate that not all the available properties were returned.
+
+In order to query the structure types of the Vulkan video profile info structures the profile defines for a specific video profile, use the following command:
+
+```C++
+VkResult vpGetProfileVideoProfileInfoStructureTypes(
+    VpCapabilities                  capabilities,
+    const VpProfileProperties*      pProfile,
+    const char*                     pBlockName,
+    uint32_t                        videoProfileIndex,
+    uint32_t*                       pStructureTypeCount,
+    VkStructureType*                pStructureTypes);
+```
+
+Where:
+* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
+* `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
+* `videoProfileIndex` is the index of the video profile to query.
+* `pStructureTypeCount` is a pointer to an integer related to the number of video profile info structure types available or queried, as described below.
+* `pStructureTypes` is either `NULL` or a pointer to an array of `VkStructureType` enums.
+
+If `pBlockName` is `NULL`, then `videoProfileIndex` specifies the index of the video profile to query within the list of video profiles of all capabilities blocks defined by the profile. Otherwise `videoProfileIndex` specifies the index of the video profile to query within the list of video profiles defined by the capabilities block identified by `pBlockName`.
+If `videoProfileIndex` is greater than or equal to the number of video profiles defined by all capabilities blocks or the specified capabilities block, respectively, then `VK_ERROR_UNKNOWN` will be returned.
+If `pStructureTypes` is `NULL`, then the number of video profile info structure types defined by the profile for the selected video profile is returned in `pStructureTypeCount`. Otherwise, `pStructureTypeCount` must point to a variable set by the user to the number of elements in the `pStructureTypes` array, and on return the variable is overwritten with the number of values actually written to `pStructureTypes`. If `pStructureTypeCount` is less than the number of video profile info structure types defined by the profile for the selected video profile, at most `pStructureTypeCount` values will be written, and `VK_INCOMPLETE` will be returned instead of `VK_SUCCESS`, to indicate that not all the available values were returned.
+
+In order to query the video profile info structures the profile defines for a specific video profile, use the following command:
+
+```C++
+VkResult vpGetProfileVideoProfileInfo(
+    VpCapabilities                  capabilities,
+    const VpProfileProperties*      pProfile,
+    const char*                     pBlockName,
+    uint32_t                        videoProfileIndex,
+    VkVideoProfileInfoKHR*          pVideoProfileInfo);
+```
+
+Where:
+* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
+* `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
+* `videoProfileIndex` is the index of the video profile to query.
+* `pVideoProfileInfo` is a pointer to a `VkVideoProfileInfoKHR` structure and corresponding `pNext` chain to fill with the video profile info of the selected video profile.
+
+If `pBlockName` is `NULL`, then `videoProfileIndex` specifies the index of the video profile to query within the list of video profiles of all capabilities blocks defined by the profile. Otherwise `videoProfileIndex` specifies the index of the video profile to query within the list of video profiles defined by the capabilities block identified by `pBlockName`.
+If `videoProfileIndex` is greater than or equal to the number of video profiles defined by all capabilities blocks or the specified capabilities block, respectively, then `VK_ERROR_UNKNOWN` will be returned.
+If the `pNext` chain of `pVideoProfileInfo` contains a Vulkan video profile info structure defined by the profile for the selected video profile, then the structure is filled with the corresponding video profile info.
+
+In order to query the structure types of the Vulkan video capability structures the profile defines for a specific video profile, use the following command:
+
+```C++
+VkResult vpGetProfileVideoCapabilityStructureTypes(
+    VpCapabilities                  capabilities,
+    const VpProfileProperties*      pProfile,
+    const char*                     pBlockName,
+    uint32_t                        videoProfileIndex,
+    uint32_t*                       pStructureTypeCount,
+    VkStructureType*                pStructureTypes);
+```
+
+Where:
+* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
+* `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
+* `videoProfileIndex` is the index of the video profile to query.
+* `pStructureTypeCount` is a pointer to an integer related to the number of video capability structure types available or queried, as described below.
+* `pStructureTypes` is either `NULL` or a pointer to an array of `VkStructureType` enums.
+
+If `pBlockName` is `NULL`, then `videoProfileIndex` specifies the index of the video profile to query within the list of video profiles of all capabilities blocks defined by the profile. Otherwise `videoProfileIndex` specifies the index of the video profile to query within the list of video profiles defined by the capabilities block identified by `pBlockName`.
+If `videoProfileIndex` is greater than or equal to the number of video profiles defined by all capabilities blocks or the specified capabilities block, respectively, then `VK_ERROR_UNKNOWN` will be returned.
+If `pStructureTypes` is `NULL`, then the number of video capability structure types defined by the profile for the selected video profile is returned in `pStructureTypeCount`. Otherwise, `pStructureTypeCount` must point to a variable set by the user to the number of elements in the `pStructureTypes` array, and on return the variable is overwritten with the number of values actually written to `pStructureTypes`. If `pStructureTypeCount` is less than the number of video capability structure types defined by the profile for the selected video profile, at most `pStructureTypeCount` values will be written, and `VK_INCOMPLETE` will be returned instead of `VK_SUCCESS`, to indicate that not all the available values were returned.
+
+In order to query the video capabilities the profile requires for a specific video profile, use the following command:
+
+```C++
+VkResult vpGetProfileVideoCapabilities(
+    VpCapabilities                  capabilities,
+    const VpProfileProperties*      pProfile,
+    const char*                     pBlockName,
+    uint32_t                        videoProfileIndex,
+    void*                           pNext);
+```
+
+Where:
+* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
+* `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
+* `videoProfileIndex` is the index of the video profile to query.
+* `pNext` is a `pNext` chain of Vulkan video capability structures (with or without a `VkVideoCapabilitiesKHR` video capability structure).
+
+If `pBlockName` is `NULL`, then `videoProfileIndex` specifies the index of the video profile to query within the list of video profiles of all capabilities blocks defined by the profile. Otherwise `videoProfileIndex` specifies the index of the video profile to query within the list of video profiles defined by the capabilities block identified by `pBlockName`.
+If `videoProfileIndex` is greater than or equal to the number of video profiles defined by all capabilities blocks or the specified capabilities block, respectively, then `VK_ERROR_UNKNOWN` will be returned.
+If the `pNext` chain contains a Vulkan video capability structure defined by the profile for the selected video profile, then the structure is modified to include those video capabilities. Other fields of the Vulkan video capability structure not defined by the profile for the selected video profile will be left unmodified and structures not defined in the profile for the selected video profile will be ignored (left unmodified as a whole).
+
+In order to query the structure types of the Vulkan video format property structures the profile defines for a specific video profile, use the following command:
+
+```C++
+VkResult vpGetProfileVideoFormatStructureTypes(
+    VpCapabilities                  capabilities,
+    const VpProfileProperties*      pProfile,
+    const char*                     pBlockName,
+    uint32_t                        videoProfileIndex,
+    uint32_t*                       pStructureTypeCount,
+    VkStructureType*                pStructureTypes);
+```
+
+Where:
+* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
+* `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
+* `videoProfileIndex` is the index of the video profile to query.
+* `pStructureTypeCount` is a pointer to an integer related to the number of video format property structure types available or queried, as described below.
+* `pStructureTypes` is either `NULL` or a pointer to an array of `VkStructureType` enums.
+
+If `pBlockName` is `NULL`, then `videoProfileIndex` specifies the index of the video profile to query within the list of video profiles of all capabilities blocks defined by the profile. Otherwise `videoProfileIndex` specifies the index of the video profile to query within the list of video profiles defined by the capabilities block identified by `pBlockName`.
+If `videoProfileIndex` is greater than or equal to the number of video profiles defined by all capabilities blocks or the specified capabilities block, respectively, then `VK_ERROR_UNKNOWN` will be returned.
+If `pStructureTypes` is `NULL`, then the number of video format property structure types defined by the profile for the selected video profile is returned in `pStructureTypeCount`. Otherwise, `pStructureTypeCount` must point to a variable set by the user to the number of elements in the `pStructureTypes` array, and on return the variable is overwritten with the number of values actually written to `pStructureTypes`. If `pStructureTypeCount` is less than the number of video format property structure types defined by the profile for the selected video profile, at most `pStructureTypeCount` values will be written, and `VK_INCOMPLETE` will be returned instead of `VK_SUCCESS`, to indicate that not all the available values were returned.
+
+In order to query the video format properties the profile requires for a specific video profile, use the following command:
+
+```C++
+VkResult vpGetProfileVideoFormatProperties(
+    VpCapabilities                  capabilities,
+    const VpProfileProperties*      pProfile,
+    const char*                     pBlockName,
+    uint32_t                        videoProfileIndex,
+    uint32_t*                       pPropertyCount,
+    VkVideoFormatPropertiesKHR*     pProperties);
+```
+
+Where:
+* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
+* `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
+* `videoProfileIndex` is the index of the video profile to query.
+* `pPropertyCount` is a pointer to an integer related to the number of video format properties available or queried, as described below.
+* `pProperties` is either `NULL` or a pointer to an array of `VkVideoFormatPropertiesKHR` structures and corresponding `pNext` chains.
+
+If `pBlockName` is `NULL`, then `videoProfileIndex` specifies the index of the video profile to query within the list of video profiles of all capabilities blocks defined by the profile. Otherwise `videoProfileIndex` specifies the index of the video profile to query within the list of video profiles defined by the capabilities block identified by `pBlockName`.
+If `videoProfileIndex` is greater than or equal to the number of video profiles defined by all capabilities blocks or the specified capabilities block, respectively, then `VK_ERROR_UNKNOWN` will be returned.
+If any element of `pProperties` or its `pNext` chain contains a Vulkan video format property structure defined by the profile for the selected video profile, then the structure is modified to include those video format properties. Other fields of the Vulkan video format property structure not defined by the profile for the selected video profile will be left unmodified and structures not defined in the profile for the selected video profile will be ignored (left unmodified as a whole).
