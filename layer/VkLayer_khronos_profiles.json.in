@@ -330,6 +330,16 @@
                             "key": "SIMULATE_FORMATS_BIT",
                             "label": "Formats",
                             "description": "The Vulkan device will report the formats from the selected Profile."
+                        },
+                        {
+                            "key": "SIMULATE_VIDEO_CAPABILITIES_BIT",
+                            "label": "Video Capabilities",
+                            "description": "The Vulkan device will report video capabilities from the selected Profile."
+                        },
+                        {
+                            "key": "SIMULATE_VIDEO_FORMATS_BIT",
+                            "label": "Video Formats",
+                            "description": "The Vulkan device will report video formats from the selected Profile."
                         }
                     ],
                     "default": [ "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT" ]

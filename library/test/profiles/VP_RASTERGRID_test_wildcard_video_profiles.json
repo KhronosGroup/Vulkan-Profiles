@@ -1,0 +1,121 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
+    "capabilities": {
+        "general": {
+            "extensions": {
+                "VK_KHR_video_queue": 1
+            },
+            "videoProfiles": [
+                {
+                    "capabilities": {
+                        "VkVideoCapabilitiesKHR": {
+                            "maxCodedExtent": {
+                                "width": 1920,
+                                "height": 1080
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "decode_420_8bit": {
+            "extensions": {
+                "VK_KHR_video_queue": 1,
+                "VK_KHR_video_decode_queue": 1
+            },
+            "videoProfiles": [
+                {
+                    "profile": {
+                        "VkVideoProfileInfoKHR": {
+                            "chromaSubsampling": [
+                                "VK_VIDEO_CHROMA_SUBSAMPLING_420_BIT_KHR"
+                            ],
+                            "lumaBitDepth": [
+                                "VK_VIDEO_COMPONENT_BIT_DEPTH_8_BIT_KHR"
+                            ],
+                            "chromaBitDepth": [
+                                "VK_VIDEO_COMPONENT_BIT_DEPTH_8_BIT_KHR"
+                            ]
+                        }
+                    },
+                    "capabilities": {
+                        "VkVideoDecodeCapabilitiesKHR": {}
+                    },
+                    "formats": [
+                        {
+                            "VkVideoFormatPropertiesKHR": {
+                                "format": "VK_FORMAT_G8_B8R8_2PLANE_420_UNORM",
+                                "imageCreateFlags": [
+                                    "VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT",
+                                    "VK_IMAGE_CREATE_EXTENDED_USAGE_BIT"
+                                ],
+                                "imageUsageFlags": [
+                                    "VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR"
+                                ]
+                            }
+                        },
+                        {
+                            "VkVideoFormatPropertiesKHR": {
+                                "format": "VK_FORMAT_G8_B8R8_2PLANE_420_UNORM",
+                                "imageUsageFlags": [
+                                    "VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "decode_h264": {
+            "extensions": {
+                "VK_KHR_video_queue": 1,
+                "VK_KHR_video_decode_queue": 1,
+                "VK_KHR_video_decode_h264": 1
+            },
+            "videoProfiles": [
+                {
+                    "profile": {
+                        "VkVideoProfileInfoKHR": {
+                            "videoCodecOperation": "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_KHR"
+                        },
+                        "VkVideoDecodeH264ProfileInfoKHR": {
+                            "pictureLayout": "VK_VIDEO_DECODE_H264_PICTURE_LAYOUT_PROGRESSIVE_KHR"
+                        }
+                    },
+                    "capabilities": {
+                        "VkVideoCapabilitiesKHR": {
+                            "maxDpbSlots": 16,
+                            "maxActiveReferencePictures": 15
+                        },
+                        "VkVideoDecodeH264CapabilitiesKHR": {
+                            "maxLevelIdc": "STD_VIDEO_H264_LEVEL_IDC_6_0"
+                        }
+                    },
+                    "formats": [
+                        {
+                            "VkVideoFormatPropertiesKHR": {
+                                "imageUsageFlags": [
+                                    "VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR",
+                                    "VK_IMAGE_USAGE_SAMPLED_BIT"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "profiles": {
+        "VP_RASTERGRID_test_wildcard_video_profiles": {
+            "version": 1,
+            "api-version": "1.1.276",
+            "label": "Sample video profile with video profile 'wildcards'",
+            "description": "Demonstration of 'wildcard' video profile requirements.",
+            "capabilities": [
+                "general",
+                "decode_420_8bit",
+                "decode_h264"
+            ]
+        }
+    }
+}

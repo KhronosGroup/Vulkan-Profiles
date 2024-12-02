@@ -136,6 +136,7 @@ Each entry in `capabilities` includes a reference name and a dictionary containi
 * `properties` - Optional. List of all required properties.
 * `formats` - Optional. List of all required formats.
 * `queueFamiliesProperties` - Optional. List of all queue families properties.
+* `videoProfiles` - Optional. List of all required video profilies.
 
 Each entry in `profiles` includes a reference name and a dictionary containing the following sections:
 * `version` - Required. The revision of the profile.

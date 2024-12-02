@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2023-2023 Valve Corporation
  * Copyright (C) 2023-2023 LunarG, Inc.
+ * Copyright (c) 2024 RasterGrid Kft.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,6 +86,10 @@ static SimulateCapabilityFlags GetSimulateCapability(const std::vector<std::stri
             result |= SIMULATE_FORMATS_BIT;
         } else if (values[i] == "SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT") {
             result |= SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT;
+        } else if (values[i] == "SIMULATE_VIDEO_CAPABILITIES_BIT") {
+            result |= SIMULATE_VIDEO_CAPABILITIES_BIT;
+        } else if (values[i] == "SIMULATE_VIDEO_FORMATS_BIT") {
+            result |= SIMULATE_VIDEO_FORMATS_BIT;
         }
     }
 
@@ -92,8 +97,10 @@ static SimulateCapabilityFlags GetSimulateCapability(const std::vector<std::stri
 }
 
 static std::vector<std::string> GetSimulateCapabilityStrings(SimulateCapabilityFlags flags) {
-    static const char *table[] = {"SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT",
-                                  "SIMULATE_EXTENSIONS_BIT",  "SIMULATE_FORMATS_BIT",  "SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT"};
+    static const char *table[] = {
+        "SIMULATE_API_VERSION_BIT",        "SIMULATE_FEATURES_BIT",     "SIMULATE_PROPERTIES_BIT",
+        "SIMULATE_EXTENSIONS_BIT",         "SIMULATE_FORMATS_BIT",      "SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT",
+        "SIMULATE_VIDEO_CAPABILITIES_BIT", "SIMULATE_VIDEO_FORMATS_BIT"};
 
     std::vector<std::string> result;
 
@@ -115,6 +122,8 @@ TEST(TestsUtil, SimulateCapability) {
     EXPECT_STREQ("SIMULATE_EXTENSIONS_BIT", strings[3].c_str());
     EXPECT_STREQ("SIMULATE_FORMATS_BIT", strings[4].c_str());
     EXPECT_STREQ("SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT", strings[5].c_str());
+    EXPECT_STREQ("SIMULATE_VIDEO_CAPABILITIES_BIT", strings[6].c_str());
+    EXPECT_STREQ("SIMULATE_VIDEO_FORMATS_BIT", strings[7].c_str());
 
     SimulateCapabilityFlags flags = GetSimulateCapability(strings);
 
@@ -124,6 +133,8 @@ TEST(TestsUtil, SimulateCapability) {
     EXPECT_TRUE(flags & SIMULATE_EXTENSIONS_BIT);
     EXPECT_TRUE(flags & SIMULATE_FORMATS_BIT);
     EXPECT_TRUE(flags & SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT);
+    EXPECT_TRUE(flags & SIMULATE_VIDEO_CAPABILITIES_BIT);
+    EXPECT_TRUE(flags & SIMULATE_VIDEO_FORMATS_BIT);
 }
 
 TEST(TestsUtil, DefaultFeatureValues) {

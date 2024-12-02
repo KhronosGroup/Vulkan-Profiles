@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 #
 # Copyright (c) 2022-2024 LunarG, Inc.
+# Copyright (c) 2024 RasterGrid Kft.
 #
 # Licensed under the Apache License, Version 2.0 (the "License")
 # you may not use this file except in compliance with the License.
@@ -204,6 +205,7 @@ class ProfileMerger():
         merged_properties = dict()
         merged_formats = dict()
         merged_qfp = list()
+        merged_video_profiles = list()
 
         for i in range(len(jsons)):
             self.first = i == 0
@@ -383,6 +385,50 @@ class ProfileMerger():
                     else:
                         print("ERROR: Unknown combination mode: " + self.mode)
 
+                if 'videoProfiles' in capability:
+                    if self.mode == 'intersection':
+                        # If this is the first json just append all video profiles
+                        if self.first:
+                            for video_profile in capability['videoProfiles']:
+                                merged_video_profiles.append(video_profile)
+                        # Otherwise do an intersect
+                        else:
+                            def deep_compare(a, b):
+                                if isinstance(a, list):
+                                    if isinstance(b, list) and len(a) == len(b):
+                                        for i in range(len(a)):
+                                            if not deep_compare(a[i], b[i]):
+                                                return False
+                                        return True
+                                    else:
+                                        return False
+                                elif isinstance(a, dict):
+                                    if isinstance(b, dict) and len(a.keys()) == len(b.keys()):
+                                        for key in a.keys():
+                                            if not key in b or not deep_compare(a[key], b[key]):
+                                                return False
+                                        return True
+                                    else:
+                                        return False
+                                else:
+                                    return a == b
+
+                            for merged_video_profile in list(merged_video_profiles):
+                                found = False
+                                for video_profile in capability['videoProfiles']:
+                                    if deep_compare(merged_video_profile, video_profile):
+                                        found = True
+                                        break
+                                if not found:
+                                    merged_video_profiles.remove(merged_video_profile)
+
+                    elif self.mode == 'union':
+                        for video_profile in capability['videoProfiles']:
+                            merged_video_profiles.append(video_profile)
+
+                    else:
+                        print("ERROR: Unknown combination mode: " + self.mode)
+
         capabilities = dict()
         if merged_extensions:
             sorted_extensions = collections.OrderedDict(sorted(merged_extensions.items()))
@@ -462,6 +508,9 @@ class ProfileMerger():
 
         if merged_qfp:
             capabilities['queueFamiliesProperties'] = merged_qfp
+
+        if merged_video_profiles:
+            capabilities['videoProfiles'] = merged_video_profiles
 
         return capabilities
 

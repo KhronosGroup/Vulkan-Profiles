@@ -1,0 +1,257 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-266.json#",
+    "capabilities": {
+        "block": {
+            "extensions": {
+                "VK_KHR_video_queue": 1,
+                "VK_KHR_video_decode_queue": 1
+            },
+            "queueFamiliesProperties": [
+                {
+                    "VkQueueFamilyProperties": {
+                        "queueFlags": [
+                            "VK_QUEUE_VIDEO_DECODE_BIT_KHR"
+                        ],
+                        "queueCount": 1
+                    }
+                }
+            ]
+        },
+        "variant_h264": {
+            "extensions": {
+                "VK_KHR_video_queue": 1,
+                "VK_KHR_video_decode_queue": 1,
+                "VK_KHR_video_decode_h264": 1
+            },
+            "queueFamiliesProperties": [
+                {
+                    "VkQueueFamilyVideoPropertiesKHR": {
+                        "videoCodecOperations": [
+                            "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_KHR"
+                        ]
+                    }
+                }
+            ],
+            "videoProfiles": [
+                {
+                    "profile": {
+                        "VkVideoProfileInfoKHR": {
+                            "videoCodecOperation": "VK_VIDEO_CODEC_OPERATION_DECODE_H264_BIT_KHR",
+                            "chromaSubsampling": [
+                                "VK_VIDEO_CHROMA_SUBSAMPLING_420_BIT_KHR"
+                            ],
+                            "lumaBitDepth": [
+                                "VK_VIDEO_COMPONENT_BIT_DEPTH_8_BIT_KHR"
+                            ],
+                            "chromaBitDepth": [
+                                "VK_VIDEO_COMPONENT_BIT_DEPTH_8_BIT_KHR"
+                            ]
+                        },
+                        "VkVideoDecodeH264ProfileInfoKHR": {
+                            "stdProfileIdc": "STD_VIDEO_H264_PROFILE_IDC_MAIN",
+                            "pictureLayout": "VK_VIDEO_DECODE_H264_PICTURE_LAYOUT_PROGRESSIVE_KHR"
+                        }
+                    },
+                    "capabilities": {
+                        "VkVideoCapabilitiesKHR": {
+                            "maxCodedExtent": {
+                                "width": 1920,
+                                "height": 1080
+                            },
+                            "maxDpbSlots": 17,
+                            "maxActiveReferencePictures": 16
+                        },
+                        "VkVideoDecodeH264CapabilitiesKHR": {
+                            "maxLevelIdc": "STD_VIDEO_H264_LEVEL_IDC_5_2"
+                        }
+                    },
+                    "formats": [
+                        {
+                            "VkVideoFormatPropertiesKHR": {
+                                "format": "VK_FORMAT_G8_B8R8_2PLANE_420_UNORM",
+                                "imageCreateFlags": [
+                                    "VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT",
+                                    "VK_IMAGE_CREATE_EXTENDED_USAGE_BIT"
+                                ],
+                                "imageType": "VK_IMAGE_TYPE_2D",
+                                "imageUsageFlags": [
+                                    "VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR",
+                                    "VK_IMAGE_USAGE_SAMPLED_BIT",
+                                    "VK_IMAGE_USAGE_TRANSFER_SRC_BIT",
+                                    "VK_IMAGE_USAGE_TRANSFER_DST_BIT"
+                                ]
+                            }
+                        },
+                        {
+                            "VkVideoFormatPropertiesKHR": {
+                                "format": "VK_FORMAT_G8_B8R8_2PLANE_420_UNORM",
+                                "imageType": "VK_IMAGE_TYPE_2D",
+                                "imageUsageFlags": [
+                                    "VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "variant_h265": {
+            "extensions": {
+                "VK_KHR_video_queue": 1,
+                "VK_KHR_video_decode_queue": 1,
+                "VK_KHR_video_decode_h265": 1
+            },
+            "queueFamiliesProperties": [
+                {
+                    "VkQueueFamilyVideoPropertiesKHR": {
+                        "videoCodecOperations": [
+                            "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_KHR"
+                        ]
+                    }
+                }
+            ],
+            "videoProfiles": [
+                {
+                    "profile": {
+                        "VkVideoProfileInfoKHR": {
+                            "videoCodecOperation": "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_KHR",
+                            "chromaSubsampling": [
+                                "VK_VIDEO_CHROMA_SUBSAMPLING_420_BIT_KHR"
+                            ],
+                            "lumaBitDepth": [
+                                "VK_VIDEO_COMPONENT_BIT_DEPTH_8_BIT_KHR"
+                            ],
+                            "chromaBitDepth": [
+                                "VK_VIDEO_COMPONENT_BIT_DEPTH_8_BIT_KHR"
+                            ]
+                        },
+                        "VkVideoDecodeH265ProfileInfoKHR": {
+                            "stdProfileIdc": "STD_VIDEO_H265_PROFILE_IDC_MAIN"
+                        }
+                    },
+                    "capabilities": {
+                        "VkVideoCapabilitiesKHR": {
+                            "maxCodedExtent": {
+                                "width": 3840,
+                                "height": 2160
+                            },
+                            "maxDpbSlots": 8,
+                            "maxActiveReferencePictures": 4
+                        },
+                        "VkVideoDecodeH265CapabilitiesKHR": {
+                            "maxLevelIdc": "STD_VIDEO_H265_LEVEL_IDC_6_0"
+                        }
+                    },
+                    "formats": [
+                        {
+                            "VkVideoFormatPropertiesKHR": {
+                                "format": "VK_FORMAT_G8_B8R8_2PLANE_420_UNORM",
+                                "imageCreateFlags": [
+                                    "VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT",
+                                    "VK_IMAGE_CREATE_EXTENDED_USAGE_BIT"
+                                ],
+                                "imageType": "VK_IMAGE_TYPE_2D",
+                                "imageUsageFlags": [
+                                    "VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR",
+                                    "VK_IMAGE_USAGE_TRANSFER_SRC_BIT",
+                                    "VK_IMAGE_USAGE_TRANSFER_DST_BIT"
+                                ]
+                            }
+                        },
+                        {
+                            "VkVideoFormatPropertiesKHR": {
+                                "format": "VK_FORMAT_G8_B8R8_2PLANE_420_UNORM",
+                                "imageType": "VK_IMAGE_TYPE_2D",
+                                "imageUsageFlags": [
+                                    "VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR",
+                                    "VK_IMAGE_USAGE_TRANSFER_SRC_BIT"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "profile": {
+                        "VkVideoProfileInfoKHR": {
+                            "videoCodecOperation": "VK_VIDEO_CODEC_OPERATION_DECODE_H265_BIT_KHR",
+                            "chromaSubsampling": [
+                                "VK_VIDEO_CHROMA_SUBSAMPLING_420_BIT_KHR"
+                            ],
+                            "lumaBitDepth": [
+                                "VK_VIDEO_COMPONENT_BIT_DEPTH_10_BIT_KHR"
+                            ],
+                            "chromaBitDepth": [
+                                "VK_VIDEO_COMPONENT_BIT_DEPTH_10_BIT_KHR"
+                            ]
+                        },
+                        "VkVideoDecodeH265ProfileInfoKHR": {
+                            "stdProfileIdc": "STD_VIDEO_H265_PROFILE_IDC_MAIN_10"
+                        }
+                    },
+                    "capabilities": {
+                        "VkVideoCapabilitiesKHR": {
+                            "maxCodedExtent": {
+                                "width": 720,
+                                "height": 480
+                            },
+                            "maxDpbSlots": 2,
+                            "maxActiveReferencePictures": 1
+                        },
+                        "VkVideoDecodeH265CapabilitiesKHR": {
+                            "maxLevelIdc": "STD_VIDEO_H265_LEVEL_IDC_5_0"
+                        }
+                    },
+                    "formats": [
+                        {
+                            "VkVideoFormatPropertiesKHR": {
+                                "format": "VK_FORMAT_G10X6_B10X6R10X6_2PLANE_420_UNORM_3PACK16",
+                                "imageCreateFlags": [
+                                    "VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT",
+                                    "VK_IMAGE_CREATE_EXTENDED_USAGE_BIT"
+                                ],
+                                "imageType": "VK_IMAGE_TYPE_2D",
+                                "imageUsageFlags": [
+                                    "VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR",
+                                    "VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR",
+                                    "VK_IMAGE_USAGE_TRANSFER_SRC_BIT",
+                                    "VK_IMAGE_USAGE_TRANSFER_DST_BIT"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "profiles": {
+        "VP_RASTERGRID_test_video_profiles": {
+            "version": 1,
+            "api-version": "1.3.225",
+            "label": "Test Video Profiles with Profile Variants",
+            "description": "Test.",
+            "contributors": {
+                "Daniel Rakos": {
+                    "company": "RasterGrid",
+                    "email": "daniel.rakos@rastergrid.com",
+                    "github": "aqnuep",
+                    "contact": true
+                }
+            },
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2024-08-28",
+                    "author": "Daniel Rakos",
+                    "comment": "Initial revision"
+                }
+            ],
+            "capabilities": [
+                "block",
+                [
+                    "variant_h264",
+                    "variant_h265"
+                ]
+            ]
+        }
+    }
+}

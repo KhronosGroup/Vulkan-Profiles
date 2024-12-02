@@ -1,5 +1,6 @@
 # ~~~
 # Copyright (c) 2023 LunarG, Inc.
+# Copyright (c) 2024 RasterGrid Kft.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -135,6 +136,8 @@ if(${CMAKE_CXX_COMPILER_ID} MATCHES "(GNU|Clang)")
     target_compile_options(VulkanCompilerConfigurationExtra INTERFACE
         -Wno-unused-function
         -Wno-missing-field-initializers
+        -Wno-type-limits    # Disable warning '>=': expression is always true
+        -Wno-extra-semi     # Disable warning about extra semicolons (used by many tests today)
     )
 elseif(MSVC)
     target_compile_options(VulkanCompilerConfigurationExtra INTERFACE

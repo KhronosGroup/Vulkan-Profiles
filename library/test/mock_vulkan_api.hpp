@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2021-2022 Valve Corporation
  * Copyright (c) 2021-2022 LunarG, Inc.
+ * Copyright (c) 2024 RasterGrid Kft.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,10 +42,54 @@ struct VulkanStructData {
         memcpy(contents.data(), pData + sizeof(VkBaseInStructure), size - sizeof(VkBaseInStructure));
     }
 
-    void copyTo(VkBaseOutStructure* pStruct)
+    void copyTo(VkBaseOutStructure* pStruct) const
     {
         uint8_t* p = static_cast<uint8_t*>(static_cast<void*>(pStruct));
         memcpy(p + sizeof(VkBaseOutStructure), contents.data(), contents.size());
+    }
+};
+
+struct VulkanVideoProfile {
+    VkVideoProfileInfoKHR info{};
+    VkVideoDecodeH264ProfileInfoKHR decode_h264{};
+    VkVideoDecodeH265ProfileInfoKHR decode_h265{};
+
+    VulkanVideoProfile() = default;
+    VulkanVideoProfile(const VkVideoProfileInfoKHR* profile_info) {
+        info = *profile_info;
+        auto pnext = reinterpret_cast<const VkBaseInStructure*>(profile_info->pNext);
+        if (pnext != nullptr) {
+            switch (pnext->sType) {
+                case VK_STRUCTURE_TYPE_VIDEO_DECODE_H264_PROFILE_INFO_KHR:
+                    decode_h264 = *reinterpret_cast<const VkVideoDecodeH264ProfileInfoKHR*>(pnext);
+                    break;
+                case VK_STRUCTURE_TYPE_VIDEO_DECODE_H265_PROFILE_INFO_KHR:
+                    decode_h265 = *reinterpret_cast<const VkVideoDecodeH265ProfileInfoKHR*>(pnext);
+                    break;
+                default:
+                    assert(false);
+                    break;
+            }
+        }
+    }
+
+    bool IsMatchingVideoProfile(const VkVideoProfileInfoKHR* profile_info) const {
+        if (profile_info->videoCodecOperation != info.videoCodecOperation) return false;
+        if (profile_info->chromaSubsampling != info.chromaSubsampling) return false;
+        if (profile_info->lumaBitDepth != info.lumaBitDepth) return false;
+        if (profile_info->chromaBitDepth != info.chromaBitDepth) return false;
+        if (decode_h264.sType == VK_STRUCTURE_TYPE_VIDEO_DECODE_H264_PROFILE_INFO_KHR) {
+            auto s = reinterpret_cast<const VkVideoDecodeH264ProfileInfoKHR*>(profile_info->pNext);
+            assert(s->sType == VK_STRUCTURE_TYPE_VIDEO_DECODE_H264_PROFILE_INFO_KHR);
+            if (s->stdProfileIdc != decode_h264.stdProfileIdc) return false;
+            if (s->pictureLayout != decode_h264.pictureLayout) return false;
+        }
+        if (decode_h265.sType == VK_STRUCTURE_TYPE_VIDEO_DECODE_H265_PROFILE_INFO_KHR) {
+            auto s = reinterpret_cast<const VkVideoDecodeH265ProfileInfoKHR*>(profile_info->pNext);
+            assert(s->sType == VK_STRUCTURE_TYPE_VIDEO_DECODE_H265_PROFILE_INFO_KHR);
+            if (s->stdProfileIdc != decode_h265.stdProfileIdc) return false;
+        }
+        return true;
     }
 };
 
@@ -56,8 +101,12 @@ enum {
     PROFILE_AREA_FEATURES_BIT = 1 << 1,
     PROFILE_AREA_PROPERTIES_BIT = 1 << 2,
     PROFILE_AREA_FORMATS_BIT = 1 << 3,
+    PROFILE_AREA_QUEUE_FAMILIES_BIT = 1 << 4,
+    PROFILE_AREA_VIDEO_CAPABILITIES_BIT = 1 << 5,
+    PROFILE_AREA_VIDEO_FORMATS_BIT = 1 << 6,
     PROFILE_AREA_ALL_BITS = PROFILE_AREA_EXTENSIONS_BIT | PROFILE_AREA_FEATURES_BIT | PROFILE_AREA_PROPERTIES_BIT |
-                            PROFILE_AREA_FORMATS_BIT
+                            PROFILE_AREA_QUEUE_FAMILIES_BIT | PROFILE_AREA_FORMATS_BIT | PROFILE_AREA_VIDEO_CAPABILITIES_BIT |
+                            PROFILE_AREA_VIDEO_FORMATS_BIT
 };
 
 class MockVulkanAPI final
@@ -77,10 +126,15 @@ private:
 
     using MockedStructData = std::unordered_map<uint32_t, VulkanStructData>;
 
+    // Array of video profile info + capabilities / format pairs
+    using MockedVideoStructData = std::vector<std::pair<VulkanVideoProfile, MockedStructData>>;
+
     MockedStructData                                m_mockedFeatures;
     MockedStructData                                m_mockedProperties;
     std::unordered_map<uint32_t, MockedStructData>  m_mockedFormats;
     std::vector<MockedStructData>                   m_mockedQueueFamilies;
+    MockedVideoStructData                           m_mockedVideoCapabilities;
+    MockedVideoStructData                           m_mockedVideoFormats;
 
     static MockVulkanAPI*   sInstance;
 
@@ -167,6 +221,18 @@ public:
 
         if (profileAreas & PROFILE_AREA_FORMATS_BIT) {
             this->m_mockedFormats.clear();
+        }
+
+        if (profileAreas & PROFILE_AREA_QUEUE_FAMILIES_BIT) {
+            this->m_mockedQueueFamilies.clear();
+        }
+
+        if (profileAreas & PROFILE_AREA_VIDEO_CAPABILITIES_BIT) {
+            this->m_mockedVideoCapabilities.clear();
+        }
+
+        if (profileAreas & PROFILE_AREA_VIDEO_FORMATS_BIT) {
+            this->m_mockedVideoFormats.clear();
         }
     }
 
@@ -567,6 +633,118 @@ public:
             return VK_SUCCESS;
         }
         return VK_ERROR_INITIALIZATION_FAILED;
+    }
+
+    void InitVideoEntryPoints()
+    {
+        AddInstanceProc(vkInstance, "vkGetPhysicalDeviceVideoCapabilitiesKHR", &vkGetPhysicalDeviceVideoCapabilitiesKHR);
+        AddInstanceProc(vkInstance, "vkGetPhysicalDeviceVideoFormatPropertiesKHR", &vkGetPhysicalDeviceVideoFormatPropertiesKHR);
+    }
+
+    void RemoveVideoProfile(const VkVideoProfileInfoKHR& profile_info) {
+        RemoveVideoCapabilities(profile_info);
+        RemoveVideoFormats(profile_info);
+    }
+
+    void AddVideoCapabilities(const VulkanVideoProfile& video_profile, std::vector<VulkanStructData>&& caps) {
+        m_mockedVideoCapabilities.emplace_back(std::pair(video_profile, MockedStructData{}));
+        auto& videoCapabilities = m_mockedVideoCapabilities.back().second;
+        for (size_t i = 0; i < caps.size(); ++i) {
+            videoCapabilities.emplace(caps[i].sType, std::move(caps[i]));
+        }
+    }
+
+    void RemoveVideoCapabilities(const VkVideoProfileInfoKHR& profile_info) {
+        m_mockedVideoCapabilities.erase(std::remove_if(m_mockedVideoCapabilities.begin(), m_mockedVideoCapabilities.end(),
+                                                       [&](auto it) { return it.first.IsMatchingVideoProfile(&profile_info); }),
+                                        m_mockedVideoCapabilities.end());
+    }
+
+    static VKAPI_ATTR VkResult VKAPI_CALL vkGetPhysicalDeviceVideoCapabilitiesKHR(
+        VkPhysicalDevice                            physicalDevice,
+        const VkVideoProfileInfoKHR*                pVideoProfile,
+        VkVideoCapabilitiesKHR*                     pCapabilities)
+    {
+        (void)physicalDevice;
+
+        EXPECT_NE(sInstance, nullptr) << "No Vulkan API mock is configured";
+        if (sInstance != nullptr) {
+            for (const auto& videoCapabilities : sInstance->m_mockedVideoCapabilities) {
+                if (videoCapabilities.first.IsMatchingVideoProfile(pVideoProfile)) {
+                    VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(pCapabilities);
+                    while (p != nullptr) {
+                        auto it = videoCapabilities.second.find(p->sType);
+                        if (it != videoCapabilities.second.end()) {
+                            it->second.copyTo(p);
+                        }
+                        p = p->pNext;
+                    }
+                    return VK_SUCCESS;
+                }
+            }
+        }
+
+        return VK_ERROR_VIDEO_PROFILE_CODEC_NOT_SUPPORTED_KHR;
+    }
+
+    void AddVideoFormat(const VulkanVideoProfile& video_profile, std::vector<VulkanStructData>&& props) {
+        m_mockedVideoFormats.emplace_back(std::pair(video_profile, MockedStructData{}));
+        auto& videoFormat = m_mockedVideoFormats.back().second;
+        for (size_t i = 0; i < props.size(); ++i) {
+            videoFormat.emplace(props[i].sType, std::move(props[i]));
+        }
+    }
+
+    void RemoveVideoFormats(const VkVideoProfileInfoKHR& profile_info) {
+        m_mockedVideoFormats.erase(std::remove_if(m_mockedVideoFormats.begin(), m_mockedVideoFormats.end(),
+                                                  [&](auto it) { return it.first.IsMatchingVideoProfile(&profile_info); }),
+                                   m_mockedVideoFormats.end());
+    }
+
+    static VKAPI_ATTR VkResult VKAPI_CALL vkGetPhysicalDeviceVideoFormatPropertiesKHR(
+        VkPhysicalDevice                            physicalDevice,
+        const VkPhysicalDeviceVideoFormatInfoKHR*   pVideoFormatInfo,
+        uint32_t*                                   pVideoFormatPropertyCount,
+        VkVideoFormatPropertiesKHR*                 pVideoFormatProperties)
+    {
+        (void)physicalDevice;
+
+        VkResult result = VK_SUCCESS;
+        uint32_t count = 0;
+
+        EXPECT_NE(sInstance, nullptr) << "No Vulkan API mock is configured";
+        if (sInstance != nullptr) {
+            for (const auto& videoFormat : sInstance->m_mockedVideoFormats) {
+                // NOTE: We assume here that the VkVideoProfileListInfoKHR structure is the only structure
+                // in the pNext chain and that it contains only a single profile. This is all that we
+                // currently support in this mocking framework anyway because we do not support formats
+                // compatible with multiple profiles, etc. This is also perfectly sufficient for testing.
+                auto pVideoProfileList = reinterpret_cast<const VkVideoProfileListInfoKHR*>(pVideoFormatInfo->pNext);
+                if (videoFormat.first.IsMatchingVideoProfile(&pVideoProfileList->pProfiles[0])) {
+                    if (pVideoFormatProperties != nullptr) {
+                        if (count < *pVideoFormatPropertyCount) {
+                            VkBaseOutStructure* p = reinterpret_cast<VkBaseOutStructure*>(&pVideoFormatProperties[count]);
+                            while (p != nullptr) {
+                                auto it = videoFormat.second.find(p->sType);
+                                if (it != videoFormat.second.end()) {
+                                    it->second.copyTo(p);
+                                }
+                                p = p->pNext;
+                            }
+                            count++;
+                        } else {
+                            result = VK_INCOMPLETE;
+                            break;
+                        }
+                    } else {
+                        count++;
+                    }
+                }
+            }
+        }
+
+        *pVideoFormatPropertyCount = count;
+        return result;
     }
 };
 

@@ -21,11 +21,13 @@
 
 import gen_profiles_solution
 import argparse
+from typing import OrderedDict
 
 COPYRIGHT_HEADER = '''
 /*
  * Copyright (C) 2015-2024 Valve Corporation
  * Copyright (C) 2015-2024 LunarG, Inc.
+ * Copyright (C) 2023-2024 RasterGrid Kft.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,6 +80,11 @@ INCLUDES_HEADER = '''
 #include "profiles_settings.h"
 #include <algorithm>
 #include <filesystem>
+#include <functional>
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
+#include <optional>
 
 namespace fs = std::filesystem;
 '''
@@ -193,6 +200,7 @@ class PhysicalDeviceData {
     MapOfVkFormatProperties device_formats_;
     MapOfVkFormatProperties3 device_formats_3_;
     ArrayOfVkQueueFamilyProperties device_queue_family_properties_;
+    SetOfVideoProfiles set_of_device_video_profiles_;
     MapOfVkExtensionProperties simulation_extensions_;
     VkPhysicalDeviceProperties physical_device_properties_;
     VkPhysicalDeviceFeatures physical_device_features_;
@@ -203,6 +211,7 @@ class PhysicalDeviceData {
     MapOfVkFormatProperties3 map_of_format_properties_3_;
     MapOfVkExtensionProperties map_of_extension_properties_;
     ArrayOfVkQueueFamilyProperties arrayof_queue_family_properties_;
+    SetOfVideoProfiles set_of_video_profiles_;
 
     bool vulkan_1_1_properties_written_;
     bool vulkan_1_2_properties_written_;
@@ -484,15 +493,15 @@ WARN_FUNCTIONS = '''
         return false;
     }
 
-    static bool WarnIfMissingBit(ProfileLayerSettings *layer_settings, bool enable_warnings, const char* device_name, const char *cap_name, const uint32_t new_value, const uint32_t old_value, const bool not_modifiable) {
+    static bool WarnIfMissingBit(ProfileLayerSettings *layer_settings, bool enable_warnings, const char* device_name, const char *cap_name, const uint64_t new_value, const uint64_t old_value, const bool not_modifiable) {
         if ((old_value | new_value) != old_value) {
             if (enable_warnings) {
                 if (not_modifiable) {
                     LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
-                        "'%s' is not modifiable but the profile value (%" PRIu32 ") is different from the device (%s) value (%" PRIu32 ")\\n", cap_name, new_value, device_name, old_value);
+                        "'%s' is not modifiable but the profile value (%" PRIu64 ") is different from the device (%s) value (%" PRIu64 ")\\n", cap_name, new_value, device_name, old_value);
                 } else {
                     LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
-                        "'%s' profile value (%" PRIu32 ") has bits set that the device (%s) value (%" PRIu32 ") does not\\n", cap_name, new_value, device_name, old_value);
+                        "'%s' profile value (%" PRIu64 ") has bits set that the device (%s) value (%" PRIu64 ") does not\\n", cap_name, new_value, device_name, old_value);
                 }
             }
             return true;
@@ -629,10 +638,10 @@ GET_VALUE_FUNCTIONS = '''
             }
             *dest = static_cast<uint8_t>(new_value);
         } else if (value.isArray()) {
-            uint32_t sum_bits = 0;
+            uint64_t sum_bits = 0;
             for (const auto &entry : value) {
                 if (entry.isString()) {
-                    sum_bits |= VkStringToUint(entry.asString());
+                    sum_bits |= VkStringToUint64(entry.asString());
                 }
             }
             if (!not_modifiable) {
@@ -732,15 +741,15 @@ GET_VALUE_FUNCTIONS = '''
                 *dest = static_cast<uint32_t>(new_value);
             }
         } else if (value.isArray()) {
-            uint32_t sum_bits = 0;
+            uint64_t sum_bits = 0;
             for (const auto &entry : value) {
                 if (entry.isString()) {
-                    sum_bits |= VkStringToUint(entry.asString());
+                    sum_bits |= VkStringToUint64(entry.asString());
                 }
             }
 
             if (!not_modifiable) {
-                *dest = sum_bits;
+                *dest = static_cast<uint32_t>(sum_bits);
             }
         } else if (value.isUInt()) {
             const uint32_t new_value = value.asUInt();
@@ -870,15 +879,15 @@ GET_VALUE_FUNCTIONS = '''
 
         const Json::Value value = parent[name];
         bool valid = true;
-        uint32_t new_value = 0;
+        uint64_t new_value = 0;
         if (value.isArray()) {
             for (const auto &entry : value) {
                 if (entry.isString()) {
-                    new_value |= VkStringToUint(entry.asString());
+                    new_value |= VkStringToUint64(entry.asString());
                 }
             }
         }
-        if (WarnIfMissingBit(&layer_settings, requested_profile, device_name, name, new_value, static_cast<uint32_t>(*dest), not_modifiable)) {
+        if (WarnIfMissingBit(&layer_settings, requested_profile, device_name, name, new_value, static_cast<uint64_t>(*dest), not_modifiable)) {
             valid = false;
         }
 
@@ -903,7 +912,7 @@ GET_VALUE_FUNCTIONS = '''
         bool valid = true;
         uint32_t new_value = 0;
         if (value.isString()) {
-            new_value = static_cast<T>(VkStringToUint(value.asString()));
+            new_value = static_cast<T>(VkStringToUint64(value.asString()));
         }
         if (warn_func) {
             if (warn_func(&layer_settings, requested_profile, device_name, name, new_value, *dest, not_modifiable)) {
@@ -1569,6 +1578,288 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
                     }
                 }
             }
+        }
+    }
+
+    if (layer_settings.simulate.capabilities & (SIMULATE_VIDEO_CAPABILITIES_BIT | SIMULATE_VIDEO_FORMATS_BIT)) {
+        // Handle video profiles
+
+        struct JsonVideoProfileData {
+            JsonVideoProfileInfo info{};
+            JsonVideoProfileCaps caps{};
+            std::vector<JsonVideoProfileFormat> formats{};
+        };
+        std::vector<JsonVideoProfileData> parsed_video_profiles{};
+
+        for (const auto &capability_variants : capabilities) {
+            for (const auto &capability_variant : capability_variants) {
+                const auto &cap_definition = cap_definisions[capability_variant];
+                if (cap_definition.isMember("videoProfiles")) {
+                    const auto &json_video_profiles = cap_definition["videoProfiles"];
+                    parsed_video_profiles.reserve(json_video_profiles.size());
+                    for (const auto &json_video_profile : json_video_profiles) {
+                        JsonVideoProfileData video_profile{};
+
+                        video_profile.info = JsonVideoProfileInfo(json_video_profile);
+                        if (!video_profile.info.IsValid()) {
+                            LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "Invalid video profile info defined in the profile\\n");
+                            failed = true;
+                            continue;
+                        }
+
+                        video_profile.caps = JsonVideoProfileCaps(json_video_profile);
+                        if (!video_profile.caps.IsValid()) {
+                            LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "Invalid video profile capabilities defined in the profile\\n");
+                            failed = true;
+                            continue;
+                        }
+
+                        if (json_video_profile.isMember("formats")) {
+                            const auto &formats = json_video_profile["formats"];
+                            video_profile.formats.reserve(formats.size());
+                            for (const auto &format : formats) {
+                                JsonVideoProfileFormat fmt(format);
+                                if (fmt.IsValid()) {
+                                    video_profile.formats.push_back(std::move(fmt));
+                                } else {
+                                    LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "Invalid video profile format defined in the profile\\n");
+                                    failed = true;
+                                    continue;
+                                }
+                            }
+                        }
+
+                        parsed_video_profiles.push_back(std::move(video_profile));
+                    }
+                }
+            }
+        }
+
+        if (!parsed_video_profiles.empty()) {
+            auto for_each_matching_video_profile = [&](const VideoProfileInfoChain &video_profile_info,
+                                                    std::function<void(const JsonVideoProfileData&)> callback) {
+                for (const auto &parsed_video_profile : parsed_video_profiles) {
+                    if (parsed_video_profile.info.IsMatching(video_profile_info)) {
+                        callback(parsed_video_profile);
+                    }
+                }
+            };
+            auto for_each_matching_video_profile_format = [&](const VideoProfileInfoChain &video_profile_info,
+                                                            std::function<void(const JsonVideoProfileFormat&)> callback) {
+                for_each_matching_video_profile(video_profile_info, [&](const JsonVideoProfileData &json_video_profile) {
+                    for (const auto &json_video_format : json_video_profile.formats) {
+                        callback(json_video_format);
+                    }
+                });
+            };
+            auto check_api_version = [&](uint32_t api_version) { return this->profile_api_version_ >= api_version; };
+            auto check_extension = [&](const char* extension) { return PhysicalDeviceData::HasSimulatedExtension(pdd_, extension); };
+
+            ForEachVideoProfile([&](const VkVideoProfileInfoKHR& info, const char *name) {
+                std::string device_and_profile_name = std::string(device_name) + ", video profile '" + name + "'";
+                bool insert_video_profile_data = false;
+                VideoProfileData video_profile{};
+
+                // Construct and verify video profile info chain
+                video_profile.info = VideoProfileInfoChain(&info);
+                if (!video_profile.info.valid) {
+                    LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "Invalid video profile info chain for video profile '%s'\\n", name);
+                    failed = true;
+                    return;
+                }
+
+                // Construct and verify video profile capabilities chain
+                video_profile.caps = VideoCapabilitiesChain(info.videoCodecOperation, check_api_version, check_extension);
+                if (!video_profile.caps.valid) {
+                    LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "Invalid video capabilities chain for video profile '%s'\\n", name);
+                    failed = true;
+                    return;
+                }
+
+                // Track whether the video profile is supported by the device or profile, as simulation flags indicate
+                bool supported = false;
+
+                // Initialize capabilities with the physical device supported video profile data, if available
+                auto pd_video_profile = pdd_->set_of_device_video_profiles_.find(video_profile);
+                if (pd_video_profile != pdd_->set_of_device_video_profiles_.end()) {
+                    // We update and not copy the capabilities object here because the supported API version and
+                    // extensions may be different between the physical device and the simulated device so
+                    // the list of structures supported and available in the pNext chain may also be different
+                    video_profile.caps.UpdateFrom(pd_video_profile->caps);
+                    supported = true;
+                }
+
+                if (layer_settings.simulate.capabilities & SIMULATE_VIDEO_CAPABILITIES_BIT) {
+                    // Find matching video profiles defined in the profile and aggregate their video capabilities
+                    bool found_matching = false;
+                    bool found_matching_completely_defined = false;
+                    JsonVideoProfileCaps merged_caps{};
+                    for_each_matching_video_profile(video_profile.info, [&](const JsonVideoProfileData &json_video_profile) {
+                        found_matching = true;
+                        if (!found_matching_completely_defined &&
+                            json_video_profile.info.IsComplete(video_profile.info)) {
+                            found_matching_completely_defined = true;
+                        }
+
+                        bool success = merged_caps.Combine(&layer_settings, json_video_profile.caps);
+                        if (!success) {
+                            LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT,
+                                       "Failed to merge video capabilities for video profile '%s'\\n", name);
+                            failed = true;
+                        }
+                    });
+
+                    if (found_matching) {
+                        bool supported_by_device = supported;
+                        if (!supported_by_device && found_matching_completely_defined) {
+                            LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
+                                       "Simulating video profile '%s' that is not supported by the device\\n", name);
+                            supported = true;
+                        }
+
+                        if (supported) {
+                            // Replace video capabilities with the values defined in the profile
+                            if (supported_by_device) {
+                                if (!merged_caps.Override(&layer_settings, video_profile.caps, name, enable_warnings)) {
+                                    failed = true;
+                                }
+                            } else {
+                                merged_caps.CopyTo(video_profile.caps);
+                            }
+
+                            // Special case: if neither distinct nor coincide output is supported by a decode profile
+                            // then enable distinct by default
+                            const VkVideoDecodeCapabilityFlagsKHR output_mode_flags = VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_DISTINCT_BIT_KHR |
+                                                                                    VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_COINCIDE_BIT_KHR;
+                            if ((video_profile.caps.video_decode_capabilities_.flags & output_mode_flags) == 0) {
+                                video_profile.caps.video_decode_capabilities_.flags |= VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_DISTINCT_BIT_KHR;
+                            }
+
+                            // Make sure the video profile will be inserted
+                            insert_video_profile_data = true;
+                        }
+                    } else {
+                        supported = false;
+                    }
+                }
+
+                if (layer_settings.simulate.capabilities & SIMULATE_VIDEO_FORMATS_BIT && supported) {
+                    // Go through each video format category supported by the video profile
+                    for (const auto usage : video_profile.GetSupportedFormatCategories()) {
+                        std::vector<VideoFormatPropertiesChain> formats{};
+                        SetOfVideoProfileFormats device_formats{};
+        
+                        // The initial set of formats is taken from the physical device supported ones, if there are any,
+                        // and they match any of the profile defined ones
+                        if (pd_video_profile != pdd_->set_of_device_video_profiles_.end()) {
+                            auto pd_video_formats = pd_video_profile->formats.find(usage);
+                            if (pd_video_formats != pd_video_profile->formats.end()) {
+                                for (const auto &pd_video_format : pd_video_formats->second) {
+                                    bool found_matching = false;
+                                    for_each_matching_video_profile_format(video_profile.info, [&](const JsonVideoProfileFormat &json_video_format) {
+                                        if (json_video_format.IsMatchingUsage(usage) &&
+                                            json_video_format.IsMatching(pd_video_format)) {
+                                            found_matching = true;
+                                        }
+                                    });
+                                    if (found_matching) {
+                                        // We create and update a new format object here because the supported API version and
+                                        // extensions may be different between the physical device and the simulated device so
+                                        // the list of structures supported and available in the pNext chain may also be different
+                                        VideoFormatPropertiesChain format(info.videoCodecOperation, usage, check_api_version, check_extension);
+                                        format.UpdateFrom(pd_video_format);
+                                        formats.push_back(format);
+                                        device_formats.insert(format);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Then, additional formats are added that are fully defined in the profile and do not match
+                        // any of the existing ones already included
+                        for_each_matching_video_profile_format(video_profile.info, [&](const JsonVideoProfileFormat &json_video_format) {
+                            if (!json_video_format.IsMatchingUsage(usage)) return;
+
+                            bool found_matching = false;
+                            for (const auto &format : formats) {
+                                if (json_video_format.IsMatching(format)) {
+                                    found_matching = true;
+                                    break;
+                                }
+                            }
+                            if (!found_matching) {
+                                VideoFormatPropertiesChain format(info.videoCodecOperation, usage, check_api_version, check_extension);
+                                if (json_video_format.IsComplete(format)) {
+                                    json_video_format.CopyTo(format);
+                                    LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
+                                               "Simulating video format %s for video profile '%s' that is not supported by the device\\n",
+                                               vkFormatToString(format.video_format_properties_.format).c_str(), name);
+                                    formats.push_back(format);
+                                }
+                            }
+                        });
+
+                        // Now it is time to find all matching video formats defined in the profile and aggregate their properties
+                        for (auto &format : formats) {
+                            JsonVideoProfileFormat merged_props{};
+                            for_each_matching_video_profile_format(video_profile.info, [&](const JsonVideoProfileFormat &json_video_format) {
+                                if (json_video_format.IsMatchingUsage(usage) &&
+                                    json_video_format.IsMatching(format)) {
+                                    bool success = merged_props.Combine(&layer_settings, json_video_format);
+                                    if (!success) {
+                                        LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT,
+                                                   "Failed to merge video format %s data for video profile '%s'\\n",
+                                                   vkFormatToString(format.video_format_properties_.format).c_str(), name);
+                                        failed = true;
+                                    }
+                                }
+                            });
+                            // Replace video format properties with the values defined in the profile
+                            // Only enable warnings if we're replacing the properties of a device supported video format
+                            if (device_formats.find(format) != device_formats.end()) {
+                                if (!merged_props.Override(&layer_settings, format, name, enable_warnings)) {
+                                    failed = true;
+                                }
+                            } else {
+                                merged_props.Override(&layer_settings, format, name, false);
+                            }
+
+                            // Make sure that usage is kept even if the profile data did not explicitly include it
+                            format.video_format_properties_.imageUsageFlags |= usage;
+                        }
+
+                        // Special case: if coincide decode output mode is supported, then we need to have at least one
+                        // format that supports both decode output and decode DPB usage, so if no such format is found
+                        // then replace coincide decode output mode with distinct
+                        // if necessary
+                        if (video_profile.caps.video_decode_capabilities_.flags & VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_COINCIDE_BIT_KHR) {
+                            const VkImageUsageFlags coincide_usage = VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR;
+                            bool found_coincide_format = false;
+                            for (const auto &format : formats) {
+                                if ((format.video_format_properties_.imageUsageFlags & coincide_usage) == coincide_usage) {
+                                    found_coincide_format = true;
+                                    break;
+                                }
+                            }
+                            if (!found_coincide_format) {
+                                video_profile.caps.video_decode_capabilities_.flags ^= VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_COINCIDE_BIT_KHR;
+                                video_profile.caps.video_decode_capabilities_.flags |= VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_DISTINCT_BIT_KHR;
+                            }
+                        }
+
+                        // Store the formats and make sure the video profile will be inserted
+                        for (const auto &format : formats) {
+                            video_profile.formats[usage].insert(format);
+                        }
+                        insert_video_profile_data = true;
+                    }
+                }
+
+                // Insert the video profile data if any profile simulated video capability or video format indicates so
+                if (insert_video_profile_data) {
+                    pdd_->set_of_video_profiles_.insert(video_profile);
+                }
+            });
         }
     }
 
@@ -2456,6 +2747,57 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties2KHR(
     VkImageFormatProperties2KHR *pImageFormatProperties) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
+
+    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
+    ProfileLayerSettings* layer_settings = &JsonLoader::Find(pdd->instance())->layer_settings;
+
+    if (layer_settings->simulate.capabilities & SIMULATE_VIDEO_FORMATS_BIT) {
+        // If video profile lists are provided, make sure to only report support for actually supported video formats
+        auto p = reinterpret_cast<const VkBaseInStructure*>(pImageFormatInfo);
+        while (p != nullptr && p->sType != VK_STRUCTURE_TYPE_VIDEO_PROFILE_LIST_INFO_KHR) {
+            p = p->pNext;
+        }
+        if (p != nullptr) {
+            const auto video_profile_list = reinterpret_cast<const VkVideoProfileListInfoKHR*>(p);
+            for (uint32_t i = 0; i < video_profile_list->profileCount; ++i) {
+                VideoProfileData in_video_profile{};
+
+                // Construct and verify video profile info chain
+                in_video_profile.info = VideoProfileInfoChain(&video_profile_list->pProfiles[i]);
+                if (!in_video_profile.info.valid) {
+                    return VK_ERROR_VIDEO_PROFILE_CODEC_NOT_SUPPORTED_KHR;
+                }
+
+                auto video_profile_data_it = pdd->set_of_video_profiles_.find(in_video_profile);
+                if (video_profile_data_it == pdd->set_of_video_profiles_.end()) {
+                    return VK_ERROR_VIDEO_PROFILE_CODEC_NOT_SUPPORTED_KHR;
+                }
+
+                // VK_IMAGE_CREATE_VIDEO_PROFILE_INDEPENDENT_BIT_KHR is ignored from compatibility perspective
+                const VkImageCreateFlags ignored_create_flags = VK_IMAGE_CREATE_VIDEO_PROFILE_INDEPENDENT_BIT_KHR;
+                const VkImageCreateFlags image_create_flags = pImageFormatInfo->flags & ~ignored_create_flags;
+
+                bool found_matching = false;
+                for (const auto &formats_per_category_it : video_profile_data_it->formats) {
+                    for (const auto &format : formats_per_category_it.second) {
+                        if (pImageFormatInfo->format == format.video_format_properties_.format &&
+                            pImageFormatInfo->type == format.video_format_properties_.imageType &&
+                            pImageFormatInfo->tiling == format.video_format_properties_.imageTiling &&
+                            (pImageFormatInfo->usage & format.video_format_properties_.imageUsageFlags) == pImageFormatInfo->usage &&
+                            (image_create_flags & format.video_format_properties_.imageCreateFlags) == image_create_flags) {
+                            found_matching = true;
+                            break;
+                        }
+                    }
+                    if (found_matching) break;
+                }
+                if (!found_matching) {
+                    return VK_ERROR_VIDEO_PROFILE_FORMAT_NOT_SUPPORTED_KHR;
+                }
+            }
+        }
+    }
+
     dt->GetPhysicalDeviceImageFormatProperties2(physicalDevice, pImageFormatInfo, pImageFormatProperties);
     return GetPhysicalDeviceImageFormatProperties(physicalDevice, pImageFormatInfo->format, pImageFormatInfo->type,
                                                   pImageFormatInfo->tiling, pImageFormatInfo->usage, pImageFormatInfo->flags,
@@ -2466,6 +2808,124 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties2(VkPhysica
                                                                        const VkPhysicalDeviceImageFormatInfo2 *pImageFormatInfo,
                                                                        VkImageFormatProperties2 *pImageFormatProperties) {
     return GetPhysicalDeviceImageFormatProperties2KHR(physicalDevice, pImageFormatInfo, pImageFormatProperties);
+}
+'''
+
+PHYSICAL_DEVICE_VIDEO_FUNCTIONS = '''
+VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceVideoCapabilitiesKHR(VkPhysicalDevice physicalDevice,
+                                                                     const VkVideoProfileInfoKHR *pVideoProfile,
+                                                                     VkVideoCapabilitiesKHR *pCapabilities) {
+    std::lock_guard<std::recursive_mutex> lock(global_lock);
+    const auto dt = instance_dispatch_table(physicalDevice);
+
+    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
+    ProfileLayerSettings* layer_settings = &JsonLoader::Find(pdd->instance())->layer_settings;
+
+    if (layer_settings->simulate.capabilities & SIMULATE_VIDEO_CAPABILITIES_BIT) {
+        VideoProfileData in_video_profile{};
+
+        // Construct and verify video profile info chain
+        in_video_profile.info = VideoProfileInfoChain(pVideoProfile);
+        if (!in_video_profile.info.valid) {
+            return VK_ERROR_VIDEO_PROFILE_CODEC_NOT_SUPPORTED_KHR;
+        }
+
+        auto video_profile_data_it = pdd->set_of_video_profiles_.find(in_video_profile);
+        if (video_profile_data_it == pdd->set_of_video_profiles_.end()) {
+            return VK_ERROR_VIDEO_PROFILE_CODEC_NOT_SUPPORTED_KHR;
+        }
+
+        video_profile_data_it->caps.CopyTo(pCapabilities);
+        return VK_SUCCESS;
+    } else {
+        return dt->GetPhysicalDeviceVideoCapabilitiesKHR(physicalDevice, pVideoProfile, pCapabilities);
+    }
+}
+
+
+VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceVideoFormatPropertiesKHR(VkPhysicalDevice physicalDevice,
+                                                                         const VkPhysicalDeviceVideoFormatInfoKHR *pVideoFormatInfo,
+                                                                         uint32_t *pVideoFormatPropertyCount,
+                                                                         VkVideoFormatPropertiesKHR *pVideoFormatProperties) {
+    std::lock_guard<std::recursive_mutex> lock(global_lock);
+    const auto dt = instance_dispatch_table(physicalDevice);
+
+    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
+    ProfileLayerSettings* layer_settings = &JsonLoader::Find(pdd->instance())->layer_settings;
+
+    if (layer_settings->simulate.capabilities & SIMULATE_VIDEO_FORMATS_BIT) {
+        auto p = reinterpret_cast<const VkBaseInStructure*>(pVideoFormatInfo);
+        while (p != nullptr && p->sType != VK_STRUCTURE_TYPE_VIDEO_PROFILE_LIST_INFO_KHR) {
+            p = p->pNext;
+        }
+        if (p == nullptr) {
+            return VK_ERROR_VIDEO_PROFILE_OPERATION_NOT_SUPPORTED_KHR;
+        }
+
+        SetOfVideoProfileFormats formats{};
+        const auto video_profile_list = reinterpret_cast<const VkVideoProfileListInfoKHR*>(p);
+        for (uint32_t i = 0; i < video_profile_list->profileCount; ++i) {
+            VideoProfileData in_video_profile{};
+
+            // Construct and verify video profile info chain
+            in_video_profile.info = VideoProfileInfoChain(&video_profile_list->pProfiles[i]);
+            if (!in_video_profile.info.valid) {
+                return VK_ERROR_VIDEO_PROFILE_CODEC_NOT_SUPPORTED_KHR;
+            }
+
+            auto video_profile_data_it = pdd->set_of_video_profiles_.find(in_video_profile);
+            if (video_profile_data_it == pdd->set_of_video_profiles_.end()) {
+                return VK_ERROR_VIDEO_PROFILE_CODEC_NOT_SUPPORTED_KHR;
+            }
+
+            if (i == 0) {
+                // First video profile, just take all matching formats as the initial set
+                const auto in_usage = pVideoFormatInfo->imageUsage;
+                for (const auto &formats_per_category_it : video_profile_data_it->formats) {
+                    for (const auto &format : formats_per_category_it.second) {
+                        if ((format.video_format_properties_.imageUsageFlags & in_usage) == in_usage) {
+                            formats.insert(format);
+                        }
+                    }
+                }
+            } else {
+                // For all other video profiles find any matching formats and intersect the properties
+                SetOfVideoProfileFormats common_formats{};
+                for (const auto &format : formats) {
+                    for (const auto &formats_per_category_it : video_profile_data_it->formats) {
+                        auto format_it = formats_per_category_it.second.find(format);
+                        if (format_it != formats_per_category_it.second.end()) {
+                            auto common_format = format;
+                            common_format.IntersectWith(*format_it);
+                            common_formats.insert(common_format);
+                        }
+                    }
+                }
+                formats = std::move(common_formats);
+            }
+        }
+
+        VkResult result = VK_SUCCESS;
+        if (pVideoFormatProperties != nullptr) {
+            if (*pVideoFormatPropertyCount < formats.size()) {
+                result = VK_INCOMPLETE;
+            } else {
+                *pVideoFormatPropertyCount = static_cast<uint32_t>(formats.size());
+            }
+            uint32_t i = 0;
+            for (const auto &format : formats) {
+                if (i >= *pVideoFormatPropertyCount) break;
+                format.CopyTo(&pVideoFormatProperties[i]);
+                i++;
+            }
+        } else {
+            *pVideoFormatPropertyCount = static_cast<uint32_t>(formats.size());
+        }
+        return result;
+    } else {
+        return dt->GetPhysicalDeviceVideoFormatPropertiesKHR(physicalDevice, pVideoFormatInfo,
+                                                             pVideoFormatPropertyCount, pVideoFormatProperties);
+    }
 }
 '''
 
@@ -2584,6 +3044,88 @@ void LoadQueueFamilyProperties(VkInstance instance, VkPhysicalDevice pd, Physica
             pdd->device_queue_family_properties_[i].properties_2 = props[i];
         }
     }
+}
+'''
+
+LOAD_VIDEO_PROFILES = '''
+static void LoadVideoProfiles(VkInstance instance, VkPhysicalDevice pd, PhysicalDeviceData *pdd, SimulateCapabilityFlags flags) {
+    if (!PhysicalDeviceData::HasExtension(pdd, "VK_KHR_video_queue")) {
+        return;
+    }
+
+    auto check_api_version = [&](uint32_t api_version) { return pdd->GetEffectiveVersion() >= api_version; };
+    auto check_extension = [&](const char* extension) { return PhysicalDeviceData::HasExtension(pdd, extension); };
+
+    const auto dt = instance_dispatch_table(instance);
+    ProfileLayerSettings *layer_settings = &JsonLoader::Find(instance)->layer_settings;
+    ForEachVideoProfile([&](const VkVideoProfileInfoKHR& info, const char *name) {
+        VideoProfileData video_profile{};
+
+        // Construct and verify video profile info chain
+        video_profile.info = VideoProfileInfoChain(&info);
+        if (!video_profile.info.valid) {
+            LogMessage(layer_settings, DEBUG_REPORT_ERROR_BIT, "Invalid video profile info chain for video profile '%s'.\\n", name);
+            return;
+        }
+
+        // Construct and verify video profile capabilities chain
+        video_profile.caps = VideoCapabilitiesChain(info.videoCodecOperation, check_api_version, check_extension);
+        if (!video_profile.caps.valid) {
+            LogMessage(layer_settings, DEBUG_REPORT_ERROR_BIT, "Invalid video capabilities chain for video profile '%s'.\\n", name);
+            return;
+        }
+
+        // Query physical device support and capabilities
+        VkResult result = dt->GetPhysicalDeviceVideoCapabilitiesKHR(pd, &video_profile.info.video_profile_info_,
+                                                                    &video_profile.caps.video_capabilities_);
+        if (result < VK_SUCCESS) return;
+
+        // If needed, also load video format data
+        if (flags & SIMULATE_VIDEO_FORMATS_BIT) {
+            VkVideoProfileListInfoKHR video_profile_list{VK_STRUCTURE_TYPE_VIDEO_PROFILE_LIST_INFO_KHR};
+            video_profile_list.profileCount = 1;
+            video_profile_list.pProfiles = &info;
+            VkPhysicalDeviceVideoFormatInfoKHR video_format_info{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VIDEO_FORMAT_INFO_KHR,
+                                                                 &video_profile_list};
+            for (const auto usage : video_profile.GetSupportedFormatCategories()) {
+                video_format_info.imageUsage = usage;
+
+                // Query number of video formats for the given usage
+                uint32_t format_count = 0;
+                result = dt->GetPhysicalDeviceVideoFormatPropertiesKHR(pd, &video_format_info, &format_count, nullptr);
+                if (result < VK_SUCCESS) continue;
+                if (format_count == 0) continue;
+
+                // Construct and verify video profile format chains
+                std::vector<VkVideoFormatPropertiesKHR> video_format_props(format_count);
+                std::vector<VideoFormatPropertiesChain> video_profile_formats(format_count,
+                    VideoFormatPropertiesChain(info.videoCodecOperation, usage, check_api_version, check_extension));
+                if (!video_profile_formats[0].valid) {
+                    LogMessage(layer_settings, DEBUG_REPORT_ERROR_BIT,
+                               "Invalid video format properties chain for video profile '%s'.\\n", name);
+                    continue;
+                }
+                for (uint32_t i = 0; i < format_count; ++i) {
+                    video_format_props[i] = video_profile_formats[i].video_format_properties_;
+                }
+                result = dt->GetPhysicalDeviceVideoFormatPropertiesKHR(pd, &video_format_info, &format_count, video_format_props.data());
+                if (result < VK_SUCCESS) {
+                    LogMessage(layer_settings, DEBUG_REPORT_ERROR_BIT,
+                               "Failed to query video format properties for video profile '%s'.\\n", name);
+                    continue;
+                }
+
+                // Store video formats in the video profile data
+                for (uint32_t i = 0; i < format_count; ++i) {
+                    video_profile_formats[i].video_format_properties_ = video_format_props[i];
+                    video_profile.formats[usage].insert(video_profile_formats[i]);
+                }
+            }
+        }
+
+        // Store video profile data in the physical device data
+        pdd->set_of_device_video_profiles_.insert(video_profile);
+    });
 }
 '''
 
@@ -2793,6 +3335,9 @@ ENUMERATE_PHYSICAL_DEVICES_MIDDLE = '''
             if (layer_settings->simulate.capabilities & SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT) {
                 LoadQueueFamilyProperties(instance, physical_device, &pdd);
             }
+            if (layer_settings->simulate.capabilities & (SIMULATE_VIDEO_CAPABILITIES_BIT | SIMULATE_VIDEO_FORMATS_BIT)) {
+                LoadVideoProfiles(instance, physical_device, &pdd, layer_settings->simulate.capabilities);
+            }
 
             LogMessage(layer_settings, DEBUG_REPORT_NOTIFICATION_BIT,
                        "Found \\"%s\\" with Vulkan %d.%d.%d driver.\\n", pdd.physical_device_properties_.deviceName,
@@ -2855,6 +3400,8 @@ VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL GetInstanceProcAddr(VkInstance instance
     GET_PROC_ADDR(GetPhysicalDeviceQueueFamilyProperties);
     GET_PROC_ADDR(GetPhysicalDeviceQueueFamilyProperties2);
     GET_PROC_ADDR(GetPhysicalDeviceQueueFamilyProperties2KHR);
+    GET_PROC_ADDR(GetPhysicalDeviceVideoCapabilitiesKHR);
+    GET_PROC_ADDR(GetPhysicalDeviceVideoFormatPropertiesKHR);
 #undef GET_PROC_ADDR
 
     if (!instance) {
@@ -2956,6 +3503,14 @@ class VulkanProfilesLayerGenerator():
     # but use the properties in the MockICD until HostImageCopyPropertiesEXT is fixed.
     ignored_structs = ['VkPhysicalDeviceHostImageCopyPropertiesEXT', 'VkPhysicalDeviceLayeredApiPropertiesListKHR']
 
+    int_to_json_type_map = {
+        'int32_t': 'Int',
+        'uint32_t': 'UInt',
+        'int64_t': 'Int64',
+        'uint64_t': 'UInt64',
+        'VkDeviceSize': 'UInt64'
+    }
+
     def generate(self, path, registry):
         self.registry = registry
         self.get_pdd_structs()
@@ -2968,6 +3523,8 @@ class VulkanProfilesLayerGenerator():
             f.write(GLOBAL_VARS)
             f.write(GET_DEFINES)
             f.write(self.generate_is_instance_extension())
+            f.write(self.generate_video_profile_data())
+            f.write(self.generate_video_profile_enumerator())
             f.write(self.generate_physical_device_data())
             f.write(self.generate_json_loader())
             f.write(self.generate_is_format_functions())
@@ -2989,6 +3546,7 @@ class VulkanProfilesLayerGenerator():
             f.write(ENUMERATE_FUNCTIONS)
             f.write(QUEUE_FAMILY_PROPERTIES_FUNCTIONS)
             f.write(PHYSICAL_DEVICE_FORMAT_FUNCTIONS)
+            f.write(PHYSICAL_DEVICE_VIDEO_FUNCTIONS)
             f.write(TOOL_PROPERTIES_FUNCTIONS)
             f.write(TRANSFER_DEFINES)
             f.write(TRANSFER_DEFINES_ARRAY)
@@ -2996,6 +3554,7 @@ class VulkanProfilesLayerGenerator():
             f.write(TRANSFER_UNDEFINE)
             f.write(self.generate_load_device_formats())
             f.write(LOAD_QUEUE_FAMILY_PROPERTIES)
+            f.write(LOAD_VIDEO_PROFILES)
             f.write(self.generate_enumerate_physical_device())
             f.write(GET_INSTANCE_PROC_ADDR)
 
@@ -3025,9 +3584,33 @@ class VulkanProfilesLayerGenerator():
         else:
             return ''
 
+    def generate_compare_and_hash_ops(self, structs):
+        gen = ''
+        for struct in structs:
+            structDef = self.registry.structs[struct]
+            gen += '\nstatic bool operator==(const {0}& lhs, const {0}& rhs) {{\n'.format(struct)
+            for member in structDef.members:
+                gen += '    if (lhs.{0} != rhs.{0}) return false;\n'.format(member)
+            gen += '    return true;\n'
+            gen += '}\n'
+            gen += '\nstatic bool operator!=(const {0}& lhs, const {0}& rhs) {{\n'.format(struct)
+            gen += '    return !operator==(lhs, rhs);\n'
+            gen += '}\n'
+            gen += '\ntemplate <>\n'
+            gen += 'struct std::hash<{0}> {{\n'.format(struct)
+            gen += '    std::size_t operator()(const {0}& k) const {{'.format(struct)
+            gen += '        const std::size_t kMagic = 0x9e3779b97f4a7c16UL;\n'
+            gen += '        std::size_t h = 0;\n'
+            for member in structDef.members:
+                gen += '        h ^= std::hash<decltype(k.{0})>{{}}(k.{0}) + kMagic + (h << 6) + (h >> 2);\n'.format(member)
+            gen += '        return h;\n'
+            gen += '    }\n'
+            gen += '};\n'
+        return gen
+
     def generate_helpers(self):
-        gen = self.generate_string_to_enum('SimulateCapabilityFlags', ('SIMULATE_API_VERSION_BIT', 'SIMULATE_FEATURES_BIT', 'SIMULATE_PROPERTIES_BIT', 'SIMULATE_EXTENSIONS_BIT', 'SIMULATE_FORMATS_BIT', 'SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT', 'SIMULATE_MAX_ENUM'))
-        gen += self.generate_enum_to_string('SimulateCapabilityFlags', ('SIMULATE_API_VERSION_BIT', 'SIMULATE_FEATURES_BIT', 'SIMULATE_PROPERTIES_BIT', 'SIMULATE_EXTENSIONS_BIT', 'SIMULATE_FORMATS_BIT', 'SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT'), 'GetSimulateCapabilitiesLog')
+        gen = self.generate_string_to_enum('SimulateCapabilityFlags', ('SIMULATE_API_VERSION_BIT', 'SIMULATE_FEATURES_BIT', 'SIMULATE_PROPERTIES_BIT', 'SIMULATE_EXTENSIONS_BIT', 'SIMULATE_FORMATS_BIT', 'SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT', 'SIMULATE_VIDEO_CAPABILITIES_BIT', 'SIMULATE_VIDEO_FORMATS_BIT', 'SIMULATE_MAX_ENUM'))
+        gen += self.generate_enum_to_string('SimulateCapabilityFlags', ('SIMULATE_API_VERSION_BIT', 'SIMULATE_FEATURES_BIT', 'SIMULATE_PROPERTIES_BIT', 'SIMULATE_EXTENSIONS_BIT', 'SIMULATE_FORMATS_BIT', 'SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT', 'SIMULATE_VIDEO_CAPABILITIES_BIT', 'SIMULATE_VIDEO_FORMATS_BIT'), 'GetSimulateCapabilitiesLog')
         gen += self.generate_enum_to_string('DebugActionFlags', ('DEBUG_REPORT_NOTIFICATION_BIT', 'DEBUG_REPORT_WARNING_BIT', 'DEBUG_REPORT_ERROR_BIT', 'DEBUG_REPORT_DEBUG_BIT'), 'GetDebugReportsLog')
 
         gen += self.generate_enum_to_string('VkFormatFeatureFlags', self.get_non_aliased_list(registry.bitmasks["VkFormatFeatureFlags"].bitsType.values, registry.bitmasks["VkFormatFeatureFlags"].bitsType.aliasValues), 'GetFormatFeatureString')
@@ -3039,11 +3622,27 @@ class VulkanProfilesLayerGenerator():
 
         gen += self.generate_string_to_image_layout(registry.enums['VkImageLayout'].values)
 
-        gen += self.generate_string_to_uint(('VkToolPurposeFlagBits', 'VkSampleCountFlagBits', 'VkResolveModeFlagBits', 'VkShaderStageFlagBits', 'VkSubgroupFeatureFlagBits', 'VkShaderFloatControlsIndependence', 'VkPointClippingBehavior', 'VkOpticalFlowGridSizeFlagBitsNV', 'VkQueueFlagBits', 'VkMemoryDecompressionMethodFlagBitsNV', 'VkLayeredDriverUnderlyingApiMSFT', 'VkImageUsageFlagBits', 'VkBufferUsageFlagBits', 'VkPhysicalDeviceSchedulingControlsFlagBitsARM', 'VkIndirectCommandsInputModeFlagBitsEXT'), registry.enums)
+        enums = set(('VkToolPurposeFlagBits', 'VkSampleCountFlagBits', 'VkResolveModeFlagBits', 'VkShaderStageFlagBits', 'VkSubgroupFeatureFlagBits', 'VkShaderFloatControlsIndependence', 'VkPointClippingBehavior', 'VkOpticalFlowGridSizeFlagBitsNV', 'VkQueueFlagBits', 'VkMemoryDecompressionMethodFlagBitsNV', 'VkLayeredDriverUnderlyingApiMSFT', 'VkImageUsageFlagBits', 'VkBufferUsageFlagBits', 'VkPhysicalDeviceSchedulingControlsFlagBitsARM', 'VkIndirectCommandsInputModeFlagBitsEXT'))
+        enums = enums.union(self.get_video_enums())
+        gen += self.generate_string_to_uint(enums, registry.enums)
 
         gen += self.generate_string_to_flag_functions(('VkFormatFeatureFlags', 'VkQueueFlags', 'VkQueueGlobalPriorityKHR', 'VkVideoCodecOperationFlagsKHR', 'VkPipelineStageFlags', 'VkPipelineStageFlags2', 'VkFormatFeatureFlags2'))
 
+        gen += self.generate_compare_and_hash_ops(('VkOffset2D', 'VkOffset3D', 'VkExtent2D', 'VkExtent3D', 'VkComponentMapping'))
+
         return gen
+
+    def get_video_enums(self):
+        video_enums = set()
+        video_base_structs = ['VkVideoProfileInfoKHR', 'VkVideoCapabilitiesKHR', 'VkVideoFormatPropertiesKHR']
+        for struct in video_base_structs + list(self.registry.videoCodecsByStructName.keys()):
+            structDef = self.registry.structs[struct]
+            for member in structDef.members.values():
+                if member.type in self.registry.bitmasks:
+                    video_enums.add(self.registry.bitmasks[member.type].bitsType.name)
+                elif member.type in self.registry.enums:
+                    video_enums.add(member.type)
+        return video_enums
 
     def generate_physical_device_data(self):
         gen = PHYSICAL_DEVICE_DATA_BEGIN
@@ -3137,6 +3736,1148 @@ class VulkanProfilesLayerGenerator():
             gen += '            return false;\n'
             gen += '    }\n'
             gen += '}\n'
+        return gen
+
+    def generate_struct_precondition(self, struct, version_check_lambda, extension_check_lambda):
+        conjunctionList = []
+        structDef = self.registry.structs[struct]
+        if structDef.definedByVersion is not None:
+            conjunctionList.append(version_check_lambda(structDef.definedByVersion.versionMacro))
+        if len(structDef.definedByExtensions) > 0:
+            disjunctionList = []
+            for ext in structDef.definedByExtensions:
+                disjunctionList.append(extension_check_lambda(ext))
+            conjunctionList.append('{0}'.format(' || '.join(disjunctionList)))
+        if len(conjunctionList) == 0:
+            return ''
+        elif len(conjunctionList) == 1:
+            return 'if ({0}) '.format(conjunctionList[0])
+        else:
+            return 'if (({0})) '.format(') && ('.join(conjunctionList))
+
+    def generate_video_profile_enumerator(self):
+        # Generates an enumerator function that goes through all supportable video profiles
+        gen = '\nstatic void ForEachVideoProfile(std::function<void(const VkVideoProfileInfoKHR&, const char*)> callback) {\n'
+        gen += '    VkVideoProfileInfoKHR video_profile_info{VK_STRUCTURE_TYPE_VIDEO_PROFILE_INFO_KHR, nullptr};\n'
+
+        gen += '    struct ChromaSubsamplingInfo {\n'
+        gen += '        VkVideoChromaSubsamplingFlagsKHR value;\n'
+        gen += '        const char* name;\n'
+        gen += '    };\n'
+        gen += '    const std::vector<ChromaSubsamplingInfo> chroma_subsampling_list = {\n'
+        gen += '        {VK_VIDEO_CHROMA_SUBSAMPLING_420_BIT_KHR, "4:2:0"},\n'
+        gen += '        {VK_VIDEO_CHROMA_SUBSAMPLING_422_BIT_KHR, "4:2:2"},\n'
+        gen += '        {VK_VIDEO_CHROMA_SUBSAMPLING_444_BIT_KHR, "4:4:4"},\n'
+        gen += '        {VK_VIDEO_CHROMA_SUBSAMPLING_MONOCHROME_BIT_KHR, "monochrome"}\n'
+        gen += '    };\n\n'
+        gen += '    struct BitDepthInfo {\n'
+        gen += '        VkVideoComponentBitDepthFlagsKHR value;\n'
+        gen += '        const char* name;\n'
+        gen += '    };\n'
+        gen += '    const std::vector<BitDepthInfo> bit_depth_list = {\n'
+        gen += '        {VK_VIDEO_COMPONENT_BIT_DEPTH_8_BIT_KHR, "8"},\n'
+        gen += '        {VK_VIDEO_COMPONENT_BIT_DEPTH_10_BIT_KHR, "10"},\n'
+        gen += '        {VK_VIDEO_COMPONENT_BIT_DEPTH_12_BIT_KHR, "12"}\n'
+        gen += '    };\n\n'
+        gen += '    auto base_format = []\n'
+        gen += '        (const ChromaSubsamplingInfo &chroma_subsampling, const BitDepthInfo &luma_bit_depth, const BitDepthInfo &chroma_bit_depth) {\n'
+        gen += '        std::string result{};\n'
+        gen += '            result += " (";\n'
+        gen += '            result += chroma_subsampling.name;\n'
+        gen += '            result += " ";\n'
+        gen += '            result += luma_bit_depth.name;\n'
+        gen += '            if (luma_bit_depth.value != chroma_bit_depth.value) {\n'
+        gen += '                result += ":";\n'
+        gen += '                result += chroma_bit_depth.name;\n'
+        gen += '            }\n'
+        gen += '            result += "-bit)";\n'
+        gen += '            return result;\n'
+        gen += '        };\n'
+        gen += '    for (auto chroma_subsampling : chroma_subsampling_list) {\n'
+        gen += '        video_profile_info.chromaSubsampling = chroma_subsampling.value;\n'
+        gen += '        for (auto luma_bit_depth : bit_depth_list) {\n'
+        gen += '            video_profile_info.lumaBitDepth = luma_bit_depth.value;\n'
+        gen += '            for (auto chroma_bit_depth : bit_depth_list) {\n'
+        gen += '                if (chroma_subsampling.value == VK_VIDEO_CHROMA_SUBSAMPLING_MONOCHROME_BIT_KHR &&\n'
+        gen += '                    luma_bit_depth.value != chroma_bit_depth.value) {\n'
+        gen += '                    // Ignore the chroma bit depth dimension for monochrome\n'
+        gen += '                    continue;\n'
+        gen += '                }\n'
+        gen += '                video_profile_info.chromaBitDepth = chroma_bit_depth.value;\n'
+
+        for videoCodecOp, videoCodec in self.registry.videoCodecsByValue.items():
+            for profileStruct in videoCodec.profileStructs:
+                gen += self.generate_platform_protect_begin(profileStruct)
+
+            gen += '{0}{{\n'.format(' ' * 16)
+            indent = ' ' * 20
+            gen += '{0}const std::string profile_base_name = "{1}" + base_format(chroma_subsampling, luma_bit_depth, chroma_bit_depth);\n'.format(indent, videoCodec.name)
+            gen += '{0}video_profile_info.pNext = nullptr;\n'.format(indent)
+            gen += '{0}video_profile_info.videoCodecOperation = {1};\n'.format(indent, videoCodecOp)
+
+            for profileStruct in videoCodec.profileStructs:
+                profileStructDef = self.registry.structs[profileStruct]
+                profileStructVar = self.create_var_name(profileStruct)
+                gen += '{0}{1} {2} = {{{3}}};\n'.format(indent, profileStruct, profileStructVar, profileStructDef.sType)
+                gen += '{0}{1}.pNext = video_profile_info.pNext;\n'.format(indent, profileStructVar)
+                gen += '{0}video_profile_info.pNext = &{1};\n'.format(indent, profileStructVar)
+
+            # Permute profiles for each profile struct member value
+            profiles = OrderedDict({'': []})
+            lastValue = dict()
+            for profileStruct in videoCodec.profileStructs.values():
+                lastValue[profileStruct.struct] = dict()
+                for profileStructMember in profileStruct.members.values():
+                    lastValue[profileStruct.struct][profileStructMember.name] = None
+                    newProfiles = {}
+                    for profileStructMemberValue, profileStructMemberName in profileStructMember.values.items():
+                        for profileName, profile in profiles.items():
+                            newProfileName = '{0} {1}'.format(profileName, profileStructMemberName)
+                            newProfiles[newProfileName] = profile + [{
+                                "struct": profileStruct.struct,
+                                "member": profileStructMember.name,
+                                "value": profileStructMemberValue
+                            }]
+                    profiles = newProfiles
+
+            for profileName, profile in profiles.items():
+                for profileStruct in videoCodec.profileStructs:
+                    for elem in profile:
+                        if elem['struct'] == profileStruct:
+                            if lastValue[elem['struct']][elem['member']] != elem['value']:
+                                gen += '{0}{1}.{2} = {3};\n'.format(indent, self.create_var_name(elem['struct']), elem['member'], elem['value'])
+                                lastValue[elem['struct']][elem['member']] = elem['value']
+                gen += '{0}callback(video_profile_info, (profile_base_name + "{1}").c_str());\n'.format(indent, profileName)
+
+            gen += '{0}}}\n'.format(' ' * 16)
+
+            for profileStruct in reversed(videoCodec.profileStructs):
+                gen += self.generate_platform_protect_end(profileStruct)
+
+        gen += '            }\n'
+        gen += '        }\n'
+        gen += '    }\n'
+        gen += '}\n'
+        return gen
+
+    def get_video_structs(self, base_struct, include_base_struct = True):
+        structs = []
+        if include_base_struct:
+            structs.append(self.registry.getNonAliasTypeName(base_struct, self.registry.structs))
+        for struct in sorted(self.registry.videoCodecsByStructName):
+            struct = self.registry.getNonAliasTypeName(struct, self.registry.structs)
+            if struct not in structs and base_struct in self.registry.structs[struct].extends:
+                structs.append(struct)
+        return structs
+
+    def generate_video_profile_info(self):
+        structs = self.get_video_structs('VkVideoProfileInfoKHR')
+
+        gen = '\nstruct VideoProfileInfoChain {\n'
+        gen += '    bool valid{false};\n'
+
+        for struct in structs:
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '    ' + struct + ' ' + self.create_var_name(struct) + '{};\n'
+            gen += self.generate_platform_protect_end(struct)
+
+        gen += '\n    VideoProfileInfoChain() {}\n'
+        gen += '    VideoProfileInfoChain(const VideoProfileInfoChain& info) {\n'
+        gen += '        InitFrom(&info.video_profile_info_);\n'
+        gen += '    }\n\n'
+        gen += '    VideoProfileInfoChain(const VkVideoProfileInfoKHR *info) {\n'
+        gen += '        InitFrom(info);\n'
+        gen += '    }\n\n'
+        gen += '    VideoProfileInfoChain& operator=(const VideoProfileInfoChain& rhs) {\n'
+        gen += '        InitFrom(&rhs.video_profile_info_);\n'
+        gen += '        return *this;\n'
+        gen += '    }\n\n'
+
+        gen += '    void InitFrom(const VkVideoProfileInfoKHR *info) {\n'
+        gen += '        auto p = reinterpret_cast<const VkBaseInStructure*>(info);\n'
+        gen += '        valid = true;\n'
+        gen += '        const void** ppnext = nullptr;\n'
+        gen += '        while (p != nullptr) {\n'
+        gen += '            switch (p->sType) {\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            indent = ' ' * 16
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '{0}case {1}:\n'.format(indent, self.registry.structs[struct].sType)
+            gen += '{0}    if (ppnext != nullptr) *ppnext = &{1};\n'.format(indent, structVar)
+            gen += '{0}    {1} = *reinterpret_cast<const {2}*>(p);\n'.format(indent, structVar, struct)
+            gen += '{0}    {1}.pNext = nullptr;\n'.format(indent, structVar)
+            gen += '{0}    ppnext = &{1}.pNext;\n'.format(indent, structVar)
+            gen += '{0}    break;\n'.format(indent)
+            gen += self.generate_platform_protect_end(struct)
+        gen += '                default:\n'
+        gen += '                    valid = false;\n'
+        gen += '                    return;\n'
+        gen += '            }\n'
+        gen += '            p = p->pNext;\n'
+        gen += '        }\n'
+        gen += '    }\n\n'
+
+        gen += '    bool operator==(const VideoProfileInfoChain &rhs) const {\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '        if ({0}.sType == {1}) {{\n'.format(structVar, structDef.sType)
+            gen += '            if (rhs.{0}.sType != {1}) return false;\n'.format(structVar, structDef.sType)
+            for member in structDef.members:
+                gen += '            if ({0}.{1} != rhs.{0}.{1}) return false;\n'.format(structVar, member)
+            gen += '        } else {\n'
+            gen += '            if (rhs.{0}.sType == {1}) return false;\n'.format(structVar, structDef.sType)
+            gen += '        }\n'
+            gen += self.generate_platform_protect_end(struct)
+        gen += '        return true;\n'
+        gen += '    }\n\n'
+
+        gen += '    struct hash {\n'
+        gen += '        std::size_t operator()(const VideoProfileInfoChain& key) const {\n'
+        gen += '            std::size_t h = 0;\n'
+        gen += '            const std::size_t kMagic = 0x9e3779b97f4a7c16UL;\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            indent = ' ' * 12
+            gen += '{0}if (key.{1}.sType == {2}) {{\n'.format(indent, structVar, structDef.sType)
+            for member in structDef.members:
+                gen += '{0}    h ^= std::hash<decltype(key.{1}.{2})>{{}}(key.{1}.{2}) + kMagic + (h << 6) + (h >> 2);\n'.format(indent, structVar, member)
+            gen += '{0}}}\n'.format(indent)
+            gen += self.generate_platform_protect_end(struct)
+        gen += '            return h;\n'
+        gen += '        }\n'
+        gen += '    };\n'
+        gen += '};\n\n'
+        gen += 'template <> struct std::hash<VideoProfileInfoChain> : VideoProfileInfoChain::hash {};\n'
+
+        # This class holds (potentially partial) video profile info parsed from the profile JSON
+        gen += '\nclass JsonVideoProfileInfo {\n'
+        gen += '    bool is_valid_{false};\n'
+
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '    bool {0}defined_{{false}};\n'.format(structVar)
+            gen += '    struct {\n'
+            for member in structDef.members.values():
+                gen += '        std::optional<{0}> {1}{{}};\n'.format(member.type, member.name)
+            gen += '    }} {0}{{}};\n'.format(structVar)
+            gen += self.generate_platform_protect_end(struct)
+
+        # Parses JSON video profile info
+        gen += '\n    bool ParseJson(const Json::Value &profile_json) {\n'
+        gen += '        if (!profile_json.isMember("profile")) return true;\n'
+        gen += '        const Json::Value &profile_info_json = profile_json["profile"];\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '        const Json::Value *{0}json = nullptr;\n'.format(structVar)
+            for alias in self.registry.structs[struct].aliases:
+                gen += '        if (profile_info_json.isMember("{0}")) {{\n'.format(alias)
+                gen += '            if ({0}json != nullptr) return false;\n'.format(structVar)
+                gen += '            {0}json = &profile_info_json["{1}"];\n'.format(structVar, alias)
+                gen += '        }\n'
+            gen += '        if ({0}json != nullptr) {{\n'.format(structVar)
+            gen += '            {0}defined_ = true;\n'.format(structVar)
+            for member in structDef.members.values():
+                gen += '            if ({0}json->isMember("{1}")) {{\n'.format(structVar, member.name)
+                gen += '                const Json::Value &value = (*{0}json)["{1}"];\n'.format(structVar, member.name)
+                if member.type in self.registry.enums:
+                    gen += '                if (!value.isString()) return false;\n'
+                    gen += '                {0}.{1} = static_cast<{2}>(VkStringToUint64(value.asString()));\n'.format(structVar, member.name, member.type)
+                elif member.type in self.registry.bitmasks:
+                    gen += '                if (!value.isArray()) return false;\n'
+                    gen += '                uint64_t mask = 0;\n'
+                    gen += '                for (const auto &entry : value) {\n'
+                    gen += '                    mask |= VkStringToUint64(entry.asString());\n'
+                    gen += '                }\n'
+                    gen += '                {0}.{1} = static_cast<{2}>(mask);\n'.format(structVar, member.name, member.type)
+                elif member.type == 'VkBool32':
+                    gen += '                if (!value.isBool()) return false;\n'
+                    gen += '                {0}.{1} = value.asBool() ? VK_TRUE : VK_FALSE;\n'.format(structVar, member.name)
+                else:
+                    gen += '#error Unsupported video profile info type "{0}" in "{1}::{2}"\n'.format(member.type, struct, member.name)
+                gen += '            }\n'
+            gen += '        }\n'
+            gen += self.generate_platform_protect_end(struct)
+        gen += '        return true;\n'
+        gen += '    }\n'
+
+        gen += '\n  public:\n'
+        gen += '    JsonVideoProfileInfo() = default;\n'
+        gen += '    JsonVideoProfileInfo(const Json::Value &profile_json) {\n'
+        gen += '        is_valid_ = ParseJson(profile_json);\n'
+        gen += '    }\n'
+
+        gen += '\n    bool IsValid() const { return is_valid_; }\n'
+
+        # Checks if the JSON video profile info matches the input video profile info
+        gen += '\n    bool IsMatching(const VideoProfileInfoChain &profile_info) const {\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '        if (profile_info.{0}.sType == {1}) {{\n'.format(structVar, structDef.sType)
+            for member in structDef.members.keys():
+                gen += '            if ({0}.{1}.has_value() && {0}.{1}.value() != profile_info.{0}.{1}) return false;\n'.format(structVar, member)
+            gen += '        } else {\n'
+            gen += '            if ({0}defined_) return false;\n'.format(structVar)
+            gen += '        }\n'
+            gen += self.generate_platform_protect_end(struct)
+        gen += '        return true;\n'
+        gen += '    }\n'
+
+        # Checks if the JSON video profile info is complete to specify the entire video profile info
+        gen += '\n    bool IsComplete(const VideoProfileInfoChain &profile_info) const {\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '        if (profile_info.{0}.sType == {1}) {{\n'.format(structVar, structDef.sType)
+            for member in structDef.members.keys():
+                gen += '            if (!{0}.{1}.has_value()) return false;\n'.format(structVar, member)
+            gen += '        }\n'
+            gen += self.generate_platform_protect_end(struct)
+        gen += '        return true;\n'
+        gen += '    }\n'
+
+        gen += '};\n\n'
+
+        return gen
+
+    def generate_video_profile_caps(self):
+        structs = self.get_video_structs('VkVideoCapabilitiesKHR')
+
+        gen = '\nstruct VideoCapabilitiesChain {\n'
+        gen += '    bool valid{false};\n'
+
+        for struct in structs:
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '    ' + struct + ' ' + self.create_var_name(struct) + '{};\n'
+            gen += self.generate_platform_protect_end(struct)
+
+        gen += '\n    VideoCapabilitiesChain() {}\n'
+        gen += '    VideoCapabilitiesChain(const VideoCapabilitiesChain& caps) {\n'
+        gen += '        InitFrom(&caps.video_capabilities_);\n'
+        gen += '    }\n\n'
+        gen += '    VideoCapabilitiesChain& operator=(const VideoCapabilitiesChain& rhs) {\n'
+        gen += '        InitFrom(&rhs.video_capabilities_);\n'
+        gen += '        return *this;\n'
+        gen += '    }\n\n'
+
+        gen += '    void InitFrom(const VkVideoCapabilitiesKHR *caps) {\n'
+        gen += '        auto p = reinterpret_cast<const VkBaseInStructure*>(caps);\n'
+        gen += '        valid = true;\n'
+        gen += '        void** ppnext = nullptr;\n'
+        gen += '        while (p != nullptr) {\n'
+        gen += '            switch (p->sType) {\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            indent = ' ' * 16
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '{0}case {1}:\n'.format(indent, self.registry.structs[struct].sType)
+            gen += '{0}    if (ppnext != nullptr) *ppnext = &{1};\n'.format(indent, structVar)
+            gen += '{0}    {1} = *reinterpret_cast<const {2}*>(p);\n'.format(indent, structVar, struct)
+            gen += '{0}    {1}.pNext = nullptr;\n'.format(indent, structVar)
+            gen += '{0}    ppnext = &{1}.pNext;\n'.format(indent, structVar)
+            gen += '{0}    break;\n'.format(indent)
+            gen += self.generate_platform_protect_end(struct)
+        gen += '                default:\n'
+        gen += '                    valid = false;\n'
+        gen += '                    return;\n'
+        gen += '            }\n'
+        gen += '            p = p->pNext;\n'
+        gen += '        }\n'
+        gen += '    }\n\n'
+
+        gen += '    VideoCapabilitiesChain(VkVideoCodecOperationFlagBitsKHR op,\n'
+        gen += '                     std::function<bool(uint32_t)> check_api_version,\n'
+        gen += '                     std::function<bool(const char*)> check_extension) {\n'
+        gen += '        (void)check_api_version;\n'
+        gen += '        (void)check_extension;\n'
+        gen += '        valid = true;\n'
+        gen += '        video_capabilities_ = {VK_STRUCTURE_TYPE_VIDEO_CAPABILITIES_KHR, nullptr};\n'
+        gen += '        switch (op) {\n'
+        for videoCodecOp, videoCodec in self.registry.videoCodecsByValue.items():
+            gen += '            case {0}:\n'.format(videoCodecOp)
+            for capsStruct in videoCodec.capabilities:
+                capsStructDef = self.registry.structs[capsStruct]
+                capsStructVar = self.create_var_name(capsStruct)
+                gen += self.generate_platform_protect_begin(capsStruct)
+                indent = ' ' * 16
+                gen += '{0}{1}{{\n'.format(indent,
+                    self.generate_struct_precondition(capsStruct,
+                        lambda ver : 'check_api_version({0})'.format(ver),
+                        lambda ext : 'check_extension("{0}")'.format(ext)))
+                gen += '{0}    {1} = {{{2}, video_capabilities_.pNext}};\n'.format(indent, capsStructVar, capsStructDef.sType)
+                gen += '{0}    video_capabilities_.pNext = &{1};\n'.format(indent, capsStructVar)
+                gen += '{0}}}\n'.format(indent)
+                gen += self.generate_platform_protect_end(capsStruct)
+            gen += '                break;\n'
+        gen += '            default:\n'
+        gen += '                valid = false;\n'
+        gen += '                return;\n'
+        gen += '        }\n'
+        gen += '    }\n\n'
+
+        gen += '    void UpdateFrom(const VideoCapabilitiesChain &source) {\n'
+        gen += '        auto p = reinterpret_cast<const VkBaseInStructure*>(&source.video_capabilities_);\n'
+        gen += '        void* orig_pnext = nullptr;\n'
+        gen += '        while (p != nullptr) {\n'
+        gen += '            switch (p->sType) {\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            indent = ' ' * 16
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '{0}case {1}:\n'.format(indent, self.registry.structs[struct].sType)
+            gen += '{0}    orig_pnext = {1}.pNext;\n'.format(indent, structVar)
+            gen += '{0}    {1} = *reinterpret_cast<const {2}*>(p);\n'.format(indent, structVar, struct)
+            gen += '{0}    {1}.pNext = orig_pnext;\n'.format(indent, structVar)
+            gen += '{0}    break;\n'.format(indent)
+            gen += self.generate_platform_protect_end(struct)
+        gen += '                default:\n'
+        gen += '                    break;\n'
+        gen += '            }\n'
+        gen += '            p = p->pNext;\n'
+        gen += '        }\n'
+        gen += '    }\n\n'
+
+        gen += '    void CopyTo(VkVideoCapabilitiesKHR *caps) const {\n'
+        gen += '        auto p = reinterpret_cast<const VkBaseInStructure*>(&video_capabilities_);\n'
+        gen += '        void* orig_pnext = nullptr;\n'
+        gen += '        while (p != nullptr) {\n'
+        gen += '            auto dst = reinterpret_cast<VkBaseOutStructure*>(caps);\n'
+        gen += '            while (dst != nullptr && dst->sType != p->sType) {\n'
+        gen += '                dst = dst->pNext;\n'
+        gen += '            }\n'
+        gen += '            if (dst != nullptr) {\n'
+        gen += '                switch (p->sType) {\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            indent = ' ' * 20
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '{0}case {1}: {{\n'.format(indent, self.registry.structs[struct].sType)
+            gen += '{0}    auto s = reinterpret_cast<{1}*>(dst);\n'.format(indent, struct)
+            gen += '{0}    orig_pnext = s->pNext;\n'.format(indent)
+            gen += '{0}    *s = *reinterpret_cast<const {1}*>(p);\n'.format(indent, struct)
+            gen += '{0}    s->pNext = orig_pnext;\n'.format(indent)
+            gen += '{0}    break;\n'.format(indent)
+            gen += '{0}}}\n'.format(indent)
+            gen += self.generate_platform_protect_end(struct)
+        gen += '                    default:\n'
+        gen += '                        break;\n'
+        gen += '                }\n'
+        gen += '            }\n'
+        gen += '            p = p->pNext;\n'
+        gen += '        }\n'
+        gen += '    }\n'
+
+        gen += '};\n'
+
+        # This class holds and is able to combine (potentially partial) video profile capabilities parsed from the profile JSON
+        gen += '\nclass JsonVideoProfileCaps {\n'
+        gen += '    bool is_valid_{false};\n'
+
+        for struct in structs:
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '    struct {\n'
+            for member in structDef.members.values():
+                limittype = self.get_limittype_class(member.limittype)
+                if member.name == 'stdHeaderVersion' and member.type == 'VkExtensionProperties':
+                    # stdHeaderVersion is a special case
+                    gen += '        struct {\n'
+                    gen += '            LimitExact<std::string> extensionName{};\n'
+                    gen += '            LimitExact<uint32_t> specVersion{};\n'
+                    gen += '        } stdHeaderVersion{};\n'
+                elif member.type in self.registry.structs:
+                    # Structure members need to be expanded
+                    nestedStructDef = self.registry.structs[member.type]
+                    gen += '        struct {\n'
+                    for nestedMember in nestedStructDef.members.values():
+                        gen += '            {0}<{1}> {2}{{}};\n'.format(limittype, nestedMember.type, nestedMember.name)
+                    gen += '        }} {0}{{}};\n'.format(member.name)
+                else:
+                    gen += '        {0}<{1}> {2}{{}};\n'.format(limittype, member.type, member.name)
+            gen += '    }} {0}{{}};\n'.format(self.create_var_name(struct))
+            gen += self.generate_platform_protect_end(struct)
+
+        # Parses JSON video profile capabilities
+        gen += '\n    bool ParseJson(const Json::Value &profile_json) {\n'
+        gen += '        if (!profile_json.isMember("capabilities")) return true;\n'
+        gen += '        const Json::Value &profile_caps_json = profile_json["capabilities"];\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '        const Json::Value *{0}json = nullptr;\n'.format(structVar)
+            for alias in self.registry.structs[struct].aliases:
+                gen += '        if (profile_caps_json.isMember("{0}")) {{\n'.format(alias)
+                gen += '            if ({0}json != nullptr) return false;\n'.format(structVar)
+                gen += '            {0}json = &profile_caps_json["{1}"];\n'.format(structVar, alias)
+                gen += '        }\n'
+            gen += '        if ({0}json != nullptr) {{\n'.format(structVar)
+            for member in structDef.members.values():
+                gen += '            if ({0}json->isMember("{1}")) {{\n'.format(structVar, member.name)
+                gen += '                const Json::Value &value = (*{0}json)["{1}"];\n'.format(structVar, member.name)
+                if member.type in self.registry.enums:
+                    gen += '                if (!value.isString()) return false;\n'
+                    gen += '                {0}.{1}.limit = static_cast<{2}>(VkStringToUint64(value.asString()));\n'.format(structVar, member.name, member.type)
+                elif member.type in self.registry.bitmasks:
+                    gen += '                if (!value.isArray()) return false;\n'
+                    gen += '                uint64_t mask = 0;\n'
+                    gen += '                for (const auto &entry : value) {\n'
+                    gen += '                    mask |= VkStringToUint64(entry.asString());\n'
+                    gen += '                }\n'
+                    gen += '                {0}.{1}.limit = static_cast<{2}>(mask);\n'.format(structVar, member.name, member.type)
+                elif member.type == 'VkBool32':
+                    gen += '                if (!value.isBool()) return false;\n'
+                    gen += '                {0}.{1}.limit = value.asBool() ? VK_TRUE : VK_FALSE;\n'.format(structVar, member.name)
+                elif member.type in self.int_to_json_type_map:
+                    intType = self.int_to_json_type_map[member.type]
+                    gen += '                if (!value.is{0}()) return false;\n'.format(intType)
+                    gen += '                {0}.{1}.limit = value.as{2}();\n'.format(structVar, member.name, intType)
+                elif member.name == 'stdHeaderVersion' and member.type == 'VkExtensionProperties':
+                    # stdHeaderVersion is a special case
+                    gen += '                if (!value.isObject()) return false;\n'
+                    gen += '                if (value.isMember("extensionName")) {\n'
+                    gen += '                    const Json::Value &std_header_name = value["extensionName"];\n'
+                    gen += '                    if (!std_header_name.isString()) return false;\n'
+                    gen += '                    {0}.stdHeaderVersion.extensionName.limit = std_header_name.asString();\n'.format(structVar)
+                    gen += '                }\n'
+                    gen += '                if (value.isMember("specVersion")) {\n'
+                    gen += '                    const Json::Value &std_header_version = value["specVersion"];\n'
+                    gen += '                    if (!std_header_version.isUInt()) return false;\n'
+                    gen += '                    {0}.stdHeaderVersion.specVersion.limit = std_header_version.asUInt();\n'.format(structVar)
+                    gen += '                }\n'
+                elif member.type in self.registry.structs:
+                    nestedStructDef = self.registry.structs[member.type]
+                    gen += '                if (!value.isObject()) return false;\n'
+                    for nestedMember in nestedStructDef.members.values():
+                        gen += '                if (value.isMember("{0}")) {{\n'.format(nestedMember.name)
+                        gen += '                    const Json::Value &nested_value = value["{0}"];\n'.format(nestedMember.name)
+                        if nestedMember.type in self.registry.enums:
+                            gen += '                    if (!nested_value.isString()) return false;\n'
+                            gen += '                    {0}.{1}.{2}.limit = static_cast<{3}>(VkStringToUint64(nested_value.asString()));\n'.format(structVar, member.name, nestedMember.name, nestedMember.type)
+                        elif nestedMember.type in self.int_to_json_type_map:
+                            intType = self.int_to_json_type_map[nestedMember.type]
+                            gen += '                    if (!nested_value.is{0}()) return false;\n'.format(intType)
+                            gen += '                    {0}.{1}.{2}.limit = nested_value.as{3}();\n'.format(structVar, member.name, nestedMember.name, intType)
+                        else:
+                            gen += '#error Unsupported video profile capability type "{0}" in "{1}::{2}::{3}"\n'.format(nestedMember.type, struct, member.name, nestedMember.name)
+                        gen += '                }\n'
+                else:
+                    gen += '#error Unsupported video profile capability type "{0}" in "{1}::{2}"\n'.format(member.type, struct, member.name)
+                gen += '            }\n'
+            gen += '        }\n'
+            gen += self.generate_platform_protect_end(struct)
+        gen += '        return true;\n'
+        gen += '    }\n'
+
+        gen += '\n  public:\n'
+        gen += '    JsonVideoProfileCaps() = default;\n'
+        gen += '    JsonVideoProfileCaps(const Json::Value &profile_json) {\n'
+        gen += '        is_valid_ = ParseJson(profile_json);\n'
+        gen += '    }\n'
+
+        gen += '\n    bool IsValid() const { return is_valid_; }\n'
+
+        # Combines two sets of (potentially partial) video profile capabilities parsed from the profile JSON
+        gen += '\n    bool Combine(ProfileLayerSettings *layer_settings, const JsonVideoProfileCaps &caps) {\n'
+        gen += '        const char *error_msg = "Conflicting video capability defined in the profile for %s\\n";\n'
+        gen += '        bool result = true;\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            for member in structDef.members.values():
+                if member.type in self.registry.structs:
+                    # Structure members need to be expanded
+                    nestedStructDef = self.registry.structs[member.type]
+                    for nestedMember in nestedStructDef.members.values():
+                        gen += '        if (caps.{0}.{1}.{2}.limit.has_value() && !{0}.{1}.{2}.Combine(caps.{0}.{1}.{2}.limit.value())) {{\n'.format(structVar, member.name, nestedMember.name)
+                        gen += '            LogMessage(layer_settings, DEBUG_REPORT_ERROR_BIT, error_msg, "{0}::{1}::{2}");\n'.format(struct, member.name, nestedMember.name)
+                        gen += '            result = false;\n'
+                        gen += '        }\n'
+                else:
+                    gen += '        if (caps.{0}.{1}.limit.has_value() && !{0}.{1}.Combine(caps.{0}.{1}.limit.value())) {{\n'.format(structVar, member.name)
+                    gen += '            LogMessage(layer_settings, DEBUG_REPORT_ERROR_BIT, error_msg, "{0}::{1}");\n'.format(struct, member.name)
+                    gen += '            result = false;\n'
+                    gen += '        }\n'
+            gen += self.generate_platform_protect_end(struct)
+        gen += '        return result;\n'
+        gen += '    }\n'
+
+        # Overrides the target video profile capabilities with the held video profile capabilities parsed from the profile JSON
+        gen += '\n    bool Override(ProfileLayerSettings *layer_settings, VideoCapabilitiesChain &caps, const char *name, bool enable_warnings) const {\n'
+        gen += '        const char *warn_msg = "Simulating video capability %s that is not supported by the device for video profile \'%s\'\\n";\n'
+        gen += '        bool result = true;\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '        if (caps.{0}.sType == {1}) {{\n'.format(structVar, structDef.sType)
+            indent = ' ' * 12
+            for member in structDef.members.values():
+                if member.type in self.registry.structs:
+                    # Structure members need to be expanded
+                    nestedStructDef = self.registry.structs[member.type]
+                    for nestedMember in nestedStructDef.members.values():
+                        if member.name == 'stdHeaderVersion' and member.type == 'VkExtensionProperties' and nestedMember.name == 'extensionName':
+                            # stdHeaderVersion.extensionName is a special case
+                            gen += '{0}if ({1}.{2}.{3}.limit.has_value() && strncmp({1}.{2}.{3}.limit.value().c_str(), caps.{1}.{2}.{3}, VK_MAX_EXTENSION_NAME_SIZE - 1) != 0) {{\n'.format(indent, structVar, member.name, nestedMember.name)
+                            gen += '{0}    memset(caps.{1}.{2}.{3}, 0, VK_MAX_EXTENSION_NAME_SIZE - 1);\n'.format(indent, structVar, member.name, nestedMember.name)
+                            gen += '{0}    strncpy(caps.{1}.{2}.{3}, {1}.{2}.{3}.limit.value().c_str(), VK_MAX_EXTENSION_NAME_SIZE - 1);\n'.format(indent, structVar, member.name, nestedMember.name)
+                        else:
+                            gen += '{0}if (!{1}.{2}.{3}.Override(caps.{1}.{2}.{3})) {{\n'.format(indent, structVar, member.name, nestedMember.name)
+                        gen += '{0}    if (enable_warnings) {{\n'.format(indent)
+                        gen += '{0}        LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT, warn_msg, "{1}::{2}::{3}", name);\n'.format(indent, struct, member.name, nestedMember.name)
+                        gen += '{0}        result = false;\n'.format(indent)
+                        gen += '{0}    }}\n'.format(indent)
+                        gen += '{0}}}\n'.format(indent)
+                else:
+                    gen += '{0}if (!{1}.{2}.Override(caps.{1}.{2})) {{\n'.format(indent, structVar, member.name)
+                    gen += '{0}    if (enable_warnings) {{\n'.format(indent)
+                    gen += '{0}        LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT, warn_msg, "{1}::{2}", name);\n'.format(indent, struct, member.name)
+                    gen += '{0}        result = false;\n'.format(indent)
+                    gen += '{0}    }}\n'.format(indent)
+                    gen += '{0}}}\n'.format(indent)
+            gen += '        }\n'
+            gen += self.generate_platform_protect_end(struct)
+        gen += '        return result;\n'
+        gen += '    }\n'
+
+        # Replaces the target video profile capabilities with the held video profile capabilities parsed from the profile JSON
+        gen += '\n    void CopyTo(VideoCapabilitiesChain &caps) const {\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '        if (caps.{0}.sType == {1}) {{\n'.format(structVar, structDef.sType)
+            gen += '            caps.{0} = {{caps.{0}.sType, caps.{0}.pNext}};\n'.format(structVar)
+            indent = ' ' * 12
+            for member in structDef.members.values():
+                if member.type in self.registry.structs:
+                    # Structure members need to be expanded
+                    nestedStructDef = self.registry.structs[member.type]
+                    for nestedMember in nestedStructDef.members.values():
+                        if member.name == 'stdHeaderVersion' and member.type == 'VkExtensionProperties' and nestedMember.name == 'extensionName':
+                            # stdHeaderVersion.extensionName is a special case
+                            gen += '{0}if ({1}.{2}.{3}.limit.has_value()) {{\n'.format(indent, structVar, member.name, nestedMember.name)
+                            gen += '{0}    memset(caps.{1}.{2}.{3}, 0, VK_MAX_EXTENSION_NAME_SIZE - 1);\n'.format(indent, structVar, member.name, nestedMember.name)
+                            gen += '{0}    strncpy(caps.{1}.{2}.{3}, {1}.{2}.{3}.limit.value().c_str(), VK_MAX_EXTENSION_NAME_SIZE - 1);\n'.format(indent, structVar, member.name, nestedMember.name)
+                            gen += '{0}}}\n'.format(indent)
+                        else:
+                            gen += '{0}if ({1}.{2}.{3}.limit.has_value()) caps.{1}.{2}.{3} = {1}.{2}.{3}.limit.value();\n'.format(indent, structVar, member.name, nestedMember.name)
+                else:
+                    gen += '{0}if ({1}.{2}.limit.has_value()) caps.{1}.{2} = {1}.{2}.limit.value();\n'.format(indent, structVar, member.name)
+            gen += '        }\n'
+            gen += self.generate_platform_protect_end(struct)
+        gen += '    }\n'
+
+        gen += '};\n'
+
+        return gen
+
+    def generate_video_profile_format(self):
+        structs = self.get_video_structs('VkVideoFormatPropertiesKHR')
+
+        gen = '\nstruct VideoFormatPropertiesChain {\n'
+        gen += '    bool valid{false};\n'
+
+        for struct in structs:
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '    ' + struct + ' ' + self.create_var_name(struct) + '{};\n'
+            gen += self.generate_platform_protect_end(struct)
+
+        gen += '\n    VideoFormatPropertiesChain() {}\n'
+        gen += '    VideoFormatPropertiesChain(const VideoFormatPropertiesChain& format) {\n'
+        gen += '        InitFrom(&format.video_format_properties_);\n'
+        gen += '    }\n\n'
+        gen += '    VideoFormatPropertiesChain& operator=(const VideoFormatPropertiesChain& rhs) {\n'
+        gen += '        InitFrom(&rhs.video_format_properties_);\n'
+        gen += '        return *this;\n'
+        gen += '    }\n\n'
+
+        gen += '    void InitFrom(const VkVideoFormatPropertiesKHR *props) {\n'
+        gen += '        auto p = reinterpret_cast<const VkBaseInStructure*>(props);\n'
+        gen += '        valid = true;\n'
+        gen += '        void** ppnext = nullptr;\n'
+        gen += '        while (p != nullptr) {\n'
+        gen += '            switch (p->sType) {\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            indent = ' ' * 16
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '{0}case {1}:\n'.format(indent, self.registry.structs[struct].sType)
+            gen += '{0}    if (ppnext != nullptr) *ppnext = &{1};\n'.format(indent, structVar)
+            gen += '{0}    {1} = *reinterpret_cast<const {2}*>(p);\n'.format(indent, structVar, struct)
+            gen += '{0}    {1}.pNext = nullptr;\n'.format(indent, structVar)
+            gen += '{0}    ppnext = &{1}.pNext;\n'.format(indent, structVar)
+            gen += '{0}    break;\n'.format(indent)
+            gen += self.generate_platform_protect_end(struct)
+        gen += '                default:\n'
+        gen += '                    valid = false;\n'
+        gen += '                    return;\n'
+        gen += '            }\n'
+        gen += '            p = p->pNext;\n'
+        gen += '        }\n'
+        gen += '    }\n\n'
+
+        gen += '    VideoFormatPropertiesChain(VkVideoCodecOperationFlagBitsKHR op,\n'
+        gen += '                       VkImageUsageFlags usage,\n'
+        gen += '                       std::function<bool(uint32_t)> check_api_version,\n'
+        gen += '                       std::function<bool(const char*)> check_extension) {\n'
+        gen += '        (void)check_api_version;\n'
+        gen += '        (void)check_extension;\n'
+        gen += '        valid = true;\n'
+        gen += '        video_format_properties_ = {VK_STRUCTURE_TYPE_VIDEO_FORMAT_PROPERTIES_KHR, nullptr};\n'
+        gen += '        switch (op) {\n'
+        for videoCodecOp, videoCodec in self.registry.videoCodecsByValue.items():
+            gen += '            case {0}:\n'.format(videoCodecOp)
+            gen += '                switch (usage) {\n'
+            for videoFormat in videoCodec.formats.values():
+                gen += '                    case {0}:\n'.format(videoFormat.usage)
+                for formatStruct in videoFormat.properties:
+                    formatStructDef = self.registry.structs[formatStruct]
+                    formatStructVar = self.create_var_name(formatStruct)
+                    gen += self.generate_platform_protect_begin(formatStruct)
+                    indent = ' ' * 24
+                    gen += '{0}{1}{{\n'.format(indent,
+                        self.generate_struct_precondition(formatStruct,
+                            lambda ver : 'check_api_version({0})'.format(ver),
+                            lambda ext : 'check_extension("{0}")'.format(ext)))
+                    gen += '{0}    {1} = {{{2}, video_format_properties_.pNext}};\n'.format(indent, formatStructVar, formatStructDef.sType)
+                    gen += '{0}    video_format_properties_.pNext = &{1};\n'.format(indent, formatStructVar)
+                    gen += '{0}}}\n'.format(indent)
+                    gen += self.generate_platform_protect_end(formatStruct)
+                gen += '                        break;\n'
+            gen += '                    default:\n'
+            gen += '                        valid = false;\n'
+            gen += '                        return;\n'
+            gen += '                }\n'
+            gen += '                break;\n'
+        gen += '            default:\n'
+        gen += '                valid = false;\n'
+        gen += '                return;\n'
+        gen += '        }\n'
+        gen += '    }\n\n'
+
+        gen += '    void UpdateFrom(const VideoFormatPropertiesChain &source) {\n'
+        gen += '        auto p = reinterpret_cast<const VkBaseInStructure*>(&source.video_format_properties_);\n'
+        gen += '        void* orig_pnext = nullptr;\n'
+        gen += '        while (p != nullptr) {\n'
+        gen += '            switch (p->sType) {\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            indent = ' ' * 16
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '{0}case {1}:\n'.format(indent, self.registry.structs[struct].sType)
+            gen += '{0}    orig_pnext = {1}.pNext;\n'.format(indent, structVar)
+            gen += '{0}    {1} = *reinterpret_cast<const {2}*>(p);\n'.format(indent, structVar, struct)
+            gen += '{0}    {1}.pNext = orig_pnext;\n'.format(indent, structVar)
+            gen += '{0}    break;\n'.format(indent)
+            gen += self.generate_platform_protect_end(struct)
+        gen += '                default:\n'
+        gen += '                    break;\n'
+        gen += '            }\n'
+        gen += '            p = p->pNext;\n'
+        gen += '        }\n'
+        gen += '    }\n\n'
+
+        gen += '    void CopyTo(VkVideoFormatPropertiesKHR *props) const {\n'
+        gen += '        auto p = reinterpret_cast<const VkBaseInStructure*>(&video_format_properties_);\n'
+        gen += '        void* orig_pnext = nullptr;\n'
+        gen += '        while (p != nullptr) {\n'
+        gen += '            auto dst = reinterpret_cast<VkBaseOutStructure*>(props);\n'
+        gen += '            while (dst != nullptr && dst->sType != p->sType) {\n'
+        gen += '                dst = dst->pNext;\n'
+        gen += '            }\n'
+        gen += '            if (dst != nullptr) {\n'
+        gen += '                switch (p->sType) {\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            indent = ' ' * 20
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '{0}case {1}: {{\n'.format(indent, self.registry.structs[struct].sType)
+            gen += '{0}    auto s = reinterpret_cast<{1}*>(dst);\n'.format(indent, struct)
+            gen += '{0}    orig_pnext = s->pNext;\n'.format(indent)
+            gen += '{0}    *s = *reinterpret_cast<const {1}*>(p);\n'.format(indent, struct)
+            gen += '{0}    s->pNext = orig_pnext;\n'.format(indent)
+            gen += '{0}    break;\n'.format(indent)
+            gen += '{0}}}\n'.format(indent)
+            gen += self.generate_platform_protect_end(struct)
+        gen += '                    default:\n'
+        gen += '                        break;\n'
+        gen += '                }\n'
+        gen += '            }\n'
+        gen += '            p = p->pNext;\n'
+        gen += '        }\n'
+        gen += '    }\n\n'
+
+        # We consider two formats to "match" if their property structures and their "exact" properties match
+        gen += '    bool operator==(const VideoFormatPropertiesChain &rhs) const {\n'
+        for struct in structs:
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            for member in structDef.members.values():
+                if member.limittype == 'exact':
+                    gen += '        if ({0}.{1} != rhs.{0}.{1}) return false;\n'.format(self.create_var_name(struct), member.name)
+            gen += self.generate_platform_protect_end(struct)
+        gen += '        return true;\n'
+        gen += '    }\n\n'
+
+        gen += '    struct hash {\n'
+        gen += '        std::size_t operator()(const VideoFormatPropertiesChain& key) const {\n'
+        gen += '            const std::size_t kMagic = 0x9e3779b97f4a7c16UL;\n'
+        gen += '            std::size_t h = 0;\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            indent = ' ' * 12
+            gen += '{0}if (key.{1}.sType == {2}) {{\n'.format(indent, structVar, structDef.sType)
+            for member in structDef.members.values():
+                if member.limittype == 'exact':
+                    gen += '{0}    h ^= std::hash<decltype(key.{1}.{2})>{{}}(key.{1}.{2}) + kMagic + (h << 6) + (h >> 2);\n'.format(indent, structVar, member.name)
+            gen += '{0}}}\n'.format(indent)
+            gen += self.generate_platform_protect_end(struct)
+        gen += '            return h;\n'
+        gen += '        }\n'
+        gen += '    };\n\n'
+
+        # In order to deal with vkGetPhysicalDeviceVideoFormatPropertiesKHR returning format lists for list of
+        # video profiles, we also need a way to return the lowest common denominator properties for a given
+        # format which takes the intersection of two formats that otherwise match in "exact" properties by
+        # taking the common properties for non-"exact" ones
+        gen += '    void IntersectWith(const VideoFormatPropertiesChain &source) {\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '        if ({0}.sType == {1} && source.{0}.sType == {1}) {{\n'.format(structVar, structDef.sType)
+            indent = ' ' * 12
+            for member in self.registry.structs[struct].members.values():
+                if 'min' in member.limittype or 'max' in member.limittype or 'bits' in member.limittype:
+                    minOrMax = 'max' if 'min' in member.limittype else 'min'
+                    if member.type in self.registry.structs:
+                        for subMember in self.registry.structs[member.type].members.values():
+                            gen += '{0}{1}.{2}.{3} = std::{4}({1}.{2}.{3}, source.{1}.{2}.{3});\n'.format(indent, structVar, member.name, subMember.name, minOrMax)
+                    else:
+                        gen += '{0}{1}.{2} = std::{4}({1}.{2}, source.{1}.{2});\n'.format(indent, structVar, member.name, minOrMax)
+                elif 'bitmask' in member.limittype:
+                    gen += '{0}{1}.{2} &= source.{1}.{2};\n'.format(indent, structVar, member.name)
+                elif member.limittype != 'exact':
+                    print("ERROR: Unexpected limittype '{0}' in member '{1}' of structure '{2}'".format(member.limittype, member.name, struct))
+            gen += '        }\n'
+            gen += self.generate_platform_protect_end(struct)
+        gen += '    }\n'
+
+        gen += '};\n\n'
+        gen += 'template <> struct std::hash<VideoFormatPropertiesChain> : VideoFormatPropertiesChain::hash {};\n'
+        gen += 'typedef std::unordered_set<VideoFormatPropertiesChain> SetOfVideoProfileFormats;\n'
+
+        # This class holds (potentially partial) video profile format properties parsed from the profile JSON
+        gen += '\nclass JsonVideoProfileFormat {\n'
+        gen += '    bool is_valid_{false};\n'
+
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '    bool {0}defined_{{false}};\n'.format(structVar)
+            gen += '    struct {\n'
+            for member in structDef.members.values():
+                limittype = self.get_limittype_class(member.limittype)
+                if member.type in self.registry.structs:
+                    # Structure members need to be expanded
+                    nestedStructDef = self.registry.structs[member.type]
+                    gen += '        struct {\n'
+                    for nestedMember in nestedStructDef.members.values():
+                        gen += '            {0}<{1}> {2}{{}};\n'.format(limittype, nestedMember.type, nestedMember.name)
+                    gen += '        }} {0}{{}};\n'.format(member.name)
+                else:
+                    gen += '        {0}<{1}> {2}{{}};\n'.format(limittype, member.type, member.name)
+            gen += '    }} {0}{{}};\n'.format(structVar)
+            gen += self.generate_platform_protect_end(struct)
+
+        # Parses JSON video profile format properties
+        gen += '\n    bool ParseJson(const Json::Value &format_json) {\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '        const Json::Value *{0}json = nullptr;\n'.format(structVar)
+            for alias in self.registry.structs[struct].aliases:
+                gen += '        if (format_json.isMember("{0}")) {{\n'.format(alias)
+                gen += '            if ({0}json != nullptr) return false;\n'.format(structVar)
+                gen += '            {0}json = &format_json["{1}"];\n'.format(structVar, alias)
+                gen += '        }\n'
+            gen += '        if ({0}json != nullptr) {{\n'.format(structVar)
+            for member in structDef.members.values():
+                gen += '            if ({0}json->isMember("{1}")) {{\n'.format(structVar, member.name)
+                gen += '                const Json::Value &value = (*{0}json)["{1}"];\n'.format(structVar, member.name)
+                if member.type in self.registry.enums:
+                    gen += '                if (!value.isString()) return false;\n'
+                    gen += '                {0}.{1}.limit = static_cast<{2}>(VkStringToUint64(value.asString()));\n'.format(structVar, member.name, member.type)
+                elif member.type in self.registry.bitmasks:
+                    gen += '                if (!value.isArray()) return false;\n'
+                    gen += '                uint64_t mask = 0;\n'
+                    gen += '                for (const auto &entry : value) {\n'
+                    gen += '                    mask |= VkStringToUint64(entry.asString());\n'
+                    gen += '                }\n'
+                    gen += '                {0}.{1}.limit = static_cast<{2}>(mask);\n'.format(structVar, member.name, member.type)
+                elif member.type == 'VkBool32':
+                    gen += '                if (!value.isBool()) return false;\n'
+                    gen += '                {0}.{1}.limit = value.asBool() ? VK_TRUE : VK_FALSE;\n'.format(structVar, member.name)
+                elif member.type in self.int_to_json_type_map:
+                    intType = self.int_to_json_type_map[member.type]
+                    gen += '                if (!value.is{0}()) return false;\n'.format(intType)
+                    gen += '                {0}.{1}.limit = value.as{2}();\n'.format(structVar, member.name, intType)
+                elif member.type in self.registry.structs:
+                    nestedStructDef = self.registry.structs[member.type]
+                    gen += '                if (!value.isObject()) return false;\n'
+                    for nestedMember in nestedStructDef.members.values():
+                        gen += '                if (value.isMember("{0}")) {{\n'.format(nestedMember.name)
+                        gen += '                    const Json::Value &nested_value = value["{0}"];\n'.format(nestedMember.name)
+                        if nestedMember.type in self.registry.enums:
+                            gen += '                    if (!nested_value.isString()) return false;\n'
+                            gen += '                    {0}.{1}.{2}.limit = static_cast<{3}>(VkStringToUint64(nested_value.asString()));\n'.format(structVar, member.name, nestedMember.name, nestedMember.type)
+                        elif nestedMember.type in self.int_to_json_type_map:
+                            intType = self.int_to_json_type_map[nestedMember.type]
+                            gen += '                    if (!nested_value.is{0}()) return false;\n'.format(intType)
+                            gen += '                    {0}.{1}.{2}.limit = nested_value.as{3}();\n'.format(structVar, member.name, nestedMember.name, intType)
+                        else:
+                            gen += '#error Unsupported video profile format type "{0}" in "{1}::{2}::{3}"\n'.format(nestedMember.type, struct, member.name, nestedMember.name)
+                        gen += '                }\n'
+                else:
+                    gen += '#error Unsupported video profile format type "{0}" in "{1}::{2}"\n'.format(member.type, struct, member.name)
+                gen += '            }\n'
+            gen += '        }\n'
+            gen += self.generate_platform_protect_end(struct)
+        gen += '        return true;\n'
+        gen += '    }\n'
+
+        gen += '\n  public:\n'
+        gen += '    JsonVideoProfileFormat() = default;\n'
+        gen += '    JsonVideoProfileFormat(const Json::Value &format_json) {\n'
+        gen += '        is_valid_ = ParseJson(format_json);\n'
+        gen += '    }\n'
+
+        gen += '\n    bool IsValid() const { return is_valid_; }\n'
+
+        # Checks if the JSON video format matches the input image usage
+        gen += '\n    bool IsMatchingUsage(VkImageUsageFlags usage) const {\n'
+        gen += '        return video_format_properties_.imageUsageFlags.limit.has_value()\n'
+        gen += '            && (video_format_properties_.imageUsageFlags.limit.value() & usage) == usage;\n'
+        gen += '    }\n'
+
+        # Checks if the JSON video format matches the input video format (only "exact" properties are checked)
+        gen += '\n    bool IsMatching(const VideoFormatPropertiesChain &format) const {\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '        if (format.{0}.sType == {1}) {{\n'.format(structVar, structDef.sType)
+            indent = ' ' * 12
+            for member in structDef.members.values():
+                if member.limittype in ['exact', 'noauto', 'not']:
+                    if member.type in self.registry.structs:
+                        # Structure members need to be expanded
+                        nestedStructDef = self.registry.structs[member.type]
+                        for nestedMember in nestedStructDef.members.values():
+                            gen += '{0}if ({1}.{2}.{3}.limit.has_value() && {1}.{2}.{3}.limit.value() != format.{1}.{2}.{3}) return false;\n'.format(indent, self.create_var_name(struct), member.name, nestedMember.name)
+                    else:
+                        gen += '{0}if ({1}.{2}.limit.has_value() && {1}.{2}.limit.value() != format.{1}.{2}) return false;\n'.format(indent, self.create_var_name(struct), member.name)
+            gen += '        } else {\n'
+            gen += '            if ({0}defined_) return false;\n'.format(structVar)
+            gen += '        }\n'
+            gen += self.generate_platform_protect_end(struct)
+        gen += '        return true;\n'
+        gen += '    }\n'
+
+        # Checks if the JSON video format is complete to specify all "exact" properties of the video format
+        gen += '\n    bool IsComplete(const VideoFormatPropertiesChain &format) const {\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '        if (format.{0}.sType == {1}) {{\n'.format(structVar, structDef.sType)
+            indent = ' ' * 12
+            for member in structDef.members.values():
+                if member.limittype in ['exact', 'noauto', 'not']:
+                    if member.type in self.registry.structs:
+                        # Structure members need to be expanded
+                        nestedStructDef = self.registry.structs[member.type]
+                        for nestedMember in nestedStructDef.members.values():
+                            gen += '{0}if (!{1}.{2}.{3}.limit.has_value()) return false;\n'.format(indent, self.create_var_name(struct), member.name, nestedMember.name)
+                    else:
+                        gen += '{0}if (!{1}.{2}.limit.has_value()) return false;\n'.format(indent, self.create_var_name(struct), member.name)
+            gen += '        }\n'
+            gen += self.generate_platform_protect_end(struct)
+        gen += '        return true;\n'
+        gen += '    }\n'
+
+        # Combines two sets of (potentially partial) video profile formats parsed from the profile JSON
+        gen += '\n    bool Combine(ProfileLayerSettings *layer_settings, const JsonVideoProfileFormat &format) {\n'
+        gen += '        const char *error_msg = "Conflicting video format property defined in the profile for %s";\n'
+        gen += '        bool result = true;\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            for member in structDef.members.values():
+                # We only combine modifiable properties
+                if member.limittype in ['exact', 'noauto', 'not']:
+                    continue
+                if member.type in self.registry.structs:
+                    # Structure members need to be expanded
+                    nestedStructDef = self.registry.structs[member.type]
+                    for nestedMember in nestedStructDef.members.values():
+                        gen += '        if (format.{0}.{1}.{2}.limit.has_value() && !{0}.{1}.{2}.Combine(format.{0}.{1}.{2}.limit.value())) {{\n'.format(structVar, member.name, nestedMember.name)
+                        gen += '            LogMessage(layer_settings, DEBUG_REPORT_ERROR_BIT, error_msg, "{0}::{1}::{2}");\n'.format(struct, member.name, nestedMember.name)
+                        gen += '            result = false;\n'
+                        gen += '        }\n'
+                else:
+                    gen += '        if (format.{0}.{1}.limit.has_value() && !{0}.{1}.Combine(format.{0}.{1}.limit.value())) {{\n'.format(structVar, member.name)
+                    gen += '            LogMessage(layer_settings, DEBUG_REPORT_ERROR_BIT, error_msg, "{0}::{1}");\n'.format(struct, member.name)
+                    gen += '            result = false;\n'
+                    gen += '        }\n'
+            gen += self.generate_platform_protect_end(struct)
+
+        gen += '        return result;\n'
+        gen += '    }\n'
+
+        # Overrides the target video format properties with the held video format properties parsed from the profile JSON
+        gen += '\n    bool Override(ProfileLayerSettings *layer_settings, VideoFormatPropertiesChain &format, const char *name, bool enable_warnings) const {\n'
+        gen += '        const char *warn_msg = "Simulating video format property %s that is not supported by the device for video profile \'%s\'\\n";\n'
+        gen += '        bool result = true;\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '        if (format.{0}.sType == {1}) {{\n'.format(structVar, structDef.sType)
+            indent = ' ' * 12
+            for member in structDef.members.values():
+                # We only override modifiable properties
+                if member.limittype in ['exact', 'noauto', 'not']:
+                    continue
+                if member.type in self.registry.structs:
+                    # Structure members need to be expanded
+                    nestedStructDef = self.registry.structs[member.type]
+                    for nestedMember in nestedStructDef.members.values():
+                        gen += '{0}if (!{1}.{2}.{3}.Override(format.{1}.{2}.{3})) {{\n'.format(indent, structVar, member.name, nestedMember.name)
+                        gen += '{0}    if (enable_warnings) {{\n'.format(indent)
+                        gen += '{0}        LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT, warn_msg, "{1}::{2}::{3}", name);\n'.format(indent, struct, member.name, nestedMember.name)
+                        gen += '{0}        result = false;\n'.format(indent)
+                        gen += '{0}    }}\n'.format(indent)
+                        gen += '{0}}}\n'.format(indent)
+                else:
+                    gen += '{0}if (!{1}.{2}.Override(format.{1}.{2})) {{\n'.format(indent, structVar, member.name)
+                    gen += '{0}    if (enable_warnings) {{\n'.format(indent)
+                    gen += '{0}        LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT, warn_msg, "{1}::{2}", name);\n'.format(indent, struct, member.name)
+                    gen += '{0}        result = false;\n'.format(indent)
+                    gen += '{0}    }}\n'.format(indent)
+                    gen += '{0}}}\n'.format(indent)
+            gen += '        }\n'
+            gen += self.generate_platform_protect_end(struct)
+        gen += '        return result;\n'
+        gen += '    }\n'
+
+        # Replaces the target video profile format with the hed video profile format parsed from the profile JSON
+        gen += '\n    void CopyTo(VideoFormatPropertiesChain &format) const {\n'
+        for struct in structs:
+            structVar = self.create_var_name(struct)
+            structDef = self.registry.structs[struct]
+            gen += self.generate_platform_protect_begin(struct)
+            gen += '        if (format.{0}.sType == {1}) {{\n'.format(structVar, structDef.sType)
+            gen += '            format.{0} = {{format.{0}.sType, format.{0}.pNext}};\n'.format(structVar)
+            indent = ' ' * 12
+            for member in structDef.members.values():
+                if member.type in self.registry.structs:
+                    # Structure members need to be expanded
+                    nestedStructDef = self.registry.structs[member.type]
+                    for nestedMember in nestedStructDef.members.values():
+                        gen += '{0}if ({1}.{2}.{3}.limit.has_value()) format.{1}.{2}.{3} = {1}.{2}.{3}.limit.value();\n'.format(indent, structVar, member.name, nestedMember.name)
+                else:
+                    gen += '{0}if ({1}.{2}.limit.has_value()) format.{1}.{2} = {1}.{2}.limit.value();\n'.format(indent, structVar, member.name)
+            gen += '        }\n'
+            gen += self.generate_platform_protect_end(struct)
+        gen += '    }\n'
+
+        gen += '};\n'
+
+        return gen
+
+    def generate_video_profile_data(self):
+        gen = self.generate_video_profile_info()
+        gen += self.generate_video_profile_caps()
+        gen += self.generate_video_profile_format()
+        gen += '\nstruct VideoProfileData {\n'
+        gen += '    VideoProfileInfoChain info;\n'
+        gen += '    VideoCapabilitiesChain caps;\n'
+        gen += '    std::unordered_map<VkImageUsageFlags, SetOfVideoProfileFormats> formats;\n\n'
+        gen += '    std::vector<VkImageUsageFlags> GetSupportedFormatCategories() const {\n'
+        gen += '        std::vector<VkImageUsageFlags> result{};\n'
+        gen += '        switch (info.video_profile_info_.videoCodecOperation) {\n'
+
+        for videoCodecOp, videoCodec in self.registry.videoCodecsByValue.items():
+            gen += '            case {0}:\n'.format(videoCodecOp)
+            for videoFormat in videoCodec.formats.values():
+                for formatStruct in videoFormat.properties:
+                    gen += self.generate_platform_protect_begin(formatStruct)
+                for requiredCaps in videoFormat.requiredCaps:
+                    gen += self.generate_platform_protect_begin(requiredCaps.struct)
+
+                indent = ' ' * 16
+
+                conditions = []
+
+                for requiredCaps in videoFormat.requiredCaps:
+                    capsStructDef = self.registry.structs[requiredCaps.struct]
+                    capsStructMember = capsStructDef.members[requiredCaps.member]
+                    capsStructMemberVar = 'caps.{0}.{1}'.format(self.create_var_name(requiredCaps.struct), requiredCaps.member)
+                    if capsStructMember.limittype == 'bitmask':
+                        conditions.append(gen_profiles_solution.genCConditionForFlags(requiredCaps.value, capsStructMemberVar))
+                    else:
+                        conditions.append('{0} == {1}'.format(capsStructMemberVar, requiredCaps.value))
+
+                if len(conditions) == 0:
+                    gen += '{0}result.push_back({1});\n'.format(indent, videoFormat.usage)
+                elif len(conditions) == 1:
+                    gen += '{0}if ({1}) {{\n{0}    result.push_back({2});\n{0}}}\n'.format(indent, conditions[0], videoFormat.usage)
+                else:
+                    gen += '{0}if (({1})) {{\n{0}    result.push_back({2});\n{0}}}\n'.format(indent, ') && ('.join(conditions), videoFormat.usage)
+
+                for requiredCaps in reversed(videoFormat.requiredCaps):
+                    gen += self.generate_platform_protect_end(requiredCaps.struct)
+                for formatStruct in reversed(videoFormat.properties):
+                    gen += self.generate_platform_protect_end(formatStruct)
+
+            gen += '                break;\n'
+
+        gen += '            default:\n'
+        gen += '                break;\n'
+        gen += '        }\n'
+        gen += '        return result;\n'
+        gen += '    }\n\n'
+        gen += '    bool operator==(const VideoProfileData &rhs) const {\n'
+        gen += '        return info == rhs.info;\n'
+        gen += '    }\n\n'
+        gen += '    struct hash {\n'
+        gen += '        std::size_t operator()(const VideoProfileData& key) const {\n'
+        gen += '            return std::hash<VideoProfileInfoChain>{}(key.info);\n'
+        gen += '        }\n'
+        gen += '    };\n'
+        gen += '};\n\n'
+        gen += 'template <> struct std::hash<VideoProfileData> : VideoProfileData::hash {};\n'
+        gen += 'typedef std::unordered_set<VideoProfileData> SetOfVideoProfiles;\n'
         return gen
 
     def generate_warn_duplicated(self):
@@ -3855,6 +5596,18 @@ class VulkanProfilesLayerGenerator():
             var_name += 'ext_'
         return var_name
 
+    def get_limittype_class(self, limittype):
+        if limittype in ['exact', 'noauto', 'not']:
+            return 'LimitExact'
+        if 'min' in limittype:
+            return 'LimitMin'
+        elif 'max' in limittype or 'bits' in limittype:
+            return 'LimitMax'
+        elif 'bitmask' in limittype:
+            return 'LimitFlags'
+        else:
+            return None
+
     def get_non_aliased_list(self, list, aliases):
         ret = []
         for el in list:
@@ -3863,14 +5616,14 @@ class VulkanProfilesLayerGenerator():
         return ret
 
     def generate_string_to_uint(self, lists, enums):
-        gen = '\nstatic uint32_t VkStringToUint(const std::string &input_value) {\n'
-        gen += '    static const std::unordered_map<std::string, uint32_t> map = {\n'
+        gen = '\nstatic uint64_t VkStringToUint64(const std::string &input_value) {\n'
+        gen += '    static const std::unordered_map<std::string, uint64_t> map = {\n'
         for list in lists:
             if list not in enums:
                 continue
             gen += '        // ' + list + '\n'
             for enum in enums[list].values:
-                gen += '        {\"' + enum + '\", static_cast<uint32_t>(' + enum + ')},\n'
+                gen += '        {\"' + enum + '\", static_cast<uint64_t>(' + enum + ')},\n'
         gen += '    };\n'
         gen += '    const auto it = map.find(input_value);\n'
         gen += '    if (it != map.end()) {\n'
