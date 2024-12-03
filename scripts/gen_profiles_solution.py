@@ -3382,7 +3382,7 @@ class VulkanExtension(VulkanDefinitionScope):
 
 
 # Dynamic arrays are ill-formed, but some of them still have a maximum size that can be used
-struct_with_valid_dynamic_array = ["VkQueueFamilyGlobalPriorityPropertiesKHR"]
+struct_with_valid_dynamic_array = ["VkQueueFamilyGlobalPriorityProperties"]
 
 class VulkanRegistry():
     def __init__(self, registryFile, api = 'vulkan'):
@@ -4257,6 +4257,9 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceVulkan13Properties'].members['uniformTexelBufferOffsetSingleTexelAlignment'].limittype = 'exact'
             self.structs['VkPhysicalDeviceVulkan13Properties'].members['minSubgroupSize'].limittype = 'min,pot'
             self.structs['VkPhysicalDeviceVulkan13Properties'].members['maxSubgroupSize'].limittype = 'max,pot'
+
+        if 'VkPhysicalDeviceVulkan14Properties' in self.structs:
+            self.structs['VkPhysicalDeviceVulkan14Properties'].members['maxCombinedImageSamplerDescriptorCount'].limittype = 'min,pot'
 
         if 'VkPhysicalDeviceTexelBufferAlignmentProperties' in self.structs:
             self.structs['VkPhysicalDeviceTexelBufferAlignmentProperties'].members['storageTexelBufferOffsetAlignmentBytes'].limittype = 'min,pot'
