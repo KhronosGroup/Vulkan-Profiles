@@ -216,10 +216,12 @@ class PhysicalDeviceData {
     bool vulkan_1_1_properties_written_;
     bool vulkan_1_2_properties_written_;
     bool vulkan_1_3_properties_written_;
+    bool vulkan_1_4_properties_written_;
 
     bool vulkan_1_1_features_written_;
     bool vulkan_1_2_features_written_;
     bool vulkan_1_3_features_written_;
+    bool vulkan_1_4_features_written_;
 '''
 
 PHYSICAL_DEVICE_DATA_CONSTRUCTOR_BEGIN = '''
@@ -232,10 +234,12 @@ PHYSICAL_DEVICE_DATA_CONSTRUCTOR_BEGIN = '''
         vulkan_1_1_properties_written_ = false;
         vulkan_1_2_properties_written_ = false;
         vulkan_1_3_properties_written_ = false;
+        vulkan_1_4_properties_written_ = false;
 
         vulkan_1_1_features_written_ = false;
         vulkan_1_2_features_written_ = false;
         vulkan_1_3_features_written_ = false;
+        vulkan_1_4_features_written_ = false;
 '''
 
 PHYSICAL_DEVICE_DATA_END = '''    }
@@ -1295,7 +1299,7 @@ bool JsonLoader::GetQueueFamilyProperties(const char* device_name, const Json::V
                 if (i > 0) {
                     priorities += ", ";
                 }
-                priorities += string_VkQueueGlobalPriorityKHR(dest->global_priority_properties_.priorities[i]);
+                priorities += string_VkQueueGlobalPriority(dest->global_priority_properties_.priorities[i]);
             }
             priorities += "]";
 
@@ -1518,6 +1522,9 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
                     if (features.isMember("VkPhysicalDeviceVulkan13Features")) {
                         pdd_->vulkan_1_3_features_written_ = true;
                     }
+                    if (features.isMember("VkPhysicalDeviceVulkan14Features")) {
+                        pdd_->vulkan_1_4_features_written_ = true;
+                    }
                     bool success = GetFeature(device_name, enable_warnings, features, feature);
                     if (!success) {
                         failed = true;
@@ -1539,6 +1546,9 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
                 }
                 if (properties.isMember("VkPhysicalDeviceVulkan13Properties")) {
                     pdd_->vulkan_1_3_properties_written_ = true;
+                }
+                if (properties.isMember("VkPhysicalDeviceVulkan14Properties")) {
+                    pdd_->vulkan_1_4_properties_written_ = true;
                 }
                 for (const auto &prop : properties.getMemberNames()) {
                     bool success = GetProperty(device_name, enable_warnings, properties, prop);
@@ -3268,6 +3278,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
             bool api_version_above_1_1 = effective_api_version >= VK_API_VERSION_1_1;
             bool api_version_above_1_2 = effective_api_version >= VK_API_VERSION_1_2;
             bool api_version_above_1_3 = effective_api_version >= VK_API_VERSION_1_3;
+            bool api_version_above_1_4 = effective_api_version >= VK_API_VERSION_1_4;
 
             ::device_has_astc_hdr = ::PhysicalDeviceData::HasExtension(&pdd, VK_EXT_TEXTURE_COMPRESSION_ASTC_HDR_EXTENSION_NAME);
             ::device_has_pvrtc = ::PhysicalDeviceData::HasExtension(&pdd, VK_IMG_FORMAT_PVRTC_EXTENSION_NAME);
@@ -3501,7 +3512,7 @@ class VulkanProfilesLayerGenerator():
     additional_properties = ['VkPhysicalDeviceProperties', 'VkPhysicalDeviceLimits', 'VkPhysicalDeviceSparseProperties', 'VkPhysicalDeviceToolProperties', 'VkPhysicalDevicePortabilitySubsetPropertiesKHR']
     # VkPhysicalDeviceHostImageCopyFeaturesEXT is not ignored to allow the people using the MockICD to still have the feature enabled,
     # but use the properties in the MockICD until HostImageCopyPropertiesEXT is fixed.
-    ignored_structs = ['VkPhysicalDeviceHostImageCopyPropertiesEXT', 'VkPhysicalDeviceLayeredApiPropertiesListKHR']
+    ignored_structs = ['VkPhysicalDeviceHostImageCopyProperties', 'VkPhysicalDeviceHostImageCopyPropertiesEXT', 'VkPhysicalDeviceLayeredApiPropertiesListKHR']
 
     int_to_json_type_map = {
         'int32_t': 'Int',
@@ -3622,7 +3633,7 @@ class VulkanProfilesLayerGenerator():
 
         gen += self.generate_string_to_image_layout(registry.enums['VkImageLayout'].values)
 
-        enums = set(('VkToolPurposeFlagBits', 'VkSampleCountFlagBits', 'VkResolveModeFlagBits', 'VkShaderStageFlagBits', 'VkSubgroupFeatureFlagBits', 'VkShaderFloatControlsIndependence', 'VkPointClippingBehavior', 'VkOpticalFlowGridSizeFlagBitsNV', 'VkQueueFlagBits', 'VkMemoryDecompressionMethodFlagBitsNV', 'VkLayeredDriverUnderlyingApiMSFT', 'VkImageUsageFlagBits', 'VkBufferUsageFlagBits', 'VkPhysicalDeviceSchedulingControlsFlagBitsARM', 'VkIndirectCommandsInputModeFlagBitsEXT'))
+        enums = set(('VkToolPurposeFlagBits', 'VkSampleCountFlagBits', 'VkResolveModeFlagBits', 'VkShaderStageFlagBits', 'VkSubgroupFeatureFlagBits', 'VkShaderFloatControlsIndependence', 'VkPointClippingBehavior', 'VkOpticalFlowGridSizeFlagBitsNV', 'VkQueueFlagBits', 'VkMemoryDecompressionMethodFlagBitsNV', 'VkLayeredDriverUnderlyingApiMSFT', 'VkImageUsageFlagBits', 'VkBufferUsageFlagBits', 'VkPhysicalDeviceSchedulingControlsFlagBitsARM', 'VkIndirectCommandsInputModeFlagBitsEXT', 'VkPipelineRobustnessBufferBehavior', 'VkPipelineRobustnessImageBehavior'))
         enums = enums.union(self.get_video_enums())
         gen += self.generate_string_to_uint(enums, registry.enums)
 
