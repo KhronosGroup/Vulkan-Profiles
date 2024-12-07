@@ -196,22 +196,22 @@ class PhysicalDeviceData {
 
     VkInstance instance() const { return instance_; }
 
-    MapOfVkExtensionProperties device_extensions_;
-    MapOfVkFormatProperties device_formats_;
-    MapOfVkFormatProperties3 device_formats_3_;
-    ArrayOfVkQueueFamilyProperties device_queue_family_properties_;
-    SetOfVideoProfiles set_of_device_video_profiles_;
-    MapOfVkExtensionProperties simulation_extensions_;
-    VkPhysicalDeviceProperties physical_device_properties_;
-    VkPhysicalDeviceFeatures physical_device_features_;
-    VkPhysicalDeviceMemoryProperties physical_device_memory_properties_;
-    VkPhysicalDeviceToolProperties physical_device_tool_properties_;
-    VkSurfaceCapabilitiesKHR surface_capabilities_;
-    MapOfVkFormatProperties map_of_format_properties_;
-    MapOfVkFormatProperties3 map_of_format_properties_3_;
-    MapOfVkExtensionProperties map_of_extension_properties_;
-    ArrayOfVkQueueFamilyProperties arrayof_queue_family_properties_;
-    SetOfVideoProfiles set_of_video_profiles_;
+    MapOfVkExtensionProperties device_extensions_{};
+    MapOfVkFormatProperties device_formats_{};
+    MapOfVkFormatProperties3 device_formats_3_{};
+    ArrayOfVkQueueFamilyProperties device_queue_family_properties_{};
+    SetOfVideoProfiles set_of_device_video_profiles_{};
+    MapOfVkExtensionProperties simulation_extensions_{};
+    VkPhysicalDeviceProperties physical_device_properties_{};
+    VkPhysicalDeviceFeatures physical_device_features_{};
+    VkPhysicalDeviceMemoryProperties physical_device_memory_properties_{};
+    VkPhysicalDeviceToolProperties physical_device_tool_properties_{};
+    VkSurfaceCapabilitiesKHR surface_capabilities_{};
+    MapOfVkFormatProperties map_of_format_properties_{};
+    MapOfVkFormatProperties3 map_of_format_properties_3_{};
+    MapOfVkExtensionProperties map_of_extension_properties_{};
+    ArrayOfVkQueueFamilyProperties arrayof_queue_family_properties_{};
+    SetOfVideoProfiles set_of_video_profiles_{};
 
     bool vulkan_1_1_properties_written_;
     bool vulkan_1_2_properties_written_;
@@ -4831,9 +4831,9 @@ class VulkanProfilesLayerGenerator():
         gen += self.generate_video_profile_caps()
         gen += self.generate_video_profile_format()
         gen += '\nstruct VideoProfileData {\n'
-        gen += '    VideoProfileInfoChain info;\n'
-        gen += '    VideoCapabilitiesChain caps;\n'
-        gen += '    std::unordered_map<VkImageUsageFlags, SetOfVideoProfileFormats> formats;\n\n'
+        gen += '    VideoProfileInfoChain info{};\n'
+        gen += '    VideoCapabilitiesChain caps{};\n'
+        gen += '    std::unordered_map<VkImageUsageFlags, SetOfVideoProfileFormats> formats{};\n\n'
         gen += '    std::vector<VkImageUsageFlags> GetSupportedFormatCategories() const {\n'
         gen += '        std::vector<VkImageUsageFlags> result{};\n'
         gen += '        switch (info.video_profile_info_.videoCodecOperation) {\n'
