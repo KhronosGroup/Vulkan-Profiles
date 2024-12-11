@@ -63,7 +63,7 @@
                         "maxPerStageResources": 200,
                         "maxSamplerLodBias": 14,
                         "maxUniformBufferRange": 65536,
-                        "maxVertexOutputComponents": 128,
+                        "maxVertexOutputComponents": 72,
                         "mipmapPrecisionBits": 6,
                         "pointSizeGranularity": 0.125,
                         "standardSampleLocations": true,
@@ -134,6 +134,12 @@
                     "date": "2024-12-11",
                     "author": "Ian Elliott",
                     "comment": "Delay VK_EXT_device_fault"
+                },
+                {
+                    "revision": 6,
+                    "date": "2024-12-11",
+                    "author": "Ian Elliott",
+                    "comment": "Delay a requirement that IMG BXM-8-256 chipsets cannot do"
                 }
             ],
             "profiles": [
