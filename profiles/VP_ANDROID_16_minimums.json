@@ -13,7 +13,6 @@
                 "VK_KHR_shader_subgroup_rotate": 1,
                 "VK_KHR_shader_subgroup_uniform_control_flow": 1,
                 "VK_KHR_swapchain_mutable_format": 1,
-                "VK_EXT_device_fault": 1,
                 "VK_EXT_host_image_copy": 1,
                 "VK_EXT_image_2d_view_of_3d": 1,
                 "VK_EXT_pipeline_protected_access": 1,
@@ -129,6 +128,12 @@
                     "date": "2024-12-10",
                     "author": "Ian Elliott",
                     "comment": "Delay some requirements that Adreno A6xx chipsets cannot do"
+                },
+                {
+                    "revision": 5,
+                    "date": "2024-12-11",
+                    "author": "Ian Elliott",
+                    "comment": "Delay VK_EXT_device_fault"
                 }
             ],
             "profiles": [
