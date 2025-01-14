@@ -4207,6 +4207,9 @@ class VulkanRegistry():
         if self.headerVersionNumber.patch < 207: # vk.xml declares maxColorAttachments with 'bitmask' limittype before header 207
             self.structs['VkPhysicalDeviceLimits'].members['maxColorAttachments'].limittype = 'max'
 
+        if self.headerVersionNumber.patch < 304: # vk.xml declares minMemoryMapAlignment with 'min,pot' limittype before header 304 (and 'noauto' before 219)
+            self.structs['VkPhysicalDeviceLimits'].members['minMemoryMapAlignment'].limittype = 'max,pot'
+
         # TODO: We currently have to apply workarounds due to "noauto" limittypes and other bugs related to limittypes in the vk.xml
         # These can only be solved permanently if we make modifications to the registry xml itself
         if 'VkPhysicalDeviceLimits' in self.structs:
@@ -4215,7 +4218,6 @@ class VulkanRegistry():
             self.structs['VkPhysicalDeviceLimits'].members['mipmapPrecisionBits'].limittype = 'bits'
             self.structs['VkPhysicalDeviceLimits'].members['viewportSubPixelBits'].limittype = 'bits'
             self.structs['VkPhysicalDeviceLimits'].members['subPixelInterpolationOffsetBits'].limittype = 'bits'
-            self.structs['VkPhysicalDeviceLimits'].members['minMemoryMapAlignment'].limittype = 'min,pot'
             self.structs['VkPhysicalDeviceLimits'].members['minTexelBufferOffsetAlignment'].limittype = 'min,pot'
             self.structs['VkPhysicalDeviceLimits'].members['minUniformBufferOffsetAlignment'].limittype = 'min,pot'
             self.structs['VkPhysicalDeviceLimits'].members['minStorageBufferOffsetAlignment'].limittype = 'min,pot'
