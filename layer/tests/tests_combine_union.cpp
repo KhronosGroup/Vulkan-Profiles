@@ -116,7 +116,7 @@ TEST_F(TestsUnion, Properties) {
     EXPECT_TRUE(std::abs(gpu_props.limits.maxSamplerAnisotropy - 16.0) < 0.0001);
     EXPECT_EQ(gpu_props.limits.viewportBoundsRange[0], -32768);
     EXPECT_EQ(gpu_props.limits.viewportBoundsRange[1], 32767);
-    EXPECT_EQ(gpu_props.limits.minMemoryMapAlignment, 2048);
+    EXPECT_EQ(gpu_props.limits.minMemoryMapAlignment, 64);
     EXPECT_EQ(gpu_props.limits.minTexelOffset, -8);
     EXPECT_EQ(gpu_props.limits.maxTexelOffset, 7u);
     EXPECT_EQ(gpu_props.limits.framebufferColorSampleCounts,

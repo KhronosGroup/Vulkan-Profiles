@@ -4203,259 +4203,221 @@ class VulkanRegistry():
 
         return profileName
 
+    def overwrite(self, structName, memberName, invalid_value, correct_value):
+        if structName in self.structs:
+            if (self.structs[structName].members[memberName].limittype == None or
+                self.structs[structName].members[memberName].limittype == invalid_value):
+                self.structs[structName].members[memberName].limittype = correct_value
+            elif (self.structs[structName].members[memberName].limittype != correct_value):
+                Log.w("Profiles is overwriting {0}::{1} from {2} to {3}, but current XML value is {4}".format(structName, memberName, invalid_value, correct_value, self.structs[structName].members[memberName].limittype))
+
+
     def applyWorkarounds(self):
         if self.headerVersionNumber.patch < 207: # vk.xml declares maxColorAttachments with 'bitmask' limittype before header 207
             self.structs['VkPhysicalDeviceLimits'].members['maxColorAttachments'].limittype = 'max'
 
         # TODO: We currently have to apply workarounds due to "noauto" limittypes and other bugs related to limittypes in the vk.xml
         # These can only be solved permanently if we make modifications to the registry xml itself
-        if 'VkPhysicalDeviceLimits' in self.structs:
-            self.structs['VkPhysicalDeviceLimits'].members['subPixelPrecisionBits'].limittype = 'bits'
-            self.structs['VkPhysicalDeviceLimits'].members['subTexelPrecisionBits'].limittype = 'bits'
-            self.structs['VkPhysicalDeviceLimits'].members['mipmapPrecisionBits'].limittype = 'bits'
-            self.structs['VkPhysicalDeviceLimits'].members['viewportSubPixelBits'].limittype = 'bits'
-            self.structs['VkPhysicalDeviceLimits'].members['subPixelInterpolationOffsetBits'].limittype = 'bits'
-            self.structs['VkPhysicalDeviceLimits'].members['minMemoryMapAlignment'].limittype = 'min,pot'
-            self.structs['VkPhysicalDeviceLimits'].members['minTexelBufferOffsetAlignment'].limittype = 'min,pot'
-            self.structs['VkPhysicalDeviceLimits'].members['minUniformBufferOffsetAlignment'].limittype = 'min,pot'
-            self.structs['VkPhysicalDeviceLimits'].members['minStorageBufferOffsetAlignment'].limittype = 'min,pot'
-            self.structs['VkPhysicalDeviceLimits'].members['optimalBufferCopyOffsetAlignment'].limittype = 'min,pot'
-            self.structs['VkPhysicalDeviceLimits'].members['optimalBufferCopyRowPitchAlignment'].limittype = 'min,pot'
-            self.structs['VkPhysicalDeviceLimits'].members['nonCoherentAtomSize'].limittype = 'min,pot'
-            self.structs['VkPhysicalDeviceLimits'].members['timestampPeriod'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceLimits'].members['bufferImageGranularity'].limittype = 'min,mul'
-            self.structs['VkPhysicalDeviceLimits'].members['pointSizeGranularity'].limittype = 'min,mul'
-            self.structs['VkPhysicalDeviceLimits'].members['lineWidthGranularity'].limittype = 'min,mul'
-            self.structs['VkPhysicalDeviceLimits'].members['strictLines'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceLimits'].members['standardSampleLocations'].limittype = 'exact'
+        self.overwrite('VkPhysicalDeviceLimits', 'subPixelPrecisionBits', 'noauto', 'bits')
+        self.overwrite('VkPhysicalDeviceLimits', 'subTexelPrecisionBits', 'noauto', 'bits')
+        self.overwrite('VkPhysicalDeviceLimits', 'mipmapPrecisionBits', 'noauto', 'bits')
+        self.overwrite('VkPhysicalDeviceLimits', 'viewportSubPixelBits', 'noauto', 'bits')
+        self.overwrite('VkPhysicalDeviceLimits', 'subPixelInterpolationOffsetBits', 'noauto', 'bits')
+        self.overwrite('VkPhysicalDeviceLimits', 'minMemoryMapAlignment', 'noauto', 'max,pot')
+        self.overwrite('VkPhysicalDeviceLimits', 'minTexelBufferOffsetAlignment', 'noauto', 'min,pot')
+        self.overwrite('VkPhysicalDeviceLimits', 'minUniformBufferOffsetAlignment', 'noauto', 'min,pot')
+        self.overwrite('VkPhysicalDeviceLimits', 'minStorageBufferOffsetAlignment', 'noauto', 'min,pot')
+        self.overwrite('VkPhysicalDeviceLimits', 'optimalBufferCopyOffsetAlignment', 'noauto', 'min,pot')
+        self.overwrite('VkPhysicalDeviceLimits', 'optimalBufferCopyRowPitchAlignment', 'noauto', 'min,pot')
+        self.overwrite('VkPhysicalDeviceLimits', 'nonCoherentAtomSize', 'noauto', 'min,pot')
+        self.overwrite('VkPhysicalDeviceLimits', 'timestampPeriod', 'noauto', 'min,mul')
+        self.overwrite('VkPhysicalDeviceLimits', 'bufferImageGranularity', 'noauto', 'min,mul')
+        self.overwrite('VkPhysicalDeviceLimits', 'pointSizeGranularity', 'max', 'min,mul')
+        self.overwrite('VkPhysicalDeviceLimits', 'lineWidthGranularity', 'max', 'min,mul')
+        self.overwrite('VkPhysicalDeviceLimits', 'strictLines', 'noauto', 'bitmask')
+        self.overwrite('VkPhysicalDeviceLimits', 'standardSampleLocations', 'noauto', 'bitmask')
 
-        if 'VkPhysicalDeviceSparseProperties' in self.structs:
-            self.structs['VkPhysicalDeviceSparseProperties'].members['residencyAlignedMipSize'].limittype = 'not'
+        self.overwrite('VkPhysicalDeviceSparseProperties', 'residencyAlignedMipSize', 'bitmask', 'not')
 
-        if 'VkPhysicalDeviceVulkan11Properties' in self.structs:
-            self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceUUID'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceVulkan11Properties'].members['driverUUID'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceLUID'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceNodeMask'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceVulkan11Properties'].members['deviceLUIDValid'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceVulkan11Properties'].members['subgroupSize'].limittype = 'max,pot'
-            self.structs['VkPhysicalDeviceVulkan11Properties'].members['pointClippingBehavior'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceVulkan11Properties'].members['protectedNoFault'].limittype = 'exact'
+        self.overwrite('VkPhysicalDeviceVulkan11Properties', 'deviceUUID', 'None', 'exact')
+        self.overwrite('VkPhysicalDeviceVulkan11Properties', 'driverUUID', 'None', 'exact')
+        self.overwrite('VkPhysicalDeviceVulkan11Properties', 'deviceLUID', 'None', 'exact')
+        self.overwrite('VkPhysicalDeviceVulkan11Properties', 'deviceNodeMask', 'None', 'exact')
+        self.overwrite('VkPhysicalDeviceVulkan11Properties', 'deviceLUIDValid', 'None', 'exact')
+        self.overwrite('VkPhysicalDeviceVulkan11Properties', 'subgroupSize', 'None', 'max,pot')
+        self.overwrite('VkPhysicalDeviceVulkan11Properties', 'pointClippingBehavior', 'None', 'exact')
+        self.overwrite('VkPhysicalDeviceVulkan11Properties', 'protectedNoFault', 'None', 'exact')
 
-        if 'VkPhysicalDeviceVulkan12Properties' in self.structs:
-            self.structs['VkPhysicalDeviceVulkan12Properties'].members['driverID'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceVulkan12Properties'].members['driverName'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceVulkan12Properties'].members['driverInfo'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceVulkan12Properties'].members['conformanceVersion'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceVulkan12Properties'].members['denormBehaviorIndependence'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceVulkan12Properties'].members['roundingModeIndependence'].limittype = 'exact'
+        self.overwrite('VkPhysicalDeviceVulkan12Properties', 'driverID', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceVulkan12Properties', 'driverName', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceVulkan12Properties', 'driverInfo', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceVulkan12Properties', 'conformanceVersion', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceVulkan12Properties', 'denormBehaviorIndependence', 'None', 'exact')
+        self.overwrite('VkPhysicalDeviceVulkan12Properties', 'roundingModeIndependence', 'None', 'exact')
 
-        if 'VkPhysicalDeviceVulkan13Properties' in self.structs:
-            self.structs['VkPhysicalDeviceVulkan13Properties'].members['storageTexelBufferOffsetAlignmentBytes'].limittype = 'min,pot'
-            self.structs['VkPhysicalDeviceVulkan13Properties'].members['storageTexelBufferOffsetSingleTexelAlignment'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceVulkan13Properties'].members['uniformTexelBufferOffsetAlignmentBytes'].limittype = 'min,pot'
-            self.structs['VkPhysicalDeviceVulkan13Properties'].members['uniformTexelBufferOffsetSingleTexelAlignment'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceVulkan13Properties'].members['minSubgroupSize'].limittype = 'min,pot'
-            self.structs['VkPhysicalDeviceVulkan13Properties'].members['maxSubgroupSize'].limittype = 'max,pot'
+        self.overwrite('VkPhysicalDeviceVulkan13Properties', 'storageTexelBufferOffsetAlignmentBytes', 'noauto', 'min,pot')
+        self.overwrite('VkPhysicalDeviceVulkan13Properties', 'storageTexelBufferOffsetSingleTexelAlignment', 'noauto', 'exact')
+        self.overwrite('VkPhysicalDeviceVulkan13Properties', 'uniformTexelBufferOffsetAlignmentBytes', 'noauto', 'min,pot')
+        self.overwrite('VkPhysicalDeviceVulkan13Properties', 'uniformTexelBufferOffsetSingleTexelAlignment', 'noauto', 'exact')
+        self.overwrite('VkPhysicalDeviceVulkan13Properties', 'minSubgroupSize', 'min', 'min,pot')
+        self.overwrite('VkPhysicalDeviceVulkan13Properties', 'maxSubgroupSize', 'max', 'max,pot')
 
-        if 'VkPhysicalDeviceVulkan14Properties' in self.structs:
-            self.structs['VkPhysicalDeviceVulkan14Properties'].members['maxCombinedImageSamplerDescriptorCount'].limittype = 'min,pot'
+        self.overwrite('VkPhysicalDeviceVulkan14Properties', 'maxCombinedImageSamplerDescriptorCount', 'None', 'max')
 
-        if 'VkPhysicalDeviceTexelBufferAlignmentProperties' in self.structs:
-            self.structs['VkPhysicalDeviceTexelBufferAlignmentProperties'].members['storageTexelBufferOffsetAlignmentBytes'].limittype = 'min,pot'
-            self.structs['VkPhysicalDeviceTexelBufferAlignmentProperties'].members['storageTexelBufferOffsetSingleTexelAlignment'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceTexelBufferAlignmentProperties'].members['uniformTexelBufferOffsetAlignmentBytes'].limittype = 'min,pot'
-            self.structs['VkPhysicalDeviceTexelBufferAlignmentProperties'].members['uniformTexelBufferOffsetSingleTexelAlignment'].limittype = 'exact'
+        self.overwrite('VkPhysicalDeviceTexelBufferAlignmentProperties', 'storageTexelBufferOffsetAlignmentBytes', 'None', 'min,pot')
+        self.overwrite('VkPhysicalDeviceTexelBufferAlignmentProperties', 'storageTexelBufferOffsetSingleTexelAlignment', 'None', 'exact')
+        self.overwrite('VkPhysicalDeviceTexelBufferAlignmentProperties', 'uniformTexelBufferOffsetAlignmentBytes', 'None', 'min,pot')
+        self.overwrite('VkPhysicalDeviceTexelBufferAlignmentProperties', 'uniformTexelBufferOffsetSingleTexelAlignment', 'None', 'exact')
 
-        if 'VkPhysicalDeviceProperties' in self.structs:
-            self.structs['VkPhysicalDeviceProperties'].members['apiVersion'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceProperties'].members['driverVersion'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceProperties'].members['vendorID'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceProperties'].members['deviceID'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceProperties'].members['deviceType'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceProperties'].members['deviceName'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceProperties'].members['pipelineCacheUUID'].limittype = 'noauto'
+        self.overwrite('VkPhysicalDeviceProperties', 'apiVersion', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceProperties', 'driverVersion', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceProperties', 'vendorID', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceProperties', 'deviceID', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceProperties', 'deviceType', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceProperties', 'deviceName', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceProperties', 'pipelineCacheUUID', 'None', 'noauto')
 
-        if 'VkPhysicalDeviceToolProperties' in self.structs:
-            self.structs['VkPhysicalDeviceToolProperties'].members['name'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceToolProperties'].members['version'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceToolProperties'].members['purposes'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceToolProperties'].members['description'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceToolProperties'].members['layer'].limittype = 'noauto'
+        self.overwrite('VkPhysicalDeviceToolProperties', 'name', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceToolProperties', 'version', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceToolProperties', 'purposes', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceToolProperties', 'description', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceToolProperties', 'layer', 'None', 'noauto')
 
-        if 'VkPhysicalDeviceSubgroupSizeControlProperties' in self.structs:
-            self.structs['VkPhysicalDeviceSubgroupSizeControlProperties'].members['minSubgroupSize'].limittype = 'min,pot'
-            self.structs['VkPhysicalDeviceSubgroupSizeControlProperties'].members['maxSubgroupSize'].limittype = 'max,pot'
+        self.overwrite('VkPhysicalDeviceSubgroupSizeControlProperties', 'minSubgroupSize', 'None', 'min,pot')
+        self.overwrite('VkPhysicalDeviceSubgroupSizeControlProperties', 'maxSubgroupSize', 'None', 'max,pot')
 
-        if 'VkPhysicalDeviceDriverProperties' in self.structs:
-            self.structs['VkPhysicalDeviceDriverProperties'].members['driverID'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceDriverProperties'].members['driverName'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceDriverProperties'].members['driverInfo'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceDriverProperties'].members['conformanceVersion'].limittype = 'noauto'
+        self.overwrite('VkPhysicalDeviceDriverProperties', 'driverID', 'noauto', 'exact')
+        self.overwrite('VkPhysicalDeviceDriverProperties', 'driverName', 'noauto', 'exact')
+        self.overwrite('VkPhysicalDeviceDriverProperties', 'driverInfo', 'noauto', 'exact')
+        self.overwrite('VkPhysicalDeviceDriverProperties', 'conformanceVersion', 'noauto', 'exact')
 
-        if 'VkPhysicalDeviceIDProperties' in self.structs:
-            self.structs['VkPhysicalDeviceIDProperties'].members['deviceUUID'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceIDProperties'].members['driverUUID'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceIDProperties'].members['deviceLUID'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceIDProperties'].members['deviceNodeMask'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceIDProperties'].members['deviceLUIDValid'].limittype = 'noauto'
+        self.overwrite('VkPhysicalDeviceIDProperties', 'deviceUUID', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceIDProperties', 'driverUUID', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceIDProperties', 'deviceLUID', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceIDProperties', 'deviceNodeMask', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceIDProperties', 'deviceLUIDValid', 'None', 'noauto')
 
-        if 'VkPhysicalDeviceSubgroupProperties' in self.structs:
-            self.structs['VkPhysicalDeviceSubgroupProperties'].members['subgroupSize'].limittype = 'max,pot'
+        self.overwrite('VkPhysicalDeviceSubgroupProperties', 'subgroupSize', 'None', 'max,pot')
 
-        if 'VkPhysicalDevicePointClippingProperties' in self.structs:
-            self.structs['VkPhysicalDevicePointClippingProperties'].members['pointClippingBehavior'].limittype = 'exact'
+        self.overwrite('VkPhysicalDevicePointClippingProperties', 'pointClippingBehavior', 'None', 'exact')
 
-        if 'VkPhysicalDeviceProtectedMemoryProperties' in self.structs:
-            self.structs['VkPhysicalDeviceProtectedMemoryProperties'].members['protectedNoFault'].limittype = 'exact'
+        self.overwrite('VkPhysicalDeviceProtectedMemoryProperties', 'protectedNoFault', 'None', 'exact')
 
-        if 'VkPhysicalDeviceFloatControlsProperties' in self.structs:
-            self.structs['VkPhysicalDeviceFloatControlsProperties'].members['denormBehaviorIndependence'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceFloatControlsProperties'].members['roundingModeIndependence'].limittype = 'exact'
+        self.overwrite('VkPhysicalDeviceFloatControlsProperties', 'denormBehaviorIndependence', 'None', 'exact')
+        self.overwrite('VkPhysicalDeviceFloatControlsProperties', 'roundingModeIndependence', 'None', 'exact')
 
-        if 'VkPhysicalDeviceTexelBufferAlignmentProperties' in self.structs:
-            self.structs['VkPhysicalDeviceTexelBufferAlignmentProperties'].members['storageTexelBufferOffsetSingleTexelAlignment'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceTexelBufferAlignmentProperties'].members['uniformTexelBufferOffsetSingleTexelAlignment'].limittype = 'exact'
+        self.overwrite('VkPhysicalDeviceTexelBufferAlignmentProperties', 'storageTexelBufferOffsetSingleTexelAlignment', 'None', 'exact')
+        self.overwrite('VkPhysicalDeviceTexelBufferAlignmentProperties', 'uniformTexelBufferOffsetSingleTexelAlignment', 'None', 'exact')
 
-        if 'VkPhysicalDevicePortabilitySubsetPropertiesKHR' in self.structs: # BETA extension
-            self.structs['VkPhysicalDevicePortabilitySubsetPropertiesKHR'].members['minVertexInputBindingStrideAlignment'].limittype = 'min,pot'
+        self.overwrite('VkPhysicalDevicePortabilitySubsetPropertiesKHR', 'minVertexInputBindingStrideAlignment', 'None', 'min,pot')
 
-        if 'VkPhysicalDeviceFragmentShadingRatePropertiesKHR' in self.structs:
-            self.structs['VkPhysicalDeviceFragmentShadingRatePropertiesKHR'].members['maxFragmentShadingRateAttachmentTexelSizeAspectRatio'].limittype = 'max,pot'
-            self.structs['VkPhysicalDeviceFragmentShadingRatePropertiesKHR'].members['maxFragmentSizeAspectRatio'].limittype = 'max,pot'
-            self.structs['VkPhysicalDeviceFragmentShadingRatePropertiesKHR'].members['maxFragmentShadingRateCoverageSamples'].limittype = 'max'
+        self.overwrite('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentShadingRateAttachmentTexelSizeAspectRatio', 'None', 'max,pot')
+        self.overwrite('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentSizeAspectRatio', 'None', 'max,pot')
+        self.overwrite('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentShadingRateCoverageSamples', 'None', 'max')
 
-        if 'VkPhysicalDeviceRayTracingPipelinePropertiesKHR' in self.structs:
-            self.structs['VkPhysicalDeviceRayTracingPipelinePropertiesKHR'].members['shaderGroupHandleSize'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceRayTracingPipelinePropertiesKHR'].members['shaderGroupBaseAlignment'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceRayTracingPipelinePropertiesKHR'].members['shaderGroupHandleCaptureReplaySize'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceRayTracingPipelinePropertiesKHR'].members['shaderGroupHandleAlignment'].limittype = 'min,pot'
+        self.overwrite('VkPhysicalDeviceRayTracingPipelinePropertiesKHR', 'shaderGroupHandleSize', 'None', 'exact')
+        self.overwrite('VkPhysicalDeviceRayTracingPipelinePropertiesKHR', 'shaderGroupBaseAlignment', 'None', 'exact')
+        self.overwrite('VkPhysicalDeviceRayTracingPipelinePropertiesKHR', 'shaderGroupHandleCaptureReplaySize', 'None', 'exact')
+        self.overwrite('VkPhysicalDeviceRayTracingPipelinePropertiesKHR', 'shaderGroupHandleAlignment', 'None', 'min,pot')
 
-        if self.headerVersionNumber.patch < 215: # vk.xml declares maxFragmentShadingRateRasterizationSamples with 'noauto' limittype before header 215
-            if 'VkPhysicalDeviceFragmentShadingRatePropertiesKHR' in self.structs:
-                self.structs['VkPhysicalDeviceFragmentShadingRatePropertiesKHR'].members['maxFragmentShadingRateRasterizationSamples'].limittype = 'max'
+        self.overwrite('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentShadingRateRasterizationSamples', 'None', 'max')
 
-        if 'VkPhysicalDeviceConservativeRasterizationPropertiesEXT' in self.structs:
-            self.structs['VkPhysicalDeviceConservativeRasterizationPropertiesEXT'].members['primitiveOverestimationSize'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceConservativeRasterizationPropertiesEXT'].members['extraPrimitiveOverestimationSizeGranularity'].limittype = 'min,mul'
-            self.structs['VkPhysicalDeviceConservativeRasterizationPropertiesEXT'].members['conservativePointAndLineRasterization'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceConservativeRasterizationPropertiesEXT'].members['degenerateTrianglesRasterized'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceConservativeRasterizationPropertiesEXT'].members['degenerateLinesRasterized'].limittype = 'exact'
+        self.overwrite('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'primitiveOverestimationSize', 'None', 'exact')
+        self.overwrite('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'extraPrimitiveOverestimationSizeGranularity', 'None', 'min,mul')
+        self.overwrite('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'conservativePointAndLineRasterization', 'None', 'bitmask')
+        self.overwrite('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'degenerateTrianglesRasterized', 'None', 'exact')
+        self.overwrite('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'degenerateLinesRasterized', 'None', 'exact')
 
-        if 'VkPhysicalDeviceLineRasterizationPropertiesEXT' in self.structs:
-            self.structs['VkPhysicalDeviceLineRasterizationPropertiesEXT'].members['lineSubPixelPrecisionBits'].limittype = 'bits'
+        self.overwrite('VkPhysicalDeviceLineRasterizationPropertiesEXT', 'lineSubPixelPrecisionBits', 'None', 'bits')
 
-        if self.headerVersionNumber.patch < 213:
-            if 'VkPhysicalDeviceTransformFeedbackPropertiesEXT' in self.structs:
-                self.structs['VkPhysicalDeviceTransformFeedbackPropertiesEXT'].members['maxTransformFeedbackBufferDataStride'].limittype = 'max'
+        self.overwrite('VkPhysicalDeviceTransformFeedbackPropertiesEXT', 'maxTransformFeedbackBufferDataStride', 'None', 'max')
 
-        if 'VkPhysicalDeviceExternalMemoryHostPropertiesEXT' in self.structs:
-            self.structs['VkPhysicalDeviceExternalMemoryHostPropertiesEXT'].members['minImportedHostPointerAlignment'].limittype = 'min,pot'
+        self.overwrite('VkPhysicalDeviceExternalMemoryHostPropertiesEXT', 'minImportedHostPointerAlignment', 'None', 'min,pot')
 
-        if 'VkPhysicalDevicePCIBusInfoPropertiesEXT' in self.structs:
-            self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciDomain'].limittype = 'noauto'
-            self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciBus'].limittype = 'noauto'
-            self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciDevice'].limittype = 'noauto'
-            self.structs['VkPhysicalDevicePCIBusInfoPropertiesEXT'].members['pciFunction'].limittype = 'noauto'
+        self.overwrite('VkPhysicalDevicePCIBusInfoPropertiesEXT', 'pciDomain', 'None', 'noauto')
+        self.overwrite('VkPhysicalDevicePCIBusInfoPropertiesEXT', 'pciBus', 'None', 'noauto')
+        self.overwrite('VkPhysicalDevicePCIBusInfoPropertiesEXT', 'pciDevice', 'None', 'noauto')
+        self.overwrite('VkPhysicalDevicePCIBusInfoPropertiesEXT', 'pciFunction', 'None', 'noauto')
 
-        if 'VkPhysicalDeviceDrmPropertiesEXT' in self.structs:
-            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['hasPrimary'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['hasRender'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['primaryMajor'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['primaryMinor'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['renderMajor'].limittype = 'noauto'
-            self.structs['VkPhysicalDeviceDrmPropertiesEXT'].members['renderMinor'].limittype = 'noauto'
+        self.overwrite('VkPhysicalDeviceDrmPropertiesEXT', 'hasPrimary', 'None', 'bitmask')
+        self.overwrite('VkPhysicalDeviceDrmPropertiesEXT', 'hasRender', 'None', 'bitmask')
+        self.overwrite('VkPhysicalDeviceDrmPropertiesEXT', 'primaryMajor', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceDrmPropertiesEXT', 'primaryMinor', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceDrmPropertiesEXT', 'renderMajor', 'None', 'noauto')
+        self.overwrite('VkPhysicalDeviceDrmPropertiesEXT', 'renderMinor', 'None', 'noauto')
 
-        if 'VkPhysicalDeviceFragmentDensityMap2PropertiesEXT' in self.structs:
-            self.structs['VkPhysicalDeviceFragmentDensityMap2PropertiesEXT'].members['subsampledLoads'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceFragmentDensityMap2PropertiesEXT'].members['subsampledCoarseReconstructionEarlyAccess'].limittype = 'exact'
+        self.overwrite('VkPhysicalDeviceFragmentDensityMap2PropertiesEXT', 'subsampledLoads', 'noauto', 'exact')
+        self.overwrite('VkPhysicalDeviceFragmentDensityMap2PropertiesEXT', 'subsampledCoarseReconstructionEarlyAccess', 'noauto', 'exact')
 
-        if 'VkPhysicalDeviceSampleLocationsPropertiesEXT' in self.structs:
-            self.structs['VkPhysicalDeviceSampleLocationsPropertiesEXT'].members['sampleLocationSubPixelBits'].limittype = 'bits'
+        self.overwrite('VkPhysicalDeviceSampleLocationsPropertiesEXT', 'sampleLocationSubPixelBits', 'noauto', 'bits')
 
-        if 'VkPhysicalDeviceRobustness2PropertiesEXT' in self.structs:
-            self.structs['VkPhysicalDeviceRobustness2PropertiesEXT'].members['robustStorageBufferAccessSizeAlignment'].limittype = 'min,pot'
-            self.structs['VkPhysicalDeviceRobustness2PropertiesEXT'].members['robustUniformBufferAccessSizeAlignment'].limittype = 'min,pot'
+        self.overwrite('VkPhysicalDeviceRobustness2PropertiesEXT', 'robustStorageBufferAccessSizeAlignment', 'noauto', 'min,pot')
+        self.overwrite('VkPhysicalDeviceRobustness2PropertiesEXT', 'robustUniformBufferAccessSizeAlignment', 'noauto', 'min,pot')
 
-        if 'VkPhysicalDeviceShaderCorePropertiesAMD' in self.structs:
-            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['shaderEngineCount'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['shaderArraysPerEngineCount'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['computeUnitsPerShaderArray'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['simdPerComputeUnit'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['wavefrontsPerSimd'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['wavefrontSize'].limittype = 'max'
-            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['sgprsPerSimd'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['sgprAllocationGranularity'].limittype = 'min,mul'
-            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['vgprsPerSimd'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceShaderCorePropertiesAMD'].members['vgprAllocationGranularity'].limittype = 'min,mul'
+        self.overwrite('VkPhysicalDeviceShaderCorePropertiesAMD', 'shaderEngineCount', 'max', 'exact')
+        self.overwrite('VkPhysicalDeviceShaderCorePropertiesAMD', 'shaderArraysPerEngineCount', 'max', 'exact')
+        self.overwrite('VkPhysicalDeviceShaderCorePropertiesAMD', 'computeUnitsPerShaderArray', 'max', 'exact')
+        self.overwrite('VkPhysicalDeviceShaderCorePropertiesAMD', 'simdPerComputeUnit', 'max', 'exact')
+        self.overwrite('VkPhysicalDeviceShaderCorePropertiesAMD', 'wavefrontsPerSimd', 'max', 'exact')
+        self.overwrite('VkPhysicalDeviceShaderCorePropertiesAMD', 'sgprsPerSimd', 'max', 'exact')
+        self.overwrite('VkPhysicalDeviceShaderCorePropertiesAMD', 'sgprAllocationGranularity', 'noauto', 'min,mul')
+        self.overwrite('VkPhysicalDeviceShaderCorePropertiesAMD', 'vgprsPerSimd', 'max', 'exact')
+        self.overwrite('VkPhysicalDeviceShaderCorePropertiesAMD', 'vgprAllocationGranularity', 'noauto', 'min,mul')
 
-        if 'VkPhysicalDeviceSubpassShadingPropertiesHUAWEI' in self.structs:
-            self.structs['VkPhysicalDeviceSubpassShadingPropertiesHUAWEI'].members['maxSubpassShadingWorkgroupSizeAspectRatio'].limittype = 'max,pot'
+        self.overwrite('VkPhysicalDeviceSubpassShadingPropertiesHUAWEI', 'maxSubpassShadingWorkgroupSizeAspectRatio', 'noauto', 'max,pot')
 
-        if 'VkPhysicalDeviceRayTracingPropertiesNV' in self.structs:
-            self.structs['VkPhysicalDeviceRayTracingPropertiesNV'].members['shaderGroupHandleSize'].limittype = 'exact'
-            self.structs['VkPhysicalDeviceRayTracingPropertiesNV'].members['shaderGroupBaseAlignment'].limittype = 'exact'
+        self.overwrite('VkPhysicalDeviceRayTracingPropertiesNV', 'shaderGroupHandleSize', 'noauto', 'exact')
+        self.overwrite('VkPhysicalDeviceRayTracingPropertiesNV', 'shaderGroupBaseAlignment', 'noauto', 'exact')
 
-        if 'VkPhysicalDeviceShadingRateImagePropertiesNV' in self.structs:
-            self.structs['VkPhysicalDeviceShadingRateImagePropertiesNV'].members['shadingRateTexelSize'].limittype = 'exact'
+        self.overwrite('VkPhysicalDeviceShadingRateImagePropertiesNV', 'shadingRateTexelSize', 'noauto', 'exact')
 
-        if 'VkPhysicalDeviceMeshShaderPropertiesNV' in self.structs:
-            self.structs['VkPhysicalDeviceMeshShaderPropertiesNV'].members['meshOutputPerVertexGranularity'].limittype = 'min,mul'
-            self.structs['VkPhysicalDeviceMeshShaderPropertiesNV'].members['meshOutputPerPrimitiveGranularity'].limittype = 'min,mul'
+        self.overwrite('VkPhysicalDeviceMeshShaderPropertiesNV', 'meshOutputPerVertexGranularity', 'noauto', 'min,mul')
+        self.overwrite('VkPhysicalDeviceMeshShaderPropertiesNV', 'meshOutputPerPrimitiveGranularity', 'noauto', 'min,mul')
 
-        if 'VkPhysicalDevicePipelineRobustnessPropertiesEXT' in self.structs:
-            self.structs['VkPhysicalDevicePipelineRobustnessPropertiesEXT'].members['defaultRobustnessStorageBuffers'].limittype = 'exact'
-            self.structs['VkPhysicalDevicePipelineRobustnessPropertiesEXT'].members['defaultRobustnessUniformBuffers'].limittype = 'exact'
-            self.structs['VkPhysicalDevicePipelineRobustnessPropertiesEXT'].members['defaultRobustnessVertexInputs'].limittype = 'exact'
-            self.structs['VkPhysicalDevicePipelineRobustnessPropertiesEXT'].members['defaultRobustnessImages'].limittype = 'exact'
+        self.overwrite('VkPhysicalDevicePipelineRobustnessPropertiesEXT', 'defaultRobustnessStorageBuffers', 'noauto', 'exact')
+        self.overwrite('VkPhysicalDevicePipelineRobustnessPropertiesEXT', 'defaultRobustnessUniformBuffers', 'noauto', 'exact')
+        self.overwrite('VkPhysicalDevicePipelineRobustnessPropertiesEXT', 'defaultRobustnessVertexInputs', 'noauto', 'exact')
+        self.overwrite('VkPhysicalDevicePipelineRobustnessPropertiesEXT', 'defaultRobustnessImages', 'noauto', 'exact')
 
-        if self.headerVersionNumber.patch < 213:
-            if 'VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV' in self.structs:
-                self.structs['VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV'].members['minSequencesCountBufferOffsetAlignment'].limittype = 'min'
-                self.structs['VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV'].members['minSequencesIndexBufferOffsetAlignment'].limittype = 'min'
-                self.structs['VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV'].members['minIndirectCommandsBufferOffsetAlignment'].limittype = 'min'
 
-        if 'VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM' in self.structs:
-            self.structs['VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM'].members['fragmentDensityOffsetGranularity'].limittype = 'min,mul'
+        self.overwrite('VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV', 'minSequencesCountBufferOffsetAlignment', 'noauto', 'min')
+        self.overwrite('VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV', 'minSequencesIndexBufferOffsetAlignment', 'noauto', 'min')
+        self.overwrite('VkPhysicalDeviceDeviceGeneratedCommandsPropertiesNV', 'minIndirectCommandsBufferOffsetAlignment', 'noauto', 'min')
 
-        if 'VkPhysicalDeviceSchedulingControlsPropertiesARM' in self.structs:
-            self.structs['VkPhysicalDeviceSchedulingControlsPropertiesARM'].members['schedulingControlsFlags'].limittype = 'bitmask'
+        self.overwrite('VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM', 'fragmentDensityOffsetGranularity', 'max', 'min,mul')
 
-        if 'VkPhysicalDeviceExternalFormatResolvePropertiesANDROID' in self.structs:
-            self.structs['VkPhysicalDeviceExternalFormatResolvePropertiesANDROID'].members['nullColorAttachmentWithExternalFormatResolve'].limittype = 'not'
+        self.overwrite('VkPhysicalDeviceSchedulingControlsPropertiesARM', 'schedulingControlsFlags', 'None', 'bitmask')
 
-        if 'VkPhysicalDeviceRenderPassStripedPropertiesARM' in self.structs:
-            self.structs['VkPhysicalDeviceRenderPassStripedPropertiesARM'].members['renderPassStripeGranularity'].limittype = 'min'
-            self.structs['VkPhysicalDeviceRenderPassStripedPropertiesARM'].members['maxRenderPassStripes'].limittype = 'max'
+        self.overwrite('VkPhysicalDeviceExternalFormatResolvePropertiesANDROID', 'nullColorAttachmentWithExternalFormatResolve', 'noauto', 'not')
 
-        if 'VkPhysicalDeviceMaintenance6PropertiesKHR' in self.structs:
-            self.structs['VkPhysicalDeviceMaintenance6PropertiesKHR'].members['maxCombinedImageSamplerDescriptorCount'].limittype = 'max'
+        self.overwrite('VkPhysicalDeviceRenderPassStripedPropertiesARM', 'renderPassStripeGranularity', 'None', 'min')
+        self.overwrite('VkPhysicalDeviceRenderPassStripedPropertiesARM', 'maxRenderPassStripes', 'None', 'max')
 
-        if 'VkPhysicalDeviceDeviceGeneratedCommandsPropertiesEXT' in self.structs:
-            self.structs['VkPhysicalDeviceDeviceGeneratedCommandsPropertiesEXT'].members['supportedIndirectCommandsInputModes'].limittype = 'bitmask'
-            self.structs['VkPhysicalDeviceDeviceGeneratedCommandsPropertiesEXT'].members['supportedIndirectCommandsShaderStages'].limittype = 'bitmask'
-            self.structs['VkPhysicalDeviceDeviceGeneratedCommandsPropertiesEXT'].members['supportedIndirectCommandsShaderStagesPipelineBinding'].limittype = 'bitmask'
-            self.structs['VkPhysicalDeviceDeviceGeneratedCommandsPropertiesEXT'].members['supportedIndirectCommandsShaderStagesShaderBinding'].limittype = 'bitmask'
+        self.overwrite('VkPhysicalDeviceMaintenance6PropertiesKHR', 'maxCombinedImageSamplerDescriptorCount', 'None', 'max')
+
+
+        self.overwrite('VkPhysicalDeviceDeviceGeneratedCommandsPropertiesEXT', 'supportedIndirectCommandsInputModes', 'None', 'bitmask')
+        self.overwrite('VkPhysicalDeviceDeviceGeneratedCommandsPropertiesEXT', 'supportedIndirectCommandsShaderStages', 'None', 'bitmask')
+        self.overwrite('VkPhysicalDeviceDeviceGeneratedCommandsPropertiesEXT', 'supportedIndirectCommandsShaderStagesPipelineBinding', 'None', 'bitmask')
+        self.overwrite('VkPhysicalDeviceDeviceGeneratedCommandsPropertiesEXT', 'supportedIndirectCommandsShaderStagesShaderBinding', 'None', 'bitmask')
 
         # TODO: The registry xml is also missing limittype definitions for format and queue family properties
         # For now we just add the important ones, this needs a larger overhaul in the vk.xml
-        self.structs['VkFormatProperties'].members['linearTilingFeatures'].limittype = 'bitmask'
-        self.structs['VkFormatProperties'].members['optimalTilingFeatures'].limittype = 'bitmask'
-        self.structs['VkFormatProperties'].members['bufferFeatures'].limittype = 'bitmask'
-        if 'VkFormatProperties3' in self.structs:
-            self.structs['VkFormatProperties3'].members['linearTilingFeatures'].limittype = 'bitmask'
-            self.structs['VkFormatProperties3'].members['optimalTilingFeatures'].limittype = 'bitmask'
-            self.structs['VkFormatProperties3'].members['bufferFeatures'].limittype = 'bitmask'
+        self.overwrite('VkFormatProperties', 'linearTilingFeatures', 'None', 'bitmask')
+        self.overwrite('VkFormatProperties', 'optimalTilingFeatures', 'None', 'bitmask')
+        self.overwrite('VkFormatProperties', 'bufferFeatures', 'None', 'bitmask')
+        self.overwrite('VkFormatProperties3', 'linearTilingFeatures', 'None', 'bitmask')
+        self.overwrite('VkFormatProperties3', 'optimalTilingFeatures', 'None', 'bitmask')
+        self.overwrite('VkFormatfProperties3', 'bufferFeatures', 'None', 'bitmask')
 
-        self.structs['VkQueueFamilyProperties'].members['queueFlags'].limittype = 'bitmask'
-        self.structs['VkQueueFamilyProperties'].members['queueCount'].limittype = 'max'
-        self.structs['VkQueueFamilyProperties'].members['timestampValidBits'].limittype = 'bits'
-        self.structs['VkQueueFamilyProperties'].members['minImageTransferGranularity'].limittype = 'min,mul'
+        self.overwrite('VkQueueFamilyProperties', 'queueFlags', 'None', 'bitmask')
+        self.overwrite('VkQueueFamilyProperties', 'queueCount', 'None', 'max')
+        self.overwrite('VkQueueFamilyProperties', 'timestampValidBits', 'None', 'bits')
+        self.overwrite('VkQueueFamilyProperties', 'minImageTransferGranularity', 'None', 'min,mul')
 
-        if 'VkSparseImageFormatProperties' in self.structs:
-            self.structs['VkSparseImageFormatProperties'].members['aspectMask'].limittype = 'bitmask'
-            self.structs['VkSparseImageFormatProperties'].members['imageGranularity'].limittype = 'min,mul'
-            self.structs['VkSparseImageFormatProperties'].members['flags'].limittype = 'bitmask'
+        self.overwrite('VkSparseImageFormatProperties', 'aspectMask', 'None', 'bitmask')
+        self.overwrite('VkSparseImageFormatProperties', 'imageGranularity', 'None', 'min,mul')
+        self.overwrite('VkSparseImageFormatProperties', 'flags', 'None', 'bitmask')
 
         # TODO: The registry xml contains some return structures that contain count + pointers to arrays
         # While the script itself is prepared to drop those, as they are ill-formed, as return structures
