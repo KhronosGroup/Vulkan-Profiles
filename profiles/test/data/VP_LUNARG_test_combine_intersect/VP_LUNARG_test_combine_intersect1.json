@@ -34,7 +34,7 @@
                         "mipmapPrecisionBits": 4,
                         "maxSamplerAnisotropy": 16.0,
                         "viewportBoundsRange": [ -32768, 32767 ],
-                        "minMemoryMapAlignment": 2048,
+                        "minMemoryMapAlignment": 64,
                         "minTexelOffset": -4,
                         "maxTexelOffset": 3,
                         "framebufferColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],

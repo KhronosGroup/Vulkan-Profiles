@@ -98,7 +98,7 @@ TEST_F(TestsIntersection, Properties) {
     EXPECT_TRUE(std::abs(gpu_props.limits.maxSamplerAnisotropy - 1.0) < 0.0001);
     EXPECT_EQ(gpu_props.limits.viewportBoundsRange[0], -16384);
     EXPECT_EQ(gpu_props.limits.viewportBoundsRange[1], 16384);
-    EXPECT_EQ(gpu_props.limits.minMemoryMapAlignment, 4096);
+    EXPECT_EQ(gpu_props.limits.minMemoryMapAlignment, 64);
     EXPECT_EQ(gpu_props.limits.minTexelOffset, -4);
     EXPECT_EQ(gpu_props.limits.maxTexelOffset, 3);
     EXPECT_EQ(gpu_props.limits.framebufferColorSampleCounts, VK_SAMPLE_COUNT_4_BIT);
