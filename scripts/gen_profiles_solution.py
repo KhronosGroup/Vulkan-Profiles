@@ -4398,6 +4398,8 @@ class VulkanRegistry():
         self.overwrite('VkPhysicalDeviceDeviceGeneratedCommandsPropertiesEXT', 'supportedIndirectCommandsShaderStagesPipelineBinding', ['None'], 'bitmask')
         self.overwrite('VkPhysicalDeviceDeviceGeneratedCommandsPropertiesEXT', 'supportedIndirectCommandsShaderStagesShaderBinding', ['None'], 'bitmask')
 
+        self.overwrite('VkPhysicalDeviceCooperativeVectorPropertiesNV', 'maxCooperativeVectorComponents', ['None'], 'min')
+
         # TODO: The registry xml is also missing limittype definitions for format and queue family properties
         # For now we just add the important ones, this needs a larger overhaul in the vk.xml
         self.overwrite('VkFormatProperties', 'linearTilingFeatures', ['None'], 'bitmask')
