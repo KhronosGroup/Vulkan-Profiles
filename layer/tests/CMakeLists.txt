@@ -23,7 +23,7 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_SOURCE_DIR}/layer/prof
 
 if (ANDROID)
     set(LAYER_TEST_FILES
-        tests_mechanism
+        tests_mechanism.cpp
     )
 elseif(APPLE)
     set(LAYER_TEST_FILES
