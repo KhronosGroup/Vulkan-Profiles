@@ -25,6 +25,7 @@
 				"VK_EXT_global_priority_query": 1,
 				"VK_EXT_graphics_pipeline_library": 1,
 				"VK_EXT_hdr_metadata": 2,
+				"VK_EXT_host_image_copy": 1,
 				"VK_EXT_host_query_reset": 1,
 				"VK_EXT_image_2d_view_of_3d": 1,
 				"VK_EXT_image_drm_format_modifier": 2,
@@ -964,13 +965,15 @@
 					"maxBufferSize": 4294967296
 				},
 				"VkPhysicalDeviceHostImageCopyPropertiesEXT": {
-					"copySrcLayoutCount": 0,
 					"pCopySrcLayouts": [
-
+						"VK_IMAGE_LAYOUT_GENERAL",
+						"VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL",
+						"VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL"
 					],
-					"copyDstLayoutCount": 0,
 					"pCopyDstLayouts": [
-
+						"VK_IMAGE_LAYOUT_GENERAL",
+						"VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL",
+						"VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL"
 					],
 					"optimalTilingLayoutUUID": [
 						0,
