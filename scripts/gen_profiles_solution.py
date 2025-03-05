@@ -3093,7 +3093,10 @@ class VulkanStructMember():
         self.arraySizeMember = None
         self.nullTerminated = False
         self.arraySize = None
+        self.arraySizeCap = None
 
+    def isDynamicallySizedArrayWithCap(self):
+            return self.isArray and self.arraySizeCap is not None
 
 class VulkanStruct():
     def __init__(self, name):
@@ -3383,6 +3386,8 @@ class VulkanExtension(VulkanDefinitionScope):
 
 # Dynamic arrays are ill-formed, but some of them still have a maximum size that can be used
 struct_with_valid_dynamic_array = ["VkQueueFamilyGlobalPriorityProperties"]
+# These dynamic arrays have a known maximum possible size
+struct_with_dynamic_array_size_cap = ["VkPhysicalDeviceHostImageCopyProperties", "VkPhysicalDeviceHostImageCopyPropertiesEXT", "VkPhysicalDeviceVulkan14Properties"]
 
 class VulkanRegistry():
     def __init__(self, registryFile, api = 'vulkan'):
@@ -3548,9 +3553,14 @@ class VulkanRegistry():
                                 structDef.members[name].isArray = True
                                 structDef.members[name].arraySizeMember = len
 
+                                # Some arrays have a natural maximum size even if they are dynamic.  For example, a list
+                                # of VkImageLayouts, because that enum itself is limited.
+                                if structDef.members[name].type == 'VkImageLayout':
+                                    structDef.members[name].arraySizeCap = 64
+
             # If any of the members is a dynamic array then we should remove the corresponding count member
             for member in list(structDef.members.values()):
-                if member.isArray and member.arraySizeMember != None and struct.get('name') not in struct_with_valid_dynamic_array:
+                if member.isArray and member.arraySizeMember != None and struct.get('name') not in struct_with_valid_dynamic_array and struct.get('name') not in struct_with_dynamic_array_size_cap:
                     structDef.members.pop(member.arraySizeMember, None)
 
             # Store struct definition
@@ -6410,7 +6420,7 @@ class VulkanProfilesSchemaGenerator():
         return gen
 
 
-    def gen_array(self, type, size, definitions):
+    def gen_array(self, type, size, sizeCap, definitions):
         arraySize = self.registry.evalArraySize(size)
         if isinstance(arraySize, list) and len(arraySize) == 1:
             # This is the last dimension of a multi-dimensional array
@@ -6429,7 +6439,7 @@ class VulkanProfilesSchemaGenerator():
             # Multi-dimensional array
             return OrderedDict({
                 "type": "array",
-                "items": self.gen_array(type, arraySize[1:], definitions),
+                "items": self.gen_array(type, arraySize[1:], None, definitions),
                 "uniqueItems": False,
                 # We don't have information from vk.xml to be able to tell what's the minimum
                 # number of items that may need to be specified
@@ -6445,7 +6455,7 @@ class VulkanProfilesSchemaGenerator():
                 # We don't have information from vk.xml to be able to tell what's the minimum
                 # number of items that may need to be specified
                 # "minItems": arraySize,
-                "maxItems": arraySize
+                "maxItems": arraySize if arraySize is not None else sizeCap
             })
 
 
@@ -6499,13 +6509,15 @@ class VulkanProfilesSchemaGenerator():
                 continue
 
             if memberDef.isArray:
-                if memberDef.arraySizeMember != None and name not in struct_with_valid_dynamic_array:
+                if memberDef.arraySizeMember != None and name not in struct_with_valid_dynamic_array and name not in struct_with_dynamic_array_size_cap:
                     # This array is a dynamic one (count + pointer to array) which is not allowed
                     # for return structures. Such structures hence are ill-formed and shouldn't
                     # be included in the schema
                     Log.w("Ignoring member '{0}' in struct '{1}' containing ill-formed pointer to array".format(memberName, name))
                 else:
-                    members[memberDef.name] = self.gen_array(memberDef.type, memberDef.arraySize, definitions)
+                    if memberDef.arraySizeMember != None and name in struct_with_dynamic_array_size_cap:
+                        Log.w("Member '{0}' in struct '{1}' is a pointer to array with a known maximum size, it will be ignored in the API library, but supported in the layer".format(memberName, name))
+                    members[memberDef.name] = self.gen_array(memberDef.type, memberDef.arraySize, memberDef.arraySizeCap, definitions)
             else:
                 members[memberDef.name] = self.gen_type(memberDef.type, definitions)
 

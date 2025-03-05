@@ -156,8 +156,8 @@ bool IsSupported(VkPhysicalDevice device, const char* extension_name){
 class ProfileGenerator():
     i = 1
     skipped_features = []
-    skipped_members = ["sType", "pNext", "physicalDevices", "driverID"]
-    skipped_properties_structs = ["VkPhysicalDeviceHostImageCopyPropertiesEXT", "VkPhysicalDeviceLineRasterizationPropertiesEXT", "VkPhysicalDeviceLayeredApiPropertiesListKHR", "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesEXT"]
+    skipped_members = ["sType", "pNext", "physicalDevices", "driverID", "copySrcLayoutCount", "copyDstLayoutCount"]
+    skipped_properties_structs = ["VkPhysicalDeviceLineRasterizationPropertiesEXT", "VkPhysicalDeviceLayeredApiPropertiesListKHR", "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesEXT"]
 
     def generate_profile(self, outProfile, registry):
         with open(outProfile, 'w') as f:
@@ -397,6 +397,11 @@ class ProfileGenerator():
                         self.i += 1
                     elif property_type == "VkQueueFlags":
                         enum = self.get_enum('VkQueueFlagBits', True)
+                        gen += enum[0]
+                        self.test_values[name][property] = enum[1]
+                        self.i += 1
+                    elif property_type == "VkImageLayout":
+                        enum = self.get_enum('VkImageLayout', True)
                         gen += enum[0]
                         self.test_values[name][property] = enum[1]
                         self.i += 1
