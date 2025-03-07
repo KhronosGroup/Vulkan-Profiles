@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD041 -->
 <p align="left"><img src="https://vulkan.lunarg.com/img/NewLunarGLogoBlack.png" alt="LunarG" width="263" height="113" /></p>
-<p align="left">Copyright © 2015-2023 LunarG, Inc.</p>
+<p align="left">Copyright © 2015-2025 LunarG, Inc.</p>
 
 [![Creative Commons][3]][4]
 
@@ -11,7 +11,7 @@
 
 # Release Notes
 
-## [Vulkan Profiles Tools 1.3.XXX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - May 2024
+## [Vulkan Profiles Tools 1.3.283](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.283.0) - May 2024
 
 ### Bugfixes:
 - Fix use of vkGetPhysicalDeviceProperties that could not be externally loaded
