@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2021-2024 Valve Corporation
- * Copyright (C) 2021-2024 LunarG, Inc.
+ * Copyright (C) 2021-2025 Valve Corporation
+ * Copyright (C) 2021-2025 LunarG, Inc.
  * Copyright (c) 2024 RasterGrid Kft.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
