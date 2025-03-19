@@ -5035,13 +5035,7 @@ class VulkanProfile():
                     # Use parent's limit type
                     limittype = parentLimittype
 
-                if limittype == 'not':
-                    # Compare everything else with equality
-                    comparePredFmt = '{0} == {1}'
-                elif limittype == 'bitmask' and type == 'VkBool32':
-                    # Compare everything else with equality
-                    comparePredFmt = '{0} == {1}'
-                elif limittype == 'bitmask':
+                if limittype == 'bitmask':
                     # Compare bitmask by checking if device value contains every bit of profile value
                     comparePredFmt = 'vpCheckFlags({0}, {1})'
                 elif limittype == 'bits':
@@ -5083,9 +5077,10 @@ class VulkanProfile():
                     # Compare range limit by checking if device range is larger than or equal to profile range
                     comparePredFmt = [ '{0} <= {1}', '{0} >= {1}' ]
                 elif limittype == 'exact' or limittype == 'struct':
-                    # Compare everything else with equality
+                    # Compare exact and struct values with equality
                     comparePredFmt = '{0} == {1}'
                 elif limittype is None or limittype == 'noauto':
+                    # Compare everything else with equality
                     comparePredFmt = '{0} == {1}'
                 else:
                     Log.f("Unsupported limittype '{0}' in member '{1}' of structure '{2}'".format(limittype, member, structDef.name))
@@ -7007,8 +7002,6 @@ class VulkanProfilesDocGenerator():
             return member
         elif limittype == 'exact':
             return member + ' (exact)'
-        elif limittype == 'not':
-            return member + ' (not)'
         elif limittype == 'max':
             return member + ' (max)'
         elif limittype == 'max,pot' or limittype == 'pot,max':
