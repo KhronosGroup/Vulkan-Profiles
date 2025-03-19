@@ -2,14 +2,14 @@
     "repos": [
         {
             "name": "Vulkan-Headers",
-            "url": "https://github.com/KhronosGroup/Vulkan-Headers.git",
+            "url": "git@gitlab.khronos.org:vulkan/Vulkan-Headers.git",
             "sub_dir": "Vulkan-Headers",
             "build_dir": "Vulkan-Headers/build",
             "install_dir": "Vulkan-Headers/build/install",
             "cmake_options": [
                 "-DVULKAN_HEADERS_ENABLE_MODULE=OFF"
             ],
-            "commit": "v1.4.309"
+            "commit": "aqnuep/bool-limittype-fixes"
         },
         {
             "name": "Vulkan-Utility-Libraries",

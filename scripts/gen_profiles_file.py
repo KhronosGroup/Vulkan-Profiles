@@ -681,6 +681,8 @@ class ProfileMerger():
                         merged[member]['width'] = entry[member]['width']
                     if entry[member]['height'] > merged[member]['height']:
                         merged[member]['height'] = entry[member]['height']
+                elif xmlmember.type == 'VkBool32':
+                    merged[member] = merged[member] or entry[member]
                 elif xmlmember.arraySize == 3:
                     if entry[member][0] > merged[member][0]:
                         merged[member][0] = entry[member][0]
@@ -702,6 +704,8 @@ class ProfileMerger():
                         merged[member]['width'] = entry[member]['width']
                     if entry[member]['height'] < merged[member]['height']:
                         merged[member]['height'] = entry[member]['height']
+                elif xmlmember.type == 'VkBool32':
+                    merged[member] = merged[member] and entry[member]
                 elif xmlmember.arraySize == 3:
                     if entry[member][0] < merged[member][0]:
                         merged[member][0] = entry[member][0]
@@ -721,12 +725,6 @@ class ProfileMerger():
                 for smember in entry[member]:
                     if smember in merged[member]:
                         merged[member] = merged[member] or smember
-                    else:
-                        merged[member].append(smember)
-            elif xmlmember.limittype == 'not':
-                for smember in entry[member]:
-                    if smember in merged[member]:
-                        merged[member] = (not merged[member]) or (not smember)
                     else:
                         merged[member].append(smember)
             elif xmlmember.limittype == 'range':
@@ -751,6 +749,8 @@ class ProfileMerger():
                         merged[member]['width'] = entry[member]['width']
                     if entry[member]['height'] < merged[member]['height']:
                         merged[member]['height'] = entry[member]['height']
+                elif xmlmember.type == 'VkBool32':
+                    merged[member] = merged[member] and entry[member]
                 elif xmlmember.arraySize == 3:
                     if entry[member][0] < merged[member][0]:
                         merged[member][0] = entry[member][0]
@@ -782,6 +782,8 @@ class ProfileMerger():
                         merged[member]['width'] = entry[member]['width']
                     if entry[member]['height'] < merged[member]['height']:
                         merged[member]['height'] = entry[member]['height']
+                elif xmlmember.type == 'VkBool32':
+                    merged[member] = merged[member] or entry[member]
                 elif xmlmember.arraySize == 3:
                     if entry[member][0] < merged[member][0]:
                         merged[member][0] = entry[member][0]
@@ -808,32 +810,12 @@ class ProfileMerger():
                 else:
                     print("ERROR: '" + member + " 'values with 'min' limittype unknown case.")
             elif xmlmember.limittype == 'bitmask':
-                if xmlmember.type == 'VkBool32':
-                    if member in entry:
-                        merged[member] = merged[member] and entry[member]
-                        if (not merged[member]):
-                            del merged[member]
-                    else:
-                        merged.remove(member)
-                else:
-                    remove_list = []
-                    for value in merged[member]:
-                        if value not in entry[member]:
-                            remove_list.append(value)
-                    for value in remove_list:
-                        merged[member].remove(value)
-            elif xmlmember.limittype == 'not':
-                if xmlmember.type == 'VkBool32':
-                    if member in entry:
-                        merged[member] = merged[member] or entry[member]
-                        if (merged[member]):
-                            del merged[member]
-                    else:
-                        merged.remove(member)
-                else:
-                    for value in merged[member]:
-                        if value not in entry[member]:
-                            merged[member].remove(value)
+                remove_list = []
+                for value in merged[member]:
+                    if value not in entry[member]:
+                        remove_list.append(value)
+                for value in remove_list:
+                    merged[member].remove(value)
             elif xmlmember.limittype == 'range':
                 if entry[member][0] > merged[member][0]:
                     merged[member][0] = entry[member][0]

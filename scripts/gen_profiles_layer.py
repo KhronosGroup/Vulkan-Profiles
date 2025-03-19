@@ -4695,7 +4695,7 @@ class VulkanProfilesLayerGenerator():
             gen += '        if (format.{0}.sType == {1}) {{\n'.format(structVar, structDef.sType)
             indent = ' ' * 12
             for member in structDef.members.values():
-                if member.limittype in ['exact', 'noauto', 'not']:
+                if member.limittype in ['exact', 'noauto']:
                     if member.type in self.registry.structs:
                         # Structure members need to be expanded
                         nestedStructDef = self.registry.structs[member.type]
@@ -4719,7 +4719,7 @@ class VulkanProfilesLayerGenerator():
             gen += '        if (format.{0}.sType == {1}) {{\n'.format(structVar, structDef.sType)
             indent = ' ' * 12
             for member in structDef.members.values():
-                if member.limittype in ['exact', 'noauto', 'not']:
+                if member.limittype in ['exact', 'noauto']:
                     if member.type in self.registry.structs:
                         # Structure members need to be expanded
                         nestedStructDef = self.registry.structs[member.type]
@@ -4742,7 +4742,7 @@ class VulkanProfilesLayerGenerator():
             gen += self.generate_platform_protect_begin(struct)
             for member in structDef.members.values():
                 # We only combine modifiable properties
-                if member.limittype in ['exact', 'noauto', 'not']:
+                if member.limittype in ['exact', 'noauto']:
                     continue
                 if member.type in self.registry.structs:
                     # Structure members need to be expanded
@@ -4774,7 +4774,7 @@ class VulkanProfilesLayerGenerator():
             indent = ' ' * 12
             for member in structDef.members.values():
                 # We only override modifiable properties
-                if member.limittype in ['exact', 'noauto', 'not']:
+                if member.limittype in ['exact', 'noauto']:
                     continue
                 if member.type in self.registry.structs:
                     # Structure members need to be expanded
@@ -5605,7 +5605,7 @@ class VulkanProfilesLayerGenerator():
         return var_name
 
     def get_limittype_class(self, limittype):
-        if limittype in ['exact', 'noauto', 'not']:
+        if limittype in ['exact', 'noauto']:
             return 'LimitExact'
         if 'min' in limittype:
             return 'LimitMin'
