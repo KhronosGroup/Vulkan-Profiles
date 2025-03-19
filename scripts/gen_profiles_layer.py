@@ -5755,7 +5755,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    registryPath  = '../external/Debug/Vulkan-Headers/build/install/share/vulkan/registry/vk.xml'
+    registryPath  = '../vk.xml'
     if args.registry is not None:
         registryPath = args.registry
 

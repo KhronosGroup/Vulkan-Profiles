@@ -24,7 +24,7 @@ endif()
 add_custom_target(VpLibrary_test_generated_library
     COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
         --api ${API_TYPE}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --registry ${CMAKE_SOURCE_DIR}/vk.xml
         --input ${PROJECT_SOURCE_DIR}/library/test/profiles
         --output-library-inc ${PROJECT_SOURCE_DIR}/library/test
         --output-library-filename "test_vulkan_profiles"

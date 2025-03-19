@@ -33,7 +33,7 @@ set(PROFILE_DESKTOP_MAX_2024_API_VERSION "1.3.244")
 
 add_custom_target(VpCreateDesktopMax2024 ALL
     COMMAND Python3::Interpreter ${MERGE_SCRIPT}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --registry ${CMAKE_SOURCE_DIR}/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/VP_LUNARG_desktop_max_2024
         --output-path ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_desktop_max_2024.json
         --output-profile VP_LUNARG_desktop_max_2024
@@ -50,7 +50,7 @@ set_target_properties(VpCreateDesktopMax2024 PROPERTIES FOLDER "Profiles generat
 
 add_custom_target(VpCreateDesktopBaseline ALL
     COMMAND Python3::Interpreter ${MERGE_SCRIPT}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --registry ${CMAKE_SOURCE_DIR}/vk.xml
         --config ${CMAKE_CURRENT_LIST_DIR}/config/VP_LUNARG_desktop_baseline_config.json
         --output-path ${CMAKE_CURRENT_LIST_DIR}/VP_LUNARG_desktop_baseline.json
         --strip-duplicate-structs
@@ -69,14 +69,14 @@ add_custom_target(VpGenerated
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/profiles ${CMAKE_CURRENT_LIST_DIR}
     COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
         --api ${API_TYPE}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --registry ${CMAKE_SOURCE_DIR}/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
         --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY}
         --output-schema ${PROJECT_SOURCE_DIR}/schema/${PROFILES_SCHEMA_FILENAME}
         --validate
     COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
         --api ${API_TYPE}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --registry ${CMAKE_SOURCE_DIR}/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
         --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY}
         --output-library-inc ${PROJECT_SOURCE_DIR}/library/include/vulkan
@@ -85,7 +85,7 @@ add_custom_target(VpGenerated
         --config release
     COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
         --api ${API_TYPE}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --registry ${CMAKE_SOURCE_DIR}/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
         --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY}
         --output-library-inc ${PROJECT_SOURCE_DIR}/library/include/vulkan/debug
@@ -94,7 +94,7 @@ add_custom_target(VpGenerated
         --config debug
     COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
         --api ${API_TYPE}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --registry ${CMAKE_SOURCE_DIR}/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
         --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY}
         --output-doc ${PROJECT_SOURCE_DIR}/PROFILES_ALL.md
@@ -111,7 +111,7 @@ add_custom_target(VpGeneratedVulkanHeaderProfilesDoc
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/profiles ${CMAKE_CURRENT_LIST_DIR}
     COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
         --api ${API_TYPE}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --registry ${CMAKE_SOURCE_DIR}/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
         --input-filenames ${PROFILES_FILES_FOR_VULKAN_HEADER_DOC}
         --output-doc ${PROJECT_SOURCE_DIR}/PROFILES.md
@@ -129,7 +129,7 @@ add_custom_target(VpGeneratedAndroidDoc
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/profiles ${CMAKE_CURRENT_LIST_DIR}
     COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
         --api ${API_TYPE}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --registry ${CMAKE_SOURCE_DIR}/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
         --input-filenames ${PROFILES_FILES_FOR_ANDROID_DOC}
         --output-doc ${PROJECT_SOURCE_DIR}/PROFILES_ANDROID.md
@@ -144,7 +144,7 @@ add_dependencies(VpGeneratedAndroidDoc VpGenerated)
 
 add_custom_target(VpTestIntersect ALL
     COMMAND Python3::Interpreter ${MERGE_SCRIPT}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --registry ${CMAKE_SOURCE_DIR}/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_intersect
         --output-path ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_intersect.json
         --output-profile VP_LUNARG_test_combine_intersect
@@ -159,7 +159,7 @@ add_dependencies(VpTestIntersect VpGenerated)
 
 add_custom_target(VpTestUnion ALL
     COMMAND Python3::Interpreter ${MERGE_SCRIPT}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --registry ${CMAKE_SOURCE_DIR}/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_union
         --output-path ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_union.json
         --output-profile VP_LUNARG_test_combine_union
@@ -174,7 +174,7 @@ add_dependencies(VpTestUnion VpGenerated)
 
 add_custom_target(VpTestGeneratedName ALL
     COMMAND Python3::Interpreter ${MERGE_SCRIPT}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --registry ${CMAKE_SOURCE_DIR}/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_intersect
         --output-path ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_generated_name.json
     VERBATIM
@@ -187,7 +187,7 @@ add_dependencies(VpTestGeneratedName VpGenerated)
 
 add_custom_target(VpTestHostImageCopy ALL
     COMMAND Python3::Interpreter ${MERGE_SCRIPT}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --registry ${CMAKE_SOURCE_DIR}/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_host_image_copy
         --output-path ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_host_image_copy.json
     VERBATIM
