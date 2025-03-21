@@ -4233,10 +4233,10 @@ class VulkanRegistry():
         self.overwrite('VkPhysicalDeviceLimits', 'bufferImageGranularity', ['noauto'], 'min,mul')
         self.overwrite('VkPhysicalDeviceLimits', 'pointSizeGranularity', ['max'], 'min,mul')
         self.overwrite('VkPhysicalDeviceLimits', 'lineWidthGranularity', ['max'], 'min,mul')
-        self.overwrite('VkPhysicalDeviceLimits', 'strictLines', ['noauto', 'bitmask'], 'exact')
-        self.overwrite('VkPhysicalDeviceLimits', 'standardSampleLocations', ['noauto', 'bitmask'], 'exact')
+        self.overwrite('VkPhysicalDeviceLimits', 'strictLines', ['noauto', 'bitmask', 'exact'], 'max')
+        self.overwrite('VkPhysicalDeviceLimits', 'standardSampleLocations', ['noauto', 'bitmask', 'exact'], 'max')
 
-        self.overwrite('VkPhysicalDeviceSparseProperties', 'residencyAlignedMipSize', ['bitmask'], 'not')
+        self.overwrite('VkPhysicalDeviceSparseProperties', 'residencyAlignedMipSize', ['bitmask', 'not'], 'min')
 
         self.overwrite('VkPhysicalDeviceVulkan11Properties', 'deviceUUID', ['None'], 'exact')
         self.overwrite('VkPhysicalDeviceVulkan11Properties', 'driverUUID', ['None'], 'exact')
@@ -4323,7 +4323,7 @@ class VulkanRegistry():
 
         self.overwrite('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'primitiveOverestimationSize', ['None'], 'exact')
         self.overwrite('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'extraPrimitiveOverestimationSizeGranularity', ['None'], 'min,mul')
-        self.overwrite('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'conservativePointAndLineRasterization', ['None'], 'bitmask')
+        self.overwrite('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'conservativePointAndLineRasterization', ['None', 'bitmask'], 'max')
         self.overwrite('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'degenerateTrianglesRasterized', ['None'], 'exact')
         self.overwrite('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'degenerateLinesRasterized', ['None'], 'exact')
 
@@ -4338,8 +4338,8 @@ class VulkanRegistry():
         self.overwrite('VkPhysicalDevicePCIBusInfoPropertiesEXT', 'pciDevice', ['None'], 'noauto')
         self.overwrite('VkPhysicalDevicePCIBusInfoPropertiesEXT', 'pciFunction', ['None'], 'noauto')
 
-        self.overwrite('VkPhysicalDeviceDrmPropertiesEXT', 'hasPrimary', ['None'], 'bitmask')
-        self.overwrite('VkPhysicalDeviceDrmPropertiesEXT', 'hasRender', ['None'], 'bitmask')
+        self.overwrite('VkPhysicalDeviceDrmPropertiesEXT', 'hasPrimary', ['None', 'bitmask'], 'max')
+        self.overwrite('VkPhysicalDeviceDrmPropertiesEXT', 'hasRender', ['None', 'bitmask'], 'max')
         self.overwrite('VkPhysicalDeviceDrmPropertiesEXT', 'primaryMajor', ['None'], 'noauto')
         self.overwrite('VkPhysicalDeviceDrmPropertiesEXT', 'primaryMinor', ['None'], 'noauto')
         self.overwrite('VkPhysicalDeviceDrmPropertiesEXT', 'renderMajor', ['None'], 'noauto')
@@ -4386,7 +4386,7 @@ class VulkanRegistry():
 
         self.overwrite('VkPhysicalDeviceSchedulingControlsPropertiesARM', 'schedulingControlsFlags', ['None'], 'bitmask')
 
-        self.overwrite('VkPhysicalDeviceExternalFormatResolvePropertiesANDROID', 'nullColorAttachmentWithExternalFormatResolve', ['noauto'], 'not')
+        self.overwrite('VkPhysicalDeviceExternalFormatResolvePropertiesANDROID', 'nullColorAttachmentWithExternalFormatResolve', ['noauto', 'not'], 'min')
 
         self.overwrite('VkPhysicalDeviceRenderPassStripedPropertiesARM', 'renderPassStripeGranularity', ['None'], 'min')
         self.overwrite('VkPhysicalDeviceRenderPassStripedPropertiesARM', 'maxRenderPassStripes', ['None'], 'max')
