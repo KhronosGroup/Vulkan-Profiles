@@ -62,7 +62,8 @@
                 "-DJSONCPP_WITH_PKGCONFIG_SUPPORT=OFF",
                 "-DBUILD_SHARED_LIBS=OFF",
                 "-DBUILD_STATIC_LIBS=ON",
-                "-DBUILD_OBJECT_LIBS=OFF"
+                "-DBUILD_OBJECT_LIBS=OFF",
+                "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
             ]
         },
         {
