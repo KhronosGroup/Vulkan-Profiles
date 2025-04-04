@@ -158,6 +158,8 @@ class ProfileGenerator():
     skipped_features = []
     skipped_members = ["sType", "pNext", "physicalDevices", "driverID", "copySrcLayoutCount", "copyDstLayoutCount"]
     skipped_properties_structs = ["VkPhysicalDeviceLineRasterizationPropertiesEXT", "VkPhysicalDeviceLayeredApiPropertiesListKHR", "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesEXT"]
+    # Currently crashes in a driver
+    skipped_test_structs = ["VkPhysicalDeviceTileShadingPropertiesQCOM"]
 
     def generate_profile(self, outProfile, registry):
         with open(outProfile, 'w') as f:
@@ -632,6 +634,8 @@ class ProfileGenerator():
 
     def gen_properties_test(self, registry, name, value):
         gen = ''
+        if name in self.skipped_test_structs:
+            return gen
         if not hasattr(self, 'test_values'):
             return gen
         # No members to test in property
