@@ -1948,11 +1948,11 @@ VkResult JsonLoader::LoadFile(const std::string& filename) {
         JsonValidator validator;
         if (!validator.Init()) {
             LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
-                "%s could not find the profile schema file to validate filename. This operation requires the Vulkan SDK to be installed. Skipping profile file validation.",
+                "%s could not find the profile schema file to validate filename. This operation requires the Vulkan SDK to be installed. Skipping profile file validation.\\n",
                 kLayerName, filename.c_str());
         } else if (!validator.Check(root)) {
             LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT,
-                "%s is not a valid JSON profile file.", filename.c_str());
+                "%s is not a valid JSON profile file.\\n", filename.c_str());
             if (layer_settings.log.debug_fail_on_error) {
                 return VK_ERROR_INITIALIZATION_FAILED;
             } else {
