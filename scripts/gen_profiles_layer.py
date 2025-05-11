@@ -1765,7 +1765,7 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
                     for (const auto usage : video_profile.GetSupportedFormatCategories()) {
                         std::vector<VideoFormatPropertiesChain> formats{};
                         SetOfVideoProfileFormats device_formats{};
-        
+
                         // The initial set of formats is taken from the physical device supported ones, if there are any,
                         // and they match any of the profile defined ones
                         if (pd_video_profile != pdd_->set_of_device_video_profiles_.end()) {
@@ -1981,7 +1981,7 @@ VkResult JsonLoader::LoadProfilesDatabase() {
             this->LoadFile(path);
             continue;
         }
-        
+
         for (const auto& entry : fs::directory_iterator(path)) {
             if (fs::is_directory(entry.path())) {
                 continue;
@@ -4988,7 +4988,7 @@ class VulkanProfilesLayerGenerator():
                         gen += '        return GetStruct(device_name, requested_profile, ' + struct + ', &pdd_->physical_device_properties_.limits);\n'
                     elif current == 'VkPhysicalDeviceSparseProperties':
                         gen += '        return GetStruct(device_name, requested_profile, ' + struct + ', &pdd_->physical_device_properties_.sparseProperties);\n'
-                    elif current.startswith('VkPhysicalDeviceHostImageCopyProperties'):
+                    elif current.startswith('VkPhysicalDeviceHostImageCopyProperties') or current == 'VkPhysicalDeviceVulkan14Properties':
                         # Initialize memory for src/dst layout arrays with a size that's way too big to be exceeded.
                         gen += '        pdd_->pCopySrcLayouts_.resize(64);\n'
                         gen += '        pdd_->pCopyDstLayouts_.resize(64);\n'
