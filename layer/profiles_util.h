@@ -158,6 +158,7 @@ typedef std::unordered_map<std::string, VkExtensionProperties> MapOfVkExtensionP
 
 struct QueueFamilyProperties {
     VkQueueFamilyProperties2 properties_2 = {};
+    VkQueueFamilyOwnershipTransferPropertiesKHR ownership_transfer_properties_ = {};
     VkQueueFamilyGlobalPriorityPropertiesKHR global_priority_properties_ = {};
     VkQueueFamilyVideoPropertiesKHR video_properties_ = {};
     VkQueueFamilyCheckpointPropertiesNV checkpoint_properties_ = {};
@@ -166,6 +167,7 @@ struct QueueFamilyProperties {
 
     QueueFamilyProperties() {
         properties_2.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2;
+        ownership_transfer_properties_.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_OWNERSHIP_TRANSFER_PROPERTIES_KHR;
         global_priority_properties_.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_GLOBAL_PRIORITY_PROPERTIES_EXT;
         video_properties_.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_VIDEO_PROPERTIES_KHR;
         checkpoint_properties_.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_CHECKPOINT_PROPERTIES_NV;

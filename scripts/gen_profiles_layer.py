@@ -1237,6 +1237,10 @@ bool JsonLoader::GetQueueFamilyProperties(const char* device_name, const Json::V
                 minImagetransferGranularity["height"].asUInt();
             dest->properties_2.queueFamilyProperties.minImageTransferGranularity.depth =
                 minImagetransferGranularity["depth"].asUInt();
+        } else if (name == "VkQueueFamilyOwnershipTransferPropertiesKHR") {
+            for (const auto &feature : props["optimalImageTransferToQueueFamilies"]) {
+                dest->ownership_transfer_properties_.optimalImageTransferToQueueFamilies |= feature.asUInt();
+            }
         } else if (name == "VkQueueFamilyGlobalPriorityPropertiesKHR" || name == "VkQueueFamilyGlobalPriorityPropertiesEXT") {
             uint32_t i = 0;
             for (const auto &feature : props["priorities"]) {
@@ -1265,6 +1269,10 @@ bool JsonLoader::GetQueueFamilyProperties(const char* device_name, const Json::V
     bool supported = false;
     for (const auto &device_qfp : pdd_->device_queue_family_properties_) {
         if (!QueueFamilyMatch(device_qfp.properties_2.queueFamilyProperties, dest->properties_2.queueFamilyProperties)) {
+            continue;
+        }
+        if ((device_qfp.ownership_transfer_properties_.optimalImageTransferToQueueFamilies & dest->ownership_transfer_properties_.optimalImageTransferToQueueFamilies) !=
+             dest->ownership_transfer_properties_.optimalImageTransferToQueueFamilies) {
             continue;
         }
         if (!GlobalPriorityMatch(device_qfp.global_priority_properties_, dest->global_priority_properties_)) {
@@ -1300,6 +1308,10 @@ bool JsonLoader::GetQueueFamilyProperties(const char* device_name, const Json::V
                    dest->properties_2.queueFamilyProperties.minImageTransferGranularity.width,
                    dest->properties_2.queueFamilyProperties.minImageTransferGranularity.height,
                    dest->properties_2.queueFamilyProperties.minImageTransferGranularity.depth);
+        if (dest->ownership_transfer_properties_.optimalImageTransferToQueueFamilies > 0) {
+            message += format(", VkQueueFamilyOwnershipTransferPropertiesKHR [optimalImageTransferToQueueFamilies: %" PRIu32 "]",
+                              dest->ownership_transfer_properties_.optimalImageTransferToQueueFamilies);
+        }
         if (dest->global_priority_properties_.priorityCount > 0) {
             std::string priorities = "[";
             for (uint32_t i = 0; i < dest->global_priority_properties_.priorityCount; ++i) {
@@ -1340,6 +1352,10 @@ bool JsonLoader::GetQueueFamilyProperties(const char* device_name, const Json::V
 QUEUE_FAMILY_FUNCTIONS = '''
 bool QueueFamilyAndExtensionsMatch(const QueueFamilyProperties &device, const QueueFamilyProperties &profile) {
     if (!QueueFamilyMatch(device.properties_2.queueFamilyProperties, profile.properties_2.queueFamilyProperties)) {
+        return false;
+    }
+    if ((device.ownership_transfer_properties_.optimalImageTransferToQueueFamilies & profile.ownership_transfer_properties_.optimalImageTransferToQueueFamilies) !=
+         profile.ownership_transfer_properties_.optimalImageTransferToQueueFamilies) {
         return false;
     }
     if (!GlobalPriorityMatch(device.global_priority_properties_, profile.global_priority_properties_)) {
@@ -3021,6 +3037,11 @@ void LoadQueueFamilyProperties(VkInstance instance, VkPhysicalDevice pd, Physica
         std::vector<void *> pNext(count);
         std::vector<VkQueueFamilyProperties2> props(count);
         for (uint32_t i = 0; i < count; ++i) {
+            if (PhysicalDeviceData::HasExtension(pdd, VK_KHR_MAINTENANCE_9_EXTENSION_NAME)) {
+                pdd->device_queue_family_properties_[i].ownership_transfer_properties_.pNext = pNext[i];
+
+                pNext[i] = &pdd->device_queue_family_properties_[i].ownership_transfer_properties_;
+            }
             if (PhysicalDeviceData::HasExtension(pdd, VK_KHR_GLOBAL_PRIORITY_EXTENSION_NAME)) {
                 pdd->device_queue_family_properties_[i].global_priority_properties_.pNext = pNext[i];
 
@@ -3515,6 +3536,7 @@ class VulkanProfilesLayerGenerator():
     additional_features = ['VkPhysicalDeviceFeatures', 'VkPhysicalDevicePortabilitySubsetFeaturesKHR']
     additional_properties = ['VkPhysicalDeviceProperties', 'VkPhysicalDeviceLimits', 'VkPhysicalDeviceSparseProperties', 'VkPhysicalDeviceToolProperties', 'VkPhysicalDevicePortabilitySubsetPropertiesKHR']
     ignored_structs = ['VkPhysicalDeviceLayeredApiPropertiesListKHR']
+    broken_pnext_structs = ['VkPhysicalDeviceDescriptorBufferTensorPropertiesARM']
 
     int_to_json_type_map = {
         'int32_t': 'Int',
@@ -3635,7 +3657,7 @@ class VulkanProfilesLayerGenerator():
 
         gen += self.generate_string_to_image_layout(registry.enums['VkImageLayout'].values)
 
-        enums = set(('VkToolPurposeFlagBits', 'VkSampleCountFlagBits', 'VkResolveModeFlagBits', 'VkShaderStageFlagBits', 'VkSubgroupFeatureFlagBits', 'VkShaderFloatControlsIndependence', 'VkPointClippingBehavior', 'VkOpticalFlowGridSizeFlagBitsNV', 'VkQueueFlagBits', 'VkMemoryDecompressionMethodFlagBitsNV', 'VkLayeredDriverUnderlyingApiMSFT', 'VkImageUsageFlagBits', 'VkBufferUsageFlagBits', 'VkPhysicalDeviceSchedulingControlsFlagBitsARM', 'VkIndirectCommandsInputModeFlagBitsEXT', 'VkPipelineRobustnessBufferBehavior', 'VkPipelineRobustnessImageBehavior'))
+        enums = set(('VkToolPurposeFlagBits', 'VkSampleCountFlagBits', 'VkResolveModeFlagBits', 'VkShaderStageFlagBits', 'VkSubgroupFeatureFlagBits', 'VkShaderFloatControlsIndependence', 'VkPointClippingBehavior', 'VkOpticalFlowGridSizeFlagBitsNV', 'VkQueueFlagBits', 'VkMemoryDecompressionMethodFlagBitsNV', 'VkLayeredDriverUnderlyingApiMSFT', 'VkImageUsageFlagBits', 'VkBufferUsageFlagBits', 'VkPhysicalDeviceSchedulingControlsFlagBitsARM', 'VkIndirectCommandsInputModeFlagBitsEXT', 'VkPipelineRobustnessBufferBehavior', 'VkPipelineRobustnessImageBehavior', 'VkDefaultVertexAttributeValueKHR'))
         enums = enums.union(self.get_video_enums())
         gen += self.generate_string_to_uint(enums, registry.enums)
 
@@ -5373,7 +5395,10 @@ class VulkanProfilesLayerGenerator():
             gen += 'if (physicalDeviceData->GetEffectiveVersion() >= ' + structure.definedByVersion.versionMacro + ') '
         gen += '{\n'
         gen += '                    ' + structure.name + ' *data = (' + structure.name + ' *)place;\n'
-        gen += '                    void *pNext = data->pNext;\n'
+        if structure.name in self.broken_pnext_structs:
+            gen += '                    void *pNext = const_cast<void*>(data->pNext);\n'
+        else:
+            gen += '                    void *pNext = data->pNext;\n'
         gen += '                    *data = physicalDeviceData->' + self.create_var_name(structure.name) + ';\n'
         gen += '                    data->pNext = pNext;\n'
         gen += '                }\n'

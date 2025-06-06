@@ -4428,6 +4428,10 @@ class VulkanRegistry():
         self.overwrite('VkSparseImageFormatProperties', 'imageGranularity', ['None'], 'min,mul')
         self.overwrite('VkSparseImageFormatProperties', 'flags', ['None'], 'bitmask')
 
+        self.overwrite('VkPhysicalDeviceDescriptorBufferTensorPropertiesARM', 'tensorCaptureReplayDescriptorDataSize', ['None'], 'noauto')
+        self.overwrite('VkPhysicalDeviceDescriptorBufferTensorPropertiesARM', 'tensorViewCaptureReplayDescriptorDataSize', ['None'], 'noauto')
+        self.overwrite('VkPhysicalDeviceDescriptorBufferTensorPropertiesARM', 'tensorDescriptorSize', ['None'], 'max')
+
         # TODO: The registry xml contains some return structures that contain count + pointers to arrays
         # While the script itself is prepared to drop those, as they are ill-formed, as return structures
         # should never contain such pointers, some of the structures (e.g. 'VkVideoProfilesKHR') actually
