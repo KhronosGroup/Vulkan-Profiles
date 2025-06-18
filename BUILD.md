@@ -172,9 +172,14 @@ Use the following to ensure the Android build works.
 ```bash
 cmake -Bandroid-build \
   -DCMAKE_TOOLCHAIN_FILE=<ndk-path>/build/cmake/android.toolchain.cmake \
+  -DUPDATE_DEPS=ON \
   -DANDROID_PLATFORM=28 \
   -DANDROID_BUILD_TOOLS=30.0.3 \
-  -DANDROID_ABI=arm64-v8a
+  -DANDROID_ABI=arm64-v8a \
+  -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a \
+  -DCMAKE_ANDROID_STL_TYPE=c++_static \
+  -DANDROID_USE_LEGACY_TOOLCHAIN_FILE=NO \
+  -GNinja
 
 cd android-build
 cmake --build . --parallel
