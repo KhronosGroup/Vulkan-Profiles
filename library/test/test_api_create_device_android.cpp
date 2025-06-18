@@ -142,7 +142,11 @@ std::vector<std::string> get_args(android_app &app, const char *intent_extra_dat
     return args;
 }
 
-static int32_t processInput(struct android_app *app, AInputEvent *event) { return 0; }
+static int32_t processInput(struct android_app *app, AInputEvent *event) {
+    (void)app;
+    (void)event;
+    return 0;
+}
 
 static void processCommand(struct android_app *app, int32_t cmd) {
     switch (cmd) {
@@ -170,7 +174,7 @@ static void destroyActivity(struct android_app *app) {
     while (app->destroyRequested == 0) {
         struct android_poll_source *source = nullptr;
         int events = 0;
-        int result = ALooper_pollAll(-1, nullptr, &events, reinterpret_cast<void **>(&source));
+        int result = ALooper_pollOnce(-1, nullptr, &events, reinterpret_cast<void **>(&source));
 
         if ((result >= 0) && (source)) {
             source->process(app, source);
@@ -181,7 +185,6 @@ static void destroyActivity(struct android_app *app) {
 }
 
 void android_main(struct android_app *app) {
-    static ANativeWindow *window;
     app->onAppCmd = processCommand;
     app->onInputEvent = processInput;
     g_app = app;
@@ -189,7 +192,7 @@ void android_main(struct android_app *app) {
     while (1) {
         int events;
         struct android_poll_source *source;
-        while (ALooper_pollAll(active ? 0 : -1, NULL, &events, (void **)&source) >= 0) {
+        while (ALooper_pollOnce(active ? 0 : -1, NULL, &events, (void **)&source) >= 0) {
             if (source) {
                 source->process(app, source);
             }

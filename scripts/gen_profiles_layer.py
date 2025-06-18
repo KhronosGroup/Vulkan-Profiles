@@ -1036,7 +1036,7 @@ GET_VALUE_FUNCTIONS = '''
         }
         const int count = static_cast<int>(value.size());
         if (!not_modifiable) {
-            *destCount = count;
+            *destCount = static_cast<uint32_t>(count);
             for (int i = 0; i < count; ++i) {
                 dest[i] = StringToImageLayout(value[i].asCString());
             }
@@ -2065,17 +2065,16 @@ void JsonLoader::ReadProfileApiVersion() {
             break;
         }
     }
-    if (!found_profile) {
-        for (const auto &profile : profiles.getMemberNames()) {
-            const std::string version_string = profiles[profile]["api-version"].asCString();
+    if (!found_profile && profiles) {
+        // Systematically load the first and default profile when the profile is not found
+        const auto &profile = profiles.getMemberNames()[0];
+        const std::string version_string = profiles[profile]["api-version"].asCString();
 
-            uint32_t api_major = 0;
-            uint32_t api_minor = 0;
-            uint32_t api_patch = 0;
-            std::sscanf(version_string.c_str(), "%u.%u.%u", &api_major, &api_minor, &api_patch);
-            profile_api_version_ = VK_MAKE_API_VERSION(0, api_major, api_minor, api_patch);
-            break; // Systematically load the first and default profile when the profile is not found
-        }
+        uint32_t api_major = 0;
+        uint32_t api_minor = 0;
+        uint32_t api_patch = 0;
+        std::sscanf(version_string.c_str(), "%u.%u.%u", &api_major, &api_minor, &api_patch);
+        profile_api_version_ = VK_MAKE_API_VERSION(0, api_major, api_minor, api_patch);
     }
 
     for (const auto& extension : layer_settings.simulate.exclude_device_extensions) {
@@ -2167,23 +2166,21 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
                     break;  // load a single profile
                 }
             }
-            if (!found_profile) {
-                for (const auto &profile : profiles.getMemberNames()) {
-                    const auto &caps = profiles[profile]["capabilities"];
+            if (!found_profile && profiles) {
+                // Systematically load the first and default profile
+                const auto &profile = profiles.getMemberNames()[0];
+                const auto &caps = profiles[profile]["capabilities"];
 
-                    for (const auto &cap : caps) {
-                        std::vector<std::string> cap_variants;
-                        if (cap.isArray()) {
-                            for (const auto &cap_variant : cap) {
-                                cap_variants.push_back(cap_variant.asString());
-                            }
-                        } else {
-                            cap_variants.push_back(cap.asString());
+                for (const auto &cap : caps) {
+                    std::vector<std::string> cap_variants;
+                    if (cap.isArray()) {
+                        for (const auto &cap_variant : cap) {
+                            cap_variants.push_back(cap_variant.asString());
                         }
-                        capabilities.push_back(cap_variants);
+                    } else {
+                        cap_variants.push_back(cap.asString());
                     }
-
-                    break; // Systematically load the first and default profile
+                    capabilities.push_back(cap_variants);
                 }
             }
 
