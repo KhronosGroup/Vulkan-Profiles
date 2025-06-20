@@ -3538,6 +3538,9 @@ class VulkanRegistry():
                         elif tail == '[' and enum != None and enum.tail == ']':
                             # [<enum>] case
                             structDef.members[name].arraySize = enum.text
+                        elif structDef.name == 'VkPhysicalDeviceDataGraphOperationSupportARM':
+                            # Handle xml bug
+                            structDef.members['name'].arraySize = 'VK_MAX_PHYSICAL_DEVICE_DATA_GRAPH_OPERATION_SET_NAME_SIZE_ARM'
                         else:
                             Log.f("Unsupported array format for struct member '{0}::{1}'".format(structDef.name, name))
 
