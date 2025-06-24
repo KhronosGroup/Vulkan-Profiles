@@ -2067,7 +2067,7 @@ void JsonLoader::ReadProfileApiVersion() {
     }
     if (!found_profile && profiles) {
         // Systematically load the first and default profile when the profile is not found
-        const auto &profile = profiles.getMemberNames()[0];
+        const auto profile = profiles.getMemberNames()[0];
         const std::string version_string = profiles[profile]["api-version"].asCString();
 
         uint32_t api_major = 0;
@@ -2168,7 +2168,7 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
             }
             if (!found_profile && profiles) {
                 // Systematically load the first and default profile
-                const auto &profile = profiles.getMemberNames()[0];
+                const auto profile = profiles.getMemberNames()[0];
                 const auto &caps = profiles[profile]["capabilities"];
 
                 for (const auto &cap : caps) {
