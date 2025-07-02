@@ -251,7 +251,7 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
         uint32_t setting_name_count = static_cast<uint32_t>(std::size(setting_names));
 
         std::vector<const char *> unknown_settings;
-        vkuGetUnknownSettings(create_info, setting_name_count, setting_names, unknown_settings);
+        vkuGetUnknownSettings(layerSettingSet, setting_name_count, setting_names, create_info, unknown_settings);
 
         for (std::size_t i = 0, n = unknown_settings.size(); i < n; ++i) {
             LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT,
