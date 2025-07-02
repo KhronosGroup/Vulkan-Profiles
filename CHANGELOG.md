@@ -16,6 +16,7 @@
 ### Bugfixes:
 - Fix `timestampPeriod` in generated profile
 - Fix `VkPhysicalDeviceVulkan14Properties` array size
+- Fix invalid unknown variables
 
 ## [Vulkan Profiles Tools 1.3.313](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.313.0) - May 2025
 
