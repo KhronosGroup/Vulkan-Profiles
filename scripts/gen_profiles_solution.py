@@ -4241,7 +4241,7 @@ class VulkanRegistry():
         self.overwrite('VkPhysicalDeviceLimits', 'optimalBufferCopyOffsetAlignment', ['noauto'], 'min,pot')
         self.overwrite('VkPhysicalDeviceLimits', 'optimalBufferCopyRowPitchAlignment', ['noauto'], 'min,pot')
         self.overwrite('VkPhysicalDeviceLimits', 'nonCoherentAtomSize', ['noauto'], 'min,pot')
-        self.overwrite('VkPhysicalDeviceLimits', 'timestampPeriod', ['noauto'], 'min,mul')
+        self.overwrite('VkPhysicalDeviceLimits', 'timestampPeriod', ['noauto', 'min,mul'], 'exact') # resolve https://github.com/KhronosGroup/Vulkan-Profiles/issues/769
         self.overwrite('VkPhysicalDeviceLimits', 'bufferImageGranularity', ['noauto'], 'min,mul')
         self.overwrite('VkPhysicalDeviceLimits', 'pointSizeGranularity', ['max'], 'min,mul')
         self.overwrite('VkPhysicalDeviceLimits', 'lineWidthGranularity', ['max'], 'min,mul')
