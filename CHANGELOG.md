@@ -11,6 +11,25 @@
 
 # Release Notes
 
+## [Vulkan Profiles Tools 1.3.321](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.321.0) - July 2025
+
+### Bugfixes:
+- Fix `timestampPeriod` in generated profile
+- Fix `VkPhysicalDeviceVulkan14Properties` array size
+
+## [Vulkan Profiles Tools 1.3.313](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.313.0) - May 2025
+
+### Improvements:
+- Add layer support for `VK_EXT_host_image_copy`
+
+### Bugfixes:
+- Fix `VkBool32` limittypes
+
+## [Vulkan Profiles Tools 1.4.304](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.304.0) - January 2025
+
+### Improvements:
+- Add video profiles support
+
 ## [Vulkan Profiles Tools 1.3.283](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.3.283.0) - May 2024
 
 ### Bugfixes:
