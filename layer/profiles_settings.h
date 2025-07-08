@@ -122,7 +122,6 @@ enum DefaultFeatureValues {
     DEFAULT_FEATURE_VALUES_DEVICE
 };
 
-
 static DefaultFeatureValues GetDefaultFeatureValues(const std::string &value) {
     if (value == "DEFAULT_FEATURE_VALUES_FALSE") {
         return DEFAULT_FEATURE_VALUES_FALSE;
@@ -141,6 +140,31 @@ static std::string GetDefaultFeatureValuesString(DefaultFeatureValues value) {
     }
 
     return "DEFAULT_FEATURE_VALUES_DEVICE";
+}
+
+enum UnknownFeatureValues {
+    UNKNOWN_FEATURE_VALUES_UNCHANGED = 0,
+    UNKNOWN_FEATURE_VALUES_DEVICE
+};
+
+static UnknownFeatureValues GetUnknownFeatureValues(const std::string &value) {
+    if (value == "UNKNOWN_FEATURE_VALUES_UNCHANGED") {
+        return UNKNOWN_FEATURE_VALUES_UNCHANGED;
+    } else if (value == "UNKNOWN_FEATURE_VALUES_DEVICE") {
+        return UNKNOWN_FEATURE_VALUES_DEVICE;
+    }
+
+    return UNKNOWN_FEATURE_VALUES_UNCHANGED;
+}
+
+static std::string GetUnknownFeatureValuesString(UnknownFeatureValues value) {
+    if (value == UNKNOWN_FEATURE_VALUES_UNCHANGED) {
+        return "UNKNOWN_FEATURE_VALUES_UNCHANGED";
+    } else if (value == UNKNOWN_FEATURE_VALUES_DEVICE) {
+        return "UNKNOWN_FEATURE_VALUES_DEVICE";
+    }
+
+    return "UNKNOWN_FEATURE_VALUES_UNCHANGED";
 }
 
 enum ForceDevice {
@@ -165,6 +189,7 @@ struct ProfileLayerSettings {
         bool profile_validation{false};
         SimulateCapabilityFlags capabilities{SIMULATE_API_VERSION_BIT | SIMULATE_FEATURES_BIT | SIMULATE_PROPERTIES_BIT};
         DefaultFeatureValues default_feature_values{DEFAULT_FEATURE_VALUES_DEVICE};
+        UnknownFeatureValues unknown_feature_values{UNKNOWN_FEATURE_VALUES_UNCHANGED};
         std::vector<std::string> exclude_device_extensions;
         std::vector<std::string> exclude_formats;
         bool emulate_portability{true};

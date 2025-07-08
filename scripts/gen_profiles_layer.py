@@ -2542,6 +2542,10 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFeatures2(VkPhysicalDevice physicalD
 
     PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
     if (pdd) {
+        ProfileLayerSettings *layer_settings = &JsonLoader::Find(pdd->instance())->layer_settings;
+        if (layer_settings->simulate.unknown_feature_values == UNKNOWN_FEATURE_VALUES_DEVICE) {
+            dt->GetPhysicalDeviceFeatures2(physicalDevice, pFeatures);
+        }
         FillPNextChain(pdd, pFeatures->pNext);
     } else {
         dt->GetPhysicalDeviceFeatures2(physicalDevice, pFeatures);
