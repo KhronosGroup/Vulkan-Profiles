@@ -305,12 +305,32 @@
                                         {
                                             "key": "DEFAULT_FEATURE_VALUES_DEVICE",
                                             "label": "Use Device Values",
-                                            "description": "When a feature is not mentionned in the select Vulkan profiles, set is to the physical device value."
+                                            "description": "When a feature is not mentioned in the select Vulkan profiles, set is to the physical device value."
                                         },
                                         {
                                             "key": "DEFAULT_FEATURE_VALUES_FALSE",
                                             "label": "Use False",
-                                            "description": "When a feature is not mentionned in the select Vulkan profiles, set it to false."
+                                            "description": "When a feature is not mentioned in the select Vulkan profiles, set it to false."
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "unknown_feature_values",
+                                    "label": "Unknown Features",
+                                    "description": "Feature values when unrecongnized by Vulkan profiles.",
+                                    "status": "STABLE",
+                                    "type": "ENUM",
+                                    "default": "UNKNOWN_FEATURE_VALUES_UNCHANGED",
+                                    "flags": [
+                                        {
+                                            "key": "UNKNOWN_FEATURE_VALUES_UNCHANGED",
+                                            "label": "Unmodified",
+                                            "description": "When a feature is not recognized by Vulkan profiles, skip it."
+                                        },
+                                        {
+                                            "key": "UNKNOWN_FEATURE_VALUES_DEVICE",
+                                            "label": "Use Device Values",
+                                            "description": "When a feature is not recognized by Vulkan profiles, attempt to load device values."
                                         }
                                     ]
                                 }
