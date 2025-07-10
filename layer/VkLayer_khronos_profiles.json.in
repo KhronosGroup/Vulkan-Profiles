@@ -175,7 +175,7 @@
                                     "status": "STABLE",
                                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
                                     "type": "STRING",
-                                    "default": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                                    "default": "",
                                     "dependence": {
                                         "mode": "ALL",
                                         "settings": [
