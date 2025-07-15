@@ -3979,9 +3979,6 @@ class VulkanRegistry():
                 self.externalTypes.remove(name)
 
     def parseVideoCodecs(self, xml, videoxml):
-        if videoxml is None:
-            return
-
         self.videoCodecs = dict()
 
         # Used to look up video codecs based on the video codec op value
@@ -3989,6 +3986,9 @@ class VulkanRegistry():
 
         # Used to reverse look up video codecs by the defined structure names if no video codec op value is available
         self.videoCodecsByStructName = dict()
+
+        if videoxml is None:
+            return
 
         self.parseVideoConstants(videoxml)
         self.parseVideoEnums(videoxml)
