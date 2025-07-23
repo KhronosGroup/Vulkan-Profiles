@@ -22,6 +22,9 @@ if(BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
+execute_process(COMMAND ${CMAKE_COMMAND} -E touch  ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp)
+execute_process(COMMAND ${CMAKE_COMMAND} -E touch  ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp)
+
 set_source_files_properties(${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp PROPERTIES GENERATED true)
 set_source_files_properties(${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp PROPERTIES GENERATED true)
 
