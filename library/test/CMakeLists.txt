@@ -31,7 +31,8 @@ add_custom_target(VpLibrary_test_generated_library
         --validate
     VERBATIM
     SOURCES ${SOLUTION_SCRIPT} ${CMAKE_CURRENT_LIST_DIR}/profiles
-    DEPENDS ${SOLUTION_SCRIPT} ${CMAKE_CURRENT_LIST_DIR}/profiles)
+    DEPENDS ${SOLUTION_SCRIPT} ${CMAKE_CURRENT_LIST_DIR}/profiles
+            ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml)
 
 set_target_properties(VpLibrary_test_generated_library PROPERTIES FOLDER "Profiles API library")
 

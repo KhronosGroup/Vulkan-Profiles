@@ -22,8 +22,8 @@ if(BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
-execute_process(COMMAND ${CMAKE_COMMAND} -E touch  ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp)
-execute_process(COMMAND ${CMAKE_COMMAND} -E touch  ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp)
+set_source_files_properties(${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp PROPERTIES GENERATED true)
+set_source_files_properties(${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp PROPERTIES GENERATED true)
 
 if(WIN32)
     # We need -DNOMINMAX for valijson build
@@ -160,7 +160,8 @@ add_custom_target(VpLayer_generate ALL
         --out-layer ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp
     VERBATIM
     SOURCES ${LAYER_PYTHON_SCRIPT}
-    DEPENDS ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+    DEPENDS ${LAYER_PYTHON_SCRIPT}
+            ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
             ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/video.xml)
 set_target_properties(VpLayer_generate PROPERTIES FOLDER "Profiles layer")
 add_dependencies(ProfilesLayer VpLayer_generate)
@@ -173,7 +174,10 @@ add_custom_target(VpLayer_generate_tests ALL
 		--out-profile ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_api_generated.json
 		--out-tests ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp
 	VERBATIM
-	DEPENDS ProfilesLayer VpLayer_generate
+    SOURCES ${TESTS_PYTHON_SCRIPT}
+	DEPENDS ${TESTS_PYTHON_SCRIPT}
+            ProfilesLayer
+            VpLayer_generate
 	)
 set_target_properties(VpLayer_generate_tests PROPERTIES FOLDER "Profiles layer")
 
