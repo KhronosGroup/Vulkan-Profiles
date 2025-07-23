@@ -1272,7 +1272,7 @@
                             "key": "DEBUG_REPORT_DEBUG_BIT",
                             "label": "Debug",
                             "description": "Report debug information for the Profiles Layer development.",
-                            "view": "ADVANCED"
+                            "view": "DEBUG"
                         }
                     ],
                     "default": [
