@@ -11,6 +11,11 @@
 
 # Release Notes
 
+## [Vulkan Profiles Tools 1.3.321](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - October 2025
+
+### Deprecation:
+- Deprecate layer forced physical device, replaced by the loader forced physical device
+
 ## [Vulkan Profiles Tools 1.3.321](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.321.0) - July 2025
 
 ### Bugfixes:

@@ -28,30 +28,6 @@
         "features": {
             "presets": [
                 {
-                    "label": "Force Physical Device Only",
-                    "description": "Use the Profiles layer to force a specific physical device",
-                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                    "status": "STABLE",
-                    "settings": [
-                        {
-                            "key": "force_device",
-                            "value": "FORCE_DEVICE_WITH_NAME"
-                        },
-                        {
-                            "key": "profile_emulation",
-                            "value": false
-                        },
-                        {
-                            "key": "simulate_capabilities",
-                            "value": []
-                        },
-                        {
-                            "key": "emulate_portability",
-                            "value": false
-                        }
-                    ]
-                },
-                {
                     "label": "Emulate a Vulkan Conformant Profile",
                     "description": "Emulate a Conformant Vulkan Profile",
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
@@ -153,7 +129,8 @@
                     "key": "force_device",
                     "label": "Force Device",
                     "description": "On system with multiple physical devices, force the use of one specific physical device.",
-                    "status": "STABLE",
+                    "status": "DEPRECATED",
+                    "view": "HIDDEN",
                     "type": "ENUM",
                     "default": "FORCE_DEVICE_OFF",
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
