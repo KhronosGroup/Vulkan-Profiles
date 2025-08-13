@@ -11,19 +11,19 @@
 
 # Release Notes
 
-## [Vulkan Profiles Tools 1.3.321](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - October 2025
+## [Vulkan Profiles Tools 1.4.XXX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - October 2025
 
 ### Deprecation:
-- Deprecate layer forced physical device, replaced by the loader forced physical device
+- Deprecate layer forced physical device, replaced by the Vulkan loader settings and Vulkan Configurator Vulkan Drivers tab
 
-## [Vulkan Profiles Tools 1.3.321](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.321.0) - July 2025
+## [Vulkan Profiles Tools 1.4.321](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.321.0) - July 2025
 
 ### Bugfixes:
 - Fix `timestampPeriod` in generated profile
 - Fix `VkPhysicalDeviceVulkan14Properties` array size
 - Fix invalid unknown variables
 
-## [Vulkan Profiles Tools 1.3.313](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.313.0) - May 2025
+## [Vulkan Profiles Tools 1.4.313](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.313.0) - May 2025
 
 ### Improvements:
 - Add layer support for `VK_EXT_host_image_copy`
