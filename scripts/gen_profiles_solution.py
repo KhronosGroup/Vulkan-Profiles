@@ -4304,9 +4304,9 @@ class VulkanRegistry():
 
         self.overwrite('VkPhysicalDeviceIDProperties', 'deviceUUID', ['None'], 'noauto')
         self.overwrite('VkPhysicalDeviceIDProperties', 'driverUUID', ['None'], 'noauto')
-        self.overwrite('VkPhysicalDeviceIDProperties', 'deviceLUID', ['None'], 'noauto')
+        self.overwrite('VkPhysicalDeviceIDProperties', 'deviceLUID', ['None', 'noauto'], 'max')
         self.overwrite('VkPhysicalDeviceIDProperties', 'deviceNodeMask', ['None'], 'noauto')
-        self.overwrite('VkPhysicalDeviceIDProperties', 'deviceLUIDValid', ['None'], 'noauto')
+        self.overwrite('VkPhysicalDeviceIDProperties', 'deviceLUIDValid', ['None', 'noauto'], 'max')
 
         self.overwrite('VkPhysicalDeviceSubgroupProperties', 'subgroupSize', ['None'], 'max,pot')
 
@@ -4400,7 +4400,7 @@ class VulkanRegistry():
 
         self.overwrite('VkPhysicalDeviceExternalFormatResolvePropertiesANDROID', 'nullColorAttachmentWithExternalFormatResolve', ['noauto', 'not'], 'min')
 
-        self.overwrite('VkPhysicalDeviceRenderPassStripedPropertiesARM', 'renderPassStripeGranularity', ['None'], 'min')
+        self.overwrite('VkPhysicalDeviceRenderPassStripedPropertiesARM', 'renderPassStripeGranularity', ['None', 'min'], 'max,mul')
         self.overwrite('VkPhysicalDeviceRenderPassStripedPropertiesARM', 'maxRenderPassStripes', ['None'], 'max')
 
         self.overwrite('VkPhysicalDeviceMaintenance6PropertiesKHR', 'maxCombinedImageSamplerDescriptorCount', ['None'], 'max')

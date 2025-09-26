@@ -157,7 +157,7 @@ class ProfileGenerator():
     i = 1
     skipped_features = []
     skipped_members = ["sType", "pNext", "physicalDevices", "driverID", "copySrcLayoutCount", "copyDstLayoutCount"]
-    skipped_properties_structs = ["VkPhysicalDeviceLineRasterizationPropertiesEXT", "VkPhysicalDeviceLayeredApiPropertiesListKHR", "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesEXT"]
+    skipped_properties_structs = ["VkPhysicalDeviceLineRasterizationPropertiesEXT", "VkPhysicalDeviceLayeredApiPropertiesListKHR", "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesEXT", "VkPhysicalDeviceCopyMemoryIndirectPropertiesNV"]
     # VkPhysicalDeviceTileShadingPropertiesQCOM currently crashes in a driver
     # VkPhysicalDeviceRobustness2PropertiesEXT is an alias of VkPhysicalDeviceRobustness2PropertiesKHR
     skipped_test_structs = ["VkPhysicalDeviceTileShadingPropertiesQCOM", "VkPhysicalDeviceRobustness2PropertiesEXT"]
