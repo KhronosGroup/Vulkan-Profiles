@@ -5637,6 +5637,8 @@ class VulkanProfilesLayerGenerator():
             var_name += 'nv_'
         if (var_name == 'physical_device_device_generated_commands_properties_' or var_name == 'physical_device_device_generated_commands_features_') and nv:
             var_name += 'nv_'
+        if (var_name == 'physical_device_copy_memory_indirect_features_' or var_name == 'physical_device_copy_memory_indirect_features_') and nv:
+            var_name += 'nv_'
         if (var_name == 'physical_device_shader_core_properties_' and arm):
             var_name += 'arm_'
         if (var_name == 'physical_device_vertex_attribute_divisor_properties_' and ext):
