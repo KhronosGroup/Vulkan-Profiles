@@ -48,7 +48,6 @@
                 "VkPhysicalDeviceProperties": {
                     "limits": {
                         "bufferImageGranularity": 4096,
-                        "lineWidthGranularity": 0.5,
                         "maxColorAttachments": 8,
                         "maxComputeWorkGroupInvocations": 256,
                         "maxComputeWorkGroupSize": [ 256, 256, 64 ],
@@ -88,6 +87,27 @@
         "shaderStencilExport": {
             "extensions": {
                 "VK_EXT_shader_stencil_export": 1
+            }
+        },
+        "wideLinesEnabledConstrained": {
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "wideLines": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "lineWidthGranularity": 0.5
+                    }
+                }
+            }
+        },
+        "wideLinesDisabledUnconstrained": {
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "wideLines": false
+                }
             }
         }
     },
@@ -140,6 +160,12 @@
                     "date": "2024-12-11",
                     "author": "Ian Elliott",
                     "comment": "Delay a requirement that IMG BXM-8-256 chipsets cannot do"
+                },
+                {
+                    "revision": 7,
+                    "date": "2025-09-30",
+                    "author": "Anjana Sherin",
+                    "comment": "Conditional validation of wideLines and lineWidthGranularity"
                 }
             ],
             "profiles": [
@@ -147,7 +173,8 @@
              ],
              "capabilities": [
                 "MUST",
-                ["multisampledToSingleSampled", "shaderStencilExport"]
+                ["multisampledToSingleSampled", "shaderStencilExport"],
+                ["wideLinesEnabledConstrained", "wideLinesDisabledUnconstrained"]
             ]
         }
     }
