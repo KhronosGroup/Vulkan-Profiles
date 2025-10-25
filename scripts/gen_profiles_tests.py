@@ -157,7 +157,7 @@ class ProfileGenerator():
     i = 1
     skipped_features = []
     skipped_members = ["sType", "pNext", "physicalDevices", "driverID", "copySrcLayoutCount", "copyDstLayoutCount"]
-    skipped_properties_structs = ["VkPhysicalDeviceLineRasterizationPropertiesEXT", "VkPhysicalDeviceLayeredApiPropertiesListKHR", "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesEXT", "VkPhysicalDeviceCopyMemoryIndirectPropertiesNV"]
+    skipped_properties_structs = ["VkPhysicalDeviceLineRasterizationPropertiesEXT", "VkPhysicalDeviceLayeredApiPropertiesListKHR", "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesEXT", "VkPhysicalDeviceCopyMemoryIndirectPropertiesNV", "VkPhysicalDeviceMemoryDecompressionPropertiesNV"]
     # VkPhysicalDeviceTileShadingPropertiesQCOM currently crashes in a driver
     # VkPhysicalDeviceRobustness2PropertiesEXT is an alias of VkPhysicalDeviceRobustness2PropertiesKHR
     skipped_test_structs = ["VkPhysicalDeviceTileShadingPropertiesQCOM", "VkPhysicalDeviceRobustness2PropertiesEXT"]
@@ -493,6 +493,11 @@ class ProfileGenerator():
                         self.i += 1
                     elif property_type == "VkPhysicalDeviceSchedulingControlsFlagsARM":
                         enum = self.get_enum('VkPhysicalDeviceSchedulingControlsFlagBitsARM', True)
+                        gen += enum[0]
+                        self.test_values[name][property] = enum[1]
+                        self.i += 1
+                    elif property_type == "VkMemoryDecompressionMethodFlagsEXT":
+                        enum = self.get_enum('VkMemoryDecompressionMethodFlagBitsEXT', True)
                         gen += enum[0]
                         self.test_values[name][property] = enum[1]
                         self.i += 1
