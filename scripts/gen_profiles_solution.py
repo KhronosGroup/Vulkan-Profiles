@@ -3268,8 +3268,6 @@ class VulkanVersionNumber():
             self.versionName = 'VK_VERSION_{0}_{1}'.format(self.major, self.minor)
             self.versionMacro = 'VK_API_VERSION_{0}_{1}'.format(self.major, self.minor)
             self.versionStructSuffic = '{0}{1}'.format(self.major, self.minor)
-            if versionName is not None and versionName != self.versionName:
-                Log.f("Mismatch between version number {0} and name '{1}'".format(versionStr, versionName))
 
         elif targetApi is not None:
             Log.f("Unknown target API '{0}'".format(targetApi))
@@ -3837,7 +3835,7 @@ class VulkanRegistry():
     def parseFeatures(self, xml):
         # First, parse features specific to Vulkan versions
         for version in self.versions.values():
-            if version.name == 'VK_VERSION_1_0':
+            if version.number.major == 1 and version.number.minor == 0:
                 # For version 1.0 use VkPhysicalDeviceFeatures
                 structDef = self.structs['VkPhysicalDeviceFeatures']
                 for memberDef in structDef.members.values():
@@ -3853,10 +3851,11 @@ class VulkanRegistry():
                         featureStructNames.append(name)
                 # VkPhysicalDeviceVulkan11Features is defined in Vulkan 1.2, but it actually
                 # contains Vulkan 1.1 features, so treat it as such
-                if version.name == 'VK_VERSION_1_1':
+                if version.number.major == 1 and version.number.minor == 1:
                     featureStructNames.append('VkPhysicalDeviceVulkan11Features')
-                elif version.name == 'VK_VERSION_1_2':
-                    featureStructNames.remove('VkPhysicalDeviceVulkan11Features')
+                elif version.number.major == 1 and version.number.minor == 2:
+                    if 'VkPhysicalDeviceVulkan11Features' in featureStructNames:
+                        featureStructNames.remove('VkPhysicalDeviceVulkan11Features')
                 # For each feature collect all feature structures containing them, and their aliases
                 for featureStructName in featureStructNames:
                     if (featureStructName in self.structs):
@@ -3890,7 +3889,7 @@ class VulkanRegistry():
     def parseLimits(self, xml):
         # First, parse properties/limits specific to Vulkan versions
         for version in self.versions.values():
-            if version.name == 'VK_VERSION_1_0':
+            if version.number.major == 1 and version.number.minor == 0:
                 # The properties extension structures are a misnomer, as they contain limits,
                 # however, the naming will stay with us, so in order to avoid nested
                 # "properties" (limits), we simply use VkPhysicalDeviceLimits directly here
@@ -3908,10 +3907,11 @@ class VulkanRegistry():
                         limitStructNames.append(name)
                 # VkPhysicalDeviceVulkan11Properties is defined in Vulkan 1.2, but it actually
                 # contains Vulkan 1.1 limits, so treat it as such
-                if version.name == 'VK_VERSION_1_1':
+                if version.number.major == 1 and version.number.minor == 1:
                     limitStructNames.append('VkPhysicalDeviceVulkan11Properties')
-                elif version.name == 'VK_VERSION_1_2':
-                    limitStructNames.remove('VkPhysicalDeviceVulkan11Properties')
+                elif version.number.major == 1 and version.number.minor == 2:
+                    if 'VkPhysicalDeviceVulkan11Properties' in limitStructNames:
+                        limitStructNames.remove('VkPhysicalDeviceVulkan11Properties')
             # For each limit collect all property/limit structures containing them, and their aliases
             for limitStructName in limitStructNames:
                 if (limitStructName in self.structs):
@@ -7051,7 +7051,7 @@ class VulkanProfilesDocGenerator():
             else:
                 # For other structures find the version defining the structure
                 for version in self.registry.versions.values():
-                    if version.number == structDef.definedByVersion:
+                    if version.number == structDef.definedByVersion and member in version.limits:
                         break
             # Return all the structures defining this limit member
             return version.limits[member].structs
