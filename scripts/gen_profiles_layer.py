@@ -3536,7 +3536,7 @@ class VulkanProfilesLayerGenerator():
     emulated_extensions = ['VK_KHR_portability_subset']
     additional_features = ['VkPhysicalDeviceFeatures', 'VkPhysicalDevicePortabilitySubsetFeaturesKHR']
     additional_properties = ['VkPhysicalDeviceProperties', 'VkPhysicalDeviceLimits', 'VkPhysicalDeviceSparseProperties', 'VkPhysicalDeviceToolProperties', 'VkPhysicalDevicePortabilitySubsetPropertiesKHR']
-    ignored_structs = ['VkPhysicalDeviceLayeredApiPropertiesListKHR']
+    ignored_structs = ['VkPhysicalDeviceLayeredApiPropertiesListKHR', 'VkPhysicalDeviceDataGraphModelFeaturesQCOM'] # Remove VkPhysicalDeviceDataGraphModelFeaturesQCOM from this list after .333
     broken_pnext_structs = ['VkPhysicalDeviceDescriptorBufferTensorPropertiesARM']
 
     int_to_json_type_map = {
