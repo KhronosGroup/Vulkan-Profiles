@@ -3536,8 +3536,8 @@ class VulkanProfilesLayerGenerator():
     emulated_extensions = ['VK_KHR_portability_subset']
     additional_features = ['VkPhysicalDeviceFeatures', 'VkPhysicalDevicePortabilitySubsetFeaturesKHR']
     additional_properties = ['VkPhysicalDeviceProperties', 'VkPhysicalDeviceLimits', 'VkPhysicalDeviceSparseProperties', 'VkPhysicalDeviceToolProperties', 'VkPhysicalDevicePortabilitySubsetPropertiesKHR']
-    ignored_structs = ['VkPhysicalDeviceLayeredApiPropertiesListKHR', 'VkPhysicalDeviceDataGraphModelFeaturesQCOM'] # Remove VkPhysicalDeviceDataGraphModelFeaturesQCOM from this list after .333
-    broken_pnext_structs = ['VkPhysicalDeviceDescriptorBufferTensorPropertiesARM']
+    ignored_structs = ['VkPhysicalDeviceLayeredApiPropertiesListKHR']
+    broken_pnext_structs = ['VkPhysicalDeviceDescriptorBufferTensorPropertiesARM', 'VkPhysicalDeviceDataGraphModelFeaturesQCOM']
 
     int_to_json_type_map = {
         'int32_t': 'Int',
@@ -5643,6 +5643,8 @@ class VulkanProfilesLayerGenerator():
             var_name += 'arm_'
         if (var_name == 'physical_device_vertex_attribute_divisor_properties_' and ext):
             var_name += 'ext_'
+        if (var_name == 'physical_device_ray_tracing_invocation_reorder_properties_' and nv):
+            var_name += 'nv_'
         return var_name
 
     def get_limittype_class(self, limittype):
