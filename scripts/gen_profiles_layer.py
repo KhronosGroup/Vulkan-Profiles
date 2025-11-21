@@ -5645,6 +5645,8 @@ class VulkanProfilesLayerGenerator():
             var_name += 'ext_'
         if (var_name == 'physical_device_ray_tracing_invocation_reorder_properties_' and nv):
             var_name += 'nv_'
+        if (var_name == 'physical_device_ray_tracing_invocation_reorder_features_' and nv):
+            var_name += 'nv_'
         return var_name
 
     def get_limittype_class(self, limittype):
