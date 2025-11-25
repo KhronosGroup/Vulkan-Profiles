@@ -3997,6 +3997,64 @@ class VulkanProfilesLayerGenerator():
 
         return gen
 
+    def generate_video_limit_struct_member(self, indent, member, inheritedLimittype = None):
+        gen = ''
+
+        if member.limittype:
+            limittype = self.get_limittype_class(member.limittype)
+        else:
+            limittype = inheritedLimittype
+
+        if member.type in self.registry.structs:
+            nestedStructDef = self.registry.structs[member.type]
+            gen += indent + 'struct {\n'
+            for nestedMember in nestedStructDef.members.values():
+                gen += self.generate_video_limit_struct_member(' ' * 4 + indent, nestedMember, limittype)
+            gen += indent + '}} {0}{{}};\n'.format(member.name)
+        else:
+            gen += indent + '{0}<{1}> {2}{{}};\n'.format(limittype, member.type, member.name)
+
+        return gen
+
+    def generate_video_limit_struct_member_parser(self, indent, jsonValue, structVar, struct, member):
+        gen = ''
+
+        memberVar = '{0}.{1}'.format(structVar, member.name)
+
+        if member.type in self.registry.enums:
+            gen += indent + 'if (!{0}.isString()) return false;\n'.format(jsonValue)
+            gen += indent + '{0}.limit = static_cast<{1}>(VkStringToUint64({2}.asString()));\n'.format(memberVar, member.type, jsonValue)
+        elif member.type in self.registry.bitmasks:
+            gen += indent + 'if (!{0}.isArray()) return false;\n'.format(jsonValue)
+            gen += indent + 'uint64_t mask = 0;\n'
+            gen += indent + 'for (const auto &entry : {0}) {{\n'.format(jsonValue)
+            gen += indent + '    mask |= VkStringToUint64(entry.asString());\n'
+            gen += indent + '}\n'
+            gen += indent + '{0}.limit = static_cast<{1}>(mask);\n'.format(memberVar, member.type)
+        elif member.type == 'VkBool32':
+            gen += indent + 'if (!{0}.isBool()) return false;\n'.format(jsonValue)
+            gen += indent + '{0}.limit = {1}.asBool() ? VK_TRUE : VK_FALSE;\n'.format(memberVar, jsonValue)
+        elif member.type == 'float':
+            gen += indent + 'if (!{0}.isDouble()) return false;\n'.format(jsonValue)
+            gen += indent + '{0}.limit = {1}.asFloat();\n'.format(memberVar, jsonValue)
+        elif member.type in self.int_to_json_type_map:
+            intType = self.int_to_json_type_map[member.type]
+            gen += indent + 'if (!{0}.is{1}()) return false;\n'.format(jsonValue, intType)
+            gen += indent + '{0}.limit = {1}.as{2}();\n'.format(memberVar, jsonValue, intType)
+        elif member.type in self.registry.structs:
+            nestedStructDef = self.registry.structs[member.type]
+            gen += indent + 'if (!{0}.isObject()) return false;\n'.format(jsonValue)
+            for nestedMember in nestedStructDef.members.values():
+                jsonSubValue = '{0}_{1}'.format(jsonValue, nestedMember.name)
+                gen += indent + 'if ({0}.isMember("{1}")) {{\n'.format(jsonValue, nestedMember.name)
+                gen += indent + '    const Json::Value &{0} = {1}["{2}"];\n'.format(jsonSubValue, jsonValue, nestedMember.name)
+                gen += self.generate_video_limit_struct_member_parser(' ' * 4 + indent, jsonSubValue, memberVar, nestedMember.type, nestedMember)
+                gen += indent + '}\n'
+        else:
+            gen += '#error Unsupported video limit type type "{0}" in "{1}::{2}"\n'.format(member.type, struct, member.name)
+
+        return gen
+
     def generate_video_profile_caps(self):
         structs = self.get_video_structs('VkVideoCapabilitiesKHR')
 
@@ -4135,22 +4193,14 @@ class VulkanProfilesLayerGenerator():
             gen += self.generate_platform_protect_begin(struct)
             gen += '    struct {\n'
             for member in structDef.members.values():
-                limittype = self.get_limittype_class(member.limittype)
                 if member.name == 'stdHeaderVersion' and member.type == 'VkExtensionProperties':
                     # stdHeaderVersion is a special case
                     gen += '        struct {\n'
                     gen += '            LimitExact<std::string> extensionName{};\n'
                     gen += '            LimitExact<uint32_t> specVersion{};\n'
                     gen += '        } stdHeaderVersion{};\n'
-                elif member.type in self.registry.structs:
-                    # Structure members need to be expanded
-                    nestedStructDef = self.registry.structs[member.type]
-                    gen += '        struct {\n'
-                    for nestedMember in nestedStructDef.members.values():
-                        gen += '            {0}<{1}> {2}{{}};\n'.format(limittype, nestedMember.type, nestedMember.name)
-                    gen += '        }} {0}{{}};\n'.format(member.name)
                 else:
-                    gen += '        {0}<{1}> {2}{{}};\n'.format(limittype, member.type, member.name)
+                    gen += self.generate_video_limit_struct_member(' ' * 8, member)
             gen += '    }} {0}{{}};\n'.format(self.create_var_name(struct))
             gen += self.generate_platform_protect_end(struct)
 
@@ -4172,24 +4222,7 @@ class VulkanProfilesLayerGenerator():
             for member in structDef.members.values():
                 gen += '            if ({0}json->isMember("{1}")) {{\n'.format(structVar, member.name)
                 gen += '                const Json::Value &value = (*{0}json)["{1}"];\n'.format(structVar, member.name)
-                if member.type in self.registry.enums:
-                    gen += '                if (!value.isString()) return false;\n'
-                    gen += '                {0}.{1}.limit = static_cast<{2}>(VkStringToUint64(value.asString()));\n'.format(structVar, member.name, member.type)
-                elif member.type in self.registry.bitmasks:
-                    gen += '                if (!value.isArray()) return false;\n'
-                    gen += '                uint64_t mask = 0;\n'
-                    gen += '                for (const auto &entry : value) {\n'
-                    gen += '                    mask |= VkStringToUint64(entry.asString());\n'
-                    gen += '                }\n'
-                    gen += '                {0}.{1}.limit = static_cast<{2}>(mask);\n'.format(structVar, member.name, member.type)
-                elif member.type == 'VkBool32':
-                    gen += '                if (!value.isBool()) return false;\n'
-                    gen += '                {0}.{1}.limit = value.asBool() ? VK_TRUE : VK_FALSE;\n'.format(structVar, member.name)
-                elif member.type in self.int_to_json_type_map:
-                    intType = self.int_to_json_type_map[member.type]
-                    gen += '                if (!value.is{0}()) return false;\n'.format(intType)
-                    gen += '                {0}.{1}.limit = value.as{2}();\n'.format(structVar, member.name, intType)
-                elif member.name == 'stdHeaderVersion' and member.type == 'VkExtensionProperties':
+                if member.name == 'stdHeaderVersion' and member.type == 'VkExtensionProperties':
                     # stdHeaderVersion is a special case
                     gen += '                if (!value.isObject()) return false;\n'
                     gen += '                if (value.isMember("extensionName")) {\n'
@@ -4202,24 +4235,8 @@ class VulkanProfilesLayerGenerator():
                     gen += '                    if (!std_header_version.isUInt()) return false;\n'
                     gen += '                    {0}.stdHeaderVersion.specVersion.limit = std_header_version.asUInt();\n'.format(structVar)
                     gen += '                }\n'
-                elif member.type in self.registry.structs:
-                    nestedStructDef = self.registry.structs[member.type]
-                    gen += '                if (!value.isObject()) return false;\n'
-                    for nestedMember in nestedStructDef.members.values():
-                        gen += '                if (value.isMember("{0}")) {{\n'.format(nestedMember.name)
-                        gen += '                    const Json::Value &nested_value = value["{0}"];\n'.format(nestedMember.name)
-                        if nestedMember.type in self.registry.enums:
-                            gen += '                    if (!nested_value.isString()) return false;\n'
-                            gen += '                    {0}.{1}.{2}.limit = static_cast<{3}>(VkStringToUint64(nested_value.asString()));\n'.format(structVar, member.name, nestedMember.name, nestedMember.type)
-                        elif nestedMember.type in self.int_to_json_type_map:
-                            intType = self.int_to_json_type_map[nestedMember.type]
-                            gen += '                    if (!nested_value.is{0}()) return false;\n'.format(intType)
-                            gen += '                    {0}.{1}.{2}.limit = nested_value.as{3}();\n'.format(structVar, member.name, nestedMember.name, intType)
-                        else:
-                            gen += '#error Unsupported video profile capability type "{0}" in "{1}::{2}::{3}"\n'.format(nestedMember.type, struct, member.name, nestedMember.name)
-                        gen += '                }\n'
                 else:
-                    gen += '#error Unsupported video profile capability type "{0}" in "{1}::{2}"\n'.format(member.type, struct, member.name)
+                    gen += self.generate_video_limit_struct_member_parser(' ' * 16, 'value', structVar, struct, member)
                 gen += '            }\n'
             gen += '        }\n'
             gen += self.generate_platform_protect_end(struct)
@@ -4243,19 +4260,22 @@ class VulkanProfilesLayerGenerator():
             structDef = self.registry.structs[struct]
             gen += self.generate_platform_protect_begin(struct)
             for member in structDef.members.values():
-                if member.type in self.registry.structs:
-                    # Structure members need to be expanded
-                    nestedStructDef = self.registry.structs[member.type]
-                    for nestedMember in nestedStructDef.members.values():
-                        gen += '        if (caps.{0}.{1}.{2}.limit.has_value() && !{0}.{1}.{2}.Combine(caps.{0}.{1}.{2}.limit.value())) {{\n'.format(structVar, member.name, nestedMember.name)
-                        gen += '            LogMessage(layer_settings, DEBUG_REPORT_ERROR_BIT, error_msg, "{0}::{1}::{2}");\n'.format(struct, member.name, nestedMember.name)
+                def gen_member(member, structVar, struct):
+                    gen = ''
+                    if member.type in self.registry.structs:
+                        memberVar = '{0}.{1}'.format(structVar, member.name)
+                        memberTypeStr = '{0}::{1}'.format(struct, member.type)
+                        nestedStructDef = self.registry.structs[member.type]
+                        for nestedMember in nestedStructDef.members.values():
+                            gen += gen_member(nestedMember, memberVar, memberTypeStr)
+                    else:
+                        gen += '        if (caps.{0}.{1}.limit.has_value() && !{0}.{1}.Combine(caps.{0}.{1}.limit.value())) {{\n'.format(structVar, member.name)
+                        gen += '            LogMessage(layer_settings, DEBUG_REPORT_ERROR_BIT, error_msg, "{0}::{1}");\n'.format(struct, member.name)
                         gen += '            result = false;\n'
                         gen += '        }\n'
-                else:
-                    gen += '        if (caps.{0}.{1}.limit.has_value() && !{0}.{1}.Combine(caps.{0}.{1}.limit.value())) {{\n'.format(structVar, member.name)
-                    gen += '            LogMessage(layer_settings, DEBUG_REPORT_ERROR_BIT, error_msg, "{0}::{1}");\n'.format(struct, member.name)
-                    gen += '            result = false;\n'
-                    gen += '        }\n'
+                    return gen
+
+                gen += gen_member(member, structVar, struct)
             gen += self.generate_platform_protect_end(struct)
         gen += '        return result;\n'
         gen += '    }\n'
@@ -4269,31 +4289,38 @@ class VulkanProfilesLayerGenerator():
             structDef = self.registry.structs[struct]
             gen += self.generate_platform_protect_begin(struct)
             gen += '        if (caps.{0}.sType == {1}) {{\n'.format(structVar, structDef.sType)
-            indent = ' ' * 12
             for member in structDef.members.values():
-                if member.type in self.registry.structs:
-                    # Structure members need to be expanded
-                    nestedStructDef = self.registry.structs[member.type]
-                    for nestedMember in nestedStructDef.members.values():
-                        if member.name == 'stdHeaderVersion' and member.type == 'VkExtensionProperties' and nestedMember.name == 'extensionName':
-                            # stdHeaderVersion.extensionName is a special case
-                            gen += '{0}if ({1}.{2}.{3}.limit.has_value() && strncmp({1}.{2}.{3}.limit.value().c_str(), caps.{1}.{2}.{3}, VK_MAX_EXTENSION_NAME_SIZE - 1) != 0) {{\n'.format(indent, structVar, member.name, nestedMember.name)
-                            gen += '{0}    memset(caps.{1}.{2}.{3}, 0, VK_MAX_EXTENSION_NAME_SIZE - 1);\n'.format(indent, structVar, member.name, nestedMember.name)
-                            gen += '{0}    strncpy(caps.{1}.{2}.{3}, {1}.{2}.{3}.limit.value().c_str(), VK_MAX_EXTENSION_NAME_SIZE - 1);\n'.format(indent, structVar, member.name, nestedMember.name)
-                        else:
-                            gen += '{0}if (!{1}.{2}.{3}.Override(caps.{1}.{2}.{3})) {{\n'.format(indent, structVar, member.name, nestedMember.name)
+                def gen_member(member, structVar, struct):
+                    indent = ' ' * 12
+                    gen = ''
+                    if member.type in self.registry.structs:
+                        memberVar = '{0}.{1}'.format(structVar, member.name)
+                        memberTypeStr = '{0}::{1}'.format(struct, member.type)
+                        nestedStructDef = self.registry.structs[member.type]
+                        for nestedMember in nestedStructDef.members.values():
+                            if member.name == 'stdHeaderVersion' and member.type == 'VkExtensionProperties' and nestedMember.name == 'extensionName':
+                                # stdHeaderVersion.extensionName is a special case
+                                gen += '{0}if ({1}.{2}.{3}.limit.has_value() && strncmp({1}.{2}.{3}.limit.value().c_str(), caps.{1}.{2}.{3}, VK_MAX_EXTENSION_NAME_SIZE - 1) != 0) {{\n'.format(indent, structVar, member.name, nestedMember.name)
+                                gen += '{0}    memset(caps.{1}.{2}.{3}, 0, VK_MAX_EXTENSION_NAME_SIZE - 1);\n'.format(indent, structVar, member.name, nestedMember.name)
+                                gen += '{0}    strncpy(caps.{1}.{2}.{3}, {1}.{2}.{3}.limit.value().c_str(), VK_MAX_EXTENSION_NAME_SIZE - 1);\n'.format(indent, structVar, member.name, nestedMember.name)
+                                gen += '{0}    if (enable_warnings) {{\n'.format(indent)
+                                gen += '{0}        LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT, warn_msg, "{1}::{2}::{3}", name);\n'.format(indent, struct, member.name, nestedMember.name)
+                                gen += '{0}        result = false;\n'.format(indent)
+                                gen += '{0}    }}\n'.format(indent)
+                                gen += '{0}}}\n'.format(indent)
+                            else:
+                                gen += gen_member(nestedMember, memberVar, memberTypeStr)
+                    else:
+                        gen += '{0}if (!{1}.{2}.Override(caps.{1}.{2})) {{\n'.format(indent, structVar, member.name)
                         gen += '{0}    if (enable_warnings) {{\n'.format(indent)
-                        gen += '{0}        LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT, warn_msg, "{1}::{2}::{3}", name);\n'.format(indent, struct, member.name, nestedMember.name)
+                        gen += '{0}        LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT, warn_msg, "{1}::{2}", name);\n'.format(indent, struct, member.name)
                         gen += '{0}        result = false;\n'.format(indent)
                         gen += '{0}    }}\n'.format(indent)
                         gen += '{0}}}\n'.format(indent)
-                else:
-                    gen += '{0}if (!{1}.{2}.Override(caps.{1}.{2})) {{\n'.format(indent, structVar, member.name)
-                    gen += '{0}    if (enable_warnings) {{\n'.format(indent)
-                    gen += '{0}        LogMessage(layer_settings, DEBUG_REPORT_WARNING_BIT, warn_msg, "{1}::{2}", name);\n'.format(indent, struct, member.name)
-                    gen += '{0}        result = false;\n'.format(indent)
-                    gen += '{0}    }}\n'.format(indent)
-                    gen += '{0}}}\n'.format(indent)
+                    return gen
+
+                gen += gen_member(member, structVar, struct)
+
             gen += '        }\n'
             gen += self.generate_platform_protect_end(struct)
         gen += '        return result;\n'
@@ -4307,22 +4334,29 @@ class VulkanProfilesLayerGenerator():
             gen += self.generate_platform_protect_begin(struct)
             gen += '        if (caps.{0}.sType == {1}) {{\n'.format(structVar, structDef.sType)
             gen += '            caps.{0} = {{caps.{0}.sType, caps.{0}.pNext}};\n'.format(structVar)
-            indent = ' ' * 12
             for member in structDef.members.values():
-                if member.type in self.registry.structs:
-                    # Structure members need to be expanded
-                    nestedStructDef = self.registry.structs[member.type]
-                    for nestedMember in nestedStructDef.members.values():
-                        if member.name == 'stdHeaderVersion' and member.type == 'VkExtensionProperties' and nestedMember.name == 'extensionName':
-                            # stdHeaderVersion.extensionName is a special case
-                            gen += '{0}if ({1}.{2}.{3}.limit.has_value()) {{\n'.format(indent, structVar, member.name, nestedMember.name)
-                            gen += '{0}    memset(caps.{1}.{2}.{3}, 0, VK_MAX_EXTENSION_NAME_SIZE - 1);\n'.format(indent, structVar, member.name, nestedMember.name)
-                            gen += '{0}    strncpy(caps.{1}.{2}.{3}, {1}.{2}.{3}.limit.value().c_str(), VK_MAX_EXTENSION_NAME_SIZE - 1);\n'.format(indent, structVar, member.name, nestedMember.name)
-                            gen += '{0}}}\n'.format(indent)
-                        else:
-                            gen += '{0}if ({1}.{2}.{3}.limit.has_value()) caps.{1}.{2}.{3} = {1}.{2}.{3}.limit.value();\n'.format(indent, structVar, member.name, nestedMember.name)
-                else:
-                    gen += '{0}if ({1}.{2}.limit.has_value()) caps.{1}.{2} = {1}.{2}.limit.value();\n'.format(indent, structVar, member.name)
+                def gen_member(member, structVar, struct):
+                    indent = ' ' * 12
+                    gen = ''
+                    if member.type in self.registry.structs:
+                        memberVar = '{0}.{1}'.format(structVar, member.name)
+                        memberTypeStr = '{0}::{1}'.format(struct, member.type)
+                        nestedStructDef = self.registry.structs[member.type]
+                        for nestedMember in nestedStructDef.members.values():
+                            if member.name == 'stdHeaderVersion' and member.type == 'VkExtensionProperties' and nestedMember.name == 'extensionName':
+                                # stdHeaderVersion.extensionName is a special case
+                                gen += '{0}if ({1}.{2}.{3}.limit.has_value()) {{\n'.format(indent, structVar, member.name, nestedMember.name)
+                                gen += '{0}    memset(caps.{1}.{2}.{3}, 0, VK_MAX_EXTENSION_NAME_SIZE - 1);\n'.format(indent, structVar, member.name, nestedMember.name)
+                                gen += '{0}    strncpy(caps.{1}.{2}.{3}, {1}.{2}.{3}.limit.value().c_str(), VK_MAX_EXTENSION_NAME_SIZE - 1);\n'.format(indent, structVar, member.name, nestedMember.name)
+                                gen += '{0}}}\n'.format(indent)
+                            else:
+                                gen += gen_member(nestedMember, memberVar, memberTypeStr)
+                    else:
+                        gen += '{0}if ({1}.{2}.limit.has_value()) caps.{1}.{2} = {1}.{2}.limit.value();\n'.format(indent, structVar, member.name)
+                    return gen
+
+                gen += gen_member(member, structVar, struct)
+
             gen += '        }\n'
             gen += self.generate_platform_protect_end(struct)
         gen += '    }\n'
@@ -4540,16 +4574,7 @@ class VulkanProfilesLayerGenerator():
             gen += '    bool {0}defined_{{false}};\n'.format(structVar)
             gen += '    struct {\n'
             for member in structDef.members.values():
-                limittype = self.get_limittype_class(member.limittype)
-                if member.type in self.registry.structs:
-                    # Structure members need to be expanded
-                    nestedStructDef = self.registry.structs[member.type]
-                    gen += '        struct {\n'
-                    for nestedMember in nestedStructDef.members.values():
-                        gen += '            {0}<{1}> {2}{{}};\n'.format(limittype, nestedMember.type, nestedMember.name)
-                    gen += '        }} {0}{{}};\n'.format(member.name)
-                else:
-                    gen += '        {0}<{1}> {2}{{}};\n'.format(limittype, member.type, member.name)
+                gen += self.generate_video_limit_struct_member(' ' * 8, member)
             gen += '    }} {0}{{}};\n'.format(structVar)
             gen += self.generate_platform_protect_end(struct)
 
@@ -4569,41 +4594,7 @@ class VulkanProfilesLayerGenerator():
             for member in structDef.members.values():
                 gen += '            if ({0}json->isMember("{1}")) {{\n'.format(structVar, member.name)
                 gen += '                const Json::Value &value = (*{0}json)["{1}"];\n'.format(structVar, member.name)
-                if member.type in self.registry.enums:
-                    gen += '                if (!value.isString()) return false;\n'
-                    gen += '                {0}.{1}.limit = static_cast<{2}>(VkStringToUint64(value.asString()));\n'.format(structVar, member.name, member.type)
-                elif member.type in self.registry.bitmasks:
-                    gen += '                if (!value.isArray()) return false;\n'
-                    gen += '                uint64_t mask = 0;\n'
-                    gen += '                for (const auto &entry : value) {\n'
-                    gen += '                    mask |= VkStringToUint64(entry.asString());\n'
-                    gen += '                }\n'
-                    gen += '                {0}.{1}.limit = static_cast<{2}>(mask);\n'.format(structVar, member.name, member.type)
-                elif member.type == 'VkBool32':
-                    gen += '                if (!value.isBool()) return false;\n'
-                    gen += '                {0}.{1}.limit = value.asBool() ? VK_TRUE : VK_FALSE;\n'.format(structVar, member.name)
-                elif member.type in self.int_to_json_type_map:
-                    intType = self.int_to_json_type_map[member.type]
-                    gen += '                if (!value.is{0}()) return false;\n'.format(intType)
-                    gen += '                {0}.{1}.limit = value.as{2}();\n'.format(structVar, member.name, intType)
-                elif member.type in self.registry.structs:
-                    nestedStructDef = self.registry.structs[member.type]
-                    gen += '                if (!value.isObject()) return false;\n'
-                    for nestedMember in nestedStructDef.members.values():
-                        gen += '                if (value.isMember("{0}")) {{\n'.format(nestedMember.name)
-                        gen += '                    const Json::Value &nested_value = value["{0}"];\n'.format(nestedMember.name)
-                        if nestedMember.type in self.registry.enums:
-                            gen += '                    if (!nested_value.isString()) return false;\n'
-                            gen += '                    {0}.{1}.{2}.limit = static_cast<{3}>(VkStringToUint64(nested_value.asString()));\n'.format(structVar, member.name, nestedMember.name, nestedMember.type)
-                        elif nestedMember.type in self.int_to_json_type_map:
-                            intType = self.int_to_json_type_map[nestedMember.type]
-                            gen += '                    if (!nested_value.is{0}()) return false;\n'.format(intType)
-                            gen += '                    {0}.{1}.{2}.limit = nested_value.as{3}();\n'.format(structVar, member.name, nestedMember.name, intType)
-                        else:
-                            gen += '#error Unsupported video profile format type "{0}" in "{1}::{2}::{3}"\n'.format(nestedMember.type, struct, member.name, nestedMember.name)
-                        gen += '                }\n'
-                else:
-                    gen += '#error Unsupported video profile format type "{0}" in "{1}::{2}"\n'.format(member.type, struct, member.name)
+                gen += self.generate_video_limit_struct_member_parser(' ' * 16, 'value', structVar, struct, member)
                 gen += '            }\n'
             gen += '        }\n'
             gen += self.generate_platform_protect_end(struct)
