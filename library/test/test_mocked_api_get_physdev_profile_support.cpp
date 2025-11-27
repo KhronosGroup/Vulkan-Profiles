@@ -24,9 +24,9 @@
 #include <vulkan/vulkan_android.h>
 
 #ifdef WITH_DEBUG_MESSAGES
-#include <vulkan/debug/vulkan_profiles.hpp>
+#include <vulkan/test/debug/vulkan_profiles_test.hpp>
 #else
-#include <vulkan/vulkan_profiles.hpp>
+#include <vulkan/test/vulkan_profiles_test.hpp>
 #endif
 
 TEST(mocked_api_get_physdev_profile_support, vulkan10_supported) {

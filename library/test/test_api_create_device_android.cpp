@@ -23,7 +23,7 @@
 
 #include "test.hpp"
 #include <vulkan/vulkan_android.h>
-#include <vulkan/debug/vulkan_profiles.hpp>
+#include <vulkan/test/debug/vulkan_profiles_test.hpp>
 
 bool IsShieldTv(VkPhysicalDevice pdev) {
     // This identifier should cover ShieldTV and ShieldTVb devices, but not other Tegra devices

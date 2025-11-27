@@ -6646,7 +6646,7 @@ class VulkanProfilesDocGenerator():
                 self.profiles.append(profile)
 
         # Determine maximum core version required across all profiles
-        self.maxRequiredCoreVersion = max(profile.apiVersionNumber for profile in self.profiles)
+        #self.maxRequiredCoreVersion = max(profile.apiVersionNumber for profile in self.profiles)
 
         # Collect extensions required by core versions up to the maximum core version required
         # across all profiles so that we can include related data in the relevant tables
@@ -6654,7 +6654,7 @@ class VulkanProfilesDocGenerator():
         self.coreDeviceExtensions = []
         for extension in self.registry.extensions.values():
             version = self.registry.getExtensionPromotedToVersion(extension.name)
-            if version != None and version.number <= self.maxRequiredCoreVersion:
+            if version != None: # and version.number <= self.maxRequiredCoreVersion:
                 if extension.type == 'instance':
                     self.coreInstanceExtensions.append(extension.name)
                 elif extension.type == 'device':
