@@ -1,0 +1,181 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-301.json#",
+    "capabilities": {
+        "MUST": {
+            "extensions": {
+                "VK_KHR_8bit_storage": 1,
+                "VK_KHR_load_store_op_none": 1,
+                "VK_KHR_maintenance6": 1,
+                "VK_KHR_map_memory2": 1,
+                "VK_KHR_shader_expect_assume": 1,
+                "VK_KHR_shader_float_controls2": 1,
+                "VK_KHR_shader_maximal_reconvergence": 1,
+                "VK_KHR_shader_subgroup_rotate": 1,
+                "VK_KHR_shader_subgroup_uniform_control_flow": 1,
+                "VK_KHR_swapchain_mutable_format": 1,
+                "VK_EXT_host_image_copy": 1,
+                "VK_EXT_image_2d_view_of_3d": 1,
+                "VK_EXT_pipeline_protected_access": 1,
+                "VK_EXT_pipeline_robustness": 1,
+                "VK_EXT_transform_feedback": 1
+            },
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "fullDrawIndexUint32": true,
+                    "shaderInt16": true
+                },
+                "VkPhysicalDeviceVulkan12Features": {
+                    "samplerMirrorClampToEdge": true,
+                    "scalarBlockLayout": true
+                },
+                "VkPhysicalDeviceProtectedMemoryFeatures": {
+                    "protectedMemory": true
+                },
+                "VkPhysicalDeviceShaderIntegerDotProductFeatures": {
+                    "shaderIntegerDotProduct": true
+                },
+                "VkPhysicalDeviceTransformFeedbackFeaturesEXT": {
+                    "transformFeedback": true
+                },
+                "VkPhysicalDeviceImage2DViewOf3DFeaturesEXT": {
+                    "image2DViewOf3D": true
+                },
+                "VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR": {
+                    "shaderSubgroupUniformControlFlow": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "bufferImageGranularity": 4096,
+                        "maxColorAttachments": 8,
+                        "maxComputeWorkGroupInvocations": 256,
+                        "maxComputeWorkGroupSize": [ 256, 256, 64 ],
+                        "maxImageArrayLayers": 2048,
+                        "maxImageDimension1D": 8192,
+                        "maxImageDimension2D": 8192,
+                        "maxImageDimensionCube": 8192,
+                        "maxDescriptorSetStorageBuffers": 96,
+                        "maxDescriptorSetUniformBuffers": 90,
+                        "maxFragmentCombinedOutputResources": 16,
+                        "maxPerStageDescriptorUniformBuffers": 15,
+                        "maxPerStageResources": 200,
+                        "maxSamplerLodBias": 14,
+                        "maxUniformBufferRange": 65536,
+                        "maxVertexOutputComponents": 72,
+                        "mipmapPrecisionBits": 6,
+                        "pointSizeGranularity": 0.125,
+                        "standardSampleLocations": true,
+                        "subTexelPrecisionBits": 8,
+                        "timestampComputeAndGraphics": true
+                    }
+                },
+                "VkPhysicalDeviceFloatControlsProperties": {
+                    "shaderSignedZeroInfNanPreserveFloat16": true,
+                    "shaderSignedZeroInfNanPreserveFloat32": true
+                },
+                "VkPhysicalDeviceVulkan11Properties": {
+                    "subgroupSupportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT"]
+                }
+            }
+        },
+        "multisampledToSingleSampled": {
+            "extensions": {
+                "VK_EXT_multisampled_render_to_single_sampled": 1
+            }
+        },
+        "shaderStencilExport": {
+            "extensions": {
+                "VK_EXT_shader_stencil_export": 1
+            }
+        },
+        "wideLinesEnabledConstrained": {
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "wideLines": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "lineWidthGranularity": 0.5
+                    }
+                }
+            }
+        },
+        "wideLinesDisabledUnconstrained": {
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "wideLines": false
+                }
+            }
+        }
+    },
+    "profiles": {
+        "VP_ANDROID_16_minimums": {
+            "version": 1,
+            "api-version": "1.3.276",
+            "label": "Vulkan Minimum Requirements for Android 16",
+            "description": "Collection of functionality that is mandated on Android 16",
+            "contributors": {
+                "Ian Elliott": {
+                    "company": "Google",
+                    "email": "ianelliott@google.com",
+                    "contact": true
+                }
+            },
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2024-02-20",
+                    "author": "Ian Elliott",
+                    "comment": "First draft"
+                },
+                {
+                    "revision": 2,
+                    "date": "2024-07-22",
+                    "author": "Ian Elliott",
+                    "comment": "Added proposed Vulkan 1.4 scope"
+                },
+                {
+                    "revision": 3,
+                    "date": "2024-11-15",
+                    "author": "Ian Elliott",
+                    "comment": "Delay some requirements that Mali Bifrost chipsets cannot do"
+                },
+                {
+                    "revision": 4,
+                    "date": "2024-12-10",
+                    "author": "Ian Elliott",
+                    "comment": "Delay some requirements that Adreno A6xx chipsets cannot do"
+                },
+                {
+                    "revision": 5,
+                    "date": "2024-12-11",
+                    "author": "Ian Elliott",
+                    "comment": "Delay VK_EXT_device_fault"
+                },
+                {
+                    "revision": 6,
+                    "date": "2024-12-11",
+                    "author": "Ian Elliott",
+                    "comment": "Delay a requirement that IMG BXM-8-256 chipsets cannot do"
+                },
+                {
+                    "revision": 7,
+                    "date": "2025-09-30",
+                    "author": "Anjana Sherin",
+                    "comment": "Conditional validation of wideLines and lineWidthGranularity"
+                }
+            ],
+            "profiles": [
+                "VP_ANDROID_15_minimums"
+             ],
+             "capabilities": [
+                "MUST",
+                ["multisampledToSingleSampled", "shaderStencilExport"],
+                ["wideLinesEnabledConstrained", "wideLinesDisabledUnconstrained"]
+            ]
+        }
+    }
+}

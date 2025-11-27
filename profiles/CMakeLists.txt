@@ -130,8 +130,7 @@ add_custom_target(VpGeneratedAndroidDoc
     COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-        --input ${CMAKE_CURRENT_LIST_DIR}
-        --input-filenames ${PROFILES_FILES_FOR_ANDROID_DOC}
+        --input ${CMAKE_CURRENT_LIST_DIR}/Android
         --output-doc ${PROJECT_SOURCE_DIR}/PROFILES_ANDROID.md
         --validate
     VERBATIM
