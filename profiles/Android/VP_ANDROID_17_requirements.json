@@ -1,0 +1,223 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-335.json#",
+    "capabilities": {
+        "MUST": {
+            "extensions": {
+                "VK_KHR_maintenance7": 1,
+                "VK_KHR_maintenance8": 1,
+                "VK_KHR_maintenance9": 1,
+                "VK_KHR_pipeline_binary": 1,
+                "VK_KHR_pipeline_library": 1,
+                "VK_KHR_present_id2": 1,
+                "VK_KHR_present_wait2": 1,
+                "VK_KHR_shader_maximal_reconvergence": 1,
+                "VK_KHR_shader_quad_control": 1,
+                "VK_KHR_shader_subgroup_uniform_control_flow": 1,
+                "VK_KHR_swapchain_mutable_format": 1,
+                "VK_KHR_workgroup_memory_explicit_layout": 1,
+                "VK_EXT_calibrated_timestamps": 1,
+                "VK_EXT_custom_border_color": 1,
+                "VK_EXT_debug_utils": 1,
+                "VK_EXT_descriptor_indexing": 1,
+                "VK_EXT_device_address_binding_report": 1,
+                "VK_EXT_device_memory_report": 1,
+                "VK_EXT_external_memory_acquire_unmodified": 1,
+                "VK_EXT_graphics_pipeline_library": 1,
+                "VK_EXT_hdr_metadata": 1,
+                "VK_EXT_image_2d_view_of_3d": 1,
+                "VK_EXT_image_compression_control": 1,
+                "VK_EXT_image_compression_control_swapchain": 1,
+                "VK_EXT_present_mode_fifo_latest_ready": 1,
+                "VK_EXT_present_timing": 1,
+                "VK_EXT_primitive_topology_list_restart": 1,
+                "VK_EXT_provoking_vertex": 1,
+                "VK_EXT_surface_maintenance1": 1,
+                "VK_EXT_swapchain_maintenance1": 1,
+                "VK_EXT_transform_feedback": 1,
+                "VK_ANDROID_external_format_resolve": 1,
+                "VK_GOOGLE_surfaceless_query": 1
+            },
+            "features": {
+                "VkPhysicalDevice16BitStorageFeatures": {
+                    "storageInputOutput16": true,
+                    "uniformAndStorageBuffer16BitAccess": true
+                },
+                "VkPhysicalDeviceCustomBorderColorFeaturesEXT": {
+                    "customBorderColors": true
+                },
+                "VkPhysicalDeviceDescriptorIndexingFeaturesEXT": {
+                    "descriptorBindingVariableDescriptorCount": true
+                },
+                "VkPhysicalDeviceFeatures": {
+                    "dualSrcBlend": true,
+                    "multiDrawIndirect": true,
+                    "shaderInt64": true,
+                    "shaderStorageImageWriteWithoutFormat": true
+                },
+                "VkPhysicalDeviceProtectedMemoryFeatures": {
+                    "protectedMemory": true
+                },
+                "VkPhysicalDeviceShaderAtomicInt64Features": {
+                    "shaderBufferInt64Atomics": true
+                },
+                "VkPhysicalDeviceShaderFloat16Int8Features": {
+                    "shaderFloat16": true
+                },
+                "VkPhysicalDeviceVulkan12Features": {
+                    "descriptorBindingVariableDescriptorCount": true,
+                    "shaderFloat16": true
+                },
+                "VkPhysicalDeviceVulkan14Features": {
+                    "hostImageCopy": true
+                }
+              },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxDescriptorSetStorageImages": 144
+                    }
+                },
+                "VkPhysicalDeviceVulkan11Properties": {
+                    "subgroupSupportedStages": ["VK_SHADER_STAGE_FRAGMENT_BIT"]
+                }
+              },
+              "formats": {
+                "VK_FORMAT_A4B4G4R4_UNORM_PACK16_EXT": {
+                  "VkFormatProperties": {
+                    "linearTilingFeatures": [
+                      "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
+                      "VK_FORMAT_FEATURE_BLIT_DST_BIT",
+                      "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                      "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                    ],
+                    "optimalTilingFeatures": [
+                      "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                      "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
+                      "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
+                      "VK_FORMAT_FEATURE_BLIT_DST_BIT",
+                      "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                      "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                    ],
+                    "bufferFeatures": []
+                  }
+                },
+                "VK_FORMAT_A4R4G4B4_UNORM_PACK16_EXT": {
+                  "VkFormatProperties": {
+                    "linearTilingFeatures": [
+                      "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
+                      "VK_FORMAT_FEATURE_BLIT_DST_BIT",
+                      "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                      "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                    ],
+                    "optimalTilingFeatures": [
+                      "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                      "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
+                      "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
+                      "VK_FORMAT_FEATURE_BLIT_DST_BIT",
+                      "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+                      "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
+                    ],
+                    "bufferFeatures": []
+                  }
+                }
+              }
+            },
+            "primitivesGeneratedQuery": {
+              "extensions": {
+                "VK_EXT_primitives_generated_query": 1
+              },
+              "features": {
+                "VkPhysicalDevicePrimitivesGeneratedQueryFeaturesEXT": {
+                  "primitivesGeneratedQuery": true
+                }
+              }
+            },
+            "pipelineStatisticsQuery": {
+              "features": {
+                "VkPhysicalDeviceFeatures": {
+                  "pipelineStatisticsQuery": true
+                }
+              }
+            },
+            "multisampledToSingleSampled": {
+              "extensions": {
+                "VK_EXT_multisampled_render_to_single_sampled": 1
+              }
+            },
+            "shaderStencilExport": {
+              "extensions": {
+                "VK_EXT_shader_stencil_export": 1
+              }
+        }
+    },
+    "profiles": {
+        "VP_ANDROID_17_requirements": {
+            "version": 4,
+            "api-version": "1.4.335",
+            "label": "Vulkan Minimum Requirements for Android 17",
+            "description": "Collection of functionality that is mandated for chipsets that launch (or renew Google Requirements Freeze) on Android 17",
+            "contributors": {
+                "Paresh Goel": {
+                    "company": "Google",
+                    "email": "pareshgoel@google.com",
+                    "contact": true
+                },
+                "Siddhartha Basu": {
+                    "company": "Google",
+                    "email": "siddharthabasu@google.com",
+                    "contact": true
+                },
+                "Ian Elliott": {
+                    "company": "Google",
+                    "email": "ianelliott@google.com",
+                    "contact": true
+                },
+                "Nate Trost": {
+                    "company": "Google",
+                    "email": "natetrost@google.com",
+                    "contact": true
+                }
+            },
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2025-07-28",
+                    "author": "Ian Elliott",
+                    "comment": "First draft"
+                },
+                {
+                    "revision": 2,
+                    "date": "2025-10-07",
+                    "author": "Paresh Goel",
+                    "comment": "Second draft"
+                },
+                {
+                    "revision": 3,
+                    "date": "2025-11-18",
+                    "author": "Paresh Goel",
+                    "comment": "Updated Profile based on partner feedbacks"
+                },
+                {
+                    "revision": 4,
+                    "date": "2025-12-02",
+                    "author": "Ian Elliott",
+                    "comment": "Renamed/rebranded from 'VP_ANDROID_17_minimums' (a.k.a. Vulkan Profile for Android 17 or VPA17) to 'VP_ANDROID_17_requirements' (a.k.a. Vulkan Requirements for Android 17 or VRA17)"
+                }
+            ],
+            "capabilities": [
+                "MUST",
+            [
+                  "primitivesGeneratedQuery",
+                  "pipelineStatisticsQuery"
+                ],
+                [
+                  "multisampledToSingleSampled",
+                  "shaderStencilExport"
+                ]
+              ],
+            "profiles": [
+                "VP_ANDROID_vulkan_profile_2025"
+             ]
+        }
+  }
+}
