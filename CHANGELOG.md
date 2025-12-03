@@ -11,7 +11,12 @@
 
 # Release Notes
 
-## [Vulkan Profiles Tools 1.4.XXX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - October 2025
+## [Vulkan Profiles Tools 1.4.335](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.335.0) - October 2025
+
+### Improvements:
+- Trivial Vulkan Header update release
+
+## [Vulkan Profiles Tools 1.4.328](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.328.0) - October 2025
 
 ### Deprecation:
 - Deprecate layer forced physical device, replaced by the Vulkan loader settings and Vulkan Configurator Vulkan Drivers tab
