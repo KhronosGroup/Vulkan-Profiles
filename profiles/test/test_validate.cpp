@@ -294,3 +294,52 @@ TEST(test_validate, VP_ANDROID_16_minimums) {
     const Json::Value json_document3 = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(json_document3));
 }
+
+TEST(test_validate, VP_ANDROID_vulkan_profile_2021) {
+    JsonValidator validator;
+
+    const std::string path = std::string(PROFILE_FILES_PATH) + "Android/VP_ANDROID_vulkan_profile_2021.json";
+    const Json::Value json_document3 = ParseJsonFile(path.c_str());
+    EXPECT_TRUE(validator.Check(json_document3));
+}
+
+TEST(test_validate, VP_ANDROID_vulkan_profile_2022) {
+    JsonValidator validator;
+
+    const std::string path = std::string(PROFILE_FILES_PATH) + "Android/VP_ANDROID_vulkan_profile_2022.json";
+    const Json::Value json_document3 = ParseJsonFile(path.c_str());
+    EXPECT_TRUE(validator.Check(json_document3));
+}
+
+TEST(test_validate, VP_ANDROID_vulkan_profile_2025) {
+    JsonValidator validator;
+
+    const std::string path = std::string(PROFILE_FILES_PATH) + "Android/VP_ANDROID_vulkan_profile_2025.json";
+    const Json::Value json_document3 = ParseJsonFile(path.c_str());
+    EXPECT_TRUE(validator.Check(json_document3));
+}
+
+TEST(test_validate, VP_ANDROID_15_requirements) {
+    JsonValidator validator;
+
+    const std::string path = std::string(PROFILE_FILES_PATH) + "Android/VP_ANDROID_15_requirements.json";
+    const Json::Value json_document3 = ParseJsonFile(path.c_str());
+    EXPECT_TRUE(validator.Check(json_document3));
+}
+
+TEST(test_validate, VP_ANDROID_16_requirements) {
+    JsonValidator validator;
+
+    const std::string path = std::string(PROFILE_FILES_PATH) + "Android/VP_ANDROID_16_requirements.json";
+    const Json::Value json_document3 = ParseJsonFile(path.c_str());
+    EXPECT_TRUE(validator.Check(json_document3));
+}
+
+TEST(test_validate, VP_ANDROID_17_requirements) {
+    JsonValidator validator;
+
+    const std::string path = std::string(PROFILE_FILES_PATH) + "Android/VP_ANDROID_17_requirements.json";
+    const Json::Value json_document3 = ParseJsonFile(path.c_str());
+    EXPECT_TRUE(validator.Check(json_document3));
+}
+

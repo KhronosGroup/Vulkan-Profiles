@@ -9,14 +9,19 @@ set(PROFILES_FILES_FOR_INSTALL
     VP_KHR_roadmap.json
     VP_LUNARG_minimum_requirements.json
     VP_LUNARG_desktop_baseline.json
-    VP_ANDROID_baseline_2021.json
-    VP_ANDROID_baseline_2022.json
-    VP_ANDROID_15_minimums.json
-    VP_ANDROID_16_minimums.json
+    Android/VP_ANDROID_vulkan_profile_2021.json
+    Android/VP_ANDROID_vulkan_profile_2022.json
+    Android/VP_ANDROID_vulkan_profile_2025.json
+    VP_ANDROID_baseline_2021.json # Deprecated
+    VP_ANDROID_baseline_2022.json # Deprecated
 )
 
 set(PROFILES_FILES_FOR_API_LIBRARY
-    "VP_KHR_roadmap.json,VP_LUNARG_minimum_requirements.json,VP_ANDROID_baseline_2021.json,VP_ANDROID_baseline_2022.json,VP_ANDROID_15_minimums.json,VP_ANDROID_16_minimums.json,VP_LUNARG_desktop_baseline.json"
+    "VP_KHR_roadmap.json,VP_LUNARG_minimum_requirements.json,VP_LUNARG_desktop_baseline.json"
+)
+
+set(PROFILES_FILES_FOR_API_LIBRARY_TEST
+    "VP_KHR_roadmap.json,VP_LUNARG_minimum_requirements.json,VP_ANDROID_baseline_2021.json,VP_ANDROID_baseline_2022.json,VP_LUNARG_desktop_baseline.json"
 )
 
 set(PROFILES_FILES_FOR_VULKAN_HEADER_DOC
@@ -24,7 +29,7 @@ set(PROFILES_FILES_FOR_VULKAN_HEADER_DOC
 )
 
 set(PROFILES_FILES_FOR_ANDROID_DOC
-    "VP_ANDROID_16_minimums.json,VP_ANDROID_15_minimums.json,VP_ANDROID_baseline_2022.json,VP_ANDROID_baseline_2021.json,VP_LUNARG_minimum_requirements.json"
+    "VP_ANDROID_15_requirements.json,VP_ANDROID_16_requirements.json,VP_ANDROID_17_requirements.json,VP_ANDROID_vulkan_profile_2021.json,VP_ANDROID_vulkan_profile_2022.json,VP_ANDROID_vulkan_profile_2025.json"
 )
 
 set(PROFILE_DESKTOP_MAX_2024_LABEL "LunarG Vulkan Desktop Max 2024 profile")
@@ -95,9 +100,48 @@ add_custom_target(VpGenerated
     COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_LIST_DIR}/Android
+        --input-filenames VP_ANDROID_vulkan_profile_2021.json
+        --output-library-inc ${PROJECT_SOURCE_DIR}/library/test
+        --output-library-src ${PROJECT_SOURCE_DIR}/library/test
+        --output-library-filename "generated_vulkan_profiles_android"
+        --config release
+    COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
+        --api ${API_TYPE}
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_LIST_DIR}
+        --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY_TEST}
+        --output-library-inc ${PROJECT_SOURCE_DIR}/library/test
+        --output-library-src ${PROJECT_SOURCE_DIR}/library/test
+        --output-library-filename "generated_vulkan_profiles"
+        --config release
+    COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
+        --api ${API_TYPE}
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_LIST_DIR}
+        --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY_TEST}
+        --output-library-inc ${PROJECT_SOURCE_DIR}/library/test
+        --output-library-src ${PROJECT_SOURCE_DIR}/library/test
+        --output-library-filename "generated_vulkan_profiles_debug"
+        --config debug
+    COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
+        --api ${API_TYPE}
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_LIST_DIR}
+        --input-filenames ${PROFILES_FILES_FOR_VULKAN_HEADER_DOC}
+        --output-doc ${PROJECT_SOURCE_DIR}/PROFILES.md
+    COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
+        --api ${API_TYPE}
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
         --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY}
         --output-doc ${PROJECT_SOURCE_DIR}/PROFILES_ALL.md
+    COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
+        --api ${API_TYPE}
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_LIST_DIR}/Android
+        --input-filenames ${PROFILES_FILES_FOR_ANDROID_DOC}
+        --output-doc ${PROJECT_SOURCE_DIR}/PROFILES_ANDROID.md
     VERBATIM
     SOURCES ${SOLUTION_SCRIPT} ${PROFILES_FILES}
     DEPENDS ${SOLUTION_SCRIPT} ${PROFILES_FILES})
@@ -105,42 +149,6 @@ add_custom_target(VpGenerated
 set_target_properties(VpGenerated PROPERTIES FOLDER "Profiles generator")
 
 add_dependencies(VpGenerated VpCreateDesktopBaseline VpCreateDesktopMax2024)
-
-add_custom_target(VpGeneratedVulkanHeaderProfilesDoc
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/schema
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/profiles ${CMAKE_CURRENT_LIST_DIR}
-    COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
-        --api ${API_TYPE}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-        --input ${CMAKE_CURRENT_LIST_DIR}
-        --input-filenames ${PROFILES_FILES_FOR_VULKAN_HEADER_DOC}
-        --output-doc ${PROJECT_SOURCE_DIR}/PROFILES.md
-        --validate
-    VERBATIM
-    SOURCES ${SOLUTION_SCRIPT} ${PROFILES_FILES}
-    DEPENDS ${SOLUTION_SCRIPT} ${PROFILES_FILES})
-
-set_target_properties(VpGeneratedVulkanHeaderProfilesDoc PROPERTIES FOLDER "Profiles generator")
-
-add_dependencies(VpGeneratedVulkanHeaderProfilesDoc VpGenerated)
-
-add_custom_target(VpGeneratedAndroidDoc
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/schema
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/profiles ${CMAKE_CURRENT_LIST_DIR}
-    COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
-        --api ${API_TYPE}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-        --input ${CMAKE_CURRENT_LIST_DIR}
-        --input-filenames ${PROFILES_FILES_FOR_ANDROID_DOC}
-        --output-doc ${PROJECT_SOURCE_DIR}/PROFILES_ANDROID.md
-        --validate
-    VERBATIM
-    SOURCES ${SOLUTION_SCRIPT} ${PROFILES_FILES}
-    DEPENDS ${SOLUTION_SCRIPT} ${PROFILES_FILES})
-
-set_target_properties(VpGeneratedAndroidDoc PROPERTIES FOLDER "Profiles generator")
-
-add_dependencies(VpGeneratedAndroidDoc VpGenerated)
 
 add_custom_target(VpTestIntersect ALL
     COMMAND Python3::Interpreter ${MERGE_SCRIPT}

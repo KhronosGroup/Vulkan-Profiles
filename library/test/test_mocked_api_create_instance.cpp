@@ -22,7 +22,7 @@
 
 #include "mock_vulkan_api.hpp"
 #include <vulkan/vulkan_android.h>
-#include <vulkan/vulkan_profiles.hpp>
+#include "generated_vulkan_profiles.hpp"
 
 static void initInstanceExtensions(const VpProfileProperties& profile, std::vector<VkExtensionProperties>& properties,
                                    std::vector<const char*>& outExtensions) {

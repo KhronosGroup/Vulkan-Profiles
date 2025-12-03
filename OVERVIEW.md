@@ -45,18 +45,37 @@ The *Vulkan Profiles Toolset* includes the following components:
 - [***The Vulkan Profiles Comparison Table***](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_definitions.html)
   - Human-readable format of *Vulkan Profiles* in a table to enable comparison.
 
-Furthermore, the *Vulkan SDK* includes implementations of some *Vulkan Profiles* using the *Vulkan Profiles JSON Schema*:
+## Vulkan Profiles Files
+
+The repository contains implementations of some *Vulkan Profiles* using the *Vulkan Profiles JSON Schema*.
+
+The Khronos Roadmap profiles expose advanced features initially found in higher-end GPUs, but will become widely available in mid-to-high-end GPUs during the lifetime of that specification:
 - [VP_KHR_roadmap_2024](https://github.com/KhronosGroup/Vulkan-Headers/blob/main/registry/profiles/VP_KHR_roadmap.json) (Vulkan 1.3)
 - [VP_KHR_roadmap_2022](https://github.com/KhronosGroup/Vulkan-Headers/blob/main/registry/profiles/VP_KHR_roadmap.json) (Vulkan 1.3)
-- [VP_ANDROID_baseline_2022](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_ANDROID_baseline_2022.json) (Vulkan 1.1)
-- [VP_ANDROID_baseline_2021](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_ANDROID_baseline_2021.json) (Vulkan 1.0)
-- VP_LUNARG_desktop_baseline_2024 (Vulkan 1.2)
-- VP_LUNARG_desktop_baseline_2023 (Vulkan 1.2)
-- VP_LUNARG_desktop_baseline_2022 (Vulkan 1.1)
 
-The `VP_LUNARG_desktop_baseline` profiles are created as examples of *Platform* profiles. Vulkan application developers should create *Platform* profiles dedicated to their Vulkan applications that match the ecosystem of devices they want the Vulkan applications to run on.
+The Android Vulkan Profiles are collection of functionality that is broadly supported on Android:
+- [VP_ANDROID_vulkan_profile_2025](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/Android/VP_ANDROID_vulkan_profile_2025.json) (Vulkan 1.1)
+- [VP_ANDROID_vulkan_profile_2022](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/Android/VP_ANDROID_vulkan_profile_2022.json) (Vulkan 1.1)
+- [VP_ANDROID_vulkan_profile_2021](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/Android/VP_ANDROID_vulkan_profile_2021.json) (Vulkan 1.0)
 
-Within the *Vulkan SDK*, the Vulkan Profiles files are located at `$(VULKAN_SDK)/Config/VK_LAYER_KHRONOS_profiles`.
+The VP_ANDROID_baseline_2022 profile has been deprecated by Android, rebranded into the VP_ANDROID_vulkan_profile_2022 profile.
+The VP_ANDROID_baseline_2021 profile has been deprecated by Android, rebranded into the VP_ANDROID_vulkan_profile_2021 profile.
+
+The Vulkan Requirement for Android profiles Collection of functionality that is mandated for chipsets that launch (or renew Google Requirements Freeze) on Android:
+
+- [VP_ANDROID_17_requirements](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/Android/VP_ANDROID_17_requirements.json) (Vulkan 1.4)
+- [VP_ANDROID_16_requirements](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/Android/VP_ANDROID_16_requirements.json) (Vulkan 1.3)
+- [VP_ANDROID_15_requirements](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/Android/VP_ANDROID_15_requirements.json) (Vulkan 1.3)
+
+The VP_ANDROID_16_minimums profile has been deprecated by Android, rebranded into the VP_ANDROID_16_requirements profile.
+The VP_ANDROID_15_minimums profile has been deprecated by Android, rebranded into the VP_ANDROID_15_requirements profile.
+
+The `VP_LUNARG_desktop_baseline` profiles are generated arbritarily as examples of *Platform* profiles from hand picked Vulkan devices profiles. They are not expected to be used by Vulkan applications as defined. Instead, Vulkan application developers should create *Platform* profiles dedicated to their Vulkan applications that match the ecosystem of devices they want the Vulkan applications to run on.
+- [VP_LUNARG_desktop_baseline_2024](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_LUNARG_desktop_baseline_2024) (Vulkan 1.2)
+- [VP_LUNARG_desktop_baseline_2023](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_LUNARG_desktop_baseline_2023) (Vulkan 1.2)
+- [VP_LUNARG_desktop_baseline_2022](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_LUNARG_desktop_baseline_2022) (Vulkan 1.1)
+
+The Vulkan Profiles files shipping within the *Vulkan SDK* are located at `$(VULKAN_SDK)/Config/VK_LAYER_KHRONOS_profiles`.
 
 ## Vulkan Profiles Tools Code Generation
 

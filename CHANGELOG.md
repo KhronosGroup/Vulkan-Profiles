@@ -11,6 +11,12 @@
 
 # Release Notes
 
+## [Vulkan Profiles Tools 1.4.XXX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.XXX.0) - February 2026
+
+### Features:
+- Add VP_ANDROID_17_requirements and VP_ANDROID_vulkan_profile_2025 profiles
+- Add Android Rebranded profiles
+
 ## [Vulkan Profiles Tools 1.4.335](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.335.0) - October 2025
 
 ### Improvements:
