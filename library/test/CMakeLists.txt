@@ -167,9 +167,7 @@ function (add_unit_test_simple_android_apk NAME)
 
     add_definitions(-DVK_USE_PLATFORM_ANDROID_KHR)
     add_library(${TEST_NAME_HO} SHARED
-                ${TEST_FILE}
-                ${vulkan_profiles_source}
-                )
+                ${TEST_FILE})
     create_android_package(${TEST_NAME_HO})
 
     target_include_directories(${TEST_NAME_HO} PUBLIC "${vulkan-headers_SOURCE_DIR}/include")

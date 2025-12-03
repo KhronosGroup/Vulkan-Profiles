@@ -23,7 +23,7 @@
 
 #include "test.hpp"
 #include <vulkan/vulkan_android.h>
-#include <vulkan/debug/vulkan_profiles.hpp>
+#include "generated_vulkan_profiles_android.hpp"
 
 bool IsShieldTv(VkPhysicalDevice pdev) {
     // This identifier should cover ShieldTV and ShieldTVb devices, but not other Tegra devices
@@ -254,7 +254,7 @@ void android_main(struct android_app *app) {
 TEST(library_api, vpCreateDevice) {
     TestScaffold scaffold;
 
-    const VpProfileProperties profile = {VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION};
+    const VpProfileProperties profile = {VP_ANDROID_VULKAN_PROFILE_2021_NAME, VP_ANDROID_VULKAN_PROFILE_2021_SPEC_VERSION};
 
     VkDeviceCreateInfo info = {};
     info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -292,7 +292,7 @@ TEST(library_api, vpGetPhysicalDeviceProfileSupport) {
         return;
     }
 
-    VpProfileProperties profile{VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION};
+    VpProfileProperties profile{VP_ANDROID_VULKAN_PROFILE_2021_NAME, VP_ANDROID_VULKAN_PROFILE_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
     vpGetPhysicalDeviceProfileSupport(scaffold.instance, scaffold.physicalDevice, &profile, &supported);

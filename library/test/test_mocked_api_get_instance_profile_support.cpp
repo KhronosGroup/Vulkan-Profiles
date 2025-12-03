@@ -24,9 +24,9 @@
 #include <vulkan/vulkan_android.h>
 
 #ifdef WITH_DEBUG_MESSAGES
-#include <vulkan/debug/vulkan_profiles.hpp>
+#include "generated_vulkan_profiles_debug.hpp"
 #else
-#include <vulkan/vulkan_profiles.hpp>
+#include "generated_vulkan_profiles.hpp"
 #endif
 
 TEST(mocked_api_get_instance_profile_support, vulkan10_supported) {
