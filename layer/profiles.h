@@ -72,7 +72,5 @@ std::string GetDebugReportsLog(DebugActionFlags flags);
 #define kLayerSettingsExcludeFormats "exclude_formats"
 #define kLayerSettingsDefaultFeatureValues "default_feature_values"
 #define kLayerSettingsUnknownFeatureValues "unknown_feature_values"
-#define kLayerSettingsForceDevice "force_device"
-#define kLayerSettingsForceDeviceUUID "force_device_uuid"
-#define kLayerSettingsForceDeviceName "force_device_name"
+
 

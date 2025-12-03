@@ -170,18 +170,6 @@ void LogFlush(ProfileLayerSettings *layer_settings) {
     }
 }
 
-static ForceDevice GetForceDevice(const std::string &value) {
-    if (value == "FORCE_DEVICE_OFF") {
-        return FORCE_DEVICE_OFF;
-    } else if (value == "FORCE_DEVICE_WITH_UUID") {
-        return FORCE_DEVICE_WITH_UUID;
-    } else if (value == "FORCE_DEVICE_WITH_NAME") {
-        return FORCE_DEVICE_WITH_NAME;
-    }
-
-    return FORCE_DEVICE_OFF;
-}
-
 static std::vector<std::string> Split(const std::string &value, const std::string &delimiter) {
     std::vector<std::string> result;
 
@@ -245,10 +233,7 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
                                               kLayerSettingsExcludeDeviceExtensions,
                                               kLayerSettingsExcludeFormats,
                                               kLayerSettingsDefaultFeatureValues,
-                                              kLayerSettingsUnknownFeatureValues,
-                                              kLayerSettingsForceDevice,
-                                              kLayerSettingsForceDeviceUUID,
-                                              kLayerSettingsForceDeviceName};
+                                              kLayerSettingsUnknownFeatureValues};
         uint32_t setting_name_count = static_cast<uint32_t>(std::size(setting_names));
 
         std::vector<const char *> unknown_settings;
@@ -401,20 +386,6 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
         if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_minVertexInputBindingStrideAlignment)) {
             vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_minVertexInputBindingStrideAlignment,
                                     layer_settings->portability.minVertexInputBindingStrideAlignment);
-        }
-    }
-
-    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsForceDevice)) {
-        std::string value;
-        vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsForceDevice, value);
-        layer_settings->device.force_device = GetForceDevice(ToUpper(value));
-
-        if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsForceDeviceUUID)) {
-            vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsForceDeviceUUID, layer_settings->device.force_device_uuid);
-        }
-
-        if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsForceDeviceName)) {
-            vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsForceDeviceName, layer_settings->device.force_device_name);
         }
     }
 
