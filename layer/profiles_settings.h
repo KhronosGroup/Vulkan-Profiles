@@ -167,12 +167,6 @@ static std::string GetUnknownFeatureValuesString(UnknownFeatureValues value) {
     return "UNKNOWN_FEATURE_VALUES_UNCHANGED";
 }
 
-enum ForceDevice {
-    FORCE_DEVICE_OFF = 0,
-    FORCE_DEVICE_WITH_UUID,
-    FORCE_DEVICE_WITH_NAME
-};
-
 struct ProfileLayerSettings {
     ~ProfileLayerSettings() {
         if (log.profiles_log_file != nullptr) {
@@ -222,12 +216,6 @@ struct ProfileLayerSettings {
         bool debug_fail_on_error{false};
         FILE *profiles_log_file{nullptr};
     } log;
-
-    struct Device {
-        ForceDevice force_device{FORCE_DEVICE_OFF};
-        std::string force_device_uuid;
-        std::string force_device_name;
-    } device;
 };
 
 void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,

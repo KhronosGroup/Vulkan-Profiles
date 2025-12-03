@@ -33,7 +33,6 @@ elseif(APPLE)
         tests_mechanism
         tests_mechanism_format
         tests_mechanism_check_values
-        tests_mechanism_physical_device_selection
         tests_util
     )
 else()
@@ -45,7 +44,6 @@ else()
         tests_mechanism_format
         tests_mechanism_api_version
         tests_mechanism_check_values
-        tests_mechanism_physical_device_selection
         tests_mechanism_video_profiles
         tests_combine_union
         tests_combine_intersection

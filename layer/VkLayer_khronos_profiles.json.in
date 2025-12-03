@@ -34,10 +34,6 @@
                     "status": "STABLE",
                     "settings": [
                         {
-                            "key": "force_device",
-                            "value": "FORCE_DEVICE_OFF"
-                        },
-                        {
                             "key": "profile_emulation",
                             "value": true
                         },
@@ -65,10 +61,6 @@
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
                     "status": "STABLE",
                     "settings": [
-                        {
-                            "key": "force_device",
-                            "value": "FORCE_DEVICE_OFF"
-                        },
                         {
                             "key": "profile_emulation",
                             "value": true
@@ -125,74 +117,6 @@
                 }
             ],
             "settings": [
-                {
-                    "key": "force_device",
-                    "label": "Force Device",
-                    "description": "On system with multiple physical devices, force the use of one specific physical device.",
-                    "status": "DEPRECATED",
-                    "view": "HIDDEN",
-                    "type": "ENUM",
-                    "default": "FORCE_DEVICE_OFF",
-                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                    "flags": [
-                        {
-                            "key": "FORCE_DEVICE_OFF",
-                            "label": "Off",
-                            "description": "Let the Vulkan Loader list all the Physical Device."
-                        },
-                        {
-                            "key": "FORCE_DEVICE_WITH_UUID",
-                            "label": "Using Device UUID",
-                            "description": "Force the Physical Device identified by the device UUID.",
-                            "settings": [
-                                {
-                                    "key": "force_device_uuid",
-                                    "label": "Device UUID",
-                                    "description": "Device UUID of the forced physical devices",
-                                    "status": "STABLE",
-                                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                                    "type": "STRING",
-                                    "default": "",
-                                    "dependence": {
-                                        "mode": "ALL",
-                                        "settings": [
-                                            {
-                                                "key": "force_device",
-                                                "value": "FORCE_DEVICE_WITH_UUID"
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            "key": "FORCE_DEVICE_WITH_NAME",
-                            "label": "Using Device Name",
-                            "description": "Force the Physical Device identified by the device UUID.",
-                            "settings": [
-                                {
-                                    "key": "force_device_name",
-                                    "label": "Device Name",
-                                    "description": "Device Name of the forced physical devices",
-                                    "status": "STABLE",
-                                    "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
-                                    "type": "ENUM",
-                                    "flags": [],
-                                    "default": "${VP_PHYSICAL_DEVICES}",
-                                    "dependence": {
-                                        "mode": "ALL",
-                                        "settings": [
-                                            {
-                                                "key": "force_device",
-                                                "value": "FORCE_DEVICE_WITH_NAME"
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        }
-                    ]
-                },
                 {
                     "key": "profile_emulation",
                     "label": "Emulate a Vulkan Profile",
