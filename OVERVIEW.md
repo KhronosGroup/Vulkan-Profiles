@@ -50,6 +50,7 @@ The *Vulkan Profiles Toolset* includes the following components:
 The repository contains implementations of some *Vulkan Profiles* using the *Vulkan Profiles JSON Schema*.
 
 The Khronos Roadmap profiles expose advanced features initially found in higher-end GPUs, but will become widely available in mid-to-high-end GPUs during the lifetime of that specification:
+- [VP_KHR_roadmap_2026](https://github.com/KhronosGroup/Vulkan-Headers/blob/main/registry/profiles/VP_KHR_roadmap.json) (Vulkan 1.3)
 - [VP_KHR_roadmap_2024](https://github.com/KhronosGroup/Vulkan-Headers/blob/main/registry/profiles/VP_KHR_roadmap.json) (Vulkan 1.3)
 - [VP_KHR_roadmap_2022](https://github.com/KhronosGroup/Vulkan-Headers/blob/main/registry/profiles/VP_KHR_roadmap.json) (Vulkan 1.3)
 
