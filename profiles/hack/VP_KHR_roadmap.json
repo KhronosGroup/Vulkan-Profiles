@@ -279,6 +279,46 @@
                 "VK_KHR_map_memory2": 1,
                 "VK_KHR_maintenance5": 1,
                 "VK_KHR_push_descriptor": 1
+            },
+            "features": {
+                "VkPhysicalDeviceDynamicRenderingLocalReadFeaturesKHR": {
+                    "dynamicRenderingLocalRead": true
+                },
+                "VkPhysicalDeviceShaderQuadControlFeaturesKHR": {
+                    "shaderQuadControl": true
+                },
+                "VkPhysicalDeviceShaderMaximalReconvergenceFeaturesKHR": {
+                    "shaderMaximalReconvergence": true
+                },
+                "VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR": {
+                    "shaderSubgroupUniformControlFlow": true
+                },
+                "VkPhysicalDeviceShaderSubgroupRotateFeaturesKHR": {
+                    "shaderSubgroupRotate": true
+                },
+                "VkPhysicalDeviceShaderFloatControls2FeaturesKHR": {
+                    "shaderFloatControls2": true
+                },
+                "VkPhysicalDeviceShaderExpectAssumeFeaturesKHR": {
+                    "shaderExpectAssume": true
+                },
+                "VkPhysicalDeviceLineRasterizationFeaturesKHR": {
+                    "rectangularLines": true,
+                    "bresenhamLines": true,
+                    "smoothLines": true,
+                    "stippledRectangularLines": true,
+                    "stippledBresenhamLines": true,
+                    "stippledSmoothLines": true
+                },
+                "VkPhysicalDeviceVertexAttributeDivisorFeaturesKHR": {
+                    "vertexAttributeInstanceRateDivisor": true
+                },
+                "VkPhysicalDeviceIndexTypeUint8FeaturesKHR": {
+                    "indexTypeUint8": true
+                },
+                "VkPhysicalDeviceMaintenance5FeaturesKHR": {
+                    "maintenance5": true
+                }
             }
         },
         "vulkan10requirements_roadmap2026": {
@@ -354,6 +394,54 @@
                     "robustBufferAccess2": true,
                     "robustImageAccess2": true,
                     "nullDescriptor": true
+                },
+                "VkPhysicalDevicePipelineBinaryFeaturesKHR": {
+                    "pipelineBinaries": true
+                },
+                "VkPhysicalDeviceFragmentShadingRateFeaturesKHR": {
+                    "pipelineFragmentShadingRate": true
+                },
+                "VkPhysicalDeviceShaderClockFeaturesKHR": {
+                    "shaderSubgroupClock": true
+                },
+                "VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR": {
+                    "workgroupMemoryExplicitLayout": true
+                },
+                "VkPhysicalDeviceComputeShaderDerivativesFeaturesKHR": {
+                    "computeDerivativeGroupLinear": true
+                },
+                "VkPhysicalDeviceMaintenance7FeaturesKHR": {
+                    "maintenance7": true
+                },
+                "VkPhysicalDeviceMaintenance8FeaturesKHR": {
+                    "maintenance8": true
+                },
+                "VkPhysicalDeviceMaintenance9FeaturesKHR": {
+                    "maintenance9": true
+                },
+                "VkPhysicalDeviceDepthClampZeroOneFeaturesKHR": {
+                    "depthClampZeroOne": true
+                },
+                "VkPhysicalDeviceCopyMemoryIndirectFeaturesKHR": {
+                    "indirectMemoryCopy": true
+                },
+                "VkPhysicalDeviceShaderUntypedPointersFeaturesKHR": {
+                    "shaderUntypedPointers": true
+                },
+                "VkPhysicalDevicePresentModeFifoLatestReadyFeaturesKHR": {
+                    "presentModeFifoLatestReady": true
+                },
+                "VkPhysicalDevicePresentId2FeaturesKHR": {
+                    "presentId2": true
+                },
+                "VkPhysicalDevicePresentWait2FeaturesKHR": {
+                    "presentWait2": true
+                },
+                "VkPhysicalDeviceSwapchainMaintenance1FeaturesKHR": {
+                    "swapchainMaintenance1": true
+                },
+                "VkPhysicalDeviceCooperativeMatrixFeaturesKHR": {
+                    "cooperativeMatrix": true
                 }
             }
         }
@@ -422,6 +510,12 @@
         }
     },
     "history": [
+        {
+            "revision": 11,
+            "date": "2026-01-28",
+            "author": "Christophe Riccio",
+            "comment": "Add required features to Roadmap profiles"
+        },
         {
             "revision": 10,
             "date": "2026-01-15",
