@@ -137,9 +137,94 @@ TEST(api_create_device_profile, check_support_roadmap_2024) {
     EXPECT_TRUE(result == VK_SUCCESS);
     EXPECT_TRUE(supported == VK_TRUE);
 }
-#endif  // VKU_FORCE_EXTRA_TESTS
 
-#ifdef VKU_FORCE_EXTRA_TESTS
+TEST(api_create_device_profile, check_support_roadmap_2026) {
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2026_NAME, VP_KHR_ROADMAP_2026_SPEC_VERSION};
+
+    VkBool32 supported = VK_FALSE;
+    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    EXPECT_TRUE(result == VK_SUCCESS);
+    EXPECT_TRUE(supported == VK_TRUE);
+}
+
+TEST(api_create_device_profile, create_roadmap_2022) {
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
+
+    VkPhysicalDeviceFeatures enabledFeatures = {};
+    enabledFeatures.robustBufferAccess = VK_TRUE;
+
+    VkDeviceCreateInfo info = {};
+    info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    info.pNext = nullptr;
+    info.queueCreateInfoCount = 1;
+    info.pQueueCreateInfos = &scaffold->queueCreateInfo;
+    info.enabledExtensionCount = 0;
+    info.ppEnabledExtensionNames = nullptr;
+    info.pEnabledFeatures = &enabledFeatures;
+
+    VpDeviceCreateInfo profileInfo = {};
+    profileInfo.pCreateInfo = &info;
+    profileInfo.enabledFullProfileCount = 1;
+    profileInfo.pEnabledFullProfiles = &profile;
+
+    VkDevice device = VK_NULL_HANDLE;
+    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
+    EXPECT_TRUE(res == VK_SUCCESS);
+    EXPECT_TRUE(device != VK_NULL_HANDLE);
+}
+
+TEST(api_create_device_profile, create_roadmap_2024) {
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2024_NAME, VP_KHR_ROADMAP_2024_SPEC_VERSION};
+
+    VkPhysicalDeviceFeatures enabledFeatures = {};
+    enabledFeatures.robustBufferAccess = VK_TRUE;
+
+    VkDeviceCreateInfo info = {};
+    info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    info.pNext = nullptr;
+    info.queueCreateInfoCount = 1;
+    info.pQueueCreateInfos = &scaffold->queueCreateInfo;
+    info.enabledExtensionCount = 0;
+    info.ppEnabledExtensionNames = nullptr;
+    info.pEnabledFeatures = &enabledFeatures;
+
+    VpDeviceCreateInfo profileInfo = {};
+    profileInfo.pCreateInfo = &info;
+    profileInfo.enabledFullProfileCount = 1;
+    profileInfo.pEnabledFullProfiles = &profile;
+
+    VkDevice device = VK_NULL_HANDLE;
+    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
+    EXPECT_TRUE(res == VK_SUCCESS);
+    EXPECT_TRUE(device != VK_NULL_HANDLE);
+}
+
+TEST(api_create_device_profile, create_roadmap_2026) {
+    const VpProfileProperties profile = {VP_KHR_ROADMAP_2026_NAME, VP_KHR_ROADMAP_2026_SPEC_VERSION};
+
+    VkPhysicalDeviceFeatures enabledFeatures = {};
+    enabledFeatures.robustBufferAccess = VK_TRUE;
+
+    VkDeviceCreateInfo info = {};
+    info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    info.pNext = nullptr;
+    info.queueCreateInfoCount = 1;
+    info.pQueueCreateInfos = &scaffold->queueCreateInfo;
+    info.enabledExtensionCount = 0;
+    info.ppEnabledExtensionNames = nullptr;
+    info.pEnabledFeatures = &enabledFeatures;
+
+    VpDeviceCreateInfo profileInfo = {};
+    profileInfo.pCreateInfo = &info;
+    profileInfo.enabledFullProfileCount = 1;
+    profileInfo.pEnabledFullProfiles = &profile;
+
+    VkDevice device = VK_NULL_HANDLE;
+    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
+    EXPECT_TRUE(res == VK_SUCCESS);
+    EXPECT_TRUE(device != VK_NULL_HANDLE);
+}
+
 TEST(api_create_device_profile, overrite_with_profile_only) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, VP_LUNARG_DESKTOP_BASELINE_2023_SPEC_VERSION};
 
