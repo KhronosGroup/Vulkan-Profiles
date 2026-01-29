@@ -105,7 +105,7 @@ TEST(api_get_profile_device_extension_properties, partial) {
     uint32_t propertyCount = 0;
     VkResult result0 = vpGetProfileDeviceExtensionProperties(&profile, nullptr, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(15, propertyCount);
+    EXPECT_EQ(16, propertyCount);
 
     propertyCount = 5;
 
@@ -115,7 +115,7 @@ TEST(api_get_profile_device_extension_properties, partial) {
     EXPECT_EQ(5, propertyCount);
 
     EXPECT_STREQ(VK_KHR_GLOBAL_PRIORITY_EXTENSION_NAME, properties[0].extensionName);
-    EXPECT_STREQ(VK_KHR_DYNAMIC_RENDERING_LOCAL_READ_EXTENSION_NAME, properties[1].extensionName);
+    EXPECT_STREQ(VK_KHR_LOAD_STORE_OP_NONE_EXTENSION_NAME, properties[1].extensionName);
 }
 
 TEST(api_get_profile_instance_extension_properties, full) {
