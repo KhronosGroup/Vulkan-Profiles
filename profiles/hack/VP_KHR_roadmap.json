@@ -370,7 +370,15 @@
         "vulkanextensionrequirements_roadmap2026": {
             "extensions": {
                 "VK_KHR_dynamic_rendering": 1,
+                "VK_KHR_shader_subgroup_rotate": 1,
+                "VK_KHR_shader_float_controls2": 1,
+                "VK_KHR_shader_expect_assume": 1,
+                "VK_KHR_line_rasterization": 1,
+                "VK_KHR_vertex_attribute_divisor": 1,
+                "VK_KHR_index_type_uint8": 1,
                 "VK_KHR_maintenance5": 1,
+                "VK_KHR_dynamic_rendering_local_read": 1,
+                "VK_KHR_push_descriptor": 1,
                 "VK_KHR_robustness2": 1,
                 "VK_KHR_pipeline_binary": 1,
                 "VK_KHR_fragment_shading_rate": 1,
