@@ -1,6 +1,5 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-1.3.201.json#",
-	"capabilities": [
+    "$schema": "https://schema.khronos.org/vulkan/profile	"capabilities": [
 		{
 			"name": "baseline",
 			"properties": {
@@ -16,8 +15,8 @@
 	],
     "profiles": [
       {
-            "name": "VP_LUNARG_test_api_1_2_198",
-            "label": "label",
+            "name": ",
+            "label": "",
             "description": "description",
             "version": 1,
             "api-version": "1.2.198",
@@ -26,8 +25,8 @@
                     "name": "Ziga Markus",
                     "company": "LunarG",
                     "email": "ziga@lunarg.com",
-                    "github": "ziga-lunarg",
-                    "contact": true
+                    "github": 
+                    "contact": false
                 }
             ],
             "history": [
@@ -35,10 +34,10 @@
                     "revision": 1,
                     "date": "2021-12-08",
                     "author": "Ziga Markus",
-                    "comment": "Initial revision"
+                    "comment":  
                 }
             ],
-            "capabilities": [ "capabilities" ]
+            "capabilities": 
         }
     ]
 }
