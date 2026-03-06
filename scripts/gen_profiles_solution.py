@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-# Copyright (c) 2021-2025 LunarG, Inc.
+# Copyright (c) 2021-2026 LunarG, Inc.
 # Copyright (c) 2023-2024 RasterGrid Kft.
 #
 # Licensed under the Apache License, Version 2.0 (the "License")
@@ -72,8 +72,8 @@ def stripNonmatchingAPIs(tree, apiName, actuallyDelete = True):
 
 COPYRIGHT_HEADER = '''
 /*
- * Copyright (C) 2021-2025 Valve Corporation
- * Copyright (C) 2021-2025 LunarG, Inc.
+ * Copyright (C) 2021-2026 Valve Corporation
+ * Copyright (C) 2021-2026 LunarG, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -1888,51 +1888,55 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
 
                 userData.variant = &variant_desc;
 
-                VkPhysicalDeviceFeatures2KHR features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR };
-                userData.variant->chainers.pfnFeature(
-                    static_cast<VkBaseOutStructure*>(static_cast<void*>(&features)), &userData,
-                    [](VkBaseOutStructure* p, void* pUser) {
-                        UserData* pUserData = static_cast<UserData*>(pUser);
-                        pUserData->gpdp2.pfnGetPhysicalDeviceFeatures2(
-                            pUserData->physicalDevice,
-                            static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p)));
+                if (supported_variant) {
+                    VkPhysicalDeviceFeatures2KHR features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR };
+                    userData.variant->chainers.pfnFeature(
+                        static_cast<VkBaseOutStructure*>(static_cast<void*>(&features)), &userData,
+                        [](VkBaseOutStructure* p, void* pUser) {
+                            UserData* pUserData = static_cast<UserData*>(pUser);
+                            pUserData->gpdp2.pfnGetPhysicalDeviceFeatures2(
+                                pUserData->physicalDevice,
+                                static_cast<VkPhysicalDeviceFeatures2KHR*>(static_cast<void*>(p)));
 
-                        pUserData->supported = true;
-                        while (p != nullptr) {
-                            if (!pUserData->variant->feature.pfnComparator(p)) {
-                                pUserData->supported = false;
+                            pUserData->supported = true;
+                            while (p != nullptr) {
+                                if (!pUserData->variant->feature.pfnComparator(p)) {
+                                    pUserData->supported = false;
+                                }
+                                p = p->pNext;
                             }
-                            p = p->pNext;
                         }
+                    );
+                    if (!userData.supported) {
+                        supported_variant = false;
                     }
-                );
-                if (!userData.supported) {
-                    supported_variant = false;
                 }
 
-                VkPhysicalDeviceProperties2KHR device_properties2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR };
-                userData.variant->chainers.pfnProperty(
-                    static_cast<VkBaseOutStructure*>(static_cast<void*>(&device_properties2)), &userData,
-                    [](VkBaseOutStructure* p, void* pUser) {
-                        UserData* pUserData = static_cast<UserData*>(pUser);
-                        pUserData->gpdp2.pfnGetPhysicalDeviceProperties2(
-                            pUserData->physicalDevice,
-                            static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p)));
+                if (supported_variant) {
+                    VkPhysicalDeviceProperties2KHR device_properties2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR };
+                    userData.variant->chainers.pfnProperty(
+                        static_cast<VkBaseOutStructure*>(static_cast<void*>(&device_properties2)), &userData,
+                        [](VkBaseOutStructure* p, void* pUser) {
+                            UserData* pUserData = static_cast<UserData*>(pUser);
+                            pUserData->gpdp2.pfnGetPhysicalDeviceProperties2(
+                                pUserData->physicalDevice,
+                                static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p)));
 
-                        pUserData->supported = true;
-                        while (p != nullptr) {
-                            if (!pUserData->variant->property.pfnComparator(p)) {
-                                pUserData->supported = false;
+                            pUserData->supported = true;
+                            while (p != nullptr) {
+                                if (!pUserData->variant->property.pfnComparator(p)) {
+                                    pUserData->supported = false;
+                                }
+                                p = p->pNext;
                             }
-                            p = p->pNext;
                         }
+                    );
+                    if (!userData.supported) {
+                        supported_variant = false;
                     }
-                );
-                if (!userData.supported) {
-                    supported_variant = false;
                 }
 
-                if (userData.variant->queueFamilyCount > 0) {
+                if (supported_variant && userData.variant->queueFamilyCount > 0) {
                     uint32_t queue_family_count = 0;
                     userData.gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2(physicalDevice, &queue_family_count, nullptr);
                     std::vector<VkQueueFamilyProperties2KHR> queueFamilyProps(queue_family_count, { VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR });
@@ -1971,7 +1975,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
                     }
                 }
 
-                for (uint32_t format_index = 0; format_index < userData.variant->formatCount && supported_variant; ++format_index) {
+                for (uint32_t format_index = 0; supported_variant && (format_index < userData.variant->formatCount); ++format_index) {
                     userData.index = format_index;
                     VkFormatProperties2KHR format_properties2{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
                     userData.variant->chainers.pfnFormat(
@@ -1997,7 +2001,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
                 }
 
 #ifdef VK_KHR_video_queue
-                if (userData.variant->videoProfileCount > 0) {
+                if (supported_variant && (userData.variant->videoProfileCount > 0)) {
                     VkVideoProfileListInfoKHR profile_list{ VK_STRUCTURE_TYPE_VIDEO_PROFILE_LIST_INFO_KHR };
                     profile_list.profileCount = 1;
                     profile_list.pProfiles = &userData.video.profileInfo;
@@ -2235,6 +2239,10 @@ VPAPI_ATTR VkResult vpCreateDevice(
 
         for (std::size_t caps_index = 0, caps_count = pProfileDesc->requiredCapabilityCount; caps_index < caps_count; ++caps_index) {
             const detail::VpCapabilitiesDesc* pCapsDesc = &pProfileDesc->pRequiredCapabilities[caps_index];
+
+            if (pCapsDesc->variantCount > 1) {
+                continue; // Multiple variants are not supported by this version of vpCreateDevice
+            }
 
             for (std::size_t variant_index = 0, variant_count = pCapsDesc->variantCount; variant_index < variant_count; ++variant_index) {
                 const detail::VpVariantDesc* variant = &pCapsDesc->pVariants[variant_index];
@@ -5223,6 +5231,22 @@ class VulkanProfile():
                 '    },\n')
         return gen
 
+    def gen_structFeaturesChainerFunc(self, structDefs, caps, baseStruct):
+        gen = '    [](VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb) {\n'
+        if structDefs:
+            pNext = 'nullptr'
+            for structDef in structDefs:
+                if structDef.name in caps:
+                    if structDef.name != baseStruct:
+                        varName = structDef.name[2].lower() + structDef.name[3:]
+                        gen += '        {0} {1}{{ {2}, {3} }};\n'.format(structDef.name, varName, structDef.sType, pNext)
+                        pNext = '&' + varName
+            gen += '        p->pNext = static_cast<VkBaseOutStructure*>(static_cast<void*>({0}));\n'.format(pNext)
+
+        gen += ('        pfnCb(p, pUser);\n'
+                '    },\n')
+        return gen
+
 
     def gen_structArrayChainerFunc(self, structDefs, baseStruct):
         gen = '    [](uint32_t count, VkBaseOutStructure* p, void* pUser, PFN_vpStructArrayChainerCb pfnCb) {\n'
@@ -5337,7 +5361,7 @@ class VulkanProfile():
         # Structure chaining descriptors
         gen += ('\n'
                 'static const VpStructChainerDesc chainerDesc = {\n')
-        gen += self.gen_structChainerFunc(self.structs.feature, 'VkPhysicalDeviceFeatures2KHR')
+        gen += self.gen_structFeaturesChainerFunc(self.structs.feature, capabilities.features, 'VkPhysicalDeviceFeatures2KHR')
         gen += self.gen_structChainerFunc(self.structs.property, 'VkPhysicalDeviceProperties2KHR')
         gen += self.gen_structArrayChainerFunc(self.structs.queueFamily, 'VkQueueFamilyProperties2KHR')
         gen += self.gen_structChainerFunc(self.structs.format, 'VkFormatProperties2KHR')
@@ -6624,7 +6648,7 @@ class VulkanProfilesSchemaGenerator():
 DOC_MD_HEADER = '''
 <!-- markdownlint-disable MD041 -->
 <p align="left"><img src="https://vulkan.lunarg.com/img/NewLunarGLogoBlack.png" alt="LunarG" width=263 height=113 /></p>
-<p align="left">Copyright (c) 2021-2025 LunarG, Inc.</p>
+<p align="left">Copyright (c) 2021-2026 LunarG, Inc.</p>
 
 <p align="center"><img src="./images/logo.png" width=400 /></p>
 

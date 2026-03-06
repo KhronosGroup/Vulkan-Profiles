@@ -11,7 +11,15 @@
 
 # Release Notes
 
-## [Vulkan Profiles Tools 1.4.XXX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.XXX.0) - February 2026
+## [Vulkan Profiles Tools 1.4.XXX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - May 2026
+
+### Features:
+- Add Vulkan 1.4 minimum requirements profile
+
+### Bugfixes:
+- Fix Vulkan Profiles library crash when checking capabilities of unsupported extensions
+
+## [Vulkan Profiles Tools 1.4.341](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.341.0) - February 2026
 
 ### Features:
 - Add VP_ANDROID_17_requirements and VP_ANDROID_vulkan_profile_2025 profiles

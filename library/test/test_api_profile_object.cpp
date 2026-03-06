@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2021-2025 Valve Corporation
- * Copyright (c) 2021-2025 LunarG, Inc.
+ * Copyright (c) 2021-2026 Valve Corporation
+ * Copyright (c) 2021-2026 LunarG, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -302,24 +302,23 @@ TEST(api_capabilities_object, get_profile_feature_structure_types) {
 
     const VpProfileProperties profileProperties = {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
 
-    uint32_t propertyCount = 0;
+    uint32_t featureCount = 0;
     VkResult result0 = vpGetProfileFeatureStructureTypes(
-        object.handle, &profileProperties, nullptr, &propertyCount, nullptr);
+        object.handle, &profileProperties, nullptr, &featureCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_EQ(4, propertyCount);
+    EXPECT_EQ(5, featureCount);
 
-    propertyCount = 5;
-
-    std::vector<VkStructureType> properties(propertyCount);
+    std::vector<VkStructureType> features(featureCount);
     VkResult result1 = vpGetProfileFeatureStructureTypes(
-        object.handle, &profileProperties, nullptr, &propertyCount, &properties[0]);
+        object.handle, &profileProperties, nullptr, &featureCount, &features[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
-    EXPECT_EQ(4, propertyCount);
+    EXPECT_EQ(5, featureCount);
 
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, properties[0]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, properties[1]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES, properties[2]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, properties[3]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, features[0]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, features[1]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES, features[2]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, features[3]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES, features[4]);
 }
 
 TEST(api_capabilities_object, get_profile_Property_structure_types) {
@@ -332,8 +331,6 @@ TEST(api_capabilities_object, get_profile_Property_structure_types) {
         object.handle, &profileProperties, nullptr, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
     EXPECT_EQ(4, propertyCount);
-
-    propertyCount = 5;
 
     std::vector<VkStructureType> properties(propertyCount);
     VkResult result1 = vpGetProfilePropertyStructureTypes(
