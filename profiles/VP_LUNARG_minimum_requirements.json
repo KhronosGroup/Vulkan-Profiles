@@ -211,6 +211,12 @@
         "vulkan12requirements": {
             "features": {
                 "VkPhysicalDeviceVulkan12Features": {
+                    "samplerMirrorClampToEdge": true,
+                    "drawIndirectCount": true,
+                    "descriptorIndexing": true,
+                    "samplerFilterMinmax": true,
+                    "shaderOutputViewportIndex": true,
+                    "shaderOutputLayer": true,
                     "uniformBufferStandardLayout": true,
                     "subgroupBroadcastDynamicId": true,
                     "imagelessFramebuffer": true,
@@ -336,14 +342,132 @@
                     "maxBufferSize": 1073741824
                 }
             }
+        },
+        "vulkan14requirements": {
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "fullDrawIndexUint32": true,
+                    "imageCubeArray": true,
+                    "independentBlend": true,
+                    "sampleRateShading": true,
+                    "drawIndirectFirstInstance": true,
+                    "depthClamp": true,
+                    "depthBiasClamp": true,
+                    "samplerAnisotropy": true,
+                    "fragmentStoresAndAtomics": true,
+                    "shaderStorageImageExtendedFormats": true,
+                    "shaderUniformBufferArrayDynamicIndexing": true,
+                    "shaderSampledImageArrayDynamicIndexing": true,
+                    "shaderStorageBufferArrayDynamicIndexing": true,
+                    "shaderStorageImageArrayDynamicIndexing": true,
+                    "shaderImageGatherExtended": true,
+                    "shaderInt16": true,
+                    "largePoints": true
+                },
+                "VkPhysicalDeviceVulkan11Features": {
+                    "storageBuffer16BitAccess": true,
+                    "variablePointersStorageBuffer": true,
+                    "variablePointers": true,
+                    "samplerYcbcrConversion": true
+                },
+                "VkPhysicalDeviceVulkan12Features": {
+                    "samplerMirrorClampToEdge": true,
+                    "storageBuffer8BitAccess": true,
+                    "scalarBlockLayout": true,
+                    "shaderInt8": true,
+                    "shaderUniformTexelBufferArrayDynamicIndexing": true,
+                    "shaderStorageTexelBufferArrayDynamicIndexing": true
+                },
+                "VkPhysicalDeviceVulkan14Features": {
+                    "globalPriorityQuery": true,
+                    "shaderSubgroupRotate": true,
+                    "shaderSubgroupRotateClustered": true,
+                    "shaderFloatControls2": true,
+                    "shaderExpectAssume": true,
+                    "bresenhamLines": true,
+                    "vertexAttributeInstanceRateDivisor": true,
+                    "indexTypeUint8": true,
+                    "dynamicRenderingLocalRead": true,
+                    "maintenance5": true,
+                    "maintenance6": true,
+                    "pushDescriptor": true,
+                    "pipelineRobustness": true
+                }
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxImageDimension1D": 8192,
+                        "maxImageDimension2D": 8192,
+                        "maxImageDimension3D": 512,
+                        "maxImageDimensionCube": 8192,
+                        "maxImageArrayLayers": 2048,
+                        "maxUniformBufferRange": 65536,
+                        "maxPushConstantsSize": 256,
+                        "bufferImageGranularity": 4096,
+                        "maxBoundDescriptorSets": 7,
+                        "maxPerStageDescriptorUniformBuffers": 15,
+                        "maxPerStageResources": 200,
+                        "maxDescriptorSetUniformBuffers": 90,
+                        "maxDescriptorSetStorageBuffers": 96,
+                        "maxDescriptorSetStorageImages": 144,
+                        "maxFragmentCombinedOutputResources": 16,
+                        "maxComputeWorkGroupInvocations": 256,
+                        "maxComputeWorkGroupSize": [
+                            256,
+                            256,
+                            64
+                        ],
+                        "subTexelPrecisionBits": 8,
+                        "mipmapPrecisionBits": 6,
+                        "maxSamplerLodBias": 14,
+                        "maxViewportDimensions": [
+                            7680,
+                            7680
+                        ],
+                        "viewportBoundsRange": [
+                            -15360,
+                            15359
+                        ],
+                        "maxFramebufferWidth": 7680,
+                        "maxFramebufferHeight": 7680,
+                        "maxColorAttachments": 8,
+                        "timestampComputeAndGraphics": true,
+                        "pointSizeRange": [
+                            1.0,
+                            256.0
+                        ],
+                        "pointSizeGranularity": 0.125,
+                        "lineWidthGranularity": 0.5,
+                        "standardSampleLocations": true
+                    }
+                },
+                "VkPhysicalDeviceVulkan11Properties": {
+                    "subgroupSupportedOperations": [ "VK_SUBGROUP_FEATURE_BASIC_BIT", "VK_SUBGROUP_FEATURE_CLUSTERED_BIT", "VK_SUBGROUP_FEATURE_ROTATE_CLUSTERED_BIT" ]
+                },                
+                "VkPhysicalDeviceVulkan12Properties": {
+                    "shaderSignedZeroInfNanPreserveFloat16": true,
+                    "shaderSignedZeroInfNanPreserveFloat32": true
+                },
+                "VkPhysicalDeviceVulkan14Properties": {
+                    "maxPushDescriptors": 32
+                }
+            }
+        },
+        "vulkan14dependent": {
+            "features": {
+                "VkPhysicalDeviceVulkan14Features": {
+                    "pipelineProtectedAccess": true
+                }
+            }
         }
     },
     "profiles": {
         "VP_LUNARG_minimum_requirements_1_0": {
             "version": 1,
             "api-version": "1.0.68",
-            "label": "Vulkan Core 1.0 Minimum Requirements",
-            "description": "Vulkan Core 1.0 Minimum Requirements.",
+            "label": "Vulkan 1.0 Minimum Requirements",
+            "description": "Vulkan 1.0 Minimum Requirements.",
             "capabilities": [
                 "vulkan10requirements"
             ]
@@ -351,8 +475,8 @@
         "VP_LUNARG_minimum_requirements_1_1": {
             "version": 1,
             "api-version": "1.1.108",
-            "label": "Vulkan Core 1.1 Minimum Requirements",
-            "description": "Vulkan Core 1.1 Minimum Requirements.",
+            "label": "Vulkan 1.1 Minimum Requirements",
+            "description": "Vulkan 1.1 Minimum Requirements.",
             "capabilities": [
                 "vulkan10requirements",
                 "vulkan11requirements_split"
@@ -361,8 +485,8 @@
         "VP_LUNARG_minimum_requirements_1_2": {
             "version": 1,
             "api-version": "1.2.131",
-            "label": "Vulkan Core 1.2 Minimum Requirements",
-            "description": "Vulkan Core 1.2 Minimum Requirements.",
+            "label": "Vulkan 1.2 Minimum Requirements",
+            "description": "Vulkan 1.2 Minimum Requirements.",
             "capabilities": [
                 "vulkan10requirements",
                 "vulkan11requirements",
@@ -372,13 +496,29 @@
         "VP_LUNARG_minimum_requirements_1_3": {
             "version": 1,
             "api-version": "1.3.204",
-            "label": "Vulkan Core 1.3 Minimum Requirements",
-            "description": "Vulkan Core 1.3 Minimum Requirements.",
+            "label": "Vulkan 1.3 Minimum Requirements",
+            "description": "Vulkan 1.3 Minimum Requirements.",
             "capabilities": [
                 "vulkan10requirements",
                 "vulkan11requirements",
                 "vulkan12requirements",
                 "vulkan13requirements"
+            ]
+        },
+        "VP_LUNARG_minimum_requirements_1_4": {
+            "version": 1,
+            "api-version": "1.4.304",
+            "label": "Vulkan 1.4 Minimum Requirements",
+            "description": "Vulkan 1.4 Minimum Requirements.",
+            "capabilities": [
+                "vulkan10requirements",
+                "vulkan11requirements",
+                "vulkan12requirements",
+                "vulkan13requirements",
+                "vulkan14requirements"
+            ],
+            "optionals": [
+                "vulkan14dependent"
             ]
         }
     },
@@ -390,6 +530,12 @@
         }
     },
     "history": [
+        {
+            "revision": 2,
+            "date": "2026-03-05",
+            "author": "Christophe Riccio",
+            "comment": "Add Vulkan 1.4 Minimum Requirements profile"
+        },
         {
             "revision": 1,
             "date": "2023-11-01",

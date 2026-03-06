@@ -24,6 +24,7 @@
         "vulkan12requirements": {
             "features": {
                 "VkPhysicalDeviceVulkan12Features": {
+                    "samplerMirrorClampToEdge": true,
                     "uniformBufferStandardLayout": true,
                     "subgroupBroadcastDynamicId": true,
                     "imagelessFramebuffer": true,
@@ -158,7 +159,6 @@
         "vulkan12requirements_roadmap2022": {
             "features": {
                 "VkPhysicalDeviceVulkan12Features": {
-                    "samplerMirrorClampToEdge": true,
                     "descriptorIndexing": true,
                     "shaderUniformTexelBufferArrayDynamicIndexing": true,
                     "shaderStorageTexelBufferArrayDynamicIndexing": true,
@@ -203,12 +203,19 @@
             }
         },
         "vulkan13requirements_roadmap2022": {
+            "features": {
+                "VkPhysicalDeviceVulkan13Features": {
+                    "descriptorBindingInlineUniformBlockUpdateAfterBind": true
+                }
+            }
+        },
+        "vulkanextensionrequirements_roadmap2022_promoted_vulkan14": {
             "extensions": {
                 "VK_KHR_global_priority": 1
             },
             "features": {
-                "VkPhysicalDeviceVulkan13Features": {
-                    "descriptorBindingInlineUniformBlockUpdateAfterBind": true
+                "VkPhysicalDeviceGlobalPriorityQueryFeaturesKHR": {
+                    "globalPriorityQuery": true
                 }
             }
         },
@@ -273,7 +280,7 @@
                 }
             }
         },
-        "vulkanextensionrequirements_roadmap2024_only": {
+        "vulkanextensionrequirements_roadmap2024_promoted_vulkan14": {
             "extensions": {
                 "VK_KHR_dynamic_rendering": 1,
                 "VK_KHR_shader_subgroup_rotate": 1,
@@ -349,6 +356,7 @@
         "vulkan14requirements_roadmap2026": {
             "features": {
                 "VkPhysicalDeviceVulkan14Features": {
+                    "globalPriorityQuery": true,
                     "shaderSubgroupRotate": true,
                     "shaderExpectAssume": true,
                     "shaderFloatControls2": true,
@@ -455,19 +463,34 @@
                 "VkPhysicalDeviceCooperativeMatrixFeaturesKHR": {
                     "cooperativeMatrix": true
                 }
+            },
+            "properties": {
+                "VkPhysicalDeviceMaintenance7PropertiesKHR": {
+                    "maxDescriptorSetTotalUniformBuffersDynamic": 8,
+                    "maxDescriptorSetTotalStorageBuffersDynamic": 4,
+                    "maxDescriptorSetTotalBuffersDynamic": 12,
+                    "maxDescriptorSetUpdateAfterBindTotalUniformBuffersDynamic": 8,
+                    "maxDescriptorSetUpdateAfterBindTotalStorageBuffersDynamic": 4,
+                    "maxDescriptorSetUpdateAfterBindTotalBuffersDynamic": 12
+                }
             }
         }
     },
     "profiles": {
         "VP_KHR_roadmap_2026": {
-            "version": 1,
+            "version": 2,
             "api-version": "1.4.328",
             "label": "Khronos Vulkan Roadmap 2026 profile",
             "description": "This roadmap profile is intended to be supported by newer devices shipping in 2026 across mainstream smartphone, tablet, laptops, console and desktop devices.",
-            "profiles": [
-                "VP_KHR_roadmap_2022"
-            ],
             "capabilities": [
+                "vulkan10requirements",
+                "vulkan11requirements",
+                "vulkan12requirements",
+                "vulkan13requirements",
+                "vulkan10requirements_roadmap2022",
+                "vulkan11requirements_roadmap2022",
+                "vulkan12requirements_roadmap2022",
+                "vulkan13requirements_roadmap2022",
                 "vulkan10requirements_roadmap2024",
                 "vulkan11requirements_roadmap2024",
                 "vulkan12requirements_roadmap2024",
@@ -478,7 +501,7 @@
             ]
         },
         "VP_KHR_roadmap_2024": {
-            "version": 1,
+            "version": 2,
             "api-version": "1.3.276",
             "label": "Khronos Vulkan Roadmap 2024 profile",
             "description": "This roadmap profile is intended to be supported by newer devices shipping in 2024 across mainstream smartphone, tablet, laptops, console and desktop devices.",
@@ -490,23 +513,24 @@
                 "vulkan11requirements_roadmap2024",
                 "vulkan12requirements_roadmap2024",
                 "vulkanextensionrequirements_roadmap2024",
-                "vulkanextensionrequirements_roadmap2024_only"
+                "vulkanextensionrequirements_roadmap2024_promoted_vulkan14"
             ]
         },
         "VP_KHR_roadmap_2022": {
-            "version": 1,
+            "version": 2,
             "api-version": "1.3.204",
             "label": "Khronos Vulkan Roadmap 2022 profile",
             "description": "This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices.",
             "capabilities": [
                 "vulkan10requirements",
-                "vulkan10requirements_roadmap2022",
                 "vulkan11requirements",
-                "vulkan11requirements_roadmap2022",
                 "vulkan12requirements",
-                "vulkan12requirements_roadmap2022",
                 "vulkan13requirements",
-                "vulkan13requirements_roadmap2022"
+                "vulkan10requirements_roadmap2022",
+                "vulkan11requirements_roadmap2022",
+                "vulkan12requirements_roadmap2022",
+                "vulkan13requirements_roadmap2022",
+                "vulkanextensionrequirements_roadmap2022_promoted_vulkan14"
             ],
             "optionals": [
                 "vulkan10optionals_roadmap2022"
@@ -526,6 +550,12 @@
         }
     },
     "history": [
+        {
+            "revision": 12,
+            "date": "2026-03-03",
+            "author": "Christophe Riccio",
+            "comment": "Fix `globalPriorityQuery` missing from profiles"
+        },
         {
             "revision": 11,
             "date": "2026-01-28",

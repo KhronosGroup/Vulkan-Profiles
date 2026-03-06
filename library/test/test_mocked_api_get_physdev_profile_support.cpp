@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2021-2025 Valve Corporation
- * Copyright (c) 2021-2025 LunarG, Inc.
+ * Copyright (c) 2021-2026 Valve Corporation
+ * Copyright (c) 2021-2026 LunarG, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -226,11 +226,12 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_version) {
     VkPhysicalDeviceVulkan13Features vulkan13Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES};
     VkPhysicalDeviceVulkan12Features vulkan12Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &vulkan13Features};
     VkPhysicalDeviceVulkan11Features vulkan11Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &vulkan12Features};
-    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkan11Features};
+    VkPhysicalDeviceGlobalPriorityQueryFeatures vulkanGlobalPriorityFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES, &vulkan11Features};
+    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkanGlobalPriorityFeatures};
     vpGetProfileFeatures(&profile, nullptr, &features);
 
     mock.SetFeatures({
-        VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features)
+        VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features), VK_STRUCT(vulkanGlobalPriorityFeatures)
     });
 
     VkPhysicalDeviceVulkan13Properties vulkan13Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES};
@@ -661,10 +662,11 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_version) {
     VkPhysicalDeviceVulkan13Features vulkan13Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES};
     VkPhysicalDeviceVulkan12Features vulkan12Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &vulkan13Features};
     VkPhysicalDeviceVulkan11Features vulkan11Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &vulkan12Features};
-    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkan11Features};
+    VkPhysicalDeviceGlobalPriorityQueryFeatures vulkanGlobalPriorityFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES, &vulkan11Features};
+    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkanGlobalPriorityFeatures};
     vpGetProfileFeatures(&profile, nullptr, &features);
 
-    mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features)});
+    mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features), VK_STRUCT(vulkanGlobalPriorityFeatures)});
 
     VkPhysicalDeviceVulkan13Properties vulkan13Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES};
     VkPhysicalDeviceVulkan12Properties vulkan12Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, &vulkan13Properties};
@@ -717,7 +719,8 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_extension) {
 
 #ifdef WITH_DEBUG_MESSAGES
     MockDebugMessageCallback cb({
-        "Unsupported extension: VK_KHR_global_priority"
+        "Unsupported extension: VK_KHR_global_priority",
+        "Unsupported feature condition: VkPhysicalDeviceGlobalPriorityQueryFeaturesKHR::globalPriorityQuery == VK_TRUE"
     });
 #endif
 
@@ -774,12 +777,13 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_feature) {
     VkPhysicalDeviceVulkan13Features vulkan13Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES};
     VkPhysicalDeviceVulkan12Features vulkan12Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &vulkan13Features};
     VkPhysicalDeviceVulkan11Features vulkan11Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &vulkan12Features};
-    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkan11Features};
+    VkPhysicalDeviceGlobalPriorityQueryFeatures vulkanGlobalPriorityFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES, &vulkan11Features};
+    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkanGlobalPriorityFeatures};
     vpGetProfileFeatures(&profile, nullptr, &features);
 
     features.features.fullDrawIndexUint32 = VK_FALSE;
 
-    mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features)});
+    mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features), VK_STRUCT(vulkanGlobalPriorityFeatures)});
 
     VkPhysicalDeviceVulkan13Properties vulkan13Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES};
     VkPhysicalDeviceVulkan12Properties vulkan12Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, &vulkan13Properties};
@@ -817,11 +821,11 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_property) {
     VkPhysicalDeviceVulkan13Features vulkan13Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES};
     VkPhysicalDeviceVulkan12Features vulkan12Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &vulkan13Features};
     VkPhysicalDeviceVulkan11Features vulkan11Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &vulkan12Features};
-    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkan11Features};
+    VkPhysicalDeviceGlobalPriorityQueryFeatures vulkanGlobalPriorityFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES, &vulkan11Features};
+    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkanGlobalPriorityFeatures};
     vpGetProfileFeatures(&profile, nullptr, &features);
 
-
-    mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features)});
+    mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features), VK_STRUCT(vulkanGlobalPriorityFeatures)});
 
     VkPhysicalDeviceVulkan13Properties vulkan13Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES};
     VkPhysicalDeviceVulkan12Properties vulkan12Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, &vulkan13Properties};
@@ -922,10 +926,11 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_supported_queue_family) {
     VkPhysicalDeviceVulkan13Features vulkan13Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES};
     VkPhysicalDeviceVulkan12Features vulkan12Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &vulkan13Features};
     VkPhysicalDeviceVulkan11Features vulkan11Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &vulkan12Features};
-    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkan11Features};
+    VkPhysicalDeviceGlobalPriorityQueryFeatures vulkanGlobalPriorityFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES, &vulkan11Features};
+    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkanGlobalPriorityFeatures};
     vpGetProfileFeatures(&profile, nullptr, &features);
 
-    mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features)});
+    mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features), VK_STRUCT(vulkanGlobalPriorityFeatures)});
 
     VkPhysicalDeviceVulkan13Properties vulkan13Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES};
     VkPhysicalDeviceVulkan12Properties vulkan12Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, &vulkan13Properties};
@@ -994,10 +999,11 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_supported_version) {
     VkPhysicalDeviceVulkan13Features vulkan13Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES};
     VkPhysicalDeviceVulkan12Features vulkan12Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &vulkan13Features};
     VkPhysicalDeviceVulkan11Features vulkan11Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &vulkan12Features};
-    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkan11Features};
+    VkPhysicalDeviceGlobalPriorityQueryFeatures vulkanGlobalPriorityFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES, &vulkan11Features};
+    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkanGlobalPriorityFeatures};
     vpGetProfileFeatures(&profile, nullptr, &features);
 
-    mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features)});
+    mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features), VK_STRUCT(vulkanGlobalPriorityFeatures)});
 
     VkPhysicalDeviceVulkan13Properties vulkan13Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES};
     VkPhysicalDeviceVulkan12Properties vulkan12Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, &vulkan13Properties};

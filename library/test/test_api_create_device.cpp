@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2021-2025 Valve Corporation
- * Copyright (c) 2021-2025 LunarG, Inc.
+ * Copyright (c) 2021-2026 Valve Corporation
+ * Copyright (c) 2021-2026 LunarG, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,6 +85,15 @@ TEST(api_create_device_profile, check_support_vulkan_1_3) {
     VkPhysicalDeviceFeatures2KHR features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR, &deviceVulkan11Features};
 
     vkGetPhysicalDeviceFeatures2(scaffold->physicalDevice, &features);
+
+    VkBool32 supported = VK_FALSE;
+    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    EXPECT_TRUE(result == VK_SUCCESS);
+    EXPECT_TRUE(supported == VK_TRUE);
+}
+
+TEST(api_create_device_profile, check_support_vulkan_1_4) {
+    const VpProfileProperties profile = {VP_LUNARG_MINIMUM_REQUIREMENTS_1_4_NAME, VP_LUNARG_MINIMUM_REQUIREMENTS_1_4_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
     VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);

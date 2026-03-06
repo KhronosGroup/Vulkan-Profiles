@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2021-2025 Valve Corporation
- * Copyright (C) 2021-2025 LunarG, Inc.
+ * Copyright (C) 2021-2026 Valve Corporation
+ * Copyright (C) 2021-2026 LunarG, Inc.
  * Copyright (c) 2024 RasterGrid Kft.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -893,7 +893,7 @@ TEST_F(TestsMechanismVideoProfiles, VideoFormatProperties) {
                     EXPECT_EQ(fmt_props[i].componentMapping.g, VK_COMPONENT_SWIZZLE_IDENTITY);
                     EXPECT_EQ(fmt_props[i].componentMapping.b, VK_COMPONENT_SWIZZLE_IDENTITY);
                     EXPECT_EQ(fmt_props[i].componentMapping.a, VK_COMPONENT_SWIZZLE_IDENTITY);
-                    EXPECT_EQ(fmt_props[i].imageCreateFlags, 0);
+                    EXPECT_EQ(fmt_props[i].imageCreateFlags, VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT | VK_IMAGE_CREATE_EXTENDED_USAGE_BIT_KHR);
                     EXPECT_EQ(fmt_props[i].imageType, VK_IMAGE_TYPE_2D);
                     EXPECT_EQ(fmt_props[i].imageUsageFlags, VK_IMAGE_USAGE_VIDEO_ENCODE_QUANTIZATION_DELTA_MAP_BIT_KHR |
                                                                 VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
@@ -1050,7 +1050,7 @@ TEST_F(TestsMechanismVideoProfiles, VideoFormatProperties) {
                     EXPECT_EQ(fmt_props[i].componentMapping.g, VK_COMPONENT_SWIZZLE_IDENTITY);
                     EXPECT_EQ(fmt_props[i].componentMapping.b, VK_COMPONENT_SWIZZLE_IDENTITY);
                     EXPECT_EQ(fmt_props[i].componentMapping.a, VK_COMPONENT_SWIZZLE_IDENTITY);
-                    EXPECT_EQ(fmt_props[i].imageCreateFlags, 0);
+                    EXPECT_EQ(fmt_props[i].imageCreateFlags, VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT | VK_IMAGE_CREATE_EXTENDED_USAGE_BIT);
                     EXPECT_EQ(fmt_props[i].imageType, VK_IMAGE_TYPE_2D);
                     EXPECT_EQ(fmt_props[i].imageUsageFlags, VK_IMAGE_USAGE_VIDEO_ENCODE_QUANTIZATION_DELTA_MAP_BIT_KHR |
                                                                 VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
