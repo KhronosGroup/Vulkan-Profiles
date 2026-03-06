@@ -143,7 +143,7 @@ struct JsonValidator {
     std::string message;
 };
 
-TEST(test_validate, VP_LUNARG_test_structure_simple) {
+TEST(test_validate_unit, VP_LUNARG_test_structure_simple) {
     JsonValidator validator;
 
     const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_structure_simple.json";
@@ -151,7 +151,7 @@ TEST(test_validate, VP_LUNARG_test_structure_simple) {
     EXPECT_TRUE(validator.Check(document));
 }
 
-TEST(test_validate, VP_LUNARG_test_structure_complex) {
+TEST(test_validate_unit, VP_LUNARG_test_structure_complex) {
     JsonValidator validator;
 
     const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_structure_complex.json";
@@ -159,7 +159,7 @@ TEST(test_validate, VP_LUNARG_test_structure_complex) {
     EXPECT_TRUE(validator.Check(document));
 }
 
-TEST(test_validate, VP_LUNARG_test_structure_fallback) {
+TEST(test_validate_unit, VP_LUNARG_test_structure_fallback) {
     JsonValidator validator;
 
     const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_structure_fallback.json";
@@ -167,7 +167,7 @@ TEST(test_validate, VP_LUNARG_test_structure_fallback) {
     EXPECT_TRUE(validator.Check(document));
 }
 
-TEST(test_validate, VP_LUNARG_test_vkformatproperties) {
+TEST(test_validate_unit, VP_LUNARG_test_vkformatproperties) {
     JsonValidator validator;
 
     const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_vkformatproperties.json";
@@ -175,7 +175,7 @@ TEST(test_validate, VP_LUNARG_test_vkformatproperties) {
     EXPECT_TRUE(validator.Check(document));
 }
 
-TEST(test_validate, VP_LUNARG_test_vkqueuefamilyproperties) {
+TEST(test_validate_unit, VP_LUNARG_test_vkqueuefamilyproperties) {
     JsonValidator validator;
 
     const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_vkqueuefamilyproperties.json";
@@ -183,7 +183,7 @@ TEST(test_validate, VP_LUNARG_test_vkqueuefamilyproperties) {
     EXPECT_TRUE(validator.Check(document));
 }
 
-TEST(test_validate, VP_LUNARG_test_api) {
+TEST(test_validate_unit, VP_LUNARG_test_api) {
     JsonValidator validator;
 
     const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_api.json";
@@ -191,7 +191,7 @@ TEST(test_validate, VP_LUNARG_test_api) {
     EXPECT_TRUE(validator.Check(document));
 }
 
-TEST(test_validate, VP_LUNARG_test_api_alternate) {
+TEST(test_validate_unit, VP_LUNARG_test_api_alternate) {
     JsonValidator validator;
 
     const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_api_alternate.json";
@@ -199,7 +199,7 @@ TEST(test_validate, VP_LUNARG_test_api_alternate) {
     EXPECT_TRUE(validator.Check(document));
 }
 
-TEST(test_validate, VP_LUNARG_test_promoted_api) {
+TEST(test_validate_unit, VP_LUNARG_test_promoted_api) {
     JsonValidator validator;
 
     const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_promoted_api.json";
@@ -207,7 +207,7 @@ TEST(test_validate, VP_LUNARG_test_promoted_api) {
     EXPECT_TRUE(validator.Check(document));
 }
 
-TEST(test_validate, VP_LUNARG_test_api_generated) {
+TEST(test_validate_unit, VP_LUNARG_test_api_generated) {
     JsonValidator validator;
 
     const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_api_generated.json";
@@ -215,7 +215,7 @@ TEST(test_validate, VP_LUNARG_test_api_generated) {
     EXPECT_TRUE(validator.Check(document));
 }
 
-TEST(test_validate, VP_LUNARG_test_duplicated) {
+TEST(test_validate_unit, VP_LUNARG_test_duplicated) {
     JsonValidator validator;
 
     const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_duplicated.json";
@@ -223,7 +223,7 @@ TEST(test_validate, VP_LUNARG_test_duplicated) {
     EXPECT_TRUE(validator.Check(document));
 }
 
-TEST(test_validate, VP_LUNARG_test_formats) {
+TEST(test_validate_unit, VP_LUNARG_test_formats) {
     JsonValidator validator;
 
     const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_formats.json";
@@ -231,7 +231,7 @@ TEST(test_validate, VP_LUNARG_test_formats) {
     EXPECT_TRUE(validator.Check(document));
 }
 
-TEST(test_validate, VP_LUNARG_desktop_max_2024) {
+TEST(test_validate_unit, VP_LUNARG_desktop_max_2024) {
     JsonValidator validator;
 
     const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_desktop_max_2024.json";
@@ -239,7 +239,7 @@ TEST(test_validate, VP_LUNARG_desktop_max_2024) {
     EXPECT_TRUE(validator.Check(json_document2));
 }
 
-TEST(test_validate, VP_LUNARG_minimum_requirements) {
+TEST(test_validate_sdk, VP_LUNARG_minimum_requirements) {
     JsonValidator validator;
 
     const std::string path = std::string(PROFILE_FILES_PATH) + "VP_LUNARG_minimum_requirements.json";
@@ -247,7 +247,7 @@ TEST(test_validate, VP_LUNARG_minimum_requirements) {
     EXPECT_TRUE(validator.Check(json_document2));
 }
 
-TEST(test_validate, VP_LUNARG_desktop_baseline) {
+TEST(test_validate_sdk, VP_LUNARG_desktop_baseline) {
     JsonValidator validator;
 
     const std::string path = std::string(PROFILE_FILES_PATH) + "VP_LUNARG_desktop_baseline.json";
@@ -255,7 +255,7 @@ TEST(test_validate, VP_LUNARG_desktop_baseline) {
     EXPECT_TRUE(validator.Check(json_document2));
 }
 
-TEST(test_validate, VP_KHR_roadmap) {
+TEST(test_validate_sdk, VP_KHR_roadmap) {
     JsonValidator validator;
 
     const std::string path = std::string(PROFILE_FILES_PATH) + "VP_KHR_roadmap.json";
@@ -263,7 +263,7 @@ TEST(test_validate, VP_KHR_roadmap) {
     EXPECT_TRUE(validator.Check(json_document3));
 }
 
-TEST(test_validate, VP_ANDROID_baseline_2021) {
+TEST(test_validate_android_deprecated, VP_ANDROID_baseline_2021) {
     JsonValidator validator;
 
     const std::string path = std::string(PROFILE_FILES_PATH) + "VP_ANDROID_baseline_2021.json";
@@ -271,7 +271,7 @@ TEST(test_validate, VP_ANDROID_baseline_2021) {
     EXPECT_TRUE(validator.Check(json_document3));
 }
 
-TEST(test_validate, VP_ANDROID_baseline_2022) {
+TEST(test_validate_android_deprecated, VP_ANDROID_baseline_2022) {
     JsonValidator validator;
 
     const std::string path = std::string(PROFILE_FILES_PATH) + "VP_ANDROID_baseline_2022.json";
@@ -279,7 +279,7 @@ TEST(test_validate, VP_ANDROID_baseline_2022) {
     EXPECT_TRUE(validator.Check(json_document3));
 }
 
-TEST(test_validate, VP_ANDROID_15_minimums) {
+TEST(test_validate_android_deprecated, VP_ANDROID_15_minimums) {
     JsonValidator validator;
 
     const std::string path = std::string(PROFILE_FILES_PATH) + "VP_ANDROID_15_minimums.json";
@@ -287,7 +287,7 @@ TEST(test_validate, VP_ANDROID_15_minimums) {
     EXPECT_TRUE(validator.Check(json_document3));
 }
 
-TEST(test_validate, VP_ANDROID_16_minimums) {
+TEST(test_validate_android_deprecated, VP_ANDROID_16_minimums) {
     JsonValidator validator;
 
     const std::string path = std::string(PROFILE_FILES_PATH) + "VP_ANDROID_16_minimums.json";
@@ -295,7 +295,7 @@ TEST(test_validate, VP_ANDROID_16_minimums) {
     EXPECT_TRUE(validator.Check(json_document3));
 }
 
-TEST(test_validate, VP_ANDROID_vulkan_profile_2021) {
+TEST(test_validate_android, VP_ANDROID_vulkan_profile_2021) {
     JsonValidator validator;
 
     const std::string path = std::string(PROFILE_FILES_PATH) + "Android/VP_ANDROID_vulkan_profile_2021.json";
@@ -303,7 +303,7 @@ TEST(test_validate, VP_ANDROID_vulkan_profile_2021) {
     EXPECT_TRUE(validator.Check(json_document3));
 }
 
-TEST(test_validate, VP_ANDROID_vulkan_profile_2022) {
+TEST(test_validate_android, VP_ANDROID_vulkan_profile_2022) {
     JsonValidator validator;
 
     const std::string path = std::string(PROFILE_FILES_PATH) + "Android/VP_ANDROID_vulkan_profile_2022.json";
@@ -311,7 +311,7 @@ TEST(test_validate, VP_ANDROID_vulkan_profile_2022) {
     EXPECT_TRUE(validator.Check(json_document3));
 }
 
-TEST(test_validate, VP_ANDROID_vulkan_profile_2025) {
+TEST(test_validate_android, VP_ANDROID_vulkan_profile_2025) {
     JsonValidator validator;
 
     const std::string path = std::string(PROFILE_FILES_PATH) + "Android/VP_ANDROID_vulkan_profile_2025.json";
@@ -319,7 +319,7 @@ TEST(test_validate, VP_ANDROID_vulkan_profile_2025) {
     EXPECT_TRUE(validator.Check(json_document3));
 }
 
-TEST(test_validate, VP_ANDROID_15_requirements) {
+TEST(test_validate_android, VP_ANDROID_15_requirements) {
     JsonValidator validator;
 
     const std::string path = std::string(PROFILE_FILES_PATH) + "Android/VP_ANDROID_15_requirements.json";
@@ -327,7 +327,7 @@ TEST(test_validate, VP_ANDROID_15_requirements) {
     EXPECT_TRUE(validator.Check(json_document3));
 }
 
-TEST(test_validate, VP_ANDROID_16_requirements) {
+TEST(test_validate_android, VP_ANDROID_16_requirements) {
     JsonValidator validator;
 
     const std::string path = std::string(PROFILE_FILES_PATH) + "Android/VP_ANDROID_16_requirements.json";
@@ -335,7 +335,7 @@ TEST(test_validate, VP_ANDROID_16_requirements) {
     EXPECT_TRUE(validator.Check(json_document3));
 }
 
-TEST(test_validate, VP_ANDROID_17_requirements) {
+TEST(test_validate_android, VP_ANDROID_17_requirements) {
     JsonValidator validator;
 
     const std::string path = std::string(PROFILE_FILES_PATH) + "Android/VP_ANDROID_17_requirements.json";
