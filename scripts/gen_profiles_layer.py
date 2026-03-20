@@ -5548,6 +5548,8 @@ class VulkanProfilesLayerGenerator():
             var_name += 'nv_'
         if (var_name == 'physical_device_ray_tracing_invocation_reorder_features_' and nv):
             var_name += 'nv_'
+        if (var_name == 'physical_device_fault_features_' and ext):
+            var_name += 'ext_'
         return var_name
 
     def get_limittype_class(self, limittype):
