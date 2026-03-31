@@ -2509,19 +2509,29 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceProperties(VkPhysicalDevice physical
     }
 }
 
-VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceProperties2(VkPhysicalDevice physicalDevice,
-                                                        VkPhysicalDeviceProperties2KHR *pProperties) {
+void GetPhysicalDeviceProperties2Impl(VkPhysicalDevice physicalDevice,
+                                      VkPhysicalDeviceProperties2KHR *pProperties,
+                                      bool core) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
-    dt->GetPhysicalDeviceProperties2(physicalDevice, pProperties);
+    if (core) {
+        dt->GetPhysicalDeviceProperties2(physicalDevice, pProperties);
+    } else {
+        dt->GetPhysicalDeviceProperties2KHR(physicalDevice, pProperties);
+    }
     GetPhysicalDeviceProperties(physicalDevice, &pProperties->properties);
     PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
     FillPNextChain(pdd, pProperties->pNext);
 }
 
+VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceProperties2(VkPhysicalDevice physicalDevice,
+                                                        VkPhysicalDeviceProperties2KHR *pProperties) {
+    GetPhysicalDeviceProperties2Impl(physicalDevice, pProperties, true);
+}
+
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceProperties2KHR(VkPhysicalDevice physicalDevice,
                                                            VkPhysicalDeviceProperties2KHR *pProperties) {
-    GetPhysicalDeviceProperties2(physicalDevice, pProperties);
+    GetPhysicalDeviceProperties2Impl(physicalDevice, pProperties, false);
 }
 
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFeatures(VkPhysicalDevice physicalDevice, VkPhysicalDeviceFeatures *pFeatures) {
@@ -2536,7 +2546,7 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFeatures(VkPhysicalDevice physicalDe
     }
 }
 
-VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFeatures2(VkPhysicalDevice physicalDevice, VkPhysicalDeviceFeatures2KHR *pFeatures) {
+void GetPhysicalDeviceFeatures2Impl(VkPhysicalDevice physicalDevice, VkPhysicalDeviceFeatures2KHR *pFeatures, bool core) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
 
@@ -2544,18 +2554,30 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFeatures2(VkPhysicalDevice physicalD
     if (pdd) {
         ProfileLayerSettings *layer_settings = &JsonLoader::Find(pdd->instance())->layer_settings;
         if (layer_settings->simulate.unknown_feature_values == UNKNOWN_FEATURE_VALUES_DEVICE) {
-            dt->GetPhysicalDeviceFeatures2(physicalDevice, pFeatures);
+            if (core) {
+                dt->GetPhysicalDeviceFeatures2(physicalDevice, pFeatures);
+            } else {
+                dt->GetPhysicalDeviceFeatures2KHR(physicalDevice, pFeatures);
+            }
         }
         FillPNextChain(pdd, pFeatures->pNext);
     } else {
-        dt->GetPhysicalDeviceFeatures2(physicalDevice, pFeatures);
+        if (core) {
+            dt->GetPhysicalDeviceFeatures2(physicalDevice, pFeatures);
+        } else {
+            dt->GetPhysicalDeviceFeatures2KHR(physicalDevice, pFeatures);
+        }
     }
 
     GetPhysicalDeviceFeatures(physicalDevice, &pFeatures->features);
 }
 
+VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFeatures2(VkPhysicalDevice physicalDevice, VkPhysicalDeviceFeatures2KHR *pFeatures) {
+    GetPhysicalDeviceFeatures2Impl(physicalDevice, pFeatures, true);
+}
+
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFeatures2KHR(VkPhysicalDevice physicalDevice, VkPhysicalDeviceFeatures2KHR *pFeatures) {
-    GetPhysicalDeviceFeatures2(physicalDevice, pFeatures);
+    GetPhysicalDeviceFeatures2Impl(physicalDevice, pFeatures, false);
 }
 '''
 
@@ -2641,9 +2663,10 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties(VkPhysicalDevi
     *pQueueFamilyPropertyCount = copy_count;
 }
 
-VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties2KHR(VkPhysicalDevice physicalDevice,
-                                                                      uint32_t *pQueueFamilyPropertyCount,
-                                                                      VkQueueFamilyProperties2KHR *pQueueFamilyProperties2) {
+void GetPhysicalDeviceQueueFamilyProperties2Impl(VkPhysicalDevice physicalDevice,
+                                                 uint32_t *pQueueFamilyPropertyCount,
+                                                 VkQueueFamilyProperties2KHR *pQueueFamilyProperties2,
+                                                 bool core) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
 
@@ -2651,7 +2674,11 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties2KHR(VkPhysical
     PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
     const uint32_t src_count = (pdd) ? static_cast<uint32_t>(pdd->arrayof_queue_family_properties_.size()) : 0;
     if (src_count == 0) {
-        dt->GetPhysicalDeviceQueueFamilyProperties2(physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties2);
+        if (core) {
+            dt->GetPhysicalDeviceQueueFamilyProperties2(physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties2);
+        } else {
+            dt->GetPhysicalDeviceQueueFamilyProperties2KHR(physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties2);
+        }
         return;
     }
 
@@ -2670,10 +2697,16 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties2KHR(VkPhysical
     FillQueueFamilyPropertiesPNextChain(pdd, pQueueFamilyProperties2, copy_count);
 }
 
+VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties2KHR(VkPhysicalDevice physicalDevice,
+                                                                      uint32_t *pQueueFamilyPropertyCount,
+                                                                      VkQueueFamilyProperties2KHR *pQueueFamilyProperties2) {
+    GetPhysicalDeviceQueueFamilyProperties2Impl(physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties2, false);
+}
+
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties2(VkPhysicalDevice physicalDevice,
                                                                    uint32_t *pQueueFamilyPropertyCount,
                                                                    VkQueueFamilyProperties2KHR *pQueueFamilyProperties2) {
-    GetPhysicalDeviceQueueFamilyProperties2KHR(physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties2);
+    GetPhysicalDeviceQueueFamilyProperties2Impl(physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties2, true);
 }
 '''
 
@@ -2731,19 +2764,28 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties(VkPhysicalDevice ph
     LogFlush(layer_settings);
 }
 
-VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties2(VkPhysicalDevice physicalDevice, VkFormat format,
-                                                              VkFormatProperties2KHR *pFormatProperties) {
+void GetPhysicalDeviceFormatProperties2Impl(VkPhysicalDevice physicalDevice, VkFormat format,
+                                            VkFormatProperties2KHR *pFormatProperties, bool core) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
-    dt->GetPhysicalDeviceFormatProperties2(physicalDevice, format, pFormatProperties);
+    if (core) {
+        dt->GetPhysicalDeviceFormatProperties2(physicalDevice, format, pFormatProperties);
+    } else {
+        dt->GetPhysicalDeviceFormatProperties2KHR(physicalDevice, format, pFormatProperties);
+    }
     GetPhysicalDeviceFormatProperties(physicalDevice, format, &pFormatProperties->formatProperties);
     PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
     FillFormatPropertiesPNextChain(pdd, pFormatProperties->pNext, format);
 }
 
+VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties2(VkPhysicalDevice physicalDevice, VkFormat format,
+                                                              VkFormatProperties2KHR *pFormatProperties) {
+    GetPhysicalDeviceFormatProperties2Impl(physicalDevice, format, pFormatProperties, true);
+}
+
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties2KHR(VkPhysicalDevice physicalDevice, VkFormat format,
                                                                  VkFormatProperties2KHR *pFormatProperties) {
-    GetPhysicalDeviceFormatProperties2(physicalDevice, format, pFormatProperties);
+    GetPhysicalDeviceFormatProperties2Impl(physicalDevice, format, pFormatProperties, false);
 }
 
 VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties(VkPhysicalDevice physicalDevice, VkFormat format,
@@ -2776,9 +2818,9 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties(VkPhysical
     return result;
 }
 
-VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties2KHR(
+VkResult GetPhysicalDeviceImageFormatProperties2Impl(
     VkPhysicalDevice physicalDevice, const VkPhysicalDeviceImageFormatInfo2KHR *pImageFormatInfo,
-    VkImageFormatProperties2KHR *pImageFormatProperties) {
+    VkImageFormatProperties2KHR *pImageFormatProperties, bool core) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
 
@@ -2832,13 +2874,22 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties2KHR(
         }
     }
 
-    return dt->GetPhysicalDeviceImageFormatProperties2(physicalDevice, pImageFormatInfo, pImageFormatProperties);
+    if (core) {
+        return dt->GetPhysicalDeviceImageFormatProperties2(physicalDevice, pImageFormatInfo, pImageFormatProperties);
+    }
+    return dt->GetPhysicalDeviceImageFormatProperties2KHR(physicalDevice, pImageFormatInfo, pImageFormatProperties);
+}
+
+VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties2KHR(
+    VkPhysicalDevice physicalDevice, const VkPhysicalDeviceImageFormatInfo2KHR *pImageFormatInfo,
+    VkImageFormatProperties2KHR *pImageFormatProperties) {
+    return GetPhysicalDeviceImageFormatProperties2Impl(physicalDevice, pImageFormatInfo, pImageFormatProperties, false);
 }
 
 VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties2(VkPhysicalDevice physicalDevice,
                                                                        const VkPhysicalDeviceImageFormatInfo2 *pImageFormatInfo,
                                                                        VkImageFormatProperties2 *pImageFormatProperties) {
-    return GetPhysicalDeviceImageFormatProperties2KHR(physicalDevice, pImageFormatInfo, pImageFormatProperties);
+    return GetPhysicalDeviceImageFormatProperties2Impl(physicalDevice, pImageFormatInfo, pImageFormatProperties, true);
 }
 '''
 
