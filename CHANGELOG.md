@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD041 -->
 <p align="left"><img src="https://vulkan.lunarg.com/img/NewLunarGLogoBlack.png" alt="LunarG" width="263" height="113" /></p>
-<p align="left">Copyright © 2015-2025 LunarG, Inc.</p>
+<p align="left">Copyright © 2015-2026 LunarG, Inc.</p>
 
 [![Creative Commons][3]][4]
 
@@ -11,7 +11,7 @@
 
 # Release Notes
 
-## [Vulkan Profiles Tools 1.4.XXX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - May 2026
+## [Vulkan Profiles Tools 1.4.350](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.350.0) - May 2026
 
 ### Features:
 - Add Vulkan 1.4 minimum requirements profile
