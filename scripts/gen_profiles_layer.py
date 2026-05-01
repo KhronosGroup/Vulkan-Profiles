@@ -1241,6 +1241,14 @@ bool JsonLoader::GetQueueFamilyProperties(const char* device_name, const Json::V
             for (const auto &feature : props["optimalImageTransferToQueueFamilies"]) {
                 dest->ownership_transfer_properties_.optimalImageTransferToQueueFamilies |= feature.asUInt();
             }
+        } else if (name == "VkQueueFamilyOptimalImageTransferGranularityPropertiesKHR") {
+            const auto &optimalImageTransferGranularity = props["optimalImageTransferGranularity"];
+            dest->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.width =
+                optimalImageTransferGranularity["width"].asUInt();
+            dest->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.height =
+                optimalImageTransferGranularity["height"].asUInt();
+            dest->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.depth =
+                optimalImageTransferGranularity["depth"].asUInt();
         } else if (name == "VkQueueFamilyGlobalPriorityPropertiesKHR" || name == "VkQueueFamilyGlobalPriorityPropertiesEXT") {
             uint32_t i = 0;
             for (const auto &feature : props["priorities"]) {
@@ -1273,6 +1281,21 @@ bool JsonLoader::GetQueueFamilyProperties(const char* device_name, const Json::V
         }
         if ((device_qfp.ownership_transfer_properties_.optimalImageTransferToQueueFamilies & dest->ownership_transfer_properties_.optimalImageTransferToQueueFamilies) !=
              dest->ownership_transfer_properties_.optimalImageTransferToQueueFamilies) {
+            continue;
+        }
+        if (dest->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.width > 0 &&
+            device_qfp.optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.width >
+                dest->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.width) {
+            continue;
+        }
+        if (dest->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.height > 0 &&
+            device_qfp.optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.height >
+                dest->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.height) {
+            continue;
+        }
+        if (dest->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.depth > 0 &&
+            device_qfp.optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.depth >
+                dest->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.depth) {
             continue;
         }
         if (!GlobalPriorityMatch(device_qfp.global_priority_properties_, dest->global_priority_properties_)) {
@@ -1311,6 +1334,15 @@ bool JsonLoader::GetQueueFamilyProperties(const char* device_name, const Json::V
         if (dest->ownership_transfer_properties_.optimalImageTransferToQueueFamilies > 0) {
             message += format(", VkQueueFamilyOwnershipTransferPropertiesKHR [optimalImageTransferToQueueFamilies: %" PRIu32 "]",
                               dest->ownership_transfer_properties_.optimalImageTransferToQueueFamilies);
+        }
+        if (dest->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.width > 0 ||
+            dest->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.height > 0 ||
+            dest->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.depth > 0) {
+            message += format(", VkQueueFamilyOptimalImageTransferGranularityPropertiesKHR [optimalImageTransferGranularity: [%" PRIu32
+                              ", %" PRIu32 ", %" PRIu32 "]]",
+                              dest->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.width,
+                              dest->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.height,
+                              dest->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.depth);
         }
         if (dest->global_priority_properties_.priorityCount > 0) {
             std::string priorities = "[";
@@ -1358,6 +1390,21 @@ bool QueueFamilyAndExtensionsMatch(const QueueFamilyProperties &device, const Qu
          profile.ownership_transfer_properties_.optimalImageTransferToQueueFamilies) {
         return false;
     }
+    if (profile.optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.width > 0 &&
+        device.optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.width >
+            profile.optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.width) {
+        return false;
+    }
+    if (profile.optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.height > 0 &&
+        device.optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.height >
+            profile.optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.height) {
+        return false;
+    }
+    if (profile.optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.depth > 0 &&
+        device.optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.depth >
+            profile.optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.depth) {
+        return false;
+    }
     if (!GlobalPriorityMatch(device.global_priority_properties_, profile.global_priority_properties_)) {
         return false;
     }
@@ -1403,6 +1450,18 @@ void CopyUnsetQueueFamilyProperties(const QueueFamilyProperties *device, QueueFa
     if (profile->properties_2.queueFamilyProperties.minImageTransferGranularity.depth == 0) {
         profile->properties_2.queueFamilyProperties.minImageTransferGranularity.depth =
             device->properties_2.queueFamilyProperties.minImageTransferGranularity.depth;
+    }
+    if (profile->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.width == 0) {
+        profile->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.width =
+            device->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.width;
+    }
+    if (profile->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.height == 0) {
+        profile->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.height =
+            device->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.height;
+    }
+    if (profile->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.depth == 0) {
+        profile->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.depth =
+            device->optimal_image_transfer_granularity_properties_.optimalImageTransferGranularity.depth;
     }
 }
 
@@ -3093,6 +3152,11 @@ void LoadQueueFamilyProperties(VkInstance instance, VkPhysicalDevice pd, Physica
                 pdd->device_queue_family_properties_[i].ownership_transfer_properties_.pNext = pNext[i];
 
                 pNext[i] = &pdd->device_queue_family_properties_[i].ownership_transfer_properties_;
+            }
+            if (PhysicalDeviceData::HasExtension(pdd, VK_KHR_MAINTENANCE_11_EXTENSION_NAME)) {
+                pdd->device_queue_family_properties_[i].optimal_image_transfer_granularity_properties_.pNext = pNext[i];
+
+                pNext[i] = &pdd->device_queue_family_properties_[i].optimal_image_transfer_granularity_properties_;
             }
             if (PhysicalDeviceData::HasExtension(pdd, VK_KHR_GLOBAL_PRIORITY_EXTENSION_NAME)) {
                 pdd->device_queue_family_properties_[i].global_priority_properties_.pNext = pNext[i];

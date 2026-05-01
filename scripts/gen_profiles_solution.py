@@ -4408,7 +4408,7 @@ class VulkanRegistry():
 
         self.overwrite('VkPhysicalDeviceExternalFormatResolvePropertiesANDROID', 'nullColorAttachmentWithExternalFormatResolve', ['noauto', 'not'], 'min')
 
-        self.overwrite('VkPhysicalDeviceRenderPassStripedPropertiesARM', 'renderPassStripeGranularity', ['None', 'min'], 'max,mul')
+        self.overwrite('VkPhysicalDeviceRenderPassStripedPropertiesARM', 'renderPassStripeGranularity', ['None', 'min', 'max,mul'], 'min,mul')
         self.overwrite('VkPhysicalDeviceRenderPassStripedPropertiesARM', 'maxRenderPassStripes', ['None'], 'max')
 
         self.overwrite('VkPhysicalDeviceMaintenance6PropertiesKHR', 'maxCombinedImageSamplerDescriptorCount', ['None'], 'max')
