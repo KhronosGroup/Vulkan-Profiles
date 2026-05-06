@@ -209,7 +209,7 @@ TEST(api_get_profile_structures, get_features) {
 
     vpGetProfileFeatures(&profile, nullptr, &deviceFeatures2);
 
-    EXPECT_EQ(VK_TRUE, deviceVulkan12Features.samplerMirrorClampToEdge);
+    EXPECT_EQ(VK_FALSE, deviceVulkan12Features.samplerMirrorClampToEdge);
     EXPECT_EQ(VK_FALSE, deviceVulkan12Features.drawIndirectCount);
     EXPECT_EQ(VK_FALSE, deviceVulkan12Features.storageBuffer8BitAccess);
     EXPECT_EQ(VK_FALSE, deviceVulkan12Features.uniformAndStorageBuffer8BitAccess);
