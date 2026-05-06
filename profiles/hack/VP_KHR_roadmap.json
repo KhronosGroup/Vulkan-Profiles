@@ -24,7 +24,6 @@
         "vulkan12requirements": {
             "features": {
                 "VkPhysicalDeviceVulkan12Features": {
-                    "samplerMirrorClampToEdge": true,
                     "uniformBufferStandardLayout": true,
                     "subgroupBroadcastDynamicId": true,
                     "imagelessFramebuffer": true,
@@ -59,7 +58,8 @@
                     "computeFullSubgroups": true,
                     "shaderDemoteToHelperInvocation": true,
                     "inlineUniformBlock": true,
-                    "dynamicRendering": true
+                    "dynamicRendering": true,
+                    "privateData": true
                 }
             },
             "properties": {
@@ -729,6 +729,9 @@
                     "vulkan14requirements_roadmap2026_line5"
                 ],
                 "vulkanextensionrequirements_roadmap2026"
+            ],
+            "optionals": [
+                "vulkan14dependent"
             ]
         },
         "VP_KHR_roadmap_2024": {
