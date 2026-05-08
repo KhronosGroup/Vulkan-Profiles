@@ -4420,6 +4420,8 @@ class VulkanRegistry():
 
         self.overwrite('VkPhysicalDeviceCooperativeVectorPropertiesNV', 'maxCooperativeVectorComponents', ['None'], 'max')
 
+        self.overwrite('VkPhysicalDeviceGpaPropertiesAMD', 'flags', ['noauto'], 'bitmask')
+
         # TODO: The registry xml is also missing limittype definitions for format and queue family properties
         # For now we just add the important ones, this needs a larger overhaul in the vk.xml
         self.overwrite('VkFormatProperties', 'linearTilingFeatures', ['None'], 'bitmask')

@@ -3561,7 +3561,7 @@ class VulkanProfilesLayerGenerator():
     emulated_extensions = ['VK_KHR_portability_subset']
     additional_features = ['VkPhysicalDeviceFeatures', 'VkPhysicalDevicePortabilitySubsetFeaturesKHR']
     additional_properties = ['VkPhysicalDeviceProperties', 'VkPhysicalDeviceLimits', 'VkPhysicalDeviceSparseProperties', 'VkPhysicalDeviceToolProperties', 'VkPhysicalDevicePortabilitySubsetPropertiesKHR']
-    ignored_structs = ['VkPhysicalDeviceLayeredApiPropertiesListKHR']
+    ignored_structs = ['VkPhysicalDeviceLayeredApiPropertiesListKHR', 'VkPhysicalDeviceGpaPropertiesAMD']
     broken_pnext_structs = ['VkPhysicalDeviceDescriptorBufferTensorPropertiesARM', 'VkPhysicalDeviceDataGraphModelFeaturesQCOM']
 
     int_to_json_type_map = {
@@ -5664,6 +5664,8 @@ class VulkanProfilesLayerGenerator():
         if (var_name == 'physical_device_ray_tracing_invocation_reorder_features_' and nv):
             var_name += 'nv_'
         if (var_name == 'physical_device_fault_features_' and ext):
+            var_name += 'ext_'
+        if (var_name == 'physical_device_opacity_micromap_properties_' or var_name == 'physical_device_opacity_micromap_features_') and ext:
             var_name += 'ext_'
         return var_name
 

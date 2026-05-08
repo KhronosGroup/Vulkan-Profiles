@@ -157,7 +157,7 @@ class ProfileGenerator():
     i = 1
     skipped_features = []
     skipped_members = ["sType", "pNext", "physicalDevices", "driverID", "copySrcLayoutCount", "copyDstLayoutCount"]
-    skipped_properties_structs = ["VkPhysicalDeviceLineRasterizationPropertiesEXT", "VkPhysicalDeviceLayeredApiPropertiesListKHR", "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesEXT", "VkPhysicalDeviceCopyMemoryIndirectPropertiesNV", "VkPhysicalDeviceMemoryDecompressionPropertiesNV"]
+    skipped_properties_structs = ["VkPhysicalDeviceLineRasterizationPropertiesEXT", "VkPhysicalDeviceLayeredApiPropertiesListKHR", "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesEXT", "VkPhysicalDeviceCopyMemoryIndirectPropertiesNV", "VkPhysicalDeviceMemoryDecompressionPropertiesNV", 'VkPhysicalDeviceGpaPropertiesAMD']
     # VkPhysicalDeviceTileShadingPropertiesQCOM currently crashes in a driver
     # VkPhysicalDeviceRobustness2PropertiesEXT is an alias of VkPhysicalDeviceRobustness2PropertiesKHR
     skipped_test_structs = ["VkPhysicalDeviceTileShadingPropertiesQCOM", "VkPhysicalDeviceRobustness2PropertiesEXT"]
@@ -305,7 +305,6 @@ class ProfileGenerator():
                 for property in value.members:
                     member = value.members[property]
                     property_type = member.type
-                    property_limittype = member.limittype
                     property_name = member.name
                     property_size = 1
                     if (member.arraySize):
