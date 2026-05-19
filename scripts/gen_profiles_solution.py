@@ -3604,7 +3604,7 @@ class VulkanRegistry():
 
             # First collect base values
             values = xml.find("./enums[@name='" + enumDef.name + "']")
-            if values:
+            if values is not None:
                 for value in values.findall("./enum"):
                     if value.get('alias') is None:
                         enumDef.values.append(value.get('name'))
