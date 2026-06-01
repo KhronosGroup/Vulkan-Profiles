@@ -21,6 +21,7 @@
 
 from datetime import datetime
 from pathlib import Path
+from enum import Enum
 import argparse
 import functools
 import importlib.resources
@@ -31,6 +32,14 @@ import os
 import sys
 import collections
 from vulkan_object import get_vulkan_object
+import vulkan_object
+
+class VK_VERSION(Enum):
+    V1_0 = "VK_VERSION_1_0"
+    V1_1 = "VK_VERSION_1_1"
+    V1_2 = "VK_VERSION_1_2"
+    V1_3 = "VK_VERSION_1_3"
+    V1_4 = "VK_VERSION_1_4"
 
 def load_profiles_jsons(input_dir):
     if not isinstance(input_dir, Path):
@@ -82,6 +91,73 @@ def save_profiles_jsons(output_dir, json_files_dict):
         with open(output_file, "w", encoding="utf-8") as file:
             json.dump(value, file, indent=4)
 
+# A Profiles Json capabilities element containts block names. Collect all the names
+# "capabilities": [
+#    "MUST",
+#    ["multisampledToSingleSampled", "shaderStencilExport"],
+#    ["wideLinesEnabledConstrained", "wideLinesDisabledUnconstrained"]
+# ]
+def collect_block_names(json_capabilities):
+    block_names = []
+    
+    for value in json_capabilities:
+        if isinstance(value, str):
+            block_names.append(value)
+        elif isinstance(value, list):
+            names = value
+            for value in names:
+                block_names.append(value)
+        
+    return block_names
+
+# Extract extensions dependencies from vk.xml extension.depends attribute
+# EG: (VK_VERSION_1_1+VK_KHR_synchronization2),VK_VERSION_1_3
+def collect_extensions(version, depend_extensions):
+    if not isinstance(version, VK_VERSION):
+        print('ERROR: `version` is not a VK_VERSION type')
+        exit()
+
+    depend_options = depend_extensions.split(",")
+    extensions = []
+
+    for depend_option in depend_options:
+        if version.value in depend_option:
+            depend_option = depend_option.strip("(")
+            depend_option = depend_option.strip(")")
+            depend_elements = depend_option.split("+") 
+            
+            for depend_element in depend_elements:
+                if "VK_VERSION" in depend_element:
+                    continue
+                extensions.append(depend_element)
+            break
+        
+    return extensions
+
+def pull_capabilities_block_dependencies(json_profiles_capabilities_block, vk):
+    extensions = json_profiles_capabilities_block["extensions"]
+    
+    for extension in extensions:
+        extension_data = vk.extensions[extension]
+        depend_extensions = collect_extensions(VK_VERSION.V1_1, extension_data.depends)
+    
+    return
+
+def pull_profiles_file_dependencies(json_file_data, vk):
+    profiles_data = json_file_data["profiles"]
+    json_profiles_capabilities = json_file_data["capabilities"]
+
+    for key, value in profiles_data.items():
+        block_names = collect_block_names(value["capabilities"])
+        
+        for block_name in block_names:
+            pull_capabilities_block_dependencies(json_profiles_capabilities[block_name], vk)
+
+def pull_profiles_files_dependencies(json_files_dict, vk):
+    for key, value in json_files_dict.items():
+        print(key)
+        pull_profiles_file_dependencies(value, vk)
+
 def main_convert(args):
     vk = get_vulkan_object()
 
@@ -90,6 +166,8 @@ def main_convert(args):
     
     json_files_dict = load_profiles_jsons(Path(args.input))
     
+    pull_profiles_files_dependencies(json_files_dict, vk)
+
     save_profiles_jsons(Path(args.output), json_files_dict)
  
 def main(argv):
