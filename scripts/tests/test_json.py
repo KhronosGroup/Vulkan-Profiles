@@ -24,6 +24,8 @@ import unittest
 from pathlib import Path
 
 from ..profiles import load_profiles_jsons
+from ..profiles import collect_extensions
+from ..profiles import VK_VERSION
 
 class TestJsonMethods(unittest.TestCase):
     def test_load_profiles_jsons(self):
@@ -33,6 +35,18 @@ class TestJsonMethods(unittest.TestCase):
         jsons = load_profiles_jsons(profiles_files_dir)
         
         self.assertEqual(len(jsons), 8)
+       
+        
+    def test_collect_extensions(self):
+        A = collect_extensions(VK_VERSION.V1_1, "(VK_VERSION_1_1+VK_KHR_synchronization2),VK_VERSION_1_3")
+        self.assertEqual(A[0], "VK_KHR_synchronization2")
+        
+        B = collect_extensions(VK_VERSION.V1_3, "(VK_VERSION_1_1+VK_KHR_synchronization2),VK_VERSION_1_3")
+        self.assertEqual(len(B), 0)
+        
+        C = collect_extensions(VK_VERSION.V1_0, "(VK_VERSION_1_1+VK_KHR_synchronization2),VK_VERSION_1_3")
+        self.assertEqual(len(C), 0)
+
 
 if __name__ == '__main__':
     unittest.main()
