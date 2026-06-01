@@ -11,6 +11,11 @@
 
 # Release Notes
 
+## [Vulkan Profiles Tools 1.4.3XX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - July 2026
+
+### Bugfixes:
+- Fix profiles schema of generated profiles file with `gen_profiles_file.py` and using `--config`
+
 ## [Vulkan Profiles Tools 1.4.350](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.350.0) - May 2026
 
 ### Features:

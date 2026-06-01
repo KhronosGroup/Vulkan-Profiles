@@ -140,7 +140,7 @@ class ProfileConfig():
                             self.input_profile_values.append(json_file['profiles'][profile])
                             self.input_profile_names.append(profile)
         else:
-            print('ERROR: Not input directory set, use --input')
+            print('ERROR: No input directory set, use --input')
             exit()
 
     def get_api_version(self, profiles, merge_mode):
@@ -998,8 +998,8 @@ if __name__ == '__main__':
         json_file = open(args.config, "r")
         json_data = json.load(json_file)
 
-        if json_data["$schema"]:
-            profile_file.set_schema(json_data["$schema"])
+        #if json_data["$schema"]:
+        #    profile_file.set_schema(json_data["$schema"])
         if json_data["contributors"]:
             profile_file.set_contributors(json_data["contributors"])
         if json_data["history"]:
