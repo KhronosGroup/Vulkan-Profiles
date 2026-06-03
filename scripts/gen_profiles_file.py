@@ -465,8 +465,8 @@ class ProfileMerger():
                 if 'VkPhysicalDeviceVulkan12Properties' in sorted_properties:
                     if 'VkPhysicalDeviceDriverPropertiesKHR' in sorted_properties:
                         del sorted_properties['VkPhysicalDeviceDriverPropertiesKHR']
-                    if 'VkPhysicalDeviceFloatControlsPropertiesKHR ' in sorted_properties:
-                        del sorted_properties['VkPhysicalDeviceFloatControlsPropertiesKHR ']
+                    if 'VkPhysicalDeviceFloatControlsPropertiesKHR' in sorted_properties:
+                        del sorted_properties['VkPhysicalDeviceFloatControlsPropertiesKHR']
                     if 'VkPhysicalDeviceDescriptorIndexingPropertiesEXT' in sorted_properties:
                         del sorted_properties['VkPhysicalDeviceDescriptorIndexingPropertiesEXT']
                     if 'VkPhysicalDeviceDepthStencilResolvePropertiesKHR' in sorted_properties:
@@ -772,7 +772,7 @@ class ProfileMerger():
                 elif xmlmember.type == 'float':
                     if float(entry[member]) < float(merged[member]):
                         merged[member] = float(entry[member])
-                elif xmlmember.type == 'uint32_t' or xmlmember.type == 'int32_t'  or xmlmember.type == 'size_t' or 'VkSampleCountFlagBits':
+                elif xmlmember.type in ('uint32_t', 'int32_t', 'size_t', 'VkSampleCountFlagBits'):
                     if entry[member] < merged[member]:
                         merged[member] = entry[member]
                 else:
@@ -805,7 +805,7 @@ class ProfileMerger():
                 elif xmlmember.type == 'float':
                     if float(entry[member]) > float(merged[member]):
                         merged[member] = float(entry[member])
-                elif xmlmember.type == 'uint32_t' or xmlmember.type == 'int32_t' or xmlmember.type == 'size_t' or 'VkSampleCountFlagBits':
+                elif xmlmember.type in ('uint32_t', 'int32_t', 'size_t', 'VkSampleCountFlagBits'):
                     if entry[member] > merged[member]:
                         merged[member] = entry[member]
                 else:
