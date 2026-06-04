@@ -33,13 +33,9 @@ import sys
 import collections
 from vulkan_object import get_vulkan_object
 import vulkan_object
+from expression_parsing import collect_extensions
+from expression_parsing import VK_VERSION
 
-class VK_VERSION(Enum):
-    V1_0 = "VK_VERSION_1_0"
-    V1_1 = "VK_VERSION_1_1"
-    V1_2 = "VK_VERSION_1_2"
-    V1_3 = "VK_VERSION_1_3"
-    V1_4 = "VK_VERSION_1_4"
 
 def load_profiles_jsons(input_dir):
     if not isinstance(input_dir, Path):
@@ -110,31 +106,10 @@ def collect_block_names(json_capabilities):
         
     return block_names
 
-# Extract extensions dependencies from vk.xml extension.depends attribute
-# EG: (VK_VERSION_1_1+VK_KHR_synchronization2),VK_VERSION_1_3
-def collect_extensions(version, depend_extensions):
-    if not isinstance(version, VK_VERSION):
-        print('ERROR: `version` is not a VK_VERSION type')
-        exit()
-
-    depend_options = depend_extensions.split(",")
-    extensions = []
-
-    for depend_option in depend_options:
-        if version.value in depend_option:
-            depend_option = depend_option.strip("(")
-            depend_option = depend_option.strip(")")
-            depend_elements = depend_option.split("+") 
-            
-            for depend_element in depend_elements:
-                if "VK_VERSION" in depend_element:
-                    continue
-                extensions.append(depend_element)
-            break
-        
-    return extensions
-
 def pull_capabilities_block_dependencies(json_profiles_capabilities_block, vk):
+    if "extensions" not in json_profiles_capabilities_block:
+        return
+    
     extensions = json_profiles_capabilities_block["extensions"]
     
     for extension in extensions:
