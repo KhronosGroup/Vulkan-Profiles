@@ -71,6 +71,7 @@ jobs:
           pip install vulkan-object
           python -m unittest -v scripts/tests/test_util.py
           python -m unittest -v scripts/tests/test_json.py
+          python -m unittest -v scripts/tests/test_expression_tree.py
 
   android:
     env:
@@ -136,3 +137,4 @@ jobs:
           python -m pip install vulkan-object
           python -m unittest -v scripts/tests/test_util.py
           python -m unittest -v scripts/tests/test_json.py
+          python -m unittest -v scripts/tests/test_expression_tree.py
