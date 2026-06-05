@@ -21,8 +21,8 @@
 
 import unittest
 
-from ..expression_parsing import collect_extensions
-from ..expression_parsing import VK_VERSION
+from ..source.expression_parsing import collect_extensions
+from ..source.expression_parsing import VK_VERSION
 
 class TestExpressionTrees(unittest.TestCase):
     def test_collect_extensions2(self):
@@ -68,6 +68,28 @@ class TestExpressionTrees(unittest.TestCase):
         self.assertEqual(len(I), 2)
         self.assertEqual(I[0], "VK_KHR_get_physical_device_properties2")
         self.assertEqual(I[1], "VK_KHR_depth_stencil_resolve")
+        
+        J = collect_extensions(VK_VERSION.V1_1, "VK_VERSION_1_1+VK_KHR_shader_float_controls")
+        self.assertEqual(len(J), 1)
+        self.assertEqual(J[0], "VK_KHR_shader_float_controls")
+        
+        K = collect_extensions(VK_VERSION.NONE, "VK_VERSION_1_1+VK_KHR_shader_float_controls")
+        self.assertEqual(len(K), 1)
+        self.assertEqual(K[0], "VK_KHR_shader_float_controls")
+
+        L = collect_extensions(VK_VERSION.V1_0, "VK_VERSION_1_1+VK_KHR_shader_float_controls")
+        self.assertEqual(len(L), 0)
+        
+        M = collect_extensions(VK_VERSION.V1_3, "VK_KHR_swapchain+(VK_KHR_maintenance2,VK_VERSION_1_1)+(VK_KHR_image_format_list,VK_VERSION_1_2)")
+        self.assertEqual(len(M), 1)
+        self.assertEqual(M[0], "VK_KHR_swapchain")
+     
+        R = collect_extensions(VK_VERSION.V1_0, "VK_KHR_swapchain+(VK_KHR_maintenance2,VK_VERSION_1_1)+(VK_KHR_image_format_list,VK_VERSION_1_2)")
+        self.assertEqual(len(R), 3)
+        self.assertEqual(R[0], "VK_KHR_swapchain")   
+        self.assertEqual(R[1], "VK_KHR_maintenance2")   
+        self.assertEqual(R[2], "VK_KHR_image_format_list")   
+
 
 if __name__ == '__main__':
     unittest.main()

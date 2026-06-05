@@ -13,6 +13,9 @@
 
 ## [Vulkan Profiles Tools 1.4.3XX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - July 2026
 
+### Features:
+- Add `profiles.py` python script, to pull dependent extensions into a source profiles file (ALPHA)
+
 ### Bugfixes:
 - Fix profiles schema of generated profiles file with `gen_profiles_file.py` and using `--config`
 
