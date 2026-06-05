@@ -72,6 +72,7 @@ jobs:
           python -m unittest -v scripts/tests/test_util.py
           python -m unittest -v scripts/tests/test_json.py
           python -m unittest -v scripts/tests/test_expression_tree.py
+          python -m unittest -v scripts/tests/test_vk_xml_parsing.py
 
   android:
     env:
@@ -138,3 +139,4 @@ jobs:
           python -m unittest -v scripts/tests/test_util.py
           python -m unittest -v scripts/tests/test_json.py
           python -m unittest -v scripts/tests/test_expression_tree.py
+          python -m unittest -v scripts/tests/test_vk_xml_parsing.py

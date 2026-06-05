@@ -20,72 +20,22 @@
 # - Christophe Riccio <christophe@lunarg.com>
 
 from datetime import datetime
-from pathlib import Path
 from enum import Enum
+from pathlib import Path
 import argparse
 import functools
 import importlib.resources
-import json
 import re
 import tempfile
-import os
 import sys
 import collections
 from vulkan_object import get_vulkan_object
 import vulkan_object
-from expression_parsing import collect_extensions
-from expression_parsing import VK_VERSION
+from source.profiles_parsing import load_profiles_jsons
+from source.profiles_parsing import save_profiles_jsons
+from source.vk_xml_parsing import find_dependent_extensions
+from source.expression_parsing import VK_VERSION
 
-
-def load_profiles_jsons(input_dir):
-    if not isinstance(input_dir, Path):
-        print('ERROR: No `input_dir` is not a Path type')
-        exit()
-    if input_dir is None:
-        print('ERROR: No input directory set, use --input')
-        exit()
-
-    profiles_files_paths = []
-    for pos_json in os.listdir(input_dir):
-        if pos_json.endswith('.json'):
-            full_path = input_dir / pos_json
-            profiles_files_paths.append(full_path)
-
-    json_files_dict = {}
-
-    # Load the json files in the directory
-    for i in range(len(profiles_files_paths)):
-        with open(profiles_files_paths[i], "r", encoding="utf-8") as file:
-            json_file_data = json.load(file)
-
-            # Check the schema start with "https://schema.khronos.org/vulkan/profiles-0.8.", otherwise it's not a profiles file (or a valid one)
-            if isinstance(json_file_data, dict) and "$schema" in json_file_data:
-                schema_url = json_file_data["$schema"]
-
-                if isinstance(schema_url, str) and schema_url.startswith("https://schema.khronos.org/vulkan/profiles-0.8"):
-                    print(f"[DEBUG] Loading: {profiles_files_paths[i]}")
-                    json_files_dict[profiles_files_paths[i]] = json_file_data
-
-    return json_files_dict
-
-def save_profiles_jsons(output_dir, json_files_dict):
-    if not isinstance(output_dir, Path):
-        print('ERROR: `output_dir` is not a Path type')
-        exit()
-    if output_dir is None:
-        print('ERROR: No output directory set, use --output')
-        exit()
-    if not output_dir.exists():
-        print(f"ERROR: {output_dir} doesn't exist")
-        exit()
-    if not output_dir.is_dir():
-        print(f'ERROR: {output_dir} is not a directory')
-        exit()
-    
-    for key, value in json_files_dict.items():
-        output_file = output_dir / key.name
-        with open(output_file, "w", encoding="utf-8") as file:
-            json.dump(value, file, indent=4)
 
 # A Profiles Json capabilities element containts block names. Collect all the names
 # "capabilities": [
@@ -106,32 +56,33 @@ def collect_block_names(json_capabilities):
         
     return block_names
 
-def pull_capabilities_block_dependencies(json_profiles_capabilities_block, vk):
+def pull_capabilities_block_dependencies(vk, version: VK_VERSION, json_profiles_capabilities_block):
     if "extensions" not in json_profiles_capabilities_block:
         return
     
-    extensions = json_profiles_capabilities_block["extensions"]
-    
-    for extension in extensions:
-        extension_data = vk.extensions[extension]
-        depend_extensions = collect_extensions(VK_VERSION.V1_1, extension_data.depends)
+    extensions = find_dependent_extensions(vk, version, json_profiles_capabilities_block["extensions"])
+    json_profiles_capabilities_block["extensions"] = extensions
     
     return
 
-def pull_profiles_file_dependencies(json_file_data, vk):
+def pull_profiles_file_dependencies(vk, require_promoted_extensions, json_file_data):
     profiles_data = json_file_data["profiles"]
     json_profiles_capabilities = json_file_data["capabilities"]
 
     for key, value in profiles_data.items():
+        version = VK_VERSION.NONE
+        if not require_promoted_extensions:
+            version = VK_VERSION.from_string(value["api-version"])
+
         block_names = collect_block_names(value["capabilities"])
         
         for block_name in block_names:
-            pull_capabilities_block_dependencies(json_profiles_capabilities[block_name], vk)
+            pull_capabilities_block_dependencies(vk, version, json_profiles_capabilities[block_name])
 
-def pull_profiles_files_dependencies(json_files_dict, vk):
+def pull_profiles_files_dependencies(vk, require_promoted_extensions, json_files_dict):
     for key, value in json_files_dict.items():
         print(key)
-        pull_profiles_file_dependencies(value, vk)
+        pull_profiles_file_dependencies(vk, require_promoted_extensions, value)
 
 def main_convert(args):
     vk = get_vulkan_object()
@@ -140,8 +91,12 @@ def main_convert(args):
         print(version.name)
     
     json_files_dict = load_profiles_jsons(Path(args.input))
+    save_profiles_jsons(Path(args.format), json_files_dict)
     
-    pull_profiles_files_dependencies(json_files_dict, vk)
+    require_promoted_extensions = False
+    if args.require_promoted_extensions is not None:
+        require_promoted_extensions = True
+    pull_profiles_files_dependencies(vk, require_promoted_extensions, json_files_dict)
 
     save_profiles_jsons(Path(args.output), json_files_dict)
  
@@ -155,6 +110,8 @@ def main(argv):
 #                        help='Use specified a JSON merge config file path instead of using individual arguments.')
     parser.add_argument('--input', '-i', action='store', required=True, help='Path to the input profiles files.')
     parser.add_argument('--output', '-o', action='store', required=True, help='Path to the output profiles files.')
+    parser.add_argument('--format', action='store', required=True, help='Path to the reformated profiles files.')
+    parser.add_argument('--require-promoted-extensions', action='store_true', help='Require all extensions promoted to a core version.')
 #    parser.add_argument('--output-profile', action='store',
 #                        help='Profile name of the output profile. Deprecated, replaced by `--profile-name`.')
 #    parser.add_argument('--profile-name', action='store',
