@@ -12,7 +12,7 @@ This document contains the instructions for building this repository.
 - Python 3.7.2 or later (from https://www.python.org/downloads).  Notes:
   - Select to install the optional sub-package to add Python to the system `PATH` environment variable.
   - Need python3.3 or later to get the Windows `py.exe` launcher that is used to get `python3` rather than `python2` if both are installed on Windows
-  - Install `jsonschema` package (`pip3 install jsonschema`)
+  - Install `jsonschema` package (`py -m pip install jsonschema`)
 - Git (from http://git-scm.com/download/win).
   - Tell the installer to allow it to be used for "Developer Prompt" as well as "Git Bash".
   - Tell the installer to treat line endings "as is" (i.e. both DOS and Unix-style line endings).
