@@ -605,7 +605,7 @@ class ProfileGenerator():
 
     def gen_privateImpl(self, registry):
         gen = '{\n'
-        gen += '    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",\n'
+        gen += '    "$schema": "https://schema.khronos.org/vulkan/profiles-0.9.0-354.json#",\n'
         gen += '    "capabilities": {\n'
         gen += '        "baseline": {\n'
         gen += '            "extensions": {'

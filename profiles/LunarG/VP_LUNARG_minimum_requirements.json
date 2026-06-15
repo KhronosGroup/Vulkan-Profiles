@@ -1,7 +1,7 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.1-204.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.9.0-354.json#",
     "capabilities": {
-        "vulkan10requirements": {
+        "vulkan_1_0_base": {
             "features": {
                 "VkPhysicalDeviceFeatures": {
                     "robustBufferAccess": true
@@ -165,32 +165,33 @@
                         "residencyNonResidentStrict": false
                     }
                 }
+            },
+            "formats": {
             }
         },
-        "vulkan11requirements_split": {
-            "features": {
-                "VkPhysicalDeviceMultiviewFeatures": {
-                    "multiview": true
+        "vulkan_1_0_sparseBinding": {
+            "depends": {
+                "features": {
+                    "VkPhysicalDeviceFeatures": {
+                        "sparseBinding": true
+                    }
                 }
             },
             "properties": {
-                "VkPhysicalDeviceSubgroupProperties": {
-                    "subgroupSize": 1,
-                    "supportedStages": [ "VK_SHADER_STAGE_COMPUTE_BIT" ],
-                    "supportedOperations": [ "VK_SUBGROUP_FEATURE_BASIC_BIT" ]
-                },
-                "VkPhysicalDeviceMultiviewProperties": {
-                    "maxMultiviewViewCount": 6,
-                    "maxMultiviewInstanceIndex": 134217727
-                },
-                "VkPhysicalDeviceMaintenance3Properties": {
-                    "maxPerSetDescriptors": 1024,
-                    "maxMemoryAllocationSize": 1073741824
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "sparseAddressSpaceSize": 2147483648
+                    }
                 }
-
             }
         },
-        "vulkan11requirements": {
+        "vulkan_1_0": {
+            "requirements": [
+                "vulkan_1_0_base",
+                "vulkan_1_0_sparseBinding"
+            ]
+        },
+        "vulkan_1_1_base": {
             "features": {
                 "VkPhysicalDeviceVulkan11Features": {
                     "multiview": true
@@ -206,9 +207,71 @@
                     "maxPerSetDescriptors": 1024,
                     "maxMemoryAllocationSize": 1073741824
                 }
+            },
+            "formats": {
+
             }
         },
-        "vulkan12requirements": {
+        "vulkan_1_1_16bit_storage": {
+            "depends": {
+                "extensions": {
+                    "VK_KHR_16bit_storage": 1
+                }
+            },
+            "features": {
+                "VkPhysicalDevice16BitStorageFeatures": {
+                    "storageBuffer16BitAccess": true
+                }
+            }
+        },
+        "vulkan_1_1_sampler_ycbcr_conversion": {
+            "depends": {
+                "extensions": {
+                    "VK_KHR_sampler_ycbcr_conversion": 14
+                }
+            },
+            "features": {
+                "VkPhysicalDeviceSamplerYcbcrConversionFeatures": {
+                    "samplerYcbcrConversion": true
+                }
+            },
+            "formats": {
+            }
+        },
+        "vulkan_1_1_shader_draw_parameters": {
+            "depends": {
+                "extensions": {
+                    "VK_KHR_shader_draw_parameters": 1
+                }
+            },
+            "features": {
+                "VkPhysicalDeviceShaderDrawParametersFeatures": {
+                    "shaderDrawParameters": true
+                }
+            }
+        },
+        "vulkan_1_1_variable_pointers": {
+            "depends": {
+                "extensions": {
+                    "VK_KHR_variable_pointers": 1
+                }
+            },
+            "features": {
+                "VkPhysicalDeviceVariablePointersFeatures": {
+                    "variablePointersStorageBuffer": true
+                }
+            }
+        },
+        "vulkan_1_1": {
+            "requirements": [
+                "vulkan_1_1_base",
+                "vulkan_1_1_16bit_storage",
+                "vulkan_1_1_sampler_ycbcr_conversion",
+                "vulkan_1_1_shader_draw_parameters",
+                "vulkan_1_1_variable_pointers"
+            ]
+        },
+        "vulkan_1_2_base": {
             "features": {
                 "VkPhysicalDeviceVulkan12Features": {
                     "samplerMirrorClampToEdge": true,
@@ -275,9 +338,148 @@
                     "maxTimelineSemaphoreValueDifference": 2147483647,
                     "framebufferIntegerColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT" ]
                 }
+            },
+            "formats": {
             }
         },
-        "vulkan13requirements": {
+        "vulkan_1_2_8bit_storage": {
+            "depends": {
+                "extensions": {
+                    "VK_KHR_8bit_storage": 1
+                }
+            },
+            "features": {
+                "VkPhysicalDeviceVulkan12Features": {
+                    "storageBuffer8BitAccess": true
+                }
+            }
+        },
+        "vulkan_1_2_draw_indirect_count": {
+            "depends": {
+                "extensions": {
+                    "VK_KHR_draw_indirect_count": 1
+                }
+            },
+            "features": {
+                "VkPhysicalDeviceVulkan12Features": {
+                    "drawIndirectCount": true
+                }
+            }
+        },
+        "vulkan_1_2_sampler_mirror_clamp_to_edge": {
+            "depends": {
+                "extensions": {
+                    "VK_KHR_sampler_mirror_clamp_to_edge": 3
+                }
+            },
+            "features": {
+                "VkPhysicalDeviceVulkan12Features": {
+                    "samplerMirrorClampToEdge": true
+                }
+            }
+        },
+        "vulkan_1_2_descriptor_indexing": {
+            "depends": {
+                "extensions": {
+                    "VK_EXT_descriptor_indexing": 2
+                }
+            },
+            "features": {
+                "VkPhysicalDeviceVulkan12Features": {
+                    "descriptorIndexing": true
+                }
+            }
+        },
+        "vulkan_1_2_scalar_block_layout": {
+            "depends": {
+                "extensions": {
+                    "VK_EXT_scalar_block_layout": 1
+                }
+            },
+            "features": {
+                "VkPhysicalDeviceVulkan12Features": {
+                    "scalarBlockLayout": true
+                }
+            }
+        },
+        "vulkan_1_2_shader_viewport_index_layer": {
+            "depends": {
+                "extensions": {
+                    "VK_EXT_shader_viewport_index_layer": 1
+                }
+            },
+            "features": {
+                "VkPhysicalDeviceVulkan12Features": {
+                    "shaderOutputViewportIndex": true,
+                    "shaderOutputLayer": true
+                }
+            }
+        },
+        "vulkan_1_2_buffer_device_address": {
+            "depends": {
+                "extensions": {
+                    "VK_KHR_buffer_device_address": 1
+                }
+            },
+            "features": {
+                "VkPhysicalDeviceVulkan12Features": {
+                    "bufferDeviceAddress": true
+                }
+            }
+        },
+        "vulkan_1_2_shader_atomic_int64": {
+            "depends": {
+                "extensions": {
+                    "VK_KHR_shader_atomic_int64": 1
+                }
+            },
+            "features": {
+                "VkPhysicalDeviceVulkan12Features": {
+                    "shaderBufferInt64Atomics": true
+                }
+            }
+        },
+        "vulkan_1_2_shader_float16_int8": {
+            "depends": {
+                "extensions": {
+                    "VK_KHR_shader_float16_int8": 1
+                }
+            },
+            "features": {
+                "VkPhysicalDeviceVulkan12Features": {
+                    "shaderFloat16": true,
+                    "shaderInt8": true
+                }
+            }
+        },
+        "vulkan_1_2_vulkan_memory_model": {
+            "depends": {
+                "extensions": {
+                    "VK_KHR_vulkan_memory_model": 3
+                }
+            },
+            "features": {
+                "VkPhysicalDeviceVulkan12Features": {
+                    "vulkanMemoryModel": true
+                }
+            }
+        },
+        "vulkan_1_2": {
+            "requirements": [
+                "vulkan_1_2_base",
+                "vulkan_1_2_8bit_storage",
+                "vulkan_1_2_draw_indirect_count",
+                "vulkan_1_2_sampler_mirror_clamp_to_edge",
+                "vulkan_1_2_descriptor_indexing",
+                "vulkan_1_2_scalar_block_layout",
+                "vulkan_1_2_shader_viewport_index_layer",
+                "vulkan_1_2_buffer_device_address",
+                "vulkan_1_2_shader_atomic_int64",
+                "vulkan_1_2_shader_float16_int8",
+                "vulkan_1_2_vulkan_memory_model"
+            ]
+        },
+        "vulkan_1_3_base": {
             "features": {
                 "VkPhysicalDeviceVulkan12Features": {
                     "vulkanMemoryModel": true,
@@ -341,9 +543,139 @@
                     "integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated": false,
                     "maxBufferSize": 1073741824
                 }
+            },
+            "formats": {
             }
         },
-        "vulkan14requirements": {
+        "vulkan_1_3_4444_formats": {
+            "depends": {
+                "extensions": {
+                    "VK_EXT_4444_formats": 1
+                }
+            },
+            "features": {
+                "VkPhysicalDevice4444FormatsFeaturesEXT": {
+                    "formatA4R4G4B4": true,
+                    "formatA4B4G4R4": true
+                }
+            },
+            "formats": {
+                "VK_FORMAT_A4R4G4B4_UNORM_PACK16": {
+                    "VkFormatProperties": {
+                        "optimalTilingFeatures": [
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
+                        ]
+                    }
+                },
+                "VK_FORMAT_A4B4G4R4_UNORM_PACK16": {
+                    "VkFormatProperties": {
+                        "optimalTilingFeatures": [
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
+                        ]
+                    }
+                },
+                "VK_FORMAT_A4R4G4B4_UNORM_PACK16_EXT": {
+                    "VkFormatProperties": {
+                        "optimalTilingFeatures": [
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
+                        ]
+                    }
+                },
+                "VK_FORMAT_A4B4G4R4_UNORM_PACK16_EXT": {
+                    "VkFormatProperties": {
+                        "optimalTilingFeatures": [
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                            "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
+                            "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT"
+                        ]
+                    }
+                }
+            }
+        },
+        "vulkan_1_3_texture_compression_astc_hdr": {
+            "depends": {
+                "extensions": {
+                    "VK_EXT_texture_compression_astc_hdr": 1
+                }
+            },
+            "features": {
+                "VkPhysicalDeviceExtendedDynamicStateFeaturesEXT": {
+                    "extendedDynamicState": true
+                }
+            },
+            "formats": {
+                "VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK": {
+                    "VkFormatProperties": {
+                    }
+                },
+                "VK_FORMAT_ASTC_5x4_SFLOAT_BLOCK": {
+                    "VkFormatProperties": {
+                    }
+                },
+                "VK_FORMAT_ASTC_5x5_SFLOAT_BLOCK": {
+                    "VkFormatProperties": {
+                    }
+                },
+                "VK_FORMAT_ASTC_6x5_SFLOAT_BLOCK": {
+                    "VkFormatProperties": {
+                    }
+                },
+                "VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK": {
+                    "VkFormatProperties": {
+                    }
+                },
+                "VK_FORMAT_ASTC_8x5_SFLOAT_BLOCK": {
+                    "VkFormatProperties": {
+                    }
+                },
+                "VK_FORMAT_ASTC_8x6_SFLOAT_BLOCK": {
+                    "VkFormatProperties": {
+                    }
+                },
+                "VK_FORMAT_ASTC_8x8_SFLOAT_BLOCK": {
+                    "VkFormatProperties": {
+                    }
+                },
+                "VK_FORMAT_ASTC_10x5_SFLOAT_BLOCK": {
+                    "VkFormatProperties": {
+                    }
+                },
+                "VK_FORMAT_ASTC_10x6_SFLOAT_BLOCK": {
+                    "VkFormatProperties": {
+                    }
+                },
+                "VK_FORMAT_ASTC_10x8_SFLOAT_BLOCK": {
+                    "VkFormatProperties": {
+                    }
+                },
+                "VK_FORMAT_ASTC_10x10_SFLOAT_BLOCK": {
+                    "VkFormatProperties": {
+                    }
+                },
+                "VK_FORMAT_ASTC_12x10_SFLOAT_BLOCK": {
+                    "VkFormatProperties": {
+                    }
+                },
+                "VK_FORMAT_ASTC_12x12_SFLOAT_BLOCK": {
+                    "VkFormatProperties": {
+                    }
+                }
+            }
+        },
+        "vulkan_1_3": {
+            "requirements": [
+                "vulkan_1_3_base",
+                "vulkan_1_3_4444_formats",
+                "vulkan_1_3_texture_compression_astc_hdr"
+            ]
+        },
+        "vulkan_1_4_base": {
             "features": {
                 "VkPhysicalDeviceFeatures": {
                     "fullDrawIndexUint32": true,
@@ -444,7 +776,7 @@
                 },
                 "VkPhysicalDeviceVulkan11Properties": {
                     "subgroupSupportedOperations": [ "VK_SUBGROUP_FEATURE_BASIC_BIT", "VK_SUBGROUP_FEATURE_CLUSTERED_BIT", "VK_SUBGROUP_FEATURE_ROTATE_CLUSTERED_BIT" ]
-                },                
+                },
                 "VkPhysicalDeviceVulkan12Properties": {
                     "shaderSignedZeroInfNanPreserveFloat16": true,
                     "shaderSignedZeroInfNanPreserveFloat32": true
@@ -454,12 +786,30 @@
                 }
             }
         },
-        "vulkan14dependent": {
+        "vulkan_1_4_protectedMemory": {
+            "depends": {
+                "features": {
+                    "VkPhysicalDeviceVulkan11Features": {
+                        "protectedMemory": true
+                    }
+                }
+            },
             "features": {
                 "VkPhysicalDeviceVulkan14Features": {
                     "pipelineProtectedAccess": true
                 }
             }
+        },
+        "vulkan_1_4": {
+            "features": {
+                "VkPhysicalDeviceVulkan14Features": {
+                    "pipelineProtectedAccess": true
+                }
+            },
+            "requirements": [
+                "vulkan_1_4_base",
+                "vulkan_1_4_protectedMemory"
+            ]
         }
     },
     "profiles": {
@@ -469,7 +819,7 @@
             "label": "Vulkan 1.0 Minimum Requirements",
             "description": "Vulkan 1.0 Minimum Requirements.",
             "capabilities": [
-                "vulkan10requirements"
+                "vulkan_1_0"
             ]
         },
         "VP_LUNARG_minimum_requirements_1_1": {
@@ -478,8 +828,8 @@
             "label": "Vulkan 1.1 Minimum Requirements",
             "description": "Vulkan 1.1 Minimum Requirements.",
             "capabilities": [
-                "vulkan10requirements",
-                "vulkan11requirements_split"
+                "vulkan_1_0",
+                "vulkan_1_1"
             ]
         },
         "VP_LUNARG_minimum_requirements_1_2": {
@@ -488,9 +838,9 @@
             "label": "Vulkan 1.2 Minimum Requirements",
             "description": "Vulkan 1.2 Minimum Requirements.",
             "capabilities": [
-                "vulkan10requirements",
-                "vulkan11requirements",
-                "vulkan12requirements"
+                "vulkan_1_0",
+                "vulkan_1_1",
+                "vulkan_1_2"
             ]
         },
         "VP_LUNARG_minimum_requirements_1_3": {
@@ -499,10 +849,10 @@
             "label": "Vulkan 1.3 Minimum Requirements",
             "description": "Vulkan 1.3 Minimum Requirements.",
             "capabilities": [
-                "vulkan10requirements",
-                "vulkan11requirements",
-                "vulkan12requirements",
-                "vulkan13requirements"
+                "vulkan_1_0",
+                "vulkan_1_1",
+                "vulkan_1_2",
+                "vulkan_1_3"
             ]
         },
         "VP_LUNARG_minimum_requirements_1_4": {
@@ -511,14 +861,11 @@
             "label": "Vulkan 1.4 Minimum Requirements",
             "description": "Vulkan 1.4 Minimum Requirements.",
             "capabilities": [
-                "vulkan10requirements",
-                "vulkan11requirements",
-                "vulkan12requirements",
-                "vulkan13requirements",
-                "vulkan14requirements"
-            ],
-            "optionals": [
-                "vulkan14dependent"
+                "vulkan_1_0",
+                "vulkan_1_1",
+                "vulkan_1_2",
+                "vulkan_1_3",
+                "vulkan_1_4"
             ]
         }
     },
@@ -530,6 +877,12 @@
         }
     },
     "history": [
+        {
+            "revision": 3,
+            "date": "2026-06-15",
+            "author": "Christophe Riccio",
+            "comment": "Refactor profiles definitions and add capabilities dependences"
+        },
         {
             "revision": 2,
             "date": "2026-03-05",

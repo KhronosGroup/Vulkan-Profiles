@@ -6092,7 +6092,7 @@ class VulkanProfilesSchemaGenerator():
 
         return OrderedDict({
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "$id": "https://schema.khronos.org/vulkan/profiles-0.8.2-{0}.json#".format(str(self.registry.headerVersionNumber.patch)),
+            "$id": "https://schema.khronos.org/vulkan/profiles-0.9.0-{0}.json#".format(str(self.registry.headerVersionNumber.patch)),
             "title": "Vulkan Profiles Schema for Vulkan {0}".format(versionStr),
             "additionalProperties": True,
             "required": [
@@ -6108,6 +6108,32 @@ class VulkanProfilesSchemaGenerator():
                         "type": "object",
                         "additionalProperties": False,
                         "properties": OrderedDict({
+                            "requirements": OrderedDict({
+                                "description": "The block that stores required blocks.",
+                                "type": "array",
+                                "uniqueItems": True,
+                                "items": OrderedDict({
+                                    "type": "string"
+                                })
+                            }),
+                            "depends": OrderedDict({
+                                "description": "The block that stores required blocks.",
+                                "type": "object",
+                                "properties": OrderedDict({
+                                    "extensions": OrderedDict({
+                                        "description": "The block that stores required extensions.",
+                                        "type": "object",
+                                        "additionalProperties": False,
+                                        "properties": extensions
+                                    }),
+                                    "features": OrderedDict({
+                                        "description": "The block that stores features requirements.",
+                                        "type": "object",
+                                        "additionalProperties": False,
+                                        "properties": features
+                                    })
+                                })
+                            }),
                             "extensions": OrderedDict({
                                 "description": "The block that stores required extensions.",
                                 "type": "object",

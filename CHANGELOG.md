@@ -15,6 +15,8 @@
 
 ### Features:
 - Add `profiles.py` python script, to pull dependent extensions into a source profiles file (ALPHA)
+- Add capabilities dependences in JSON schema, version 0.9
+- Add capabilities dependences in minimum requirements profiles
 - Add the generated `VP_LUNARG_desktop_baseline_2026` profile
 
 ### Bugfixes:
