@@ -97,7 +97,7 @@ if (BUILD_TESTS_EXTRA)
     add_definitions(-DVKU_FORCE_EXTRA_TESTS)
 endif()
 
-set(PROFILES_SCHEMA_FILENAME "profiles-0.8-latest.json")
+set(PROFILES_SCHEMA_FILENAME "profiles-0.9-latest.json")
 
 # Generate profiles executable
 function(add_pyinstaller_target TARGET_NAME)

@@ -54,11 +54,11 @@ JsonValidator::~JsonValidator() {
 
 bool JsonValidator::Init() {
 #ifdef __APPLE__
-    const std::string schema_path = "/usr/local/share/vulkan/registry/profiles-0.8-latest.json";
+    const std::string schema_path = "/usr/local/share/vulkan/registry/profiles-0.9-latest.json";
 #else
     const char *sdk_path = std::getenv("VULKAN_SDK");
     if (sdk_path == nullptr) return false;
-    const std::string schema_path = std::string(sdk_path) + "/share/vulkan/registry/profiles-0.8-latest.json";
+    const std::string schema_path = std::string(sdk_path) + "/share/vulkan/registry/profiles-0.9-latest.json";
 #endif
 
     if (!schema) {
