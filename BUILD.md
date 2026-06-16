@@ -9,10 +9,10 @@ This document contains the instructions for building this repository.
 - Microsoft Visual Studio 2019 or higher
 - [CMake 3.22.1](https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1-windows-x86_64.zip) is recommended.
   - Tell the installer to "Add CMake to the system `PATH`" environment variable.
-- Python 3.7.2 or later (from https://www.python.org/downloads).  Notes:
+- Python 3.13 or later (from https://www.python.org/downloads).  Notes:
   - Select to install the optional sub-package to add Python to the system `PATH` environment variable.
-  - Need python3.3 or later to get the Windows `py.exe` launcher that is used to get `python3` rather than `python2` if both are installed on Windows
   - Install `jsonschema` package (`py -m pip install jsonschema`)
+  - Install `vulkan-object` package (`py -m pip install vulkan-object`)
 - Git (from http://git-scm.com/download/win).
   - Tell the installer to allow it to be used for "Developer Prompt" as well as "Git Bash".
   - Tell the installer to treat line endings "as is" (i.e. both DOS and Unix-style line endings).
@@ -39,9 +39,10 @@ sudo apt-get install wget autotools-dev libxcb-keysyms1 libxcb-keysyms1-dev libx
 # If performing 32-bit builds, you will also need:
 sudo apt-get install libc6-dev-i386 g++-multilib
 
-# Install jsonschema python package
+# Install python packages
 sudo apt-get install python3-pip
 pip3 install jsonschema
+pip3 install vulkan-object
 ```
 
 ### Fedora Core System Requirements
@@ -59,9 +60,10 @@ sudo dnf install git @development-tools glm-devel \
                  libX11-devel libXpresent libxcb xcb-util libxcb-devel libXrandr-devel \
                  xcb-util-keysyms-devel xcb-util-wm-devel
 
-# Install jsonschema python package
+# Install python packages
 sudo dnf install python3-pip
 pip3 install jsonschema
+pip3 install vulkan-object
 ```
 
 Optional software packages:
@@ -84,9 +86,10 @@ export PATH=/usr/local/bin:$PATH
 brew install python python3 git
 ```
 
-- Install `jsonschema` python package
+- Install python packages
 ```
 pip3 install jsonschema
+pip3 install vulkan-object
 ```
 
 ### Android Additional System Requirements

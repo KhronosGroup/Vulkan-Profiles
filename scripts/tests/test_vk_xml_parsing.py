@@ -53,7 +53,7 @@ class TestVKXMLParsing(unittest.TestCase):
         }
         
         # Case 0
-        dependent_extensions0 = find_dependent_extensions(vk, VK_VERSION.V1_0, extensions_data)
+        dependent_extensions0 = find_dependent_extensions(vk, VK_VERSION.V1_0, False, extensions_data)
         
         expected_extensions0 = {
             "VK_KHR_get_physical_device_properties2": 2,
@@ -67,7 +67,7 @@ class TestVKXMLParsing(unittest.TestCase):
         self.assertEqual(dependent_extensions0, expected_extensions0)
        
        # Case 1
-        dependent_extensions1 = find_dependent_extensions(vk, VK_VERSION.V1_1, extensions_data)
+        dependent_extensions1 = find_dependent_extensions(vk, VK_VERSION.V1_1, False, extensions_data)
 
         expected_extensions1 = {
             "VK_KHR_depth_stencil_resolve": 1,
@@ -97,7 +97,7 @@ class TestVKXMLParsing(unittest.TestCase):
             "VK_EXT_transform_feedback": 1
         }
         
-        dependent_extensions2 = find_dependent_extensions(vk, VK_VERSION.V1_3, extensions_data2)
+        dependent_extensions2 = find_dependent_extensions(vk, VK_VERSION.V1_3, False, extensions_data2)
 
         expected_extensions2 = {
             "VK_KHR_load_store_op_none": 1,
@@ -119,6 +119,48 @@ class TestVKXMLParsing(unittest.TestCase):
         }
 
         self.assertEqual(dependent_extensions2, expected_extensions2)
+        
+        # Case 3
+        
+        extensions_data3 = {
+            "VK_KHR_load_store_op_none": 1,
+            "VK_KHR_maintenance6": 1,
+            "VK_KHR_map_memory2": 1,
+            "VK_KHR_shader_expect_assume": 1,
+            "VK_KHR_shader_float_controls2": 1,
+            "VK_KHR_shader_maximal_reconvergence": 1,
+            "VK_KHR_shader_subgroup_rotate": 2,
+            "VK_KHR_shader_subgroup_uniform_control_flow": 1,
+            "VK_KHR_swapchain_mutable_format": 1,
+            "VK_EXT_host_image_copy": 1,
+            "VK_EXT_image_2d_view_of_3d": 1,
+            "VK_EXT_pipeline_protected_access": 1,
+            "VK_EXT_pipeline_robustness": 1,
+            "VK_EXT_transform_feedback": 1
+        }
+        
+        dependent_extensions3 = find_dependent_extensions(vk, VK_VERSION.V1_3, True, extensions_data3)
+
+        expected_extensions3 = {
+            "VK_KHR_load_store_op_none": 1,
+            "VK_KHR_maintenance6": 1,
+            "VK_KHR_map_memory2": 1,
+            "VK_KHR_shader_expect_assume": 1,
+            "VK_KHR_shader_float_controls": 1,
+            "VK_KHR_shader_float_controls2": 1,
+            "VK_KHR_shader_maximal_reconvergence": 1,
+            "VK_KHR_shader_subgroup_rotate": 1,
+            "VK_KHR_shader_subgroup_uniform_control_flow": 1,
+            "VK_KHR_swapchain": 1,
+            "VK_KHR_swapchain_mutable_format": 1,
+            "VK_EXT_host_image_copy": 1,
+            "VK_EXT_image_2d_view_of_3d": 1,
+            "VK_EXT_pipeline_protected_access": 1,
+            "VK_EXT_pipeline_robustness": 1,
+            "VK_EXT_transform_feedback": 1
+        }
+
+        self.assertEqual(dependent_extensions3, expected_extensions3)
         
         return
     

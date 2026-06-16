@@ -30,7 +30,7 @@ def find_extension_version(vk: VulkanObject, extension_name: str) -> int:
         return 0 # extension not found
 
 
-def find_dependent_extensions(vk: VulkanObject, version: VK_VERSION, extensions: dict[str, int]) -> dict[str, int]:
+def find_dependent_extensions(vk: VulkanObject, version: VK_VERSION, ignore_extension_versions: bool, extensions: dict[str, int]) -> dict[str, int]:
     result = {}
     
     for extension in extensions:
@@ -45,11 +45,17 @@ def find_dependent_extensions(vk: VulkanObject, version: VK_VERSION, extensions:
         # First insert the dependent extensions
         for depend_extension in depend_extensions:
             if depend_extension not in result:
-                result[depend_extension] = find_extension_version(vk, depend_extension)
+                if ignore_extension_versions:
+                    result[depend_extension] = 1
+                else:
+                    result[depend_extension] = find_extension_version(vk, depend_extension)
             
         # Then insert the source extension
         if extension not in result:
-            result[extension] = extension_data.specVersionValue
+            if ignore_extension_versions:
+                result[extension] = 1
+            else:
+                result[extension] = extension_data.specVersionValue
     
     return result
     
