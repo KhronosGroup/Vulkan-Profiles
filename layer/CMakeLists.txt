@@ -68,6 +68,8 @@ if(BUILD_MOCK_ANDROID_SUPPORT)
     add_definitions(-DVK_USE_PLATFORM_ANDROID_KHR)
 endif()
 
+option(ENABLE_SO_VERSIONING "Build as SHARED library with SO versioning for packaging" OFF)
+
 add_definitions(-DVK_ENABLE_BETA_EXTENSIONS)
 
 source_group("JSON Manifest" FILES ${LAYER_NAME}.json.in)
@@ -77,6 +79,12 @@ source_group("Export Files" FILES ${LAYER_NAME}.def ${LAYER_NAME}.map)
 
 if(IOS)
     add_library(ProfilesLayer SHARED)
+elseif(ENABLE_SO_VERSIONING)
+    add_library(ProfilesLayer SHARED)
+    set_target_properties(ProfilesLayer PROPERTIES
+        VERSION ${VULKAN_PROFILE_VERSION}
+        SOVERSION 1
+    )
 else()
     add_library(ProfilesLayer MODULE)
 endif()
@@ -196,6 +204,8 @@ if (WIN32)
     set(JSON_LIBRARY_PATH ".\\\\${LAYER_NAME}.dll")
 elseif(APPLE)
     set(JSON_LIBRARY_PATH "./lib${LAYER_NAME}.dylib")
+elseif(ENABLE_SO_VERSIONING)
+    set(JSON_LIBRARY_PATH "./lib${LAYER_NAME}.so.1")
 else()
     set(JSON_LIBRARY_PATH "./lib${LAYER_NAME}.so")
 endif()
@@ -216,6 +226,8 @@ if (UNIX)
 
     if(APPLE)
         set(JSON_LIBRARY_PATH "lib${LAYER_NAME}.dylib")
+    elseif(ENABLE_SO_VERSIONING)
+        set(JSON_LIBRARY_PATH "lib${LAYER_NAME}.so.1")
     else()
         set(JSON_LIBRARY_PATH "lib${LAYER_NAME}.so")
     endif()
