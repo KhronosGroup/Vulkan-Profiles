@@ -15,6 +15,7 @@
 
 ### Features:
 - Add `profiles.py` python script, to pull dependent extensions into a source profiles file (ALPHA)
+- Add the generated `VP_LUNARG_desktop_baseline_2026` profile
 
 ### Bugfixes:
 - Fix profiles schema of generated profiles file with `gen_profiles_file.py` and using `--config`

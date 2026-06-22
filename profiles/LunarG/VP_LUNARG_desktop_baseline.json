@@ -8552,6 +8552,12 @@
     },
     "history": [
         {
+            "revision": 3,
+            "date": "2026-06-22",
+            "author": "Christophe Riccio",
+            "comment": "Add Desktop Baseline 2026 with Vulkan 1.4 requirement"
+        },
+        {
             "revision": 2,
             "date": "2024-02-21",
             "author": "Christophe Riccio",

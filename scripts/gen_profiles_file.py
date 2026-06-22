@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 #
-# Copyright (c) 2022-2024 LunarG, Inc.
+# Copyright (C) 2022-2026 Valve Corporation
+# Copyright (c) 2022-2026 LunarG, Inc.
 # Copyright (c) 2024 RasterGrid Kft.
 #
 # Licensed under the Apache License, Version 2.0 (the "License")
