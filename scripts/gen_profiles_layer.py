@@ -25,8 +25,8 @@ from typing import OrderedDict
 
 COPYRIGHT_HEADER = '''
 /*
- * Copyright (C) 2015-2024 Valve Corporation
- * Copyright (C) 2015-2024 LunarG, Inc.
+ * Copyright (C) 2015-2026 Valve Corporation
+ * Copyright (C) 2015-2026 LunarG, Inc.
  * Copyright (C) 2023-2024 RasterGrid Kft.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
