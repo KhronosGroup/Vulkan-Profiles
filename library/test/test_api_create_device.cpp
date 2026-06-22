@@ -128,6 +128,15 @@ TEST(api_create_device_profile, check_support_desktop_2024) {
     EXPECT_TRUE(supported == VK_TRUE);
 }
 
+TEST(api_create_device_profile, check_support_desktop_2026) {
+    const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2026_NAME, VP_LUNARG_DESKTOP_BASELINE_2026_SPEC_VERSION};
+
+    VkBool32 supported = VK_FALSE;
+    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    EXPECT_TRUE(result == VK_SUCCESS);
+    EXPECT_TRUE(supported == VK_TRUE);
+}
+
 TEST(api_create_device_profile, check_support_roadmap_2022) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
 

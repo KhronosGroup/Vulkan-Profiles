@@ -239,6 +239,14 @@ TEST(test_validate_unit, VP_LUNARG_desktop_max_2024) {
     EXPECT_TRUE(validator.Check(json_document2));
 }
 
+TEST(test_validate_unit, VP_LUNARG_desktop_max_2026) {
+    JsonValidator validator;
+
+    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_desktop_max_2026.json";
+    const Json::Value json_document2 = ParseJsonFile(path.c_str());
+    EXPECT_TRUE(validator.Check(json_document2));
+}
+
 TEST(test_validate_sdk, VP_LUNARG_minimum_requirements) {
     JsonValidator validator;
 
