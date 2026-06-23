@@ -31,7 +31,7 @@ import collections
 class ProfileFile():
     def __init__(self):
         self.json_output = dict()
-        self.json_output['$schema'] = 'https://schema.khronos.org/vulkan/profiles-0.8-latest.json#'
+        self.json_output['$schema'] = 'https://schema.khronos.org/vulkan/profiles-0.9-latest.json#'
         self.json_output['capabilities'] = dict()
         self.json_output['profiles'] = dict()
         self.json_output['contributors'] = dict()

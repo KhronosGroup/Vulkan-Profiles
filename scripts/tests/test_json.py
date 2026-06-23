@@ -63,7 +63,7 @@ class TestJsonMethods(unittest.TestCase):
     def test_validate_profiles_json(self):
         repository_path = Path(__file__).resolve().parent.parent.parent
         profiles_files_file = repository_path / "profiles/VP_KHR_roadmap.json"
-        profiles_schema_file = repository_path / "schema/profiles-0.8-latest.json"
+        profiles_schema_file = repository_path / "schema/profiles-0.9-latest.json"
 
         validated_json = validate_profiles_json(profiles_files_file, profiles_schema_file)
         self.assertEqual(validated_json, True)
@@ -71,7 +71,7 @@ class TestJsonMethods(unittest.TestCase):
     def test_validate_profiles_jsons(self):
         repository_path = Path(__file__).resolve().parent.parent.parent
         profiles_files_dir = repository_path / "profiles"
-        profiles_schema_file = repository_path / "schema/profiles-0.8-latest.json"
+        profiles_schema_file = repository_path / "schema/profiles-0.9-latest.json"
 
         validated_jsons = validate_profiles_jsons(profiles_files_dir, profiles_schema_file)
         self.assertEqual(validated_jsons, 8)
