@@ -903,7 +903,6 @@
                         "VK_SHADER_STAGE_FRAGMENT_BIT",
                         "VK_SHADER_STAGE_COMPUTE_BIT",
                         "VK_SHADER_STAGE_ALL_GRAPHICS",
-                        "VK_SHADER_STAGE_ALL",
                         "VK_SHADER_STAGE_TASK_BIT_NV",
                         "VK_SHADER_STAGE_MESH_BIT_NV"
                     ],

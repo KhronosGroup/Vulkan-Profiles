@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD041 -->
 <p align="left"><img src="https://vulkan.lunarg.com/img/NewLunarGLogoBlack.png" alt="LunarG" width=263 height=113 /></p>
-<p align="left">Copyright (c) 2021-2025 LunarG, Inc.</p>
+<p align="left">Copyright (c) 2021-2026 LunarG, Inc.</p>
 
 [![Creative Commons][3]][4]
 
@@ -30,14 +30,14 @@ The *Vulkan Profiles Toolset* includes the following components:
 - [***The Vulkan Profiles JSON Schema***](https://github.com/KhronosGroup/Khronos-Schemas/tree/main/vulkan)
   - A data format to exchange Vulkan capabilities: extensions, features, properties, formats and queue properties.
   - Each revision of Vulkan API is represented by a schema that supersedes older versions of Vulkan API.
-  - The schema covers Vulkan 1.3 and all extensions.
+  - The schema covers Vulkan capabilities and all extensions.
 - [***The Vulkan Profiles JSON file generation***](#vulkan-profiles-json-file-generation)
   - A `Python` script to generate profiles file by combining multiple exist profiles files.
   - It supports both `union` and `intersection` of Vulkan capabilities.
 - [***The Vulkan Profiles API library***](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_api_library.html)
   - A header-only C++ library to use *Vulkan Profiles* in Vulkan applications.
   - The library allows checking Profiles support on a device and creating a `VkDevice` instance with the profile features and extensions enabled.
-  - The library requires a Vulkan 1.0 driver that supports `VK_KHR_get_physical_device_properties2` extension.
+  - The library requires a Vulkan 1.1 driver.
 - [***The Vulkan Profiles Layer***](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_layer.html)
   - A layer used during application development to ensure adherence to the requirements of a chosen *Vulkan Profile*.
   - [It simulates but doesn't emulate](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_layer.html#technical-details) Vulkan capabilities. Hence, it is used with the [Validation layer](https://github.com/KhronosGroup/Vulkan-ValidationLayers) to clamp available capabilities on the Vulkan developer system.
@@ -72,6 +72,7 @@ The VP_ANDROID_16_minimums profile has been deprecated by Android, rebranded int
 The VP_ANDROID_15_minimums profile has been deprecated by Android, rebranded into the VP_ANDROID_15_requirements profile.
 
 The `VP_LUNARG_desktop_baseline` profiles are generated arbritarily as examples of *Platform* profiles from hand picked Vulkan devices profiles. They are not expected to be used by Vulkan applications as defined. Instead, Vulkan application developers should create *Platform* profiles dedicated to their Vulkan applications that match the ecosystem of devices they want the Vulkan applications to run on.
+- [VP_LUNARG_desktop_baseline_2026](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_LUNARG_desktop_baseline_2026) (Vulkan 1.4)
 - [VP_LUNARG_desktop_baseline_2024](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_LUNARG_desktop_baseline_2024) (Vulkan 1.2)
 - [VP_LUNARG_desktop_baseline_2023](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_LUNARG_desktop_baseline_2023) (Vulkan 1.2)
 - [VP_LUNARG_desktop_baseline_2022](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_LUNARG_desktop_baseline_2022) (Vulkan 1.1)
