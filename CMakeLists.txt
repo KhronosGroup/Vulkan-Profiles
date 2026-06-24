@@ -38,6 +38,7 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN "YES")
 add_subdirectory(scripts)
 set(MERGE_SCRIPT ${PROJECT_SOURCE_DIR}/scripts/gen_profiles_file.py)
 set(SOLUTION_SCRIPT ${PROJECT_SOURCE_DIR}/scripts/gen_profiles_solution.py)
+set(PROFILES_SCRIPT ${PROJECT_SOURCE_DIR}/scripts/profiles.py)
 
 find_package(VulkanHeaders REQUIRED CONFIG QUIET)
 
