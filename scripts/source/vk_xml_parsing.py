@@ -59,3 +59,6 @@ def find_dependent_extensions(vk: VulkanObject, version: VK_VERSION, ignore_exte
     
     return result
     
+
+def find_feature_alias(vk: VulkanObject, version: VK_VERSION, struct: str, feature: str):
+    return 

@@ -102,9 +102,9 @@
                         "maxFragmentOutputAttachments": 4,
                         "maxFragmentCombinedOutputResources": 8,
                         "maxComputeSharedMemorySize": 16384,
-                        "maxComputeWorkGroupCount": [ 65535, 65535, 65535 ],
+                        "maxComputeWorkGroupCount": [65535, 65535, 65535],
                         "maxComputeWorkGroupInvocations": 128,
-                        "maxComputeWorkGroupSize": [ 128, 128, 64 ],
+                        "maxComputeWorkGroupSize": [128, 128, 64],
                         "subPixelPrecisionBits": 4,
                         "subTexelPrecisionBits": 4,
                         "mipmapPrecisionBits": 4,
@@ -113,8 +113,8 @@
                         "maxSamplerLodBias": 2.0,
                         "maxSamplerAnisotropy": 1.0,
                         "maxViewports": 1,
-                        "maxViewportDimensions": [ 4096, 4096 ],
-                        "viewportBoundsRange": [ -8192, 8191 ],
+                        "maxViewportDimensions": [4096, 4096],
+                        "viewportBoundsRange": [-8192, 8191],
                         "minTexelBufferOffsetAlignment": 256,
                         "minUniformBufferOffsetAlignment": 256,
                         "minStorageBufferOffsetAlignment": 256,
@@ -126,16 +126,16 @@
                         "maxFramebufferWidth": 4096,
                         "maxFramebufferHeight": 4096,
                         "maxFramebufferLayers": 256,
-                        "framebufferColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
-                        "framebufferDepthSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
-                        "framebufferStencilSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
-                        "framebufferNoAttachmentsSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "framebufferColorSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                        "framebufferDepthSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                        "framebufferStencilSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                        "framebufferNoAttachmentsSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                         "maxColorAttachments": 4,
-                        "sampledImageColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
-                        "sampledImageIntegerSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT" ],
-                        "sampledImageDepthSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
-                        "sampledImageStencilSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
-                        "storageImageSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT" ],
+                        "sampledImageColorSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                        "sampledImageIntegerSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
+                        "sampledImageDepthSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                        "sampledImageStencilSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                        "storageImageSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
                         "maxSampleMaskWords": 1,
                         "discreteQueuePriorities": 2,
                         "pointSizeGranularity": 1,
@@ -813,9 +813,7 @@
                     "comment": "Renamed/rebranded from 'VP_ANDROID_baseline_2022' (a.k.a. Android Baseline Profile 2022 or ABP 2022) to 'VP_ANDROID_vulkan_profile_2022' (a.k.a. Android Vulkan Profile 2022 or AVP 2022)"
                 }
             ],
-            "capabilities": [
-                "baseline"
-            ]
+            "capabilities": ["baseline"]
         }
     }
 }

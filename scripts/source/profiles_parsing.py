@@ -22,7 +22,9 @@
 import logging
 import os
 import json
+import re
 from pathlib import Path
+from enum import StrEnum
 
 def _validate_profiles_json_data(json_data, schema_data) -> bool:
     try:
@@ -134,7 +136,12 @@ def load_profiles_jsons(input_dir):
     return json_files_dict
 
 
-def save_profiles_jsons(json_files_dict, output_dir):
+class OutputFormatType(StrEnum):
+    PRETTY = 'pretty'
+    FLATTEN = 'flatten'
+
+
+def save_profiles_jsons(json_files_dict, output_dir, format: OutputFormatType):
     if not isinstance(output_dir, Path):
         logging.error('`output_dir` is not a Path type')
         exit()
@@ -151,6 +158,16 @@ def save_profiles_jsons(json_files_dict, output_dir):
     for key, value in json_files_dict.items():
         output_file = output_dir / key.name
         with open(output_file, "w", encoding="utf-8") as file:
-            json.dump(value, file, indent=4)
+            if format == OutputFormatType.FLATTEN:
+                pretty_json = json.dumps(value, indent=4)
+                # Updated Regex: [^\[\]{}] means "no brackets AND no curly braces"
+                flat_json = re.sub(
+                    r'\[([^\[\]{}]*?)\]', 
+                    lambda m: '[' + re.sub(r'\s+', ' ', m.group(1)).strip() + ']', 
+                    pretty_json
+                )
+                file.write(flat_json)
+            else:
+                json.dump(value, file, indent=4)
             
             

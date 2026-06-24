@@ -51,7 +51,7 @@
                         "lineWidthGranularity": 0.5,
                         "maxColorAttachments": 8,
                         "maxComputeWorkGroupInvocations": 256,
-                        "maxComputeWorkGroupSize": [ 256, 256, 64 ],
+                        "maxComputeWorkGroupSize": [256, 256, 64],
                         "maxImageArrayLayers": 2048,
                         "maxImageDimension1D": 8192,
                         "maxImageDimension2D": 8192,
@@ -148,10 +148,8 @@
                     "comment": "Renamed/rebranded from 'VP_ANDROID_16_minimums' (a.k.a. Vulkan Profile for Android 16 or VPA16) to 'VP_ANDROID_16_requirements' (a.k.a. Vulkan Requirements for Android 16 or VRA16)"
                 }
             ],
-            "profiles": [
-                "VP_ANDROID_15_requirements"
-             ],
-             "capabilities": [
+            "profiles": ["VP_ANDROID_15_requirements"],
+            "capabilities": [
                 "MUST",
                 ["multisampledToSingleSampled", "shaderStencilExport"]
             ]

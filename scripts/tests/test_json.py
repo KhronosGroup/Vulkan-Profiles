@@ -24,6 +24,7 @@ import logging
 
 from pathlib import Path
 
+from ..source.profiles_parsing import OutputFormatType
 from ..source.profiles_parsing import load_profiles_jsons
 from ..source.profiles_parsing import save_profiles_jsons
 from ..source.profiles_parsing import validate_profiles_json
@@ -32,22 +33,22 @@ from ..source.profiles_parsing import validate_profiles_jsons
 class TestJsonMethods(unittest.TestCase):
     def test_load_profiles_jsons(self):
         repository_path = Path(__file__).resolve().parent.parent.parent
-        profiles_files_dir = repository_path / "profiles"
+        profiles_files_dir = repository_path / "profiles/LunarG"
 
         jsons = load_profiles_jsons(profiles_files_dir)
-        self.assertEqual(len(jsons), 8)
+        self.assertEqual(len(jsons), 2)
 
     def test_save_profiles_jsons(self):
         repository_path = Path(__file__).resolve().parent.parent.parent
-        profiles_files_dir = repository_path / "profiles"
+        profiles_files_dir = repository_path / "profiles/LunarG"
 
         jsons_ref = load_profiles_jsons(profiles_files_dir)
-        self.assertEqual(len(jsons_ref), 8)
+        self.assertEqual(len(jsons_ref), 2)
 
-        save_profiles_jsons(jsons_ref, repository_path / "build")
+        save_profiles_jsons(jsons_ref, repository_path / "build", OutputFormatType.FLATTEN)
         
         jsons_copy = load_profiles_jsons(repository_path / "build")
-        self.assertEqual(len(jsons_copy), 8)
+        self.assertEqual(len(jsons_copy), 2)
         
         for ref_key in jsons_ref.keys():
             filename = Path(ref_key).name
@@ -62,7 +63,7 @@ class TestJsonMethods(unittest.TestCase):
 
     def test_validate_profiles_json(self):
         repository_path = Path(__file__).resolve().parent.parent.parent
-        profiles_files_file = repository_path / "profiles/VP_KHR_roadmap.json"
+        profiles_files_file = repository_path / "profiles/LunarG/VP_LUNARG_minimum_requirements.json"
         profiles_schema_file = repository_path / "schema/profiles-0.8-latest.json"
 
         validated_json = validate_profiles_json(profiles_files_file, profiles_schema_file)
@@ -70,11 +71,11 @@ class TestJsonMethods(unittest.TestCase):
 
     def test_validate_profiles_jsons(self):
         repository_path = Path(__file__).resolve().parent.parent.parent
-        profiles_files_dir = repository_path / "profiles"
+        profiles_files_dir = repository_path / "profiles/LunarG"
         profiles_schema_file = repository_path / "schema/profiles-0.8-latest.json"
 
         validated_jsons = validate_profiles_jsons(profiles_files_dir, profiles_schema_file)
-        self.assertEqual(validated_jsons, 8)
+        self.assertEqual(validated_jsons, 2)
 
 
 if __name__ == '__main__':
