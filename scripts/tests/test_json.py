@@ -21,7 +21,7 @@
 
 import unittest
 import logging
-
+import shutil
 from pathlib import Path
 
 from ..source.profiles_parsing import OutputFormatType
@@ -45,9 +45,12 @@ class TestJsonMethods(unittest.TestCase):
         jsons_ref = load_profiles_jsons(profiles_files_dir)
         self.assertEqual(len(jsons_ref), 2)
 
-        save_profiles_jsons(jsons_ref, repository_path / "build", OutputFormatType.FLATTEN)
+        tmp_dir = repository_path / "_tmp"
+        tmp_dir.mkdir(parents=True, exist_ok=True)
+
+        save_profiles_jsons(jsons_ref, tmp_dir, OutputFormatType.FLATTEN)
         
-        jsons_copy = load_profiles_jsons(repository_path / "build")
+        jsons_copy = load_profiles_jsons(tmp_dir)
         self.assertEqual(len(jsons_copy), 2)
         
         for ref_key in jsons_ref.keys():
@@ -60,6 +63,8 @@ class TestJsonMethods(unittest.TestCase):
                     break
 
             self.assertEqual(jsons_ref[ref_key], jsons_copy[copy_key])
+
+        shutil.rmtree(tmp_dir, ignore_errors=True)
 
     def test_validate_profiles_json(self):
         repository_path = Path(__file__).resolve().parent.parent.parent

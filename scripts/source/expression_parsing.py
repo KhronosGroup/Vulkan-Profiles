@@ -174,7 +174,7 @@ def collect_extensions(current_version: VK_VERSION, expression_str: str) -> list
                 if VERSION_ORDER.index(current_version) < VERSION_ORDER.index(token_ver):
                     # FEATURE 1: Record the error message in case the evaluation fails
                     errors.append(
-                        f"ERROR: Invalid Profiles File, the required Vulkan version '{current_version.value}' by the profile is older than the requied Vulkan version '{token_ver.value}' by an extension"
+                        f"WARNING: Invalid Profiles File, the required Vulkan version '{current_version.value}' by the profile is older than the requied Vulkan version '{token_ver.value}' by an extension"
                     )
                     return False
                 return True
