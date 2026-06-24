@@ -77,7 +77,7 @@
                     }
                 },
                 "VkPhysicalDeviceVulkan11Properties": {
-                  "subgroupSupportedOperations": ["VK_SUBGROUP_FEATURE_BASIC_BIT", "VK_SUBGROUP_FEATURE_VOTE_BIT", "VK_SUBGROUP_FEATURE_ARITHMETIC_BIT", "VK_SUBGROUP_FEATURE_BALLOT_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT"]
+                    "subgroupSupportedOperations": ["VK_SUBGROUP_FEATURE_BASIC_BIT", "VK_SUBGROUP_FEATURE_VOTE_BIT", "VK_SUBGROUP_FEATURE_ARITHMETIC_BIT", "VK_SUBGROUP_FEATURE_BALLOT_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT"]
                 }
             },
             "formats": {
@@ -165,12 +165,10 @@
                     "date": "2025-12-02",
                     "author": "Ian Elliott",
                     "comment": "Renamed/rebranded from 'VP_ANDROID_15_minimums' (a.k.a. Vulkan Profile for Android 15 or VPA15) to 'VP_ANDROID_15_requirements' (a.k.a. Vulkan Requirements for Android 15 or VRA15)"
-                 }
+                }
             ],
-            "profiles": [
-                "VP_ANDROID_vulkan_profile_2022"
-             ],
-             "capabilities": [
+            "profiles": ["VP_ANDROID_vulkan_profile_2022"],
+            "capabilities": [
                 "MUST",
                 ["primitivesGeneratedQuery", "pipelineStatisticsQuery"],
                 ["swBresenhamLines", "hwBresenhamLines"]

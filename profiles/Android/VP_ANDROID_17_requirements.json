@@ -70,7 +70,7 @@
                 "VkPhysicalDeviceVulkan14Features": {
                     "hostImageCopy": true
                 }
-              },
+            },
             "properties": {
                 "VkPhysicalDeviceProperties": {
                     "limits": {
@@ -80,74 +80,50 @@
                 "VkPhysicalDeviceVulkan11Properties": {
                     "subgroupSupportedStages": ["VK_SHADER_STAGE_FRAGMENT_BIT"]
                 }
-              },
-              "formats": {
+            },
+            "formats": {
                 "VK_FORMAT_A4B4G4R4_UNORM_PACK16_EXT": {
-                  "VkFormatProperties": {
-                    "linearTilingFeatures": [
-                      "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
-                      "VK_FORMAT_FEATURE_BLIT_DST_BIT",
-                      "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                      "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                    ],
-                    "optimalTilingFeatures": [
-                      "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
-                      "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
-                      "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                      "VK_FORMAT_FEATURE_BLIT_DST_BIT",
-                      "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                      "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                    ],
-                    "bufferFeatures": []
-                  }
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": ["VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"],
+                        "optimalTilingFeatures": ["VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"],
+                        "bufferFeatures": []
+                    }
                 },
                 "VK_FORMAT_A4R4G4B4_UNORM_PACK16_EXT": {
-                  "VkFormatProperties": {
-                    "linearTilingFeatures": [
-                      "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
-                      "VK_FORMAT_FEATURE_BLIT_DST_BIT",
-                      "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                      "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                    ],
-                    "optimalTilingFeatures": [
-                      "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
-                      "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
-                      "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-                      "VK_FORMAT_FEATURE_BLIT_DST_BIT",
-                      "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-                      "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"
-                    ],
-                    "bufferFeatures": []
-                  }
+                    "VkFormatProperties": {
+                        "linearTilingFeatures": ["VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"],
+                        "optimalTilingFeatures": ["VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"],
+                        "bufferFeatures": []
+                    }
                 }
-              }
-            },
-            "primitivesGeneratedQuery": {
-              "extensions": {
+            }
+        },
+        "primitivesGeneratedQuery": {
+            "extensions": {
                 "VK_EXT_primitives_generated_query": 1
-              },
-              "features": {
+            },
+            "features": {
                 "VkPhysicalDevicePrimitivesGeneratedQueryFeaturesEXT": {
-                  "primitivesGeneratedQuery": true
+                    "primitivesGeneratedQuery": true
                 }
-              }
-            },
-            "pipelineStatisticsQuery": {
-              "features": {
+            }
+        },
+        "pipelineStatisticsQuery": {
+            "features": {
                 "VkPhysicalDeviceFeatures": {
-                  "pipelineStatisticsQuery": true
+                    "pipelineStatisticsQuery": true
                 }
-              }
-            },
-            "multisampledToSingleSampled": {
-              "extensions": {
+            }
+        },
+        "multisampledToSingleSampled": {
+            "extensions": {
                 "VK_EXT_multisampled_render_to_single_sampled": 1
-              }
-            },
-            "shaderStencilExport": {
-              "extensions": {
+            }
+        },
+        "shaderStencilExport": {
+            "extensions": {
                 "VK_EXT_shader_stencil_export": 1
-              }
+            }
         }
     },
     "profiles": {
@@ -206,18 +182,10 @@
             ],
             "capabilities": [
                 "MUST",
-            [
-                  "primitivesGeneratedQuery",
-                  "pipelineStatisticsQuery"
-                ],
-                [
-                  "multisampledToSingleSampled",
-                  "shaderStencilExport"
-                ]
-              ],
-            "profiles": [
-                "VP_ANDROID_vulkan_profile_2025"
-             ]
+                ["primitivesGeneratedQuery", "pipelineStatisticsQuery"],
+                ["multisampledToSingleSampled", "shaderStencilExport"]
+            ],
+            "profiles": ["VP_ANDROID_vulkan_profile_2025"]
         }
-  }
+    }
 }

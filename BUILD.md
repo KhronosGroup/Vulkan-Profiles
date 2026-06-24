@@ -9,7 +9,7 @@ This document contains the instructions for building this repository.
 - Microsoft Visual Studio 2019 or higher
 - [CMake 3.22.1](https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1-windows-x86_64.zip) is recommended.
   - Tell the installer to "Add CMake to the system `PATH`" environment variable.
-- Python 3.13 or later (from https://www.python.org/downloads).  Notes:
+- Python 3.11 or later (from https://www.python.org/downloads).  Notes:
   - Select to install the optional sub-package to add Python to the system `PATH` environment variable.
   - Install `jsonschema` package (`py -m pip install jsonschema`)
   - Install `vulkan-object` package (`py -m pip install vulkan-object`)
