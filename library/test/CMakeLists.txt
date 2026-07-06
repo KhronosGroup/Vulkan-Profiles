@@ -12,6 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# Authors: 
+# - Christophe Riccio <christophe@lunarg.com>
 # ~~~
 
 set(test_libraries GTest::gtest GTest::gtest_main Vulkan::Headers Vulkan::Profiles Vulkan::CompilerConfiguration Vulkan::CompilerConfigurationExtra)
