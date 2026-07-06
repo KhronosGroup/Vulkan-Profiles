@@ -23,7 +23,6 @@ from enum import Enum
 from enum import IntEnum
 import re
 
-
 # --- Updated Enum Definition ---
 class VK_VERSION(Enum):
     NONE = "VK_NONE"

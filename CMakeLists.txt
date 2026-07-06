@@ -59,6 +59,8 @@ if (BUILD_TESTS)
     if(NOT ANDROID)
         find_package(VulkanLoader REQUIRED CONFIG)
     endif()
+
+    add_subdirectory(scripts/tests)
 endif()
 
 option(BUILD_TESTS_EXTRA "Build the extra tests, for developers only")
