@@ -19,12 +19,21 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
+import argparse
+from pathlib import Path
+import sys
 import unittest
 
-from ..source.expression_parsing import collect_extensions
-from ..source.expression_parsing import VK_VERSION
+scripts_dir = Path(__file__).resolve().parent.parent
+if str(scripts_dir) not in sys.path:
+    sys.path.insert(0, str(scripts_dir))
+
+from source.expression_parsing import collect_extensions
+from source.expression_parsing import VK_VERSION
 
 class TestExpressionTrees(unittest.TestCase):
+    registry_path = None
+
     def test_collect_extensions2(self):
         O = collect_extensions(VK_VERSION.V1_1, "")
         self.assertEqual(len(O), 0)
@@ -92,5 +101,15 @@ class TestExpressionTrees(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--registry', '-r', action='store', required=True,
+                        help='Use specified registry file instead of vk.xml (video.xml must be present in the same directory for video support).')
+
+    args, unparsed = parser.parse_known_args()
+    TestExpressionTrees.registry_path = args.registry
+
+    unittest.main(argv=[sys.argv[0]] + unparsed)
+
     unittest.main()
 

@@ -19,18 +19,26 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
+import argparse
+from pathlib import Path
+import sys
 import unittest
 
-from vulkan_object import get_vulkan_object
-import vulkan_object
+scripts_dir = Path(__file__).resolve().parent.parent
+if str(scripts_dir) not in sys.path:
+    sys.path.insert(0, str(scripts_dir))
 
-from ..source.vk_xml_parsing import find_extension_version
-from ..source.vk_xml_parsing import find_dependent_extensions
-from ..source.expression_parsing import VK_VERSION
+from vulkan_object import VulkanObject
+from source.vulkan_object_utils import getVulkanObject
+from source.vk_xml_parsing import find_extension_version
+from source.vk_xml_parsing import find_dependent_extensions
+from source.expression_parsing import VK_VERSION
 
 class TestVKXMLParsing(unittest.TestCase):
+    registry_path = None
+
     def test_find_extension_version(self):
-        vk = get_vulkan_object()
+        vk: VulkanObject = getVulkanObject(self.registry_path)
 
         extension_version0 = find_extension_version(vk, "VK_KHR_dynamic_rendering")
         self.assertEqual(extension_version0, 1)
@@ -44,7 +52,7 @@ class TestVKXMLParsing(unittest.TestCase):
     def test_find_dependent_extensions(self):
         self.maxDiff = 1024
         
-        vk = get_vulkan_object()
+        vk: VulkanObject = getVulkanObject(self.registry_path)
 
         extensions_data = {
             "VK_KHR_dynamic_rendering": 1,
@@ -163,8 +171,14 @@ class TestVKXMLParsing(unittest.TestCase):
         self.assertEqual(dependent_extensions3, expected_extensions3)
         
         return
-    
 
 if __name__ == '__main__':
-    unittest.main()
+    parser = argparse.ArgumentParser()
 
+    parser.add_argument('--registry', '-r', action='store', required=True,
+                        help='Use specified registry file instead of vk.xml (video.xml must be present in the same directory for video support).')
+
+    args, unparsed = parser.parse_known_args()
+    TestVKXMLParsing.registry_path = args.registry
+
+    unittest.main(argv=[sys.argv[0]] + unparsed)

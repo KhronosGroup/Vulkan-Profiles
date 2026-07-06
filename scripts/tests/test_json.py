@@ -19,18 +19,27 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
+import argparse
+from pathlib import Path
+import sys
 import unittest
+
+scripts_dir = Path(__file__).resolve().parent.parent
+if str(scripts_dir) not in sys.path:
+    sys.path.insert(0, str(scripts_dir))
+
 import logging
 import shutil
-from pathlib import Path
 
-from ..source.profiles_parsing import OutputFormatType
-from ..source.profiles_parsing import load_profiles_jsons
-from ..source.profiles_parsing import save_profiles_jsons
-from ..source.profiles_parsing import validate_profiles_json
-from ..source.profiles_parsing import validate_profiles_jsons
+from source.profiles_parsing import OutputFormatType
+from source.profiles_parsing import load_profiles_jsons
+from source.profiles_parsing import save_profiles_jsons
+from source.profiles_parsing import validate_profiles_json
+from source.profiles_parsing import validate_profiles_jsons
 
 class TestJsonMethods(unittest.TestCase):
+    registry_path = None
+
     def test_load_profiles_jsons(self):
         repository_path = Path(__file__).resolve().parent.parent.parent
         profiles_files_dir = repository_path / "profiles/LunarG"
@@ -86,5 +95,13 @@ class TestJsonMethods(unittest.TestCase):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.FATAL, format='%(levelname)s: %(message)s')
     
-    unittest.main()
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--registry', '-r', action='store', required=True,
+                        help='Use specified registry file instead of vk.xml (video.xml must be present in the same directory for video support).')
+
+    args, unparsed = parser.parse_known_args()
+    TestJsonMethods.registry_path = args.registry
+
+    unittest.main(argv=[sys.argv[0]] + unparsed)
 
