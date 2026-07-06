@@ -1,5 +1,5 @@
 # ~~~
-# Copyright (c) 2023 LunarG, Inc.
+# Copyright (c) 2023-2026 LunarG, Inc.
 # Copyright (c) 2024 RasterGrid Kft.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
