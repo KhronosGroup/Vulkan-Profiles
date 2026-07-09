@@ -19,36 +19,8 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
-from enum import Enum
-from enum import IntEnum
 import re
-
-# --- Updated Enum Definition ---
-class VK_VERSION(Enum):
-    NONE = "VK_NONE"
-    V1_0 = "VK_VERSION_1_0"
-    V1_1 = "VK_VERSION_1_1"
-    V1_2 = "VK_VERSION_1_2"
-    V1_3 = "VK_VERSION_1_3"
-    V1_4 = "VK_VERSION_1_4"
-
-    @classmethod
-    def from_string(cls, version_str: str) -> "VK_VERSION":
-        # 1. Split the version string (e.g., "1.3.276" -> ["1", "3", "276"])
-        parts = version_str.split('.')
-        
-        # 2. Extract major and minor, ignoring the revision
-        major, minor = parts[0], parts[1]
-        
-        # 3. Construct the matching Enum value string (e.g., "VK_VERSION_1_3")
-        target_value = f"VK_VERSION_{major}_{minor}"
-        
-        return cls(target_value)
-        
-
-# Establish sequential hierarchy based on the Enum's definition order
-VERSION_ORDER = list(VK_VERSION)
-
+from source.vulkan_object_version import VK_VERSION
 
 class Node:
     def __init__(self, value, left=None, right=None):
@@ -92,7 +64,7 @@ class ExpressionTree:
         return Node(value=self._consume())
 
 
-# def collect_extensions(current_version: VK_VERSION, expression_str: str) -> list:
+# def collectExtensions(current_version: VK_VERSION, expression_str: str) -> list:
 #     """
 #     Parses the expression tree and returns the mandatory extension strings 
 #     required given the system's current string-backed Vulkan version enum.
@@ -143,7 +115,7 @@ class ExpressionTree:
 #     result = _evaluate(tree.root)
 #     return [] if isinstance(result, bool) else result
 
-def collect_extensions(current_version: VK_VERSION, expression_str: str) -> list:
+def collectExtensions(current_version: VK_VERSION, expression_str: str) -> list:
     """
     Parses the expression tree and returns the mandatory extension strings 
     required given the system's current string-backed Vulkan version enum.
@@ -151,6 +123,8 @@ def collect_extensions(current_version: VK_VERSION, expression_str: str) -> list
     # GUARD CLAUSE: Handle None, empty strings, or whitespace-only strings gracefully
     if not expression_str or not expression_str.strip():
         return []
+    
+    VERSION_ORDER = list(VK_VERSION)
     
     tree = ExpressionTree(expression_str)
     errors = []  # To track version mismatches during evaluation

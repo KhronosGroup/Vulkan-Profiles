@@ -12,7 +12,7 @@ This document contains the instructions for building this repository.
 - Python 3.11 or later (from https://www.python.org/downloads).  Notes:
   - Select to install the optional sub-package to add Python to the system `PATH` environment variable.
   - Install `jsonschema` package (`py -m pip install jsonschema`)
-  - Install `vulkan-object` package (`py -m pip install vulkan-object`)
+  - Install `pyinstaller` package (`py -m pip install pyinstaller`)
 - Git (from http://git-scm.com/download/win).
   - Tell the installer to allow it to be used for "Developer Prompt" as well as "Git Bash".
   - Tell the installer to treat line endings "as is" (i.e. both DOS and Unix-style line endings).
@@ -42,7 +42,7 @@ sudo apt-get install libc6-dev-i386 g++-multilib
 # Install python packages
 sudo apt-get install python3-pip
 pip3 install jsonschema
-pip3 install vulkan-object
+pip3 install pyinstaller
 ```
 
 ### Fedora Core System Requirements
@@ -63,7 +63,7 @@ sudo dnf install git @development-tools glm-devel \
 # Install python packages
 sudo dnf install python3-pip
 pip3 install jsonschema
-pip3 install vulkan-object
+pip3 install pyinstaller
 ```
 
 Optional software packages:
@@ -89,7 +89,7 @@ brew install python python3 git
 - Install python packages
 ```
 pip3 install jsonschema
-pip3 install vulkan-object
+pip3 install pyinstaller
 ```
 
 ### Android Additional System Requirements

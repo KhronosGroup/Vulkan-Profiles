@@ -29,14 +29,26 @@ if str(scripts_dir) not in sys.path:
     sys.path.insert(0, str(scripts_dir))
 
 from vulkan_object import VulkanObject, StructCapabilityAlias, ExtensionCapabilityAlias
-from source.vulkan_object_utils import getVulkanObject, gatherCapabilityAliases
+from source.vulkan_object_utils import initVulkanObject, VK_VERSION, gatherCapabilityAliases, gatherDependentExtensions, findExtensionVersion
+#from source.vulkan_object_version import buildVulkanVersionEnum
 
 class TestVulkanObjectUtils(unittest.TestCase):
     registry_path = None
 
+    # def testVulkanObjectVersion(self):
+    #     vk: VulkanObject = initVulkanObject(self.registry_path)
+        
+    #     VK_VERSION = buildVulkanVersionEnum(vk)
+        
+    #     assert VK_VERSION.V1_1 != VK_VERSION.V1_4
+        
+    #     versionA = VK_VERSION.from_string("1.4.304")
+        
+    #     assert versionA == VK_VERSION.V1_4
+
     # Check we can get the list of feature aliases from any feature structure
     def testVulkanObjectUtilsStructFeatureAliasesAccess(self):
-        vk: VulkanObject = getVulkanObject(self.registry_path)
+        vk: VulkanObject = initVulkanObject(self.registry_path)
         
         # Case 2: Building the list of aliases of an actual struct using the getAliases helper function that hide that not all structs are stored in vk.structs
         query_id2 = StructCapabilityAlias("VkPhysicalDeviceShaderSubgroupRotateFeatures", "shaderSubgroupRotate")
@@ -110,7 +122,7 @@ class TestVulkanObjectUtils(unittest.TestCase):
 
     # Check we can get the list of property aliases from any property structure
     def testVulkanObjectUtilsStructPropertyAliasesAccess(self):
-        vk: VulkanObject = getVulkanObject(self.registry_path)
+        vk: VulkanObject = initVulkanObject(self.registry_path)
 
         # Case 1: Building the list of aliases of an actual struct using the getCapabilityAliases helper function that hide that not all structs are stored in vk.structs
         query_id1 = StructCapabilityAlias("VkPhysicalDeviceLineRasterizationProperties", "lineSubPixelPrecisionBits")
@@ -183,6 +195,141 @@ class TestVulkanObjectUtils(unittest.TestCase):
         query_idC = StructCapabilityAlias("VkPhysicalDeviceVertexAttributeDivisorProperties", "unknown")
         member_C_aliases = gatherCapabilityAliases(vk, query_idC)
         assert member_C_aliases == []
+
+    def testFindExtensionVersion(self):
+        vk: VulkanObject = initVulkanObject(self.registry_path)
+
+        extension_version0 = findExtensionVersion(vk, "VK_KHR_dynamic_rendering")
+        self.assertEqual(extension_version0, 1)
+
+        extension_version1 = findExtensionVersion(vk, "VK_EXT_debug_report")
+        self.assertEqual(extension_version1, 10)
+        
+        extension_version2 = findExtensionVersion(vk, "VK_KHR_dedicated_allocation")
+        self.assertEqual(extension_version2, 3)
+
+    def testGatherDependentExtensions(self):
+        self.maxDiff = 1024
+        
+        vk: VulkanObject = initVulkanObject(self.registry_path)
+
+        extensions_data = {
+            "VK_KHR_dynamic_rendering": 1,
+            "VK_EXT_debug_report": 10,
+            "VK_KHR_dedicated_allocation": 3
+        }
+        
+        # Case 0
+        dependent_extensions0 = gatherDependentExtensions(vk, VK_VERSION.V1_0, False, extensions_data)
+        
+        expected_extensions0 = {
+            "VK_KHR_get_physical_device_properties2": 2,
+            "VK_KHR_depth_stencil_resolve": 1,
+            "VK_KHR_dynamic_rendering": 1,
+            "VK_EXT_debug_report": 10,
+            "VK_KHR_get_memory_requirements2": 1,
+            "VK_KHR_dedicated_allocation": 3
+        }
+        
+        self.assertEqual(dependent_extensions0, expected_extensions0)
+       
+       # Case 1
+        dependent_extensions1 = gatherDependentExtensions(vk, VK_VERSION.V1_1, False, extensions_data)
+
+        expected_extensions1 = {
+            "VK_KHR_depth_stencil_resolve": 1,
+            "VK_KHR_dynamic_rendering": 1,
+            "VK_EXT_debug_report": 10,
+            "VK_KHR_dedicated_allocation": 3
+        }
+
+        self.assertEqual(dependent_extensions1, expected_extensions1)
+        
+        # Case 2
+        
+        extensions_data2 = {
+            "VK_KHR_load_store_op_none": 1,
+            "VK_KHR_maintenance6": 1,
+            "VK_KHR_map_memory2": 1,
+            "VK_KHR_shader_expect_assume": 1,
+            "VK_KHR_shader_float_controls2": 1,
+            "VK_KHR_shader_maximal_reconvergence": 1,
+            "VK_KHR_shader_subgroup_rotate": 1,
+            "VK_KHR_shader_subgroup_uniform_control_flow": 1,
+            "VK_KHR_swapchain_mutable_format": 1,
+            "VK_EXT_host_image_copy": 1,
+            "VK_EXT_image_2d_view_of_3d": 1,
+            "VK_EXT_pipeline_protected_access": 1,
+            "VK_EXT_pipeline_robustness": 1,
+            "VK_EXT_transform_feedback": 1
+        }
+        
+        dependent_extensions2 = gatherDependentExtensions(vk, VK_VERSION.V1_3, False, extensions_data2)
+
+        expected_extensions2 = {
+            "VK_KHR_load_store_op_none": 1,
+            "VK_KHR_maintenance6": 1,
+            "VK_KHR_map_memory2": 1,
+            "VK_KHR_shader_expect_assume": 1,
+            "VK_KHR_shader_float_controls": 4,
+            "VK_KHR_shader_float_controls2": 1,
+            "VK_KHR_shader_maximal_reconvergence": 1,
+            "VK_KHR_shader_subgroup_rotate": 2,
+            "VK_KHR_shader_subgroup_uniform_control_flow": 1,
+            "VK_KHR_swapchain": 70,
+            "VK_KHR_swapchain_mutable_format": 1,
+            "VK_EXT_host_image_copy": 1,
+            "VK_EXT_image_2d_view_of_3d": 1,
+            "VK_EXT_pipeline_protected_access": 1,
+            "VK_EXT_pipeline_robustness": 1,
+            "VK_EXT_transform_feedback": 1
+        }
+
+        self.assertEqual(dependent_extensions2, expected_extensions2)
+        
+        # Case 3
+        
+        extensions_data3 = {
+            "VK_KHR_load_store_op_none": 1,
+            "VK_KHR_maintenance6": 1,
+            "VK_KHR_map_memory2": 1,
+            "VK_KHR_shader_expect_assume": 1,
+            "VK_KHR_shader_float_controls2": 1,
+            "VK_KHR_shader_maximal_reconvergence": 1,
+            "VK_KHR_shader_subgroup_rotate": 2,
+            "VK_KHR_shader_subgroup_uniform_control_flow": 1,
+            "VK_KHR_swapchain_mutable_format": 1,
+            "VK_EXT_host_image_copy": 1,
+            "VK_EXT_image_2d_view_of_3d": 1,
+            "VK_EXT_pipeline_protected_access": 1,
+            "VK_EXT_pipeline_robustness": 1,
+            "VK_EXT_transform_feedback": 1
+        }
+        
+        dependent_extensions3 = gatherDependentExtensions(vk, VK_VERSION.V1_3, True, extensions_data3)
+
+        expected_extensions3 = {
+            "VK_KHR_load_store_op_none": 1,
+            "VK_KHR_maintenance6": 1,
+            "VK_KHR_map_memory2": 1,
+            "VK_KHR_shader_expect_assume": 1,
+            "VK_KHR_shader_float_controls": 1,
+            "VK_KHR_shader_float_controls2": 1,
+            "VK_KHR_shader_maximal_reconvergence": 1,
+            "VK_KHR_shader_subgroup_rotate": 1,
+            "VK_KHR_shader_subgroup_uniform_control_flow": 1,
+            "VK_KHR_swapchain": 1,
+            "VK_KHR_swapchain_mutable_format": 1,
+            "VK_EXT_host_image_copy": 1,
+            "VK_EXT_image_2d_view_of_3d": 1,
+            "VK_EXT_pipeline_protected_access": 1,
+            "VK_EXT_pipeline_robustness": 1,
+            "VK_EXT_transform_feedback": 1
+        }
+
+        self.assertEqual(dependent_extensions3, expected_extensions3)
+        
+        return
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

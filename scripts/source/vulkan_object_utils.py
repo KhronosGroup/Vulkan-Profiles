@@ -26,9 +26,11 @@ import os
 from xml.etree import ElementTree
 from typing import Any
 
-from vulkan_object import (VulkanObject, CapabilityAlias, StructCapabilityAlias, ExtensionCapabilityAlias)
+from vulkan_object import VulkanObject, CapabilityAlias, StructCapabilityAlias, ExtensionCapabilityAlias
 from reg import Registry
 from base_generator import BaseGenerator, BaseGeneratorOptions, SetOutputDirectory, SetOutputFileName, SetTargetApiName, SetMergedApiNames
+from source.vulkan_object_version import VK_VERSION
+from source.vulkan_object_expression_parsing import collectExtensions
 
 # Define the public API for your package
 __all__ = [
@@ -38,7 +40,7 @@ __all__ = [
 
 # Create the simplified, cached public function
 @functools.lru_cache(maxsize=1)
-def getVulkanObject(alternative_xml: str = None, video: bool = False) -> VulkanObject:
+def initVulkanObject(alternative_xml: str = None, video: bool = False) -> VulkanObject:
     """
     Parses the bundled Vulkan registry (vk.xml) and returns the populated
     VulkanObject.
@@ -116,6 +118,8 @@ def getVulkanObject(alternative_xml: str = None, video: bool = False) -> VulkanO
         # This invokes reg.py and will populate _InternalGenerator
         reg.apiGen()
 
+        #globals()['VK_VERSION'] = buildVulkanVersionEnum(generator.vk)
+
         return generator.vk
 
 def getStructByName(structs_dict, struct_name):
@@ -192,3 +196,41 @@ def gatherCapabilityAliases(vk: VulkanObject, alias_id: CapabilityAlias) -> list
 
     # Step 3: Streamlined filtering to remove the original query item
     return [item for item in aliases if item != alias_id]
+
+def gatherDependentCapabilityAliases(vk: VulkanObject, version: VK_VERSION, alias_id: CapabilityAlias) -> list[CapabilityAlias]:
+    return []
+
+def findExtensionVersion(vk: VulkanObject, extension_name: str) -> int:
+    if extension_name in vk.extensions:
+        return vk.extensions[extension_name].specVersionValue
+    else:
+        return 0 # extension not found
+    
+def gatherDependentExtensions(vk: VulkanObject, version: VK_VERSION, ignore_extension_versions: bool, extensions: dict[str, int]) -> dict[str, int]:
+    result = {}
+    
+    for extension in extensions:
+        if extension not in vk.extensions:
+            print(f'ERROR: {extension} is part of vk.xml, discarding')
+            continue
+        
+        extension_data = vk.extensions[extension]
+       
+        depend_extensions = collectExtensions(version, extension_data.depends)
+    
+        # First insert the dependent extensions
+        for depend_extension in depend_extensions:
+            if depend_extension not in result:
+                if ignore_extension_versions:
+                    result[depend_extension] = 1
+                else:
+                    result[depend_extension] = findExtensionVersion(vk, depend_extension)
+            
+        # Then insert the source extension
+        if extension not in result:
+            if ignore_extension_versions:
+                result[extension] = 1
+            else:
+                result[extension] = extension_data.specVersionValue
+    
+    return result
