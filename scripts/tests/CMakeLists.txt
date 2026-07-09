@@ -16,59 +16,26 @@
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
-#add_custom_target(VpTestVulkanObjectEmpty ALL
-#    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-#        ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_empty.py
-#        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-#    VERBATIM
-#    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-#    SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_empty.py
-#    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/test_empty.py)
-
-#set_target_properties(VpTestVulkanObjectEmpty PROPERTIES FOLDER "Profiles generator/Tests")
-
-#add_custom_target(VpTestVulkanObjectUtils ALL
-#    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-#        ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_vulkan_object_utils.py
-#        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-#    VERBATIM
-#    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-#    SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_vulkan_object_utils.py
-#    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/test_vulkan_object_utils.py)
-
-#set_target_properties(VpTestVulkanObjectUtils PROPERTIES FOLDER "Profiles generator/Tests")
-
-#add_custom_target(VpTestVulkanProfilesJson ALL
-#    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-#        ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_json.py
-#        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-#    VERBATIM
-#    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-#    SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_json.py
-#    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/test_json.py)
-
-# set_target_properties(VpTestVulkanProfilesJson PROPERTIES FOLDER "Profiles generator/Tests")
-
 function(add_vulkan_python_test TARGET_NAME SCRIPT_FILENAME)
     set(REGISTRY_PATH "${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry")
     set(FULL_SCRIPT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT_FILENAME}")
 
-    add_custom_target(${TARGET_NAME} ALL
-        COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${REGISTRY_PATH}"
-            ${Python3_EXECUTABLE} "${FULL_SCRIPT_PATH}"
-            --registry "${REGISTRY_PATH}/vk.xml"
-        VERBATIM
+    # Register the script as a CTest test case
+    add_test(NAME ${TARGET_NAME}
+        COMMAND ${Python3_EXECUTABLE} "${FULL_SCRIPT_PATH}" --registry "${REGISTRY_PATH}/vk.xml"
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-        SOURCES "${FULL_SCRIPT_PATH}"
-        DEPENDS "${FULL_SCRIPT_PATH}"
     )
 
-    set_target_properties(${TARGET_NAME} PROPERTIES FOLDER "Profiles generator/Tests")
+    # Cleanly inject environment variables into the test environment
+    set_tests_properties(${TARGET_NAME} PROPERTIES
+        ENVIRONMENT "PYTHONPATH=${REGISTRY_PATH}"
+    )
 endfunction()
 
-add_vulkan_python_test(VpTestVulkanObjectEmpty   test_empty.py)
-add_vulkan_python_test(VpTestVulkanObjectUtils   test_vulkan_object_utils.py)
-add_vulkan_python_test(VpTestVulkanProfilesJson  test_json.py)
-add_vulkan_python_test(VpTestVulkanProfilesUtil  test_util.py)
-add_vulkan_python_test(VpTestVulkanObjectXML     test_vk_xml_parsing.py)
-add_vulkan_python_test(VpTestVulkanObjectDepends test_expression_tree.py)
+if(NOT APPLE) # macOS doesn't handle dynamically loading Python jsonschema'
+    add_vulkan_python_test(VpTestVulkanProfilesUtil test_util.py)
+    #add_vulkan_python_test(VpTestVulkanObjectEmpty   test_init.py) requires Header 357
+    #add_vulkan_python_test(VpTestVulkanObjectUtils   test_vulkan_object_utils.py) requires Header 357
+    add_vulkan_python_test(VpTestVulkanObjectDepends test_vulkan_object_expression_parsing.py)
+    add_vulkan_python_test(VpTestVulkanProfilesJson  test_vulkan_profiles.py)
+endif()

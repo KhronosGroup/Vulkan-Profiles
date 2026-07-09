@@ -24,7 +24,7 @@ import os
 import json
 import re
 from pathlib import Path
-from enum import StrEnum
+from enum import Enum
 
 def _validate_profiles_json_data(json_data, schema_data) -> bool:
     try:
@@ -136,7 +136,7 @@ def load_profiles_jsons(input_dir):
     return json_files_dict
 
 
-class OutputFormatType(StrEnum):
+class OutputFormatType(Enum):
     PRETTY = 'pretty'
     FLATTEN = 'flatten'
 

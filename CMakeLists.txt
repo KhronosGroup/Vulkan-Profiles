@@ -43,12 +43,10 @@ set(MERGE_SCRIPT ${PROJECT_SOURCE_DIR}/scripts/gen_profiles_file.py)
 set(SOLUTION_SCRIPT ${PROJECT_SOURCE_DIR}/scripts/gen_profiles_solution.py)
 set(PROFILES_SCRIPT ${PROJECT_SOURCE_DIR}/scripts/profiles.py)
 
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
 find_package(VulkanHeaders REQUIRED CONFIG QUIET)
-
 find_package(VulkanUtilityLibraries REQUIRED CONFIG QUIET)
-
 find_package(valijson REQUIRED CONFIG)
-
 find_package(jsoncpp REQUIRED CONFIG)
 
 option(BUILD_TESTS "Build the tests")
@@ -70,7 +68,42 @@ endif()
 
 set(PROFILES_SCHEMA_FILENAME "profiles-0.8-latest.json")
 
-find_package(Python3 REQUIRED)
+# Generate profiles executable
+set(OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/scripts")
+
+set(PYTHON_DEPENDENCIES
+    "${PROFILES_SCRIPT}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/gen_profiles_file.py"
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/gen_profiles_layer.py"
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/gen_profiles_solution.py"
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/gen_profiles_tests.py"
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/profiles_parsing.py"
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/vulkan_object_expression_parsing.py"
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/vulkan_object_utils.py"
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/vulkan_object_version.py"
+)
+
+if(WIN32)
+    set(EXE_NAME "profiles.exe")
+else()
+    set(EXE_NAME "profiles")
+endif()
+set(FINAL_EXECUTABLE "${OUTPUT_DIR}/${EXE_NAME}")
+
+add_custom_command(
+    OUTPUT "${FINAL_EXECUTABLE}"
+    COMMAND ${Python3_EXECUTABLE} -m PyInstaller --onefile --distpath "${OUTPUT_DIR}" "${PROFILES_SCRIPT}"
+    DEPENDS ${PYTHON_DEPENDENCIES}
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    COMMENT "Packaging profiles.py into a standalone executable..."
+    VERBATIM
+)
+
+add_custom_target(
+    profiles
+    DEPENDS "${FINAL_EXECUTABLE}"
+)
+set_target_properties(profiles PROPERTIES FOLDER "Profiles generator")
 
 # The profiles directory regenerates the Profiles source and headers.
 add_subdirectory(profiles)

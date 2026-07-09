@@ -29,13 +29,13 @@ if str(scripts_dir) not in sys.path:
     sys.path.insert(0, str(scripts_dir))
 
 from vulkan_object import VulkanObject
-from source.vulkan_object_utils import getVulkanObject
+from source.vulkan_object_utils import initVulkanObject
 
-class TestVulkanObjectEmpty(unittest.TestCase):
+class TestVulkanObjectInit(unittest.TestCase):
     registry_path = None
 
     def test_load_vulkan_object(self):
-        vk: VulkanObject = getVulkanObject(self.registry_path)
+        vk: VulkanObject = initVulkanObject(self.registry_path)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -44,7 +44,7 @@ if __name__ == '__main__':
                         help='Use specified registry file instead of vk.xml (video.xml must be present in the same directory for video support).')
 
     args, unparsed = parser.parse_known_args()
-    TestVulkanObjectEmpty.registry_path = args.registry
+    TestVulkanObjectInit.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
 

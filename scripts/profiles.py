@@ -25,14 +25,12 @@ from enum import StrEnum
 from pathlib import Path
 import argparse
 import sys
-from vulkan_object import get_vulkan_object
 from vulkan_object import VulkanObject
+from source.vulkan_object_utils import initVulkanObject, VK_VERSION, gatherDependentExtensions
 from source.profiles_parsing import load_profiles_jsons
 from source.profiles_parsing import save_profiles_jsons
 from source.profiles_parsing import validate_profiles_json
 from source.profiles_parsing import OutputFormatType
-from source.vk_xml_parsing import find_dependent_extensions
-from source.expression_parsing import VK_VERSION
 
 class ConvertMode(StrEnum):
     STRIP_DUPLICATION = 'strip-duplication'
@@ -61,7 +59,7 @@ def pull_capabilities_block_dependencies(vk: VulkanObject, version: VK_VERSION, 
     if "extensions" not in json_profiles_capabilities_block:
         return
     
-    extensions = find_dependent_extensions(vk, version, ignore_extension_versions, json_profiles_capabilities_block["extensions"])
+    extensions = gatherDependentExtensions(vk, version, ignore_extension_versions, json_profiles_capabilities_block["extensions"])
     json_profiles_capabilities_block["extensions"] = extensions
     
     return
@@ -125,7 +123,7 @@ def strip_profiles_files_capabilities_duplication(json_files_dict):
 
 
 def main_convert(args):
-    vk = get_vulkan_object(args.registry or None)
+    vk = initVulkanObject(args.registry or None)
 
     for version in vk.versions.values():
         logging.debug(version.name)
