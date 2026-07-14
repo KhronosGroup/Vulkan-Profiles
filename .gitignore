@@ -66,6 +66,6 @@ scripts/source/vulkan_object.py
 scripts/source/base_generator.py
 scripts/source/vk.xml
 scripts/profiles.spec
-profiles.spec
-scripts/profiles
-scripts/profiles.exe
+vkprofiles.spec
+scripts/vkprofiles
+scripts/vkprofiles.exe

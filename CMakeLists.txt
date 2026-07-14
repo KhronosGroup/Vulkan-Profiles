@@ -69,7 +69,54 @@ endif()
 set(PROFILES_SCHEMA_FILENAME "profiles-0.8-latest.json")
 
 # Generate profiles executable
-set(OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/scripts")
+function(add_pyinstaller_target TARGET_NAME)
+    # Define the arguments the function accepts
+    set(options)
+    set(oneValueArgs SCRIPT OUTPUT_DIR FOLDER OUTPUT_NAME)
+    set(multiValueArgs DEPENDS)
+    cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    if(NOT ARG_SCRIPT)
+        message(FATAL_ERROR "add_pyinstaller_target: SCRIPT argument is required for target ${TARGET_NAME}")
+    endif()
+
+    if(NOT ARG_OUTPUT_DIR)
+        set(ARG_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+    endif()
+
+    if(NOT ARG_OUTPUT_NAME)
+        set(ARG_OUTPUT_NAME "${TARGET_NAME}")
+    endif()
+
+    # Handle OS-specific executable extension
+    if(WIN32)
+        set(EXE_NAME "${ARG_OUTPUT_NAME}.exe")
+    else()
+        set(EXE_NAME "${ARG_OUTPUT_NAME}")
+    endif()
+    set(FINAL_EXECUTABLE "${ARG_OUTPUT_DIR}/${EXE_NAME}")
+
+    # Generate the executable via PyInstaller
+    add_custom_command(
+        OUTPUT "${FINAL_EXECUTABLE}"
+        COMMAND ${Python3_EXECUTABLE} -m PyInstaller --onefile --name "${ARG_OUTPUT_NAME}" --distpath "${ARG_OUTPUT_DIR}" "${ARG_SCRIPT}"
+        DEPENDS ${ARG_DEPENDS}
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+        COMMENT "Packaging ${TARGET_NAME} into a standalone executable..."
+        VERBATIM
+    )
+
+    # Create the custom target to hook into the build system
+    add_custom_target(
+        ${TARGET_NAME}
+        DEPENDS "${FINAL_EXECUTABLE}"
+    )
+
+    # Set IDE folder property if provided
+    if(ARG_FOLDER)
+        set_target_properties(${TARGET_NAME} PROPERTIES FOLDER "${ARG_FOLDER}")
+    endif()
+endfunction()
 
 set(PYTHON_DEPENDENCIES
     "${PROFILES_SCRIPT}"
@@ -83,27 +130,13 @@ set(PYTHON_DEPENDENCIES
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/vulkan_object_version.py"
 )
 
-if(WIN32)
-    set(EXE_NAME "profiles.exe")
-else()
-    set(EXE_NAME "profiles")
-endif()
-set(FINAL_EXECUTABLE "${OUTPUT_DIR}/${EXE_NAME}")
-
-add_custom_command(
-    OUTPUT "${FINAL_EXECUTABLE}"
-    COMMAND ${Python3_EXECUTABLE} -m PyInstaller --onefile --distpath "${OUTPUT_DIR}" "${PROFILES_SCRIPT}"
+add_pyinstaller_target(VpProfilesProcessor
+    OUTPUT_NAME "vkprofiles"
+    SCRIPT "${PROFILES_SCRIPT}"
+    OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/scripts"
     DEPENDS ${PYTHON_DEPENDENCIES}
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-    COMMENT "Packaging profiles.py into a standalone executable..."
-    VERBATIM
+    FOLDER "Profiles generator"
 )
-
-add_custom_target(
-    profiles
-    DEPENDS "${FINAL_EXECUTABLE}"
-)
-set_target_properties(profiles PROPERTIES FOLDER "Profiles generator")
 
 # The profiles directory regenerates the Profiles source and headers.
 add_subdirectory(profiles)
