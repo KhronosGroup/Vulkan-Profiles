@@ -7740,7 +7740,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--registry', '-r', action='store', required=True,
                         help='Use specified registry file instead of vk.xml (video.xml must be present in the same directory for video support).')
-    parser.add_argument('--input', '-i', action='store', required=True,
+    parser.add_argument('--input', '-i', action='store',
                         help='Path to directory with profiles.')
     parser.add_argument('--input-filenames', action='store',
                         help='The optional filenames of the profiles files in the directory. If this parameter is not set, all profiles files are loaded.')
