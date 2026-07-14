@@ -92,7 +92,7 @@ function(LayerTestAndroid NAME)
                 vktestframework.cpp)
 
     add_test(NAME ${ANDROID_APK_NAME} COMMAND profiles_${NAME})
-    add_dependencies(${ANDROID_APK_NAME} ProfilesLayer VpCreateDesktopBaseline)
+    add_dependencies(${ANDROID_APK_NAME} ProfilesLayer VpGenerate-Libraries)
 
     if (NOT ANDROID_SDK_HOME)
         set(ANDROID_SDK_HOME $ENV{ANDROID_SDK_HOME})
