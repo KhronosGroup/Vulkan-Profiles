@@ -11,7 +11,19 @@
 
 # Release Notes
 
-## [Vulkan Profiles Tools 1.4.3XX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - July 2026
+## [Vulkan Profiles Tools 1.4.3XX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - September 2026
+
+### Features:
+- Add `vkprofiles` executable which bundles the python scripts in a standalone executable
+
+### Improvements:
+- Improve profiles schema to support capabilities dynamic structures
+- Optimize profiles schema to avoid duplicated values
+
+### Deprecation:
+- `gen_profiles*.py` file are all deprecated and replaced by `vkprofiles`
+
+## [Vulkan Profiles Tools 1.4.357](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.357.0) - July 2026
 
 ### Features:
 - Add `profiles.py` python script, to pull dependent extensions into a source profiles file (ALPHA)

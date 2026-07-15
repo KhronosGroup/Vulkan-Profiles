@@ -20,6 +20,8 @@
 set(TEST_FILE test_validate.cpp)
 set(TEST_NAME VpProfile_test_schema_validation)
 
+set(REGISTRY_PATH "${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry")
+
 file(GLOB FILES_UNIT_TEST ${CMAKE_CURRENT_SOURCE_DIR}/data/*.json)
 file(GLOB FILES_PROFILE ${CMAKE_CURRENT_SOURCE_DIR}/../*.json)
 file(GLOB SCHEMA_PROFILE ${CMAKE_CURRENT_SOURCE_DIR}/../../schema/${PROFILES_SCHEMA_FILENAME})
@@ -37,5 +39,6 @@ target_compile_definitions(${TEST_NAME} PRIVATE
 target_link_libraries(${TEST_NAME} PRIVATE GTest::gtest GTest::gtest_main jsoncpp_static valijson)
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME} --gtest_catch_exceptions=0)
 set_target_properties(${TEST_NAME} PROPERTIES FOLDER "Profiles schema")
+set_tests_properties(${TEST_NAME} PROPERTIES ENVIRONMENT "PYTHONPATH=${REGISTRY_PATH}")
 add_dependencies(${TEST_NAME} VpGenerate-ProfilesDesktopMax VpGenerate-ProfilesDesktopBaseline)
 
