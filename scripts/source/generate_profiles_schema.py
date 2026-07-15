@@ -20,14 +20,27 @@
 # - Christophe Riccio <christophe@lunarg.com>
 
 import json
-from typing import OrderedDict
+from collections import OrderedDict
 
-from source.vulkan_registry import VulkanRegistry, struct_with_valid_dynamic_array, struct_with_dynamic_array_size_cap
+from source.vulkan_object_utils import gatherDynamicStructs
 from source.log import Log
 
-class VulkanProfilesSchemaGenerator():
-    def __init__(self, registry):
-        self.registry = registry
+EXTERNAL_TYPES = {
+    "Display", "VisualID", "Window", "ANativeWindow", "wl_display", "wl_surface",
+    "_XDisplay", "HINSTANCE", "HWND", "HANDLE", "DWORD", "LPCWSTR", "zx_handle_t",
+    "GgpStreamDescriptor", "GgpFrameToken", "CAMetalLayer", "SECURITY_ATTRIBUTES"
+}
+
+class VulkanProfilesSchemaGenerator2():
+    def __init__(self, vk):
+        """
+        :param vk: An instance of VulkanObject from vulkan_object.py
+        """
+        self.vk = vk
+        
+        # Call the global discovery helper passing the VulkanObject parameter
+        self.valid_dynamic_structs = gatherDynamicStructs(vk)
+        
         self.schema = self.gen_schema()
 
     def validate(self):
@@ -43,6 +56,36 @@ class VulkanProfilesSchemaGenerator():
         with open(outSchema, 'w') as f:
             f.write(json.dumps(self.schema, indent=4))
 
+    def getNonAliasTypeName(self, name):
+        if name in self.vk.structs:
+            return name
+        for struct_name, struct_def in self.vk.structs.items():
+            if name in struct_def.aliases:
+                return struct_name
+        return name
+
+    def evalArraySize(self, size):
+        if size is None:
+            return None
+        if isinstance(size, list):
+            return [self.evalArraySize(s) for s in size]
+        if isinstance(size, int):
+            return size
+        if isinstance(size, str):
+            if size in self.vk.constants:
+                val = self.vk.constants[size].value
+                try:
+                    return int(val)
+                except (ValueError, TypeError):
+                    return val
+            try:
+                clean_str = size.rstrip('UuLl')
+                if clean_str.startswith('0x') or clean_str.startswith('0X'):
+                    return int(clean_str, 16)
+                return int(clean_str)
+            except ValueError:
+                return size
+        return size
 
     def gen_schema(self):
         definitions = self.gen_baseDefinitions()
@@ -54,11 +97,12 @@ class VulkanProfilesSchemaGenerator():
         videoProfiles = self.gen_videoProfiles(definitions)
         videoCapabilities = self.gen_videoCapabilities(definitions)
         videoFormats = self.gen_videoFormats(definitions)
-        versionStr = str(self.registry.headerVersionNumber)
+        
+        versionStr = self.vk.headerVersionComplete
 
         return OrderedDict({
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "$id": "https://schema.khronos.org/vulkan/profiles-0.8.2-{0}.json#".format(str(self.registry.headerVersionNumber.patch)),
+            "$id": "https://schema.khronos.org/vulkan/profiles-0.8.2-{0}.json#".format(self.vk.headerVersion),
             "title": "Vulkan Profiles Schema for Vulkan {0}".format(versionStr),
             "additionalProperties": True,
             "required": [
@@ -268,43 +312,6 @@ class VulkanProfilesSchemaGenerator():
                                     "items": OrderedDict({
                                         "type": "string"
                                     })
-                                }),
-                                "contributors": OrderedDict({
-                                    "type": "object",
-                                    "description": "The list of contributors of the profile.",
-                                    "additionalProperties": OrderedDict({
-                                        "$ref": "#/definitions/contributor"
-                                    })
-                                }),
-                                "history": OrderedDict({
-                                    "description": "The version history of the profile file",
-                                    "type": "array",
-                                    "uniqueItems": True,
-                                    "minItems": 1,
-                                    "items": OrderedDict({
-                                        "type": "object",
-                                        "required": [
-                                            "revision",
-                                            "date",
-                                            "author",
-                                            "comment"
-                                        ],
-                                        "properties": OrderedDict({
-                                            "revision": OrderedDict({
-                                                "type": "integer"
-                                            }),
-                                            "date": OrderedDict({
-                                                "type": "string",
-                                                "pattern": "((?:19|20)\\d\\d)-(0?[1-9]|1[012])-([12][0-9]|3[01]|0?[1-9])"
-                                            }),
-                                            "author": OrderedDict({
-                                                "type": "string"
-                                            }),
-                                            "comment": OrderedDict({
-                                                "type": "string"
-                                            })
-                                        })
-                                    })
                                 })
                             })
                         })
@@ -313,9 +320,8 @@ class VulkanProfilesSchemaGenerator():
             })
         })
 
-
     def gen_baseDefinitions(self):
-        gen = OrderedDict({
+        return OrderedDict({
             "status": OrderedDict({
                 "description": "The development status of the setting. When missing, this property is inherited from parent nodes. If no parent node defines it, the default value is 'STABLE'.",
                 "type": "string",
@@ -324,290 +330,261 @@ class VulkanProfilesSchemaGenerator():
             "contributor": OrderedDict({
                 "type": "object",
                 "additionalProperties": False,
-                "required": [
-                    "company"
-                ],
+                "required": [ "company" ],
                 "properties": OrderedDict({
-                    "company": OrderedDict({
-                        "type": "string"
-                    }),
-                    "email": OrderedDict({
-                        "type": "string",
-                        "pattern": "^[A-Za-z0-9_.]+@[a-zA-Z0-9-].[a-zA-Z0-9-.]+$"
-                    }),
-                    "github": OrderedDict({
-                        "type": "string",
-                        "pattern": "^[A-Za-z0-9_-]+$"
-                    }),
-                    "contact": OrderedDict({
-                        "type": "boolean"
-                    })
+                    "company": OrderedDict({ "type": "string" }),
+                    "email": OrderedDict({ "type": "string", "pattern": "^[A-Za-z0-9_.]+@[a-zA-Z0-9-].[a-zA-Z0-9-.]+$" }),
+                    "github": OrderedDict({ "type": "string", "pattern": "^[A-Za-z0-9_-]+$" }),
+                    "contact": OrderedDict({ "type": "boolean" })
                 })
             }),
-            "uint8_t": OrderedDict({
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 255
-            }),
-            "int32_t": OrderedDict({
-                "type": "integer",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-            }),
-            "uint32_t": OrderedDict({
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 4294967295
-            }),
-            "int64_t": OrderedDict({
-                "type": "integer"
-            }),
-            "uint64_t": OrderedDict({
-                "type": "integer",
-                "minimum": 0
-            }),
-            "VkDeviceSize": OrderedDict({
-                "type": "integer",
-                "minimum": 0
-            }),
-            "char": {
-                "type": "string"
-            },
-            "float": {
-                "type": "number"
-            },
-            "size_t": OrderedDict({
-                "type": "integer",
-                "minimum": 0
-            })
+            "uint8_t": OrderedDict({ "type": "integer", "minimum": 0, "maximum": 255 }),
+            "int32_t": OrderedDict({ "type": "integer", "minimum": -2147483648, "maximum": 2147483647 }),
+            "uint32_t": OrderedDict({ "type": "integer", "minimum": 0, "maximum": 4294967295 }),
+            "int64_t": OrderedDict({ "type": "integer" }),
+            "uint64_t": OrderedDict({ "type": "integer", "minimum": 0 }),
+            "VkDeviceSize": OrderedDict({ "type": "integer", "minimum": 0 }),
+            "char": { "type": "string" },
+            "float": { "type": "number" },
+            "size_t": OrderedDict({ "type": "integer", "minimum": 0 })
         })
-        return gen
-
 
     def gen_extensions(self):
         gen = OrderedDict()
-        for extName in sorted(self.registry.extensions.keys()):
+        for extName in sorted(self.vk.extensions.keys()):
             gen[extName] = { "type": "integer" }
         return gen
 
+    def gen_type(self, type_name, definitions):
+        if type_name == 'VkBool32':
+            return { "type": "boolean" }
+            
+        gen = { "$ref": "#/definitions/" + type_name }
 
-    def gen_type(self, type, definitions):
-        if type == 'VkBool32':
-            # Simple boolean
-            gen = { "type": "boolean" }
+        if type_name in definitions:
+            pass
+        elif type_name in self.vk.structs:
+            self.gen_struct(type_name, definitions)
+        elif self.vk.videoStd and type_name in self.vk.videoStd.structs:
+            self.gen_struct(type_name, definitions, is_video_std=True)
+        elif type_name in self.vk.enums:
+            self.gen_enum(type_name, definitions)
+        elif self.vk.videoStd and type_name in self.vk.videoStd.enums:
+            self.gen_enum(type_name, definitions, is_video_std=True)
+        elif type_name in self.vk.bitmasks or type_name in self.vk.flags:
+            self.gen_bitmask(type_name, definitions)
         else:
-            # All other types are referenced
-            gen = { "$ref": "#/definitions/" + type }
-
-        if gen.get("$ref") != None:
-            # Generate referenced type, if needed
-            if type in definitions:
-                # Nothing to do, already defined
-                pass
-            elif type in self.registry.structs:
-                # Generate structure definition
-                self.gen_struct(type, definitions)
-            elif type in self.registry.enums:
-                # Generate enum definition
-                self.gen_enum(type, definitions)
-            elif type in self.registry.bitmasks:
-                # Generate bitmask definition
-                self.gen_bitmask(type, definitions)
-            else:
-                Log.f("Unknown type '{0}'".format(type))
+            if type_name not in definitions:
+                return { "type": "integer" }
 
         return gen
 
-
-    def gen_array(self, type, size, sizeCap, definitions):
-        arraySize = self.registry.evalArraySize(size)
+    def gen_array(self, type_name, size, sizeCap, definitions, len_attribute=None):
+        arraySize = self.evalArraySize(size)
         if isinstance(arraySize, list) and len(arraySize) == 1:
-            # This is the last dimension of a multi-dimensional array
-            # Treat it as one-dimensional from here on
             arraySize = arraySize[0]
 
-        if type == 'char':
-            # Character arrays should be handled as strings
-            # We assume all are null-terminated, even though the vk.xml doesn't specify that
-            # everywhere, but that's probably a bug rather than intentional
+        if type_name == 'char':
+            max_len = arraySize - 1 if isinstance(arraySize, int) else 256
             return OrderedDict({
                 "type": "string",
-                "maxLength": arraySize - 1
+                "maxLength": max(0, max_len)
             })
         elif isinstance(arraySize, list):
-            # Multi-dimensional array
             return OrderedDict({
                 "type": "array",
-                "items": self.gen_array(type, arraySize[1:], None, definitions),
+                "items": self.gen_array(type_name, arraySize[1:], None, definitions, len_attribute),
                 "uniqueItems": False,
-                # We don't have information from vk.xml to be able to tell what's the minimum
-                # number of items that may need to be specified
-                # "minItems": arraySize[0],
                 "maxItems": arraySize[0]
             })
         else:
-            # One-dimensional array
-            return OrderedDict({
+            is_enum_group = (type_name in self.vk.enums or 
+                             type_name in self.vk.bitmasks or 
+                             type_name in self.vk.flags or 
+                             (self.vk.videoStd and (type_name in self.vk.videoStd.enums)))
+            
+            res = OrderedDict({
                 "type": "array",
-                "items": self.gen_type(type, definitions),
-                "uniqueItems": False,
-                # We don't have information from vk.xml to be able to tell what's the minimum
-                # number of items that may need to be specified
-                # "minItems": arraySize,
-                "maxItems": arraySize if arraySize is not None else sizeCap
+                "items": self.gen_type(type_name, definitions),
+                "uniqueItems": True if is_enum_group else False
             })
 
+            max_items = arraySize if isinstance(arraySize, int) else sizeCap
+            if max_items is not None and len_attribute is None:
+                res["maxItems"] = max_items
 
-    def gen_enum(self, name, definitions):
-        enumDef = self.registry.enums[name]
+            if len_attribute is not None:
+                res["description"] = f"The number of items is determined by {len_attribute}"
 
-        if len(enumDef.values) > 0:
-            values = sorted(enumDef.values)
-        else:
-            # If the enum has no values then we must add a dummy one
-            # in order to produce a valid JSON schema
+            return res
+
+    def gen_enum(self, name, definitions, is_video_std=False):
+        if name in definitions:
+            return
+        enumDef = self.vk.videoStd.enums[name] if is_video_std else self.vk.enums[name]
+        values = []
+        for field in enumDef.fields:
+            values.append(field.name)
+            for alias in field.aliases:
+                values.append(alias)
+                
+        values = sorted(list(set(values)))
+        if len(values) == 0:
             values = [ 0 ]
 
-        # Generate definition
-        definitions[name] = OrderedDict({
-            "enum": values
-        })
+        definitions[name] = OrderedDict({ "enum": values })
 
+    def gen_bitmask_enum(self, name, definitions):
+        if name in definitions:
+            return
+        bitmaskDef = self.vk.bitmasks[name]
+        values = []
+        for flag in bitmaskDef.flags:
+            values.append(flag.name)
+            for alias in flag.aliases:
+                values.append(alias)
+                
+        values = sorted(list(set(values)))
+        if len(values) == 0:
+            values = [ 0 ]
+
+        definitions[name] = OrderedDict({ "enum": values })
 
     def gen_bitmask(self, name, definitions):
-        bitmaskDef = self.registry.bitmasks[name]
+        if name in definitions:
+            return
+            
+        if name in self.vk.flags:
+            bitmask_name = self.vk.flags[name].bitmaskName
+            if bitmask_name and bitmask_name in self.vk.bitmasks:
+                self.gen_bitmask_enum(bitmask_name, definitions)
+                itemType = { "$ref": "#/definitions/" + bitmask_name }
+            else:
+                itemType = { "enum": [ 0 ] }
 
-        if bitmaskDef.bitsType != None:
-            # Also generate corresponding bits enum
-            self.gen_enum(bitmaskDef.bitsType.name, definitions)
-            itemType = { "$ref": "#/definitions/" + bitmaskDef.bitsType.name }
-        else:
-            # If the bitmask has no bits type then we must add a dummy
-            # item type with a single dummy value
-            itemType = { "enum": [ 0 ] }
+            definitions[name] = OrderedDict({
+                "type": "array",
+                "items": itemType,
+                "uniqueItems": True
+            })
+        elif name in self.vk.bitmasks:
+            self.gen_bitmask_enum(name, definitions)
 
-        # Generate definition
-        definitions[name] = OrderedDict({
-            "type": "array",
-            "items": itemType,
-            "uniqueItems": True
-        })
+    def gen_struct(self, name, definitions, is_video_std=False):
+        if name in definitions:
+            return
+        structDef = self.vk.videoStd.structs[name] if is_video_std else self.vk.structs[name]
+        
+        # Parity Rule 1: Skip structures containing unhandled dynamic pointer arrays using our automated helper list
+        for memberDef in structDef.members:
+            if memberDef.length is not None and memberDef.pointer:
+                if name not in self.valid_dynamic_structs:
+                    return
 
-
-    def gen_struct(self, name, definitions):
-        structDef = self.registry.structs[name]
-
-        # Generate member data
         members = OrderedDict()
-        for memberName in sorted(structDef.members.keys()):
-            memberDef = structDef.members[memberName]
-
-            if memberDef.type in self.registry.externalTypes and not memberDef.type in definitions:
-                # Members with types defined externally and aren't manually defined are ignored
-                Log.w("Ignoring member '{0}' in struct '{1}' with external type '{2}'".format(memberName, name, memberDef.type))
+        for memberDef in sorted(structDef.members, key=lambda m: m.name):
+            # Parity Rule 3: Skip structural runtime pointer metadata
+            if memberDef.name in ['sType', 'pNext']:
                 continue
 
-            if memberDef.isArray:
-                if memberDef.arraySizeMember != None and name not in struct_with_valid_dynamic_array and name not in struct_with_dynamic_array_size_cap:
-                    # This array is a dynamic one (count + pointer to array) which is not allowed
-                    # for return structures. Such structures hence are ill-formed and shouldn't
-                    # be included in the schema
-                    Log.w("Ignoring member '{0}' in struct '{1}' containing ill-formed pointer to array".format(memberName, name))
-                else:
-                    if memberDef.arraySizeMember != None and name in struct_with_dynamic_array_size_cap:
-                        Log.w("Member '{0}' in struct '{1}' is a pointer to array with a known maximum size, it will be ignored in the API library, but supported in the layer".format(memberName, name))
-                    members[memberDef.name] = self.gen_array(memberDef.type, memberDef.arraySize, memberDef.arraySizeCap, definitions)
+            if memberDef.type in EXTERNAL_TYPES and not memberDef.type in definitions:
+                continue
+
+            # Parity Rule 2: Discern arrays accurately using vulkan_object definitions
+            is_fixed_array = len(memberDef.fixedSizeArray) > 0
+            is_dynamic_array = memberDef.length is not None and memberDef.pointer
+
+            if is_fixed_array:
+                size = memberDef.fixedSizeArray
+                members[memberDef.name] = self.gen_array(memberDef.type, size, None, definitions)
+            elif is_dynamic_array:
+                array_size_member = memberDef.length
+                size_cap = 1 if name in self.valid_dynamic_structs else None
+                
+                members[memberDef.name] = self.gen_array(
+                    memberDef.type, 
+                    array_size_member, 
+                    size_cap, 
+                    definitions, 
+                    len_attribute=array_size_member
+                )
             else:
                 members[memberDef.name] = self.gen_type(memberDef.type, definitions)
 
-        # Generate definition
         definitions[name] = OrderedDict({
             "type": "object",
             "additionalProperties": False,
             "properties": members
         })
 
-
     def gen_structChainDefinitions(self, basename, definitions):
         structNames = [ basename ]
-        if basename + '2' in self.registry.structs:
-            # Structure has version 2 which is extensible
+        if basename + '2' in self.vk.structs:
             basename += '2'
             structNames.append(basename)
 
-        # Collect unique chainable structures (ignoring aliases)
-        for structName in sorted(self.registry.structs.keys()):
-            structDef = self.registry.structs[structName]
-            if not structDef.isAlias and basename in structDef.extends:
+        for structName in sorted(self.vk.structs.keys()):
+            structDef = self.vk.structs[structName]
+            if basename in structDef.extends:
                 structNames.append(structName)
 
-        # Generate structure definitions and references
         gen = OrderedDict()
         for structName in structNames:
-            # Add structure definition and reference
             self.gen_struct(structName, definitions)
-            gen[structName] = { "$ref": "#/definitions/" + structName }
+            if structName in definitions:
+                gen[structName] = { "$ref": "#/definitions/" + structName }
 
-            # Add structure references for all alises
-            for alias in self.registry.structs[structName].aliases:
-                if alias != structName:
-                    gen[alias] = gen[structName]
+                for alias in self.vk.structs[structName].aliases:
+                    if alias != structName:
+                        gen[alias] = gen[structName]
 
         return gen
-
 
     def gen_features(self, definitions):
         return self.gen_structChainDefinitions("VkPhysicalDeviceFeatures", definitions)
 
-
     def gen_properties(self, definitions):
         return self.gen_structChainDefinitions("VkPhysicalDeviceProperties", definitions)
 
-
     def gen_formats(self, definitions):
-        # Add definition for format properties
         definitions['formatProperties'] = OrderedDict({
             "type": "object",
             "additionalProperties": False,
             "properties": self.gen_structChainDefinitions("VkFormatProperties", definitions)
         })
 
-        # Generate references to the format properties definition for each format
         gen = OrderedDict()
-        for format in sorted(self.registry.enums['VkFormat'].values):
-            gen[format] = OrderedDict({
+        format_values = []
+        if 'VkFormat' in self.vk.enums:
+            for field in self.vk.enums['VkFormat'].fields:
+                format_values.append(field.name)
+                for alias in field.aliases:
+                    format_values.append(alias)
+                
+        for format_name in sorted(list(set(format_values))):
+            gen[format_name] = OrderedDict({
                 "$ref": "#/definitions/formatProperties"
             })
         return gen
 
-
     def gen_queueFamilies(self, definitions):
         return self.gen_structChainDefinitions("VkQueueFamilyProperties", definitions)
 
-
     def gen_videoProfiles(self, definitions):
-        # We do not want to include usage hint structures in the schema
-        # as those are only usage scenario customizations and do not affect capabilities
-        excludedSet = {
-            "VkVideoDecodeUsageInfoKHR",
-            "VkVideoEncodeUsageInfoKHR"
-        }
+        excludedSet = { "VkVideoDecodeUsageInfoKHR", "VkVideoEncodeUsageInfoKHR" }
         videoProfiles = self.gen_structChainDefinitions("VkVideoProfileInfoKHR", definitions)
         for excluded in excludedSet:
-            excluded = self.registry.getNonAliasTypeName(excluded, self.registry.structs)
+            excluded = self.getNonAliasTypeName(excluded)
             if excluded in videoProfiles:
                 del videoProfiles[excluded]
-            # Check also any aliases
-            for alias in self.registry.structs[excluded].aliases:
-                if alias in videoProfiles:
-                    del videoProfiles[excluded]
-
+            if excluded in self.vk.structs:
+                for alias in self.vk.structs[excluded].aliases:
+                    if alias in videoProfiles:
+                        del videoProfiles[alias]
         return videoProfiles
-
 
     def gen_videoCapabilities(self, definitions):
         return self.gen_structChainDefinitions("VkVideoCapabilitiesKHR", definitions)
-
 
     def gen_videoFormats(self, definitions):
         return self.gen_structChainDefinitions("VkVideoFormatPropertiesKHR", definitions)

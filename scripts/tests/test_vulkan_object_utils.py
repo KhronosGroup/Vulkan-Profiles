@@ -29,7 +29,7 @@ if str(scripts_dir) not in sys.path:
     sys.path.insert(0, str(scripts_dir))
 
 from vulkan_object import VulkanObject, StructCapabilityAlias, ExtensionCapabilityAlias
-from source.vulkan_object_utils import initVulkanObject, VK_VERSION, gatherCapabilityAliases, gatherDependentExtensions, findExtensionVersion
+from source.vulkan_object_utils import initVulkanObject, VK_VERSION, gatherCapabilityAliases, gatherDependentExtensions, findExtensionVersion, gatherDynamicStructs
 #from source.vulkan_object_version import buildVulkanVersionEnum
 
 class TestVulkanObjectUtils(unittest.TestCase):
@@ -330,6 +330,31 @@ class TestVulkanObjectUtils(unittest.TestCase):
         self.assertEqual(dependent_extensions3, expected_extensions3)
         
         return
+    
+    def testGatherDynamicStructs(self):
+        """
+        Verifies that gatherDynamicStructs correctly builds an automated layout 
+        of valid dynamic array properties directly from the parsed VulkanObject.
+        """
+        vk: VulkanObject = initVulkanObject(self.registry_path)
+        
+        # Programmatically discover all extensible dynamic array property containers
+        dynamic_structs = gatherDynamicStructs(vk)
+        
+        # Verify the list type and sorting
+        self.assertIsInstance(dynamic_structs, list)
+        
+        # Check for traditional dynamic property containers
+        self.assertIn("VkPhysicalDeviceHostImageCopyProperties", dynamic_structs)
+        
+        # Verify that the modern structures missing from the legacy path are discovered correctly
+        self.assertIn("VkPhysicalDeviceLayeredApiPropertiesListKHR", dynamic_structs)
+        self.assertIn("VkPhysicalDeviceGpaPropertiesAMD", dynamic_structs)
+        
+        # Ensure standard flat properties are NOT misclassified as dynamic arrays
+        self.assertNotIn("VkPhysicalDeviceFeatures2", dynamic_structs)
+        self.assertNotIn("VkPhysicalDeviceProperties2", dynamic_structs)
+        self.assertNotIn("VkPhysicalDeviceVulkan11Properties", dynamic_structs)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

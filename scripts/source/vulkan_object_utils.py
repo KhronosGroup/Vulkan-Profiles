@@ -234,3 +234,15 @@ def gatherDependentExtensions(vk: VulkanObject, version: VK_VERSION, ignore_exte
                 result[extension] = extension_data.specVersionValue
     
     return result
+
+def gatherDynamicStructs(vk: VulkanObject):
+    """
+    Global discovery function that automatically identifies all Vulkan structures 
+    containing variable-length pointer arrays by scanning metadata within a VulkanObject.
+    """
+    discovered = set()
+    for struct_name, struct_def in vk.structs.items():
+        for member in struct_def.members:
+            if member.pointer and member.length is not None:
+                discovered.add(struct_name)
+    return sorted(list(discovered))
