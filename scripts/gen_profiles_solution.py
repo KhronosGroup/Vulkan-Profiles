@@ -30,8 +30,11 @@ import json
 from string import Template
 
 from source.generate_schema import VulkanProfilesSchemaGenerator
+from source.generate_profiles_schema import VulkanProfilesSchemaGenerator2
 from source.vulkan_registry import VulkanRegistry, VulkanVersionNumber
 from source.log import Log
+from vulkan_object import VulkanObject
+from source.vulkan_object_utils import initVulkanObject, VK_VERSION, gatherDependentExtensions
 
 COPYRIGHT_HEADER = '''
 /*
@@ -5691,11 +5694,14 @@ if __name__ == '__main__':
 
     if args.registry != None:
         registry = VulkanRegistry(args.registry, args.api)
+        vk: VulkanObject = initVulkanObject(args.registry, True)
 
     if args.output_schema != None or args.validate:
         generator = VulkanProfilesSchemaGenerator(registry)
+        generator2 = VulkanProfilesSchemaGenerator2(vk)
         if args.output_schema is not None:
-            generator.generate(args.output_schema)
+            #generator.generate(args.output_schema)
+            generator2.generate(args.output_schema)
         if args.validate:
             generator.validate()
             schema = generator.schema
