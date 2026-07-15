@@ -52,7 +52,8 @@ set(PROFILES_FILES_FOR_ANDROID_DOC
 # Generate profiles schema
 add_custom_target(VpGenerate-ProfilesSchema
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/schema
-    COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
+    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
+        ${Python3_EXECUTABLE} ${SOLUTION_SCRIPT}
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --output-schema ${PROJECT_SOURCE_DIR}/schema/${PROFILES_SCHEMA_FILENAME}

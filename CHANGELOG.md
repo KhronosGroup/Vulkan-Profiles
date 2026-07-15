@@ -15,11 +15,17 @@
 
 ### Features:
 - Implement `VK_NO_PROTOTYPES` support #734
+- Add `vkprofiles` executable which bundles the python scripts in a standalone executable
+
+### Improvements:
+- Improve profiles schema to support capabilities dynamic structures
+- Optimize profiles schema to avoid duplicated values
 
 ### Deprecation:
+- `gen_profiles*.py` file are all deprecated and replaced by `vkprofiles`
 - Require Vulkan 1.1
 
-## [Vulkan Profiles Tools 1.4.356](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.356.0) - July 2026
+## [Vulkan Profiles Tools 1.4.357](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.357.0) - July 2026
 
 ### Features:
 - Add `profiles.py` python script, to pull dependent extensions into a source profiles file (ALPHA)
