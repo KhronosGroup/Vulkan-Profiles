@@ -1,0 +1,3 @@
+# Python modules needed for project builds
+jsonschema == 4.*
+pyinstaller == 6.*
