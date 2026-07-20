@@ -22,7 +22,7 @@ function(add_vulkan_python_test TARGET_NAME SCRIPT_FILENAME)
 
     # Register the script as a CTest test case
     add_test(NAME ${TARGET_NAME}
-        COMMAND ${Python3_EXECUTABLE} "${FULL_SCRIPT_PATH}" --registry "${REGISTRY_PATH}/vk.xml"
+        COMMAND ${VENV_PYTHON_EXECUTABLE} "${FULL_SCRIPT_PATH}" --registry "${REGISTRY_PATH}/vk.xml"
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     )
 
