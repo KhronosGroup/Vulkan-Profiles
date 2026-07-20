@@ -2,4 +2,3 @@
 jsonschema == 4.*
 pyinstaller == 6.*
 pyparsing == 3.*
-vulkan-object == 1.*
