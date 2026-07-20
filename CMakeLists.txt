@@ -131,7 +131,7 @@ function(add_pyinstaller_target TARGET_NAME)
     add_custom_command(
         OUTPUT "${FINAL_EXECUTABLE}"
         COMMAND "${VENV_PYTHON_EXECUTABLE}" -m PyInstaller --onefile --name "${ARG_OUTPUT_NAME}" --distpath "${ARG_OUTPUT_DIR}" "${ARG_SCRIPT}"
-        DEPENDS ${ARG_DEPENDS} "${VENV_STAMP}"
+        DEPENDS ${ARG_DEPENDS} python_venv
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
         COMMENT "Packaging ${TARGET_NAME} into a standalone executable..."
         VERBATIM
