@@ -25,7 +25,8 @@ else()
 endif()
 
 add_custom_target(VpLibrary_test_generated_library
-    COMMAND Python3::Interpreter ${SOLUTION_SCRIPT}
+    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
+        ${Python3_EXECUTABLE} ${SOLUTION_SCRIPT}
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${PROJECT_SOURCE_DIR}/library/test/profiles
