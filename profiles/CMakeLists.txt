@@ -46,7 +46,7 @@ set(PROFILES_FILES_FOR_VULKAN_HEADER_DOC
 )
 
 set(PROFILES_FILES_FOR_ANDROID_DOC
-    "VP_ANDROID_15_requirements.json,VP_ANDROID_16_requirements.json,VP_ANDROID_17_requirements.json,VP_ANDROID_vulkan_profile_2021.json,VP_ANDROID_vulkan_profile_2022.json,VP_ANDROID_vulkan_profile_2025.json"
+    "VP_ANDROID_15_requirements.json,VP_ANDROID_16_requirements.json,VP_ANDROID_17_requirements.json,VP_ANDROID_vulkan_profile_2021.json,VP_ANDROID_vulkan_profile_2022.json"
 )
 
 # Generate profiles schema
