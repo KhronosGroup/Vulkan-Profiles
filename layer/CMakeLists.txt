@@ -169,7 +169,7 @@ endif()
 
 add_custom_target(VpLayer_generate ALL
     COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${Python3_EXECUTABLE} ${LAYER_PYTHON_SCRIPT}
+        ${VENV_PYTHON_EXECUTABLE} ${LAYER_PYTHON_SCRIPT}
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --out-layer ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp
@@ -177,14 +177,15 @@ add_custom_target(VpLayer_generate ALL
     SOURCES ${LAYER_PYTHON_SCRIPT}
     DEPENDS ${LAYER_PYTHON_SCRIPT}
             ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-            ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/video.xml)
+            ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/video.xml
+            python_venv)
 set_target_properties(VpLayer_generate PROPERTIES FOLDER "Profiles layer")
 add_dependencies(ProfilesLayer VpLayer_generate)
 
 source_group("Python Files" FILES ${TESTS_PYTHON_SCRIPT})
 add_custom_target(VpLayer_generate_tests ALL
 	COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${Python3_EXECUTABLE} ${TESTS_PYTHON_SCRIPT}
+        ${VENV_PYTHON_EXECUTABLE} ${TESTS_PYTHON_SCRIPT}
 		--api ${API_TYPE}
 		--registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
 		--out-profile ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_api_generated.json
@@ -194,6 +195,7 @@ add_custom_target(VpLayer_generate_tests ALL
 	DEPENDS ${TESTS_PYTHON_SCRIPT}
             ProfilesLayer
             VpLayer_generate
+            python_venv
 	)
 set_target_properties(VpLayer_generate_tests PROPERTIES FOLDER "Profiles layer")
 
