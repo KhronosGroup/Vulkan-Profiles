@@ -156,16 +156,16 @@ def gatherCapabilityAliases(vk: VulkanObject, alias_id: CapabilityAlias) -> list
         # Follow the chain if the canonical member itself points to another structure feature
         if canonical_struct in vk.structs:
             for member in vk.structs[canonical_struct].members:
-                if member.name == alias_id.member and isinstance(member.alias, StructCapabilityAlias):
-                    target_struct_obj = getStructByName(vk.structs, member.alias.struct)
-                    canonical_key = (target_struct_obj.name if target_struct_obj else member.alias.struct, member.alias.member)
+                if member.name == alias_id.member and isinstance(member.capabilityAlias, StructCapabilityAlias):
+                    target_struct_obj = getStructByName(vk.structs, member.capabilityAlias.struct)
+                    canonical_key = (target_struct_obj.name if target_struct_obj else member.capabilityAlias.struct, member.capabilityAlias.member)
                     break
     
     elif isinstance(alias_id, ExtensionCapabilityAlias):
         # Extensions lack structural layout, so locate their defining struct member
         for struct_name, struct_obj in vk.structs.items():
             for member in struct_obj.members:
-                if isinstance(member.alias, ExtensionCapabilityAlias) and member.alias.name == alias_id.name:
+                if isinstance(member.capabilityAlias, ExtensionCapabilityAlias) and member.capabilityAlias.name == alias_id.name:
                     canonical_key = (struct_name, member.name)
                     break
             if canonical_key:
@@ -179,9 +179,9 @@ def gatherCapabilityAliases(vk: VulkanObject, alias_id: CapabilityAlias) -> list
     for struct_name, struct_obj in vk.structs.items():
         for member in struct_obj.members:
             # Determine where the current member resolves to
-            if isinstance(member.alias, StructCapabilityAlias):
-                target_struct_obj = getStructByName(vk.structs, member.alias.struct)
-                current_key = (target_struct_obj.name if target_struct_obj else member.alias.struct, member.alias.member)
+            if isinstance(member.capabilityAlias, StructCapabilityAlias):
+                target_struct_obj = getStructByName(vk.structs, member.capabilityAlias.struct)
+                current_key = (target_struct_obj.name if target_struct_obj else member.capabilityAlias.struct, member.capabilityAlias.member)
             else:
                 current_key = (struct_name, member.name)
 
@@ -191,8 +191,8 @@ def gatherCapabilityAliases(vk: VulkanObject, alias_id: CapabilityAlias) -> list
                 for alias_struct in struct_obj.aliases:
                     aliases.append(StructCapabilityAlias(alias_struct, member.name))
 
-                if isinstance(member.alias, ExtensionCapabilityAlias) and member.alias.name in vk.extensions:
-                    aliases.append(ExtensionCapabilityAlias(member.alias.name))
+                if isinstance(member.capabilityAlias, ExtensionCapabilityAlias) and member.capabilityAlias.name in vk.extensions:
+                    aliases.append(ExtensionCapabilityAlias(member.capabilityAlias.name))
 
     # Step 3: Streamlined filtering to remove the original query item
     return [item for item in aliases if item != alias_id]
