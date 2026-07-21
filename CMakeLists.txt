@@ -49,7 +49,7 @@ find_package(Python3 3.10 REQUIRED COMPONENTS Interpreter)
 # Some Python-based build operations (e.g. turning a Python script into a standalone
 # executable) require custom Python modules.  Here we'll create a custom
 # Python virtual environment with the modules we need.
-set(VENV_DIR "${CMAKE_CURRENT_BINARY_DIR}/venv")
+set(VENV_DIR "${CMAKE_CURRENT_BINARY_DIR}/python-venv")
 if(WIN32)
     set(VENV_PYTHON_EXECUTABLE "${VENV_DIR}/Scripts/python.exe")
 else()
@@ -69,6 +69,10 @@ add_custom_command(
     COMMENT "Creating Python virtual environment and installing dependencies..."
     VERBATIM
 )
+
+# This target works in subdirectories as a dependency.
+add_custom_target(python_venv DEPENDS "${VENV_STAMP}")
+
 # ==============================================================================
 
 find_package(VulkanHeaders REQUIRED CONFIG QUIET)
@@ -127,7 +131,7 @@ function(add_pyinstaller_target TARGET_NAME)
     add_custom_command(
         OUTPUT "${FINAL_EXECUTABLE}"
         COMMAND "${VENV_PYTHON_EXECUTABLE}" -m PyInstaller --onefile --name "${ARG_OUTPUT_NAME}" --distpath "${ARG_OUTPUT_DIR}" "${ARG_SCRIPT}"
-        DEPENDS ${ARG_DEPENDS} "${VENV_STAMP}"
+        DEPENDS ${ARG_DEPENDS} python_venv
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
         COMMENT "Packaging ${TARGET_NAME} into a standalone executable..."
         VERBATIM
