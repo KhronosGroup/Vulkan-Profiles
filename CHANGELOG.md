@@ -15,6 +15,8 @@
 
 ### Features:
 - Add `vkprofiles` executable which bundles the python scripts in a standalone executable
+  - Validate profiles JSON file with `validate` command
+  - Generate profiles schema file with `schema` command
 
 ### Improvements:
 - Improve profiles schema to support capabilities dynamic structures
