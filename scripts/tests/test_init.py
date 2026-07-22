@@ -35,7 +35,7 @@ class TestVulkanObjectInit(unittest.TestCase):
     registry_path = None
 
     def test_load_vulkan_object(self):
-        vk: VulkanObject = initVulkanObject(self.registry_path)
+        vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

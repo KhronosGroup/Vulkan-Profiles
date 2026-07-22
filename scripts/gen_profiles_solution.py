@@ -5694,7 +5694,7 @@ if __name__ == '__main__':
 
     if args.registry != None:
         registry = VulkanRegistry(args.registry, args.api)
-        vk: VulkanObject = initVulkanObject(args.registry, True)
+        vk: VulkanObject = initVulkanObject(args.api, args.registry, True)
 
     if args.output_schema != None or args.validate:
         generator = VulkanProfilesSchemaGenerator(registry)

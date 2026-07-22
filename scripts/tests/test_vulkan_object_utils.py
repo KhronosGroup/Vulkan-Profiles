@@ -36,7 +36,7 @@ class TestVulkanObjectUtils(unittest.TestCase):
     registry_path = None
 
     # def testVulkanObjectVersion(self):
-    #     vk: VulkanObject = initVulkanObject(self.registry_path)
+    #     vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
         
     #     VK_VERSION = buildVulkanVersionEnum(vk)
         
@@ -48,7 +48,7 @@ class TestVulkanObjectUtils(unittest.TestCase):
 
     # Check we can get the list of feature aliases from any feature structure
     def testVulkanObjectUtilsStructFeatureAliasesAccess(self):
-        vk: VulkanObject = initVulkanObject(self.registry_path)
+        vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
         
         # Case 2: Building the list of aliases of an actual struct using the getAliases helper function that hide that not all structs are stored in vk.structs
         query_id2 = StructCapabilityAlias("VkPhysicalDeviceShaderSubgroupRotateFeatures", "shaderSubgroupRotate")
@@ -122,7 +122,7 @@ class TestVulkanObjectUtils(unittest.TestCase):
 
     # Check we can get the list of property aliases from any property structure
     def testVulkanObjectUtilsStructPropertyAliasesAccess(self):
-        vk: VulkanObject = initVulkanObject(self.registry_path)
+        vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
 
         # Case 1: Building the list of aliases of an actual struct using the getCapabilityAliases helper function that hide that not all structs are stored in vk.structs
         query_id1 = StructCapabilityAlias("VkPhysicalDeviceLineRasterizationProperties", "lineSubPixelPrecisionBits")
@@ -197,7 +197,7 @@ class TestVulkanObjectUtils(unittest.TestCase):
         assert member_C_aliases == []
 
     def testFindExtensionVersion(self):
-        vk: VulkanObject = initVulkanObject(self.registry_path)
+        vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
 
         extension_version0 = findExtensionVersion(vk, "VK_KHR_dynamic_rendering")
         self.assertEqual(extension_version0, 1)
@@ -211,7 +211,7 @@ class TestVulkanObjectUtils(unittest.TestCase):
     def testGatherDependentExtensions(self):
         self.maxDiff = 1024
         
-        vk: VulkanObject = initVulkanObject(self.registry_path)
+        vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
 
         extensions_data = {
             "VK_KHR_dynamic_rendering": 1,
@@ -336,7 +336,7 @@ class TestVulkanObjectUtils(unittest.TestCase):
         Verifies that gatherDynamicStructs correctly builds an automated layout 
         of valid dynamic array properties directly from the parsed VulkanObject.
         """
-        vk: VulkanObject = initVulkanObject(self.registry_path)
+        vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
         
         # Programmatically discover all extensible dynamic array property containers
         dynamic_structs = gatherDynamicStructs(vk)

@@ -21,7 +21,7 @@
 
 import logging
 from datetime import datetime
-from enum import StrEnum
+from enum import Enum
 from pathlib import Path
 import argparse
 import sys
@@ -29,10 +29,12 @@ from vulkan_object import VulkanObject
 from source.vulkan_object_utils import initVulkanObject, VK_VERSION, gatherDependentExtensions
 from source.profiles_parsing import load_profiles_jsons
 from source.profiles_parsing import save_profiles_jsons
-from source.profiles_parsing import validate_profiles_json
+from source.profiles_parsing import validate_profiles_json, validate_profiles_jsons_data
 from source.profiles_parsing import OutputFormatType
+from source.generate_profiles_schema import VulkanProfilesSchemaGenerator2
+from source.log import Log
 
-class ConvertMode(StrEnum):
+class ConvertMode(str, Enum):
     STRIP_DUPLICATION = 'strip-duplication'
     PULL_DEPENDENCES = 'pull-dependences'
 
@@ -123,7 +125,7 @@ def strip_profiles_files_capabilities_duplication(json_files_dict):
 
 
 def main_convert(args):
-    vk = initVulkanObject(args.registry or None)
+    vk = initVulkanObject(args.api, args.registry or None)
 
     for version in vk.versions.values():
         logging.debug(version.name)
@@ -151,8 +153,25 @@ def main_convert(args):
 
 
 def main_validate(args):
-    validate_profiles_json(Path(args.input), Path(args.schema))
+    if args.schema is None:
+        if args.registry is None:
+            Log.e("`--schema` or `--registry` are required to validate profile files")
+        else:
+            vk: VulkanObject = initVulkanObject(args.api, args.registry, True)
+            generator2 = VulkanProfilesSchemaGenerator2(vk)
+            validate_profiles_jsons_data(Path(args.input), generator2.schema)
+    else:
+        validate_profiles_json(Path(args.input), Path(args.schema))
 
+
+def main_schema(args):
+    vk: VulkanObject
+    if args.registry is None:
+        vk = initVulkanObject(args.api)
+    else:
+        vk = initVulkanObject(args.api, args.registry, True)
+    generator = VulkanProfilesSchemaGenerator2(vk)
+    generator.generate(args.output)
  
 def main(argv):
     logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
@@ -170,8 +189,14 @@ def main(argv):
     convert_parser.add_argument('--mode', nargs='*',action='store', choices=list(ConvertMode), default=list(ConvertMode), help='List of conversion capabilities')
 
     validate_parser = subparsers.add_parser('validate', help='Validate a profile file against a profile schema.')
-    validate_parser.add_argument('--schema', '-s', action='store', required=True, help='Use a specific Vulkan registry file (vk.xml).')
+    validate_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
+    validate_parser.add_argument('--schema', '-s', action='store', help='Use a profile schema (profiles-*.json). By default, generate a profile schema vk.xml.')
     validate_parser.add_argument('--input', '-i', action='store', required=True, help='Path to the input profiles files.')
+
+    schema_parser = subparsers.add_parser('schema', help='Generate a profile json schema file.')
+    schema_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
+    schema_parser.add_argument('--output', '-o', action='store', required=True, help='Path to the output profile schema file.')
+    schema_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
 
     args = parser.parse_args(argv)
 
@@ -179,6 +204,8 @@ def main(argv):
         main_convert(args)
     elif args.command == 'validate':
         main_validate(args)
+    elif args.command == 'schema':
+        main_schema(args)
     else:
         parser.print_help()
 
