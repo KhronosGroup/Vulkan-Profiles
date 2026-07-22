@@ -40,7 +40,7 @@ __all__ = [
 
 # Create the simplified, cached public function
 @functools.lru_cache(maxsize=1)
-def initVulkanObject(alternative_xml: str = None, video: bool = False) -> VulkanObject:
+def initVulkanObject(target_api: str = 'vulkan', alternative_xml: str = None, video: bool = False) -> VulkanObject:
     """
     Parses the bundled Vulkan registry (vk.xml) and returns the populated
     VulkanObject.
@@ -74,7 +74,7 @@ def initVulkanObject(alternative_xml: str = None, video: bool = False) -> Vulkan
         SetOutputDirectory(output_dir)
         SetOutputFileName("unused.txt")
         # TODO - Make a get_vulkan_sc_object() or pass this in as a parameter
-        SetTargetApiName('vulkan')
+        SetTargetApiName(target_api)
         SetMergedApiNames(None)
 
         xml_path = None
