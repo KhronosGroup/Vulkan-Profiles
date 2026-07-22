@@ -104,7 +104,7 @@ function(add_pyinstaller_target TARGET_NAME)
     # Define the arguments the function accepts
     set(options)
     set(oneValueArgs SCRIPT OUTPUT_DIR FOLDER OUTPUT_NAME)
-    set(multiValueArgs DEPENDS)
+    set(multiValueArgs DEPENDS PATHS)
     cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     if(NOT ARG_SCRIPT)
@@ -127,10 +127,15 @@ function(add_pyinstaller_target TARGET_NAME)
     endif()
     set(FINAL_EXECUTABLE "${ARG_OUTPUT_DIR}/${EXE_NAME}")
 
+    set(PYINSTALLER_PATH_FLAGS)
+    foreach(p ${ARG_PATHS})
+        list(APPEND PYINSTALLER_PATH_FLAGS "--paths" "${p}")
+    endforeach()
+
     # Generate the executable via PyInstaller using the VENV python executable
     add_custom_command(
         OUTPUT "${FINAL_EXECUTABLE}"
-        COMMAND "${VENV_PYTHON_EXECUTABLE}" -m PyInstaller --onefile --name "${ARG_OUTPUT_NAME}" --distpath "${ARG_OUTPUT_DIR}" "${ARG_SCRIPT}"
+        COMMAND "${VENV_PYTHON_EXECUTABLE}" -m PyInstaller --onefile --clean ${PYINSTALLER_PATH_FLAGS} --name "${ARG_OUTPUT_NAME}" --distpath "${ARG_OUTPUT_DIR}" "${ARG_SCRIPT}"
         DEPENDS ${ARG_DEPENDS} python_venv
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
         COMMENT "Packaging ${TARGET_NAME} into a standalone executable..."
@@ -161,10 +166,22 @@ set(PYTHON_DEPENDENCIES
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/vulkan_object_version.py"
 )
 
+if(VULKAN_HEADERS_INSTALL_DIR)
+    set(VULKAN_REGISTRY_DIR "${VULKAN_HEADERS_INSTALL_DIR}/registry")
+    set(VULKAN_REGISTRY_SHARE_DIR "${VULKAN_HEADERS_INSTALL_DIR}/share/vulkan/registry")
+elseif(TARGET Vulkan::Registry)
+    get_target_property(VULKAN_REGISTRY_DIR Vulkan::Registry INTERFACE_INCLUDE_DIRECTORIES)
+    set(VULKAN_REGISTRY_SHARE_DIR "${VULKAN_REGISTRY_DIR}")
+endif()
+
 add_pyinstaller_target(VpProfilesProcessor
     OUTPUT_NAME "vkprofiles"
     SCRIPT "${PROFILES_SCRIPT}"
     OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/scripts"
+    PATHS
+        "${VULKAN_REGISTRY_DIR}"
+        "${VULKAN_REGISTRY_SHARE_DIR}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source"
     DEPENDS ${PYTHON_DEPENDENCIES}
     FOLDER "Profiles generator"
 )

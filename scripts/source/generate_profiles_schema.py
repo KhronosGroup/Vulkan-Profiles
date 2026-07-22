@@ -40,7 +40,6 @@ class VulkanProfilesSchemaGenerator2():
         
         # Call the global discovery helper passing the VulkanObject parameter
         self.valid_dynamic_structs = gatherDynamicStructs(vk)
-        
         self.schema = self.gen_schema()
 
     def validate(self):

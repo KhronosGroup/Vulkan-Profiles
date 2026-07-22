@@ -43,6 +43,7 @@ def _validate_profiles_json_data(json_data, schema_data) -> bool:
         logging.warning("`jsonschema` module is not installed, schema validation skip")
         return False
 
+
 def validate_profiles_json(json_data_path: Path, json_schema_path: Path) -> bool:
     schema_data = load_schema_json(json_schema_path)
     if schema_data is None:
@@ -59,12 +60,7 @@ def validate_profiles_json(json_data_path: Path, json_schema_path: Path) -> bool
     return _validate_profiles_json_data(json_data, schema_data)
 
 
-def validate_profiles_jsons(json_data_dir: Path, json_schema_path: Path) -> int:
-    schema_data = load_schema_json(json_schema_path)
-    if schema_data is None:
-        logging.error(f"Invalid profile file: {json_schema_path}")
-        return 0
-    
+def validate_profiles_jsons_data(json_data_dir: Path, json_schema_data) -> int:
     profiles_files_paths = []
     for pos_json in os.listdir(json_data_dir):
         if pos_json.endswith('.json'):
@@ -78,10 +74,19 @@ def validate_profiles_jsons(json_data_dir: Path, json_schema_path: Path) -> int:
             logging.debug(f"Invalid profile file: {profiles_files_paths[i]}")
             continue
         
-        if _validate_profiles_json_data(json_data, schema_data):
+        if _validate_profiles_json_data(json_data, json_schema_data):
             result += 1
             
     return result
+
+
+def validate_profiles_jsons(json_data_dir: Path, json_schema_path: Path) -> int:
+    schema_data = load_schema_json(json_schema_path)
+    if schema_data is None:
+        logging.error(f"Invalid profile file: {json_schema_path}")
+        return 0
+            
+    return validate_profiles_jsons_data(json_data_dir, schema_data)
 
 
 def load_schema_json(input_file):
@@ -135,7 +140,6 @@ def load_profiles_jsons(input_dir):
 
     return json_files_dict
 
-
 class OutputFormatType(Enum):
     PRETTY = 'pretty'
     FLATTEN = 'flatten'
@@ -169,5 +173,3 @@ def save_profiles_jsons(json_files_dict, output_dir, format: OutputFormatType):
                 file.write(flat_json)
             else:
                 json.dump(value, file, indent=4)
-            
-            
