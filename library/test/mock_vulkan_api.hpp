@@ -198,6 +198,18 @@ public:
         , vkAllocator{}
     {
         sInstance = this;
+
+        VpCapabilitiesCreateInfo createInfo{};
+        VpVulkanFunctions vulkanFunctions{};
+        vulkanFunctions.GetInstanceProcAddr = MockVulkanAPI::vkGetInstanceProcAddr;
+        vulkanFunctions.EnumerateInstanceExtensionProperties = MockVulkanAPI::vkEnumerateInstanceExtensionProperties;
+        vulkanFunctions.EnumerateDeviceExtensionProperties = MockVulkanAPI::vkEnumerateDeviceExtensionProperties;
+        vulkanFunctions.CreateInstance = MockVulkanAPI::vkCreateInstance;
+        vulkanFunctions.CreateDevice = MockVulkanAPI::vkCreateDevice;
+        createInfo.pVulkanFunctions = &vulkanFunctions;
+        createInfo.flags = VP_CAPABILITIES_CREATE_DYNAMIC_BIT;
+        vpInitialize(&createInfo);
+        vpLoadInstance(vkInstance, {});
     }
 
     ~MockVulkanAPI()
@@ -255,6 +267,7 @@ public:
 
     void SetInstanceAPIVersion(uint32_t version)
     {
+        VpInstanceFunctionsLoadFlags loadInstanceFlags{};
         m_instanceAPIVersion = version;
         if (version >= VK_API_VERSION_1_1) {
             AddInstanceProc(nullptr, "vkEnumerateInstanceVersion", &vkEnumerateInstanceVersion);
@@ -275,7 +288,20 @@ public:
             RemoveInstanceProc(vkInstance, "vkGetPhysicalDeviceProperties2");
             RemoveInstanceProc(vkInstance, "vkGetPhysicalDeviceFormatProperties2");
             RemoveInstanceProc(vkInstance, "vkGetPhysicalDeviceQueueFamilyProperties2");
+            loadInstanceFlags = VP_INSTANCE_FUNCTIONS_LOAD_KHR_GET_PHYSICAL_DEVICE_PROPERTIES2_BIT;
         }
+
+        VpCapabilitiesCreateInfo createInfo{};
+        VpVulkanFunctions vulkanFunctions{};
+        vulkanFunctions.GetInstanceProcAddr = MockVulkanAPI::vkGetInstanceProcAddr;
+        vulkanFunctions.EnumerateInstanceExtensionProperties = MockVulkanAPI::vkEnumerateInstanceExtensionProperties;
+        vulkanFunctions.EnumerateDeviceExtensionProperties = MockVulkanAPI::vkEnumerateDeviceExtensionProperties;
+        vulkanFunctions.CreateInstance = MockVulkanAPI::vkCreateInstance;
+        vulkanFunctions.CreateDevice = MockVulkanAPI::vkCreateDevice;
+        createInfo.pVulkanFunctions = &vulkanFunctions;
+        createInfo.flags = VP_CAPABILITIES_CREATE_DYNAMIC_BIT;
+        vpInitialize(&createInfo);
+        vpLoadInstance(vkInstance, loadInstanceFlags);
     }
 
     static VKAPI_ATTR VkResult VKAPI_CALL vkEnumerateInstanceVersion(

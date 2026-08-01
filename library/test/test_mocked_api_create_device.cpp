@@ -20,8 +20,9 @@
  * - Daniel Rakos <daniel.rakos@rastergrid.com>
  */
 
-#include "mock_vulkan_api.hpp"
 #include <vulkan/vulkan_profiles.hpp>
+
+#include "mock_vulkan_api.hpp"
 
 TEST(mocked_api_create_device, default_extensions) {
     MockVulkanAPI mock;

@@ -52,9 +52,10 @@ struct Capabilities {
     VpCapabilities handle = VK_NULL_HANDLE;
 
     Capabilities() {
+        vpCreateCapabilities(nullptr, &handle);
+
         VpVulkanFunctions vulkanFunctions;
         vulkanFunctions.GetInstanceProcAddr = vkGetInstanceProcAddr;
-        vulkanFunctions.GetDeviceProcAddr = vkGetDeviceProcAddr;
         vulkanFunctions.EnumerateInstanceVersion = vkEnumerateInstanceVersion;
         vulkanFunctions.EnumerateInstanceExtensionProperties = vkEnumerateInstanceExtensionProperties;
         vulkanFunctions.EnumerateDeviceExtensionProperties = vkEnumerateDeviceExtensionProperties;
@@ -66,11 +67,9 @@ struct Capabilities {
         vulkanFunctions.CreateDevice = vkCreateDevice;
 
         VpCapabilitiesCreateInfo createInfo;
-        createInfo.apiVersion = VK_API_VERSION_1_1;
-        createInfo.flags = VP_PROFILE_CREATE_STATIC_BIT;
+        createInfo.flags = VP_CAPABILITIES_CREATE_STATIC_BIT;
         createInfo.pVulkanFunctions = &vulkanFunctions;
-
-        vpCreateCapabilities(&createInfo, nullptr, &handle);
+        vpInitialize(handle, &createInfo);
     }
 
     ~Capabilities() {
