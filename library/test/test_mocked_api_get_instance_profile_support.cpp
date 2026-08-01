@@ -19,15 +19,18 @@
  * - Daniel Rakos <daniel.rakos@rastergrid.com>
  */
 
-#include "mock_vulkan_api.hpp"
-#include "mock_debug_message_callback.hpp"
+#include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan_android.h>
+
+#include "mock_debug_message_callback.hpp"
 
 #ifdef WITH_DEBUG_MESSAGES
 #include "generated_vulkan_profiles_debug.hpp"
 #else
 #include "generated_vulkan_profiles.hpp"
 #endif
+
+#include "mock_vulkan_api.hpp"
 
 TEST(mocked_api_get_instance_profile_support, vulkan10_supported) {
     MockVulkanAPI mock;

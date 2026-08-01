@@ -22,6 +22,8 @@
   - [API reference](#api-reference)
     - [Preprocessor definitions](#preprocessor-definitions)
     - [Profile support and usage](#profile-support-and-usage)
+      - [Initializing capabilities](#initializing-capabilities)
+      - [Loading instance-level functions](#loading-instance-level-functions)
       - [Checking instance level support](#checking-instance-level-support)
       - [Creating instance with profile](#creating-instance-with-profile)
       - [Checking device level support](#checking-device-level-support)
@@ -87,13 +89,20 @@ In order to use the Profiles API library, the application first has to create a 
 ```C++
     VpCapabilities capabilities = VK_NULL_HANDLE;
 
-    VpCapabilitiesCreateInfo createInfo;
-    createInfo.apiVersion = VK_API_VERSION_1_1;
-    createInfo.flags = VP_PROFILE_CREATE_STATIC_BIT;
+    vpCreateCapabilities(nullptr, &capabilities);
+```
+
+`vpCreateCapabilities` only allocates the `VpCapabilities` object; it no longer takes a `VpCapabilitiesCreateInfo` argument. The object must then be initialized with the global-level Vulkan functions (such as `vkCreateInstance` and `vkEnumerateInstanceExtensionProperties`) it needs by calling `vpInitialize`:
+
+```C++
+    VpCapabilitiesCreateInfo createInfo{};
+    createInfo.flags = VP_CAPABILITIES_CREATE_STATIC_BIT;
     createInfo.pVulkanFunctions = nullptr;
 
-    vpCreateCapabilities(&createInfo, nullptr, &capabilities);
+    vpInitialize(capabilities, &createInfo);
 ```
+
+`VP_CAPABILITIES_CREATE_STATIC_BIT` tells the library to resolve the Vulkan functions it needs from the statically linked Vulkan loader; this flag is only available when the application links against the Vulkan loader directly (i.e. `VK_NO_PROTOTYPES` and `VP_DISABLE_STATIC_LINKING` are not defined). Applications that load Vulkan dynamically should instead use `VP_CAPABILITIES_CREATE_DYNAMIC_BIT` and provide a `VpVulkanFunctions::GetInstanceProcAddr` pointer through `pVulkanFunctions`, from which the library will resolve the remaining global-level functions it needs.
 
 Then the application has to make sure that the Vulkan implementation supports the selected profile as follows:
 ```C++
@@ -146,7 +155,17 @@ The above code example will create a Vulkan instance with the API version and in
 
 Make sure to set the `apiVersion` in the `VkApplicationInfo` structure at least to the minimum API version required by the profile, as seen above, to ensure the correct Vulkan API version is used.
 
-Once a Vulkan instance is created, the application can check whether individual physical devices support the selected profile as follows:
+Once a Vulkan instance is created, the `VpCapabilities` object must be told about it so that it can resolve the instance-level Vulkan functions (such as `vkCreateDevice` and `vkGetPhysicalDeviceFeatures2`) it needs for device-level queries and device creation:
+
+```C++
+    result = vpLoadInstance(capabilities, instance, {});
+    if (result != VK_SUCCESS) {
+        // something went wrong
+        ...
+    }
+```
+
+Once the instance-level functions are loaded, the application can check whether individual physical devices support the selected profile as follows:
 
 ```C++
     result = vpGetPhysicalDeviceProfileSupport(capabilities, instance, physicalDevice,
@@ -263,6 +282,96 @@ Where:
 ### Profile support and usage
 
 The Vulkan Profile library offers a set of APIs to verify support for a particular Vulkan profile and to create Vulkan instances and devices using the extensions and features required by the profile.
+
+#### Initializing capabilities
+
+After a `VpCapabilities` object is allocated with `vpCreateCapabilities`, it must be initialized with the global-level Vulkan functions it needs by calling the following command:
+
+```C++
+VkResult vpInitialize(
+    VpCapabilities                  capabilities,
+    const VpCapabilitiesCreateInfo* pCreateInfo);
+```
+
+Where:
+* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `pCreateInfo` is a pointer to the `VpCapabilitiesCreateInfo` structure specifying how the library should resolve the Vulkan functions it needs.
+
+The `VpCapabilitiesCreateInfo` structure is defined as follows:
+
+```C++
+typedef struct VpCapabilitiesCreateInfo
+{
+    VpCapabilitiesCreateFlags       flags;
+    const VpVulkanFunctions*        pVulkanFunctions;
+} VpCapabilitiesCreateInfo;
+```
+
+Where:
+* `flags` is a bitmask of `VpCapabilitiesCreateFlagBits` indicating how the Vulkan functions are to be resolved.
+* `pVulkanFunctions` is either `NULL` or a pointer to a `VpVulkanFunctions` structure providing application-supplied Vulkan function pointers, as described below.
+
+The `VpCapabilitiesCreateFlagBits` enumeration is defined as follows:
+
+```C++
+typedef enum VpCapabilitiesCreateFlagBits {
+    VP_CAPABILITIES_CREATE_STATIC_BIT = (1 << 0),
+    VP_CAPABILITIES_CREATE_DYNAMIC_BIT = (1 << 1),
+    VP_CAPABILITIES_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+} VpCapabilitiesCreateFlagBits;
+```
+
+If `VP_CAPABILITIES_CREATE_STATIC_BIT` is specified, the library resolves the Vulkan functions it needs from the statically linked Vulkan loader. This flag is only available when `VK_NO_PROTOTYPES` and `VP_DISABLE_STATIC_LINKING` are not defined.
+
+If `VP_CAPABILITIES_CREATE_DYNAMIC_BIT` is specified, the application must provide a `VpVulkanFunctions::GetInstanceProcAddr` pointer through `pVulkanFunctions`, and the library resolves the remaining global-level functions it needs by calling it.
+
+The `VpVulkanFunctions` structure allows the application to explicitly provide any of the Vulkan function pointers the library needs (overriding or supplementing the ones resolved automatically):
+
+```C++
+typedef struct VpVulkanFunctions {
+    PFN_vkGetInstanceProcAddr                          GetInstanceProcAddr;
+    PFN_vkEnumerateInstanceVersion                     EnumerateInstanceVersion;
+    PFN_vkEnumerateInstanceExtensionProperties         EnumerateInstanceExtensionProperties;
+    PFN_vkEnumerateDeviceExtensionProperties           EnumerateDeviceExtensionProperties;
+    PFN_vkGetPhysicalDeviceFeatures2                   GetPhysicalDeviceFeatures2;
+    PFN_vkGetPhysicalDeviceProperties2                 GetPhysicalDeviceProperties2;
+    PFN_vkGetPhysicalDeviceFormatProperties2            GetPhysicalDeviceFormatProperties2;
+    PFN_vkGetPhysicalDeviceQueueFamilyProperties2       GetPhysicalDeviceQueueFamilyProperties2;
+    PFN_vkCreateInstance                               CreateInstance;
+    PFN_vkCreateDevice                                 CreateDevice;
+} VpVulkanFunctions;
+```
+
+Note that `VpVulkanFunctions` no longer includes a `GetDeviceProcAddr` member, as device-level functions are now resolved through the instance rather than through a device proc addr loader.
+
+#### Loading instance-level functions
+
+Once a Vulkan instance has been created, the instance-level Vulkan functions the library needs for device-level queries and device creation (such as `vkCreateDevice` and `vkGetPhysicalDeviceFeatures2`) must be loaded by calling the following command:
+
+```C++
+VkResult vpLoadInstance(
+    VpCapabilities                  capabilities,
+    VkInstance                      instance,
+    VpInstanceFunctionsLoadFlags    flags);
+```
+
+Where:
+* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `instance` is the Vulkan instance to load the instance-level functions from.
+* `flags` is a bitmask of `VpInstanceFunctionsLoadFlagBits` indicating additional entry point variants to try when loading.
+
+The `VpInstanceFunctionsLoadFlagBits` enumeration is defined as follows:
+
+```C++
+typedef enum VpInstanceFunctionsLoadFlagBits {
+    VP_INSTANCE_FUNCTIONS_LOAD_KHR_GET_PHYSICAL_DEVICE_PROPERTIES2_BIT = (1 << 0),
+    VP_INSTANCE_FUNCTIONS_LOAD_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+} VpInstanceFunctionsLoadFlagBits;
+```
+
+If `VP_INSTANCE_FUNCTIONS_LOAD_KHR_GET_PHYSICAL_DEVICE_PROPERTIES2_BIT` is specified, and the core `vkGetPhysicalDeviceFeatures2`/`vkGetPhysicalDeviceProperties2`/`vkGetPhysicalDeviceFormatProperties2`/`vkGetPhysicalDeviceQueueFamilyProperties2` entry points are not available, the library falls back to loading their `VK_KHR_get_physical_device_properties2` (`...KHR`) variants instead. This is useful when targeting a Vulkan 1.0 implementation that only supports the extension.
+
+`vpLoadInstance` must be called after `vpCreateInstance` (or after any other means of instance creation) and before querying device-level profile support or creating a device with `vpCreateDevice`.
 
 #### Checking instance level support
 

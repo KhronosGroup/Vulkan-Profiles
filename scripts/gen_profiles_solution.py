@@ -213,12 +213,21 @@ typedef struct VpDeviceCreateInfo {
 VK_DEFINE_HANDLE(VpCapabilities)
 
 typedef enum VpCapabilitiesCreateFlagBits {
-    VP_PROFILE_CREATE_STATIC_BIT = (1 << 0),
-    //VP_PROFILE_CREATE_DYNAMIC_BIT = (1 << 1),
-    VP_PROFILE_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+#if !defined(VK_NO_PROTOTYPES) && !defined(VP_DISABLE_STATIC_LINKING)
+    VP_CAPABILITIES_CREATE_STATIC_BIT = (1 << 0),
+#endif
+    VP_CAPABILITIES_CREATE_DYNAMIC_BIT = (1 << 1),
+    VP_CAPABILITIES_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
 } VpCapabilitiesCreateFlagBits;
 
 typedef VkFlags VpCapabilitiesCreateFlags;
+
+typedef enum VpInstanceFunctionsLoadFlagBits {
+    VP_INSTANCE_FUNCTIONS_LOAD_KHR_GET_PHYSICAL_DEVICE_PROPERTIES2_BIT = (1 << 0),
+    VP_INSTANCE_FUNCTIONS_LOAD_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+} VpInstanceFunctionsLoadFlagBits;
+
+typedef VkFlags VpInstanceFunctionsLoadFlags;
 
 // Pointers to some Vulkan functions - a subset used by the library.
 // Used in VpCapabilitiesCreateInfo::pVulkanFunctions.
@@ -226,8 +235,6 @@ typedef VkFlags VpCapabilitiesCreateFlags;
 typedef struct VpVulkanFunctions {
     /// Required when using VP_DYNAMIC_VULKAN_FUNCTIONS.
     PFN_vkGetInstanceProcAddr GetInstanceProcAddr;
-    /// Required when using VP_DYNAMIC_VULKAN_FUNCTIONS.
-    PFN_vkGetDeviceProcAddr GetDeviceProcAddr;
     PFN_vkEnumerateInstanceVersion EnumerateInstanceVersion;
     PFN_vkEnumerateInstanceExtensionProperties EnumerateInstanceExtensionProperties;
     PFN_vkEnumerateDeviceExtensionProperties EnumerateDeviceExtensionProperties;
@@ -244,12 +251,10 @@ typedef struct VpCapabilitiesCreateInfo
 {
     /// Flags for created allocator. Use #VpInstanceCreateFlagBits enum.
     VpCapabilitiesCreateFlags       flags;
-    uint32_t                        apiVersion;
     const VpVulkanFunctions*        pVulkanFunctions;
 } VpCapabilitiesCreateInfo;
 
 VPAPI_ATTR VkResult vpCreateCapabilities(
-    const VpCapabilitiesCreateInfo*             pCreateInfo,
     const VkAllocationCallbacks*                pAllocator,
     VpCapabilities*                             pCapabilities);
 
@@ -257,6 +262,21 @@ VPAPI_ATTR VkResult vpCreateCapabilities(
 VPAPI_ATTR void vpDestroyCapabilities(
     VpCapabilities                              capabilities,
     const VkAllocationCallbacks*                pAllocator);
+
+/// Initializes capabilities with global functions
+VPAPI_ATTR VkResult vpInitialize(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpCapabilitiesCreateInfo*             pCreateInfo);
+
+/// Initializes capabilities with instance functions
+VPAPI_ATTR VkResult vpLoadInstance(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    VkInstance                                  instance,
+    VpInstanceFunctionsLoadFlags                flags);
 
 // Query the list of available profiles in the library
 VPAPI_ATTR VkResult vpGetProfiles(
@@ -1153,21 +1173,25 @@ VPAPI_ATTR VkResult vpGetProfileVideoProfileDesc(
 
 PUBLIC_IMPL_BODY = '''
 struct VpCapabilities_T : public VpVulkanFunctions {
-    bool singleton = false;
-    uint32_t apiVersion = VK_API_VERSION_1_0;
+    bool initialized = false;
 
     static VpCapabilities_T& Get() {
         static VpCapabilities_T instance;
-        VpCapabilitiesCreateInfo createInfo{};
-        createInfo.flags = VP_PROFILE_CREATE_STATIC_BIT;
-        instance.init(&createInfo);
-        instance.singleton = true;
+
+#if !defined(VK_NO_PROTOTYPES) && !defined(VP_DISABLE_STATIC_LINKING)
+        if (!instance.initialized) {
+            VpCapabilitiesCreateInfo createInfo{};
+            createInfo.flags = VP_CAPABILITIES_CREATE_STATIC_BIT;
+            instance.init(&createInfo);
+            instance.initialized = true;
+        }
+#endif
+
         return instance;
     }
 
     VpCapabilities_T() {
         this->GetInstanceProcAddr = nullptr;
-        this->GetDeviceProcAddr = nullptr;
         this->EnumerateInstanceVersion = nullptr;
         this->EnumerateInstanceExtensionProperties = nullptr;
         this->EnumerateDeviceExtensionProperties = nullptr;
@@ -1182,29 +1206,33 @@ struct VpCapabilities_T : public VpVulkanFunctions {
     VkResult init(const VpCapabilitiesCreateInfo* pCreateInfo) {
         assert(pCreateInfo != nullptr);
 
-        return ImportVulkanFunctions(pCreateInfo);
-    }
+        if (pCreateInfo->flags & VP_CAPABILITIES_CREATE_DYNAMIC_BIT) {
+            if (!pCreateInfo->pVulkanFunctions) {
+                return VK_ERROR_INITIALIZATION_FAILED;
+            }
+            if (!pCreateInfo->pVulkanFunctions->GetInstanceProcAddr) {
+                return VK_ERROR_INITIALIZATION_FAILED;
+            }
+            ImportGlobalVulkanFunctions_Dynamic(pCreateInfo->pVulkanFunctions->GetInstanceProcAddr);
+            ImportVulkanFunctions_Custom(pCreateInfo->pVulkanFunctions);
+            return ValidateGlobalVulkanFunctions();
+        }
 
-    VkResult ImportVulkanFunctions(const VpCapabilitiesCreateInfo* pCreateInfo) {
-        if (pCreateInfo->flags & VP_PROFILE_CREATE_STATIC_BIT) {
+#if !defined(VK_NO_PROTOTYPES) && !defined(VP_DISABLE_STATIC_LINKING)
+        if (pCreateInfo->flags & VP_CAPABILITIES_CREATE_STATIC_BIT) {
             ImportVulkanFunctions_Static();
         }
+#endif
 
-        if (pCreateInfo->pVulkanFunctions != nullptr) {
-            ImportVulkanFunctions_Custom((VpVulkanFunctions*)pCreateInfo->pVulkanFunctions);
-        }
-/*
-        if (pCreateInfo->flags & VP_PROFILE_CREATE_DYNAMIC_BIT) {
-            ImportVulkanFunctions_Dynamic();
-        }
-*/
-        return ValidateVulkanFunctions();
+        ImportVulkanFunctions_Custom(pCreateInfo->pVulkanFunctions);
+        VkResult result = ValidateGlobalVulkanFunctions();
+        return result != VK_SUCCESS ? result : ValidateInstanceVulkanFunctions({});
     }
 
+#if !defined(VK_NO_PROTOTYPES) && !defined(VP_DISABLE_STATIC_LINKING)
     void ImportVulkanFunctions_Static() {
         // Vulkan 1.1
         this->GetInstanceProcAddr = (PFN_vkGetInstanceProcAddr)vkGetInstanceProcAddr;
-        this->GetDeviceProcAddr = (PFN_vkGetDeviceProcAddr)vkGetDeviceProcAddr;
 
         this->EnumerateInstanceVersion = (PFN_vkEnumerateInstanceVersion)vkEnumerateInstanceVersion;
         this->EnumerateInstanceExtensionProperties = (PFN_vkEnumerateInstanceExtensionProperties)vkEnumerateInstanceExtensionProperties;
@@ -1218,13 +1246,95 @@ struct VpCapabilities_T : public VpVulkanFunctions {
         this->CreateInstance = (PFN_vkCreateInstance)vkCreateInstance;
         this->CreateDevice = (PFN_vkCreateDevice)vkCreateDevice;
     }
+#endif
 
-    void ImportVulkanFunctions_Custom(VpVulkanFunctions* pFunctions) {
-    #define VP_COPY_IF_NOT_NULL(funcName) \
-        if(pFunctions->funcName != nullptr) this->funcName = pFunctions->funcName;
+    void ImportGlobalVulkanFunctions_Dynamic(PFN_vkGetInstanceProcAddr getInstanceProcAddr) {
+        this->GetInstanceProcAddr = getInstanceProcAddr;
+
+#define VP_FETCH_FUNC(memberName, functionNameString) \
+    if(this->memberName == nullptr) \
+        this->memberName = (PFN_vk##memberName)this->GetInstanceProcAddr(nullptr, functionNameString)
+
+        VP_FETCH_FUNC(EnumerateInstanceVersion, "vkEnumerateInstanceVersion");
+        VP_FETCH_FUNC(EnumerateInstanceExtensionProperties, "vkEnumerateInstanceExtensionProperties");
+
+        VP_FETCH_FUNC(CreateInstance, "vkCreateInstance");
+
+#undef VP_FETCH_FUNC
+    }
+
+    VkResult ValidateGlobalVulkanFunctions() {
+        // vkEnumerateInstanceVersion is omitted from validation on purpose.
+        // It is not available in Vulkan 1.0, and nullptr is a valid state indicating Vulkan 1.0.
+
+        if (this->EnumerateInstanceExtensionProperties == nullptr ||
+            this->CreateInstance == nullptr ||
+            this->GetInstanceProcAddr == nullptr) {
+            return VK_ERROR_INITIALIZATION_FAILED;
+        }
+
+        return VK_SUCCESS;
+    }
+
+    void ImportInstanceVulkanFunctions_Dynamic(VkInstance instance, VpInstanceFunctionsLoadFlags flags) {
+#define VP_FETCH_FUNC(memberName, functionNameString) \
+    if(this->memberName == nullptr) \
+        this->memberName = (PFN_vk##memberName)this->GetInstanceProcAddr(instance, functionNameString);
+
+        VP_FETCH_FUNC(EnumerateDeviceExtensionProperties, "vkEnumerateDeviceExtensionProperties");
+        VP_FETCH_FUNC(GetPhysicalDeviceFeatures2, "vkGetPhysicalDeviceFeatures2");
+        if (!this->GetPhysicalDeviceFeatures2 && (flags & VP_INSTANCE_FUNCTIONS_LOAD_KHR_GET_PHYSICAL_DEVICE_PROPERTIES2_BIT)) {
+            VP_FETCH_FUNC(GetPhysicalDeviceFeatures2, "vkGetPhysicalDeviceFeatures2KHR");
+        }
+
+        VP_FETCH_FUNC(GetPhysicalDeviceProperties2, "vkGetPhysicalDeviceProperties2");
+        if (!this->GetPhysicalDeviceProperties2 && (flags & VP_INSTANCE_FUNCTIONS_LOAD_KHR_GET_PHYSICAL_DEVICE_PROPERTIES2_BIT)) {
+            VP_FETCH_FUNC(GetPhysicalDeviceProperties2, "vkGetPhysicalDeviceProperties2KHR");
+        }
+
+        VP_FETCH_FUNC(GetPhysicalDeviceFormatProperties2, "vkGetPhysicalDeviceFormatProperties2");
+        if (!this->GetPhysicalDeviceFormatProperties2 && (flags & VP_INSTANCE_FUNCTIONS_LOAD_KHR_GET_PHYSICAL_DEVICE_PROPERTIES2_BIT)) {
+            VP_FETCH_FUNC(GetPhysicalDeviceFormatProperties2, "vkGetPhysicalDeviceFormatProperties2KHR");
+        }
+
+        VP_FETCH_FUNC(GetPhysicalDeviceQueueFamilyProperties2, "vkGetPhysicalDeviceQueueFamilyProperties2");
+        if (!this->GetPhysicalDeviceQueueFamilyProperties2 && (flags & VP_INSTANCE_FUNCTIONS_LOAD_KHR_GET_PHYSICAL_DEVICE_PROPERTIES2_BIT)) {
+            VP_FETCH_FUNC(GetPhysicalDeviceQueueFamilyProperties2, "vkGetPhysicalDeviceQueueFamilyProperties2KHR");
+        }
+
+        VP_FETCH_FUNC(CreateDevice, "vkCreateDevice");
+
+#undef VP_FETCH_FUNC
+    }
+
+    VkResult ValidateInstanceVulkanFunctions(VpInstanceFunctionsLoadFlags flags) {
+        if (this->EnumerateDeviceExtensionProperties == nullptr ||
+            this->CreateDevice == nullptr) {
+            return VK_ERROR_INITIALIZATION_FAILED;
+        }
+
+        bool requiresProperties2 = (flags & VP_INSTANCE_FUNCTIONS_LOAD_KHR_GET_PHYSICAL_DEVICE_PROPERTIES2_BIT);
+
+        if (this->GetPhysicalDeviceFeatures2 == nullptr ||
+            this->GetPhysicalDeviceProperties2 == nullptr ||
+            this->GetPhysicalDeviceFormatProperties2 == nullptr ||
+            this->GetPhysicalDeviceQueueFamilyProperties2 == nullptr) {
+            return requiresProperties2 ? VK_ERROR_INITIALIZATION_FAILED : VK_ERROR_EXTENSION_NOT_PRESENT;
+        }
+
+        return VK_SUCCESS;
+    }
+
+    void ImportVulkanFunctions_Custom(const VpVulkanFunctions* functions) {
+        if (!functions) {
+            return;
+        }
+
+#define VP_COPY_IF_NOT_NULL(funcName) \
+    if(functions->funcName != nullptr) \
+        this->funcName = functions->funcName;
 
         VP_COPY_IF_NOT_NULL(GetInstanceProcAddr);
-        VP_COPY_IF_NOT_NULL(GetDeviceProcAddr);
 
         VP_COPY_IF_NOT_NULL(EnumerateInstanceVersion);
         VP_COPY_IF_NOT_NULL(EnumerateInstanceExtensionProperties);
@@ -1237,100 +1347,20 @@ struct VpCapabilities_T : public VpVulkanFunctions {
 
         VP_COPY_IF_NOT_NULL(CreateInstance);
         VP_COPY_IF_NOT_NULL(CreateDevice);
-    #undef VP_COPY_IF_NOT_NULL
-    }
-/*
-    VkResult ImportVulkanFunctions_Dynamic() {
-        // To use VP_PROFILE_CREATE_DYNAMIC_BIT you have to pass VpVulkanFunctions::vkGetInstanceProcAddr and vkGetDeviceProcAddr as VpCapabilitiesCreateInfo::pVulkanFunctions. Other members can be null.
-        if (this->GetInstanceProcAddr == nullptr || this->GetDeviceProcAddr == nullptr) {
-            return VK_ERROR_INITIALIZATION_FAILED;
-        }
-
-    #define VP_FETCH_INSTANCE_FUNC(memberName, functionNameString) \
-        if(this->memberName == nullptr) \
-           this->memberName = (PFN_vk##memberName)this->GetInstanceProcAddr(m_hInstance, functionNameString);
-    #define VP_FETCH_DEVICE_FUNC(memberName, functionNameString) \
-        if(this->memberName == nullptr) \
-            this->memberName = (PFN_vk##memberName)this->GetDeviceProcAddr(m_hDevice, functionNameString);
-
-        VP_FETCH_INSTANCE_FUNC(GetInstanceProcAddr, "vkGetInstanceProcAddr");
-        VP_FETCH_DEVICE_FUNC(GetDeviceProcAddr, "vkGetDeviceProcAddr");
-
-        VP_FETCH_INSTANCE_FUNC(EnumerateInstanceVersion, "vkEnumerateInstanceVersion");
-        VP_FETCH_INSTANCE_FUNC(EnumerateInstanceExtensionProperties, "vkEnumerateInstanceExtensionProperties");
-        VP_FETCH_DEVICE_FUNC(EnumerateDeviceExtensionProperties, "vkEnumerateDeviceExtensionProperties");
-
-        VP_FETCH_DEVICE_FUNC(GetPhysicalDeviceFeatures2, "vkGetPhysicalDeviceFeatures2");
-        VP_FETCH_DEVICE_FUNC(GetPhysicalDeviceProperties2, "vkGetPhysicalDeviceProperties2");
-        VP_FETCH_DEVICE_FUNC(GetPhysicalDeviceFormatProperties2, "vkGetPhysicalDeviceFormatProperties2");
-        VP_FETCH_DEVICE_FUNC(GetPhysicalDeviceQueueFamilyProperties2, "vkGetPhysicalDeviceQueueFamilyProperties2");
-
-        VP_FETCH_INSTANCE_FUNC(CreateInstance, "vkCreateInstance");
-        VP_FETCH_DEVICE_FUNC(CreateDevice, "vkCreateDevice");
-    #undef VP_FETCH_DEVICE_FUNC
-    #undef VP_FETCH_INSTANCE_FUNC
-    }
-*/
-    VkResult ValidateVulkanFunctions() {
-        if (this->GetInstanceProcAddr == nullptr) {
-            return VK_ERROR_INITIALIZATION_FAILED;
-        }
-
-        if (this->GetDeviceProcAddr == nullptr) {
-            return VK_ERROR_INITIALIZATION_FAILED;
-        }
-
-        if (this->EnumerateInstanceVersion == nullptr && apiVersion >= VK_API_VERSION_1_1) {
-            return VK_ERROR_INITIALIZATION_FAILED;
-        }
-
-        if (this->EnumerateInstanceExtensionProperties == nullptr) {
-            return VK_ERROR_INITIALIZATION_FAILED;
-        }
-
-        if (this->EnumerateDeviceExtensionProperties == nullptr) {
-            return VK_ERROR_INITIALIZATION_FAILED;
-        }
-
-        if (this->GetPhysicalDeviceFeatures2 == nullptr) {
-            return apiVersion >= VK_API_VERSION_1_1 ? VK_ERROR_INITIALIZATION_FAILED : VK_ERROR_EXTENSION_NOT_PRESENT;
-        }
-
-        if (this->GetPhysicalDeviceProperties2 == nullptr) {
-            return apiVersion >= VK_API_VERSION_1_1 ? VK_ERROR_INITIALIZATION_FAILED : VK_ERROR_EXTENSION_NOT_PRESENT;
-        }
-
-        if (this->GetPhysicalDeviceFormatProperties2 == nullptr) {
-            return apiVersion >= VK_API_VERSION_1_1 ? VK_ERROR_INITIALIZATION_FAILED : VK_ERROR_EXTENSION_NOT_PRESENT;
-        }
-
-        if (this->GetPhysicalDeviceQueueFamilyProperties2 == nullptr) {
-            return apiVersion >= VK_API_VERSION_1_1 ? VK_ERROR_INITIALIZATION_FAILED : VK_ERROR_EXTENSION_NOT_PRESENT;
-        }
-
-        if (this->CreateInstance == nullptr) {
-            return VK_ERROR_INITIALIZATION_FAILED;
-        }
-
-        if (this->CreateDevice == nullptr) {
-            return VK_ERROR_INITIALIZATION_FAILED;
-        }
-
-        return VK_SUCCESS;
+#undef VP_COPY_IF_NOT_NULL
     }
 };
 
 VPAPI_ATTR VkResult vpCreateCapabilities(
-    const VpCapabilitiesCreateInfo*             pCreateInfo,
     const VkAllocationCallbacks*                pAllocator,
     VpCapabilities*                             pCapabilities) {
     (void)pAllocator;
-
-    VpCapabilities_T* capabilities = new VpCapabilities_T();
-    VkResult result = capabilities->init(pCreateInfo);
+    VpCapabilities_T* capabilities = new (std::nothrow) VpCapabilities_T();
     *pCapabilities = capabilities;
-
-    return result;
+    if (!capabilities) {
+        return VK_ERROR_INITIALIZATION_FAILED;
+    }
+    return VK_SUCCESS;
 }
 
 /// Destroys allocator object.
@@ -1340,6 +1370,41 @@ VPAPI_ATTR void vpDestroyCapabilities(
     (void)pAllocator;
     
     delete capabilities;
+}
+
+/// Initializes capabilities with global functions
+VPAPI_ATTR VkResult vpInitialize(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    const VpCapabilitiesCreateInfo*             pCreateInfo) {
+#ifdef VP_USE_OBJECT
+    VpCapabilities_T& vp = capabilities == nullptr ? VpCapabilities_T::Get() : *capabilities;
+#else
+    VpCapabilities_T& vp = VpCapabilities_T::Get();
+#endif//VP_USE_OBJECT
+
+    // Reset before initializing
+    vp = VpCapabilities_T {};
+    vp.initialized = true;
+    return vp.init(pCreateInfo);
+}
+
+/// Initializes capabilities with instance functions
+VPAPI_ATTR VkResult vpLoadInstance(
+#ifdef VP_USE_OBJECT
+    VpCapabilities                              capabilities,
+#endif//VP_USE_OBJECT
+    VkInstance                                  instance,
+    VpInstanceFunctionsLoadFlags                flags) {
+#ifdef VP_USE_OBJECT
+    VpCapabilities_T& vp = capabilities == nullptr ? VpCapabilities_T::Get() : *capabilities;
+#else
+    VpCapabilities_T& vp = VpCapabilities_T::Get();
+#endif//VP_USE_OBJECT
+
+    vp.ImportInstanceVulkanFunctions_Dynamic(instance, flags);
+    return vp.ValidateInstanceVulkanFunctions(flags);
 }
 
 VPAPI_ATTR VkResult vpGetProfiles(
@@ -1512,8 +1577,7 @@ VPAPI_ATTR VkResult vpGetInstanceProfileVariantsSupport(
     VkResult result = VK_SUCCESS;
 
     uint32_t api_version = VK_API_VERSION_1_0;
-    PFN_vkEnumerateInstanceVersion pfnEnumerateInstanceVersion = vp.singleton ?
-        (PFN_vkEnumerateInstanceVersion)vkGetInstanceProcAddr(VK_NULL_HANDLE, "vkEnumerateInstanceVersion") : vp.EnumerateInstanceVersion;
+    PFN_vkEnumerateInstanceVersion pfnEnumerateInstanceVersion = vp.EnumerateInstanceVersion;
     if (pfnEnumerateInstanceVersion != nullptr) {
         result = pfnEnumerateInstanceVersion(&api_version);
         if (result != VK_SUCCESS) {
@@ -1793,36 +1857,10 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
         bool supported;
     } userData{physicalDevice, supported_blocks, unsupported_blocks};
 
-    if (!vp.singleton) {
-        userData.gpdp2.pfnGetPhysicalDeviceFeatures2 = vp.GetPhysicalDeviceFeatures2;
-        userData.gpdp2.pfnGetPhysicalDeviceProperties2 = vp.GetPhysicalDeviceProperties2;
-        userData.gpdp2.pfnGetPhysicalDeviceFormatProperties2 = vp.GetPhysicalDeviceFormatProperties2;
-        userData.gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2 = vp.GetPhysicalDeviceQueueFamilyProperties2;
-    }
-
-    // Attempt to load core versions of the GPDP2 entry points
-    if (userData.gpdp2.pfnGetPhysicalDeviceFeatures2 == nullptr) {
-        userData.gpdp2.pfnGetPhysicalDeviceFeatures2 =
-            (PFN_vkGetPhysicalDeviceFeatures2KHR)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceFeatures2");
-        userData.gpdp2.pfnGetPhysicalDeviceProperties2 =
-            (PFN_vkGetPhysicalDeviceProperties2KHR)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceProperties2");
-        userData.gpdp2.pfnGetPhysicalDeviceFormatProperties2 =
-            (PFN_vkGetPhysicalDeviceFormatProperties2KHR)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceFormatProperties2");
-        userData.gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2 =
-            (PFN_vkGetPhysicalDeviceQueueFamilyProperties2KHR)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceQueueFamilyProperties2");
-    }
-
-    // If not successful, try to load KHR variant
-    if (userData.gpdp2.pfnGetPhysicalDeviceFeatures2 == nullptr) {
-        userData.gpdp2.pfnGetPhysicalDeviceFeatures2 =
-            (PFN_vkGetPhysicalDeviceFeatures2KHR)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceFeatures2KHR");
-        userData.gpdp2.pfnGetPhysicalDeviceProperties2 =
-            (PFN_vkGetPhysicalDeviceProperties2KHR)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceProperties2KHR");
-        userData.gpdp2.pfnGetPhysicalDeviceFormatProperties2 =
-            (PFN_vkGetPhysicalDeviceFormatProperties2KHR)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceFormatProperties2KHR");
-        userData.gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2 =
-            (PFN_vkGetPhysicalDeviceQueueFamilyProperties2KHR)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceQueueFamilyProperties2KHR");
-    }
+    userData.gpdp2.pfnGetPhysicalDeviceFeatures2 = vp.GetPhysicalDeviceFeatures2;
+    userData.gpdp2.pfnGetPhysicalDeviceProperties2 = vp.GetPhysicalDeviceProperties2;
+    userData.gpdp2.pfnGetPhysicalDeviceFormatProperties2 = vp.GetPhysicalDeviceFormatProperties2;
+    userData.gpdp2.pfnGetPhysicalDeviceQueueFamilyProperties2 = vp.GetPhysicalDeviceQueueFamilyProperties2;
 
     if (userData.gpdp2.pfnGetPhysicalDeviceFeatures2 == nullptr ||
         userData.gpdp2.pfnGetPhysicalDeviceProperties2 == nullptr ||
@@ -1832,7 +1870,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
     }
 
 #ifdef VK_KHR_video_queue
-    PFN_vkGetInstanceProcAddr gipa = vp.singleton ? vkGetInstanceProcAddr : vp.GetInstanceProcAddr;
+    PFN_vkGetInstanceProcAddr gipa = vp.GetInstanceProcAddr;
     userData.video.pfnGetPhysicalDeviceVideoCapabilitiesKHR =
         (PFN_vkGetPhysicalDeviceVideoCapabilitiesKHR)gipa(instance, "vkGetPhysicalDeviceVideoCapabilitiesKHR");
     userData.video.pfnGetPhysicalDeviceVideoFormatPropertiesKHR =

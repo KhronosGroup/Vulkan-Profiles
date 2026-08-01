@@ -20,9 +20,11 @@
  * - Daniel Rakos <daniel.rakos@rastergrid.com>
  */
 
-#include "mock_vulkan_api.hpp"
+#include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan_android.h>
+
 #include "generated_vulkan_profiles.hpp"
+#include "mock_vulkan_api.hpp"
 
 static void initInstanceExtensions(const VpProfileProperties& profile, std::vector<VkExtensionProperties>& properties,
                                    std::vector<const char*>& outExtensions) {
