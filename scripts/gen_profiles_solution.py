@@ -1206,6 +1206,8 @@ struct VpCapabilities_T : public VpVulkanFunctions {
     VkResult init(const VpCapabilitiesCreateInfo* pCreateInfo) {
         assert(pCreateInfo != nullptr);
 
+        ImportVulkanFunctions_Custom(pCreateInfo->pVulkanFunctions);
+
         if (pCreateInfo->flags & VP_CAPABILITIES_CREATE_DYNAMIC_BIT) {
             if (!pCreateInfo->pVulkanFunctions) {
                 return VK_ERROR_INITIALIZATION_FAILED;
@@ -1214,7 +1216,6 @@ struct VpCapabilities_T : public VpVulkanFunctions {
                 return VK_ERROR_INITIALIZATION_FAILED;
             }
             ImportGlobalVulkanFunctions_Dynamic(pCreateInfo->pVulkanFunctions->GetInstanceProcAddr);
-            ImportVulkanFunctions_Custom(pCreateInfo->pVulkanFunctions);
             return ValidateGlobalVulkanFunctions();
         }
 
@@ -1224,27 +1225,31 @@ struct VpCapabilities_T : public VpVulkanFunctions {
         }
 #endif
 
-        ImportVulkanFunctions_Custom(pCreateInfo->pVulkanFunctions);
         VkResult result = ValidateGlobalVulkanFunctions();
         return result != VK_SUCCESS ? result : ValidateInstanceVulkanFunctions({});
     }
 
 #if !defined(VK_NO_PROTOTYPES) && !defined(VP_DISABLE_STATIC_LINKING)
     void ImportVulkanFunctions_Static() {
-        // Vulkan 1.1
-        this->GetInstanceProcAddr = (PFN_vkGetInstanceProcAddr)vkGetInstanceProcAddr;
+#define VP_SET_STATIC(memberName, staticFuncName) \
+    if (this->memberName == nullptr) \
+        this->memberName = (PFN_vk##memberName)staticFuncName
 
-        this->EnumerateInstanceVersion = (PFN_vkEnumerateInstanceVersion)vkEnumerateInstanceVersion;
-        this->EnumerateInstanceExtensionProperties = (PFN_vkEnumerateInstanceExtensionProperties)vkEnumerateInstanceExtensionProperties;
-        this->EnumerateDeviceExtensionProperties = (PFN_vkEnumerateDeviceExtensionProperties)vkEnumerateDeviceExtensionProperties;
+        VP_SET_STATIC(GetInstanceProcAddr, vkGetInstanceProcAddr);
 
-        this->GetPhysicalDeviceFeatures2 = (PFN_vkGetPhysicalDeviceFeatures2)vkGetPhysicalDeviceFeatures2;
-        this->GetPhysicalDeviceProperties2 = (PFN_vkGetPhysicalDeviceProperties2)vkGetPhysicalDeviceProperties2;
-        this->GetPhysicalDeviceFormatProperties2 = (PFN_vkGetPhysicalDeviceFormatProperties2)vkGetPhysicalDeviceFormatProperties2;
-        this->GetPhysicalDeviceQueueFamilyProperties2 = (PFN_vkGetPhysicalDeviceQueueFamilyProperties2)vkGetPhysicalDeviceQueueFamilyProperties2;
+        VP_SET_STATIC(EnumerateInstanceVersion, vkEnumerateInstanceVersion);
+        VP_SET_STATIC(EnumerateInstanceExtensionProperties, vkEnumerateInstanceExtensionProperties);
+        VP_SET_STATIC(EnumerateDeviceExtensionProperties, vkEnumerateDeviceExtensionProperties);
 
-        this->CreateInstance = (PFN_vkCreateInstance)vkCreateInstance;
-        this->CreateDevice = (PFN_vkCreateDevice)vkCreateDevice;
+        VP_SET_STATIC(GetPhysicalDeviceFeatures2, vkGetPhysicalDeviceFeatures2);
+        VP_SET_STATIC(GetPhysicalDeviceProperties2, vkGetPhysicalDeviceProperties2);
+        VP_SET_STATIC(GetPhysicalDeviceFormatProperties2, vkGetPhysicalDeviceFormatProperties2);
+        VP_SET_STATIC(GetPhysicalDeviceQueueFamilyProperties2, vkGetPhysicalDeviceQueueFamilyProperties2);
+
+        VP_SET_STATIC(CreateInstance, vkCreateInstance);
+        VP_SET_STATIC(CreateDevice, vkCreateDevice);
+
+#undef VP_SET_STATIC
     }
 #endif
 
