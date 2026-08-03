@@ -11,7 +11,12 @@
 
 # Release Notes
 
-## [Vulkan Profiles Tools 1.4.3XX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - July 2026
+## [Vulkan Profiles Tools 1.4.3XX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - September 2026
+
+### Features:
+- Implement `VK_NO_PROTOTYPES` support #734
+
+## [Vulkan Profiles Tools 1.4.356](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.356.0) - July 2026
 
 ### Features:
 - Add `profiles.py` python script, to pull dependent extensions into a source profiles file (ALPHA)
