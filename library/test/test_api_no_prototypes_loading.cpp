@@ -57,9 +57,18 @@ TEST(no_prototypes, create_instance_with_dynamic_pointers) {
     ai.pEngineName = "No Engine";
     ai.engineVersion = VK_MAKE_VERSION(1, 2, 0);
     ai.apiVersion = VK_API_VERSION_1_2;
+
     VkInstanceCreateInfo ici{};
     ici.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     ici.pApplicationInfo = &ai;
+
+#if defined(__APPLE__)
+    const char* extensions[] = { VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME };
+    ici.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+    ici.enabledExtensionCount = 1;
+    ici.ppEnabledExtensionNames = extensions;
+#endif
+
     VkInstance instance{};
     EXPECT_TRUE(dl.vkCreateInstance(&ici, nullptr, &instance) == VK_SUCCESS);
 
