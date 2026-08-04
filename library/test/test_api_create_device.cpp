@@ -40,11 +40,6 @@ int main(int argc, char** argv) {
 
     ::scaffold = new TestScaffold;
 
-    VpCapabilitiesCreateInfo createInfo{};
-    createInfo.flags = VP_CAPABILITIES_CREATE_STATIC_BIT;
-    vpInitialize(&createInfo);
-    vpLoadInstance(::scaffold->instance, {});
-
     int result = RUN_ALL_TESTS();
 
     delete ::scaffold;
