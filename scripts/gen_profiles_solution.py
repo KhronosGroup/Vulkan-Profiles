@@ -213,9 +213,9 @@ typedef struct VpDeviceCreateInfo {
 VK_DEFINE_HANDLE(VpCapabilities)
 
 typedef enum VpCapabilitiesCreateFlagBits {
-#if !defined(VK_NO_PROTOTYPES) && !defined(VP_DISABLE_STATIC_LINKING)
+#ifndef VK_NO_PROTOTYPES
     VP_CAPABILITIES_CREATE_STATIC_BIT = (1 << 0),
-#endif
+#endif//VK_NO_PROTOTYPES
     VP_CAPABILITIES_CREATE_DYNAMIC_BIT = (1 << 1),
     VP_CAPABILITIES_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
 } VpCapabilitiesCreateFlagBits;
@@ -1178,14 +1178,14 @@ struct VpCapabilities_T : public VpVulkanFunctions {
     static VpCapabilities_T& Get() {
         static VpCapabilities_T instance;
 
-#if !defined(VK_NO_PROTOTYPES) && !defined(VP_DISABLE_STATIC_LINKING)
+#ifndef VK_NO_PROTOTYPES
         if (!instance.initialized) {
             VpCapabilitiesCreateInfo createInfo{};
             createInfo.flags = VP_CAPABILITIES_CREATE_STATIC_BIT;
             instance.init(&createInfo);
             instance.initialized = true;
         }
-#endif
+#endif//VK_NO_PROTOTYPES
 
         return instance;
     }
@@ -1219,17 +1219,17 @@ struct VpCapabilities_T : public VpVulkanFunctions {
             return ValidateGlobalVulkanFunctions();
         }
 
-#if !defined(VK_NO_PROTOTYPES) && !defined(VP_DISABLE_STATIC_LINKING)
+#ifndef VK_NO_PROTOTYPES
         if (pCreateInfo->flags & VP_CAPABILITIES_CREATE_STATIC_BIT) {
             ImportVulkanFunctions_Static();
         }
-#endif
+#endif//VK_NO_PROTOTYPES
 
         VkResult result = ValidateGlobalVulkanFunctions();
         return result != VK_SUCCESS ? result : ValidateInstanceVulkanFunctions({});
     }
 
-#if !defined(VK_NO_PROTOTYPES) && !defined(VP_DISABLE_STATIC_LINKING)
+#ifndef VK_NO_PROTOTYPES
     void ImportVulkanFunctions_Static() {
 #define VP_SET_STATIC(memberName, staticFuncName) \
     if (this->memberName == nullptr) \
@@ -1251,7 +1251,7 @@ struct VpCapabilities_T : public VpVulkanFunctions {
 
 #undef VP_SET_STATIC
     }
-#endif
+#endif//VK_NO_PROTOTYPES
 
     void ImportGlobalVulkanFunctions_Dynamic(PFN_vkGetInstanceProcAddr getInstanceProcAddr) {
         this->GetInstanceProcAddr = getInstanceProcAddr;
