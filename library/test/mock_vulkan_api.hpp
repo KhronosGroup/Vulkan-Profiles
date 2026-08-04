@@ -31,6 +31,10 @@
 #include <unordered_map>
 #include <algorithm>
 
+#ifndef VP_USE_OBJECT
+#define VP_USE_OBJECT 1
+#endif
+
 struct VulkanStructData {
     VkStructureType         sType;
     std::vector<uint8_t>    contents;
@@ -177,6 +181,7 @@ public:
     VkPhysicalDevice        vkPhysicalDevice;
     VkDevice                vkDevice;
     VkAllocationCallbacks   vkAllocator;
+    VpFunctions             functions;
 
     MockVulkanAPI()
         : m_instanceProcAddr{}
@@ -199,21 +204,26 @@ public:
     {
         sInstance = this;
 
-        VpCapabilitiesCreateInfo createInfo{};
-        VpVulkanFunctions vulkanFunctions{};
-        vulkanFunctions.GetInstanceProcAddr = MockVulkanAPI::vkGetInstanceProcAddr;
-        vulkanFunctions.EnumerateInstanceExtensionProperties = MockVulkanAPI::vkEnumerateInstanceExtensionProperties;
-        vulkanFunctions.EnumerateDeviceExtensionProperties = MockVulkanAPI::vkEnumerateDeviceExtensionProperties;
-        vulkanFunctions.CreateInstance = MockVulkanAPI::vkCreateInstance;
-        vulkanFunctions.CreateDevice = MockVulkanAPI::vkCreateDevice;
-        createInfo.pVulkanFunctions = &vulkanFunctions;
-        createInfo.flags = VP_CAPABILITIES_CREATE_DYNAMIC_BIT;
-        vpInitialize(&createInfo);
-        vpLoadInstance(vkInstance, {});
+        VpFunctionsCreateInfo functionsCreateInfo{};
+        functionsCreateInfo.GetInstanceProcAddr = MockVulkanAPI::vkGetInstanceProcAddr;
+        functionsCreateInfo.EnumerateInstanceVersion = MockVulkanAPI::vkEnumerateInstanceVersion;
+        functionsCreateInfo.EnumerateInstanceExtensionProperties = MockVulkanAPI::vkEnumerateInstanceExtensionProperties;
+        functionsCreateInfo.EnumerateDeviceExtensionProperties = MockVulkanAPI::vkEnumerateDeviceExtensionProperties;
+        functionsCreateInfo.CreateInstance = MockVulkanAPI::vkCreateInstance;
+        functionsCreateInfo.CreateDevice = MockVulkanAPI::vkCreateDevice;
+        functionsCreateInfo.GetPhysicalDeviceFeatures2 = MockVulkanAPI::vkGetPhysicalDeviceFeatures2;
+        functionsCreateInfo.GetPhysicalDeviceFormatProperties2 = MockVulkanAPI::vkGetPhysicalDeviceFormatProperties2;
+        functionsCreateInfo.GetPhysicalDeviceProperties2 = MockVulkanAPI::vkGetPhysicalDeviceProperties2;
+        functionsCreateInfo.GetPhysicalDeviceQueueFamilyProperties2 = MockVulkanAPI::vkGetPhysicalDeviceQueueFamilyProperties2;
+
+        VkResult result = vpCreateFunctions(&functionsCreateInfo, nullptr, &this->functions);
+        assert(result == VK_SUCCESS);
     }
 
     ~MockVulkanAPI()
     {
+        vpDestroyFunctions(this->functions, nullptr);
+
         sInstance = nullptr;
     }
 
@@ -290,18 +300,6 @@ public:
             RemoveInstanceProc(vkInstance, "vkGetPhysicalDeviceQueueFamilyProperties2");
             loadInstanceFlags = VP_INSTANCE_FUNCTIONS_LOAD_KHR_GET_PHYSICAL_DEVICE_PROPERTIES2_BIT;
         }
-
-        VpCapabilitiesCreateInfo createInfo{};
-        VpVulkanFunctions vulkanFunctions{};
-        vulkanFunctions.GetInstanceProcAddr = MockVulkanAPI::vkGetInstanceProcAddr;
-        vulkanFunctions.EnumerateInstanceExtensionProperties = MockVulkanAPI::vkEnumerateInstanceExtensionProperties;
-        vulkanFunctions.EnumerateDeviceExtensionProperties = MockVulkanAPI::vkEnumerateDeviceExtensionProperties;
-        vulkanFunctions.CreateInstance = MockVulkanAPI::vkCreateInstance;
-        vulkanFunctions.CreateDevice = MockVulkanAPI::vkCreateDevice;
-        createInfo.pVulkanFunctions = &vulkanFunctions;
-        createInfo.flags = VP_CAPABILITIES_CREATE_DYNAMIC_BIT;
-        vpInitialize(&createInfo);
-        vpLoadInstance(vkInstance, loadInstanceFlags);
     }
 
     static VKAPI_ATTR VkResult VKAPI_CALL vkEnumerateInstanceVersion(
