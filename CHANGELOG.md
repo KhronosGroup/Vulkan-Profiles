@@ -16,6 +16,9 @@
 ### Features:
 - Implement `VK_NO_PROTOTYPES` support #734
 
+### Deprecation:
+- Require Vulkan 1.1
+
 ## [Vulkan Profiles Tools 1.4.356](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.356.0) - July 2026
 
 ### Features:

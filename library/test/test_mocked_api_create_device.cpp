@@ -20,6 +20,10 @@
  * - Daniel Rakos <daniel.rakos@rastergrid.com>
  */
 
+#ifndef VP_USE_OBJECT
+#define VP_USE_OBJECT 1
+#endif
+
 #include <vulkan/vulkan_profiles.hpp>
 
 #include "mock_vulkan_api.hpp"
@@ -52,7 +56,7 @@ TEST(mocked_api_create_device, default_extensions) {
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
     VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, nullptr, &outFeatures);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &outFeatures);
 
     mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
         VK_STRUCT(outFeatures),
@@ -64,7 +68,7 @@ TEST(mocked_api_create_device, default_extensions) {
     VpDeviceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
+    VkResult result = vpCreateDevice(mock.functions, mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_TRUE(device == mock.vkDevice);
@@ -105,7 +109,7 @@ TEST(mocked_api_create_device, merge_extensions) {
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
     VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, nullptr, &outFeatures);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &outFeatures);
 
     mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
         VK_STRUCT(outFeatures),
@@ -117,7 +121,7 @@ TEST(mocked_api_create_device, merge_extensions) {
     VpDeviceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
+    VkResult result = vpCreateDevice(mock.functions, mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_TRUE(device == mock.vkDevice);
@@ -150,7 +154,7 @@ TEST(mocked_api_create_device, default_features) {
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
     VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, nullptr, &outFeatures);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &outFeatures);
 
     mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
         VK_STRUCT(outFeatures),
@@ -162,7 +166,7 @@ TEST(mocked_api_create_device, default_features) {
     VpDeviceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
+    VkResult result = vpCreateDevice(mock.functions, mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_TRUE(device == mock.vkDevice);
@@ -205,7 +209,7 @@ TEST(mocked_api_create_device, legacy_enabled_features) {
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
     VkPhysicalDeviceFeatures2 outFeatures2{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11};
     outFeatures2.features = inFeatures.features;
-    vpGetProfileFeatures(&profile, nullptr, &outFeatures2);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &outFeatures2);
 
     mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {
         VK_STRUCT(outFeatures2),
@@ -218,7 +222,7 @@ TEST(mocked_api_create_device, legacy_enabled_features) {
     VpDeviceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
+    VkResult result = vpCreateDevice(mock.functions, mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_TRUE(device == mock.vkDevice);
@@ -251,7 +255,7 @@ TEST(mocked_api_create_device, disable_robust_buffer_access) {
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
     VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, nullptr, &outFeatures);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &outFeatures);
 
     outFeatures.features.robustBufferAccess = VK_FALSE;
 
@@ -265,7 +269,7 @@ TEST(mocked_api_create_device, disable_robust_buffer_access) {
     VpDeviceCreateInfo createInfo{&inCreateInfo, VP_DEVICE_CREATE_DISABLE_ROBUST_BUFFER_ACCESS_BIT, 1, &profile};
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
+    VkResult result = vpCreateDevice(mock.functions, mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_TRUE(device == mock.vkDevice);
@@ -299,7 +303,7 @@ TEST(mocked_api_create_device, disable_robust_image_access) {
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
     VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, nullptr, &outFeatures);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &outFeatures);
 
     outFeatures13.robustImageAccess = VK_FALSE;
 
@@ -313,7 +317,7 @@ TEST(mocked_api_create_device, disable_robust_image_access) {
     VpDeviceCreateInfo createInfo{&inCreateInfo, VP_DEVICE_CREATE_DISABLE_ROBUST_IMAGE_ACCESS_BIT, 1, &profile};
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
+    VkResult result = vpCreateDevice(mock.functions, mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_TRUE(device == mock.vkDevice);
@@ -346,7 +350,7 @@ TEST(mocked_api_create_device, disable_robust_access) {
     VkPhysicalDeviceVulkan12Features outFeatures12{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &outFeatures13 };
     VkPhysicalDeviceVulkan11Features outFeatures11{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &outFeatures12 };
     VkPhysicalDeviceFeatures2 outFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &outFeatures11 };
-    vpGetProfileFeatures(&profile, nullptr, &outFeatures);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &outFeatures);
 
     outFeatures.features.robustBufferAccess = VK_FALSE;
     outFeatures13.robustImageAccess = VK_FALSE;
@@ -361,7 +365,7 @@ TEST(mocked_api_create_device, disable_robust_access) {
     VpDeviceCreateInfo createInfo{&inCreateInfo, VP_DEVICE_CREATE_DISABLE_ROBUST_ACCESS, 1, &profile};
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult result = vpCreateDevice(mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
+    VkResult result = vpCreateDevice(mock.functions, mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_TRUE(device == mock.vkDevice);

@@ -22,7 +22,8 @@
   - [API reference](#api-reference)
     - [Preprocessor definitions](#preprocessor-definitions)
     - [Profile support and usage](#profile-support-and-usage)
-      - [Initializing capabilities](#initializing-capabilities)
+      - [Initializing Vulkan functions object](#initializing-vulkan-functions-object)
+      - [`VK_NO_PROTOTYPES`](#vk_no_prototypes)
       - [Loading instance-level functions](#loading-instance-level-functions)
       - [Checking instance level support](#checking-instance-level-support)
       - [Creating instance with profile](#creating-instance-with-profile)
@@ -82,27 +83,43 @@ For more information about the Vulkan Profiles library generation, use the comma
 
 The typically expected usage of the Vulkan Profiles library is for applications to target a specific profile with their application and leave it to the Vulkan Profiles library to enable any necessary extensions and features required by that profile.
 
-The Vulkan Header version 1.3.278 introduced the `VpCapabilities` object which broke backward compatibility with previous version of the library. The `VpCapabilities` object enables using the Profiles API library with Vulkan functions provided external.
+The Vulkan Header version 1.4.358 introduced the `VpFunctions` object which broke backward compatibility with previous version of the library. The `VpFunctions` object enables using the Profiles API library with Vulkan functions provided external and dynamic Vulkan API loading.
 While this new API remains at the `BETA` development stage, it's protected by the `VP_USE_OBJECT` `#define` which must be defined to use the new API described bellow.
 
-In order to use the Profiles API library, the application first has to create a `VpCapabilities` object as follows:
 ```C++
-    VpCapabilities capabilities = VK_NULL_HANDLE;
-
-    vpCreateCapabilities(nullptr, &capabilities);
+    #define VP_USE_OBJECT 1
 ```
 
-`vpCreateCapabilities` only allocates the `VpCapabilities` object; it no longer takes a `VpCapabilitiesCreateInfo` argument. The object must then be initialized with the global-level Vulkan functions (such as `vkCreateInstance` and `vkEnumerateInstanceExtensionProperties`) it needs by calling `vpInitialize`:
-
+In order to use the Profiles API library, the application first has to create a `VpFunctions` object as follows:
 ```C++
-    VpCapabilitiesCreateInfo createInfo{};
-    createInfo.flags = VP_CAPABILITIES_CREATE_STATIC_BIT;
-    createInfo.pVulkanFunctions = nullptr;
+    VpFunctionsCreateInfo createInfo{};
 
-    vpInitialize(capabilities, &createInfo);
+    VpFunctions functions = VK_NULL_HANDLE;
+    vpCreateFunctions(&createInfo, nullptr, &functions);
 ```
 
-`VP_CAPABILITIES_CREATE_STATIC_BIT` tells the library to resolve the Vulkan functions it needs from the statically linked Vulkan loader; this flag is only available when the application links against the Vulkan loader directly (i.e. `VK_NO_PROTOTYPES` and `VP_DISABLE_STATIC_LINKING` are not defined). Applications that load Vulkan dynamically should instead use `VP_CAPABILITIES_CREATE_DYNAMIC_BIT` and provide a `VpVulkanFunctions::GetInstanceProcAddr` pointer through `pVulkanFunctions`, from which the library will resolve the remaining global-level functions it needs.
+`vpCreateFunctions` allocates the `VpFunctions` object; When `VK_NO_PROTOTYPES` is defined, the object must then be initialized with the global-level Vulkan functions (such as `vkCreateInstance` and `vkEnumerateInstanceExtensionProperties`) by calling `vpInitializeGlobalFunctions`:
+
+```C++
+    VkResult result = vpInitializeGlobalFunctions(functions, dl.vkGetInstanceProcAddr);
+    assert(result == VK_SUCCESS);
+```
+
+Alternatively, the Vulkan functions can be provided using `VpFunctionsCreateInfo`, eg:
+
+```C++
+    VpFunctionsCreateInfo createInfo{};
+    createInfo.GetInstanceProcAddr = MockVulkanAPI::vkGetInstanceProcAddr;
+    createInfo.EnumerateInstanceVersion = MockVulkanAPI::vkEnumerateInstanceVersion;
+    createInfo.EnumerateInstanceExtensionProperties = MockVulkanAPI::vkEnumerateInstanceExtensionProperties;
+    createInfo.EnumerateDeviceExtensionProperties = MockVulkanAPI::vkEnumerateDeviceExtensionProperties;
+    createInfo.CreateInstance = MockVulkanAPI::vkCreateInstance;
+    createInfo.CreateDevice = MockVulkanAPI::vkCreateDevice;
+    createInfo.GetPhysicalDeviceFeatures2 = MockVulkanAPI::vkGetPhysicalDeviceFeatures2;
+    createInfo.GetPhysicalDeviceFormatProperties2 = MockVulkanAPI::vkGetPhysicalDeviceFormatProperties2;
+    createInfo.GetPhysicalDeviceProperties2 = MockVulkanAPI::vkGetPhysicalDeviceProperties2;
+    createInfo.GetPhysicalDeviceQueueFamilyProperties2 = MockVulkanAPI::vkGetPhysicalDeviceQueueFamilyProperties2;
+```
 
 Then the application has to make sure that the Vulkan implementation supports the selected profile as follows:
 ```C++
@@ -113,7 +130,7 @@ Then the application has to make sure that the Vulkan implementation supports th
         VP_KHR_ROADMAP_2022_SPEC_VERSION
     };
 
-    result = vpGetInstanceProfileSupport(capabilities, nullptr, &profile, &supported);
+    result = vpGetInstanceProfileSupport(functions, nullptr, &profile, &supported);
     if (result != VK_SUCCESS) {
         // something went wrong
         ...
@@ -144,7 +161,7 @@ If the profile is supported by the Vulkan implementation at the instance level, 
     vpCreateInfo.pEnabledFullProfiles = &profile;
 
     VkInstance instance = VK_NULL_HANDLE;
-    result = vpCreateInstance(capabilities, &vpCreateInfo, nullptr, &instance);
+    result = vpCreateInstance(functions, &vpCreateInfo, nullptr, &instance);
     if (result != VK_SUCCESS) {
         // something went wrong
         ...
@@ -153,12 +170,14 @@ If the profile is supported by the Vulkan implementation at the instance level, 
 
 The above code example will create a Vulkan instance with the API version and instance extensions required by the profile (unless the application overrides any of them, as explained later).
 
-Make sure to set the `apiVersion` in the `VkApplicationInfo` structure at least to the minimum API version required by the profile, as seen above, to ensure the correct Vulkan API version is used.
+Make sure to set the `apiVersion` in the `VkApplicationInfo` structure at least to the minimum API version required by the profile, as seen above, to ensure the correct Vulkan API version is used. If `pApplicationInfo` is null, then `vpCreateInstance` will use the profile Vulkan version.
 
-Once a Vulkan instance is created, the `VpCapabilities` object must be told about it so that it can resolve the instance-level Vulkan functions (such as `vkCreateDevice` and `vkGetPhysicalDeviceFeatures2`) it needs for device-level queries and device creation:
+When a Vulkan instance is created, the `VpFunctions` object initialize the instance-level Vulkan functions (such as `vkCreateDevice` and `vkGetPhysicalDeviceFeatures2`) it needs for device-level queries and device creation. However, `vpCreateInstance` doesn't override the `VpFunctionsCreateInfo` the provided instance-level Vulkan functions.
+
+However, if the application doesn't use `vpCreateInstance` but `vkCreateInstance` for instance creation, instance-level Vulkan functions can be loaded using `vpInitializeInstanceFunctions`.
 
 ```C++
-    result = vpLoadInstance(capabilities, instance, {});
+    result = vpInitializeInstanceFunctions(functions, instance, 0);
     if (result != VK_SUCCESS) {
         // something went wrong
         ...
@@ -194,7 +213,7 @@ Finally, once a physical device supporting the profile is selected, a Vulkan dev
     vpCreateInfo.pEnabledFullProfiles = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
-    result = vpCreateDevice(capabilities, physicalDevice, &vpCreateInfo, nullptr, &device);
+    result = vpCreateDevice(functions, physicalDevice, &vpCreateInfo, nullptr, &device);
     if (result != VK_SUCCESS) {
         // something went wrong
         ...
@@ -283,80 +302,64 @@ Where:
 
 The Vulkan Profile library offers a set of APIs to verify support for a particular Vulkan profile and to create Vulkan instances and devices using the extensions and features required by the profile.
 
-#### Initializing capabilities
+#### Initializing Vulkan functions object
 
-After a `VpCapabilities` object is allocated with `vpCreateCapabilities`, it must be initialized with the global-level Vulkan functions it needs by calling the following command:
+After a `VpFunctions` object is allocated with `vpCreateFunctions`, it must be initialized with the global-level Vulkan functions it needs by calling the following command:
 
 ```C++
-VkResult vpInitialize(
-    VpCapabilities                  capabilities,
-    const VpCapabilitiesCreateInfo* pCreateInfo);
+VkResult vpCreateFunctions(
+    const VpFunctionsCreateInfo*                pCreateInfo,
+    const VkAllocationCallbacks*                pAllocator,
+    VpFunctions*                                pFunctions);
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
-* `pCreateInfo` is a pointer to the `VpCapabilitiesCreateInfo` structure specifying how the library should resolve the Vulkan functions it needs.
+* `pCreateInfo` is a pointer to the `VpFunctionsCreateInfo` structure specifying how the library should resolve the Vulkan functions it needs.
+* `pAllocator` controls host memory allocation and is analogous to the corresponding parameter of `vkCreateInstance`.
+* `pFunctions` points to a `VpFunctions` handle in which the resulting instance is returned.
 
-The `VpCapabilitiesCreateInfo` structure is defined as follows:
+The `VpFunctionCreateInfo` structure is defined as follows:
 
 ```C++
-typedef struct VpCapabilitiesCreateInfo
+typedef struct VpFunctionsCreateInfo
 {
-    VpCapabilitiesCreateFlags       flags;
-    const VpVulkanFunctions*        pVulkanFunctions;
-} VpCapabilitiesCreateInfo;
+    /// Flags reserved for future usages
+    VpFunctionsCreateFlags          flags;
+
+    PFN_vkGetInstanceProcAddr GetInstanceProcAddr = nullptr;
+    PFN_vkEnumerateInstanceVersion EnumerateInstanceVersion;
+    PFN_vkEnumerateInstanceExtensionProperties EnumerateInstanceExtensionProperties = nullptr;
+    PFN_vkEnumerateDeviceExtensionProperties EnumerateDeviceExtensionProperties = nullptr;
+    PFN_vkCreateInstance CreateInstance = nullptr;
+    PFN_vkCreateDevice CreateDevice = nullptr;
+    PFN_vkGetPhysicalDeviceFeatures2 GetPhysicalDeviceFeatures2 = nullptr;
+    PFN_vkGetPhysicalDeviceProperties2 GetPhysicalDeviceProperties2 = nullptr;
+    PFN_vkGetPhysicalDeviceFormatProperties2 GetPhysicalDeviceFormatProperties2 = nullptr;
+    PFN_vkGetPhysicalDeviceQueueFamilyProperties2 GetPhysicalDeviceQueueFamilyProperties2 = nullptr;
+} VpFunctionsCreateInfo;
 ```
 
-Where:
-* `flags` is a bitmask of `VpCapabilitiesCreateFlagBits` indicating how the Vulkan functions are to be resolved.
-* `pVulkanFunctions` is either `NULL` or a pointer to a `VpVulkanFunctions` structure providing application-supplied Vulkan function pointers, as described below.
+Note that `VpFunctionsCreateInfo` doesn't include a `GetDeviceProcAddr` member, as device-level functions are now resolved through the instance rather than through a device proc addr loader.
 
-The `VpCapabilitiesCreateFlagBits` enumeration is defined as follows:
+The `VpFunctionsCreateInfo` structure allows the application to explicitly provide any of the Vulkan function pointers the library needs (overriding or supplementing the ones resolved automatically)
 
-```C++
-typedef enum VpCapabilitiesCreateFlagBits {
-    VP_CAPABILITIES_CREATE_STATIC_BIT = (1 << 0),
-    VP_CAPABILITIES_CREATE_DYNAMIC_BIT = (1 << 1),
-    VP_CAPABILITIES_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
-} VpCapabilitiesCreateFlagBits;
-```
+#### `VK_NO_PROTOTYPES`
 
-If `VP_CAPABILITIES_CREATE_STATIC_BIT` is specified, the library resolves the Vulkan functions it needs from the statically linked Vulkan loader. This flag is only available when `VK_NO_PROTOTYPES` and `VP_DISABLE_STATIC_LINKING` are not defined.
-
-If `VP_CAPABILITIES_CREATE_DYNAMIC_BIT` is specified, the application must provide a `VpVulkanFunctions::GetInstanceProcAddr` pointer through `pVulkanFunctions`, and the library resolves the remaining global-level functions it needs by calling it.
-
-The `VpVulkanFunctions` structure allows the application to explicitly provide any of the Vulkan function pointers the library needs (overriding or supplementing the ones resolved automatically):
-
-```C++
-typedef struct VpVulkanFunctions {
-    PFN_vkGetInstanceProcAddr                          GetInstanceProcAddr;
-    PFN_vkEnumerateInstanceVersion                     EnumerateInstanceVersion;
-    PFN_vkEnumerateInstanceExtensionProperties         EnumerateInstanceExtensionProperties;
-    PFN_vkEnumerateDeviceExtensionProperties           EnumerateDeviceExtensionProperties;
-    PFN_vkGetPhysicalDeviceFeatures2                   GetPhysicalDeviceFeatures2;
-    PFN_vkGetPhysicalDeviceProperties2                 GetPhysicalDeviceProperties2;
-    PFN_vkGetPhysicalDeviceFormatProperties2            GetPhysicalDeviceFormatProperties2;
-    PFN_vkGetPhysicalDeviceQueueFamilyProperties2       GetPhysicalDeviceQueueFamilyProperties2;
-    PFN_vkCreateInstance                               CreateInstance;
-    PFN_vkCreateDevice                                 CreateDevice;
-} VpVulkanFunctions;
-```
-
-Note that `VpVulkanFunctions` no longer includes a `GetDeviceProcAddr` member, as device-level functions are now resolved through the instance rather than through a device proc addr loader.
+When `VK_NO_PROTOTYPES` is defined, the `VpFunctions` object are not initialized with the default static Vulkan functions. As a result, Vulkan functions must be initialized either using `VpFunctionsCreateInfo` function pointers or using `vpInitializeGlobalFunctions` and `vpInitializeInstanceFunctions` functions. Otherwise, the profiles APIs will return a `VK_ERROR_INITIALIZATION_FAILED` error.
 
 #### Loading instance-level functions
 
 Once a Vulkan instance has been created, the instance-level Vulkan functions the library needs for device-level queries and device creation (such as `vkCreateDevice` and `vkGetPhysicalDeviceFeatures2`) must be loaded by calling the following command:
 
 ```C++
-VkResult vpLoadInstance(
-    VpCapabilities                  capabilities,
+VkResult vpInitializeInstanceFunctions(
+    VpFunctions                     functions,
     VkInstance                      instance,
     VpInstanceFunctionsLoadFlags    flags);
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `instance` is the Vulkan instance to load the instance-level functions from.
 * `flags` is a bitmask of `VpInstanceFunctionsLoadFlagBits` indicating additional entry point variants to try when loading.
 
@@ -365,13 +368,16 @@ The `VpInstanceFunctionsLoadFlagBits` enumeration is defined as follows:
 ```C++
 typedef enum VpInstanceFunctionsLoadFlagBits {
     VP_INSTANCE_FUNCTIONS_LOAD_KHR_GET_PHYSICAL_DEVICE_PROPERTIES2_BIT = (1 << 0),
+    VP_INSTANCE_FUNCTIONS_LOAD_MISSING_ONLY_BIT = (1 << 1),
     VP_INSTANCE_FUNCTIONS_LOAD_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
 } VpInstanceFunctionsLoadFlagBits;
 ```
 
 If `VP_INSTANCE_FUNCTIONS_LOAD_KHR_GET_PHYSICAL_DEVICE_PROPERTIES2_BIT` is specified, and the core `vkGetPhysicalDeviceFeatures2`/`vkGetPhysicalDeviceProperties2`/`vkGetPhysicalDeviceFormatProperties2`/`vkGetPhysicalDeviceQueueFamilyProperties2` entry points are not available, the library falls back to loading their `VK_KHR_get_physical_device_properties2` (`...KHR`) variants instead. This is useful when targeting a Vulkan 1.0 implementation that only supports the extension.
 
-`vpLoadInstance` must be called after `vpCreateInstance` (or after any other means of instance creation) and before querying device-level profile support or creating a device with `vpCreateDevice`.
+If `VP_INSTANCE_FUNCTIONS_LOAD_MISSING_ONLY_BIT` is specified, only uninitilized functions will be loaded. This flag prevents overwritting Vulkan functions set with `VpFunctionCreateInfo`.
+
+`vpInitializeInstanceFunctions` may be called after `vpCreateInstance` (or after any other means of instance creation) and before querying device-level profile support or creating a device with `vpCreateDevice`.
 
 #### Checking instance level support
 
@@ -379,14 +385,14 @@ In order to query whether the Vulkan implementation supports the necessary insta
 
 ```C++
 VkResult vpGetInstanceProfileSupport(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const char*                     pLayerName,
     const VpProfileProperties*      pProfile,
     VkBool32*                       pSupported);
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pLayerName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming the layer to retrieve extensions from (analogous to the corresponding parameter of `vkEnumerateInstanceExtensionProperties`).
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile to check support for.
 * `pSupported` is a pointer to a `VkBool32`, which is set to `VK_TRUE` to indicate support, and `VK_FALSE` otherwise.
@@ -408,7 +414,7 @@ When a profile supports multiple variants, it might be useful to know what capab
 
 ```C++
 VkResult vpGetInstanceProfileVariantsSupport(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const char*                     pLayerName,
     const VpProfileProperties*      pProfile,
     VkBool32*                       pSupported,
@@ -417,7 +423,7 @@ VkResult vpGetInstanceProfileVariantsSupport(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pLayerName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming the layer to retrieve extensions from (analogous to the corresponding parameter of `vkEnumerateInstanceExtensionProperties`).
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile to check support for.
 * `pSupported` is a pointer to a `VkBool32`, which is set to `VK_TRUE` to indicate support, and `VK_FALSE` otherwise.
@@ -440,14 +446,14 @@ The Vulkan Profiles library provides the following helper function that enables 
 
 ```C++
 VkResult vpCreateInstance(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpInstanceCreateInfo*     pCreateInfo,
     const VkAllocationCallbacks*    pAllocator,
     VkInstance*                     pInstance);
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pCreateInfo` is a pointer to the `VpInstanceCreateInfo` structure specifying the instance creation info, as described below.
 * `pAllocator` controls host memory allocation and is analogous to the corresponding parameter of `vkCreateInstance`.
 * `pInstance` points to a `VkInstance` handle in which the resulting instance is returned.
@@ -483,7 +489,7 @@ In order to query whether a Vulkan physical device supports the necessary device
 
 ```C++
 VkResult vpGetPhysicalDeviceProfileSupport(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     VkInstance                      instance,
     VkPhysicalDevice                physicalDevice,
     const VpProfileProperties*      pProfile,
@@ -491,7 +497,7 @@ VkResult vpGetPhysicalDeviceProfileSupport(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `instance` is the Vulkan instance.
 * `physicalDevice` is the physical device to check support on.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile to check support for.
@@ -510,7 +516,7 @@ When a profile supports multiple variants, it might be useful to know what capab
 
 ```C++
 VkResult vpGetPhysicalDeviceProfileVariantsSupport(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     VkInstance                      instance,
     VkPhysicalDevice                physicalDevice,
     const VpProfileProperties*      pProfile,
@@ -520,7 +526,7 @@ VkResult vpGetPhysicalDeviceProfileVariantsSupport(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `instance` is the Vulkan instance.
 * `physicalDevice` is the physical device to check support on.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile to check support for.
@@ -544,7 +550,7 @@ The Vulkan Profiles library provides the following helper function that enables 
 
 ```C++
 VkResult vpCreateDevice(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     VkPhysicalDevice                physicalDevice,
     const VpDeviceCreateInfo*       pCreateInfo,
     const VkAllocationCallbacks*    pAllocator,
@@ -552,7 +558,7 @@ VkResult vpCreateDevice(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `physicalDevice` is the physical device to create the logical device for.
 * `pCreateInfo` is a pointer to the `VpDeviceCreateInfo` structure specifying the device creation info, as described below.
 * `pAllocator` controls host memory allocation and is analogous to the corresponding parameter of `vkCreateDevice`.
@@ -610,13 +616,13 @@ In order to query the list of available profiles, use the following command:
 
 ```C++
 VkResult vpGetProfiles(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     uint32_t*                       pPropertyCount,
     VpProfileProperties*            pProperties);
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pPropertyCount` is a pointer to an integer related to the number of profiles available or queried, as described below.
 * `pProperties` is either `NULL` or a pointer to an array of `VpProfileProperties` structures.
 
@@ -628,14 +634,14 @@ Some profiles require other profiles. In order to query the list of required pro
 
 ```C++
 VkResult vpGetProfileRequiredProfiles(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     uint32_t*                       pPropertyCount,
     VpProfileProperties*            pProperties);
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile whose required profiles are queried.
 * `pPropertyCount` is a pointer to an integer related to the number of required profiles available or queried, as described below.
 * `pProperties` is either `NULL` or a pointer to an array of `VpProfileProperties` structures.
@@ -650,13 +656,13 @@ In order to query whether a Vulkan profile has multiple variants, use the follow
 
 ```C++
 VkResult vpHasMultipleVariantsProfile(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     VkBool32*                       pHasMultipleVariants);
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile whose property is queried.
 * `pHasMultipleVariants` is a pointer to a `VkBook32` indicating whether the profiles has multiple variants.
 
@@ -668,12 +674,12 @@ In order to query the required Vulkan API version for a given profile, use the f
 
 ```C++
 uint32_t vpGetProfileAPIVersion(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile);
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile whose required Vulkan API version is queried.
 
 If a profile requires other profiles, `vpGetProfileAPIVersion` will look for the required Vulkan API version of each profile and return the newest Vulkan API version among all the profiles.
@@ -684,14 +690,14 @@ Some profiles have recommended fallback profiles, i.e. profiles to use as a fall
 
 ```C++
 VkResult vpGetProfileFallbacks(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     uint32_t*                       pPropertyCount,
     VpProfileProperties*            pProperties);
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile whose fallback profiles are queried.
 * `pPropertyCount` is a pointer to an integer related to the number of fallback profiles available or queried, as described below.
 * `pProperties` is either `NULL` or a pointer to an array of `VpProfileProperties` structures.
@@ -704,7 +710,7 @@ In order to query the list of instance extensions required by a profile, use the
 
 ```C++
 VkResult vpGetProfileInstanceExtensionProperties(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     const char*                     pBlockName,
     uint32_t*                       pPropertyCount,
@@ -712,7 +718,7 @@ VkResult vpGetProfileInstanceExtensionProperties(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pPropertyCount` is a pointer to an integer related to the number of instance extensions available or queried, as described below.
@@ -727,7 +733,7 @@ In order to query the list of device extensions required by a profile, use the f
 
 ```C++
 VkResult vpGetProfileDeviceExtensionProperties(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     const char*                     pBlockName,
     uint32_t*                       pPropertyCount,
@@ -735,7 +741,7 @@ VkResult vpGetProfileDeviceExtensionProperties(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pPropertyCount` is a pointer to an integer related to the number of device extensions available or queried, as described below.
@@ -750,7 +756,7 @@ In order to query the structure types of the Vulkan device feature structures fo
 
 ```C++
 VkResult vpGetProfileFeatureStructureTypes(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     const char*                     pBlockName,
     uint32_t*                       pStructureTypeCount,
@@ -758,7 +764,7 @@ VkResult vpGetProfileFeatureStructureTypes(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pStructureTypeCount` is a pointer to an integer related to the number of device feature structure types available or queried, as described below.
@@ -771,14 +777,14 @@ In order to query the device features required by a profile, use the following c
 
 ```C++
 VkResult vpGetProfileFeatures(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     const char*                     pBlockName,
     void*                           pNext);
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pNext` is a `pNext` chain of Vulkan device feature structures (with or without a `VkPhysicalDeviceFeatures2` feature structure).
@@ -792,7 +798,7 @@ In order to query the structure types of the Vulkan device property structures f
 
 ```C++
 VkResult vpGetProfilePropertyStructureTypes(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     const char*                     pBlockName,
     uint32_t*                       pStructureTypeCount,
@@ -800,7 +806,7 @@ VkResult vpGetProfilePropertyStructureTypes(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pStructureTypeCount` is a pointer to an integer related to the number of device property structure types available or queried, as described below.
@@ -813,14 +819,14 @@ In order to query the device properties required by a profile, use the following
 
 ```C++
 VkResult vpGetProfileProperties(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     const char*                     pBlockName,
     void*                           pNext);
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pNext` is a `pNext` chain of Vulkan device property structures (with or without a `VkPhysicalDeviceProperties2` property structure).
@@ -834,7 +840,7 @@ If the `pNext` chain contains a Vulkan device property structure for which the p
 In order to query the structure types of the Vulkan queue family property structures for which the profile defines requirements, use the following command:
 ```C++
 VkResult vpGetProfileQueueFamilyStructureTypes(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     const char*                     pBlockName,
     uint32_t*                       pStructureTypeCount,
@@ -842,7 +848,7 @@ VkResult vpGetProfileQueueFamilyStructureTypes(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pStructureTypeCount` is a pointer to an integer related to the number of queue family property structure types available or queried, as described below.
@@ -855,7 +861,7 @@ In order to query the queue family properties required by a profile, use the fol
 
 ```C++
 VkResult vpGetProfileQueueFamilyProperties(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     const char*                     pBlockName,
     uint32_t*                       pPropertyCount,
@@ -863,7 +869,7 @@ VkResult vpGetProfileQueueFamilyProperties(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pPropertyCount` is a pointer to an integer related to the number of queue family properties available or queried, as described below.
@@ -880,7 +886,7 @@ In order to query the structure types of the Vulkan format property structures f
 
 ```C++
 VkResult vpGetProfileFormatStructureTypes(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     const char*                     pBlockName,
     uint32_t*                       pStructureTypeCount,
@@ -888,7 +894,7 @@ VkResult vpGetProfileFormatStructureTypes(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pStructureTypeCount` is a pointer to an integer related to the number of format property structure types available or queried, as described below.
@@ -901,7 +907,7 @@ In order to query the list of formats required by a profile, use the following c
 
 ```C++
 VkResult vpGetProfileFormats(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     const char*                     pBlockName,
     uint32_t*                       pFormatCount,
@@ -909,7 +915,7 @@ VkResult vpGetProfileFormats(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pFormatCount` is a pointer to an integer related to the number of formats available or queried, as described below.
@@ -922,7 +928,7 @@ In order to query the format properties required by a profile for a specific for
 
 ```C++
 VkResult vpGetProfileFormatProperties(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     const char*                     pBlockName,
     VkFormat                        format,
@@ -930,7 +936,7 @@ VkResult vpGetProfileFormatProperties(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `format` is the format for which required properties are queried.
@@ -945,7 +951,7 @@ In order to query the list of video profile names required by a profile, use the
 
 ```C++
 VkResult vpGetProfileVideoProfiles(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     const char*                     pBlockName,
     uint32_t*                       pVideoProfileCount,
@@ -953,7 +959,7 @@ VkResult vpGetProfileVideoProfiles(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `pVideoProfileCount` is a pointer to an integer related to the number of video profiles available or queried, as described below.
@@ -966,7 +972,7 @@ In order to query the structure types of the Vulkan video profile info structure
 
 ```C++
 VkResult vpGetProfileVideoProfileInfoStructureTypes(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     const char*                     pBlockName,
     uint32_t                        videoProfileIndex,
@@ -975,7 +981,7 @@ VkResult vpGetProfileVideoProfileInfoStructureTypes(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `videoProfileIndex` is the index of the video profile to query.
@@ -990,7 +996,7 @@ In order to query the video profile info structures the profile defines for a sp
 
 ```C++
 VkResult vpGetProfileVideoProfileInfo(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     const char*                     pBlockName,
     uint32_t                        videoProfileIndex,
@@ -998,7 +1004,7 @@ VkResult vpGetProfileVideoProfileInfo(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `videoProfileIndex` is the index of the video profile to query.
@@ -1012,7 +1018,7 @@ In order to query the structure types of the Vulkan video capability structures 
 
 ```C++
 VkResult vpGetProfileVideoCapabilityStructureTypes(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     const char*                     pBlockName,
     uint32_t                        videoProfileIndex,
@@ -1021,7 +1027,7 @@ VkResult vpGetProfileVideoCapabilityStructureTypes(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `videoProfileIndex` is the index of the video profile to query.
@@ -1036,7 +1042,7 @@ In order to query the video capabilities the profile requires for a specific vid
 
 ```C++
 VkResult vpGetProfileVideoCapabilities(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     const char*                     pBlockName,
     uint32_t                        videoProfileIndex,
@@ -1044,7 +1050,7 @@ VkResult vpGetProfileVideoCapabilities(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `videoProfileIndex` is the index of the video profile to query.
@@ -1058,7 +1064,7 @@ In order to query the structure types of the Vulkan video format property struct
 
 ```C++
 VkResult vpGetProfileVideoFormatStructureTypes(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     const char*                     pBlockName,
     uint32_t                        videoProfileIndex,
@@ -1067,7 +1073,7 @@ VkResult vpGetProfileVideoFormatStructureTypes(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `videoProfileIndex` is the index of the video profile to query.
@@ -1082,7 +1088,7 @@ In order to query the video format properties the profile requires for a specifi
 
 ```C++
 VkResult vpGetProfileVideoFormatProperties(
-    VpCapabilities                  capabilities,
+    VpFunctions                     functions,
     const VpProfileProperties*      pProfile,
     const char*                     pBlockName,
     uint32_t                        videoProfileIndex,
@@ -1091,7 +1097,7 @@ VkResult vpGetProfileVideoFormatProperties(
 ```
 
 Where:
-* `capabilities` must be one of the capabilities handles returned from a call to `vpCreateCapabilities`.
+* `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the queried profile.
 * `pBlockName` is either `NULL` or a pointer to a null-terminated UTF-8 string naming identifying a capabilities block of a profile.
 * `videoProfileIndex` is the index of the video profile to query.

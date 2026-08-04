@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+#ifndef VP_USE_OBJECT
+#define VP_USE_OBJECT 1
+#endif
+
 #ifndef VK_NO_PROTOTYPES
 #define VK_NO_PROTOTYPES 1
 #endif
@@ -43,12 +47,12 @@ TEST(no_prototypes, create_instance_with_dynamic_pointers) {
     vk::detail::DispatchLoaderDynamic dl;
     dl.init();
 
-    VpCapabilitiesCreateInfo cci{};
-    cci.flags = VP_CAPABILITIES_CREATE_DYNAMIC_BIT;
-    VpVulkanFunctions vf{};
-    vf.GetInstanceProcAddr = dl.vkGetInstanceProcAddr;
-    cci.pVulkanFunctions = &vf;
-    EXPECT_TRUE(vpInitialize(&cci) == VK_SUCCESS);
+    VpFunctionsCreateInfo functionsCreateInfo{};
+
+    VpFunctions functions;
+    vpCreateFunctions(&functionsCreateInfo, nullptr, &functions);
+
+    EXPECT_TRUE(vpInitializeGlobalFunctions(functions, dl.vkGetInstanceProcAddr) == VK_SUCCESS);
 
     VkApplicationInfo ai{};
     ai.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -69,8 +73,8 @@ TEST(no_prototypes, create_instance_with_dynamic_pointers) {
     ici.ppEnabledExtensionNames = extensions;
 #endif
 
-    VkInstance instance{};
-    EXPECT_TRUE(dl.vkCreateInstance(&ici, nullptr, &instance) == VK_SUCCESS);
+    VpInstanceCreateInfo createInfo{ &ici, 0, 0, nullptr };
 
-    EXPECT_TRUE(vpLoadInstance(instance, {}) == VK_SUCCESS);
+    VkInstance instance = VK_NULL_HANDLE;
+    EXPECT_TRUE(vpCreateInstance(functions, &createInfo, nullptr, &instance) == VK_SUCCESS);
 }

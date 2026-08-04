@@ -20,20 +20,24 @@
  * - Daniel Rakos <daniel.rakos@rastergrid.com>
  */
 
+#ifndef VP_USE_OBJECT
+#define VP_USE_OBJECT 1
+#endif
+
 #include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan_android.h>
 
 #include "generated_vulkan_profiles.hpp"
 #include "mock_vulkan_api.hpp"
 
-static void initInstanceExtensions(const VpProfileProperties& profile, std::vector<VkExtensionProperties>& properties,
+static void initInstanceExtensions(const VpFunctions& functions, const VpProfileProperties& profile, std::vector<VkExtensionProperties>& properties,
                                    std::vector<const char*>& outExtensions) {
     uint32_t propertyCount = 0;
-    VkResult result0 = vpGetProfileInstanceExtensionProperties(&profile, nullptr, &propertyCount, nullptr);
+    VkResult result0 = vpGetProfileInstanceExtensionProperties(functions, &profile, nullptr, &propertyCount, nullptr);
     EXPECT_EQ(VK_SUCCESS, result0);
 
     properties.resize(propertyCount);
-    VkResult result1 = vpGetProfileInstanceExtensionProperties(&profile, nullptr, &propertyCount, &properties[0]);
+    VkResult result1 = vpGetProfileInstanceExtensionProperties(functions, &profile, nullptr, &propertyCount, &properties[0]);
     EXPECT_EQ(VK_SUCCESS, result1);
 
     for (std::size_t i = 0, n = properties.size(); i < n; ++i) {
@@ -48,7 +52,7 @@ TEST(mocked_api_create_instance, vulkan10_no_app_info) {
 
     std::vector<VkExtensionProperties> properties;
     std::vector<const char*> outExtensions;
-    initInstanceExtensions(profile, properties, outExtensions);
+    initInstanceExtensions(mock.functions, profile, properties, outExtensions);
 
     std::vector<const char*> dummyLayerNames{ "VK_DUMMY_layer1", "VK_DUMMY_layer2" };
 
@@ -69,7 +73,7 @@ TEST(mocked_api_create_instance, vulkan10_no_app_info) {
     VpInstanceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
 
     VkInstance instance = VK_NULL_HANDLE;
-    VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
+    VkResult result = vpCreateInstance(mock.functions, &createInfo, &mock.vkAllocator, &instance);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_TRUE(instance == mock.vkInstance);
@@ -82,7 +86,7 @@ TEST(mocked_api_create_instance, vulkan10_with_app_info) {
 
     std::vector<VkExtensionProperties> properties;
     std::vector<const char*> outExtensions;
-    initInstanceExtensions(profile, properties, outExtensions);
+    initInstanceExtensions(mock.functions, profile, properties, outExtensions);
 
     std::vector<const char*> dummyLayerNames{ "VK_DUMMY_layer1" };
 
@@ -107,7 +111,7 @@ TEST(mocked_api_create_instance, vulkan10_with_app_info) {
     VpInstanceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
 
     VkInstance instance = VK_NULL_HANDLE;
-    VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
+    VkResult result = vpCreateInstance(mock.functions, &createInfo, &mock.vkAllocator, &instance);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_TRUE(instance == mock.vkInstance);
@@ -120,7 +124,7 @@ TEST(mocked_api_create_instance, vulkan11) {
 
     std::vector<VkExtensionProperties> properties;
     std::vector<const char*> outExtensions;
-    initInstanceExtensions(profile, properties, outExtensions);
+    initInstanceExtensions(mock.functions, profile, properties, outExtensions);
 
     std::vector<const char*> dummyLayerNames{ "VK_DUMMY_layer1", "VK_DUMMY_layer2", "VK_DUMMY_layer3" };
 
@@ -145,7 +149,7 @@ TEST(mocked_api_create_instance, vulkan11) {
     VpInstanceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
 
     VkInstance instance = VK_NULL_HANDLE;
-    VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
+    VkResult result = vpCreateInstance(mock.functions, &createInfo, &mock.vkAllocator, &instance);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_TRUE(instance == mock.vkInstance);
@@ -177,7 +181,7 @@ TEST(mocked_api_create_instance, default_extensions) {
     VpInstanceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
 
     VkInstance instance = VK_NULL_HANDLE;
-    VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
+    VkResult result = vpCreateInstance(mock.functions, &createInfo, &mock.vkAllocator, &instance);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_TRUE(instance == mock.vkInstance);
@@ -218,7 +222,7 @@ TEST(mocked_api_create_instance, merge_extensions) {
     VpInstanceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
 
     VkInstance instance = VK_NULL_HANDLE;
-    VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
+    VkResult result = vpCreateInstance(mock.functions, &createInfo, &mock.vkAllocator, &instance);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_TRUE(instance == mock.vkInstance);
@@ -232,7 +236,7 @@ TEST(mocked_api_create_instance, retain_chained_structs) {
 
     std::vector<VkExtensionProperties> properties;
     std::vector<const char*> outExtensions;
-    initInstanceExtensions(profile, properties, outExtensions);
+    initInstanceExtensions(mock.functions, profile, properties, outExtensions);
 
     int dummyData;
     VkValidationFlagsEXT validationFlags{ VK_STRUCTURE_TYPE_VALIDATION_FLAGS_EXT };
@@ -260,7 +264,7 @@ TEST(mocked_api_create_instance, retain_chained_structs) {
     VpInstanceCreateInfo createInfo{ &inCreateInfo, 0, 1, &profile };
 
     VkInstance instance = VK_NULL_HANDLE;
-    VkResult result = vpCreateInstance(&createInfo, &mock.vkAllocator, &instance);
+    VkResult result = vpCreateInstance(mock.functions, &createInfo, &mock.vkAllocator, &instance);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_TRUE(instance == mock.vkInstance);

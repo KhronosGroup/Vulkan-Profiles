@@ -19,6 +19,10 @@
  * - Daniel Rakos <daniel.rakos@rastergrid.com>
  */
 
+#ifndef VP_USE_OBJECT
+#define VP_USE_OBJECT 1
+#endif
+
 #include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan_android.h>
 
@@ -67,7 +71,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_supported) {
 
     VkPhysicalDeviceMultiviewFeaturesKHR multiviewFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR };
     VkPhysicalDeviceFeatures2KHR features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR, &multiviewFeatures };
-    vpGetProfileFeatures(&profile, nullptr, &features);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &features);
     features.features.dualSrcBlend = VK_TRUE;
     features.features.drawIndirectFirstInstance = VK_TRUE;
     multiviewFeatures.multiview = VK_TRUE;
@@ -78,7 +82,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_supported) {
 
     VkPhysicalDeviceMultiviewPropertiesKHR multiviewProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR };
     VkPhysicalDeviceProperties2KHR props{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR, &multiviewProps };
-    vpGetProfileProperties(&profile, nullptr, &props);
+    vpGetProfileProperties(mock.functions, &profile, nullptr, &props);
     props.properties.limits.maxImageDimension2D = 16384;
     props.properties.limits.maxBoundDescriptorSets = 8;
     props.properties.limits.subPixelPrecisionBits = 8;
@@ -97,12 +101,12 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_supported) {
     });
 
     uint32_t formatCount;
-    vpGetProfileFormats(&profile, nullptr, &formatCount, nullptr);
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, nullptr);
     std::vector<VkFormat> formats(formatCount);
-    vpGetProfileFormats(&profile, nullptr, &formatCount, formats.data());
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, formats.data());
     for (size_t i = 0; i < formatCount; ++i) {
         VkFormatProperties2KHR formatProps{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-        vpGetProfileFormatProperties(&profile, nullptr, formats[i], &formatProps);
+        vpGetProfileFormatProperties(mock.functions, &profile, nullptr, formats[i], &formatProps);
         formatProps.formatProperties.optimalTilingFeatures |= VK_FORMAT_FEATURE_BLIT_SRC_BIT;
         formatProps.formatProperties.bufferFeatures |= VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
         mock.AddFormat(formats[i], { VK_STRUCT(formatProps) });
@@ -116,13 +120,14 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_supported) {
     mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
 }
 
-TEST(mocked_api_get_physdev_profile_support, vulkan10_no_gpdp2) {
+// Vulkan 1.1 is required
+TEST(DISABLED_mocked_api_get_physdev_profile_support, vulkan10_no_gpdp2) {
     MockVulkanAPI mock;
 
     // We don't set an instance version which will also result in no GPDP2 entry points
@@ -152,7 +157,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_no_gpdp2) {
 
     VkPhysicalDeviceMultiviewFeaturesKHR multiviewFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR };
     VkPhysicalDeviceFeatures2KHR features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR, &multiviewFeatures };
-    vpGetProfileFeatures(&profile, nullptr, &features);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &features);
     features.features.dualSrcBlend = VK_TRUE;
     features.features.drawIndirectFirstInstance = VK_TRUE;
     multiviewFeatures.multiview = VK_TRUE;
@@ -163,7 +168,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_no_gpdp2) {
 
     VkPhysicalDeviceMultiviewPropertiesKHR multiviewProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR };
     VkPhysicalDeviceProperties2KHR props{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR, &multiviewProps };
-    vpGetProfileProperties(&profile, nullptr, &props);
+    vpGetProfileProperties(mock.functions, &profile, nullptr, &props);
     props.properties.limits.maxImageDimension2D = 16384;
     props.properties.limits.maxBoundDescriptorSets = 8;
     props.properties.limits.subPixelPrecisionBits = 8;
@@ -182,12 +187,12 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_no_gpdp2) {
     });
 
     uint32_t formatCount;
-    vpGetProfileFormats(&profile, nullptr, &formatCount, nullptr);
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, nullptr);
     std::vector<VkFormat> formats(formatCount);
-    vpGetProfileFormats(&profile, nullptr, &formatCount, formats.data());
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, formats.data());
     for (size_t i = 0; i < formatCount; ++i) {
         VkFormatProperties2KHR formatProps{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-        vpGetProfileFormatProperties(&profile, nullptr, formats[i], &formatProps);
+        vpGetProfileFormatProperties(mock.functions, &profile, nullptr, formats[i], &formatProps);
         formatProps.formatProperties.optimalTilingFeatures |= VK_FORMAT_FEATURE_BLIT_SRC_BIT;
         formatProps.formatProperties.bufferFeatures |= VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
         mock.AddFormat(formats[i], { VK_STRUCT(formatProps) });
@@ -201,7 +206,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_no_gpdp2) {
     mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_ERROR_EXTENSION_NOT_PRESENT);
     EXPECT_EQ(supported, VK_TRUE);
@@ -231,7 +236,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_version) {
     VkPhysicalDeviceVulkan11Features vulkan11Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &vulkan12Features};
     VkPhysicalDeviceGlobalPriorityQueryFeatures vulkanGlobalPriorityFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES, &vulkan11Features};
     VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkanGlobalPriorityFeatures};
-    vpGetProfileFeatures(&profile, nullptr, &features);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &features);
 
     mock.SetFeatures({
         VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features), VK_STRUCT(vulkanGlobalPriorityFeatures)
@@ -241,19 +246,19 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_version) {
     VkPhysicalDeviceVulkan12Properties vulkan12Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, &vulkan13Properties};
     VkPhysicalDeviceVulkan11Properties vulkan11Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, &vulkan12Properties};
     VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, &vulkan11Properties};
-    vpGetProfileProperties(&profile, nullptr, &props);
+    vpGetProfileProperties(mock.functions, &profile, nullptr, &props);
 
     mock.SetProperties(
         {VK_STRUCT(props), VK_STRUCT(vulkan11Properties), VK_STRUCT(vulkan12Properties), VK_STRUCT(vulkan13Properties)
     });
 
     uint32_t formatCount;
-    vpGetProfileFormats(&profile, nullptr, &formatCount, nullptr);
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, nullptr);
     std::vector<VkFormat> formats(formatCount);
-    vpGetProfileFormats(&profile, nullptr, &formatCount, formats.data());
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, formats.data());
     for (size_t i = 0; i < formatCount; ++i) {
         VkFormatProperties2KHR formatProps{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-        vpGetProfileFormatProperties(&profile, nullptr, formats[i], &formatProps);
+        vpGetProfileFormatProperties(mock.functions, &profile, nullptr, formats[i], &formatProps);
         formatProps.formatProperties.optimalTilingFeatures |= VK_FORMAT_FEATURE_BLIT_SRC_BIT;
         formatProps.formatProperties.bufferFeatures |= VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
         mock.AddFormat(formats[i], { VK_STRUCT(formatProps) });
@@ -279,7 +284,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_version) {
     mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -321,7 +326,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_extension) {
 
     VkPhysicalDeviceMultiviewFeaturesKHR multiviewFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR };
     VkPhysicalDeviceFeatures2KHR features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR, &multiviewFeatures };
-    vpGetProfileFeatures(&profile, nullptr, &features);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &features);
     features.features.dualSrcBlend = VK_TRUE;
     features.features.drawIndirectFirstInstance = VK_TRUE;
     multiviewFeatures.multiview = VK_TRUE;
@@ -332,7 +337,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_extension) {
 
     VkPhysicalDeviceMultiviewPropertiesKHR multiviewProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR };
     VkPhysicalDeviceProperties2KHR props{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR, &multiviewProps };
-    vpGetProfileProperties(&profile, nullptr, &props);
+    vpGetProfileProperties(mock.functions, &profile, nullptr, &props);
     props.properties.limits.maxImageDimension2D = 16384;
     props.properties.limits.maxBoundDescriptorSets = 8;
     props.properties.limits.subPixelPrecisionBits = 8;
@@ -351,12 +356,12 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_extension) {
     });
 
     uint32_t formatCount;
-    vpGetProfileFormats(&profile, nullptr, &formatCount, nullptr);
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, nullptr);
     std::vector<VkFormat> formats(formatCount);
-    vpGetProfileFormats(&profile, nullptr, &formatCount, formats.data());
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, formats.data());
     for (size_t i = 0; i < formatCount; ++i) {
         VkFormatProperties2KHR formatProps{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-        vpGetProfileFormatProperties(&profile, nullptr, formats[i], &formatProps);
+        vpGetProfileFormatProperties(mock.functions, &profile, nullptr, formats[i], &formatProps);
         formatProps.formatProperties.optimalTilingFeatures |= VK_FORMAT_FEATURE_BLIT_SRC_BIT;
         formatProps.formatProperties.bufferFeatures |= VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
         mock.AddFormat(formats[i], { VK_STRUCT(formatProps) });
@@ -370,7 +375,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_extension) {
     mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -412,7 +417,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_feature) {
 
     VkPhysicalDeviceMultiviewFeaturesKHR multiviewFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR };
     VkPhysicalDeviceFeatures2KHR features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR, &multiviewFeatures };
-    vpGetProfileFeatures(&profile, nullptr, &features);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &features);
     features.features.sampleRateShading = VK_FALSE; // Unsupported feature
     features.features.dualSrcBlend = VK_TRUE;
     features.features.drawIndirectFirstInstance = VK_TRUE;
@@ -424,7 +429,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_feature) {
 
     VkPhysicalDeviceMultiviewPropertiesKHR multiviewProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR };
     VkPhysicalDeviceProperties2KHR props{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR, &multiviewProps };
-    vpGetProfileProperties(&profile, nullptr, &props);
+    vpGetProfileProperties(mock.functions, &profile, nullptr, &props);
     props.properties.limits.maxImageDimension2D = 16384;
     props.properties.limits.maxBoundDescriptorSets = 8;
     props.properties.limits.subPixelPrecisionBits = 8;
@@ -443,12 +448,12 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_feature) {
     });
 
     uint32_t formatCount;
-    vpGetProfileFormats(&profile, nullptr, &formatCount, nullptr);
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, nullptr);
     std::vector<VkFormat> formats(formatCount);
-    vpGetProfileFormats(&profile, nullptr, &formatCount, formats.data());
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, formats.data());
     for (size_t i = 0; i < formatCount; ++i) {
         VkFormatProperties2KHR formatProps{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-        vpGetProfileFormatProperties(&profile, nullptr, formats[i], &formatProps);
+        vpGetProfileFormatProperties(mock.functions, &profile, nullptr, formats[i], &formatProps);
         formatProps.formatProperties.optimalTilingFeatures |= VK_FORMAT_FEATURE_BLIT_SRC_BIT;
         formatProps.formatProperties.bufferFeatures |= VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
         mock.AddFormat(formats[i], { VK_STRUCT(formatProps) });
@@ -462,7 +467,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_feature) {
     mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -504,7 +509,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_property) {
 
     VkPhysicalDeviceMultiviewFeaturesKHR multiviewFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR };
     VkPhysicalDeviceFeatures2KHR features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR, &multiviewFeatures };
-    vpGetProfileFeatures(&profile, nullptr, &features);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &features);
     features.features.dualSrcBlend = VK_TRUE;
     features.features.drawIndirectFirstInstance = VK_TRUE;
     multiviewFeatures.multiview = VK_TRUE;
@@ -515,7 +520,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_property) {
 
     VkPhysicalDeviceMultiviewPropertiesKHR multiviewProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR };
     VkPhysicalDeviceProperties2KHR props{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR, &multiviewProps };
-    vpGetProfileProperties(&profile, nullptr, &props);
+    vpGetProfileProperties(mock.functions, &profile, nullptr, &props);
     props.properties.limits.maxImageDimension2D = 2048; // Unsupported property
     props.properties.limits.maxBoundDescriptorSets = 8;
     props.properties.limits.subPixelPrecisionBits = 8;
@@ -534,12 +539,12 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_property) {
     });
 
     uint32_t formatCount;
-    vpGetProfileFormats(&profile, nullptr, &formatCount, nullptr);
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, nullptr);
     std::vector<VkFormat> formats(formatCount);
-    vpGetProfileFormats(&profile, nullptr, &formatCount, formats.data());
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, formats.data());
     for (size_t i = 0; i < formatCount; ++i) {
         VkFormatProperties2KHR formatProps{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-        vpGetProfileFormatProperties(&profile, nullptr, formats[i], &formatProps);
+        vpGetProfileFormatProperties(mock.functions, &profile, nullptr, formats[i], &formatProps);
         formatProps.formatProperties.optimalTilingFeatures |= VK_FORMAT_FEATURE_BLIT_SRC_BIT;
         formatProps.formatProperties.bufferFeatures |= VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
         mock.AddFormat(formats[i], { VK_STRUCT(formatProps) });
@@ -553,7 +558,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_property) {
     mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -601,7 +606,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_format) {
 
     VkPhysicalDeviceMultiviewFeaturesKHR multiviewFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR };
     VkPhysicalDeviceFeatures2KHR features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR, &multiviewFeatures };
-    vpGetProfileFeatures(&profile, nullptr, &features);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &features);
     mock.SetFeatures({
         VK_STRUCT(features),
         VK_STRUCT(multiviewFeatures)
@@ -609,19 +614,19 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_format) {
 
     VkPhysicalDeviceMultiviewPropertiesKHR multiviewProps{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR };
     VkPhysicalDeviceProperties2KHR props{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR, &multiviewProps };
-    vpGetProfileProperties(&profile, nullptr, &props);
+    vpGetProfileProperties(mock.functions, &profile, nullptr, &props);
     mock.SetProperties({
         VK_STRUCT(props),
         VK_STRUCT(multiviewProps)
     });
 
     uint32_t formatCount;
-    vpGetProfileFormats(&profile, nullptr, &formatCount, nullptr);
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, nullptr);
     std::vector<VkFormat> formats(formatCount);
-    vpGetProfileFormats(&profile, nullptr, &formatCount, formats.data());
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, formats.data());
     for (size_t i = 0; i < formatCount; ++i) {
         VkFormatProperties2KHR formatProps{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-        vpGetProfileFormatProperties(&profile, nullptr, formats[i], &formatProps);
+        vpGetProfileFormatProperties(mock.functions, &profile, nullptr, formats[i], &formatProps);
         formatProps.formatProperties.optimalTilingFeatures |= VK_FORMAT_FEATURE_BLIT_SRC_BIT;
         formatProps.formatProperties.bufferFeatures |= VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT;
         if (formats[i] == VK_FORMAT_E5B9G9R9_UFLOAT_PACK32) {
@@ -638,7 +643,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_format) {
     mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -667,7 +672,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_version) {
     VkPhysicalDeviceVulkan11Features vulkan11Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &vulkan12Features};
     VkPhysicalDeviceGlobalPriorityQueryFeatures vulkanGlobalPriorityFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES, &vulkan11Features};
     VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkanGlobalPriorityFeatures};
-    vpGetProfileFeatures(&profile, nullptr, &features);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &features);
 
     mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features), VK_STRUCT(vulkanGlobalPriorityFeatures)});
 
@@ -675,18 +680,18 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_version) {
     VkPhysicalDeviceVulkan12Properties vulkan12Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, &vulkan13Properties};
     VkPhysicalDeviceVulkan11Properties vulkan11Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, &vulkan12Properties};
     VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, &vulkan11Properties};
-    vpGetProfileProperties(&profile, nullptr, &props);
+    vpGetProfileProperties(mock.functions, &profile, nullptr, &props);
 
     mock.SetProperties(
         {VK_STRUCT(props), VK_STRUCT(vulkan11Properties), VK_STRUCT(vulkan12Properties), VK_STRUCT(vulkan13Properties)});
 
     uint32_t formatCount;
-    vpGetProfileFormats(&profile, nullptr, &formatCount, nullptr);
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, nullptr);
     std::vector<VkFormat> formats(formatCount);
-    vpGetProfileFormats(&profile, nullptr, &formatCount, formats.data());
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, formats.data());
     for (size_t i = 0; i < formatCount; ++i) {
         VkFormatProperties2KHR formatProps{VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR};
-        vpGetProfileFormatProperties(&profile, nullptr, formats[i], &formatProps);
+        vpGetProfileFormatProperties(mock.functions, &profile, nullptr, formats[i], &formatProps);
         mock.AddFormat(formats[i], {VK_STRUCT(formatProps)});
     }
 
@@ -711,7 +716,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_version) {
     mock.AddQueueFamily({VK_STRUCT(queueFamilyProps)});
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -739,7 +744,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_extension) {
     VkPhysicalDeviceVulkan12Features vulkan12Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, &vulkan13Features};
     VkPhysicalDeviceVulkan11Features vulkan11Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &vulkan12Features};
     VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkan11Features};
-    vpGetProfileFeatures(&profile, nullptr, &features);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &features);
 
     mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features)});
 
@@ -747,12 +752,12 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_extension) {
     VkPhysicalDeviceVulkan12Properties vulkan12Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, &vulkan13Properties};
     VkPhysicalDeviceVulkan11Properties vulkan11Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, &vulkan12Properties};
     VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, &vulkan11Properties};
-    vpGetProfileProperties(&profile, nullptr, &props);
+    vpGetProfileProperties(mock.functions, &profile, nullptr, &props);
 
     mock.SetProperties({VK_STRUCT(props), VK_STRUCT(vulkan11Properties), VK_STRUCT(vulkan12Properties), VK_STRUCT(vulkan13Properties)});
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -781,7 +786,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_feature) {
     VkPhysicalDeviceVulkan11Features vulkan11Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &vulkan12Features};
     VkPhysicalDeviceGlobalPriorityQueryFeatures vulkanGlobalPriorityFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES, &vulkan11Features};
     VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkanGlobalPriorityFeatures};
-    vpGetProfileFeatures(&profile, nullptr, &features);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &features);
 
     features.features.fullDrawIndexUint32 = VK_FALSE;
 
@@ -791,12 +796,12 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_feature) {
     VkPhysicalDeviceVulkan12Properties vulkan12Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, &vulkan13Properties};
     VkPhysicalDeviceVulkan11Properties vulkan11Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, &vulkan12Properties};
     VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, &vulkan11Properties};
-    vpGetProfileProperties(&profile, nullptr, &props);
+    vpGetProfileProperties(mock.functions, &profile, nullptr, &props);
 
     mock.SetProperties({VK_STRUCT(props), VK_STRUCT(vulkan11Properties), VK_STRUCT(vulkan12Properties), VK_STRUCT(vulkan13Properties)});
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -825,7 +830,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_property) {
     VkPhysicalDeviceVulkan11Features vulkan11Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &vulkan12Features};
     VkPhysicalDeviceGlobalPriorityQueryFeatures vulkanGlobalPriorityFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES, &vulkan11Features};
     VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkanGlobalPriorityFeatures};
-    vpGetProfileFeatures(&profile, nullptr, &features);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &features);
 
     mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features), VK_STRUCT(vulkanGlobalPriorityFeatures)});
 
@@ -833,7 +838,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_property) {
     VkPhysicalDeviceVulkan12Properties vulkan12Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, &vulkan13Properties};
     VkPhysicalDeviceVulkan11Properties vulkan11Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, &vulkan12Properties};
     VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, &vulkan11Properties};
-    vpGetProfileProperties(&profile, nullptr, &props);
+    vpGetProfileProperties(mock.functions, &profile, nullptr, &props);
 
     props.properties.limits.maxImageDimensionCube = 2048;
 
@@ -841,7 +846,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_property) {
         {VK_STRUCT(props), VK_STRUCT(vulkan11Properties), VK_STRUCT(vulkan12Properties), VK_STRUCT(vulkan13Properties)});
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -868,31 +873,31 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_format) {
     mock.SetDeviceAPIVersion(VK_API_VERSION_1_1);
 
     uint32_t extensionsCount = 0;
-    vpGetProfileDeviceExtensionProperties(&profile, nullptr, &extensionsCount, nullptr);
+    vpGetProfileDeviceExtensionProperties(mock.functions, &profile, nullptr, &extensionsCount, nullptr);
 
     std::vector<VkExtensionProperties> extensions(extensionsCount);
-    vpGetProfileDeviceExtensionProperties(&profile, nullptr, &extensionsCount, &extensions[0]);
+    vpGetProfileDeviceExtensionProperties(mock.functions, &profile, nullptr, &extensionsCount, &extensions[0]);
     mock.SetDeviceExtensions(mock.vkPhysicalDevice, extensions);
 
     VkPhysicalDeviceFeatures2 features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
-    vpGetProfileFeatures(&profile, nullptr, &features);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &features);
     mock.SetFeatures({
         VK_STRUCT(features),
     });
 
     VkPhysicalDeviceProperties2 props{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2 };
-    vpGetProfileProperties(&profile, nullptr, &props);
+    vpGetProfileProperties(mock.functions, &profile, nullptr, &props);
     mock.SetProperties({
         VK_STRUCT(props),
     });
 
     uint32_t formatCount;
-    vpGetProfileFormats(&profile, nullptr, &formatCount, nullptr);
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, nullptr);
     std::vector<VkFormat> formats(formatCount);
-    vpGetProfileFormats(&profile, nullptr, &formatCount, formats.data());
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, formats.data());
     for (size_t i = 0; i < formatCount; ++i) {
         VkFormatProperties2KHR formatProps{ VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR };
-        vpGetProfileFormatProperties(&profile, nullptr, formats[i], &formatProps);
+        vpGetProfileFormatProperties(mock.functions, &profile, nullptr, formats[i], &formatProps);
         if (formats[i] == VK_FORMAT_E5B9G9R9_UFLOAT_PACK32) {
             formatProps.formatProperties.optimalTilingFeatures = 0; // Unsupported format
         }
@@ -900,7 +905,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_format) {
     }
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -930,7 +935,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_supported_queue_family) {
     VkPhysicalDeviceVulkan11Features vulkan11Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &vulkan12Features};
     VkPhysicalDeviceGlobalPriorityQueryFeatures vulkanGlobalPriorityFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES, &vulkan11Features};
     VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkanGlobalPriorityFeatures};
-    vpGetProfileFeatures(&profile, nullptr, &features);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &features);
 
     mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features), VK_STRUCT(vulkanGlobalPriorityFeatures)});
 
@@ -938,18 +943,18 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_supported_queue_family) {
     VkPhysicalDeviceVulkan12Properties vulkan12Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, &vulkan13Properties};
     VkPhysicalDeviceVulkan11Properties vulkan11Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, &vulkan12Properties};
     VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, &vulkan11Properties};
-    vpGetProfileProperties(&profile, nullptr, &props);
+    vpGetProfileProperties(mock.functions, &profile, nullptr, &props);
 
     mock.SetProperties(
         {VK_STRUCT(props), VK_STRUCT(vulkan11Properties), VK_STRUCT(vulkan12Properties), VK_STRUCT(vulkan13Properties)});
 
     uint32_t formatCount;
-    vpGetProfileFormats(&profile, nullptr, &formatCount, nullptr);
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, nullptr);
     std::vector<VkFormat> formats(formatCount);
-    vpGetProfileFormats(&profile, nullptr, &formatCount, formats.data());
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, formats.data());
     for (size_t i = 0; i < formatCount; ++i) {
         VkFormatProperties2KHR formatProps{VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR};
-        vpGetProfileFormatProperties(&profile, nullptr, formats[i], &formatProps);
+        vpGetProfileFormatProperties(mock.functions, &profile, nullptr, formats[i], &formatProps);
         mock.AddFormat(formats[i], {VK_STRUCT(formatProps)});
     }
 
@@ -974,7 +979,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_supported_queue_family) {
     mock.AddQueueFamily({VK_STRUCT(queueFamilyProps)});
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -1003,7 +1008,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_supported_version) {
     VkPhysicalDeviceVulkan11Features vulkan11Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, &vulkan12Features};
     VkPhysicalDeviceGlobalPriorityQueryFeatures vulkanGlobalPriorityFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES, &vulkan11Features};
     VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkanGlobalPriorityFeatures};
-    vpGetProfileFeatures(&profile, nullptr, &features);
+    vpGetProfileFeatures(mock.functions, &profile, nullptr, &features);
 
     mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11Features), VK_STRUCT(vulkan12Features), VK_STRUCT(vulkan13Features), VK_STRUCT(vulkanGlobalPriorityFeatures)});
 
@@ -1011,23 +1016,23 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_supported_version) {
     VkPhysicalDeviceVulkan12Properties vulkan12Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, &vulkan13Properties};
     VkPhysicalDeviceVulkan11Properties vulkan11Properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, &vulkan12Properties};
     VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, &vulkan11Properties};
-    vpGetProfileProperties(&profile, nullptr, &props);
+    vpGetProfileProperties(mock.functions, &profile, nullptr, &props);
 
     mock.SetProperties(
         {VK_STRUCT(props), VK_STRUCT(vulkan11Properties), VK_STRUCT(vulkan12Properties), VK_STRUCT(vulkan13Properties)});
 
     uint32_t formatCount;
-    vpGetProfileFormats(&profile, nullptr, &formatCount, nullptr);
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, nullptr);
     std::vector<VkFormat> formats(formatCount);
-    vpGetProfileFormats(&profile, nullptr, &formatCount, formats.data());
+    vpGetProfileFormats(mock.functions, &profile, nullptr, &formatCount, formats.data());
     for (size_t i = 0; i < formatCount; ++i) {
         VkFormatProperties2KHR formatProps{VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR};
-        vpGetProfileFormatProperties(&profile, nullptr, formats[i], &formatProps);
+        vpGetProfileFormatProperties(mock.functions, &profile, nullptr, formats[i], &formatProps);
         mock.AddFormat(formats[i], {VK_STRUCT(formatProps)});
     }
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);

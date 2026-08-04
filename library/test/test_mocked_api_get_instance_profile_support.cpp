@@ -19,6 +19,10 @@
  * - Daniel Rakos <daniel.rakos@rastergrid.com>
  */
 
+#ifndef VP_USE_OBJECT
+#define VP_USE_OBJECT 1
+#endif
+
 #include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan_android.h>
 
@@ -53,7 +57,7 @@ TEST(mocked_api_get_instance_profile_support, vulkan10_supported) {
     VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetInstanceProfileSupport(nullptr, &profile, &supported);
+    VkResult result = vpGetInstanceProfileSupport(mock.functions, nullptr, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -86,7 +90,7 @@ TEST(mocked_api_get_instance_profile_support, vulkan10_no_gpdp2) {
     VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetInstanceProfileSupport(nullptr, &profile, &supported);
+    VkResult result = vpGetInstanceProfileSupport(mock.functions, nullptr, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -115,7 +119,7 @@ TEST(mocked_api_get_instance_profile_support, vulkan10_unsupported_version) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetInstanceProfileSupport(nullptr, &profile, &supported);
+    VkResult result = vpGetInstanceProfileSupport(mock.functions, nullptr, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -145,7 +149,7 @@ TEST(mocked_api_get_instance_profile_support, vulkan10_unsupported_extension) {
     VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetInstanceProfileSupport(nullptr, &profile, &supported);
+    VkResult result = vpGetInstanceProfileSupport(mock.functions, nullptr, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -172,7 +176,7 @@ TEST(mocked_api_get_instance_profile_support, vulkan11_supported) {
     VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetInstanceProfileSupport(nullptr, &profile, &supported);
+    VkResult result = vpGetInstanceProfileSupport(mock.functions, nullptr, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -201,7 +205,7 @@ TEST(mocked_api_get_instance_profile_support, vulkan11_unsupported_version) {
     VpProfileProperties profile{ VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION };
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetInstanceProfileSupport(nullptr, &profile, &supported);
+    VkResult result = vpGetInstanceProfileSupport(mock.functions, nullptr, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -233,7 +237,7 @@ TEST(mocked_api_get_instance_profile_support, vulkan11_unsupported_extension) {
     VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetInstanceProfileSupport(nullptr, &profile, &supported);
+    VkResult result = vpGetInstanceProfileSupport(mock.functions, nullptr, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -260,7 +264,7 @@ TEST(mocked_api_get_instance_profile_support, layer_supported) {
     VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetInstanceProfileSupport("VK_DUMMY_layer1", &profile, &supported);
+    VkResult result = vpGetInstanceProfileSupport(mock.functions, "VK_DUMMY_layer1", &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -302,7 +306,7 @@ TEST(mocked_api_get_instance_profile_support, layer_unsupported) {
     VpProfileProperties profile{ VP_ANDROID_BASELINE_2021_NAME, VP_ANDROID_BASELINE_2021_SPEC_VERSION };
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetInstanceProfileSupport("VK_DUMMY_layer2", &profile, &supported);
+    VkResult result = vpGetInstanceProfileSupport(mock.functions, "VK_DUMMY_layer2", &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
