@@ -13,8 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Authors: 
+# Authors:
 # - Christophe Riccio <christophe@lunarg.com>
+# - Charles Giessen <charles@lunarg.com>
 # ~~~
 
 cmake_minimum_required(VERSION 3.22.1)
@@ -79,6 +80,13 @@ find_package(VulkanHeaders REQUIRED CONFIG QUIET)
 find_package(VulkanUtilityLibraries REQUIRED CONFIG QUIET)
 find_package(valijson REQUIRED CONFIG)
 find_package(jsoncpp REQUIRED CONFIG)
+
+# Workaround AppleClang using the wrong headers when there are headers in /usr/local/include
+if (CMAKE_CXX_COMPILER_ID STREQUAL AppleClang AND TARGET Vulkan::Headers AND TARGET Vulkan::LayerSettings AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
+    set_target_properties(Vulkan::Headers PROPERTIES SYSTEM OFF)
+    set_target_properties(Vulkan::LayerSettings PROPERTIES SYSTEM OFF)
+    set_target_properties(Vulkan::UtilityHeaders PROPERTIES SYSTEM OFF)
+endif()
 
 option(BUILD_TESTS "Build the tests")
 if (BUILD_TESTS)
