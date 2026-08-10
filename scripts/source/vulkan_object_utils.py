@@ -23,6 +23,7 @@ import functools
 import importlib.resources
 import tempfile
 import os
+import re
 from xml.etree import ElementTree
 from typing import Any
 
@@ -197,8 +198,138 @@ def gatherCapabilityAliases(vk: VulkanObject, alias_id: CapabilityAlias) -> list
     # Step 3: Streamlined filtering to remove the original query item
     return [item for item in aliases if item != alias_id]
 
+def _parse_version_tuple(v) -> tuple[int, int]:
+    """Extracts a (major, minor) version tuple from a VK_VERSION enum, Version object, or string."""
+    if v is None:
+        return (0, 0)
+    s = str(getattr(v, 'name', v))
+    nums = re.findall(r'\d+', s)
+    if len(nums) >= 2:
+        return (int(nums[0]), int(nums[1]))
+    elif len(nums) == 1:
+        return (int(nums[0]), 0)
+    return (0, 0)
+
+def _get_promoted_core_version(vk: VulkanObject, promoted_to_str: str | None) -> tuple[int, int] | None:
+    """Returns the core version tuple if `promoted_to_str` represents a Vulkan Core version (e.g., 'VK_VERSION_1_2')."""
+    if not promoted_to_str:
+        return None
+    if hasattr(vk, 'versions') and promoted_to_str in vk.versions:
+        return _parse_version_tuple(promoted_to_str)
+    if promoted_to_str.startswith("VK_VERSION_") or promoted_to_str.startswith("VK_API_VERSION_"):
+        return _parse_version_tuple(promoted_to_str)
+    return None
+
+def gatherDependentCapabilityAliases2(vk: VulkanObject, version: VK_VERSION, alias_id: CapabilityAlias) -> list[CapabilityAlias]:
+    """
+    Retrieves capability aliases for a given `alias_id`, filtering out aliases that belong to
+    extensions promoted to a Vulkan core version less than or equal to `version`.
+    """
+    aliases = gatherCapabilityAliases(vk, alias_id)
+    target_ver_tuple = _parse_version_tuple(version)
+
+    filtered_aliases = []
+    for alias in aliases:
+        ext_names = set()
+
+        if isinstance(alias, ExtensionCapabilityAlias):
+            ext_names.add(alias.name)
+
+        elif isinstance(alias, StructCapabilityAlias):
+            struct_name = alias.struct
+
+            # 1. Check explicit alias requirement mapping
+            if hasattr(vk, 'aliasTypeRequirements') and struct_name in vk.aliasTypeRequirements:
+                ext_names.update(vk.aliasTypeRequirements[struct_name].keys())
+            # 2. Check canonical structure defining requirements
+            elif struct_name in vk.structs:
+                struct_obj = vk.structs[struct_name]
+                if getattr(struct_obj, 'definingRequirements', None):
+                    ext_names.update(struct_obj.definingRequirements.keys())
+                elif getattr(struct_obj, 'extensions', None):
+                    ext_names.update(struct_obj.extensions)
+            # 3. Fallback resolution via getStructByName
+            else:
+                struct_obj = getStructByName(vk.structs, struct_name)
+                if struct_obj:
+                    if getattr(struct_obj, 'definingRequirements', None):
+                        ext_names.update(struct_obj.definingRequirements.keys())
+                    elif getattr(struct_obj, 'extensions', None):
+                        ext_names.update(struct_obj.extensions)
+
+        # Only filter out aliases whose defining extension was promoted to Vulkan CORE <= version
+        is_promoted_to_core = False
+        for ext_name in ext_names:
+            if ext_name in vk.extensions:
+                ext = vk.extensions[ext_name]
+                promoted_core_ver = _get_promoted_core_version(vk, ext.promotedTo)
+                if promoted_core_ver is not None and promoted_core_ver <= target_ver_tuple:
+                    is_promoted_to_core = True
+                    break
+
+        if not is_promoted_to_core:
+            filtered_aliases.append(alias)
+
+    return filtered_aliases
+
+def _get_struct_core_version(vk: VulkanObject, struct_name: str) -> tuple[int, int] | None:
+    """
+    Returns the Vulkan Core version tuple in which a core structure was introduced,
+    or None if the structure belongs to an extension.
+    """
+    if struct_name in vk.structs:
+        struct_obj = vk.structs[struct_name]
+        if getattr(struct_obj, 'version', None):
+            ver = _parse_version_tuple(struct_obj.version)
+            if ver > (0, 0):
+                return ver
+        if getattr(struct_obj, 'definingRequirements', None):
+            for req in struct_obj.definingRequirements:
+                ver = _get_promoted_core_version(vk, req)
+                if ver:
+                    return ver
+
+    if hasattr(vk, 'aliasTypeRequirements') and struct_name in vk.aliasTypeRequirements:
+        for req in vk.aliasTypeRequirements[struct_name]:
+            ver = _get_promoted_core_version(vk, req)
+            if ver:
+                return ver
+
+    return None
+
 def gatherDependentCapabilityAliases(vk: VulkanObject, version: VK_VERSION, alias_id: CapabilityAlias) -> list[CapabilityAlias]:
-    return []
+    """
+    Retrieves capability aliases for `alias_id`, filtered according to the target `version`:
+    - If `version` is `VK_VERSION.NONE` (0, 0), no version filtering is applied.
+    - Core structures introduced in a version newer than `version` are filtered out.
+    - Extension capability aliases promoted to a core version <= `version` are filtered out.
+    """
+    aliases = gatherCapabilityAliases(vk, alias_id)
+    target_ver_tuple = _parse_version_tuple(version)
+
+    # Return all aliases without filtering if target version is NONE
+    if target_ver_tuple == (0, 0):
+        return aliases
+
+    filtered_aliases = []
+    for alias in aliases:
+        # Rule 1: Filter out Core structures introduced in a version newer than target version
+        if isinstance(alias, StructCapabilityAlias):
+            struct_core_ver = _get_struct_core_version(vk, alias.struct)
+            if struct_core_ver is not None and target_ver_tuple < struct_core_ver:
+                continue
+
+        # Rule 2: Filter out Extension Capability Aliases promoted to Core <= target version
+        if isinstance(alias, ExtensionCapabilityAlias):
+            if alias.name in vk.extensions:
+                ext = vk.extensions[alias.name]
+                promoted_core_ver = _get_promoted_core_version(vk, ext.promotedTo)
+                if promoted_core_ver is not None and target_ver_tuple >= promoted_core_ver:
+                    continue
+
+        filtered_aliases.append(alias)
+
+    return filtered_aliases
 
 def findExtensionVersion(vk: VulkanObject, extension_name: str) -> int:
     if extension_name in vk.extensions:
