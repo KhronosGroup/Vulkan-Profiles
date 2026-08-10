@@ -29,7 +29,7 @@ if str(scripts_dir) not in sys.path:
     sys.path.insert(0, str(scripts_dir))
 
 from vulkan_object import VulkanObject, StructCapabilityAlias, ExtensionCapabilityAlias
-from source.vulkan_object_utils import initVulkanObject, VK_VERSION, gatherCapabilityAliases, gatherDependentExtensions, findExtensionVersion, gatherDynamicStructs
+from source.vulkan_object_utils import initVulkanObject, VK_VERSION, gatherCapabilityAliases, gatherDependentCapabilityAliases, gatherDependentExtensions, findExtensionVersion, gatherDynamicStructs
 #from source.vulkan_object_version import buildVulkanVersionEnum
 
 class TestVulkanObjectUtils(unittest.TestCase):
@@ -45,6 +45,136 @@ class TestVulkanObjectUtils(unittest.TestCase):
     #     versionA = VK_VERSION.from_string("1.4.304")
         
     #     assert versionA == VK_VERSION.V1_4
+
+    def testVulkanObjectUtilsStructDependentFeatureAliasesAccess(self):
+        vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
+        
+        query_id1 = StructCapabilityAlias("VkPhysicalDeviceShaderSubgroupRotateFeatures", "shaderSubgroupRotate")
+
+        member_1A_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_1, query_id1)
+        assert len(member_1A_aliases) == 1
+        assert StructCapabilityAlias("VkPhysicalDeviceShaderSubgroupRotateFeaturesKHR", "shaderSubgroupRotate") in member_1A_aliases
+      
+        member_1B_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_4, query_id1)
+        assert len(member_1B_aliases) == 2
+        assert StructCapabilityAlias("VkPhysicalDeviceVulkan14Features", "shaderSubgroupRotate") in member_1B_aliases
+        assert StructCapabilityAlias("VkPhysicalDeviceShaderSubgroupRotateFeaturesKHR", "shaderSubgroupRotate") in member_1B_aliases
+        
+        
+        query_id2 = StructCapabilityAlias("VkPhysicalDeviceVulkan14Features", "shaderSubgroupRotate")
+
+        member_2A_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_1, query_id2)
+        assert len(member_2A_aliases) == 1
+        assert StructCapabilityAlias("VkPhysicalDeviceShaderSubgroupRotateFeaturesKHR", "shaderSubgroupRotate") in member_2A_aliases
+        
+        member_2B_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_4, query_id2)
+        assert len(member_2B_aliases) == 2
+        assert StructCapabilityAlias("VkPhysicalDeviceShaderSubgroupRotateFeatures", "shaderSubgroupRotate") in member_2B_aliases
+        assert StructCapabilityAlias("VkPhysicalDeviceShaderSubgroupRotateFeaturesKHR", "shaderSubgroupRotate") in member_2B_aliases
+
+
+        query_id3 = StructCapabilityAlias("VkPhysicalDeviceShaderSubgroupRotateFeaturesKHR", "shaderSubgroupRotate")
+
+        member_3A_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_1, query_id3)
+        assert len(member_3A_aliases) == 0
+      
+        member_3B_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_4, query_id3)
+        assert len(member_3B_aliases) == 2
+        assert StructCapabilityAlias("VkPhysicalDeviceShaderSubgroupRotateFeatures", "shaderSubgroupRotate") in member_3B_aliases
+        assert StructCapabilityAlias("VkPhysicalDeviceVulkan14Features", "shaderSubgroupRotate") in member_3B_aliases
+
+
+        query_id4 = StructCapabilityAlias("VkPhysicalDevice8BitStorageFeatures", "storageBuffer8BitAccess")
+
+        member_4A_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_1, query_id4)
+        assert len(member_4A_aliases) == 1
+        assert StructCapabilityAlias("VkPhysicalDevice8BitStorageFeaturesKHR", "storageBuffer8BitAccess") in member_4A_aliases
+
+        member_4B_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_2, query_id4)
+        assert len(member_4B_aliases) == 2
+        assert StructCapabilityAlias("VkPhysicalDevice8BitStorageFeaturesKHR", "storageBuffer8BitAccess") in member_4B_aliases
+        assert StructCapabilityAlias("VkPhysicalDeviceVulkan12Features", "storageBuffer8BitAccess") in member_4B_aliases
+
+        member_4C_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_3, query_id4)
+        assert len(member_4C_aliases) == 2
+        assert StructCapabilityAlias("VkPhysicalDevice8BitStorageFeaturesKHR", "storageBuffer8BitAccess") in member_4C_aliases
+        assert StructCapabilityAlias("VkPhysicalDeviceVulkan12Features", "storageBuffer8BitAccess") in member_4C_aliases
+        
+        query_id5 = StructCapabilityAlias("VkPhysicalDeviceVulkan12Features", "storageBuffer8BitAccess")
+
+        member_5A_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_1, query_id5)
+        assert len(member_5A_aliases) == 1
+        assert StructCapabilityAlias("VkPhysicalDevice8BitStorageFeaturesKHR", "storageBuffer8BitAccess") in member_5A_aliases
+
+        member_5B_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_2, query_id5)
+        assert len(member_5B_aliases) == 2
+        assert StructCapabilityAlias("VkPhysicalDevice8BitStorageFeaturesKHR", "storageBuffer8BitAccess") in member_5B_aliases
+        assert StructCapabilityAlias("VkPhysicalDevice8BitStorageFeatures", "storageBuffer8BitAccess") in member_5B_aliases
+
+        member_5C_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_3, query_id5)
+        assert len(member_5C_aliases) == 2
+        assert StructCapabilityAlias("VkPhysicalDevice8BitStorageFeaturesKHR", "storageBuffer8BitAccess") in member_5C_aliases
+        assert StructCapabilityAlias("VkPhysicalDevice8BitStorageFeatures", "storageBuffer8BitAccess") in member_5C_aliases
+        
+        query_id6 = StructCapabilityAlias("VkPhysicalDevice8BitStorageFeaturesKHR", "storageBuffer8BitAccess")
+
+        member_6A_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_1, query_id6)
+        assert len(member_6A_aliases) == 0
+
+        member_6B_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_2, query_id6)
+        assert len(member_6B_aliases) == 2
+        assert StructCapabilityAlias("VkPhysicalDevice8BitStorageFeatures", "storageBuffer8BitAccess") in member_6B_aliases
+        assert StructCapabilityAlias("VkPhysicalDeviceVulkan12Features", "storageBuffer8BitAccess") in member_6B_aliases
+
+        member_6C_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_3, query_id6)
+        assert len(member_6C_aliases) == 2
+        assert StructCapabilityAlias("VkPhysicalDevice8BitStorageFeatures", "storageBuffer8BitAccess") in member_6C_aliases
+        assert StructCapabilityAlias("VkPhysicalDeviceVulkan12Features", "storageBuffer8BitAccess") in member_6C_aliases
+
+
+        query_id7 = StructCapabilityAlias("VkPhysicalDeviceVulkan12Features", "samplerMirrorClampToEdge")
+
+        member_7A_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_1, query_id7)
+        assert len(member_7A_aliases) == 1
+        assert ExtensionCapabilityAlias("VK_KHR_sampler_mirror_clamp_to_edge") in member_7A_aliases
+
+        member_8B_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_2, query_id7)
+        assert len(member_8B_aliases) == 0
+   
+
+        query_id8 = StructCapabilityAlias("VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE", "mutableDescriptorType")
+        member_8_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_1, query_id8)
+        assert len(member_8_aliases) == 1
+        assert StructCapabilityAlias("VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT", "mutableDescriptorType") in member_8_aliases
+
+        query_id9 = StructCapabilityAlias("VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT", "mutableDescriptorType")
+        member_9_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.V1_4, query_id9)
+        assert len(member_9_aliases) == 1
+        assert StructCapabilityAlias("VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE", "mutableDescriptorType") in member_9_aliases
+        
+        
+        query_id_none1 = StructCapabilityAlias("VkPhysicalDeviceShaderSubgroupRotateFeatures", "shaderSubgroupRotate")
+        member_none1_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.NONE, query_id_none1)
+        assert len(member_none1_aliases) == 2
+        assert StructCapabilityAlias("VkPhysicalDeviceShaderSubgroupRotateFeaturesKHR", "shaderSubgroupRotate") in member_none1_aliases
+        assert StructCapabilityAlias("VkPhysicalDeviceVulkan14Features", "shaderSubgroupRotate") in member_none1_aliases
+
+        query_id_none2 = StructCapabilityAlias("VkPhysicalDeviceVulkan14Features", "shaderSubgroupRotate")
+        member_none2_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.NONE, query_id_none2)
+        assert len(member_none2_aliases) == 2
+        assert StructCapabilityAlias("VkPhysicalDeviceShaderSubgroupRotateFeatures", "shaderSubgroupRotate") in member_none2_aliases
+        assert StructCapabilityAlias("VkPhysicalDeviceShaderSubgroupRotateFeaturesKHR", "shaderSubgroupRotate") in member_none2_aliases
+
+        query_id_none3 = StructCapabilityAlias("VkPhysicalDeviceVulkan12Features", "samplerMirrorClampToEdge")
+        member_none3_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.NONE, query_id_none3)
+        assert len(member_none3_aliases) == 1
+        assert ExtensionCapabilityAlias("VK_KHR_sampler_mirror_clamp_to_edge") in member_none3_aliases
+
+        query_id_none4 = StructCapabilityAlias("VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT", "mutableDescriptorType")
+        member_none4_aliases = gatherDependentCapabilityAliases(vk, VK_VERSION.NONE, query_id_none4)
+        assert len(member_none4_aliases) == 1
+        assert StructCapabilityAlias("VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE", "mutableDescriptorType") in member_none4_aliases
+
 
     # Check we can get the list of feature aliases from any feature structure
     def testVulkanObjectUtilsStructFeatureAliasesAccess(self):
