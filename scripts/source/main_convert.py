@@ -202,22 +202,19 @@ def pull_aliases_profiles_files(vk: VulkanObject, require_promoted_extensions: b
         pull_aliases_profiles_file(vk, require_promoted_extensions, value)
 
 
-def strip_capabilities_block_duplication(json_files_dict, json_profiles_capabilities_block, collected_extension_names: set[str]):
-    if "extensions" not in json_profiles_capabilities_block:
-        return
-    
-    stripped_extensions: dict[str, int] = {}
-    
-    for extension_name, extension_version in json_profiles_capabilities_block["extensions"].items():
-        if extension_name in collected_extension_names:
-            continue # The extension was already listed, it's a duplicate.
-        collected_extension_names.add(extension_name)
-        stripped_extensions[extension_name] = extension_version
-    
-    json_profiles_capabilities_block["extensions"] = stripped_extensions
+def strip_capabilities_block_duplication(json_files_dict, version: VK_VERSION, json_profiles_capabilities_block, collected_extension_names: set[str]):
+    if "extensions" in json_profiles_capabilities_block:
+        stripped_extensions: dict[str, int] = {}
+        
+        for extension_name, extension_version in json_profiles_capabilities_block["extensions"].items():
+            if extension_name in collected_extension_names:
+                continue # The extension was already listed, it's a duplicate.
+            collected_extension_names.add(extension_name)
+            stripped_extensions[extension_name] = extension_version
+        
+        json_profiles_capabilities_block["extensions"] = stripped_extensions
 
-
-def strip_profiles_file_capabilities_duplication(json_files_dict, json_file_data):
+def strip_profiles_file_capabilities_duplication2(json_files_dict, json_file_data):
     profiles_data = json_file_data["profiles"]
     json_profiles_capabilities = json_file_data["capabilities"]
 
@@ -229,7 +226,101 @@ def strip_profiles_file_capabilities_duplication(json_files_dict, json_file_data
         block_names = collect_block_names(value["capabilities"]) # Here, it collects all the block names but some blocks are OR
         
         for block_name in block_names:
-            strip_capabilities_block_duplication(json_files_dict, json_profiles_capabilities[block_name], collected_extension_names)
+            strip_capabilities_block_duplication(json_files_dict, version, json_profiles_capabilities[block_name], collected_extension_names)
+    
+    return
+
+
+def strip_profiles_files_capabilities_duplication2(json_files_dict):
+    for key, value in json_files_dict.items():
+        logging.debug(f"Strip duplicated capabilities for: {key}")
+        strip_profiles_file_capabilities_duplication2(json_files_dict, value)
+
+
+
+def get_profile_and_file_data(json_files_dict, profile_name: str):
+    """
+    Finds a profile object and its corresponding file JSON data across all loaded JSON files.
+    """
+    for file_path, json_file_data in json_files_dict.items():
+        if isinstance(json_file_data, dict) and "profiles" in json_file_data:
+            if profile_name in json_file_data["profiles"]:
+                return json_file_data["profiles"][profile_name], json_file_data
+    return None, None
+
+
+def collect_required_profiles_extensions(json_files_dict, required_profile_names: list[str], visited_profiles: set[str] = None) -> set[str]:
+    """
+    Recursively collects all extension names required by parent profiles listed in the 'profiles' element.
+    """
+    if visited_profiles is None:
+        visited_profiles = set()
+
+    collected_extensions: set[str] = set()
+
+    for profile_name in required_profile_names:
+        if profile_name in visited_profiles:
+            continue
+        visited_profiles.add(profile_name)
+
+        profile_obj, json_file_data = get_profile_and_file_data(json_files_dict, profile_name)
+        if not profile_obj or not json_file_data:
+            logging.warning(f"Required profile '{profile_name}' not found in loaded JSON files.")
+            continue
+
+        # 1. Recursively collect extensions from ancestor profiles
+        ancestor_profiles = profile_obj.get("profiles", [])
+        if ancestor_profiles:
+            collected_extensions.update(
+                collect_required_profiles_extensions(json_files_dict, ancestor_profiles, visited_profiles)
+            )
+
+        # 2. Collect extensions from this required profile's capability blocks
+        capabilities_dict = json_file_data.get("capabilities", {})
+        block_names = collect_block_names(profile_obj.get("capabilities", []))
+
+        for block_name in block_names:
+            if block_name in capabilities_dict:
+                block = capabilities_dict[block_name]
+                if "extensions" in block and isinstance(block["extensions"], dict):
+                    collected_extensions.update(block["extensions"].keys())
+
+    return collected_extensions
+
+
+def strip_capabilities_block_duplication(json_files_dict, version: VK_VERSION, json_profiles_capabilities_block, collected_extension_names: set[str]):
+    if "extensions" in json_profiles_capabilities_block:
+        stripped_extensions: dict[str, int] = {}
+        
+        for extension_name, extension_version in json_profiles_capabilities_block["extensions"].items():
+            if extension_name in collected_extension_names:
+                continue # The extension was already listed, it's a duplicate.
+            collected_extension_names.add(extension_name)
+            stripped_extensions[extension_name] = extension_version
+        
+        json_profiles_capabilities_block["extensions"] = stripped_extensions
+
+
+def strip_profiles_file_capabilities_duplication(json_files_dict, json_file_data):
+    profiles_data = json_file_data["profiles"]
+    json_profiles_capabilities = json_file_data["capabilities"]
+
+    for key, value in profiles_data.items():
+        # Initialize collected_extension_names with extensions required by parent profiles
+        required_profile_names = value.get("profiles", [])
+        collected_extension_names: set[str] = collect_required_profiles_extensions(
+            json_files_dict, required_profile_names
+        )
+        
+        version = VK_VERSION.from_string(value["api-version"])
+
+        block_names = collect_block_names(value["capabilities"])
+        
+        for block_name in block_names:
+            if block_name in json_profiles_capabilities:
+                strip_capabilities_block_duplication(
+                    json_files_dict, version, json_profiles_capabilities[block_name], collected_extension_names
+                )
     
     return
 
