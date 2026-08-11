@@ -257,17 +257,24 @@ def _is_format_struct_valid(vk: VulkanObject, struct_name: str, version: VK_VERS
     return False
 
 
-def pull_aliases_capabilities_block(vk: VulkanObject, version: VK_VERSION, json_profiles_capabilities_block: dict, inherited_exts: set[str] = None) -> dict:
+def pull_aliases_capabilities_block(vk: VulkanObject, version: VK_VERSION, json_profiles_capabilities_block: dict, inherited_caps: dict = None) -> dict:
+    inherited_caps = inherited_caps or {}
     ext_block = json_profiles_capabilities_block.get("extensions", {})
     block_exts = set(ext_block.keys()) if isinstance(ext_block, dict) else set(ext_block)
-    enabled_exts = block_exts | (inherited_exts or set())
+    inherited_exts = set(inherited_caps.get("extensions", {}).keys())
+    enabled_exts = block_exts | inherited_exts
 
     # 1. Process 2-level categories: "features" and "properties"
     for category in ("features", "properties"):
-        if category not in json_profiles_capabilities_block:
+        category_block = {}
+        if category in inherited_caps:
+            deep_merge_dict(category_block, inherited_caps[category])
+        if category in json_profiles_capabilities_block:
+            deep_merge_dict(category_block, json_profiles_capabilities_block[category])
+
+        if not category_block:
             continue
 
-        category_block = json_profiles_capabilities_block[category]
         new_category_block = {}
 
         for struct_name, members in category_block.items():
@@ -309,11 +316,17 @@ def pull_aliases_capabilities_block(vk: VulkanObject, version: VK_VERSION, json_
                                 target_ext_block.append(alias.name)
                                 enabled_exts.add(alias.name)
 
-        json_profiles_capabilities_block[category] = new_category_block
+        if new_category_block:
+            json_profiles_capabilities_block[category] = new_category_block
 
     # 2. Process 3-level category: "formats" using FormatFeatureFlagConverter
+    formats_block = {}
+    if "formats" in inherited_caps:
+        deep_merge_dict(formats_block, inherited_caps["formats"])
     if "formats" in json_profiles_capabilities_block:
-        formats_block = json_profiles_capabilities_block["formats"]
+        deep_merge_dict(formats_block, json_profiles_capabilities_block["formats"])
+
+    if formats_block:
         new_formats_block = {}
         flag_converter = FormatFeatureFlagConverter(vk)
 
@@ -372,9 +385,11 @@ def pull_aliases_capabilities_block(vk: VulkanObject, version: VK_VERSION, json_
                         for m_name, flags_4khr in members_4khr.items():
                             new_structs_dict[target_4khr][m_name] = flags_4khr
 
-            new_formats_block[format_name] = new_structs_dict
+            if new_structs_dict:
+                new_formats_block[format_name] = new_structs_dict
 
-        json_profiles_capabilities_block["formats"] = new_formats_block
+        if new_formats_block:
+            json_profiles_capabilities_block["formats"] = new_formats_block
 
     return json_profiles_capabilities_block
 
@@ -388,13 +403,12 @@ def pull_aliases_profiles_file(vk: VulkanObject, require_promoted_extensions: bo
 
         required_profile_names = value.get("profiles", [])
         inherited_caps = collect_required_profiles_capabilities(json_files_dict, required_profile_names)
-        inherited_exts = set(inherited_caps.get("extensions", {}).keys())
 
         block_names = collect_block_names(value["capabilities"])
         
         for block_name in block_names:
             if block_name in json_profiles_capabilities:
-                pull_aliases_capabilities_block(vk, version, json_profiles_capabilities[block_name], inherited_exts)
+                pull_aliases_capabilities_block(vk, version, json_profiles_capabilities[block_name], inherited_caps)
 
 
 def pull_aliases_profiles_files(vk: VulkanObject, require_promoted_extensions: bool, json_files_dict):
@@ -595,3 +609,5 @@ def main_convert(args):
         strip_profiles_files_capabilities_duplication(json_files_dict)
 
     save_profiles_jsons(json_files_dict, Path(args.output), OutputFormatType(args.format))
+    
+    
