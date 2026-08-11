@@ -21,6 +21,7 @@
 
 import copy
 import logging
+import re
 from pathlib import Path
 from enum import Enum
 
@@ -36,15 +37,7 @@ from source.vulkan_object_utils import (
     CapabilityAlias
 )
 from source.profiles_parsing import load_profiles_jsons, save_profiles_jsons, OutputFormatType
-
-
-class ConvertBits(str, Enum):
-    STRIP_DUPLICATION = 'strip-duplication'
-    PULL_DEPENDENCES = 'pull-dependences'
-    PULL_ALIASES = 'pull-aliases'
-    PULL_PROMOTED_EXTENSIONS = 'pull-promoted-extensions' # Require all extensions promoted to a core version.
-    IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions' # Set all required extensions to version 1, ignoring extension versions.
-
+from source.format_flag_converter import FormatFeatureFlagConverter 
 
 FORMAT_STRUCTS_32 = [
     "VkFormatProperties",
@@ -59,82 +52,49 @@ FORMAT_STRUCTS_4KHR = [
     "VkFormatProperties4KHR",
 ]
 
+class ConvertBits(str, Enum):
+    STRIP_DUPLICATION = 'strip-duplication'
+    PULL_DEPENDENCES = 'pull-dependences'
+    PULL_ALIASES = 'pull-aliases'
+    PULL_PROMOTED_EXTENSIONS = 'pull-promoted-extensions' # Require all extensions promoted to a core version.
+    IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions' # Set all required extensions to version 1, ignoring extension versions.
 
-class FormatFeatureFlagConverter:
+def _parse_version_tuple(version) -> tuple[int, int]:
     """
-    Bidirectionally maps 32-bit VkFormatFeatureFlagBits <-> 64-bit VkFormatFeatureFlagBits2 / VkFormatFeatureFlagBits4KHR
-    by matching bitpos values directly from vk.xml.
+    Safely extracts (major, minor) version integers from string API versions (e.g. '1.3.273')
+    or VK_VERSION objects.
     """
-    def __init__(self, vk: VulkanObject):
-        self.flag32_to_flag64: dict[str, str] = {}
-        self.flag64_to_flag32: dict[str, str] = {}
-        self.flag32_to_flag4khr: dict[str, str] = {}
-        self.flag4khr_to_flag32: dict[str, str] = {}
-        self._build_maps(vk)
+    if version is None:
+        return (0, 0)
+    if hasattr(version, 'major') and hasattr(version, 'minor'):
+        return (int(version.major), int(version.minor))
+    s = str(getattr(version, 'name', version))
+    nums = re.findall(r'\d+', s)
+    if len(nums) >= 2:
+        return (int(nums[0]), int(nums[1]))
+    elif len(nums) == 1:
+        return (int(nums[0]), 0)
+    return (0, 0)
 
-    def _build_maps(self, vk: VulkanObject):
-        bitmask_32 = vk.bitmasks.get("VkFormatFeatureFlagBits")
-        bitmask_64 = vk.bitmasks.get("VkFormatFeatureFlagBits2")
-        bitmask_4khr = vk.bitmasks.get("VkFormatFeatureFlagBits4KHR")
 
-        if bitmask_32 and bitmask_64:
-            bitpos_to_flag64 = {
-                flag.bitpos: flag.name 
-                for flag in bitmask_64.flags 
-                if flag.bitpos is not None
-            }
-            for flag32 in bitmask_32.flags:
-                if flag32.bitpos is not None and flag32.bitpos in bitpos_to_flag64:
-                    flag64_name = bitpos_to_flag64[flag32.bitpos]
-                    self.flag32_to_flag64[flag32.name] = flag64_name
-                    self.flag64_to_flag32[flag64_name] = flag32.name
-                    for alias32 in getattr(flag32, 'aliases', []):
-                        self.flag32_to_flag64[alias32] = flag64_name
+def gather_promoted_extensions_for_version(vk: VulkanObject, target_version: VK_VERSION) -> dict[str, int]:
+    """
+    Collects all extensions in vk.xml promoted to the target core API version or an earlier core version.
+    """
+    promoted_exts = {}
+    target_ver_tuple = _parse_version_tuple(target_version)
+    if target_ver_tuple == (0, 0):
+        return promoted_exts
 
-        if bitmask_32 and bitmask_4khr:
-            bitpos_to_flag4khr = {
-                flag.bitpos: flag.name 
-                for flag in bitmask_4khr.flags 
-                if flag.bitpos is not None
-            }
-            for flag32 in bitmask_32.flags:
-                if flag32.bitpos is not None and flag32.bitpos in bitpos_to_flag4khr:
-                    flag4_name = bitpos_to_flag4khr[flag32.bitpos]
-                    self.flag32_to_flag4khr[flag32.name] = flag4_name
-                    self.flag4khr_to_flag32[flag4_name] = flag32.name
-                    for alias32 in getattr(flag32, 'aliases', []):
-                        self.flag32_to_flag4khr[alias32] = flag4_name
+    for ext_name, ext_obj in vk.extensions.items():
+        promoted_to = getattr(ext_obj, 'promotedTo', None) or getattr(ext_obj, 'promoted_to', None)
+        if promoted_to:
+            promoted_ver_tuple = _parse_version_tuple(promoted_to)
+            if promoted_ver_tuple != (0, 0) and promoted_ver_tuple <= target_ver_tuple:
+                spec_version = getattr(ext_obj, 'specVersion', 1) or getattr(ext_obj, 'version', 1) or 1
+                promoted_exts[ext_name] = spec_version
 
-    def to_flag64_list(self, flags32: list[str]) -> list[str]:
-        result = []
-        for f32 in flags32:
-            if f32 in self.flag32_to_flag64:
-                result.append(self.flag32_to_flag64[f32])
-            elif f32.startswith("VK_FORMAT_FEATURE_2_"):
-                result.append(f32)  # Already a 64-bit flag
-        return result
-
-    def to_flag4khr_list(self, flags32: list[str]) -> list[str]:
-        result = []
-        for f32 in flags32:
-            if f32 in self.flag32_to_flag4khr:
-                result.append(self.flag32_to_flag4khr[f32])
-            elif f32 in self.flag32_to_flag64:
-                result.append(self.flag32_to_flag64[f32])  # Fallback to flag64 if bitpos aligns
-            elif f32.startswith("VK_FORMAT_FEATURE_4_") or f32.startswith("VK_FORMAT_FEATURE_2_"):
-                result.append(f32)
-        return result
-
-    def to_flag32_list(self, flags64: list[str]) -> list[str]:
-        result = []
-        for f64 in flags64:
-            if f64 in self.flag64_to_flag32:
-                result.append(self.flag64_to_flag32[f64])
-            elif f64 in self.flag4khr_to_flag32:
-                result.append(self.flag4khr_to_flag32[f64])
-            elif f64.startswith("VK_FORMAT_FEATURE_") and not f64.startswith("VK_FORMAT_FEATURE_2_") and not f64.startswith("VK_FORMAT_FEATURE_4_"):
-                result.append(f64)  # Already a 32-bit flag
-        return result
+    return promoted_exts
 
 
 def collect_block_names(json_capabilities):
@@ -166,10 +126,29 @@ def parse_profile_capabilities(json_capabilities: list) -> list:
     return parsed
 
 
-def pull_capabilities_block_dependencies(vk: VulkanObject, version: VK_VERSION, ignore_extension_versions: bool, json_profiles_capabilities_block):
+def pull_capabilities_block_dependencies(
+    vk: VulkanObject, 
+    version: VK_VERSION, 
+    require_promoted_extensions: bool, 
+    ignore_extension_versions: bool, 
+    api_version: VK_VERSION, 
+    json_profiles_capabilities_block: dict
+):
+    # If require_promoted_extensions is True, pull all extensions promoted to api_version
+    if require_promoted_extensions:
+        promoted_exts = gather_promoted_extensions_for_version(vk, api_version)
+        if promoted_exts:
+            if "extensions" not in json_profiles_capabilities_block:
+                json_profiles_capabilities_block["extensions"] = {}
+
+            ext_dict = json_profiles_capabilities_block["extensions"]
+            for ext_name, ext_ver in promoted_exts.items():
+                if ext_name not in ext_dict:
+                    ext_dict[ext_name] = 1 if ignore_extension_versions else ext_ver
+
     if "extensions" not in json_profiles_capabilities_block:
         return
-    
+
     extensions = gatherDependentExtensions(vk, version, ignore_extension_versions, json_profiles_capabilities_block["extensions"])
     json_profiles_capabilities_block["extensions"] = extensions
 
@@ -179,15 +158,16 @@ def pull_profiles_file_dependencies(vk: VulkanObject, require_promoted_extension
     json_profiles_capabilities = json_file_data["capabilities"]
 
     for key, value in profiles_data.items():
-        version = VK_VERSION.NONE
-        if not require_promoted_extensions:
-            version = VK_VERSION.from_string(value["api-version"])
+        api_version = VK_VERSION.from_string(value["api-version"])
+        version = VK_VERSION.NONE if require_promoted_extensions else api_version
 
         block_names = collect_block_names(value["capabilities"])
         
         for block_name in block_names:
             if block_name in json_profiles_capabilities:
-                pull_capabilities_block_dependencies(vk, version, ignore_extension_versions, json_profiles_capabilities[block_name])
+                pull_capabilities_block_dependencies(
+                    vk, version, require_promoted_extensions, ignore_extension_versions, api_version, json_profiles_capabilities[block_name]
+                )
 
 
 def pull_profiles_files_dependencies(vk: VulkanObject, require_promoted_extensions: bool, ignore_extension_versions: bool, json_files_dict):
@@ -196,10 +176,10 @@ def pull_profiles_files_dependencies(vk: VulkanObject, require_promoted_extensio
         pull_profiles_file_dependencies(vk, require_promoted_extensions, ignore_extension_versions, value)
 
 
-def _is_struct_extension_enabled(vk: VulkanObject, struct_name: str, enabled_exts: set[str]) -> bool:
+def _is_struct_extension_enabled(vk: VulkanObject, struct_name: str, version: VK_VERSION, enabled_exts: set[str]) -> bool:
     """
     Checks whether a structure's defining extension requirements are satisfied
-    by the set of enabled extensions in the profile block.
+    by either the enabled extensions or because the extension was promoted to the target core API version.
     """
     ext_names = set()
 
@@ -221,7 +201,20 @@ def _is_struct_extension_enabled(vk: VulkanObject, struct_name: str, enabled_ext
 
     required_exts = {ext for ext in ext_names if ext in vk.extensions}
 
-    if required_exts and not required_exts.intersection(enabled_exts):
+    if required_exts:
+        # 1. Enabled explicitly in extensions block
+        if required_exts.intersection(enabled_exts):
+            return True
+
+        # 2. Promoted to the profile's API version or earlier
+        target_ver_tuple = _parse_version_tuple(version)
+        for ext in required_exts:
+            ext_obj = vk.extensions.get(ext)
+            if ext_obj and getattr(ext_obj, 'promotedTo', None):
+                promoted_ver = _parse_version_tuple(ext_obj.promotedTo)
+                if promoted_ver != (0, 0) and target_ver_tuple >= promoted_ver:
+                    return True
+
         return False
 
     return True
@@ -235,20 +228,11 @@ def _is_format_struct_valid(vk: VulkanObject, struct_name: str, version: VK_VERS
     if struct_name == "VkFormatProperties":
         return True
 
-    if not _is_struct_extension_enabled(vk, struct_name, enabled_exts):
-        return False
+    target_ver_tuple = _parse_version_tuple(version)
 
-    target_ver_tuple = (
-        int(version.name.split('V')[1].split('_')[0]), 
-        int(version.name.split('V')[1].split('_')[1])
-    ) if hasattr(version, 'name') and 'V' in version.name else (0, 0)
-
-    if struct_name == "VkFormatProperties3":
+    if struct_name in ("VkFormatProperties3", "VkFormatProperties3KHR"):
         if target_ver_tuple >= (1, 3):
             return True
-        return "VK_KHR_format_feature_flags2" in enabled_exts
-
-    if struct_name == "VkFormatProperties3KHR":
         return "VK_KHR_format_feature_flags2" in enabled_exts
 
     if struct_name == "VkFormatProperties4KHR":
@@ -293,7 +277,7 @@ def pull_aliases_capabilities_block(vk: VulkanObject, version: VK_VERSION, json_
                         target_struct = alias.struct
                         target_member = alias.member
 
-                        if not _is_struct_extension_enabled(vk, target_struct, enabled_exts):
+                        if not _is_struct_extension_enabled(vk, target_struct, version, enabled_exts):
                             continue
 
                         if is_dict:
@@ -609,5 +593,4 @@ def main_convert(args):
         strip_profiles_files_capabilities_duplication(json_files_dict)
 
     save_profiles_jsons(json_files_dict, Path(args.output), OutputFormatType(args.format))
-    
     
