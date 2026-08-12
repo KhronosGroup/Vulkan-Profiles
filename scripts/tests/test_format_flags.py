@@ -30,7 +30,11 @@ if str(scripts_dir) not in sys.path:
 
 from vulkan_object import VulkanObject
 from source.vulkan_object_utils import initVulkanObject
-from source.main_convert import FormatFeatureFlagConverter
+from source.vulkan_object_version import VK_VERSION
+from source.format_flag_converter import (
+    FormatFeatureFlagConverter,
+    isFormatStructValid
+)
 
 
 class TestFormatFeatureFlagConverter(unittest.TestCase):
@@ -136,6 +140,58 @@ class TestFormatFeatureFlagConverter(unittest.TestCase):
         self.assertEqual(self.converter.to_flag32_list([]), [])
         self.assertEqual(self.converter.to_flag4khr_list([]), [])
 
+    def testIsFormatStructValidCore(self):
+        """Verifies VkFormatProperties and VkFormatProperties3 validity across core versions."""
+        enabled_exts = set()
+
+        # VkFormatProperties is valid for all API versions
+        self.assertTrue(isFormatStructValid(self.vk, "VkFormatProperties", VK_VERSION.V1_0, enabled_exts))
+        self.assertTrue(isFormatStructValid(self.vk, "VkFormatProperties", VK_VERSION.V1_3, enabled_exts))
+
+        # VkFormatProperties3 is invalid on Vulkan < 1.3 without extension
+        self.assertFalse(isFormatStructValid(self.vk, "VkFormatProperties3", VK_VERSION.V1_1, enabled_exts))
+        self.assertFalse(isFormatStructValid(self.vk, "VkFormatProperties3", VK_VERSION.V1_2, enabled_exts))
+
+        # VkFormatProperties3 is valid on Vulkan >= 1.3
+        self.assertTrue(isFormatStructValid(self.vk, "VkFormatProperties3", VK_VERSION.V1_3, enabled_exts))
+        self.assertTrue(isFormatStructValid(self.vk, "VkFormatProperties3", VK_VERSION.V1_4, enabled_exts))
+
+    def testIsFormatStructValidWithExtensions(self):
+        """Verifies format struct validity when enabled by extensions on older API versions."""
+        # Enable VK_KHR_format_feature_flags2 on Vulkan 1.1
+        exts_ff2 = {"VK_KHR_format_feature_flags2"}
+        self.assertTrue(isFormatStructValid(self.vk, "VkFormatProperties3", VK_VERSION.V1_1, exts_ff2))
+        self.assertTrue(isFormatStructValid(self.vk, "VkFormatProperties3KHR", VK_VERSION.V1_1, exts_ff2))
+
+        # Enable VK_KHR_extended_flags
+        exts_ef = {"VK_KHR_extended_flags"}
+        self.assertTrue(isFormatStructValid(self.vk, "VkFormatProperties4KHR", VK_VERSION.V1_3, exts_ef))
+        self.assertFalse(isFormatStructValid(self.vk, "VkFormatProperties4KHR", VK_VERSION.V1_3, set()))
+
+    def testExpandFormatStruct(self):
+        """Verifies expand_format_struct expands 32-bit input flags into 64-bit and 4KHR structures on Vulkan 1.3."""
+        input_members = {
+            "optimalTilingFeatures": [
+                "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT"
+            ]
+        }
+        enabled_exts = {"VK_KHR_extended_flags"}
+
+        expanded = self.converter.expand_format_struct(
+            self.vk, "VkFormatProperties", input_members, VK_VERSION.V1_3, enabled_exts
+        )
+
+        # VkFormatProperties, VkFormatProperties3, and VkFormatProperties4KHR should all be generated
+        self.assertIn("VkFormatProperties", expanded)
+        self.assertIn("VkFormatProperties3", expanded)
+        self.assertIn("VkFormatProperties4KHR", expanded)
+
+        # Check converted flag names in VkFormatProperties3
+        opt_64 = expanded["VkFormatProperties3"]["optimalTilingFeatures"]
+        self.assertIn("VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT", opt_64)
+        self.assertIn("VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BIT", opt_64)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -149,5 +205,4 @@ if __name__ == '__main__':
     TestFormatFeatureFlagConverter.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
-
     
