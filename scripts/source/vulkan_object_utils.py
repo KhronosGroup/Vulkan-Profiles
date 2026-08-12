@@ -366,6 +366,7 @@ def gatherDependentExtensions(vk: VulkanObject, version: VK_VERSION, ignore_exte
     
     return result
 
+
 def gatherDynamicStructs(vk: VulkanObject):
     """
     Global discovery function that automatically identifies all Vulkan structures 
@@ -377,3 +378,64 @@ def gatherDynamicStructs(vk: VulkanObject):
             if member.pointer and member.length is not None:
                 discovered.add(struct_name)
     return sorted(list(discovered))
+
+
+def gatherPromotedExtensionsForVersion(vk: VulkanObject, target_version: VK_VERSION) -> dict[str, int]:
+    """
+    Collects all extensions in vk.xml promoted to the target core API version or an earlier core version.
+    """
+    promoted_exts = {}
+    if target_version == VK_VERSION.NONE:
+        return promoted_exts
+
+    for ext_name, ext_obj in vk.extensions.items():
+        promoted_to = getattr(ext_obj, 'promotedTo', None) or getattr(ext_obj, 'promoted_to', None)
+        if promoted_to:
+            promoted_ver = VK_VERSION.from_string(promoted_to)
+            if promoted_ver != VK_VERSION.NONE and target_version >= promoted_ver:
+                spec_version = getattr(ext_obj, 'specVersion', 1) or getattr(ext_obj, 'version', 1) or 1
+                promoted_exts[ext_name] = spec_version
+
+    return promoted_exts
+
+def isStructExtensionEnabled(vk: VulkanObject, struct_name: str, version: VK_VERSION, enabled_exts: set[str]) -> bool:
+    """
+    Checks whether a structure's defining extension requirements are satisfied
+    by either the enabled extensions or because the extension was promoted to the target core API version.
+    """
+    ext_names = set()
+
+    if hasattr(vk, 'aliasTypeRequirements') and struct_name in vk.aliasTypeRequirements:
+        ext_names.update(vk.aliasTypeRequirements[struct_name].keys())
+    elif struct_name in vk.structs:
+        struct_obj = vk.structs[struct_name]
+        if getattr(struct_obj, 'definingRequirements', None):
+            ext_names.update(struct_obj.definingRequirements.keys())
+        elif getattr(struct_obj, 'extensions', None):
+            ext_names.update(struct_obj.extensions)
+    else:
+        struct_obj = getStructByName(vk.structs, struct_name)
+        if struct_obj:
+            if getattr(struct_obj, 'definingRequirements', None):
+                ext_names.update(struct_obj.definingRequirements.keys())
+            elif getattr(struct_obj, 'extensions', None):
+                ext_names.update(struct_obj.extensions)
+
+    required_exts = {ext for ext in ext_names if ext in vk.extensions}
+
+    if required_exts:
+        # 1. Enabled explicitly in extensions block
+        if required_exts.intersection(enabled_exts):
+            return True
+
+        # 2. Promoted to the profile's API version or earlier
+        for ext in required_exts:
+            ext_obj = vk.extensions.get(ext)
+            if ext_obj and getattr(ext_obj, 'promotedTo', None):
+                promoted_ver = VK_VERSION.from_string(ext_obj.promotedTo)
+                if promoted_ver != VK_VERSION.NONE and version >= promoted_ver:
+                    return True
+
+        return False
+
+    return True

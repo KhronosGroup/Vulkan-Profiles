@@ -29,7 +29,17 @@ if str(scripts_dir) not in sys.path:
     sys.path.insert(0, str(scripts_dir))
 
 from vulkan_object import VulkanObject, StructCapabilityAlias, ExtensionCapabilityAlias
-from source.vulkan_object_utils import initVulkanObject, VK_VERSION, gatherCapabilityAliases, gatherDependentCapabilityAliases, gatherDependentExtensions, findExtensionVersion, gatherDynamicStructs
+from source.vulkan_object_utils import (
+    initVulkanObject,
+    VK_VERSION,
+    gatherCapabilityAliases,
+    gatherDependentCapabilityAliases,
+    gatherDependentExtensions,
+    isStructExtensionEnabled,
+    findExtensionVersion,
+    gatherDynamicStructs,
+    gatherPromotedExtensionsForVersion
+)
 #from source.vulkan_object_version import buildVulkanVersionEnum
 
 class TestVulkanObjectUtils(unittest.TestCase):
@@ -458,8 +468,6 @@ class TestVulkanObjectUtils(unittest.TestCase):
         }
 
         self.assertEqual(dependent_extensions3, expected_extensions3)
-        
-        return
     
     def testGatherDynamicStructs(self):
         """
@@ -485,6 +493,48 @@ class TestVulkanObjectUtils(unittest.TestCase):
         self.assertNotIn("VkPhysicalDeviceFeatures2", dynamic_structs)
         self.assertNotIn("VkPhysicalDeviceProperties2", dynamic_structs)
         self.assertNotIn("VkPhysicalDeviceVulkan11Properties", dynamic_structs)
+
+    def testGatherPromotedExtensionsForVersion(self):
+        vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
+
+        # Case 0: NONE version returns empty dict
+        none_promoted = gatherPromotedExtensionsForVersion(vk, VK_VERSION.NONE)
+        self.assertEqual(none_promoted, {})
+
+        # Case 1: Vulkan 1.0 has no promoted extensions
+        v1_0_promoted = gatherPromotedExtensionsForVersion(vk, VK_VERSION.V1_0)
+        self.assertEqual(v1_0_promoted, {})
+
+        # Case 2: Vulkan 1.1 includes 1.1 promoted extensions (e.g. VK_KHR_multiview, VK_KHR_maintenance1)
+        v1_1_promoted = gatherPromotedExtensionsForVersion(vk, VK_VERSION.V1_1)
+        self.assertIn("VK_KHR_multiview", v1_1_promoted)
+        self.assertIn("VK_KHR_maintenance1", v1_1_promoted)
+        self.assertNotIn("VK_KHR_dynamic_rendering", v1_1_promoted)
+        self.assertEqual(v1_1_promoted["VK_KHR_multiview"], findExtensionVersion(vk, "VK_KHR_multiview"))
+
+        # Case 3: Vulkan 1.3 includes extensions promoted up to 1.3
+        v1_3_promoted = gatherPromotedExtensionsForVersion(vk, VK_VERSION.V1_3)
+        self.assertIn("VK_KHR_multiview", v1_3_promoted)          # Promoted to 1.1
+        self.assertIn("VK_KHR_driver_properties", v1_3_promoted)  # Promoted to 1.2
+        self.assertIn("VK_KHR_dynamic_rendering", v1_3_promoted)  # Promoted to 1.3
+        self.assertIn("VK_KHR_format_feature_flags2", v1_3_promoted) # Promoted to 1.3
+        self.assertEqual(v1_3_promoted["VK_KHR_dynamic_rendering"], findExtensionVersion(vk, "VK_KHR_dynamic_rendering"))
+
+    def testIsStructExtensionEnabled(self):
+        vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
+
+        # 1. Core structures (no extension requirement) are always enabled
+        self.assertTrue(isStructExtensionEnabled(vk, "VkPhysicalDeviceFeatures2", VK_VERSION.V1_0, set()))
+
+        # 2. Extension struct disabled when extension is not enabled and version is older than promotion
+        self.assertFalse(isStructExtensionEnabled(vk, "VkPhysicalDeviceDynamicRenderingFeatures", VK_VERSION.V1_1, set()))
+
+        # 3. Extension struct enabled via explicit extension enablement
+        exts = {"VK_KHR_dynamic_rendering"}
+        self.assertTrue(isStructExtensionEnabled(vk, "VkPhysicalDeviceDynamicRenderingFeatures", VK_VERSION.V1_1, exts))
+
+        # 4. Extension struct enabled via core version promotion (VK_KHR_dynamic_rendering promoted to Vulkan 1.3)
+        self.assertTrue(isStructExtensionEnabled(vk, "VkPhysicalDeviceDynamicRenderingFeatures", VK_VERSION.V1_3, set()))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

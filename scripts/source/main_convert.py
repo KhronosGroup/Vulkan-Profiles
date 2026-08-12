@@ -21,7 +21,6 @@
 
 import copy
 import logging
-import re
 from pathlib import Path
 from enum import Enum
 
@@ -31,6 +30,8 @@ from source.vulkan_object_utils import (
     VK_VERSION, 
     gatherDependentExtensions, 
     gatherDependentCapabilityAliases, 
+    gatherPromotedExtensionsForVersion,
+    isStructExtensionEnabled,
     getStructByName,
     StructCapabilityAlias, 
     ExtensionCapabilityAlias, 
@@ -39,62 +40,13 @@ from source.vulkan_object_utils import (
 from source.profiles_parsing import load_profiles_jsons, save_profiles_jsons, OutputFormatType
 from source.format_flag_converter import FormatFeatureFlagConverter 
 
-FORMAT_STRUCTS_32 = [
-    "VkFormatProperties",
-]
-
-FORMAT_STRUCTS_64 = [
-    "VkFormatProperties3",
-    "VkFormatProperties3KHR",
-]
-
-FORMAT_STRUCTS_4KHR = [
-    "VkFormatProperties4KHR",
-]
 
 class ConvertBits(str, Enum):
     STRIP_DUPLICATION = 'strip-duplication'
     PULL_DEPENDENCES = 'pull-dependences'
     PULL_ALIASES = 'pull-aliases'
-    PULL_PROMOTED_EXTENSIONS = 'pull-promoted-extensions' # Require all extensions promoted to a core version.
-    IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions' # Set all required extensions to version 1, ignoring extension versions.
-
-def _parse_version_tuple(version) -> tuple[int, int]:
-    """
-    Safely extracts (major, minor) version integers from string API versions (e.g. '1.3.273')
-    or VK_VERSION objects.
-    """
-    if version is None:
-        return (0, 0)
-    if hasattr(version, 'major') and hasattr(version, 'minor'):
-        return (int(version.major), int(version.minor))
-    s = str(getattr(version, 'name', version))
-    nums = re.findall(r'\d+', s)
-    if len(nums) >= 2:
-        return (int(nums[0]), int(nums[1]))
-    elif len(nums) == 1:
-        return (int(nums[0]), 0)
-    return (0, 0)
-
-
-def gather_promoted_extensions_for_version(vk: VulkanObject, target_version: VK_VERSION) -> dict[str, int]:
-    """
-    Collects all extensions in vk.xml promoted to the target core API version or an earlier core version.
-    """
-    promoted_exts = {}
-    target_ver_tuple = _parse_version_tuple(target_version)
-    if target_ver_tuple == (0, 0):
-        return promoted_exts
-
-    for ext_name, ext_obj in vk.extensions.items():
-        promoted_to = getattr(ext_obj, 'promotedTo', None) or getattr(ext_obj, 'promoted_to', None)
-        if promoted_to:
-            promoted_ver_tuple = _parse_version_tuple(promoted_to)
-            if promoted_ver_tuple != (0, 0) and promoted_ver_tuple <= target_ver_tuple:
-                spec_version = getattr(ext_obj, 'specVersion', 1) or getattr(ext_obj, 'version', 1) or 1
-                promoted_exts[ext_name] = spec_version
-
-    return promoted_exts
+    PULL_PROMOTED_EXTENSIONS = 'pull-promoted-extensions'  # Require all extensions promoted to a core version.
+    IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions'  # Set all required extensions to version 1, ignoring extension versions.
 
 
 def collect_block_names(json_capabilities):
@@ -136,7 +88,7 @@ def pull_capabilities_block_dependencies(
 ):
     # If require_promoted_extensions is True, pull all extensions promoted to api_version
     if require_promoted_extensions:
-        promoted_exts = gather_promoted_extensions_for_version(vk, api_version)
+        promoted_exts = gatherPromotedExtensionsForVersion(vk, api_version)
         if promoted_exts:
             if "extensions" not in json_profiles_capabilities_block:
                 json_profiles_capabilities_block["extensions"] = {}
@@ -176,71 +128,6 @@ def pull_profiles_files_dependencies(vk: VulkanObject, require_promoted_extensio
         pull_profiles_file_dependencies(vk, require_promoted_extensions, ignore_extension_versions, value)
 
 
-def _is_struct_extension_enabled(vk: VulkanObject, struct_name: str, version: VK_VERSION, enabled_exts: set[str]) -> bool:
-    """
-    Checks whether a structure's defining extension requirements are satisfied
-    by either the enabled extensions or because the extension was promoted to the target core API version.
-    """
-    ext_names = set()
-
-    if hasattr(vk, 'aliasTypeRequirements') and struct_name in vk.aliasTypeRequirements:
-        ext_names.update(vk.aliasTypeRequirements[struct_name].keys())
-    elif struct_name in vk.structs:
-        struct_obj = vk.structs[struct_name]
-        if getattr(struct_obj, 'definingRequirements', None):
-            ext_names.update(struct_obj.definingRequirements.keys())
-        elif getattr(struct_obj, 'extensions', None):
-            ext_names.update(struct_obj.extensions)
-    else:
-        struct_obj = getStructByName(vk.structs, struct_name)
-        if struct_obj:
-            if getattr(struct_obj, 'definingRequirements', None):
-                ext_names.update(struct_obj.definingRequirements.keys())
-            elif getattr(struct_obj, 'extensions', None):
-                ext_names.update(struct_obj.extensions)
-
-    required_exts = {ext for ext in ext_names if ext in vk.extensions}
-
-    if required_exts:
-        # 1. Enabled explicitly in extensions block
-        if required_exts.intersection(enabled_exts):
-            return True
-
-        # 2. Promoted to the profile's API version or earlier
-        target_ver_tuple = _parse_version_tuple(version)
-        for ext in required_exts:
-            ext_obj = vk.extensions.get(ext)
-            if ext_obj and getattr(ext_obj, 'promotedTo', None):
-                promoted_ver = _parse_version_tuple(ext_obj.promotedTo)
-                if promoted_ver != (0, 0) and target_ver_tuple >= promoted_ver:
-                    return True
-
-        return False
-
-    return True
-
-
-def _is_format_struct_valid(vk: VulkanObject, struct_name: str, version: VK_VERSION, enabled_exts: set[str]) -> bool:
-    """
-    Determines if a format properties structure (32-bit or 64-bit) is valid for the target API version
-    and enabled extensions.
-    """
-    if struct_name == "VkFormatProperties":
-        return True
-
-    target_ver_tuple = _parse_version_tuple(version)
-
-    if struct_name in ("VkFormatProperties3", "VkFormatProperties3KHR"):
-        if target_ver_tuple >= (1, 3):
-            return True
-        return "VK_KHR_format_feature_flags2" in enabled_exts
-
-    if struct_name == "VkFormatProperties4KHR":
-        return "VK_KHR_extended_flags" in enabled_exts
-
-    return False
-
-
 def pull_aliases_capabilities_block(vk: VulkanObject, version: VK_VERSION, json_profiles_capabilities_block: dict, inherited_caps: dict = None) -> dict:
     inherited_caps = inherited_caps or {}
     ext_block = json_profiles_capabilities_block.get("extensions", {})
@@ -277,7 +164,7 @@ def pull_aliases_capabilities_block(vk: VulkanObject, version: VK_VERSION, json_
                         target_struct = alias.struct
                         target_member = alias.member
 
-                        if not _is_struct_extension_enabled(vk, target_struct, version, enabled_exts):
+                        if not isStructExtensionEnabled(vk, target_struct, version, enabled_exts):
                             continue
 
                         if is_dict:
@@ -321,53 +208,11 @@ def pull_aliases_capabilities_block(vk: VulkanObject, version: VK_VERSION, json_
             new_structs_dict = {}
 
             for src_struct_name, members_dict in structs_dict.items():
-                if not isinstance(members_dict, dict):
-                    continue
-
-                src_is_64 = src_struct_name in FORMAT_STRUCTS_64 or src_struct_name in FORMAT_STRUCTS_4KHR
-                members_32 = {}
-                members_64 = {}
-                members_4khr = {}
-
-                for member_name, flag_list in members_dict.items():
-                    if isinstance(flag_list, list):
-                        if src_is_64:
-                            flags_32 = flag_converter.to_flag32_list(flag_list)
-                            members_32[member_name] = flags_32
-                            members_64[member_name] = flag_converter.to_flag64_list(flags_32)
-                            members_4khr[member_name] = flag_converter.to_flag4khr_list(flags_32)
-                        else:
-                            members_32[member_name] = flag_list
-                            members_64[member_name] = flag_converter.to_flag64_list(flag_list)
-                            members_4khr[member_name] = flag_converter.to_flag4khr_list(flag_list)
-                    else:
-                        members_32[member_name] = flag_list
-                        members_64[member_name] = flag_list
-                        members_4khr[member_name] = flag_list
-
-                # Generate valid 32-bit format structures (VkFormatProperties)
-                for target_32 in FORMAT_STRUCTS_32:
-                    if _is_format_struct_valid(vk, target_32, version, enabled_exts):
-                        if target_32 not in new_structs_dict:
-                            new_structs_dict[target_32] = {}
-                        for m_name, flags_32 in members_32.items():
-                            new_structs_dict[target_32][m_name] = flags_32
-
-                # Generate valid 64-bit format structures (VkFormatProperties3 / VkFormatProperties3KHR)
-                for target_64 in FORMAT_STRUCTS_64:
-                    if _is_format_struct_valid(vk, target_64, version, enabled_exts):
-                        if target_64 not in new_structs_dict:
-                            new_structs_dict[target_64] = {}
-                        for m_name, flags_64 in members_64.items():
-                            new_structs_dict[target_64][m_name] = flags_64
-
-                # Generate valid VK_KHR_extended_flags format structures (VkFormatProperties4KHR)
-                for target_4khr in FORMAT_STRUCTS_4KHR:
-                    if _is_format_struct_valid(vk, target_4khr, version, enabled_exts):
-                        if target_4khr not in new_structs_dict:
-                            new_structs_dict[target_4khr] = {}
-                        for m_name, flags_4khr in members_4khr.items():
-                            new_structs_dict[target_4khr][m_name] = flags_4khr
+                if isinstance(members_dict, dict):
+                    expanded = flag_converter.expand_format_struct(
+                        vk, src_struct_name, members_dict, version, enabled_exts
+                    )
+                    deep_merge_dict(new_structs_dict, expanded)
 
             if new_structs_dict:
                 new_formats_block[format_name] = new_structs_dict

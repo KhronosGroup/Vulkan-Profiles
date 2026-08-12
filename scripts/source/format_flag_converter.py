@@ -20,6 +20,40 @@
 # - Christophe Riccio <christophe@lunarg.com>
 
 from source.vulkan_object_utils import VulkanObject
+from source.vulkan_object_version import VK_VERSION
+
+FORMAT_STRUCTS_32 = [
+    "VkFormatProperties",
+]
+
+FORMAT_STRUCTS_64 = [
+    "VkFormatProperties3",
+    "VkFormatProperties3KHR",
+]
+
+FORMAT_STRUCTS_4KHR = [
+    "VkFormatProperties4KHR",
+]
+
+
+def isFormatStructValid(vk: VulkanObject, struct_name: str, version: VK_VERSION, enabled_exts: set[str]) -> bool:
+    """
+    Determines if a format properties structure (32-bit, 64-bit, or 4KHR) is valid 
+    for the target API version and set of enabled extensions.
+    """
+    if struct_name == "VkFormatProperties":
+        return True
+
+    if struct_name in ("VkFormatProperties3", "VkFormatProperties3KHR"):
+        if version >= VK_VERSION.V1_3:
+            return True
+        return "VK_KHR_format_feature_flags2" in enabled_exts
+
+    if struct_name == "VkFormatProperties4KHR":
+        return "VK_KHR_extended_flags" in enabled_exts
+
+    return False
+
 
 class FormatFeatureFlagConverter:
     """
@@ -96,3 +130,42 @@ class FormatFeatureFlagConverter:
             elif f64.startswith("VK_FORMAT_FEATURE_") and not f64.startswith("VK_FORMAT_FEATURE_2_") and not f64.startswith("VK_FORMAT_FEATURE_4_"):
                 result.append(f64)
         return result
+
+    def expand_format_struct(
+        self,
+        vk: VulkanObject,
+        src_struct_name: str,
+        members_dict: dict,
+        version: VK_VERSION,
+        enabled_exts: set[str]
+    ) -> dict[str, dict]:
+        """
+        Converts format property member flags and expands valid 32-bit, 64-bit, 
+        and 4KHR target format structures based on API version and enabled extensions.
+        """
+        src_is_64 = src_struct_name in FORMAT_STRUCTS_64 or src_struct_name in FORMAT_STRUCTS_4KHR
+        members_32, members_64, members_4khr = {}, {}, {}
+
+        for member_name, flag_list in members_dict.items():
+            if isinstance(flag_list, list):
+                flags_32 = self.to_flag32_list(flag_list) if src_is_64 else flag_list
+                members_32[member_name] = flags_32
+                members_64[member_name] = self.to_flag64_list(flags_32)
+                members_4khr[member_name] = self.to_flag4khr_list(flags_32)
+            else:
+                members_32[member_name] = members_64[member_name] = members_4khr[member_name] = flag_list
+
+        target_groups = [
+            (FORMAT_STRUCTS_32, members_32),
+            (FORMAT_STRUCTS_64, members_64),
+            (FORMAT_STRUCTS_4KHR, members_4khr),
+        ]
+
+        result_structs = {}
+        for struct_list, members in target_groups:
+            for target_struct in struct_list:
+                if isFormatStructValid(vk, target_struct, version, enabled_exts):
+                    result_structs.setdefault(target_struct, {}).update(members)
+
+        return result_structs
+    
