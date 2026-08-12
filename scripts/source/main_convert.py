@@ -31,6 +31,7 @@ from source.vulkan_object_utils import (
     gatherDependentExtensions, 
     gatherDependentCapabilityAliases, 
     gatherPromotedExtensionsForVersion,
+    gatherSatisfiedRequiredFeatures,
     isStructExtensionEnabled,
     getStructByName,
     StructCapabilityAlias, 
@@ -77,6 +78,10 @@ def parse_profile_capabilities(json_capabilities: list) -> list:
             parsed.append([item for item in entry if isinstance(item, str)])
     return parsed
 
+
+# -----------------------------------------------------------------------------
+# Phase 1: Extension Dependencies & Promoted Extensions
+# -----------------------------------------------------------------------------
 
 def pull_capabilities_block_dependencies(
     vk: VulkanObject, 
@@ -128,6 +133,10 @@ def pull_profiles_files_dependencies(vk: VulkanObject, require_promoted_extensio
         pull_profiles_file_dependencies(vk, require_promoted_extensions, ignore_extension_versions, value)
 
 
+# -----------------------------------------------------------------------------
+# Phase 2: Structural & Format Feature Aliases
+# -----------------------------------------------------------------------------
+
 def pull_aliases_capabilities_block(vk: VulkanObject, version: VK_VERSION, json_profiles_capabilities_block: dict, inherited_caps: dict = None) -> dict:
     inherited_caps = inherited_caps or {}
     ext_block = json_profiles_capabilities_block.get("extensions", {})
@@ -178,14 +187,13 @@ def pull_aliases_capabilities_block(vk: VulkanObject, version: VK_VERSION, json_
                                 new_category_block[target_struct].append(target_member)
 
                     elif isinstance(alias, ExtensionCapabilityAlias):
-                        if "extensions" in json_profiles_capabilities_block:
+                        # ONLY record alias if the extension is ALREADY enabled in the profile/context
+                        if alias.name in enabled_exts and "extensions" in json_profiles_capabilities_block:
                             target_ext_block = json_profiles_capabilities_block["extensions"]
                             if isinstance(target_ext_block, dict):
                                 target_ext_block[alias.name] = 1
-                                enabled_exts.add(alias.name)
                             elif isinstance(target_ext_block, list) and alias.name not in target_ext_block:
                                 target_ext_block.append(alias.name)
-                                enabled_exts.add(alias.name)
 
         if new_category_block:
             json_profiles_capabilities_block[category] = new_category_block
@@ -247,7 +255,48 @@ def pull_aliases_profiles_files(vk: VulkanObject, require_promoted_extensions: b
 
 
 # -----------------------------------------------------------------------------
-# Deep Duplication Stripping & Profile Inheritance Traversal
+# Phase 3: Late-Stage Required Features Evaluation (handling "depends")
+# -----------------------------------------------------------------------------
+
+def pull_required_features_capabilities_block(
+    vk: VulkanObject, 
+    api_version: VK_VERSION, 
+    json_profiles_capabilities_block: dict
+):
+    ext_block = json_profiles_capabilities_block.get("extensions", {})
+    enabled_exts = set(ext_block.keys()) if isinstance(ext_block, dict) else set(ext_block)
+
+    features_block = json_profiles_capabilities_block.setdefault("features", {})
+
+    satisfied_features = gatherSatisfiedRequiredFeatures(vk, api_version, enabled_exts, features_block)
+
+    if satisfied_features:
+        deep_merge_dict(features_block, satisfied_features)
+
+
+def pull_required_features_profiles_file(vk: VulkanObject, json_file_data):
+    profiles_data = json_file_data.get("profiles", {})
+    json_profiles_capabilities = json_file_data.get("capabilities", {})
+
+    for key, value in profiles_data.items():
+        api_version = VK_VERSION.from_string(value["api-version"])
+        block_names = collect_block_names(value["capabilities"])
+
+        for block_name in block_names:
+            if block_name in json_profiles_capabilities:
+                pull_required_features_capabilities_block(
+                    vk, api_version, json_profiles_capabilities[block_name]
+                )
+
+
+def pull_required_features_profiles_files(vk: VulkanObject, json_files_dict):
+    for key, value in json_files_dict.items():
+        logging.debug(f"Pulling satisfied required features for: {key}")
+        pull_required_features_profiles_file(vk, value)
+
+
+# -----------------------------------------------------------------------------
+# Phase 4: Deep Duplication Stripping & Profile Inheritance Traversal
 # -----------------------------------------------------------------------------
 
 def deep_merge_dict(target: dict, source: dict):
@@ -410,6 +459,10 @@ def strip_profiles_files_capabilities_duplication(json_files_dict):
         strip_profiles_file_capabilities_duplication(json_files_dict, value)
 
 
+# -----------------------------------------------------------------------------
+# Main Conversion Entry Point
+# -----------------------------------------------------------------------------
+
 def main_convert(args):
     vk = initVulkanObject('vulkan', args.registry or None)
 
@@ -428,12 +481,18 @@ def main_convert(args):
     if ConvertBits.IGNORE_EXTENSION_VERSIONS in mode_enums:
         ignore_extension_versions = True
     
+    # Phase 1: Pull extension dependencies & promoted extensions
     if ConvertBits.PULL_DEPENDENCES in mode_enums:
         pull_profiles_files_dependencies(vk, require_promoted_extensions, ignore_extension_versions, json_files_dict)
 
+    # Phase 2: Expand capability aliases (features, properties, format flags)
     if ConvertBits.PULL_ALIASES in mode_enums:
         pull_aliases_profiles_files(vk, require_promoted_extensions, json_files_dict)
 
+    # Phase 3: Evaluate & pull satisfied required features (handling FeatureRequirement.depends)
+    pull_required_features_profiles_files(vk, json_files_dict)
+
+    # Phase 4: Strip duplication across profile inheritance hierarchy
     if ConvertBits.STRIP_DUPLICATION in mode_enums:
         strip_profiles_files_capabilities_duplication(json_files_dict)
 

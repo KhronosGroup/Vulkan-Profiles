@@ -20,6 +20,7 @@
 # - Christophe Riccio <christophe@lunarg.com>
 
 import re
+from typing import Callable
 from source.vulkan_object_version import VK_VERSION
 
 class Node:
@@ -186,3 +187,62 @@ def collectExtensions(current_version: VK_VERSION, expression_str: str) -> list:
             print(err)
 
     return [] if isinstance(result, bool) else result
+
+
+def evalExpression(expression: str, is_symbol_enabled: Callable[[str], bool]) -> bool:
+    """
+    Evaluates a Vulkan XML boolean dependency expression.
+    
+    Operator precedence in vk.xml:
+    - '+' = AND (higher precedence)
+    - ',' = OR  (lower precedence)
+    - '(' / ')' = Grouping
+    """
+    if not expression or not expression.strip():
+        return True
+
+    # Tokenize by operators: '(', ')', '+', ',' and symbols
+    raw_tokens = re.split(r'([(),+])', expression)
+    tokens = [t.strip() for t in raw_tokens if t and t.strip()]
+
+    pos = 0
+
+    def parse_expr() -> bool:
+        """Parses OR (',') terms."""
+        nonlocal pos
+        result = parse_term()
+        while pos < len(tokens) and tokens[pos] == ',':
+            pos += 1  # consume ','
+            rhs = parse_term()
+            result = result or rhs
+        return result
+
+    def parse_term() -> bool:
+        """Parses AND ('+') factors."""
+        nonlocal pos
+        result = parse_factor()
+        while pos < len(tokens) and tokens[pos] == '+':
+            pos += 1  # consume '+'
+            rhs = parse_factor()
+            result = result and rhs
+        return result
+
+    def parse_factor() -> bool:
+        """Parses grouped sub-expressions or individual symbols."""
+        nonlocal pos
+        if pos >= len(tokens):
+            return False
+
+        token = tokens[pos]
+        if token == '(':
+            pos += 1  # consume '('
+            res = parse_expr()
+            if pos < len(tokens) and tokens[pos] == ')':
+                pos += 1  # consume ')'
+            return res
+        else:
+            pos += 1  # consume symbol
+            return is_symbol_enabled(token)
+
+    return parse_expr()
+
