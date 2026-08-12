@@ -38,23 +38,14 @@ from source.vulkan_object_utils import (
     isStructExtensionEnabled,
     findExtensionVersion,
     gatherDynamicStructs,
-    gatherPromotedExtensionsForVersion
+    gatherSatisfiedRequiredFeatures,
+    gatherPromotedExtensionsForVersion,
+    gatherRequiredFeaturesForVersion
 )
 #from source.vulkan_object_version import buildVulkanVersionEnum
 
 class TestVulkanObjectUtils(unittest.TestCase):
     registry_path = None
-
-    # def testVulkanObjectVersion(self):
-    #     vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
-        
-    #     VK_VERSION = buildVulkanVersionEnum(vk)
-        
-    #     assert VK_VERSION.V1_1 != VK_VERSION.V1_4
-        
-    #     versionA = VK_VERSION.from_string("1.4.304")
-        
-    #     assert versionA == VK_VERSION.V1_4
 
     def testVulkanObjectUtilsStructDependentFeatureAliasesAccess(self):
         vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
@@ -535,6 +526,101 @@ class TestVulkanObjectUtils(unittest.TestCase):
 
         # 4. Extension struct enabled via core version promotion (VK_KHR_dynamic_rendering promoted to Vulkan 1.3)
         self.assertTrue(isStructExtensionEnabled(vk, "VkPhysicalDeviceDynamicRenderingFeatures", VK_VERSION.V1_3, set()))
+
+    def testGatherRequiredFeaturesForVersion(self):
+        vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
+
+        # Vulkan 1.0 has no version feature requirement block
+        v1_0_features = gatherRequiredFeaturesForVersion(vk, VK_VERSION.V1_0)
+        self.assertEqual(v1_0_features, {})
+
+        # Vulkan 1.2 includes required features introduced up to 1.2
+        v1_2_features = gatherRequiredFeaturesForVersion(vk, VK_VERSION.V1_2)
+        
+        # Verify structure keys exist if defined in the parsed vk.xml
+        if "VkPhysicalDeviceVulkan12Features" in v1_2_features:
+            self.assertIn("timelineSemaphore", v1_2_features["VkPhysicalDeviceVulkan12Features"])
+            self.assertTrue(v1_2_features["VkPhysicalDeviceVulkan12Features"]["timelineSemaphore"])
+
+    def testGatherSatisfiedRequiredFeaturesWithDepends(self):
+        """
+        Verifies that required features governed by a 'depends' attribute 
+        (e.g., samplerMirrorClampToEdge in VkPhysicalDeviceVulkan12Features 
+        requiring VK_KHR_sampler_mirror_clamp_to_edge) are only gathered 
+        when their dependency condition is satisfied.
+        """
+        vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
+
+        # Case 1: On Vulkan 1.1 WITHOUT VK_KHR_sampler_mirror_clamp_to_edge enabled,
+        # samplerMirrorClampToEdge is NOT gathered because its extension dependency is missing.
+        features_v11_no_ext = gatherSatisfiedRequiredFeatures(
+            vk, VK_VERSION.V1_1, enabled_exts=set(), json_features_block={}
+        )
+        v12_features_v11 = features_v11_no_ext.get("VkPhysicalDeviceVulkan12Features", {})
+        self.assertNotIn("samplerMirrorClampToEdge", v12_features_v11)
+
+        # Case 2: On Vulkan 1.1 WITH VK_KHR_sampler_mirror_clamp_to_edge enabled,
+        # the depends condition is satisfied, so samplerMirrorClampToEdge IS gathered.
+        exts_with_clamp = {"VK_KHR_sampler_mirror_clamp_to_edge"}
+        features_v11_ext = gatherSatisfiedRequiredFeatures(
+            vk, VK_VERSION.V1_1, enabled_exts=exts_with_clamp, json_features_block={}
+        )
+        v12_features_ext = features_v11_ext.get("VkPhysicalDeviceVulkan12Features", {})
+        self.assertIn("samplerMirrorClampToEdge", v12_features_ext)
+        self.assertTrue(v12_features_ext["samplerMirrorClampToEdge"])
+
+        # Case 3: On Vulkan 1.2+, the core API version satisfies the requirement,
+        # so samplerMirrorClampToEdge IS gathered even without the extension explicitly enabled.
+        features_v12 = gatherSatisfiedRequiredFeatures(
+            vk, VK_VERSION.V1_2, enabled_exts=set(), json_features_block={}
+        )
+        v12_features_v12 = features_v12.get("VkPhysicalDeviceVulkan12Features", {})
+        self.assertIn("samplerMirrorClampToEdge", v12_features_v12)
+        self.assertTrue(v12_features_v12["samplerMirrorClampToEdge"])
+
+    def testGatherSatisfiedRequiredFeaturesWithFeatureDepends(self):
+        """
+        Verifies that required features governed by a feature-on-feature 'depends' attribute
+        containing OR (',') conditions (e.g., shaderInt64 in VkPhysicalDeviceFeatures 
+        depending on VkPhysicalDeviceShaderAtomicInt64Features::shaderSharedInt64Atomics OR
+        VkPhysicalDeviceShaderAtomicInt64Features::shaderBufferInt64Atomics)
+        are gathered when either dependency feature is enabled in the active features block.
+        """
+        vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
+
+        # Case 1: Neither atomic Int64 feature is enabled -> shaderInt64 is NOT gathered
+        features_none = gatherSatisfiedRequiredFeatures(
+            vk, VK_VERSION.V1_0, enabled_exts=set(), json_features_block={}
+        )
+        base_features_none = features_none.get("VkPhysicalDeviceFeatures", {})
+        self.assertNotIn("shaderInt64", base_features_none)
+
+        # Case 2: Enable shaderBufferInt64Atomics (second feature in OR expression)
+        input_buffer_atomic = {
+            "VkPhysicalDeviceShaderAtomicInt64Features": {
+                "shaderBufferInt64Atomics": True
+            }
+        }
+        features_buffer = gatherSatisfiedRequiredFeatures(
+            vk, VK_VERSION.V1_0, enabled_exts=set(), json_features_block=input_buffer_atomic
+        )
+        base_features_buffer = features_buffer.get("VkPhysicalDeviceFeatures", {})
+        self.assertIn("shaderInt64", base_features_buffer)
+        self.assertTrue(base_features_buffer["shaderInt64"])
+
+        # Case 3: Enable shaderSharedInt64Atomics (first feature in OR expression)
+        input_shared_atomic = {
+            "VkPhysicalDeviceShaderAtomicInt64Features": {
+                "shaderSharedInt64Atomics": True
+            }
+        }
+        features_shared = gatherSatisfiedRequiredFeatures(
+            vk, VK_VERSION.V1_0, enabled_exts=set(), json_features_block=input_shared_atomic
+        )
+        base_features_shared = features_shared.get("VkPhysicalDeviceFeatures", {})
+        self.assertIn("shaderInt64", base_features_shared)
+        self.assertTrue(base_features_shared["shaderInt64"])
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

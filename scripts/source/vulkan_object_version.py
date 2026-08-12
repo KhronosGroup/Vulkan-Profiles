@@ -36,24 +36,27 @@ class VK_VERSION(Enum):
         if not version_str or version_str in ("NONE", "VK_NONE"):
             return cls.NONE
         
-        # Match enum value string directly if passed (e.g., "VK_VERSION_1_3")
+        # 1. Direct enum value match
         try:
             return cls(version_str)
         except ValueError:
             pass
 
-        # Extract major/minor digits from version strings (e.g., "1.3.276" -> ["1", "3"])
-        parts = re.findall(r'\d+', str(version_str))
-        if len(parts) >= 2:
-            try:
-                return cls(f"VK_VERSION_{parts[0]}_{parts[1]}")
-            except ValueError:
-                return cls.NONE
-        elif len(parts) == 1:
-            try:
-                return cls(f"VK_VERSION_{parts[0]}_0")
-            except ValueError:
-                return cls.NONE
+        s = str(version_str).strip()
+
+        # 2. Strict guard: MUST start with VK_VERSION_, VK_API_VERSION_, or a version digit
+        if s.startswith("VK_VERSION_") or s.startswith("VK_API_VERSION_") or (s and s[0].isdigit()):
+            parts = re.findall(r'\d+', s)
+            if len(parts) >= 2:
+                try:
+                    return cls(f"VK_VERSION_{parts[0]}_{parts[1]}")
+                except ValueError:
+                    return cls.NONE
+            elif len(parts) == 1:
+                try:
+                    return cls(f"VK_VERSION_{parts[0]}_0")
+                except ValueError:
+                    return cls.NONE
 
         return cls.NONE
 

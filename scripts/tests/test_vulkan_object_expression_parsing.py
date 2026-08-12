@@ -30,6 +30,7 @@ if str(scripts_dir) not in sys.path:
 
 from source.vulkan_object_expression_parsing import collectExtensions
 from source.vulkan_object_version import VK_VERSION
+from source.vulkan_object_expression_parsing import evalExpression
 
 class TestExpressionTrees(unittest.TestCase):
     registry_path = None
@@ -98,6 +99,39 @@ class TestExpressionTrees(unittest.TestCase):
         self.assertEqual(R[0], "VK_KHR_swapchain")   
         self.assertEqual(R[1], "VK_KHR_maintenance2")   
         self.assertEqual(R[2], "VK_KHR_image_format_list")   
+
+
+class TestEvalExpression(unittest.TestCase):
+
+    def testSimpleSymbols(self):
+        enabled = {"VK_KHR_dynamic_rendering", "VK_EXT_custom_border_color"}
+        is_enabled = lambda s: s in enabled
+
+        self.assertTrue(evalExpression("VK_KHR_dynamic_rendering", is_enabled))
+        self.assertFalse(evalExpression("VK_KHR_swapchain", is_enabled))
+
+    def testAndOperations(self):
+        enabled = {"VK_VERSION_1_2", "VK_EXT_descriptor_indexing"}
+        is_enabled = lambda s: s in enabled
+
+        self.assertTrue(evalExpression("VK_VERSION_1_2+VK_EXT_descriptor_indexing", is_enabled))
+        self.assertFalse(evalExpression("VK_VERSION_1_2+VK_KHR_dynamic_rendering", is_enabled))
+
+    def testOrOperations(self):
+        enabled = {"VK_EXT_descriptor_indexing"}
+        is_enabled = lambda s: s in enabled
+
+        self.assertTrue(evalExpression("VK_VERSION_1_2,VK_EXT_descriptor_indexing", is_enabled))
+        self.assertFalse(evalExpression("VK_VERSION_1_3,VK_KHR_dynamic_rendering", is_enabled))
+
+    def testPrecedenceAndGrouping(self):
+        # "A + (B , C)"
+        enabled = {"A", "C"}
+        is_enabled = lambda s: s in enabled
+
+        self.assertTrue(evalExpression("A+(B,C)", is_enabled))
+        self.assertFalse(evalExpression("A+B,D", is_enabled))
+        
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
