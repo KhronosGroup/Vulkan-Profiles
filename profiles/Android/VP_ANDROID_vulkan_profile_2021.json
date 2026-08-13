@@ -40,6 +40,12 @@
                     "shaderUniformBufferArrayDynamicIndexing": true,
                     "textureCompressionASTC_LDR": true,
                     "textureCompressionETC2": true
+                },
+                "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                    "variablePointersStorageBuffer": true
+                },
+                "VkPhysicalDeviceVariablePointersFeaturesKHR": {
+                    "variablePointersStorageBuffer": true
                 }
             },
             "properties": {
