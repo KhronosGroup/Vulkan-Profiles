@@ -3,7 +3,6 @@
     "capabilities": {
         "MUST": {
             "extensions": {
-                "VK_KHR_8bit_storage": 1,
                 "VK_KHR_load_store_op_none": 1,
                 "VK_KHR_maintenance6": 1,
                 "VK_KHR_map_memory2": 1,
@@ -20,19 +19,8 @@
                 "VK_EXT_transform_feedback": 1
             },
             "features": {
-                "VkPhysicalDeviceFeatures": {
-                    "fullDrawIndexUint32": true,
-                    "shaderInt16": true
-                },
-                "VkPhysicalDeviceVulkan12Features": {
-                    "samplerMirrorClampToEdge": true,
-                    "scalarBlockLayout": true
-                },
-                "VkPhysicalDeviceProtectedMemoryFeatures": {
+                "VkPhysicalDeviceVulkan11Features": {
                     "protectedMemory": true
-                },
-                "VkPhysicalDeviceShaderIntegerDotProductFeatures": {
-                    "shaderIntegerDotProduct": true
                 },
                 "VkPhysicalDeviceTransformFeedbackFeaturesEXT": {
                     "transformFeedback": true
@@ -42,52 +30,160 @@
                 },
                 "VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR": {
                     "shaderSubgroupUniformControlFlow": true
+                },
+                "VkPhysicalDeviceMaintenance6FeaturesKHR": {
+                    "maintenance6": true
+                },
+                "VkPhysicalDeviceShaderExpectAssumeFeaturesKHR": {
+                    "shaderExpectAssume": true
+                },
+                "VkPhysicalDeviceShaderFloatControls2FeaturesKHR": {
+                    "shaderFloatControls2": true
+                },
+                "VkPhysicalDeviceShaderMaximalReconvergenceFeaturesKHR": {
+                    "shaderMaximalReconvergence": true
+                },
+                "VkPhysicalDeviceShaderSubgroupRotateFeaturesKHR": {
+                    "shaderSubgroupRotate": true
+                },
+                "VkPhysicalDeviceHostImageCopyFeaturesEXT": {
+                    "hostImageCopy": true
+                },
+                "VkPhysicalDevicePipelineProtectedAccessFeaturesEXT": {
+                    "pipelineProtectedAccess": true
+                },
+                "VkPhysicalDevicePipelineRobustnessFeaturesEXT": {
+                    "pipelineRobustness": true
                 }
             },
             "properties": {
                 "VkPhysicalDeviceProperties": {
                     "limits": {
-                        "bufferImageGranularity": 4096,
-                        "lineWidthGranularity": 0.5,
-                        "maxColorAttachments": 8,
-                        "maxComputeWorkGroupInvocations": 256,
-                        "maxComputeWorkGroupSize": [256, 256, 64],
-                        "maxImageArrayLayers": 2048,
                         "maxImageDimension1D": 8192,
                         "maxImageDimension2D": 8192,
                         "maxImageDimensionCube": 8192,
-                        "maxDescriptorSetStorageBuffers": 96,
-                        "maxDescriptorSetUniformBuffers": 90,
-                        "maxFragmentCombinedOutputResources": 16,
+                        "maxImageArrayLayers": 2048,
+                        "maxUniformBufferRange": 65536,
                         "maxPerStageDescriptorUniformBuffers": 15,
                         "maxPerStageResources": 200,
-                        "maxSamplerLodBias": 14,
-                        "maxUniformBufferRange": 65536,
+                        "maxDescriptorSetUniformBuffers": 90,
+                        "maxDescriptorSetStorageBuffers": 96,
                         "maxVertexOutputComponents": 72,
-                        "mipmapPrecisionBits": 6,
-                        "pointSizeGranularity": 0.125,
-                        "standardSampleLocations": true,
+                        "maxFragmentCombinedOutputResources": 16,
+                        "maxComputeWorkGroupInvocations": 256,
+                        "maxComputeWorkGroupSize": [256, 256, 64],
                         "subTexelPrecisionBits": 8,
+                        "mipmapPrecisionBits": 6,
+                        "maxSamplerLodBias": 14,
+                        "maxColorAttachments": 8,
+                        "pointSizeGranularity": 0.125,
+                        "bufferImageGranularity": 4096,
+                        "lineWidthGranularity": 0.5,
                         "timestampComputeAndGraphics": true
                     }
+                },
+                "VkPhysicalDeviceVulkan11Properties": {
+                    "subgroupSupportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT"]
+                },
+                "VkPhysicalDeviceSubgroupProperties": {
+                    "supportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT"]
                 },
                 "VkPhysicalDeviceFloatControlsProperties": {
                     "shaderSignedZeroInfNanPreserveFloat16": true,
                     "shaderSignedZeroInfNanPreserveFloat32": true
                 },
-                "VkPhysicalDeviceVulkan11Properties": {
-                    "subgroupSupportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT"]
+                "VkPhysicalDeviceVulkan12Properties": {
+                    "shaderSignedZeroInfNanPreserveFloat16": true,
+                    "shaderSignedZeroInfNanPreserveFloat32": true
+                },
+                "VkPhysicalDeviceFloatControlsPropertiesKHR": {
+                    "shaderSignedZeroInfNanPreserveFloat16": true,
+                    "shaderSignedZeroInfNanPreserveFloat32": true
                 }
             }
         },
         "multisampledToSingleSampled": {
             "extensions": {
                 "VK_EXT_multisampled_render_to_single_sampled": 1
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxImageDimension1D": 4096,
+                        "maxImageDimension2D": 4096,
+                        "maxImageDimensionCube": 4096,
+                        "maxImageArrayLayers": 256,
+                        "maxUniformBufferRange": 16384,
+                        "maxPerStageDescriptorUniformBuffers": 12,
+                        "maxPerStageResources": 44,
+                        "maxDescriptorSetUniformBuffers": 36,
+                        "maxDescriptorSetStorageBuffers": 24,
+                        "maxVertexOutputComponents": 64,
+                        "maxFragmentCombinedOutputResources": 8,
+                        "maxComputeWorkGroupInvocations": 128,
+                        "maxComputeWorkGroupSize": [128, 128, 64],
+                        "subTexelPrecisionBits": 4,
+                        "mipmapPrecisionBits": 4,
+                        "maxSamplerLodBias": 2.0,
+                        "maxColorAttachments": 4,
+                        "pointSizeGranularity": 1
+                    }
+                }
             }
         },
         "shaderStencilExport": {
             "extensions": {
                 "VK_EXT_shader_stencil_export": 1
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxImageDimension1D": 4096,
+                        "maxImageDimension2D": 4096,
+                        "maxImageDimensionCube": 4096,
+                        "maxImageArrayLayers": 256,
+                        "maxUniformBufferRange": 16384,
+                        "maxPerStageDescriptorUniformBuffers": 12,
+                        "maxPerStageResources": 44,
+                        "maxDescriptorSetUniformBuffers": 36,
+                        "maxDescriptorSetStorageBuffers": 24,
+                        "maxVertexOutputComponents": 64,
+                        "maxFragmentCombinedOutputResources": 8,
+                        "maxComputeWorkGroupInvocations": 128,
+                        "maxComputeWorkGroupSize": [128, 128, 64],
+                        "subTexelPrecisionBits": 4,
+                        "mipmapPrecisionBits": 4,
+                        "maxSamplerLodBias": 2.0,
+                        "maxColorAttachments": 4,
+                        "pointSizeGranularity": 1
+                    }
+                }
+            }
+        },
+        "vulkan11pulledrequirements": {
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxImageDimension1D": 4096,
+                        "maxImageDimension2D": 4096,
+                        "maxImageDimensionCube": 4096,
+                        "maxImageArrayLayers": 256,
+                        "maxUniformBufferRange": 16384,
+                        "maxPerStageDescriptorUniformBuffers": 12,
+                        "maxPerStageResources": 44,
+                        "maxDescriptorSetUniformBuffers": 36,
+                        "maxDescriptorSetStorageBuffers": 24,
+                        "maxVertexOutputComponents": 64,
+                        "maxFragmentCombinedOutputResources": 8,
+                        "maxComputeWorkGroupInvocations": 128,
+                        "maxComputeWorkGroupSize": [128, 128, 64],
+                        "subTexelPrecisionBits": 4,
+                        "mipmapPrecisionBits": 4,
+                        "maxSamplerLodBias": 2.0,
+                        "maxColorAttachments": 4,
+                        "pointSizeGranularity": 1
+                    }
+                }
             }
         }
     },
@@ -151,7 +247,8 @@
             "profiles": ["VP_ANDROID_15_requirements"],
             "capabilities": [
                 "MUST",
-                ["multisampledToSingleSampled", "shaderStencilExport"]
+                ["multisampledToSingleSampled", "shaderStencilExport"],
+                "vulkan11pulledrequirements"
             ]
         }
     }

@@ -3,27 +3,29 @@
     "capabilities": {
         "baseline": {
             "extensions": {
+                "VK_KHR_surface": 1,
                 "VK_KHR_android_surface": 1,
                 "VK_KHR_bind_memory2": 1,
                 "VK_KHR_create_renderpass2": 1,
                 "VK_KHR_dedicated_allocation": 1,
                 "VK_KHR_descriptor_update_template": 1,
-                "VK_KHR_device_group": 1,
                 "VK_KHR_device_group_creation": 1,
+                "VK_KHR_device_group": 1,
                 "VK_KHR_driver_properties": 1,
-                "VK_KHR_external_fence": 1,
                 "VK_KHR_external_fence_capabilities": 1,
+                "VK_KHR_external_fence": 1,
                 "VK_KHR_external_fence_fd": 1,
                 "VK_KHR_external_memory": 1,
                 "VK_KHR_external_memory_capabilities": 1,
                 "VK_KHR_external_memory_fd": 1,
-                "VK_KHR_external_semaphore": 1,
                 "VK_KHR_external_semaphore_capabilities": 1,
+                "VK_KHR_external_semaphore": 1,
                 "VK_KHR_external_semaphore_fd": 1,
                 "VK_KHR_get_memory_requirements2": 1,
                 "VK_KHR_get_physical_device_properties2": 1,
                 "VK_KHR_get_surface_capabilities2": 1,
                 "VK_KHR_image_format_list": 1,
+                "VK_KHR_swapchain": 1,
                 "VK_KHR_incremental_present": 1,
                 "VK_KHR_maintenance1": 1,
                 "VK_KHR_maintenance2": 1,
@@ -36,16 +38,14 @@
                 "VK_KHR_shader_float16_int8": 1,
                 "VK_KHR_shader_float_controls": 1,
                 "VK_KHR_storage_buffer_storage_class": 1,
-                "VK_KHR_surface": 1,
-                "VK_KHR_swapchain": 1,
                 "VK_KHR_variable_pointers": 1,
                 "VK_KHR_vulkan_memory_model": 1,
+                "VK_EXT_queue_family_foreign": 1,
                 "VK_ANDROID_external_memory_android_hardware_buffer": 1,
                 "VK_GOOGLE_display_timing": 1,
                 "VK_EXT_debug_report": 1,
                 "VK_EXT_host_query_reset": 1,
                 "VK_EXT_index_type_uint8": 1,
-                "VK_EXT_queue_family_foreign": 1,
                 "VK_EXT_scalar_block_layout": 1,
                 "VK_EXT_separate_stencil_usage": 1,
                 "VK_EXT_swapchain_colorspace": 1
@@ -78,16 +78,35 @@
                 "VkPhysicalDeviceSamplerYcbcrConversionFeatures": {
                     "samplerYcbcrConversion": true
                 },
-                "VkPhysicalDeviceShaderDrawParameterFeatures": {
+                "VkPhysicalDeviceShaderDrawParametersFeatures": {
                     "shaderDrawParameters": true
                 },
-                "VkPhysicalDeviceVariablePointerFeatures": {
+                "VkPhysicalDeviceVariablePointersFeatures": {
                     "variablePointers": true,
                     "variablePointersStorageBuffer": true
                 },
-                "VkPhysicalDeviceVariablePointerFeaturesKHR": {
-                    "variablePointers": true,
-                    "variablePointersStorageBuffer": true
+                "VkPhysicalDeviceShaderFloat16Int8FeaturesKHR": {
+                    "shaderFloat16": true,
+                    "shaderInt8": true
+                },
+                "VkPhysicalDeviceFloat16Int8FeaturesKHR": {
+                    "shaderFloat16": true,
+                    "shaderInt8": true
+                },
+                "VkPhysicalDeviceVulkanMemoryModelFeaturesKHR": {
+                    "vulkanMemoryModel": true
+                },
+                "VkPhysicalDeviceHostQueryResetFeaturesEXT": {
+                    "hostQueryReset": true
+                },
+                "VkPhysicalDeviceIndexTypeUint8FeaturesEXT": {
+                    "indexTypeUint8": true
+                },
+                "VkPhysicalDeviceIndexTypeUint8FeaturesKHR": {
+                    "indexTypeUint8": true
+                },
+                "VkPhysicalDeviceScalarBlockLayoutFeaturesEXT": {
+                    "scalarBlockLayout": true
                 }
             },
             "properties": {
@@ -170,6 +189,10 @@
                     }
                 },
                 "VkPhysicalDeviceMultiviewProperties": {
+                    "maxMultiviewViewCount": 6,
+                    "maxMultiviewInstanceIndex": 134217727
+                },
+                "VkPhysicalDeviceMultiviewPropertiesKHR": {
                     "maxMultiviewViewCount": 6,
                     "maxMultiviewInstanceIndex": 134217727
                 }
@@ -876,6 +899,16 @@
                     }
                 }
             }
+        },
+        "vulkan11pulledrequirements": {
+            "extensions": {
+                "VK_KHR_16bit_storage": 1
+            },
+            "features": {
+                "VkPhysicalDevice16BitStorageFeatures": {
+                    "storageBuffer16BitAccess": true
+                }
+            }
         }
     },
     "profiles": {
@@ -910,7 +943,7 @@
                     "comment": "Updated the profile based on partner feedbacks"
                 }
             ],
-            "capabilities": ["baseline"]
+            "capabilities": ["baseline", "vulkan11pulledrequirements"]
         }
     }
 }
