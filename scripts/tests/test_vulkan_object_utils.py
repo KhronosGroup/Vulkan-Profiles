@@ -515,7 +515,7 @@ class TestVulkanObjectUtils(unittest.TestCase):
         vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
 
         # 1. Core structures (no extension requirement) are always enabled
-        self.assertTrue(isStructExtensionEnabled(vk, "VkPhysicalDeviceFeatures2", VK_VERSION.V1_0, set()))
+        self.assertTrue(isStructExtensionEnabled(vk, "VkPhysicalDeviceFeatures", VK_VERSION.V1_0, set()))
 
         # 2. Extension struct disabled when extension is not enabled and version is older than promotion
         self.assertFalse(isStructExtensionEnabled(vk, "VkPhysicalDeviceDynamicRenderingFeatures", VK_VERSION.V1_1, set()))

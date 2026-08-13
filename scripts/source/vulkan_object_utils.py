@@ -80,8 +80,6 @@ def initVulkanObject(target_api: str = 'vulkan', alternative_xml: str = None, vi
 
         xml_path = None
 
-        alternative_xml
-
         if alternative_xml:
             if not os.path.isfile(alternative_xml):
                 raise FileNotFoundError(f"The provided alternative XML file does not exist or is not a file: {alternative_xml}")
@@ -118,8 +116,6 @@ def initVulkanObject(target_api: str = 'vulkan', alternative_xml: str = None, vi
 
         # This invokes reg.py and will populate _InternalGenerator
         reg.apiGen()
-
-        #globals()['VK_VERSION'] = buildVulkanVersionEnum(generator.vk)
 
         return generator.vk
 
@@ -393,52 +389,10 @@ def gatherPromotedExtensionsForVersion(vk: VulkanObject, target_version: VK_VERS
         if promoted_to:
             promoted_ver = VK_VERSION.from_string(promoted_to)
             if promoted_ver != VK_VERSION.NONE and target_version >= promoted_ver:
-                spec_version = getattr(ext_obj, 'specVersion', 1) or getattr(ext_obj, 'version', 1) or 1
+                spec_version = getattr(ext_obj, 'specVersionValue', None) or findExtensionVersion(vk, ext_name) or 1
                 promoted_exts[ext_name] = spec_version
 
     return promoted_exts
-
-def isStructExtensionEnabled(vk: VulkanObject, struct_name: str, version: VK_VERSION, enabled_exts: set[str]) -> bool:
-    """
-    Checks whether a structure's defining extension requirements are satisfied
-    by either the enabled extensions or because the extension was promoted to the target core API version.
-    """
-    ext_names = set()
-
-    if hasattr(vk, 'aliasTypeRequirements') and struct_name in vk.aliasTypeRequirements:
-        ext_names.update(vk.aliasTypeRequirements[struct_name].keys())
-    elif struct_name in vk.structs:
-        struct_obj = vk.structs[struct_name]
-        if getattr(struct_obj, 'definingRequirements', None):
-            ext_names.update(struct_obj.definingRequirements.keys())
-        elif getattr(struct_obj, 'extensions', None):
-            ext_names.update(struct_obj.extensions)
-    else:
-        struct_obj = getStructByName(vk.structs, struct_name)
-        if struct_obj:
-            if getattr(struct_obj, 'definingRequirements', None):
-                ext_names.update(struct_obj.definingRequirements.keys())
-            elif getattr(struct_obj, 'extensions', None):
-                ext_names.update(struct_obj.extensions)
-
-    required_exts = {ext for ext in ext_names if ext in vk.extensions}
-
-    if required_exts:
-        # 1. Enabled explicitly in extensions block
-        if required_exts.intersection(enabled_exts):
-            return True
-
-        # 2. Promoted to the profile's API version or earlier
-        for ext in required_exts:
-            ext_obj = vk.extensions.get(ext)
-            if ext_obj and getattr(ext_obj, 'promotedTo', None):
-                promoted_ver = VK_VERSION.from_string(ext_obj.promotedTo)
-                if promoted_ver != VK_VERSION.NONE and version >= promoted_ver:
-                    return True
-
-        return False
-
-    return True
 
 
 def gatherRequiredFeaturesForVersion(vk: VulkanObject, target_version: VK_VERSION) -> dict[str, dict[str, bool]]:
@@ -479,44 +433,93 @@ def gatherRequiredFeaturesForVersion(vk: VulkanObject, target_version: VK_VERSIO
     return required_features
 
 
-def evaluateFeatureDepends(depends_expr: str | None, api_version: VK_VERSION, enabled_exts: set[str], enabled_features: set[tuple[str, str]]) -> bool:
+def isStructExtensionEnabled(vk: VulkanObject, struct_name: str, version: VK_VERSION, enabled_exts: set[str]) -> bool:
     """
-    Evaluates a FeatureRequirement 'depends' expression string.
-    Returns True if the requirement has no 'depends' condition or if the condition is satisfied.
+    Checks whether a structure's defining requirements (extensions or core versions) are satisfied.
+    """
+    req_keys = set()
+
+    # 1. Direct struct definingRequirements
+    struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
+    if struct_obj:
+        if hasattr(struct_obj, 'definingRequirements') and struct_obj.definingRequirements:
+            req_keys.update(struct_obj.definingRequirements.keys())
+        elif hasattr(struct_obj, 'extensions') and struct_obj.extensions:
+            req_keys.update(struct_obj.extensions)
+
+    # 2. Alias definingRequirements
+    if hasattr(vk, 'aliasTypeRequirements') and struct_name in vk.aliasTypeRequirements:
+        req_keys.update(vk.aliasTypeRequirements[struct_name].keys())
+
+    if struct_obj and hasattr(struct_obj, 'aliases'):
+        for alias in struct_obj.aliases:
+            if hasattr(vk, 'aliasTypeRequirements') and alias in vk.aliasTypeRequirements:
+                req_keys.update(vk.aliasTypeRequirements[alias].keys())
+
+    if not req_keys:
+        return True
+
+    # Check if ANY requirement key is satisfied
+    for req in req_keys:
+        # Check if req is a core API version (e.g., "VK_VERSION_1_3")
+        if req.startswith("VK_VERSION_") or req.startswith("VK_API_VERSION_"):
+            ver = VK_VERSION.from_string(req)
+            if ver != VK_VERSION.NONE and version != VK_VERSION.NONE and version >= ver:
+                return True
+
+        # Check if req is an enabled extension
+        if req in enabled_exts:
+            return True
+
+        # Check if req is an extension promoted to 'version' or earlier
+        ext_obj = vk.extensions.get(req)
+        if ext_obj and getattr(ext_obj, 'promotedTo', None):
+            promoted_ver = VK_VERSION.from_string(ext_obj.promotedTo)
+            if promoted_ver != VK_VERSION.NONE and version != VK_VERSION.NONE and version >= promoted_ver:
+                return True
+
+    return False
+
+
+def evaluateFeatureDepends(
+    vk: VulkanObject,
+    depends_expr: str | None, 
+    api_version: VK_VERSION, 
+    enabled_exts: set[str], 
+    enabled_features: set[tuple[str, str]]
+) -> bool:
+    """
+    Evaluates a FeatureRequirement 'depends' expression string against the active version,
+    enabled extensions, and enabled features.
     """
     if not depends_expr:
         return True
 
-    # Check if depends is a simple core version or extension
-    dep_ver = VK_VERSION.from_string(depends_expr)
-    if dep_ver != VK_VERSION.NONE:
-        return api_version >= dep_ver
-
-    if depends_expr in enabled_exts:
-        return True
-
-    # Parse and evaluate complex expressions (e.g., "VK_VERSION_1_2+VkPhysicalDeviceVulkan12Features::descriptorIndexing")
-    # Custom evaluator callback or token matching
     def is_symbol_enabled(token: str) -> bool:
         # 1. Feature flag reference (e.g. "VkPhysicalDeviceVulkan12Features::descriptorIndexing")
         if "::" in token:
-            struct_name, member_name = token.split("::")
-            return (struct_name, member_name) in enabled_features
+            parts = token.split("::")
+            return (parts[0], parts[1]) in enabled_features
 
-        # 2. Core API Version reference (e.g. "VK_VERSION_1_2" or "1.2")
+        # 2. Core API Version reference (e.g. "VK_VERSION_1_2")
         if token.startswith("VK_VERSION_") or token.startswith("VK_API_VERSION_") or (token and token[0].isdigit()):
             ver = VK_VERSION.from_string(token)
             if ver != VK_VERSION.NONE:
-                return api_version >= ver
+                return api_version != VK_VERSION.NONE and api_version >= ver
 
-        # 3. Extension name reference (e.g. "VK_EXT_swapchain_maintenance1")
-        return token in enabled_exts
+        # 3. Extension name reference (e.g. "VK_KHR_sampler_mirror_clamp_to_edge")
+        if token in enabled_exts:
+            return True
 
-    try:
-        return evalExpression(depends_expr, is_symbol_enabled)
-    except Exception:
-        # Fallback: if token evaluation fails, check simple inclusion
+        ext_obj = vk.extensions.get(token)
+        if ext_obj and getattr(ext_obj, 'promotedTo', None):
+            promoted_ver = VK_VERSION.from_string(ext_obj.promotedTo)
+            if promoted_ver != VK_VERSION.NONE and api_version != VK_VERSION.NONE and api_version >= promoted_ver:
+                return True
+
         return False
+
+    return evalExpression(depends_expr, is_symbol_enabled)
 
 
 def gatherSatisfiedRequiredFeatures(
@@ -534,30 +537,36 @@ def gatherSatisfiedRequiredFeatures(
     for struct_name, members in json_features_block.items():
         if isinstance(members, dict):
             for member_name, val in members.items():
-                if val:  # Only count enabled features (True)
+                if val:
                     enabled_features.add((struct_name, member_name))
 
     satisfied_features: dict[str, dict[str, bool]] = {}
 
-    # Helper to process a list of FeatureRequirements
-    def process_requirements(req_list):
+    def process_requirements(req_list, ver: VK_VERSION = None):
         for req in req_list:
-            if evaluateFeatureDepends(req.depends, api_version, enabled_exts, enabled_features):
-                # req.field can be comma-delimited for OR fields
-                fields = [f.strip() for f in req.field.split(',')] if req.field else []
-                for field_name in fields:
-                    satisfied_features.setdefault(req.struct, {})[field_name] = True
+            if req.depends:
+                # If 'depends' condition exists, evaluate whether it's satisfied
+                if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
+                    fields = [f.strip() for f in req.field.split(',')] if req.field else []
+                    for field_name in fields:
+                        satisfied_features.setdefault(req.struct, {})[field_name] = True
+            else:
+                # Unconditional requirement: only active if part of enabled extension (ver is None) 
+                # or if core version is <= api_version
+                if ver is None or (ver != VK_VERSION.NONE and api_version != VK_VERSION.NONE and ver <= api_version):
+                    fields = [f.strip() for f in req.field.split(',')] if req.field else []
+                    for field_name in fields:
+                        satisfied_features.setdefault(req.struct, {})[field_name] = True
 
-    # 1. Check requirements from core Vulkan versions <= api_version
+    # 1. Process featureRequirements across ALL core Vulkan versions
     for ver_name, ver_obj in vk.versions.items():
         ver = VK_VERSION.from_string(ver_name)
-        if ver != VK_VERSION.NONE and api_version >= ver:
-            process_requirements(getattr(ver_obj, 'featureRequirement', []))
+        process_requirements(getattr(ver_obj, 'featureRequirement', []), ver)
 
-    # 2. Check requirements from enabled extensions
+    # 2. Process featureRequirements across ALL enabled extensions
     for ext_name in enabled_exts:
         if ext_name in vk.extensions:
             ext_obj = vk.extensions[ext_name]
-            process_requirements(getattr(ext_obj, 'featureRequirement', []))
+            process_requirements(getattr(ext_obj, 'featureRequirement', []), ver=None)
 
     return satisfied_features
