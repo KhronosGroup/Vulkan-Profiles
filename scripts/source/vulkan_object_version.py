@@ -70,6 +70,16 @@ class VK_VERSION(Enum):
         return (-1, -1)
 
     # Native Rich Comparisons
+    def __eq__(self, other) -> bool:
+        if isinstance(other, VK_VERSION):
+            return self.value == other.value
+        if isinstance(other, str):
+            other_ver = VK_VERSION.from_string(other)
+            if self == VK_VERSION.NONE or other_ver == VK_VERSION.NONE:
+                return self.value == other_ver.value
+            return self.as_tuple() == other_ver.as_tuple()
+        return False
+
     def __lt__(self, other) -> bool:
         other_ver = other if isinstance(other, VK_VERSION) else VK_VERSION.from_string(other)
         return self.as_tuple() < other_ver.as_tuple()
