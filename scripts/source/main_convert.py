@@ -48,6 +48,7 @@ class ConvertBits(str, Enum):
     PULL_ALIASES = 'pull-aliases'
     PULL_PROMOTED_EXTENSIONS = 'pull-promoted-extensions'  # Require all extensions promoted to a core version.
     IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions'  # Set all required extensions to version 1, ignoring extension versions.
+    CONSOLIDATE = 'consolidate'  # Consolidate all mandatory capability blocks into a single block per profile.
 
 
 def collect_block_names(json_capabilities):
@@ -505,6 +506,58 @@ def strip_profiles_files_capabilities_duplication(json_files_dict):
 
 
 # -----------------------------------------------------------------------------
+# Phase 5: Consolidation
+# -----------------------------------------------------------------------------
+
+def consolidate_profiles_file(json_files_dict: dict, json_file_data: dict):
+    profiles_data = json_file_data.get("profiles", {})
+    capabilities_dict = json_file_data.setdefault("capabilities", {})
+
+    for profile_name, profile_obj in profiles_data.items():
+        # 1. Collect mandatory capabilities inherited from required parent profiles
+        required_profile_names = profile_obj.get("profiles", [])
+        consolidated_caps = collect_required_profiles_capabilities(json_files_dict, required_profile_names)
+
+        # 2. Collect mandatory capabilities from the current profile and keep optional (OR) blocks separate
+        parsed_caps = parse_profile_capabilities(profile_obj.get("capabilities", []))
+        optional_blocks = []
+
+        for item in parsed_caps:
+            if isinstance(item, str):
+                if item in capabilities_dict:
+                    deep_merge_dict(consolidated_caps, capabilities_dict[item])
+            elif isinstance(item, list):
+                optional_blocks.append(item)
+
+        # 3. Create the consolidated unique block and update profile references
+        if consolidated_caps:
+            consolidated_block_name = f"{profile_name}_requirements"
+            capabilities_dict[consolidated_block_name] = consolidated_caps
+
+            profile_obj["capabilities"] = [consolidated_block_name] + optional_blocks
+            profile_obj["profiles"] = []
+
+    # Cleanup unreferenced capability blocks in this file
+    referenced_blocks = set()
+    for prof in profiles_data.values():
+        for item in prof.get("capabilities", []):
+            if isinstance(item, str):
+                referenced_blocks.add(item)
+            elif isinstance(item, list):
+                referenced_blocks.update(item)
+
+    for block_name in list(capabilities_dict.keys()):
+        if block_name not in referenced_blocks:
+            del capabilities_dict[block_name]
+
+
+def consolidate_profiles_files(json_files_dict: dict):
+    for key, value in json_files_dict.items():
+        logging.debug(f"Consolidating capabilities for: {key}")
+        consolidate_profiles_file(json_files_dict, value)
+
+
+# -----------------------------------------------------------------------------
 # Main Conversion Entry Point
 # -----------------------------------------------------------------------------
 
@@ -541,4 +594,9 @@ def main_convert(args):
     if ConvertBits.STRIP_DUPLICATION in mode_enums:
         strip_profiles_files_capabilities_duplication(json_files_dict)
 
+    # Phase 5: Consolidate mandatory capability blocks into a single unique block per profile
+    if ConvertBits.CONSOLIDATE in mode_enums:
+        consolidate_profiles_files(json_files_dict)
+
     save_profiles_jsons(json_files_dict, Path(args.output), OutputFormatType(args.format))
+    
