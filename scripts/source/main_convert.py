@@ -21,6 +21,7 @@
 
 import copy
 import logging
+import re
 from pathlib import Path
 from enum import Enum
 
@@ -30,8 +31,9 @@ from source.vulkan_object_utils import (
     VK_VERSION, 
     gatherDependentExtensions, 
     gatherDependentCapabilityAliases, 
-    gatherPromotedExtensionsForVersion,
-    gatherSatisfiedRequiredFeatures,
+    gatherPromotedExtensionsForExactVersion,
+    gatherSatisfiedCoreRequiredFeaturesForVersion,
+    gatherSatisfiedExtensionRequiredFeatures,
     isStructExtensionEnabled,
     getStructByName,
     StructCapabilityAlias, 
@@ -49,6 +51,9 @@ class ConvertBits(str, Enum):
     PULL_PROMOTED_EXTENSIONS = 'pull-promoted-extensions'  # Require all extensions promoted to a core version.
     IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions'  # Set all required extensions to version 1, ignoring extension versions.
     CONSOLIDATE = 'consolidate'  # Consolidate all mandatory capability blocks into a single block per profile.
+
+
+CORE_VERSIONS = [VK_VERSION.V1_1, VK_VERSION.V1_2, VK_VERSION.V1_3, VK_VERSION.V1_4]
 
 
 def collect_block_names(json_capabilities):
@@ -90,11 +95,9 @@ def collect_profile_capabilities(json_files_dict: dict, json_file_data: dict, pr
     capability blocks in the profile and its inherited parent profiles.
     Used for profile-wide context during alias expansion and 'depends' evaluation across sibling blocks.
     """
-    # 1. Start with capabilities inherited from parent profiles
     required_profile_names = profile_obj.get("profiles", [])
     combined_caps = collect_required_profiles_capabilities(json_files_dict, required_profile_names)
 
-    # 2. Merge all mandatory (string) blocks from the current profile
     capabilities_dict = json_file_data.get("capabilities", {})
     parsed_caps = parse_profile_capabilities(profile_obj.get("capabilities", []))
 
@@ -112,23 +115,9 @@ def collect_profile_capabilities(json_files_dict: dict, json_file_data: dict, pr
 def pull_capabilities_block_dependencies(
     vk: VulkanObject, 
     version: VK_VERSION, 
-    require_promoted_extensions: bool, 
     ignore_extension_versions: bool, 
-    api_version: VK_VERSION, 
     json_profiles_capabilities_block: dict
 ):
-    # If require_promoted_extensions is True, pull all extensions promoted to api_version
-    if require_promoted_extensions:
-        promoted_exts = gatherPromotedExtensionsForVersion(vk, api_version)
-        if promoted_exts:
-            if "extensions" not in json_profiles_capabilities_block:
-                json_profiles_capabilities_block["extensions"] = {}
-
-            ext_dict = json_profiles_capabilities_block["extensions"]
-            for ext_name, ext_ver in promoted_exts.items():
-                if ext_name not in ext_dict:
-                    ext_dict[ext_name] = 1 if ignore_extension_versions else ext_ver
-
     if "extensions" not in json_profiles_capabilities_block:
         return
 
@@ -136,31 +125,144 @@ def pull_capabilities_block_dependencies(
     json_profiles_capabilities_block["extensions"] = extensions
 
 
-def pull_profiles_file_dependencies(vk: VulkanObject, require_promoted_extensions: bool, ignore_extension_versions: bool, json_file_data):
-    profiles_data = json_file_data["profiles"]
-    json_profiles_capabilities = json_file_data["capabilities"]
+def pull_profiles_file_dependencies(vk: VulkanObject, ignore_extension_versions: bool, json_file_data: dict):
+    profiles_data = json_file_data.get("profiles", {})
+    json_profiles_capabilities = json_file_data.get("capabilities", {})
 
     for key, value in profiles_data.items():
         api_version = VK_VERSION.from_string(value["api-version"])
-        version = VK_VERSION.NONE if require_promoted_extensions else api_version
-
         block_names = collect_block_names(value["capabilities"])
         
         for block_name in block_names:
             if block_name in json_profiles_capabilities:
                 pull_capabilities_block_dependencies(
-                    vk, version, require_promoted_extensions, ignore_extension_versions, api_version, json_profiles_capabilities[block_name]
+                    vk, api_version, ignore_extension_versions, json_profiles_capabilities[block_name]
                 )
 
 
-def pull_profiles_files_dependencies(vk: VulkanObject, require_promoted_extensions: bool, ignore_extension_versions: bool, json_files_dict):
+def pull_profiles_files_dependencies(vk: VulkanObject, ignore_extension_versions: bool, json_files_dict: dict):
     for key, value in json_files_dict.items():
         logging.debug(f"Fill capabilities dependencies for: {key}")
-        pull_profiles_file_dependencies(vk, require_promoted_extensions, ignore_extension_versions, value)
+        pull_profiles_file_dependencies(vk, ignore_extension_versions, value)
+
+
+def pull_promoted_extensions_profiles_file(vk: VulkanObject, ignore_extension_versions: bool, json_file_data: dict):
+    profiles_data = json_file_data.get("profiles", {})
+    capabilities_dict = json_file_data.setdefault("capabilities", {})
+
+    for key, profile_obj in profiles_data.items():
+        api_version = VK_VERSION.from_string(profile_obj["api-version"])
+
+        for ver in CORE_VERSIONS:
+            if ver != VK_VERSION.NONE and api_version != VK_VERSION.NONE and ver <= api_version:
+                promoted_exts = gatherPromotedExtensionsForExactVersion(vk, ver)
+                if promoted_exts:
+                    ver_tuple = ver.as_tuple()
+                    block_name = f"vulkan{ver_tuple[0]}{ver_tuple[1]}pulledrequirements"
+
+                    block = capabilities_dict.setdefault(block_name, {})
+                    ext_dict = block.setdefault("extensions", {})
+
+                    for ext_name, ext_ver in promoted_exts.items():
+                        if ext_name not in ext_dict:
+                            ext_dict[ext_name] = 1 if ignore_extension_versions else ext_ver
+
+                    pull_capabilities_block_dependencies(vk, api_version, ignore_extension_versions, block)
+
+                    profile_caps_list = profile_obj.setdefault("capabilities", [])
+                    if block_name not in profile_caps_list:
+                        profile_caps_list.append(block_name)
+
+
+def pull_promoted_extensions_profiles_files(vk: VulkanObject, ignore_extension_versions: bool, json_files_dict: dict):
+    for key, value in json_files_dict.items():
+        logging.debug(f"Pulling promoted extensions for: {key}")
+        pull_promoted_extensions_profiles_file(vk, ignore_extension_versions, value)
 
 
 # -----------------------------------------------------------------------------
-# Phase 2: Structural & Format Feature Aliases
+# Phase 2: Late-Stage Required Features Evaluation (handling "depends")
+# -----------------------------------------------------------------------------
+
+def pull_required_features_profiles_file(vk: VulkanObject, json_files_dict: dict, json_file_data: dict):
+    profiles_data = json_file_data.get("profiles", {})
+    capabilities_dict = json_file_data.setdefault("capabilities", {})
+
+    for key, profile_obj in profiles_data.items():
+        api_version = VK_VERSION.from_string(profile_obj["api-version"])
+
+        # Remove previous pulled block references from caps list to prepare for re-evaluation
+        profile_caps_list = profile_obj.setdefault("capabilities", [])
+        for ver in CORE_VERSIONS:
+            ver_tuple = ver.as_tuple()
+            core_block_name = f"vulkan{ver_tuple[0]}{ver_tuple[1]}pulledrequirements"
+            if core_block_name in capabilities_dict and not capabilities_dict[core_block_name]:
+                del capabilities_dict[core_block_name]
+
+        profile_caps = collect_profile_capabilities(json_files_dict, json_file_data, profile_obj)
+        profile_enabled_exts = set(profile_caps.get("extensions", {}).keys())
+        profile_features_block = profile_caps.get("features", {})
+
+        enabled_features: set[tuple[str, str]] = set()
+        for struct_name, members in profile_features_block.items():
+            if isinstance(members, dict):
+                for member_name, val in members.items():
+                    if val:
+                        enabled_features.add((struct_name, member_name))
+
+        # 1. Pull extension-specific feature requirements into the capability block defining the extension
+        block_names = collect_block_names(profile_obj.get("capabilities", []))
+        for block_name in block_names:
+            if block_name in capabilities_dict:
+                block = capabilities_dict[block_name]
+                ext_dict = block.get("extensions", {})
+                ext_list = list(ext_dict.keys()) if isinstance(ext_dict, dict) else (ext_dict if isinstance(ext_dict, list) else [])
+
+                for ext_name in ext_list:
+                    ext_satisfied = gatherSatisfiedExtensionRequiredFeatures(
+                        vk, ext_name, api_version, profile_enabled_exts, enabled_features
+                    )
+                    if ext_satisfied:
+                        block_features = block.setdefault("features", {})
+                        deep_merge_dict(block_features, ext_satisfied)
+
+        # Re-collect aggregate features after pulling extension features
+        profile_caps = collect_profile_capabilities(json_files_dict, json_file_data, profile_obj)
+        profile_features_block = profile_caps.get("features", {})
+        enabled_features = set()
+        for struct_name, members in profile_features_block.items():
+            if isinstance(members, dict):
+                for member_name, val in members.items():
+                    if val:
+                        enabled_features.add((struct_name, member_name))
+
+        # 2. Pull core version feature requirements into dedicated core block for that version
+        for ver in CORE_VERSIONS:
+            if ver != VK_VERSION.NONE and api_version != VK_VERSION.NONE and ver <= api_version:
+                satisfied_core_features = gatherSatisfiedCoreRequiredFeaturesForVersion(
+                    vk, ver, api_version, profile_enabled_exts, enabled_features
+                )
+
+                if satisfied_core_features:
+                    ver_tuple = ver.as_tuple()
+                    core_block_name = f"vulkan{ver_tuple[0]}{ver_tuple[1]}pulledrequirements"
+
+                    core_block = capabilities_dict.setdefault(core_block_name, {})
+                    core_features = core_block.setdefault("features", {})
+                    deep_merge_dict(core_features, satisfied_core_features)
+
+                    if core_block_name not in profile_caps_list:
+                        profile_caps_list.append(core_block_name)
+
+
+def pull_required_features_profiles_files(vk: VulkanObject, json_files_dict: dict):
+    for key, value in json_files_dict.items():
+        logging.debug(f"Pulling satisfied required features for: {key}")
+        pull_required_features_profiles_file(vk, json_files_dict, value)
+
+
+# -----------------------------------------------------------------------------
+# Phase 3: Structural & Format Feature Aliases
 # -----------------------------------------------------------------------------
 
 def pull_aliases_capabilities_block(
@@ -175,7 +277,6 @@ def pull_aliases_capabilities_block(
     block_exts = set(ext_block.keys()) if isinstance(ext_block, dict) else set(ext_block)
     inherited_exts = set(inherited_caps.get("extensions", {}).keys())
 
-    # Prefer profile-wide enabled extensions if provided (handles multi-block Roadmap profiles)
     enabled_exts = profile_enabled_exts if profile_enabled_exts is not None else (block_exts | inherited_exts)
 
     # 1. Process 2-level categories: "features" and "properties"
@@ -221,7 +322,6 @@ def pull_aliases_capabilities_block(
                                 new_category_block[target_struct].append(target_member)
 
                     elif isinstance(alias, ExtensionCapabilityAlias):
-                        # ONLY record alias if the extension is ALREADY enabled in the profile/context
                         if alias.name in enabled_exts and "extensions" in json_profiles_capabilities_block:
                             target_ext_block = json_profiles_capabilities_block["extensions"]
                             if isinstance(target_ext_block, dict):
@@ -275,7 +375,6 @@ def pull_aliases_profiles_file(vk: VulkanObject, require_promoted_extensions: bo
         required_profile_names = value.get("profiles", [])
         inherited_caps = collect_required_profiles_capabilities(json_files_dict, required_profile_names)
 
-        # Gather aggregate capabilities across ALL mandatory blocks of this profile
         profile_caps = collect_profile_capabilities(json_files_dict, json_file_data, value)
         profile_enabled_exts = set(profile_caps.get("extensions", {}).keys())
 
@@ -292,53 +391,6 @@ def pull_aliases_profiles_files(vk: VulkanObject, require_promoted_extensions: b
     for key, value in json_files_dict.items():
         logging.debug(f"Fill capabilities aliases for: {key}")
         pull_aliases_profiles_file(vk, require_promoted_extensions, json_files_dict, value)
-
-
-# -----------------------------------------------------------------------------
-# Phase 3: Late-Stage Required Features Evaluation (handling "depends")
-# -----------------------------------------------------------------------------
-
-def pull_required_features_profiles_file(vk: VulkanObject, json_files_dict: dict, json_file_data: dict):
-    profiles_data = json_file_data.get("profiles", {})
-
-    for key, profile_obj in profiles_data.items():
-        api_version = VK_VERSION.from_string(profile_obj["api-version"])
-
-        # Gather aggregate capabilities across ALL mandatory blocks of this profile
-        profile_caps = collect_profile_capabilities(json_files_dict, json_file_data, profile_obj)
-        profile_enabled_exts = set(profile_caps.get("extensions", {}).keys())
-        profile_features_block = profile_caps.get("features", {})
-
-        satisfied_features = gatherSatisfiedRequiredFeatures(
-            vk, api_version, profile_enabled_exts, profile_features_block
-        )
-
-        if not satisfied_features:
-            continue
-
-        # Derive pulled core requirements block name (e.g., "vulkan14pulledrequirements")
-        ver_tuple = api_version.as_tuple()
-        if ver_tuple != (-1, -1):
-            block_name = f"vulkan{ver_tuple[0]}{ver_tuple[1]}pulledrequirements"
-        else:
-            block_name = "vulkanpulledrequirements"
-
-        # Create/update the dedicated pulled capability block
-        capabilities_dict = json_file_data.setdefault("capabilities", {})
-        core_block = capabilities_dict.setdefault(block_name, {})
-        core_features = core_block.setdefault("features", {})
-        deep_merge_dict(core_features, satisfied_features)
-
-        # Prepend block_name at index 0 of profile's capabilities list
-        profile_caps_list = profile_obj.setdefault("capabilities", [])
-        if block_name not in profile_caps_list:
-            profile_caps_list.insert(0, block_name)
-
-
-def pull_required_features_profiles_files(vk: VulkanObject, json_files_dict: dict):
-    for key, value in json_files_dict.items():
-        logging.debug(f"Pulling satisfied required features for: {key}")
-        pull_required_features_profiles_file(vk, json_files_dict, value)
 
 
 # -----------------------------------------------------------------------------
@@ -367,17 +419,14 @@ def strip_dict_duplication(target: dict, reference: dict):
         if key in reference:
             ref_value = reference[key]
 
-            # 1. Handle nested dictionaries (e.g. VkPhysicalDeviceProperties -> limits)
             if isinstance(value, dict) and isinstance(ref_value, dict):
                 strip_dict_duplication(value, ref_value)
-                if not value:  # Remove dictionary if empty after stripping
+                if not value:
                     keys_to_delete.append(key)
 
-            # 2. Handle identical primitive values (booleans, numbers, strings)
             elif value == ref_value:
                 keys_to_delete.append(key)
 
-            # 3. Handle list comparisons (e.g. subgroupSupportedOperations or format feature lists)
             elif isinstance(value, list) and isinstance(ref_value, list):
                 try:
                     if sorted(value) == sorted(ref_value):
@@ -391,9 +440,6 @@ def strip_dict_duplication(target: dict, reference: dict):
 
 
 def get_profile_and_file_data(json_files_dict, profile_name: str):
-    """
-    Finds a profile object and its corresponding JSON data across all loaded files.
-    """
     for file_path, json_file_data in json_files_dict.items():
         if isinstance(json_file_data, dict) and "profiles" in json_file_data:
             if profile_name in json_file_data["profiles"]:
@@ -402,10 +448,6 @@ def get_profile_and_file_data(json_files_dict, profile_name: str):
 
 
 def collect_required_profiles_capabilities(json_files_dict, required_profile_names: list[str], visited_profiles: set[str] = None) -> dict:
-    """
-    Recursively collects all mandatory capability sections (extensions, features, properties, formats)
-    required by parent profiles listed in the 'profiles' element. OR (alternative) blocks are excluded.
-    """
     if visited_profiles is None:
         visited_profiles = set()
 
@@ -421,18 +463,16 @@ def collect_required_profiles_capabilities(json_files_dict, required_profile_nam
             logging.error(f"Required parent profile '{profile_name}' not found in loaded JSON files! Stripping will fail for this dependency.")
             continue
 
-        # 1. Recursively collect capabilities from ancestor profiles
         ancestor_profiles = profile_obj.get("profiles", [])
         if ancestor_profiles:
             ancestor_caps = collect_required_profiles_capabilities(json_files_dict, ancestor_profiles, visited_profiles)
             deep_merge_dict(collected_capabilities, ancestor_caps)
 
-        # 2. Collect ONLY mandatory (string / AND) blocks from this parent profile
         capabilities_dict = json_file_data.get("capabilities", {})
         parsed_caps = parse_profile_capabilities(profile_obj.get("capabilities", []))
 
         for item in parsed_caps:
-            if isinstance(item, str):  # Mandatory block
+            if isinstance(item, str):
                 if item in capabilities_dict:
                     deep_merge_dict(collected_capabilities, capabilities_dict[item])
 
@@ -440,14 +480,13 @@ def collect_required_profiles_capabilities(json_files_dict, required_profile_nam
 
 
 def strip_capabilities_block_duplication(json_files_dict, version: VK_VERSION, json_profiles_capabilities_block: dict, collected_capabilities: dict):
-    # 1. Strip duplicate extensions
     if "extensions" in json_profiles_capabilities_block and "extensions" in collected_capabilities:
         stripped_extensions: dict[str, int] = {}
         ref_extensions = collected_capabilities["extensions"]
 
         for extension_name, extension_version in json_profiles_capabilities_block["extensions"].items():
             if extension_name in ref_extensions:
-                continue  # Duplicate extension from parent profile/block
+                continue
             stripped_extensions[extension_name] = extension_version
 
         if stripped_extensions:
@@ -455,7 +494,6 @@ def strip_capabilities_block_duplication(json_files_dict, version: VK_VERSION, j
         else:
             del json_profiles_capabilities_block["extensions"]
 
-    # 2. Strip duplicate features, properties, and formats
     for section in ("features", "properties", "formats"):
         if section in json_profiles_capabilities_block and section in collected_capabilities:
             strip_dict_duplication(json_profiles_capabilities_block[section], collected_capabilities[section])
@@ -468,7 +506,6 @@ def strip_profiles_file_capabilities_duplication(json_files_dict, json_file_data
     json_profiles_capabilities = json_file_data.get("capabilities", {})
 
     for key, value in profiles_data.items():
-        # Initialize baseline with mandatory capabilities inherited from parent profiles
         required_profile_names = value.get("profiles", [])
         collected_capabilities: dict = collect_required_profiles_capabilities(
             json_files_dict, required_profile_names
@@ -479,19 +516,13 @@ def strip_profiles_file_capabilities_duplication(json_files_dict, json_file_data
 
         for item in parsed_caps:
             if isinstance(item, str):
-                # Mandatory (AND) block:
-                # 1. Strip duplicates against accumulated baseline
                 if item in json_profiles_capabilities:
                     strip_capabilities_block_duplication(
                         json_files_dict, version, json_profiles_capabilities[item], collected_capabilities
                     )
-                    # 2. Merge remaining features into the baseline for subsequent blocks
                     deep_merge_dict(collected_capabilities, json_profiles_capabilities[item])
 
             elif isinstance(item, list):
-                # Alternative (OR) group (e.g., ["multisampledToSingleSampled", "shaderStencilExport"]):
-                # 1. Strip EACH alternative against the accumulated mandatory baseline
-                # 2. Do NOT merge alternatives into each other or into the mandatory baseline
                 for alt_block_name in item:
                     if alt_block_name in json_profiles_capabilities:
                         strip_capabilities_block_duplication(
@@ -514,11 +545,9 @@ def consolidate_profiles_file(json_files_dict: dict, json_file_data: dict):
     capabilities_dict = json_file_data.setdefault("capabilities", {})
 
     for profile_name, profile_obj in profiles_data.items():
-        # 1. Collect mandatory capabilities inherited from required parent profiles
         required_profile_names = profile_obj.get("profiles", [])
         consolidated_caps = collect_required_profiles_capabilities(json_files_dict, required_profile_names)
 
-        # 2. Collect mandatory capabilities from the current profile and keep optional (OR) blocks separate
         parsed_caps = parse_profile_capabilities(profile_obj.get("capabilities", []))
         optional_blocks = []
 
@@ -529,7 +558,6 @@ def consolidate_profiles_file(json_files_dict: dict, json_file_data: dict):
             elif isinstance(item, list):
                 optional_blocks.append(item)
 
-        # 3. Create the consolidated unique block and update profile references
         if consolidated_caps:
             consolidated_block_name = f"{profile_name}_requirements"
             capabilities_dict[consolidated_block_name] = consolidated_caps
@@ -537,7 +565,6 @@ def consolidate_profiles_file(json_files_dict: dict, json_file_data: dict):
             profile_obj["capabilities"] = [consolidated_block_name] + optional_blocks
             profile_obj["profiles"] = []
 
-    # Cleanup unreferenced capability blocks in this file
     referenced_blocks = set()
     for prof in profiles_data.values():
         for item in prof.get("capabilities", []):
@@ -555,6 +582,41 @@ def consolidate_profiles_files(json_files_dict: dict):
     for key, value in json_files_dict.items():
         logging.debug(f"Consolidating capabilities for: {key}")
         consolidate_profiles_file(json_files_dict, value)
+
+
+# -----------------------------------------------------------------------------
+# Cleanup and Sorting Helpers
+# -----------------------------------------------------------------------------
+
+def cleanup_and_sort_pulled_blocks(json_file_data: dict):
+    capabilities_dict = json_file_data.get("capabilities", {})
+    profiles_data = json_file_data.get("profiles", {})
+
+    empty_blocks = []
+    for block_name, block_content in capabilities_dict.items():
+        if block_name.endswith("pulledrequirements"):
+            if not block_content or not any(block_content.values()):
+                empty_blocks.append(block_name)
+
+    for block_name in empty_blocks:
+        del capabilities_dict[block_name]
+        for prof in profiles_data.values():
+            caps = prof.get("capabilities", [])
+            if block_name in caps:
+                caps.remove(block_name)
+
+    for prof in profiles_data.values():
+        caps = prof.get("capabilities", [])
+        pulled_blocks = [c for c in caps if isinstance(c, str) and c.endswith("pulledrequirements")]
+        other_blocks = [c for c in caps if not (isinstance(c, str) and c.endswith("pulledrequirements"))]
+
+        def get_ver_key(name: str):
+            nums = re.findall(r'\d+', name)
+            return int(nums[0]) if nums else 0
+
+        pulled_blocks.sort(key=get_ver_key)
+        # Authored blocks MUST precede pulled blocks to maintain baseline precedence
+        prof["capabilities"] = other_blocks + pulled_blocks
 
 
 # -----------------------------------------------------------------------------
@@ -579,16 +641,20 @@ def main_convert(args):
     if ConvertBits.IGNORE_EXTENSION_VERSIONS in mode_enums:
         ignore_extension_versions = True
     
-    # Phase 1: Pull extension dependencies & promoted extensions
+    # Phase 1a: Pull extension dependencies for existing capability blocks
     if ConvertBits.PULL_DEPENDENCES in mode_enums:
-        pull_profiles_files_dependencies(vk, require_promoted_extensions, ignore_extension_versions, json_files_dict)
+        pull_profiles_files_dependencies(vk, ignore_extension_versions, json_files_dict)
 
-    # Phase 2: Expand capability aliases (features, properties, format flags)
+    # Phase 1b: Pull promoted extensions into version-specific vulkan1Xpulledrequirements blocks
+    if ConvertBits.PULL_PROMOTED_EXTENSIONS in mode_enums:
+        pull_promoted_extensions_profiles_files(vk, ignore_extension_versions, json_files_dict)
+
+    # Phase 2: Evaluate & pull satisfied required features into capability blocks
+    pull_required_features_profiles_files(vk, json_files_dict)
+
+    # Phase 3: Expand capability aliases (features, properties, format flags)
     if ConvertBits.PULL_ALIASES in mode_enums:
         pull_aliases_profiles_files(vk, require_promoted_extensions, json_files_dict)
-
-    # Phase 3: Evaluate & pull satisfied required features into dedicated core capability blocks
-    pull_required_features_profiles_files(vk, json_files_dict)
 
     # Phase 4: Strip duplication across profile inheritance hierarchy
     if ConvertBits.STRIP_DUPLICATION in mode_enums:
@@ -597,6 +663,10 @@ def main_convert(args):
     # Phase 5: Consolidate mandatory capability blocks into a single unique block per profile
     if ConvertBits.CONSOLIDATE in mode_enums:
         consolidate_profiles_files(json_files_dict)
+
+    # Cleanup empty pulled blocks & organize capability order
+    for json_file in json_files_dict.values():
+        cleanup_and_sort_pulled_blocks(json_file)
 
     save_profiles_jsons(json_files_dict, Path(args.output), OutputFormatType(args.format))
     

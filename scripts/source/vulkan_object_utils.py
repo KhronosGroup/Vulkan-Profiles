@@ -33,48 +33,23 @@ from base_generator import BaseGenerator, BaseGeneratorOptions, SetOutputDirecto
 from source.vulkan_object_version import VK_VERSION
 from source.vulkan_object_expression_parsing import collectExtensions, evalExpression
 
-# Define the public API for your package
 __all__ = [
     'getVulkanObject',
-    'VulkanObject'  # Exposing the class is good for type-hinting
+    'VulkanObject'
 ]
 
-# Create the simplified, cached public function
 @functools.lru_cache(maxsize=1)
 def initVulkanObject(target_api: str = 'vulkan', alternative_xml: str = None, video: bool = False) -> VulkanObject:
-    """
-    Parses the bundled Vulkan registry (vk.xml) and returns the populated
-    VulkanObject.
-
-    This function encapsulates all the setup logic. The result is cached,
-    so subsequent calls are instantaneous.
-
-    Args:
-        api_name: The API name to parse from the registry, defaults to 'vulkan'.
-        alternative_xml: Supply a full path to a different vk.xml (used for testing future extensions)
-
-    Returns:
-        An initialized VulkanObject instance providing access to the
-        Vulkan API registry data.
-    """
-    # This dummy generator class is required by the reg.py interface.
-    # We don't need it to do anything, as we just want the parsed data object.
     class _InternalGenerator(BaseGenerator):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
 
         def generate(self):
-            # This method is called by reg.apiGen() but we don't need to
-            # generate any files, so we just pass. The real goal is to
-            # populate self.vk (the VulkanObject).
             pass
 
-    # The original script required setting an output directory, even if
-    # it's not used. We'll use a temporary one that cleans itself up.
     with tempfile.TemporaryDirectory() as output_dir:
         SetOutputDirectory(output_dir)
         SetOutputFileName("unused.txt")
-        # TODO - Make a get_vulkan_sc_object() or pass this in as a parameter
         SetTargetApiName(target_api)
         SetMergedApiNames(None)
 
@@ -85,7 +60,6 @@ def initVulkanObject(target_api: str = 'vulkan', alternative_xml: str = None, vi
                 raise FileNotFoundError(f"The provided alternative XML file does not exist or is not a file: {alternative_xml}")
             xml_path = alternative_xml
         else:
-            # Try the installed package resource first
             try:
                 resource_path = importlib.resources.files('vulkan_object').joinpath('vk.xml')
                 if resource_path.is_file():
@@ -93,7 +67,6 @@ def initVulkanObject(target_api: str = 'vulkan', alternative_xml: str = None, vi
             except (ImportError, ModuleNotFoundError, TypeError):
                 xml_path = None
 
-            # Fallback: Check local development path 'src/vulkan_object/vk.xml'
             if xml_path is None:
                 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
                 fallback_path = os.path.join(base_dir, 'vulkan_object', 'vk.xml')
@@ -107,50 +80,32 @@ def initVulkanObject(target_api: str = 'vulkan', alternative_xml: str = None, vi
         if video:
             video_xml_path = xml_path[:-6] + 'video.xml'
 
-        # Initialize the generator and the registry machinery
         generator = _InternalGenerator()
         base_options = BaseGeneratorOptions(videoXmlPath=video_xml_path)
         reg = Registry(generator, base_options)
         tree = ElementTree.parse(xml_path)
         reg.loadElementTree(tree)
 
-        # This invokes reg.py and will populate _InternalGenerator
         reg.apiGen()
 
         return generator.vk
 
 def getStructByName(structs_dict, struct_name):
-    """
-    Retrieves a structure object from the registry dictionary using either
-    its canonical structure name or any of its structure alias names.
-    Returns None if the structure name or alias could not be resolved.
-    """
-    # 1. Direct lookup
     if struct_name in structs_dict:
         return structs_dict[struct_name]
-    
-    # 2. Alias lookup
     return next((struct_obj for struct_obj in structs_dict.values() if struct_name in struct_obj.aliases), None)
 
 def getMemberByName(search_struct, member_name):
-    """
-    Retrieves a member object from the specified structure.
-    Returns None if the structure or the member name is not found.
-    """
     return next((member for member in search_struct.members if member.name == member_name), None)
 
 def gatherCapabilityAliases(vk: VulkanObject, alias_id: CapabilityAlias) -> list[CapabilityAlias]:
-    """Retrieves all alternative capability aliases for a given CapabilityAlias."""
-    
     canonical_key = None
 
-    # Step 1: Resolve the canonical tracking key based on the input type
     if isinstance(alias_id, StructCapabilityAlias):
         struct_obj = getStructByName(vk.structs, alias_id.struct)
         canonical_struct = struct_obj.name if struct_obj else alias_id.struct
         canonical_key = (canonical_struct, alias_id.member)
         
-        # Follow the chain if the canonical member itself points to another structure feature
         if canonical_struct in vk.structs:
             for member in vk.structs[canonical_struct].members:
                 if member.name == alias_id.member and isinstance(member.capabilityAlias, StructCapabilityAlias):
@@ -159,7 +114,6 @@ def gatherCapabilityAliases(vk: VulkanObject, alias_id: CapabilityAlias) -> list
                     break
     
     elif isinstance(alias_id, ExtensionCapabilityAlias):
-        # Extensions lack structural layout, so locate their defining struct member
         for struct_name, struct_obj in vk.structs.items():
             for member in struct_obj.members:
                 if isinstance(member.capabilityAlias, ExtensionCapabilityAlias) and member.capabilityAlias.name == alias_id.name:
@@ -171,18 +125,15 @@ def gatherCapabilityAliases(vk: VulkanObject, alias_id: CapabilityAlias) -> list
         if not canonical_key:
             return []
 
-    # Step 2: Unified Scan and Collection
     aliases = []
     for struct_name, struct_obj in vk.structs.items():
         for member in struct_obj.members:
-            # Determine where the current member resolves to
             if isinstance(member.capabilityAlias, StructCapabilityAlias):
                 target_struct_obj = getStructByName(vk.structs, member.capabilityAlias.struct)
                 current_key = (target_struct_obj.name if target_struct_obj else member.capabilityAlias.struct, member.capabilityAlias.member)
             else:
                 current_key = (struct_name, member.name)
 
-            # If it shares the same canonical root, gather it and its structural/extension variants
             if current_key == canonical_key:
                 aliases.append(StructCapabilityAlias(struct_name, member.name))
                 for alias_struct in struct_obj.aliases:
@@ -191,11 +142,9 @@ def gatherCapabilityAliases(vk: VulkanObject, alias_id: CapabilityAlias) -> list
                 if isinstance(member.capabilityAlias, ExtensionCapabilityAlias) and member.capabilityAlias.name in vk.extensions:
                     aliases.append(ExtensionCapabilityAlias(member.capabilityAlias.name))
 
-    # Step 3: Streamlined filtering to remove the original query item
     return [item for item in aliases if item != alias_id]
 
 def _parse_version_tuple(v) -> tuple[int, int]:
-    """Extracts a (major, minor) version tuple from a VK_VERSION enum, Version object, or string."""
     if v is None:
         return (0, 0)
     s = str(getattr(v, 'name', v))
@@ -207,7 +156,6 @@ def _parse_version_tuple(v) -> tuple[int, int]:
     return (0, 0)
 
 def _get_promoted_core_version(vk: VulkanObject, promoted_to_str: str | None) -> tuple[int, int] | None:
-    """Returns the core version tuple if `promoted_to_str` represents a Vulkan Core version (e.g., 'VK_VERSION_1_2')."""
     if not promoted_to_str:
         return None
     if hasattr(vk, 'versions') and promoted_to_str in vk.versions:
@@ -217,10 +165,6 @@ def _get_promoted_core_version(vk: VulkanObject, promoted_to_str: str | None) ->
     return None
 
 def gatherDependentCapabilityAliases2(vk: VulkanObject, version: VK_VERSION, alias_id: CapabilityAlias) -> list[CapabilityAlias]:
-    """
-    Retrieves capability aliases for a given `alias_id`, filtering out aliases that belong to
-    extensions promoted to a Vulkan core version less than or equal to `version`.
-    """
     aliases = gatherCapabilityAliases(vk, alias_id)
     target_ver_tuple = _parse_version_tuple(version)
 
@@ -234,17 +178,14 @@ def gatherDependentCapabilityAliases2(vk: VulkanObject, version: VK_VERSION, ali
         elif isinstance(alias, StructCapabilityAlias):
             struct_name = alias.struct
 
-            # 1. Check explicit alias requirement mapping
             if hasattr(vk, 'aliasTypeRequirements') and struct_name in vk.aliasTypeRequirements:
                 ext_names.update(vk.aliasTypeRequirements[struct_name].keys())
-            # 2. Check canonical structure defining requirements
             elif struct_name in vk.structs:
                 struct_obj = vk.structs[struct_name]
                 if getattr(struct_obj, 'definingRequirements', None):
                     ext_names.update(struct_obj.definingRequirements.keys())
                 elif getattr(struct_obj, 'extensions', None):
                     ext_names.update(struct_obj.extensions)
-            # 3. Fallback resolution via getStructByName
             else:
                 struct_obj = getStructByName(vk.structs, struct_name)
                 if struct_obj:
@@ -253,7 +194,6 @@ def gatherDependentCapabilityAliases2(vk: VulkanObject, version: VK_VERSION, ali
                     elif getattr(struct_obj, 'extensions', None):
                         ext_names.update(struct_obj.extensions)
 
-        # Only filter out aliases whose defining extension was promoted to Vulkan CORE <= version
         is_promoted_to_core = False
         for ext_name in ext_names:
             if ext_name in vk.extensions:
@@ -269,10 +209,6 @@ def gatherDependentCapabilityAliases2(vk: VulkanObject, version: VK_VERSION, ali
     return filtered_aliases
 
 def _get_struct_core_version(vk: VulkanObject, struct_name: str) -> tuple[int, int] | None:
-    """
-    Returns the Vulkan Core version tuple in which a core structure was introduced,
-    or None if the structure belongs to an extension.
-    """
     if struct_name in vk.structs:
         struct_obj = vk.structs[struct_name]
         if getattr(struct_obj, 'version', None):
@@ -294,28 +230,19 @@ def _get_struct_core_version(vk: VulkanObject, struct_name: str) -> tuple[int, i
     return None
 
 def gatherDependentCapabilityAliases(vk: VulkanObject, version: VK_VERSION, alias_id: CapabilityAlias) -> list[CapabilityAlias]:
-    """
-    Retrieves capability aliases for `alias_id`, filtered according to the target `version`:
-    - If `version` is `VK_VERSION.NONE` (0, 0), no version filtering is applied.
-    - Core structures introduced in a version newer than `version` are filtered out.
-    - Extension capability aliases promoted to a core version <= `version` are filtered out.
-    """
     aliases = gatherCapabilityAliases(vk, alias_id)
     target_ver_tuple = _parse_version_tuple(version)
 
-    # Return all aliases without filtering if target version is NONE
     if target_ver_tuple == (0, 0):
         return aliases
 
     filtered_aliases = []
     for alias in aliases:
-        # Rule 1: Filter out Core structures introduced in a version newer than target version
         if isinstance(alias, StructCapabilityAlias):
             struct_core_ver = _get_struct_core_version(vk, alias.struct)
             if struct_core_ver is not None and target_ver_tuple < struct_core_ver:
                 continue
 
-        # Rule 2: Filter out Extension Capability Aliases promoted to Core <= target version
         if isinstance(alias, ExtensionCapabilityAlias):
             if alias.name in vk.extensions:
                 ext = vk.extensions[alias.name]
@@ -331,7 +258,7 @@ def findExtensionVersion(vk: VulkanObject, extension_name: str) -> int:
     if extension_name in vk.extensions:
         return vk.extensions[extension_name].specVersionValue
     else:
-        return 0 # extension not found
+        return 0
     
 def gatherDependentExtensions(vk: VulkanObject, version: VK_VERSION, ignore_extension_versions: bool, extensions: dict[str, int]) -> dict[str, int]:
     result = {}
@@ -342,10 +269,8 @@ def gatherDependentExtensions(vk: VulkanObject, version: VK_VERSION, ignore_exte
             continue
         
         extension_data = vk.extensions[extension]
-       
         depend_extensions = collectExtensions(version, extension_data.depends)
     
-        # First insert the dependent extensions
         for depend_extension in depend_extensions:
             if depend_extension not in result:
                 if ignore_extension_versions:
@@ -353,7 +278,6 @@ def gatherDependentExtensions(vk: VulkanObject, version: VK_VERSION, ignore_exte
                 else:
                     result[depend_extension] = findExtensionVersion(vk, depend_extension)
             
-        # Then insert the source extension
         if extension not in result:
             if ignore_extension_versions:
                 result[extension] = 1
@@ -362,12 +286,7 @@ def gatherDependentExtensions(vk: VulkanObject, version: VK_VERSION, ignore_exte
     
     return result
 
-
 def gatherDynamicStructs(vk: VulkanObject):
-    """
-    Global discovery function that automatically identifies all Vulkan structures 
-    containing variable-length pointer arrays by scanning metadata within a VulkanObject.
-    """
     discovered = set()
     for struct_name, struct_def in vk.structs.items():
         for member in struct_def.members:
@@ -375,11 +294,7 @@ def gatherDynamicStructs(vk: VulkanObject):
                 discovered.add(struct_name)
     return sorted(list(discovered))
 
-
 def gatherPromotedExtensionsForVersion(vk: VulkanObject, target_version: VK_VERSION) -> dict[str, int]:
-    """
-    Collects all extensions in vk.xml promoted to the target core API version or an earlier core version.
-    """
     promoted_exts = {}
     if target_version == VK_VERSION.NONE:
         return promoted_exts
@@ -394,12 +309,22 @@ def gatherPromotedExtensionsForVersion(vk: VulkanObject, target_version: VK_VERS
 
     return promoted_exts
 
+def gatherPromotedExtensionsForExactVersion(vk: VulkanObject, exact_version: VK_VERSION) -> dict[str, int]:
+    promoted_exts = {}
+    if exact_version == VK_VERSION.NONE:
+        return promoted_exts
+
+    for ext_name, ext_obj in vk.extensions.items():
+        promoted_to = getattr(ext_obj, 'promotedTo', None) or getattr(ext_obj, 'promoted_to', None)
+        if promoted_to:
+            promoted_ver = VK_VERSION.from_string(promoted_to)
+            if promoted_ver == exact_version:
+                spec_version = getattr(ext_obj, 'specVersionValue', None) or findExtensionVersion(vk, ext_name) or 1
+                promoted_exts[ext_name] = spec_version
+
+    return promoted_exts
 
 def gatherRequiredFeaturesForVersion(vk: VulkanObject, target_version: VK_VERSION) -> dict[str, dict[str, bool]]:
-    """
-    Collects all feature requirements defined by the target core API version or earlier core versions in vk.xml.
-    Returns a dictionary structure: { "VkPhysicalDeviceVulkan12Features": { "timelineSemaphore": True, ... } }
-    """
     required_features: dict[str, dict[str, bool]] = {}
     if target_version == VK_VERSION.NONE:
         return required_features
@@ -407,7 +332,6 @@ def gatherRequiredFeaturesForVersion(vk: VulkanObject, target_version: VK_VERSIO
     for ver_name, ver_obj in vk.versions.items():
         ver = VK_VERSION.from_string(ver_name)
         if ver != VK_VERSION.NONE and target_version >= ver:
-            # 1. Direct requiredFeatures attribute
             req_features = getattr(ver_obj, 'requiredFeatures', None) or getattr(ver_obj, 'required_features', None)
             if req_features:
                 if isinstance(req_features, dict):
@@ -420,7 +344,6 @@ def gatherRequiredFeaturesForVersion(vk: VulkanObject, target_version: VK_VERSIO
                         if struct_name and feat_name:
                             required_features.setdefault(struct_name, {})[feat_name] = True
 
-            # 2. Requirements list attribute
             reqs = getattr(ver_obj, 'requirements', None) or []
             for req in reqs:
                 features = getattr(req, 'features', None) or getattr(req, 'requiredFeatures', None) or []
@@ -432,14 +355,9 @@ def gatherRequiredFeaturesForVersion(vk: VulkanObject, target_version: VK_VERSIO
 
     return required_features
 
-
 def isStructExtensionEnabled(vk: VulkanObject, struct_name: str, version: VK_VERSION, enabled_exts: set[str]) -> bool:
-    """
-    Checks whether a structure's defining requirements (extensions or core versions) are satisfied.
-    """
     req_keys = set()
 
-    # 1. Direct struct definingRequirements
     struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
     if struct_obj:
         if hasattr(struct_obj, 'definingRequirements') and struct_obj.definingRequirements:
@@ -447,7 +365,6 @@ def isStructExtensionEnabled(vk: VulkanObject, struct_name: str, version: VK_VER
         elif hasattr(struct_obj, 'extensions') and struct_obj.extensions:
             req_keys.update(struct_obj.extensions)
 
-    # 2. Alias definingRequirements
     if hasattr(vk, 'aliasTypeRequirements') and struct_name in vk.aliasTypeRequirements:
         req_keys.update(vk.aliasTypeRequirements[struct_name].keys())
 
@@ -459,19 +376,15 @@ def isStructExtensionEnabled(vk: VulkanObject, struct_name: str, version: VK_VER
     if not req_keys:
         return True
 
-    # Check if ANY requirement key is satisfied
     for req in req_keys:
-        # Check if req is a core API version (e.g., "VK_VERSION_1_3")
         if req.startswith("VK_VERSION_") or req.startswith("VK_API_VERSION_"):
             ver = VK_VERSION.from_string(req)
             if ver != VK_VERSION.NONE and version != VK_VERSION.NONE and version >= ver:
                 return True
 
-        # Check if req is an enabled extension
         if req in enabled_exts:
             return True
 
-        # Check if req is an extension promoted to 'version' or earlier
         ext_obj = vk.extensions.get(req)
         if ext_obj and getattr(ext_obj, 'promotedTo', None):
             promoted_ver = VK_VERSION.from_string(ext_obj.promotedTo)
@@ -480,7 +393,6 @@ def isStructExtensionEnabled(vk: VulkanObject, struct_name: str, version: VK_VER
 
     return False
 
-
 def evaluateFeatureDepends(
     vk: VulkanObject,
     depends_expr: str | None, 
@@ -488,26 +400,19 @@ def evaluateFeatureDepends(
     enabled_exts: set[str], 
     enabled_features: set[tuple[str, str]]
 ) -> bool:
-    """
-    Evaluates a FeatureRequirement 'depends' expression string against the active version,
-    enabled extensions, and enabled features.
-    """
     if not depends_expr:
         return True
 
     def is_symbol_enabled(token: str) -> bool:
-        # 1. Feature flag reference (e.g. "VkPhysicalDeviceVulkan12Features::descriptorIndexing")
         if "::" in token:
             parts = token.split("::")
             return (parts[0], parts[1]) in enabled_features
 
-        # 2. Core API Version reference (e.g. "VK_VERSION_1_2")
         if token.startswith("VK_VERSION_") or token.startswith("VK_API_VERSION_") or (token and token[0].isdigit()):
             ver = VK_VERSION.from_string(token)
             if ver != VK_VERSION.NONE:
                 return api_version != VK_VERSION.NONE and api_version >= ver
 
-        # 3. Extension name reference (e.g. "VK_KHR_sampler_mirror_clamp_to_edge")
         if token in enabled_exts:
             return True
 
@@ -521,52 +426,58 @@ def evaluateFeatureDepends(
 
     return evalExpression(depends_expr, is_symbol_enabled)
 
-
-def gatherSatisfiedRequiredFeatures(
+def gatherSatisfiedCoreRequiredFeaturesForVersion(
     vk: VulkanObject, 
+    exact_ver: VK_VERSION,
     api_version: VK_VERSION, 
     enabled_exts: set[str], 
-    json_features_block: dict
+    enabled_features: set[tuple[str, str]]
 ) -> dict[str, dict[str, bool]]:
-    """
-    Scans vk.versions and enabled vk.extensions for FeatureRequirements whose 'depends'
-    conditions are satisfied by the current API version, enabled extensions, and active features.
-    """
-    # Build set of currently enabled (struct, member) feature pairs
-    enabled_features: set[tuple[str, str]] = set()
-    for struct_name, members in json_features_block.items():
-        if isinstance(members, dict):
-            for member_name, val in members.items():
-                if val:
-                    enabled_features.add((struct_name, member_name))
-
     satisfied_features: dict[str, dict[str, bool]] = {}
 
-    def process_requirements(req_list, ver: VK_VERSION = None):
-        for req in req_list:
-            if req.depends:
-                # If 'depends' condition exists, evaluate whether it's satisfied
-                if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
-                    fields = [f.strip() for f in req.field.split(',')] if req.field else []
-                    for field_name in fields:
-                        satisfied_features.setdefault(req.struct, {})[field_name] = True
-            else:
-                # Unconditional requirement: only active if part of enabled extension (ver is None) 
-                # or if core version is <= api_version
-                if ver is None or (ver != VK_VERSION.NONE and api_version != VK_VERSION.NONE and ver <= api_version):
-                    fields = [f.strip() for f in req.field.split(',')] if req.field else []
-                    for field_name in fields:
-                        satisfied_features.setdefault(req.struct, {})[field_name] = True
+    if exact_ver == VK_VERSION.NONE or api_version == VK_VERSION.NONE or exact_ver > api_version:
+        return satisfied_features
 
-    # 1. Process featureRequirements across ALL core Vulkan versions
-    for ver_name, ver_obj in vk.versions.items():
-        ver = VK_VERSION.from_string(ver_name)
-        process_requirements(getattr(ver_obj, 'featureRequirement', []), ver)
+    ver_obj = vk.versions.get(exact_ver.value)
+    if not ver_obj:
+        return satisfied_features
 
-    # 2. Process featureRequirements across ALL enabled extensions
-    for ext_name in enabled_exts:
-        if ext_name in vk.extensions:
-            ext_obj = vk.extensions[ext_name]
-            process_requirements(getattr(ext_obj, 'featureRequirement', []), ver=None)
+    for req in getattr(ver_obj, 'featureRequirement', []):
+        if req.depends:
+            if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
+                fields = [f.strip() for f in req.field.split(',')] if req.field else []
+                for field_name in fields:
+                    satisfied_features.setdefault(req.struct, {})[field_name] = True
+        else:
+            fields = [f.strip() for f in req.field.split(',')] if req.field else []
+            for field_name in fields:
+                satisfied_features.setdefault(req.struct, {})[field_name] = True
 
     return satisfied_features
+
+def gatherSatisfiedExtensionRequiredFeatures(
+    vk: VulkanObject, 
+    ext_name: str, 
+    api_version: VK_VERSION, 
+    enabled_exts: set[str], 
+    enabled_features: set[tuple[str, str]]
+) -> dict[str, dict[str, bool]]:
+    satisfied_features: dict[str, dict[str, bool]] = {}
+
+    if ext_name not in vk.extensions:
+        return satisfied_features
+
+    ext_obj = vk.extensions[ext_name]
+    for req in getattr(ext_obj, 'featureRequirement', []):
+        if req.depends:
+            if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
+                fields = [f.strip() for f in req.field.split(',')] if req.field else []
+                for field_name in fields:
+                    satisfied_features.setdefault(req.struct, {})[field_name] = True
+        else:
+            fields = [f.strip() for f in req.field.split(',')] if req.field else []
+            for field_name in fields:
+                satisfied_features.setdefault(req.struct, {})[field_name] = True
+
+    return satisfied_features
+
