@@ -25,8 +25,8 @@
                 "VK_KHR_external_fence": 1,
                 "VK_KHR_external_fence_fd": 1,
                 "VK_KHR_variable_pointers": 1,
-                "VK_ANDROID_external_memory_android_hardware_buffer": 1,
                 "VK_EXT_queue_family_foreign": 1,
+                "VK_ANDROID_external_memory_android_hardware_buffer": 1,
                 "VK_KHR_driver_properties": 1,
                 "VK_KHR_create_renderpass2": 1,
                 "VK_KHR_sampler_mirror_clamp_to_edge": 1
@@ -52,13 +52,34 @@
                 "VkPhysicalDeviceMultiviewFeatures": {
                     "multiview": true
                 },
+                "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                    "multiview": true
+                },
                 "VkPhysicalDeviceSamplerYcbcrConversionFeatures": {
+                    "samplerYcbcrConversion": true
+                },
+                "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
                     "samplerYcbcrConversion": true
                 },
                 "VkPhysicalDeviceShaderDrawParametersFeatures": {
                     "shaderDrawParameters": true
                 },
+                "VkPhysicalDeviceShaderDrawParameterFeatures": {
+                    "shaderDrawParameters": true
+                },
                 "VkPhysicalDeviceVariablePointersFeatures": {
+                    "variablePointers": true,
+                    "variablePointersStorageBuffer": true
+                },
+                "VkPhysicalDeviceVariablePointerFeatures": {
+                    "variablePointers": true,
+                    "variablePointersStorageBuffer": true
+                },
+                "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                    "variablePointers": true,
+                    "variablePointersStorageBuffer": true
+                },
+                "VkPhysicalDeviceVariablePointersFeaturesKHR": {
                     "variablePointers": true,
                     "variablePointersStorageBuffer": true
                 }
@@ -144,6 +165,10 @@
                     }
                 },
                 "VkPhysicalDeviceMultiviewProperties": {
+                    "maxMultiviewInstanceIndex": 134217727,
+                    "maxMultiviewViewCount": 6
+                },
+                "VkPhysicalDeviceMultiviewPropertiesKHR": {
                     "maxMultiviewInstanceIndex": 134217727,
                     "maxMultiviewViewCount": 6
                 }
@@ -773,6 +798,28 @@
                     }
                 }
             }
+        },
+        "vulkan11pulledrequirements": {
+            "extensions": {
+                "VK_KHR_multiview": 1,
+                "VK_KHR_device_group_creation": 1,
+                "VK_KHR_device_group": 1,
+                "VK_KHR_shader_draw_parameters": 1,
+                "VK_KHR_16bit_storage": 1,
+                "VK_KHR_maintenance2": 1,
+                "VK_KHR_relaxed_block_layout": 1,
+                "VK_KHR_sampler_ycbcr_conversion": 1,
+                "VK_KHR_bind_memory2": 1,
+                "VK_KHR_maintenance3": 1
+            },
+            "features": {
+                "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                    "storageBuffer16BitAccess": true
+                },
+                "VkPhysicalDevice16BitStorageFeatures": {
+                    "storageBuffer16BitAccess": true
+                }
+            }
         }
     },
     "profiles": {
@@ -813,7 +860,7 @@
                     "comment": "Renamed/rebranded from 'VP_ANDROID_baseline_2022' (a.k.a. Android Baseline Profile 2022 or ABP 2022) to 'VP_ANDROID_vulkan_profile_2022' (a.k.a. Android Vulkan Profile 2022 or AVP 2022)"
                 }
             ],
-            "capabilities": ["baseline"]
+            "capabilities": ["baseline", "vulkan11pulledrequirements"]
         }
     }
 }
