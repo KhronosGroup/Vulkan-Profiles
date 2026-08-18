@@ -29,6 +29,7 @@ from source.main_validate import main_validate
 from source.main_layer import main_layer
 from source.main_tests import main_tests
 from source.main_merge import main_merge
+from source.main_library import main_library
 
 
 def main(argv):
@@ -72,6 +73,18 @@ def main(argv):
     solution_parser.add_argument('--mode', '-m', action='store', choices=['union', 'intersection'], default='intersection', help='Mode of profile combination.')
     solution_parser.add_argument('--strip-duplicate-structs', action='store_true', help='Strip the duplicated structures in the generated profiles file.')
 
+    library_parser = subparsers.add_parser('library', help='Generate the Vulkan profiles C/C++ API library headers and source files.')
+    library_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
+    library_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
+    library_parser.add_argument('--input', '-i', action='store', required=True, help='Path to directory with profiles.')
+    library_parser.add_argument('--input-filenames', action='store', help='Comma separated list of profile filenames.')
+    library_parser.add_argument('--output-inc', '--output-library-inc', action='store', help='Output include directory for profile library.')
+    library_parser.add_argument('--output-src', '--output-library-src', action='store', help='Output source directory for profile library.')
+    library_parser.add_argument('--output-filename', '--output-library-filename', action='store', default='vulkan_profiles', help='Output filename for profile library, default "vulkan_profiles".')
+    library_parser.add_argument('--validate', '-v', action='store_true', help='Validate generated JSON profile schema and JSON profiles against the schema.')
+    library_parser.add_argument('--debug', '-d', action='store_true', help='Also generate library variant with debug messages.')
+    library_parser.add_argument('--config', '-c', action='store', default='release', choices=['release', 'debug'], help='Select build configuration.')
+
     layer_parser = subparsers.add_parser('layer', help='Generate the Vulkan profiles layer source file.')
     layer_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     layer_parser.add_argument('--registry', '-r', action='store', help='Use specified registry file instead of vk.xml.')
@@ -91,11 +104,13 @@ def main(argv):
         main_validate(args)
     elif args.command == 'schema':
         main_schema(args)
-    elif args.command in 'merge':
+    elif args.command == 'merge':
         main_merge(args)
+    elif args.command in 'library':
+        main_library(args)
     elif args.command == 'layer':
         main_layer(args)
-    elif args.command in 'tests':
+    elif args.command == 'tests':
         main_tests(args)
     else:
         parser.print_help()
@@ -105,3 +120,4 @@ if __name__ == '__main__':
     print(sys.executable)
     
     sys.exit(main(sys.argv[1:]))
+    
