@@ -21,6 +21,8 @@
 
 import sys
 import gen_profiles_solution
+from source.vulkan_object_utils import initVulkanObject
+from source.generate_profiles_schema import VulkanProfilesSchemaGenerator2
 
 
 def main_library(args):
@@ -34,7 +36,8 @@ def main_library(args):
     validate = getattr(args, 'validate', False)
     schema = None
     if validate:
-        schema_gen = gen_profiles_solution.VulkanProfilesSchemaGenerator(registry)
+        vk = initVulkanObject(api, args.registry or None)
+        schema_gen = VulkanProfilesSchemaGenerator2(vk)
         schema_gen.validate()
         schema = schema_gen.schema
 
@@ -61,3 +64,4 @@ def main_library(args):
         registry, input_profiles_files, output_filename, debug
     )
     generator.generate(out_inc, out_src)
+    

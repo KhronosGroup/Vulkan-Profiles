@@ -64,16 +64,6 @@ add_custom_target(VpGenerate-ProfilesSchema
         --api ${API_TYPE}
     VERBATIM)
 
-#    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-#        ${VENV_PYTHON_EXECUTABLE} ${SOLUTION_SCRIPT}
-#        --api ${API_TYPE}
-#        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-#        --output-schema ${PROJECT_SOURCE_DIR}/schema/${PROFILES_SCHEMA_FILENAME}
-#        --validate
-#    VERBATIM
-#    SOURCES ${SOLUTION_SCRIPT}
-#    DEPENDS ${SOLUTION_SCRIPT} python_venv)
-
 set_target_properties(VpGenerate-ProfilesSchema PROPERTIES FOLDER "Profiles schema")
 add_dependencies(VpGenerate-ProfilesSchema VpProfilesProcessor python_venv)
 
