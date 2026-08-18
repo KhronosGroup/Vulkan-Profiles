@@ -25,11 +25,17 @@ if(BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
-execute_process(COMMAND ${CMAKE_COMMAND} -E touch  ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp)
-execute_process(COMMAND ${CMAKE_COMMAND} -E touch  ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp)
+execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp)
+execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp)
 
 set_source_files_properties(${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp PROPERTIES GENERATED true)
 set_source_files_properties(${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp PROPERTIES GENERATED true)
+
+if(WIN32)
+    set(VKPROFILES_EXE "${PROJECT_SOURCE_DIR}/scripts/vkprofiles.exe")
+else()
+    set(VKPROFILES_EXE "${PROJECT_SOURCE_DIR}/scripts/vkprofiles")
+endif()
 
 if(WIN32)
     # We need -DNOMINMAX for valijson build
@@ -123,15 +129,7 @@ else()
     target_link_options(ProfilesLayer PRIVATE LINKER:--version-script=${CMAKE_CURRENT_SOURCE_DIR}/${LAYER_NAME}.map,-Bsymbolic,--exclude-libs,ALL)
 endif()
 
-set(TESTS_PYTHON_SCRIPT ${CMAKE_SOURCE_DIR}/scripts/gen_profiles_tests.py)
-set(LAYER_PYTHON_SCRIPT ${CMAKE_SOURCE_DIR}/scripts/gen_profiles_layer.py)
-set(PYTHON_SCRIPTS
-    ${LAYER_PYTHON_SCRIPT}
-    ${TESTS_PYTHON_SCRIPT}
-    ${CMAKE_SOURCE_DIR}/scripts/gen_profiles_solution.py
-)
-
-source_group("Python Files" FILES ${PYTHON_SCRIPTS})
+source_group("Python Files" FILES ${PROFILES_SCRIPT})
 
 target_sources(ProfilesLayer PRIVATE
     profiles_settings.cpp
@@ -149,7 +147,7 @@ target_sources(ProfilesLayer PRIVATE
     ${LAYER_NAME}.json.in
     ${LAYER_NAME}.def
     ${LAYER_NAME}.map
-    ${PYTHON_SCRIPTS}
+    ${PROFILES_SCRIPT}
 )
 
 target_link_libraries(ProfilesLayer PRIVATE
@@ -168,35 +166,30 @@ if(ANDROID)
 endif()
 
 add_custom_target(VpLayer_generate ALL
-    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${VENV_PYTHON_EXECUTABLE} ${LAYER_PYTHON_SCRIPT}
+    COMMAND ${VKPROFILES_EXE} layer
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-        --out-layer ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp
+        --output ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp
     VERBATIM
-    SOURCES ${LAYER_PYTHON_SCRIPT}
-    DEPENDS ${LAYER_PYTHON_SCRIPT}
-            ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+    DEPENDS ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
             ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/video.xml
+            VpProfilesProcessor
             python_venv)
 set_target_properties(VpLayer_generate PROPERTIES FOLDER "Profiles layer")
 add_dependencies(ProfilesLayer VpLayer_generate)
 
-source_group("Python Files" FILES ${TESTS_PYTHON_SCRIPT})
 add_custom_target(VpLayer_generate_tests ALL
-	COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${VENV_PYTHON_EXECUTABLE} ${TESTS_PYTHON_SCRIPT}
-		--api ${API_TYPE}
-		--registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-		--out-profile ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_api_generated.json
-		--out-tests ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp
-	VERBATIM
-    SOURCES ${TESTS_PYTHON_SCRIPT}
-	DEPENDS ${TESTS_PYTHON_SCRIPT}
-            ProfilesLayer
+    COMMAND ${VKPROFILES_EXE} tests
+        --api ${API_TYPE}
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --out-profile ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_api_generated.json
+        --output ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp
+    VERBATIM
+    DEPENDS ProfilesLayer
             VpLayer_generate
+            VpProfilesProcessor
             python_venv
-	)
+)
 set_target_properties(VpLayer_generate_tests PROPERTIES FOLDER "Profiles layer")
 
 set(INPUT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${LAYER_NAME}.json.in")
