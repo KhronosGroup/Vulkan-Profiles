@@ -19,4 +19,45 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
+import sys
+import gen_profiles_solution
 
+
+def main_library(args):
+    if not args.registry or not args.input:
+        gen_profiles_solution.Log.e("Generating the profile library requires specifying --registry and --input")
+        sys.exit(1)
+
+    api = getattr(args, 'api', 'vulkan') or 'vulkan'
+    registry = gen_profiles_solution.VulkanRegistry(args.registry, api)
+
+    validate = getattr(args, 'validate', False)
+    schema = None
+    if validate:
+        schema_gen = gen_profiles_solution.VulkanProfilesSchemaGenerator(registry)
+        schema_gen.validate()
+        schema = schema_gen.schema
+
+    profiles_filenames = []
+    input_filenames = getattr(args, 'input_filenames', None)
+    if input_filenames:
+        profiles_filenames = input_filenames.split(',')
+
+    input_profiles_files = gen_profiles_solution.VulkanProfilesFiles(
+        registry, args.input, profiles_filenames, validate, schema
+    )
+
+    debug = getattr(args, 'debug', False) or (getattr(args, 'config', 'release').lower() == 'debug')
+    output_filename = getattr(args, 'output_filename', None) or 'vulkan_profiles'
+
+    out_inc = getattr(args, 'output_inc', None)
+    out_src = getattr(args, 'output_src', None)
+
+    if not out_inc and not out_src:
+        gen_profiles_solution.Log.e("At least one output directory (--output-inc or --output-src) must be provided")
+        sys.exit(1)
+
+    generator = gen_profiles_solution.VulkanProfilesLibraryGenerator(
+        registry, input_profiles_files, output_filename, debug
+    )
+    generator.generate(out_inc, out_src)
