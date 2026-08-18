@@ -23,10 +23,11 @@
 from datetime import datetime
 import argparse
 import json
-import gen_profiles_solution
 import re
 import os
 import collections
+
+import gen_profiles_solution
 
 class ProfileFile():
     def __init__(self):
@@ -63,7 +64,7 @@ class ProfileFile():
         self.json_output['profiles'][json_profile_key] = json_profile_value
 
     def dump(self, path):
-        # Wite new merged profile
+        # Write new merged profile
         with open(path, 'w') as file:
             json.dump(self.json_output, file, indent = 4)
 
@@ -121,8 +122,8 @@ class ProfileConfig():
                 file = open(paths[i], "r")
                 json_files.append(json.load(file))
             # We need to iterate through profile names first, so the indices of jsons and profiles lists will match
-            if (len(input_profile_names) > 0):
-                for profile_name in input_profile_names:
+            if (len(self.input_profile_names) > 0):
+                for profile_name in self.input_profile_names:
                     for json_file in json_files:
                         if 'profiles' in json_file and profile_name in json_file['profiles']:
                             self.input_jsons.append(json_file)
@@ -131,7 +132,7 @@ class ProfileConfig():
                             profiles_not_found.remove(profile_name)
                             break
                 if profiles_not_found:
-                    print('Profiles: ' + ' '.join(profiles_not_found) + ' not found in directory ' + args.input)
+                    print('Profiles: ' + ' '.join(profiles_not_found) + ' not found in directory ' + input_dir)
                     exit()
             else:
                 for json_file in json_files:
@@ -232,9 +233,6 @@ class ProfileMerger():
                 if 'extensions' in capability:
                     if self.mode == 'union' or self.first:
                         for extension in capability['extensions']:
-                            # vk_version = self.get_promoted_version(self.registry.extensions[extension].promotedTo)
-                            # Check if the extension was not promoted in the version used
-                            # if vk_version is None or (vk_version[0] > api_version[0]) or (vk_version[0] == api_version[0] and vk_version[1] > api_version[1]):
                             merged_extensions[extension] = capability['extensions'][extension]
                     elif self.mode == 'intersection':
                         for extension in list(merged_extensions):
@@ -293,7 +291,7 @@ class ProfileMerger():
                                 # Add this structure
                                 self.add_struct(property, capability['properties'][property], merged_properties)
                                 # Combine all other extension structures (which are promoted to this version) into this structure
-                                self.promote_structs(feature, merged_properties, True)
+                                self.promote_structs(property, merged_properties, True)
                             else:
                                 aliases = self.registry.structs[property].aliases
                                 for alias in aliases:
@@ -321,10 +319,6 @@ class ProfileMerger():
                                 for features in ['linearTilingFeatures', 'optimalTilingFeatures', 'bufferFeatures']:
                                     self.merge_format_features(merged_formats, format, capability, prop_name, features)
 
-                            # Remove empty entries (can occur when using intersect)
-                            #if not dict(merged_formats[format]['VkFormatProperties']) and not dict(merged_formats[format]['VkFormatProperties3']) and not dict(merged_formats[format]['VkFormatProperties3KHR']):
-                            #    del merged_formats[format]
-
                 if 'queueFamiliesProperties' in capability:
                     if self.mode == 'intersection':
                         # If this is the first json just append all queue family properties
@@ -335,18 +329,6 @@ class ProfileMerger():
                         else:
                             for mqfp in list(merged_qfp):
                                 found = False
-                                #if self.compareList(mqfp['VkQueueFamilyProperties']['queueFlags'], qfp['VkQueueFamilyProperties']['queueFlags']):
-                                #    found = True
-                                #    if (qfp['VkQueueFamilyProperties']['queueCount'] < mqfp['VkQueueFamilyProperties']['queueCount']):
-                                #        mqfp['VkQueueFamilyProperties']['queueCount'] = qfp['VkQueueFamilyProperties']['queueCount']
-                                #    if (qfp['VkQueueFamilyProperties']['timestampValidBits'] < mqfp['VkQueueFamilyProperties']['timestampValidBits']):
-                                #        mqfp['VkQueueFamilyProperties']['timestampValidBits'] = qfp['VkQueueFamilyProperties']['timestampValidBits']
-                                #    if (qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width'] > mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width']):
-                                #        mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width'] = qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width']
-                                #    if (qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height'] > mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height']):
-                                #        mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height'] = qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height']
-                                #    if (qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth'] > mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth']):
-                                #        mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth'] = qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth']
                                 for qfp in capability['queueFamiliesProperties']:
                                     if mqfp['VkQueueFamilyProperties']['queueFlags'] != qfp['VkQueueFamilyProperties']['queueFlags']:
                                         continue
@@ -552,20 +534,9 @@ class ProfileMerger():
     def promote_structs(self, promoted, merged, feature):
         for struct in dict(merged):
             if self.get_promoted_struct_name(struct, feature) == promoted and struct is not promoted:
-                # Union
                 if self.mode == 'union':
                     for member in merged[struct]:
                         merged[promoted][member] = merged[struct][member]
-                # Intersect
-                #elif self.mode == 'intersection':
-                #    if promoted in merged:
-                #        for member in list(merged[promoted]):
-                #            if member not in merged[struct]:
-                #                del merged[promoted][member]
-                #else:
-                #    print("ERROR: Unknown combination mode: " + self.mode)
-                #del merged[struct]
-
 
     def get_promoted_struct_name(self, struct, feature):
         # Workaround, because Vulkan11 structs were added in vulkan 1.2
@@ -584,8 +555,8 @@ class ProfileMerger():
         else:
             aliases = self.registry.structs[struct].aliases
             for alias in aliases:
-                if registry.structs[alias].definedByVersion:
-                    version = registry.structs[alias].definedByVersion
+                if self.registry.structs[alias].definedByVersion:
+                    version = self.registry.structs[alias].definedByVersion
                     break
         if version is None:
             return False
@@ -627,8 +598,7 @@ class ProfileMerger():
                 xmlmember = self.registry.structs[property].members[member]
                 if (xmlmember.limittype == 'exact' or xmlmember.limittype == 'noauto') and not xmlmember.isDynamicallySizedArrayWithCap():
                     del merged[member]
-                #elif 'mul'  in xmlmember.limittype and xmlmember.type == 'float':
-                #    del merged[member]
+
         for member in entry:
             if property is None:
                 if self.mode == 'union' or self.first is True:
@@ -664,14 +634,6 @@ class ProfileMerger():
         if (xmlmember.limittype == 'exact' or xmlmember.limittype == 'noauto') and not xmlmember.isDynamicallySizedArrayWithCap():
             del merged[member]
         elif self.mode == 'union':
-            #if xmlmember.limittype == 'exact':
-                #if merged[member] != entry[member]:
-                    # merged.remove(member)
-                    # del merged[member]
-                    # del entry[member]
-                    #print("ERROR: '" + member + " 'values with 'exact' limittype have different values.")
-            #if 'mul'  in xmlmember.limittype and xmlmember.type == 'float':
-            #    del merged[member]
             if 'max' in xmlmember.limittype or xmlmember.limittype == 'bits':
                 if xmlmember.type == 'VkExtent2D':
                     if entry[member]['width'] > merged[member]['width']:
@@ -737,14 +699,6 @@ class ProfileMerger():
             else:
                 print("ERROR: Unknown limitype: " + xmlmember.limittype + " for " + member)
         elif self.mode == 'intersection':
-            #if xmlmember.limittype == 'exact':
-                #if merged[member] != entry[member]:
-                    #merged.remove(member)
-                    #del merged[member]
-                    #del entry[member]
-                    #print("ERROR: '" + member + " 'values with 'exact' limittype have different values.")
-            #if 'mul'  in xmlmember.limittype and xmlmember.type == 'float':
-            #    del merged[member]
             if 'max' in xmlmember.limittype or xmlmember.limittype == 'bits':
                 if xmlmember.type == 'VkExtent2D':
                     if entry[member]['width'] < merged[member]['width']:
@@ -823,8 +777,6 @@ class ProfileMerger():
                     merged[member][0] = entry[member][0]
                 if entry[member][1] < merged[member][1]:
                     merged[member][1] = entry[member][1]
-                #if member[1] < member[0]:
-                #    merged.pop(member, None)
             elif xmlmember.isDynamicallySizedArrayWithCap():
                 entry_set = set(merged[member])
                 merged_set = set(entry[member])
@@ -836,21 +788,21 @@ class ProfileMerger():
             print("ERROR: Unknown combination mode: " + self.mode)
 
     def find_higher_struct(self, struct1, struct2):
-        if registry.structs[struct1].definedByVersion:
+        if self.registry.structs[struct1].definedByVersion:
             return struct1
-        if registry.structs[struct2].definedByVersion:
+        if self.registry.structs[struct2].definedByVersion:
             return struct2
         ext1_ext = False
         ext1_other = False
         ext2_ext = False
         ext2_other = False
-        for ext in registry.structs[struct1].definedByExtensions:
-            if registry.extensions[ext].name[3:6] == 'EXT':
+        for ext in self.registry.structs[struct1].definedByExtensions:
+            if self.registry.extensions[ext].name[3:6] == 'EXT':
                 ext1_ext = True
             else:
                 ext1_other = True
-        for ext in registry.structs[struct2].definedByExtensions:
-            if registry.extensions[ext].name[3:6] == 'EXT':
+        for ext in self.registry.structs[struct2].definedByExtensions:
+            if self.registry.extensions[ext].name[3:6] == 'EXT':
                 ext2_ext = True
             else:
                 ext2_other = True
@@ -999,8 +951,6 @@ if __name__ == '__main__':
         json_file = open(args.config, "r")
         json_data = json.load(json_file)
 
-        #if json_data["$schema"]:
-        #    profile_file.set_schema(json_data["$schema"])
         if json_data["contributors"]:
             profile_file.set_contributors(json_data["contributors"])
         if json_data["history"]:
@@ -1021,5 +971,4 @@ if __name__ == '__main__':
             strip_duplicate_struct)
 
     profile_file.dump(args.output_path)
-
-
+    

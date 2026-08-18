@@ -87,22 +87,20 @@ set(PROFILE_DESKTOP_MAX_2026_API_VERSION "1.4.353")
 
 # Generate profiles files
 add_custom_target(VpGenerate-ProfilesDesktopMax ALL
-    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${VENV_PYTHON_EXECUTABLE} ${MERGE_SCRIPT}
+    COMMAND ${VKPROFILES_EXE} merge
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_max_2024
-        --output-path ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_desktop_max_2024.json
+        --output ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_desktop_max_2024.json
         --output-profile VP_LUNARG_desktop_max_2024
         --profile-label ${PROFILE_DESKTOP_MAX_2024_LABEL}
         --profile-desc ${PROFILE_DESKTOP_MAX_2024_DESC}
         --profile-date 2023-11-01
         --profile-stage BETA
         --profile-api-version ${PROFILE_DESKTOP_MAX_2024_API_VERSION}
-    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${VENV_PYTHON_EXECUTABLE} ${MERGE_SCRIPT}
+    COMMAND ${VKPROFILES_EXE} merge
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_max_2026
-        --output-path ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_desktop_max_2026.json
+        --output ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_desktop_max_2026.json
         --output-profile VP_LUNARG_desktop_max_2026
         --profile-label ${PROFILE_DESKTOP_MAX_2026_LABEL}
         --profile-desc ${PROFILE_DESKTOP_MAX_2026_DESC}
@@ -110,8 +108,8 @@ add_custom_target(VpGenerate-ProfilesDesktopMax ALL
         --profile-stage BETA
         --profile-api-version ${PROFILE_DESKTOP_MAX_2026_API_VERSION}
     VERBATIM
-    SOURCES ${MERGE_SCRIPT} ${PROFILES_FILES}
-    DEPENDS ${MERGE_SCRIPT} ${PROFILES_FILES} python_venv)
+    SOURCES ${PROFILES_FILES}
+    DEPENDS ${PROFILES_FILES} python_venv)
 set_target_properties(VpGenerate-ProfilesDesktopMax PROPERTIES FOLDER "Profiles generator")
 add_dependencies(VpGenerate-ProfilesDesktopMax VpGenerate-ProfilesSchema)
 
