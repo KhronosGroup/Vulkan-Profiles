@@ -22,7 +22,7 @@ if (BUILD_TESTS AND NOT ANDROID)
 endif()
 
 file(GLOB PROFILES_FILES ${CMAKE_CURRENT_LIST_DIR})
-source_group("Python Files" FILES ${MERGE_SCRIPT} ${SOLUTION_SCRIPT})
+source_group("Python Files" FILES ${PROFILES_SCRIPT})
 
 set(PROFILES_FILES_FOR_INSTALL
     Khronos/VP_KHR_roadmap.json
@@ -104,8 +104,7 @@ set_target_properties(VpGenerate-ProfilesDesktopMax PROPERTIES FOLDER "Profiles 
 add_dependencies(VpGenerate-ProfilesDesktopMax VpGenerate-ProfilesSchema)
 
 add_custom_target(VpGenerate-ProfilesDesktopBaseline ALL
-    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${VENV_PYTHON_EXECUTABLE} ${MERGE_SCRIPT}
+    COMMAND ${VKPROFILES_EXE} merge
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --config ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline_config.json
         --output-path ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline.json
@@ -113,8 +112,8 @@ add_custom_target(VpGenerate-ProfilesDesktopBaseline ALL
     COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline.json ${CMAKE_CURRENT_LIST_DIR}
     VERBATIM
-    SOURCES ${MERGE_SCRIPT} ${PROFILES_FILES}
-    DEPENDS ${MERGE_SCRIPT} ${PROFILES_FILES} python_venv)
+    SOURCES ${PROFILES_FILES}
+    DEPENDS ${PROFILES_FILES} python_venv)
 set_target_properties(VpGenerate-ProfilesDesktopBaseline PROPERTIES FOLDER "Profiles generator")
 add_dependencies(VpGenerate-ProfilesDesktopBaseline VpGenerate-ProfilesSchema)
 
@@ -128,16 +127,11 @@ add_custom_target(VpGenerate-Libraries
         ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/profiles/VP_KHR_roadmap.json
     #    ${CMAKE_CURRENT_LIST_DIR}/Khronos/VP_KHR_roadmap.json
         ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_minimum_requirements.json ${CMAKE_CURRENT_LIST_DIR}
-    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${VENV_PYTHON_EXECUTABLE} ${SOLUTION_SCRIPT}
+    COMMAND ${VKPROFILES_EXE} validate
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
-        --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY}
-        --output-schema ${PROJECT_SOURCE_DIR}/schema/${PROFILES_SCHEMA_FILENAME}
-        --validate
-    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${VENV_PYTHON_EXECUTABLE} ${SOLUTION_SCRIPT}
+    COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
@@ -146,8 +140,7 @@ add_custom_target(VpGenerate-Libraries
         --output-library-src ${PROJECT_SOURCE_DIR}/library/source
         --output-library-filename "vulkan_profiles"
         --config release
-    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${VENV_PYTHON_EXECUTABLE} ${SOLUTION_SCRIPT}
+    COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
@@ -156,8 +149,7 @@ add_custom_target(VpGenerate-Libraries
         --output-library-src ${PROJECT_SOURCE_DIR}/library/source/debug
         --output-library-filename "vulkan_profiles"
         --config debug
-    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${VENV_PYTHON_EXECUTABLE} ${SOLUTION_SCRIPT}
+    COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/Android
@@ -166,8 +158,7 @@ add_custom_target(VpGenerate-Libraries
         --output-library-src ${PROJECT_SOURCE_DIR}/library/test
         --output-library-filename "generated_vulkan_profiles_android"
         --config release
-    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${VENV_PYTHON_EXECUTABLE} ${SOLUTION_SCRIPT}
+    COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
@@ -176,8 +167,7 @@ add_custom_target(VpGenerate-Libraries
         --output-library-src ${PROJECT_SOURCE_DIR}/library/test
         --output-library-filename "generated_vulkan_profiles"
         --config release
-    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${VENV_PYTHON_EXECUTABLE} ${SOLUTION_SCRIPT}
+    COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
@@ -187,88 +177,81 @@ add_custom_target(VpGenerate-Libraries
         --output-library-filename "generated_vulkan_profiles_debug"
         --config debug
     VERBATIM
-    SOURCES ${SOLUTION_SCRIPT} ${PROFILES_FILES}
-    DEPENDS ${SOLUTION_SCRIPT} ${PROFILES_FILES} python_venv)
+    SOURCES ${PROFILES_FILES}
+    DEPENDS ${PROFILES_FILES} python_venv)
 set_target_properties(VpGenerate-Libraries PROPERTIES FOLDER "Profiles generator")
 add_dependencies(VpGenerate-Libraries VpGenerate-ProfilesDesktopBaseline VpGenerate-ProfilesDesktopMax)
 
 add_custom_target(VpGenerate-Markdown
-    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${VENV_PYTHON_EXECUTABLE} ${SOLUTION_SCRIPT}
+    COMMAND ${VKPROFILES_EXE} doc
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
         --input-filenames ${PROFILES_FILES_FOR_VULKAN_HEADER_DOC}
-        --output-doc ${PROJECT_SOURCE_DIR}/PROFILES.md
-    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${VENV_PYTHON_EXECUTABLE} ${SOLUTION_SCRIPT}
+        --output ${PROJECT_SOURCE_DIR}/PROFILES.md
+    COMMAND ${VKPROFILES_EXE} doc
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
         --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY}
-        --output-doc ${PROJECT_SOURCE_DIR}/PROFILES_ALL.md
-    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${VENV_PYTHON_EXECUTABLE} ${SOLUTION_SCRIPT}
+        --output ${PROJECT_SOURCE_DIR}/PROFILES_ALL.md
+    COMMAND ${VKPROFILES_EXE} doc
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/Android
         --input-filenames ${PROFILES_FILES_FOR_ANDROID_DOC}
-        --output-doc ${PROJECT_SOURCE_DIR}/PROFILES_ANDROID.md
+        --output ${PROJECT_SOURCE_DIR}/PROFILES_ANDROID.md
     VERBATIM
-    SOURCES ${SOLUTION_SCRIPT} ${PROFILES_FILES}
-    DEPENDS ${SOLUTION_SCRIPT} ${PROFILES_FILES} python_venv)
+    SOURCES ${PROFILES_FILES}
+    DEPENDS ${PROFILES_FILES} python_venv)
 set_target_properties(VpGenerate-Markdown PROPERTIES FOLDER "Profiles generator")
 add_dependencies(VpGenerate-Markdown VpGenerate-ProfilesDesktopBaseline VpGenerate-ProfilesDesktopMax)
 
 add_custom_target(VpTestIntersect ALL
-    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${VENV_PYTHON_EXECUTABLE} ${MERGE_SCRIPT}
+    COMMAND ${VKPROFILES_EXE} merge
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_intersect
         --output-path ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_intersect.json
         --output-profile VP_LUNARG_test_combine_intersect
         --mode intersection
     VERBATIM
-    SOURCES ${MERGE_SCRIPT} ${PROFILES_FILES}
-    DEPENDS ${MERGE_SCRIPT} ${PROFILES_FILES} python_venv)
+    SOURCES ${PROFILES_FILES}
+    DEPENDS ${PROFILES_FILES} python_venv)
 set_target_properties(VpTestIntersect PROPERTIES FOLDER "Profiles generator/Tests")
 add_dependencies(VpTestIntersect VpProfilesProcessor)
 
 add_custom_target(VpTestUnion ALL
-    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${VENV_PYTHON_EXECUTABLE} ${MERGE_SCRIPT}
+    COMMAND ${VKPROFILES_EXE} merge
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_union
         --output-path ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_union.json
         --output-profile VP_LUNARG_test_combine_union
         --mode union
     VERBATIM
-    SOURCES ${MERGE_SCRIPT} ${PROFILES_FILES}
-    DEPENDS ${MERGE_SCRIPT} ${PROFILES_FILES} python_venv)
+    SOURCES ${PROFILES_FILES}
+    DEPENDS ${PROFILES_FILES} python_venv)
 set_target_properties(VpTestUnion PROPERTIES FOLDER "Profiles generator/Tests")
 add_dependencies(VpTestUnion VpProfilesProcessor)
 
 add_custom_target(VpTestGeneratedName ALL
-    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${VENV_PYTHON_EXECUTABLE} ${MERGE_SCRIPT}
+    COMMAND ${VKPROFILES_EXE} merge
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_intersect
         --output-path ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_generated_name.json
     VERBATIM
-    SOURCES ${MERGE_SCRIPT} ${PROFILES_FILES}
-    DEPENDS ${MERGE_SCRIPT} ${PROFILES_FILES} python_venv)
+    SOURCES ${PROFILES_FILES}
+    DEPENDS ${PROFILES_FILES} python_venv)
 set_target_properties(VpTestGeneratedName PROPERTIES FOLDER "Profiles generator/Tests")
 add_dependencies(VpTestGeneratedName VpProfilesProcessor)
 
 add_custom_target(VpTestHostImageCopy ALL
-    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry"
-        ${VENV_PYTHON_EXECUTABLE} ${MERGE_SCRIPT}
+    COMMAND ${VKPROFILES_EXE} merge
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_host_image_copy
         --output-path ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_host_image_copy.json
     VERBATIM
-    SOURCES ${MERGE_SCRIPT} ${PROFILES_FILES}
-    DEPENDS ${MERGE_SCRIPT} ${PROFILES_FILES} python_venv)
+    SOURCES ${PROFILES_FILES}
+    DEPENDS ${PROFILES_FILES} python_venv)
 set_target_properties(VpTestHostImageCopy PROPERTIES FOLDER "Profiles generator/Tests")
 add_dependencies(VpTestHostImageCopy VpProfilesProcessor)
 
@@ -286,9 +269,7 @@ install(
 
 install(
     FILES
-        ${MERGE_SCRIPT}
-        ${MERGE_SCRIPT}
-        ${SOLUTION_SCRIPT}
+        ${PROFILES_SCRIPT}
         ${PROJECT_SOURCE_DIR}/schema/${PROFILES_SCHEMA_FILENAME}
     DESTINATION
         "${CMAKE_INSTALL_DATADIR}/vulkan/registry"

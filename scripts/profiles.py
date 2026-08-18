@@ -30,6 +30,7 @@ from source.main_layer import main_layer
 from source.main_tests import main_tests
 from source.main_merge import main_merge
 from source.main_library import main_library
+from source.main_doc import main_doc
 
 
 def main(argv):
@@ -49,6 +50,7 @@ def main(argv):
     validate_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
     validate_parser.add_argument('--schema', '-s', action='store', help='Use a profile schema (profiles-*.json). By default, generate a profile schema vk.xml.')
     validate_parser.add_argument('--input', '-i', action='store', required=True, help='Path to the input profiles files.')
+    validate_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
 
     schema_parser = subparsers.add_parser('schema', help='Generate a profile json schema file.')
     schema_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
@@ -85,6 +87,13 @@ def main(argv):
     library_parser.add_argument('--debug', '-d', action='store_true', help='Also generate library variant with debug messages.')
     library_parser.add_argument('--config', '-c', action='store', default='release', choices=['release', 'debug'], help='Select build configuration.')
 
+    doc_parser = subparsers.add_parser('doc', help='Generate markdown documentation for Vulkan profiles.')
+    doc_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
+    doc_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
+    doc_parser.add_argument('--input', '-i', action='store', required=True, help='Path to directory with profiles.')
+    doc_parser.add_argument('--input-filenames', action='store', help='Comma separated list of profile filenames.')
+    doc_parser.add_argument('--output', '-o', '--output-doc', action='store', required=True, help='Output markdown file for profiles documentation.')
+
     layer_parser = subparsers.add_parser('layer', help='Generate the Vulkan profiles layer source file.')
     layer_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     layer_parser.add_argument('--registry', '-r', action='store', help='Use specified registry file instead of vk.xml.')
@@ -106,8 +115,10 @@ def main(argv):
         main_schema(args)
     elif args.command == 'merge':
         main_merge(args)
-    elif args.command in 'library':
+    elif args.command == 'library':
         main_library(args)
+    elif args.command == 'doc':
+        main_doc(args)
     elif args.command == 'layer':
         main_layer(args)
     elif args.command == 'tests':

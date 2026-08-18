@@ -173,6 +173,7 @@ set(PYTHON_DEPENDENCIES
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/generate_profiles_schema.py"
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/log.py"
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/main_convert.py"
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/main_doc.py"
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/main_layer.py"
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/main_library.py"
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/main_merge.py"
