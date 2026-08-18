@@ -162,9 +162,12 @@ class ProfileGenerator():
     # VkPhysicalDeviceRobustness2PropertiesEXT is an alias of VkPhysicalDeviceRobustness2PropertiesKHR
     skipped_test_structs = ["VkPhysicalDeviceTileShadingPropertiesQCOM", "VkPhysicalDeviceRobustness2PropertiesEXT"]
 
-    def generate_profile(self, outProfile, registry):
+    def __init__(self, registry):
+        self.registry = registry
+
+    def generate_profile(self, outProfile):
         with open(outProfile, 'w') as f:
-            f.write(self.gen_privateImpl(registry))
+            f.write(self.gen_privateImpl())
 
     def gen_extensions(self, extensions):
         gen = ''
@@ -180,10 +183,10 @@ class ProfileGenerator():
             gen += str(info.spec_version)
         return gen
 
-    def gen_physical_device_features(self, registry):
+    def gen_physical_device_features(self):
         gen = "                    \"features\": {"
         first = True
-        for feature in registry.features["VkPhysicalDeviceFeatures"]:
+        for feature in self.registry.features["VkPhysicalDeviceFeatures"]:
             if first:
                 first = False
             else:
@@ -195,11 +198,11 @@ class ProfileGenerator():
         gen += "                    }"
         return gen
 
-    def gen_features(self, extensions, registry):
+    def gen_features(self, extensions):
         gen = ''
         first = True
         self.test_features = list()
-        for name, value  in registry.structs.items():
+        for name, value in self.registry.structs.items():
             if ('VkPhysicalDeviceFeatures2' in value.extends and value.definedByExtensions):
                 self.test_features.append(name)
                 if (first):
@@ -219,8 +222,8 @@ class ProfileGenerator():
                     else:
                         gen += ','
                     gen += '\n'
-                    if "VkPhysicalDeviceFeatures2"in name:
-                        gen += self.gen_physical_device_features(registry)
+                    if "VkPhysicalDeviceFeatures2" in name:
+                        gen += self.gen_physical_device_features()
                     else:
                         gen += '                    \"'
                         gen += feature_name
@@ -230,7 +233,7 @@ class ProfileGenerator():
         return gen
 
     def get_random_enum_value(self, name):
-        return registry.enums[name].values[self.i % len(registry.enums[name].values)]
+        return self.registry.enums[name].values[self.i % len(self.registry.enums[name].values)]
 
     def get_enum(self, name, array):
         gen = ''
@@ -283,13 +286,13 @@ class ProfileGenerator():
         gen += '                        \"patch\": '
         gen += str(self.i + 3)
         gen += '\n                    }'
-        return gen, (self.i, self.i + 1, self.i + 2, self.i +3)
+        return gen, (self.i, self.i + 1, self.i + 2, self.i + 3)
 
-    def gen_properties(self, extensions, registry):
+    def gen_properties(self, extensions):
         gen = ''
         first = True
         self.test_values = dict()
-        for name, value in registry.structs.items():
+        for name, value in self.registry.structs.items():
             if ('VkPhysicalDeviceProperties2' in value.extends and value.definedByExtensions):
                 if (name in self.skipped_properties_structs):
                     continue
@@ -309,7 +312,7 @@ class ProfileGenerator():
                     property_size = 1
                     if (member.arraySize):
                         if (isinstance(member.arraySize, str)):
-                            property_size = int(registry.constants[member.arraySize])
+                            property_size = int(self.registry.constants[member.arraySize])
                         else:
                             property_size = member.arraySize
                     skip = False
@@ -327,8 +330,6 @@ class ProfileGenerator():
                     gen += '                    \"'
                     gen += property_name
                     gen += '\": '
-                    #if member.limittype == "":
-                    #    self.test_values[name][property] =
                     if property_type == "VkBool32":
                         gen += "true"
                         self.test_values[name][property] = 'VK_TRUE'
@@ -540,7 +541,7 @@ class ProfileGenerator():
     def pseudo_random(self, s):
         return Fraction(math.sin(s * 12.9898) * 43758.5453123)
 
-    def gen_random_format_features(self, registry, name, list_index):
+    def gen_random_format_features(self, name, list_index):
         # Choose from 0 to including 3 number of format features
         num = int(self.pseudo_random(self.i) * 1000) % 5
         self.i += 1
@@ -548,11 +549,11 @@ class ProfileGenerator():
         first = True
         used = list()
         for j in range(num):
-            index = int(self.pseudo_random(self.i) * 1000) % len(registry.enums['VkFormatFeatureFlagBits'].values)
+            index = int(self.pseudo_random(self.i) * 1000) % len(self.registry.enums['VkFormatFeatureFlagBits'].values)
             if (index in used):
                 continue
-            feature = registry.enums['VkFormatFeatureFlagBits'].values[index]
-            if feature in registry.betaFormatFeatures:
+            feature = self.registry.enums['VkFormatFeatureFlagBits'].values[index]
+            if feature in self.registry.betaFormatFeatures:
                 continue
             if first:
                 first = False
@@ -570,12 +571,12 @@ class ProfileGenerator():
 
         return gen
 
-    def gen_formats(self, registry):
+    def gen_formats(self):
         gen = ''
         first = True
         self.test_features = dict()
-        for name in registry.enums['VkFormat'].values:
-            if name in registry.aliasFormats:
+        for name in self.registry.enums['VkFormat'].values:
+            if name in self.registry.aliasFormats:
                 continue
             self.test_features[name] = list()
             # List for each of linear, optimal and buffer features
@@ -591,35 +592,35 @@ class ProfileGenerator():
             gen += '\": {\n'
             gen += '                    "VkFormatProperties": {\n'
             gen += '                        "linearTilingFeatures": [ '
-            gen += self.gen_random_format_features(registry, name, 0)
+            gen += self.gen_random_format_features(name, 0)
             gen += '],\n'
             gen += '                        "optimalTilingFeatures": [ '
-            gen += self.gen_random_format_features(registry, name, 1)
+            gen += self.gen_random_format_features(name, 1)
             gen += '],\n'
             gen += '                        "bufferFeatures": [ '
-            gen += self.gen_random_format_features(registry, name, 2)
+            gen += self.gen_random_format_features(name, 2)
             gen += ']\n'
             gen += '                    }\n'
             gen += '                }'
         return gen
 
-    def gen_privateImpl(self, registry):
+    def gen_privateImpl(self):
         gen = '{\n'
         gen += '    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",\n'
         gen += '    "capabilities": {\n'
         gen += '        "baseline": {\n'
         gen += '            "extensions": {'
-        gen += self.gen_extensions(registry.extensions)
+        gen += self.gen_extensions(self.registry.extensions)
         gen += '\n'
         gen += '            },\n'
         gen += '            "features": {'
-        gen += self.gen_features(registry.extensions, registry)
+        gen += self.gen_features(self.registry.extensions)
         gen += '\n            },\n'
         gen += '            "properties": {'
-        gen += self.gen_properties(registry.extensions, registry)
+        gen += self.gen_properties(self.registry.extensions)
         gen += '\n            },\n'
         gen += '            "formats": {'
-        gen += self.gen_formats(registry)
+        gen += self.gen_formats()
         gen += '\n            }\n'
         gen += '        }\n'
         gen += '    },'
@@ -627,27 +628,27 @@ class ProfileGenerator():
         gen += '}\n'
         return gen
 
-    def generate_tests(self, outTests, registry):
+    def generate_tests(self, outTests):
         with open(outTests, 'w') as f:
-            f.write(self.gen_tests(registry))
+            f.write(self.gen_tests())
 
-    def gen_tests(self, registry):
+    def gen_tests(self):
         gen = TESTS_HEADER
 
-        for name, value  in registry.structs.items():
+        for name, value in self.registry.structs.items():
             if ('VkPhysicalDeviceProperties2' in value.extends):
-                gen += self.gen_properties_test(registry, name, value)
+                gen += self.gen_properties_test(name, value)
             if ('VkPhysicalDeviceFeatures2' in value.extends):
                 if name in self.skipped_features:
                     continue
-                gen += self.gen_features_test(registry, name, value)
+                gen += self.gen_features_test(name, value)
 
         for name in self.test_features:
             gen += self.gen_format_test(name, self.test_features[name])
 
         return gen
 
-    def gen_properties_test(self, registry, name, value):
+    def gen_properties_test(self, name, value):
         gen = ''
         if name in self.skipped_test_structs:
             return gen
@@ -658,11 +659,11 @@ class ProfileGenerator():
             return gen
         gen += 'TEST_F(TestsCapabilitiesGenerated, Test' + name[16:] + ') {\n'
         for ext in value.definedByExtensions:
-            gen += '#ifdef ' + registry.extensions[ext].name + '\n'
+            gen += '#ifdef ' + self.registry.extensions[ext].name + '\n'
 
         gen += '    bool supported = true;\n'
         for ext in value.definedByExtensions:
-            gen += '    supported = supported && IsSupported(gpu_profile, "' + registry.extensions[ext].name + '");\n\n'
+            gen += '    supported = supported && IsSupported(gpu_profile, "' + self.registry.extensions[ext].name + '");\n\n'
 
         var_name = self.create_var_name(name)
         gen += '    ' + name + ' ' + var_name + '_native' + '{};\n'
@@ -685,8 +686,8 @@ class ProfileGenerator():
             if member in self.test_values[name]:
                 property_value = self.test_values[name][member]
                 if (property_value):
-                    if (registry.structs[name].members[member].limittype == 'exact' or registry.structs[name].members[member].limittype == 'noauto'):
-                        member_type = registry.structs[name].members[member].type
+                    if (self.registry.structs[name].members[member].limittype == 'exact' or self.registry.structs[name].members[member].limittype == 'noauto'):
+                        member_type = self.registry.structs[name].members[member].type
                         # VkConformanceVersion is noauto and unmodified
                         if 'VkConformanceVersion' in member_type:
                             continue
@@ -708,7 +709,7 @@ class ProfileGenerator():
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.depth, ' + var_name + '_native' + '.' + member + '.depth);\n'
                             else:
                                 print('ERROR: unknown tuple type from ' + name + '.' + member)
-                        elif registry.structs[name].members[member].type == 'char':
+                        elif self.registry.structs[name].members[member].type == 'char':
                             gen += '    EXPECT_EQ(0, strncmp(' + var_name + '_profile' + '.' + member + ', ' + var_name + '_native' + '.' + member + ', ' + str(len(property_value)) + '));\n'
                         else:
                             gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + ', ' + var_name + '_native' + '.' + member + ');\n'
@@ -721,7 +722,7 @@ class ProfileGenerator():
                             else:
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + ', ' + str(property_value[0]) + ');\n'
                         elif type(property_value) is tuple:
-                            member_type = registry.structs[name].members[member].type
+                            member_type = self.registry.structs[name].members[member].type
                             if (member_type == 'VkExtent2D'):
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.width, ' + str(property_value[0]) + ');\n'
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.height, ' + str(property_value[1]) + ');\n'
@@ -731,7 +732,7 @@ class ProfileGenerator():
                                 gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + '.depth, ' + str(property_value[2]) + ');\n'
                             else:
                                 print('ERROR: unknown tuple type from ' + name + '.' + member)
-                        elif registry.structs[name].members[member].type == 'char':
+                        elif self.registry.structs[name].members[member].type == 'char':
                             gen += '    EXPECT_EQ(0, strncmp(' + var_name + '_profile' + '.' + member + ', ' + property_value + ', ' + str(len(property_value)) + '));\n'
                         else:
                             gen += '    EXPECT_EQ(' + var_name + '_profile' + '.' + member + ', ' + property_value + ');\n'
@@ -741,13 +742,13 @@ class ProfileGenerator():
         gen += '}\n\n'
         return gen
 
-    def gen_features_test(self, registry, name, value):
+    def gen_features_test(self, name, value):
         gen = ''
         if (not name in self.test_features):
             return gen
         gen += 'TEST_F(TestsCapabilitiesGenerated, Test' + name[16:] + ') {\n'
         for ext in value.definedByExtensions:
-            gen += '#ifdef ' + registry.extensions[ext].name + '\n'
+            gen += '#ifdef ' + self.registry.extensions[ext].name + '\n'
 
         var_name = self.create_var_name(name)
         gen += '    ' + name + ' ' + var_name + '{};\n'
@@ -857,6 +858,7 @@ if __name__ == '__main__':
         exit()
 
     registry = gen_profiles_solution.VulkanRegistry(args.registry, args.api)
-    generator = ProfileGenerator()
-    generator.generate_profile(args.out_profile, registry)
-    generator.generate_tests(args.out_tests, registry)
+    generator = ProfileGenerator(registry)
+    generator.generate_profile(args.out_profile)
+    if args.out_tests:
+        generator.generate_tests(args.out_tests)

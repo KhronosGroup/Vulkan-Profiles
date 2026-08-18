@@ -33,35 +33,40 @@ def main_library(args):
     api = getattr(args, 'api', 'vulkan') or 'vulkan'
     registry = gen_profiles_solution.VulkanRegistry(args.registry, api)
 
+    output_schema = getattr(args, 'output_schema', None)
     validate = getattr(args, 'validate', False)
-    schema = None
-    if validate:
-        vk = initVulkanObject(api, args.registry or None)
-        schema_gen = VulkanProfilesSchemaGenerator2(vk)
-        schema_gen.validate()
-        schema = schema_gen.schema
-
-    profiles_filenames = []
-    input_filenames = getattr(args, 'input_filenames', None)
-    if input_filenames:
-        profiles_filenames = input_filenames.split(',')
-
-    input_profiles_files = gen_profiles_solution.VulkanProfilesFiles(
-        registry, args.input, profiles_filenames, validate, schema
-    )
-
-    debug = getattr(args, 'debug', False) or (getattr(args, 'config', 'release').lower() == 'debug')
-    output_filename = getattr(args, 'output_filename', None) or 'vulkan_profiles'
-
     out_inc = getattr(args, 'output_inc', None)
     out_src = getattr(args, 'output_src', None)
 
-    if not out_inc and not out_src:
-        gen_profiles_solution.Log.e("At least one output directory (--output-inc or --output-src) must be provided")
+    if not out_inc and not out_src and not validate and not output_schema:
+        gen_profiles_solution.Log.e("At least one action (--output-inc, --output-src, --output-schema, or --validate) must be provided")
         sys.exit(1)
 
-    generator = gen_profiles_solution.VulkanProfilesLibraryGenerator(
-        registry, input_profiles_files, output_filename, debug
-    )
-    generator.generate(out_inc, out_src)
-    
+    schema = None
+    if output_schema or validate:
+        vk = initVulkanObject(api, args.registry or None, video=True)
+        schema_gen = VulkanProfilesSchemaGenerator2(vk)
+        if output_schema:
+            schema_gen.generate(output_schema)
+        if validate:
+            schema_gen.validate()
+            schema = schema_gen.schema
+
+    if out_inc or out_src:
+        profiles_filenames = []
+        input_filenames = getattr(args, 'input_filenames', None)
+        if input_filenames:
+            profiles_filenames = input_filenames.split(',')
+
+        input_profiles_files = gen_profiles_solution.VulkanProfilesFiles(
+            registry, args.input, profiles_filenames, validate, schema
+        )
+
+        debug = getattr(args, 'debug', False) or (getattr(args, 'config', 'release').lower() == 'debug')
+        output_filename = getattr(args, 'output_filename', None) or 'vulkan_profiles'
+
+        generator = gen_profiles_solution.VulkanProfilesLibraryGenerator(
+            registry, input_profiles_files, output_filename, debug
+        )
+        generator.generate(out_inc, out_src)
+        

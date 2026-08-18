@@ -24,16 +24,17 @@ import gen_profiles_layer
 
 def main_layer(args):
     registry_path = '../external/Debug/Vulkan-Headers/build/install/share/vulkan/registry/vk.xml'
-    if args.registry is not None:
+    if getattr(args, 'registry', None) is not None:
         registry_path = args.registry
 
     output_path = "../layer/profiles_generated.cpp"
-    if args.out_layer is not None:
-        output_path = args.out_layer
+    out_val = getattr(args, 'output', None) or getattr(args, 'out_layer', None)
+    if out_val is not None:
+        output_path = out_val
 
-    registry = gen_profiles_solution.VulkanRegistry(registry_path, args.api)
+    api = getattr(args, 'api', 'vulkan') or 'vulkan'
+    registry = gen_profiles_solution.VulkanRegistry(registry_path, api)
 
     generator = gen_profiles_layer.VulkanProfilesLayerGenerator()
     generator.generate(output_path, registry)
-    
     
