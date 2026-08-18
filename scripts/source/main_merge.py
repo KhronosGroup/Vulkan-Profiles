@@ -23,7 +23,9 @@ import sys
 import re
 import json
 import os
+
 import gen_profiles_solution
+import gen_profiles_file
 
 def main_merge(args):
     if args.registry is None:
@@ -43,12 +45,12 @@ def main_merge(args):
     else:
         input_profile_names = list()
 
-    profile_file = gen_profiles_solution.ProfileFile()
+    profile_file = gen_profiles_file.ProfileFile()
 
     profile_configs = list()
 
     if args.config is None:
-        profile_config = gen_profiles_solution.ProfileConfig(
+        profile_config = gen_profiles_file.ProfileConfig(
             args.input, input_profile_names, args.profile_api_version, args.mode
         )
 
@@ -98,7 +100,7 @@ def main_merge(args):
 
         for profile_name in json_data.get("profiles", {}):
             profile_value = json_data["profiles"][profile_name]
-            profile_config = gen_profiles_solution.ProfileConfig(
+            profile_config = gen_profiles_file.ProfileConfig(
                 os.path.join(currentdir, profile_value["input"]),
                 list(),
                 profile_value["api-version"],
@@ -108,7 +110,7 @@ def main_merge(args):
             profile_configs.append(profile_config)
 
     for config in profile_configs:
-        profile_merger = gen_profiles_solution.ProfileMerger(registry)
+        profile_merger = gen_profiles_file.ProfileMerger(registry)
         profile_merger.merge(
             config,
             profile_file,
@@ -116,6 +118,6 @@ def main_merge(args):
             strip_duplicate_struct
         )
 
-    profile_file.dump(args.output_path)
+    profile_file.dump(args.output)
     
     
