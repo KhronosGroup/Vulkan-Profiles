@@ -25,14 +25,20 @@ import gen_profiles_solution
 import gen_profiles_tests
 
 def main_tests(args):
-    if args.registry is None or args.out_profile is None:
+    registry_arg = getattr(args, 'registry', None)
+    out_profile = getattr(args, 'out_profile', None)
+
+    if registry_arg is None or out_profile is None:
         print('Error: --registry and --out-profile are required for test generation.')
         sys.exit(1)
 
-    registry = gen_profiles_solution.VulkanRegistry(args.registry, args.api)
-    generator = gen_profiles_tests.ProfileGenerator()
-    generator.generate_profile(args.out_profile, registry)
-    if args.out_tests is not None:
-        generator.generate_tests(args.out_tests, registry)
-        
+    api = getattr(args, 'api', 'vulkan') or 'vulkan'
+    registry = gen_profiles_solution.VulkanRegistry(registry_arg, api)
+    
+    generator = gen_profiles_tests.ProfileGenerator(registry)
+    generator.generate_profile(out_profile)
+
+    out_tests = getattr(args, 'output', None) or getattr(args, 'out_tests', None)
+    if out_tests is not None:
+        generator.generate_tests(out_tests)
         

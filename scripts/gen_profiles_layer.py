@@ -3674,18 +3674,18 @@ class VulkanProfilesLayerGenerator():
         gen += self.generate_enum_to_string('SimulateCapabilityFlags', ('SIMULATE_API_VERSION_BIT', 'SIMULATE_FEATURES_BIT', 'SIMULATE_PROPERTIES_BIT', 'SIMULATE_EXTENSIONS_BIT', 'SIMULATE_FORMATS_BIT', 'SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT', 'SIMULATE_VIDEO_CAPABILITIES_BIT', 'SIMULATE_VIDEO_FORMATS_BIT'), 'GetSimulateCapabilitiesLog')
         gen += self.generate_enum_to_string('DebugActionFlags', ('DEBUG_REPORT_NOTIFICATION_BIT', 'DEBUG_REPORT_WARNING_BIT', 'DEBUG_REPORT_ERROR_BIT', 'DEBUG_REPORT_DEBUG_BIT'), 'GetDebugReportsLog')
 
-        gen += self.generate_enum_to_string('VkFormatFeatureFlags', self.get_non_aliased_list(registry.bitmasks["VkFormatFeatureFlags"].bitsType.values, registry.bitmasks["VkFormatFeatureFlags"].bitsType.aliasValues), 'GetFormatFeatureString')
-        gen += self.generate_enum_to_string('VkFormatFeatureFlags2', self.get_non_aliased_list(registry.bitmasks["VkFormatFeatureFlags2"].bitsType.values, registry.bitmasks["VkFormatFeatureFlags2"].bitsType.aliasValues), 'GetFormatFeature2String')
-        gen += self.generate_enum_to_string('VkQueueFlags', registry.bitmasks["VkQueueFlags"].bitsType.values, 'GetQueueFlagsToString')
+        gen += self.generate_enum_to_string('VkFormatFeatureFlags', self.get_non_aliased_list(self.registry.bitmasks["VkFormatFeatureFlags"].bitsType.values, self.registry.bitmasks["VkFormatFeatureFlags"].bitsType.aliasValues), 'GetFormatFeatureString')
+        gen += self.generate_enum_to_string('VkFormatFeatureFlags2', self.get_non_aliased_list(self.registry.bitmasks["VkFormatFeatureFlags2"].bitsType.values, self.registry.bitmasks["VkFormatFeatureFlags2"].bitsType.aliasValues), 'GetFormatFeature2String')
+        gen += self.generate_enum_to_string('VkQueueFlags', self.registry.bitmasks["VkQueueFlags"].bitsType.values, 'GetQueueFlagsToString')
 
-        gen += self.generate_format_to_string(registry.enums['VkFormat'].values, registry.enums['VkFormat'].aliasValues)
-        gen += self.generate_string_to_format(registry.enums['VkFormat'].values)
+        gen += self.generate_format_to_string(self.registry.enums['VkFormat'].values, self.registry.enums['VkFormat'].aliasValues)
+        gen += self.generate_string_to_format(self.registry.enums['VkFormat'].values)
 
-        gen += self.generate_string_to_image_layout(registry.enums['VkImageLayout'].values)
+        gen += self.generate_string_to_image_layout(self.registry.enums['VkImageLayout'].values)
 
         enums = set(('VkToolPurposeFlagBits', 'VkSampleCountFlagBits', 'VkResolveModeFlagBits', 'VkShaderStageFlagBits', 'VkSubgroupFeatureFlagBits', 'VkShaderFloatControlsIndependence', 'VkPointClippingBehavior', 'VkOpticalFlowGridSizeFlagBitsNV', 'VkQueueFlagBits', 'VkMemoryDecompressionMethodFlagBitsNV', 'VkLayeredDriverUnderlyingApiMSFT', 'VkImageUsageFlagBits', 'VkBufferUsageFlagBits', 'VkPhysicalDeviceSchedulingControlsFlagBitsARM', 'VkIndirectCommandsInputModeFlagBitsEXT', 'VkPipelineRobustnessBufferBehavior', 'VkPipelineRobustnessImageBehavior', 'VkDefaultVertexAttributeValueKHR'))
         enums = enums.union(self.get_video_enums())
-        gen += self.generate_string_to_uint(enums, registry.enums)
+        gen += self.generate_string_to_uint(enums, self.registry.enums)
 
         gen += self.generate_string_to_flag_functions(('VkFormatFeatureFlags', 'VkQueueFlags', 'VkQueueGlobalPriorityKHR', 'VkVideoCodecOperationFlagsKHR', 'VkPipelineStageFlags', 'VkPipelineStageFlags2', 'VkFormatFeatureFlags2'))
 
@@ -3740,9 +3740,9 @@ class VulkanProfilesLayerGenerator():
             gen += '\n        // ' + ext + ' structs\n'
             gen += self.generate_platform_protect_begin(ext)
             for property in properties:
-                gen += '        ' + self.create_var_name(property) + ' = {' + registry.structs[property].sType +  '};\n'
+                gen += '        ' + self.create_var_name(property) + ' = {' + self.registry.structs[property].sType +  '};\n'
             for feature in features:
-                gen += '        ' + self.create_var_name(feature) + ' = {' + registry.structs[feature].sType +  '};\n'
+                gen += '        ' + self.create_var_name(feature) + ' = {' + self.registry.structs[feature].sType +  '};\n'
             gen += self.generate_platform_protect_end(ext)
 
         gen += PHYSICAL_DEVICE_DATA_END
@@ -3755,7 +3755,7 @@ class VulkanProfilesLayerGenerator():
         gen += '\t const char* table[] = {\n'
 
         first = True
-        for extension in registry.extensions.values():
+        for extension in self.registry.extensions.values():
             if (extension.type == 'instance'):
                 if not first:
                     gen += ',\n'
@@ -3780,7 +3780,7 @@ class VulkanProfilesLayerGenerator():
     def generate_is_format_functions(self):
         # Find all unique compressed formats in registry
         compressed_formats = set()
-        for format, compressed_format in registry.formatCompression.items():
+        for format, compressed_format in self.registry.formatCompression.items():
             compressed_formats.add(compressed_format)
         compressed_formats = sorted(compressed_formats)
 
@@ -3789,8 +3789,8 @@ class VulkanProfilesLayerGenerator():
         for compressed_format in compressed_formats:
             gen += '\nstatic bool Is' + compressed_format.replace(' ', '') + 'Format(VkFormat format) {\n'
             gen += '    switch (format) {\n'
-            for format in registry.formatCompression:
-                if registry.formatCompression[format] == compressed_format:
+            for format in self.registry.formatCompression:
+                if self.registry.formatCompression[format] == compressed_format:
                     gen += '        case ' + format + ':\n'
             gen += '            return true;\n'
             gen += '        default:\n'
@@ -4949,7 +4949,7 @@ class VulkanProfilesLayerGenerator():
 
     def generate_duplicated_checks(self, extends):
         gen = ''
-        for name, value in registry.structs.items():
+        for name, value in self.registry.structs.items():
             if extends in value.extends and value.isAlias == False:
                 aliases = value.aliases.copy()
                 aliases.remove(name)
@@ -4983,7 +4983,7 @@ class VulkanProfilesLayerGenerator():
         gen = ''
         first = True
         count = 0
-        for name, value  in registry.structs.items():
+        for name, value  in self.registry.structs.items():
             if name in self.ignored_structs:
                 continue
             if (extends in value.extends and value.isAlias == False) or (name in additional):
@@ -5003,20 +5003,20 @@ class VulkanProfilesLayerGenerator():
                     gen += 'if (name == \"' + current + '\"'
                     copy_aliases = aliases.copy()
                     for alias in copy_aliases:
-                        same_version = registry.structs[current].definedByVersion and registry.structs[alias].definedByVersion
-                        same_extension = registry.structs[current].definedByExtensions and registry.structs[current].definedByExtensions == registry.structs[alias].definedByExtensions
+                        same_version = self.registry.structs[current].definedByVersion and self.registry.structs[alias].definedByVersion
+                        same_extension = self.registry.structs[current].definedByExtensions and self.registry.structs[current].definedByExtensions == self.registry.structs[alias].definedByExtensions
                         if same_version or same_extension:
                             gen += ' || name == \"' + alias + '\"'
                             aliases.remove(alias)
 
                     gen += ') {\n'
 
-                    version = registry.structs[current].definedByVersion
+                    version = self.registry.structs[current].definedByVersion
                     if version:
                         if version and (version.major != 1 or version.minor != 0):
-                            gen += '        if (!CheckVersionSupport(' + registry.structs[current].definedByVersion.versionMacro + ', name)) return false;\n'
+                            gen += '        if (!CheckVersionSupport(' + self.registry.structs[current].definedByVersion.versionMacro + ', name)) return false;\n'
                     else:
-                        ext = registry.extensions[registry.structs[current].definedByExtensions[0]]
+                        ext = self.registry.extensions[self.registry.structs[current].definedByExtensions[0]]
                         gen += self.generate_platform_protect_begin(ext.name)
                         if not ext.name in self.emulated_extensions:
                             ext_name = ext.upperCaseName + '_EXTENSION_NAME'
@@ -5051,7 +5051,7 @@ class VulkanProfilesLayerGenerator():
         gen += '        const auto &props = qf_props[name];\n'
 
         structs = ['VkQueueFamilyProperties', 'VkQueueFamilyProperties2']
-        for name, value  in registry.structs.items():
+        for name, value  in self.registry.structs.items():
             if 'VkQueueFamilyProperties2' in value.extends and not value.isAlias:
                 structs.append(name)
 
@@ -5063,12 +5063,12 @@ class VulkanProfilesLayerGenerator():
             else:
                 gen += ' else '
             gen += 'if (name == \"' + struct + '\"'
-            for name, value in registry.structs.items():
+            for name, value in self.registry.structs.items():
                 if struct != name and value.aliases and struct in value.aliases:
                     gen += ' || \"' + name + '\"'
             gen += ') {\n'
-            for member_name in registry.structs[struct].members:
-                member = registry.structs[struct].members[member_name]
+            for member_name in self.registry.structs[struct].members:
+                member = self.registry.structs[struct].members[member_name]
                 if (member.limittype == 'bitmask'):
                     gen += '            for (const auto &feature : props[\"' + member_name + '\"]) {\n'
                     gen += '                dest->' + self.create_var_name(struct) + '.' + member_name + ' |= StringTo' + member.type + '(feature.asString())\n'
@@ -5096,13 +5096,13 @@ class VulkanProfilesLayerGenerator():
         gen += '\tLogMessage(&layer_settings, DEBUG_REPORT_NOTIFICATION_BIT,\n'
         gen += '\t\"- Adding promoted extensions to core in Vulkan (%" PRIu32 ".%" PRIu32 ").\\n", major, minor);\n\n'
 
-        for i in range(registry.headerVersionNumber.major):
+        for i in range(self.registry.headerVersionNumber.major):
             major = str(i + 1)
-            for j in range(registry.headerVersionNumber.minor):
+            for j in range(self.registry.headerVersionNumber.minor):
                 minor = str(j + 1)
                 gen += '    static const std::vector<const char *> promoted_' + major + '_' + minor + ' = {\n'
-                for ext in registry.extensions:
-                    extension = registry.extensions[ext]
+                for ext in self.registry.extensions:
+                    extension = self.registry.extensions[ext]
                     if 'VK_VERSION_' + major + '_' + minor in extension.promotedTo:
                         gen += '        ' + extension.upperCaseName + '_EXTENSION_NAME,\n'
                 gen += '    };\n'
@@ -5204,7 +5204,7 @@ class VulkanProfilesLayerGenerator():
         gen += '            VkBaseOutStructure *structure = (VkBaseOutStructure *)place;\n\n'
         gen += '            switch (structure->sType) {\n'
 
-        for name, value  in registry.structs.items():
+        for name, value  in self.registry.structs.items():
             if 'VkQueueFamilyProperties2' in value.extends and not value.isAlias:
                 gen += '                case ' + value.sType + ': {\n'
                 gen += '                    ' + name + ' *data = (' + name + ' *)place;\n'
@@ -5224,21 +5224,21 @@ class VulkanProfilesLayerGenerator():
 
     def generate_transfer_values(self):
         gen = ''
-        for i in range(registry.headerVersionNumber.major):
+        for i in range(self.registry.headerVersionNumber.major):
             major = str(i + 1)
-            for j in range(registry.headerVersionNumber.minor):
+            for j in range(self.registry.headerVersionNumber.minor):
                 minor = str(j + 1)
                 gen += '\n\n// VK_VULKAN_' + major + '_' + minor + '\n'
 
                 for ext, property_names, feature_names in self.extension_structs:
                     for property_name in property_names:
-                        property = registry.structs[property_name]
+                        property = self.registry.structs[property_name]
                         version = None
                         if property.definedByVersion:
                             version = property.definedByVersion
                         else:
                             for alias_name in property.aliases:
-                                alias = registry.structs[alias_name]
+                                alias = self.registry.structs[alias_name]
                                 if alias.definedByVersion:
                                     version = alias.definedByVersion
                                     break
@@ -5246,13 +5246,13 @@ class VulkanProfilesLayerGenerator():
                             gen += self.generate_transfer_function(major, minor, 'Properties', property_name)
 
                     for feature_name in feature_names:
-                        feature = registry.structs[feature_name]
+                        feature = self.registry.structs[feature_name]
                         version = None
                         if feature.definedByVersion:
                             version = feature.definedByVersion
                         else:
                             for alias_name in feature.aliases:
-                                alias = registry.structs[alias_name]
+                                alias = self.registry.structs[alias_name]
                                 if alias.definedByVersion:
                                     version = alias.definedByVersion
                                     break
@@ -5265,9 +5265,9 @@ class VulkanProfilesLayerGenerator():
         gen = '\nvoid LoadDeviceFormats(VkInstance instance, PhysicalDeviceData *pdd, VkPhysicalDevice pd, MapOfVkFormatProperties *dest,\n'
         gen += '                       MapOfVkFormatProperties3 *dest3) {\n'
         gen += '    std::vector<VkFormat> formats = {\n'
-        a = registry.enums['VkFormat']
-        for format in registry.enums['VkFormat'].values:
-            if format not in registry.enums['VkFormat'].aliasValues:
+        a = self.registry.enums['VkFormat']
+        for format in self.registry.enums['VkFormat'].values:
+            if format not in self.registry.enums['VkFormat'].aliasValues:
                 gen += '        ' + format + ',\n'
         gen += '    };\n'
         gen += '    const auto dt = instance_dispatch_table(instance);\n'
@@ -5297,43 +5297,43 @@ class VulkanProfilesLayerGenerator():
             gen += self.generate_physical_device_chain_case(ext, None, properties, features)
 
         for property in self.non_extension_properties:
-            version = registry.structs[property].definedByVersion
+            version = self.registry.structs[property].definedByVersion
             gen += self.generate_physical_device_chain_case(None, version, [property], [])
         for feature in self.non_extension_features:
-            version = registry.structs[feature].definedByVersion
+            version = self.registry.structs[feature].definedByVersion
             gen += self.generate_physical_device_chain_case(None, version, [], [feature])
 
         gen += ENUMERATE_PHYSICAL_DEVICES_MIDDLE
 
-        for i in range(registry.headerVersionNumber.major):
+        for i in range(self.registry.headerVersionNumber.major):
             version_major = i + 1
             major = str(version_major)
-            for j in range(registry.headerVersionNumber.minor):
+            for j in range(self.registry.headerVersionNumber.minor):
                 version_minor = j + 1
                 minor = str(version_minor)
                 gen += '\n            // VK_VULKAN_' + str(major) + '_' + str(minor) + '\n'
                 for ext, property_names, feature_names in self.extension_structs:
                     for property_name in property_names:
-                        property = registry.structs[property_name]
+                        property = self.registry.structs[property_name]
                         promoted_version = None
                         if property.definedByVersion:
                             promoted_version = property.definedByVersion
                         else:
                             for alias_name in property.aliases:
-                                alias = registry.structs[alias_name]
+                                alias = self.registry.structs[alias_name]
                                 if alias.definedByVersion:
                                     promoted_version = alias.definedByVersion
                                     break
                         if promoted_version and version_major == promoted_version.major and version_minor == promoted_version.minor:
                             gen += '            TransferValue(&(pdd.physical_device_vulkan_' + major + minor + '_properties_), &(pdd.' + self.create_var_name(property_name) + '), pdd.vulkan_' + major + '_' + minor + '_properties_written_);\n'
                     for feature_name in feature_names:
-                        feature = registry.structs[feature_name]
+                        feature = self.registry.structs[feature_name]
                         promoted_version = None
                         if feature.definedByVersion:
                             promoted_version = feature.definedByVersion
                         else:
                             for alias_name in feature.aliases:
-                                alias = registry.structs[alias_name]
+                                alias = self.registry.structs[alias_name]
                                 if alias.definedByVersion:
                                     promoted_version = alias.definedByVersion
                                     break
@@ -5349,13 +5349,13 @@ class VulkanProfilesLayerGenerator():
         if ext:
             gen += '\n                if ('
             first = True
-            for promotedTo in [ext] + registry.getExtensionPromotedToExtensionList(ext):
+            for promotedTo in [ext] + self.registry.getExtensionPromotedToExtensionList(ext):
                 if first:
                     first = False
                 else:
                     gen += ' || '
                 gen += 'PhysicalDeviceData::HasExtension(&pdd, '
-                gen += registry.extensions[promotedTo].upperCaseName + '_EXTENSION_NAME'
+                gen += self.registry.extensions[promotedTo].upperCaseName + '_EXTENSION_NAME'
                 gen += ')'
             gen += ') {\n'
         else:
@@ -5374,8 +5374,8 @@ class VulkanProfilesLayerGenerator():
 
     def generate_transfer_function(self, major, minor, type, name):
         gen = '\nvoid TransferValue(VkPhysicalDeviceVulkan' + major + minor + type + ' *dest, ' + name + ' *src, bool promoted_written) {\n'
-        for member_name in registry.structs[name].members:
-            member = registry.structs[name].members[member_name]
+        for member_name in self.registry.structs[name].members:
+            member = self.registry.structs[name].members[member_name]
             # The arrays need a enum member to specify the size of the array
             if hasattr(member, 'enum'):
                 gen += '    TRANSFER_VALUE_ARRAY(' + member_name + ');\n'
@@ -5385,7 +5385,7 @@ class VulkanProfilesLayerGenerator():
         return gen
 
     def generate_fill_case(self, struct):
-        structure = registry.structs[struct]
+        structure = self.registry.structs[struct]
         if structure.name in self.ignored_structs:
             return ''
         gen = '            case ' + structure.sType + ':\n'
@@ -5398,13 +5398,13 @@ class VulkanProfilesLayerGenerator():
                     first = False
                 else:
                     gen += ' && '
-                for promotedTo in [ext] + registry.getExtensionPromotedToExtensionList(ext):
+                for promotedTo in [ext] + self.registry.getExtensionPromotedToExtensionList(ext):
                     if promotedTo != ext:
                         gen += ' || '
                     else:
                         gen += '('
                     gen += 'PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, '
-                    gen += registry.extensions[promotedTo].upperCaseName + '_EXTENSION_NAME'
+                    gen += self.registry.extensions[promotedTo].upperCaseName + '_EXTENSION_NAME'
                     gen += ')'
                 gen += ')'
             gen += ') '
@@ -5432,13 +5432,13 @@ class VulkanProfilesLayerGenerator():
         gen += '    LogMessage(&layer_settings, DEBUG_REPORT_DEBUG_BIT, \"\\tJsonLoader::GetStruct(' + structure + ')\\n\");\n'
         gen += '    bool valid = true;\n'
         gen += '    for (const auto &member : parent.getMemberNames()) {\n'
-        for member_name in registry.structs[structure].members:
-            member = registry.structs[structure].members[member_name]
+        for member_name in self.registry.structs[structure].members:
+            member = self.registry.structs[structure].members[member_name]
             not_modifiable = str((member.limittype == 'exact' or member.limittype == 'noauto') and not member.isDynamicallySizedArrayWithCap()).lower()
             if member.isArray:
                 gen += ('        GetArray(device_name, parent, member, "' + member_name + '", dest->' + member_name + ', ' +
                         ('&dest->' + member.arraySizeMember + ', ' if member.isDynamicallySizedArrayWithCap() else '') + not_modifiable + ');\n')
-            elif member.type in registry.enums:
+            elif member.type in self.registry.enums:
                 gen += '        GET_VALUE_ENUM_WARN(member, ' + member_name + ', ' + not_modifiable + ', requested_profile, WarnIfNotEqualEnum);\n'
             elif member.type == 'VkConformanceVersion' or member.type == 'VkToolPurposeFlags':
                 continue
@@ -5553,7 +5553,7 @@ class VulkanProfilesLayerGenerator():
         properties_alias = []
         features = []
         features_alias = []
-        for name, value  in registry.structs.items():
+        for name, value  in self.registry.structs.items():
             if ('VkPhysicalDeviceProperties2' in value.extends):
                 if (value.isAlias == False):
                     properties.append((name, value.definedByExtensions))
@@ -5590,7 +5590,7 @@ class VulkanProfilesLayerGenerator():
                 self.non_extension_features.append(feature_name)
 
         self.extension_structs = []
-        for extension in registry.extensions:
+        for extension in self.registry.extensions:
             feature_names = []
             property_names = []
             for property in properties:
@@ -5710,10 +5710,10 @@ class VulkanProfilesLayerGenerator():
     def generate_string_to_flag_functions(self, function_names):
         gen = ''
         for name in function_names:
-            if name in registry.bitmasks:
-                gen += self.generate_string_to_flags(name, registry.bitmasks[name].bitsType)
-            elif name in registry.enums:
-                gen += self.generate_string_to_flags(name, registry.enums[name])
+            if name in self.registry.bitmasks:
+                gen += self.generate_string_to_flags(name, self.registry.bitmasks[name].bitsType)
+            elif name in self.registry.enums:
+                gen += self.generate_string_to_flags(name, self.registry.enums[name])
         return gen
 
     def generate_string_to_flags(self, type, enums):
