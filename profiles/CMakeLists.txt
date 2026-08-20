@@ -81,7 +81,7 @@ add_custom_target(VpGenerate-ProfilesDesktopMax ALL
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_max_2024
         --output ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_desktop_max_2024.json
-        --output-profile VP_LUNARG_desktop_max_2024
+        --profile-name VP_LUNARG_desktop_max_2024
         --profile-label ${PROFILE_DESKTOP_MAX_2024_LABEL}
         --profile-desc ${PROFILE_DESKTOP_MAX_2024_DESC}
         --profile-date 2023-11-01
@@ -91,7 +91,7 @@ add_custom_target(VpGenerate-ProfilesDesktopMax ALL
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_max_2026
         --output ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_desktop_max_2026.json
-        --output-profile VP_LUNARG_desktop_max_2026
+        --profile-name VP_LUNARG_desktop_max_2026
         --profile-label ${PROFILE_DESKTOP_MAX_2026_LABEL}
         --profile-desc ${PROFILE_DESKTOP_MAX_2026_DESC}
         --profile-date 2026-06-22
@@ -136,45 +136,50 @@ add_custom_target(VpGenerate-Libraries
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
         --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY}
-        --output-library-inc ${PROJECT_SOURCE_DIR}/library/include/vulkan
-        --output-library-src ${PROJECT_SOURCE_DIR}/library/source
-        --output-library-filename "vulkan_profiles"
+        --output ${PROJECT_SOURCE_DIR}/library/include/vulkan
+        --output-src ${PROJECT_SOURCE_DIR}/library/source
+        --output-filename "vulkan_profiles"
+        --mode header+source
         --config release
     COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
         --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY}
-        --output-library-inc ${PROJECT_SOURCE_DIR}/library/include/vulkan/debug
-        --output-library-src ${PROJECT_SOURCE_DIR}/library/source/debug
-        --output-library-filename "vulkan_profiles"
+        --output ${PROJECT_SOURCE_DIR}/library/include/vulkan/debug
+        --output-src ${PROJECT_SOURCE_DIR}/library/source/debug
+        --output-filename "vulkan_profiles"
+        --mode header+source
         --config debug
     COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/Android
         --input-filenames ${PROFILES_FILES_FOR_ANDROID_DOC}
-        --output-library-inc ${PROJECT_SOURCE_DIR}/library/test
-        --output-library-src ${PROJECT_SOURCE_DIR}/library/test
-        --output-library-filename "generated_vulkan_profiles_android"
+        --output ${PROJECT_SOURCE_DIR}/library/test
+        --output-src ${PROJECT_SOURCE_DIR}/library/test
+        --output-filename "generated_vulkan_profiles_android"
+        --mode header+source
         --config release
     COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
         --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY_TEST}
-        --output-library-inc ${PROJECT_SOURCE_DIR}/library/test
-        --output-library-src ${PROJECT_SOURCE_DIR}/library/test
-        --output-library-filename "generated_vulkan_profiles"
+        --output ${PROJECT_SOURCE_DIR}/library/test
+        --output-src ${PROJECT_SOURCE_DIR}/library/test
+        --output-filename "generated_vulkan_profiles"
+        --mode header+source
         --config release
     COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
         --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY_TEST}
-        --output-library-inc ${PROJECT_SOURCE_DIR}/library/test
-        --output-library-src ${PROJECT_SOURCE_DIR}/library/test
-        --output-library-filename "generated_vulkan_profiles_debug"
+        --output ${PROJECT_SOURCE_DIR}/library/test
+        --output-src ${PROJECT_SOURCE_DIR}/library/test
+        --output-filename "generated_vulkan_profiles_debug"
+        --mode header+source
         --config debug
     VERBATIM
     SOURCES ${PROFILES_FILES}
@@ -212,7 +217,7 @@ add_custom_target(VpTestIntersect ALL
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_intersect
         --output ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_intersect.json
-        --output-profile VP_LUNARG_test_combine_intersect
+        --profile-name VP_LUNARG_test_combine_intersect
         --mode intersection
     VERBATIM
     SOURCES ${PROFILES_FILES}
@@ -225,7 +230,7 @@ add_custom_target(VpTestUnion ALL
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_union
         --output ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_union.json
-        --output-profile VP_LUNARG_test_combine_union
+        --profile-name VP_LUNARG_test_combine_union
         --mode union
     VERBATIM
     SOURCES ${PROFILES_FILES}

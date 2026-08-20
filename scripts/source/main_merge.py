@@ -118,6 +118,6 @@ def main_merge(args):
             strip_duplicate_struct
         )
 
-    profile_file.dump(args.output)
-    
+    format_type = getattr(args, 'format', None)
+    profile_file.dump(args.output, format_type)
     
