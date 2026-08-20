@@ -40,12 +40,14 @@ def main(argv):
     subparsers = parser.add_subparsers(dest='command', required=True)
     
     convert_parser = subparsers.add_parser('convert', help='Convert an implicit profile to an explicit profile by pulling Vulkan capabilities dependencies from vk.xml.')
+    convert_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     convert_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
     convert_parser.add_argument('--input', '-i', action='store', required=True, help='Path to the input profiles files.')
     convert_parser.add_argument('--output', '-o', action='store', required=True, help='Path to the output profiles files.')
     convert_parser.add_argument('--format', action='store', choices=list(OutputFormatType), default=OutputFormatType.FLATTEN, help='Formatting style for the profiles files (default: flatten).')
     convert_parser.add_argument('--mode', nargs='*', action='store', choices=list(ConvertBits), default=list(ConvertBits), help='List of conversion capabilities')
-    
+    convert_parser.add_argument('--validate', action='store_true', help='Validate profile files before conversion against profile schema.')
+
     validate_parser = subparsers.add_parser('validate', help='Validate a profile file against a profile schema.')
     validate_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     validate_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
@@ -105,8 +107,8 @@ def main(argv):
     tests_parser = subparsers.add_parser('tests', help='Generate test profile and test C++ source file.')
     tests_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     tests_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
-    tests_parser.add_argument('--out-profile', action='store', required=True, help='Output profiles file.')
-    tests_parser.add_argument('--output', '-o', '--out-tests', action='store', help='Output tests file.')
+    tests_parser.add_argument('--output-profile', action='store', required=True, help='Output profile test file.')
+    tests_parser.add_argument('--output-cpp', '-o', '--out-tests', action='store', help='Output C++ tests file.')
 
     args = parser.parse_args(argv)
 
@@ -134,3 +136,4 @@ if __name__ == '__main__':
     print(sys.executable)
     
     sys.exit(main(sys.argv[1:]))
+    

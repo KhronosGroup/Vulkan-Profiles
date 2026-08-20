@@ -19,12 +19,14 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
+import argparse
 import copy
 import logging
 import re
 from pathlib import Path
 from enum import Enum
 
+from source.main_validate import main_validate
 from source.vulkan_object_utils import (
     VulkanObject, 
     initVulkanObject, 
@@ -750,6 +752,15 @@ def cleanup_and_sort_pulled_blocks(json_file_data: dict):
 # -----------------------------------------------------------------------------
 
 def main_convert(args):
+    if getattr(args, 'validate', False):
+        validate_args = argparse.Namespace(
+            registry=getattr(args, 'registry', None),
+            input=args.input,
+            schema=getattr(args, 'schema', None),
+            api=getattr(args, 'api', 'vulkan') or 'vulkan'
+        )
+        main_validate(validate_args)
+
     vk = initVulkanObject('vulkan', args.registry or None)
 
     for version in vk.versions.values():
