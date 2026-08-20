@@ -101,6 +101,12 @@ endif()
 set_target_properties(ProfilesLayer PROPERTIES FOLDER "Profiles layer")
 set_target_properties(ProfilesLayer PROPERTIES OUTPUT_NAME ${LAYER_NAME})
 
+# Workaround AppleClang searching /usr/local/include ahead of -isystem paths, which can
+# pick up a stale, globally-installed Vulkan SDK header instead of this project's own.
+if (CMAKE_CXX_COMPILER_ID STREQUAL AppleClang AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
+    set_target_properties(ProfilesLayer PROPERTIES NO_SYSTEM_FROM_IMPORTED ON)
+endif()
+
 if (MSVC)
     target_compile_options(ProfilesLayer PRIVATE "$<$<CONFIG:Release>:/Zi>")
     target_link_options(ProfilesLayer PRIVATE /DEF:${CMAKE_CURRENT_SOURCE_DIR}/${LAYER_NAME}.def)
