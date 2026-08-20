@@ -19,10 +19,14 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
+import os
 import sys
+import tempfile
+import argparse
 import gen_profiles_solution
 from source.vulkan_object_utils import initVulkanObject
 from source.generate_profiles_schema import VulkanProfilesSchemaGenerator2
+from source.main_convert import main_convert, OutputFormatType
 
 
 def main_library(args):
@@ -53,13 +57,37 @@ def main_library(args):
             schema = schema_gen.schema
 
     if out_inc or out_src:
+        input_dir = args.input
+
+        temp_dir_obj = None
+        convert_mode = getattr(args, 'convert', None)
+
+        if convert_mode is not None:
+            intermediate_arg = getattr(args, 'intermediate', None)
+            if intermediate_arg:
+                input_dir = intermediate_arg
+                os.makedirs(input_dir, exist_ok=True)
+            else:
+                temp_dir_obj = tempfile.TemporaryDirectory()
+                input_dir = temp_dir_obj.name
+
+            convert_args = argparse.Namespace(
+                registry=args.registry,
+                input=args.input,
+                output=input_dir,
+                mode=convert_mode,
+                format=OutputFormatType.FLATTEN,
+                api=api
+            )
+            main_convert(convert_args)
+
         profiles_filenames = []
         input_filenames = getattr(args, 'input_filenames', None)
         if input_filenames:
             profiles_filenames = input_filenames.split(',')
 
         input_profiles_files = gen_profiles_solution.VulkanProfilesFiles(
-            registry, args.input, profiles_filenames, validate, schema
+            registry, input_dir, profiles_filenames, validate, schema
         )
 
         debug = getattr(args, 'debug', False) or (getattr(args, 'config', 'release').lower() == 'debug')
@@ -69,4 +97,6 @@ def main_library(args):
             registry, input_profiles_files, output_filename, debug
         )
         generator.generate(out_inc, out_src)
-        
+
+        if temp_dir_obj is not None:
+            temp_dir_obj.cleanup()

@@ -47,10 +47,10 @@ def main(argv):
     convert_parser.add_argument('--mode', nargs='*', action='store', choices=list(ConvertBits), default=list(ConvertBits), help='List of conversion capabilities')
     
     validate_parser = subparsers.add_parser('validate', help='Validate a profile file against a profile schema.')
+    validate_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     validate_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
     validate_parser.add_argument('--schema', '-s', action='store', help='Use a profile schema (profiles-*.json). By default, generate a profile schema vk.xml.')
     validate_parser.add_argument('--input', '-i', action='store', required=True, help='Path to the input profiles files.')
-    validate_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
 
     schema_parser = subparsers.add_parser('schema', help='Generate a profile json schema file.')
     schema_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
@@ -83,7 +83,10 @@ def main(argv):
     library_parser.add_argument('--output-inc', '--output-library-inc', action='store', help='Output include directory for profile library.')
     library_parser.add_argument('--output-src', '--output-library-src', action='store', help='Output source directory for profile library.')
     library_parser.add_argument('--output-filename', '--output-library-filename', action='store', default='vulkan_profiles', help='Output filename for profile library, default "vulkan_profiles".')
+    library_parser.add_argument('--output-schema', action='store', help='Output file for JSON profile schema.')
     library_parser.add_argument('--validate', '-v', action='store_true', help='Validate generated JSON profile schema and JSON profiles against the schema.')
+    library_parser.add_argument('--convert', nargs='*', action='store', choices=list(ConvertBits), help='List of conversion capabilities to apply before generating the library.')
+    library_parser.add_argument('--intermediate', action='store', help='Directory path for intermediate converted profiles (used when --convert is provided).')
     library_parser.add_argument('--debug', '-d', action='store_true', help='Also generate library variant with debug messages.')
     library_parser.add_argument('--config', '-c', action='store', default='release', choices=['release', 'debug'], help='Select build configuration.')
 
@@ -131,4 +134,3 @@ if __name__ == '__main__':
     print(sys.executable)
     
     sys.exit(main(sys.argv[1:]))
-    
