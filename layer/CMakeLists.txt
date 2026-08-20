@@ -182,8 +182,8 @@ add_custom_target(VpLayer_generate_tests ALL
     COMMAND ${VKPROFILES_EXE} tests
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-        --out-profile ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_api_generated.json
-        --output ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp
+        --output-profile ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_api_generated.json
+        --output-cpp ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp
     VERBATIM
     DEPENDS ProfilesLayer
             VpLayer_generate
