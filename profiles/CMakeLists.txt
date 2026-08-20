@@ -107,7 +107,7 @@ add_custom_target(VpGenerate-ProfilesDesktopBaseline ALL
     COMMAND ${VKPROFILES_EXE} merge
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --config ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline_config.json
-        --output-path ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline.json
+        --output ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline.json
         --strip-duplicate-structs
     COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline.json ${CMAKE_CURRENT_LIST_DIR}
@@ -211,7 +211,7 @@ add_custom_target(VpTestIntersect ALL
     COMMAND ${VKPROFILES_EXE} merge
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_intersect
-        --output-path ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_intersect.json
+        --output ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_intersect.json
         --output-profile VP_LUNARG_test_combine_intersect
         --mode intersection
     VERBATIM
@@ -224,7 +224,7 @@ add_custom_target(VpTestUnion ALL
     COMMAND ${VKPROFILES_EXE} merge
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_union
-        --output-path ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_union.json
+        --output ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_union.json
         --output-profile VP_LUNARG_test_combine_union
         --mode union
     VERBATIM
@@ -237,7 +237,7 @@ add_custom_target(VpTestGeneratedName ALL
     COMMAND ${VKPROFILES_EXE} merge
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_intersect
-        --output-path ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_generated_name.json
+        --output ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_generated_name.json
     VERBATIM
     SOURCES ${PROFILES_FILES}
     DEPENDS ${PROFILES_FILES} python_venv)
@@ -248,7 +248,7 @@ add_custom_target(VpTestHostImageCopy ALL
     COMMAND ${VKPROFILES_EXE} merge
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_host_image_copy
-        --output-path ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_host_image_copy.json
+        --output ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_host_image_copy.json
     VERBATIM
     SOURCES ${PROFILES_FILES}
     DEPENDS ${PROFILES_FILES} python_venv)

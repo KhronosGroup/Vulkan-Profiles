@@ -19,20 +19,66 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
+import sys
+import json
 from pathlib import Path
 
+import gen_profiles_solution
 from source.vulkan_object_utils import initVulkanObject
 from source.generate_profiles_schema import VulkanProfilesSchemaGenerator2
-from source.profiles_parsing import validate_profiles_json, validate_profiles_jsons_data
-from source.log import Log
+
 
 def main_validate(args):
-    if args.schema is None:
-        if args.registry is None:
-            Log.e("`--schema` or `--registry` are required to validate profile files")
-        else:
-            vk = initVulkanObject(args.api, args.registry, True)
-            generator2 = VulkanProfilesSchemaGenerator2(vk)
-            validate_profiles_jsons_data(Path(args.input), generator2.schema)
+    try:
+        import jsonschema
+    except ModuleNotFoundError:
+        gen_profiles_solution.Log.w("`jsonschema` module is not installed, skipping schema validation.")
+        return
+
+    registry = getattr(args, 'registry', None)
+    api = getattr(args, 'api', 'vulkan') or 'vulkan'
+
+    if getattr(args, 'schema', None):
+        try:
+            with open(args.schema, 'r') as f:
+                schema = json.load(f)
+        except json.JSONDecodeError as e:
+            gen_profiles_solution.Log.e(f"JSON Parse Error in schema file '{args.schema}':\n  {e}")
+            sys.exit(1)
+        except Exception as e:
+            gen_profiles_solution.Log.e(f"Failed to load schema file '{args.schema}': {e}")
+            sys.exit(1)
     else:
-        validate_profiles_json(Path(args.input), Path(args.schema))
+        vk = initVulkanObject(api, registry, video=True)
+        schema_gen = VulkanProfilesSchemaGenerator2(vk)
+        schema = schema_gen.schema
+
+    input_path = Path(args.input)
+    if input_path.is_file():
+        json_files = [input_path]
+    elif input_path.is_dir():
+        json_files = list(input_path.glob('*.json'))
+    else:
+        gen_profiles_solution.Log.e(f"Input path '{args.input}' does not exist.")
+        sys.exit(1)
+
+    for json_file in json_files:
+        try:
+            with open(json_file, 'r') as f:
+                data = json.load(f)
+            jsonschema.validate(instance=data, schema=schema)
+            gen_profiles_solution.Log.i(f"Validation successful: '{json_file.name}'")
+        except json.JSONDecodeError as e:
+            gen_profiles_solution.Log.e(f"JSON Parse Error in '{json_file.name}':\n  {e}")
+            sys.exit(1)
+        except jsonschema.exceptions.ValidationError as e:
+            location = " -> ".join(str(p) for p in e.path) if e.path else "root"
+            gen_profiles_solution.Log.e(
+                f"Validation Error in '{json_file.name}':\n"
+                f"  Location : {location}\n"
+                f"  Message  : {e.message}"
+            )
+            sys.exit(1)
+        except jsonschema.exceptions.SchemaError as e:
+            gen_profiles_solution.Log.e(f"Schema Error:\n  {e.message}")
+            sys.exit(1)
