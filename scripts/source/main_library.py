@@ -39,11 +39,20 @@ def main_library(args):
 
     output_schema = getattr(args, 'output_schema', None)
     validate = getattr(args, 'validate', False)
-    out_inc = getattr(args, 'output_inc', None)
+    out_inc = getattr(args, 'output_inc', None) or getattr(args, 'output', None)
     out_src = getattr(args, 'output_src', None)
 
-    if not out_inc and not out_src and not validate and not output_schema:
-        gen_profiles_solution.Log.e("At least one action (--output-inc, --output-src, --output-schema, or --validate) must be provided")
+    mode = getattr(args, 'mode', ['header+source'])
+    if isinstance(mode, str):
+        mode = [mode]
+
+    if 'header-only' in mode:
+        out_src = None
+    elif not out_src:
+        out_src = out_inc
+
+    if not out_inc and not validate and not output_schema:
+        gen_profiles_solution.Log.e("At least one action (--output, --output-inc, --output-schema, or --validate) must be provided")
         sys.exit(1)
 
     schema = None

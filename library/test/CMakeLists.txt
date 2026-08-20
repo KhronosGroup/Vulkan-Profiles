@@ -35,8 +35,8 @@ add_custom_target(VpLibrary_test_generated_library
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${PROJECT_SOURCE_DIR}/library/test/profiles
-        --output-library-inc ${PROJECT_SOURCE_DIR}/library/test
-        --output-library-filename "test_vulkan_profiles"
+        --output ${PROJECT_SOURCE_DIR}/library/test
+        --output-filename "test_vulkan_profiles"
         --validate
     VERBATIM
     SOURCES ${CMAKE_CURRENT_LIST_DIR}/profiles

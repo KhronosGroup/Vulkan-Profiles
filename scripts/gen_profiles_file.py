@@ -63,10 +63,22 @@ class ProfileFile():
     def add_profile(self, json_profile_key, json_profile_value):
         self.json_output['profiles'][json_profile_key] = json_profile_value
 
-    def dump(self, path):
+    def dump(self, path, format_type=None):
         # Write new merged profile
+        indent = 4
+        separators = None
+
+        if format_type is not None:
+            fmt_str = str(format_type).lower()
+            if 'flatten' in fmt_str:
+                indent = None
+                separators = (',', ': ')
+
         with open(path, 'w') as file:
-            json.dump(self.json_output, file, indent = 4)
+            if indent is None:
+                json.dump(self.json_output, file, separators=separators)
+            else:
+                json.dump(self.json_output, file, indent=indent)
 
 class ProfileConfig():
     def __init__(self, input_dir, input_profile_names, profile_api_version, merge_mode):
