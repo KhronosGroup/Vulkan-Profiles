@@ -46,7 +46,7 @@ def main(argv):
     convert_parser.add_argument('--output', '-o', action='store', required=True, help='Path to the output profiles files.')
     convert_parser.add_argument('--format', action='store', choices=list(OutputFormatType), default=OutputFormatType.FLATTEN, help='Formatting style for the profiles files (default: flatten).')
     convert_parser.add_argument('--mode', nargs='*', action='store', choices=list(ConvertBits), default=list(ConvertBits), help='List of conversion capabilities')
-    convert_parser.add_argument('--validate', action='store_true', help='Validate profile files before conversion against profile schema.')
+    convert_parser.add_argument('--validate', '-v', action='store_true', help='Validate profile files before conversion against profile schema.')
 
     validate_parser = subparsers.add_parser('validate', help='Validate a profile file against a profile schema.')
     validate_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
@@ -98,6 +98,7 @@ def main(argv):
     doc_parser.add_argument('--input', '-i', action='store', required=True, help='Path to directory with profiles.')
     doc_parser.add_argument('--input-filenames', action='store', help='Comma separated list of profile filenames.')
     doc_parser.add_argument('--output', '-o', '--output-doc', action='store', required=True, help='Output markdown file for profiles documentation.')
+    doc_parser.add_argument('--validate', '-v', action='store_true', help='Validate profile files before generating documentation against profile schema.')
 
     layer_parser = subparsers.add_parser('layer', help='Generate the Vulkan profiles layer source file.')
     layer_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")

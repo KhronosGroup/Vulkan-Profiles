@@ -20,13 +20,24 @@
 # - Christophe Riccio <christophe@lunarg.com>
 
 import sys
+import argparse
 import gen_profiles_solution
+from source.main_validate import main_validate
 
 
 def main_doc(args):
     if not args.registry or not args.input or not args.output:
         gen_profiles_solution.Log.e("Generating markdown documentation requires specifying --registry, --input, and --output")
         sys.exit(1)
+
+    if getattr(args, 'validate', False):
+        validate_args = argparse.Namespace(
+            registry=getattr(args, 'registry', None),
+            input=args.input,
+            schema=getattr(args, 'schema', None),
+            api=getattr(args, 'api', 'vulkan') or 'vulkan'
+        )
+        main_validate(validate_args)
 
     api = getattr(args, 'api', 'vulkan') or 'vulkan'
     registry = gen_profiles_solution.VulkanRegistry(args.registry, api)
