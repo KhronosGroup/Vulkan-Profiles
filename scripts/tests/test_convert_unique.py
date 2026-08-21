@@ -310,6 +310,10 @@ class TestConvertUnique(unittest.TestCase):
             },
             "capabilities": {
                 "baseline": {
+                    "extensions": {
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_multiview": 1
+                    },
                     "features": {
                         "VkPhysicalDevice16BitStorageFeatures": {
                             "storageBuffer16BitAccess": true
@@ -319,7 +323,7 @@ class TestConvertUnique(unittest.TestCase):
                         }
                     },
                     "properties": {
-                        "VkPhysicalDeviceVulkan11Properties": {
+                        "VkPhysicalDeviceMultiviewProperties": {
                             "maxMultiviewViewCount": 6
                         },
                         "VkPhysicalDeviceMultiviewPropertiesKHR": {
@@ -341,13 +345,17 @@ class TestConvertUnique(unittest.TestCase):
             },
             "capabilities": {
                 "baseline": {
+                    "extensions": {
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_multiview": 1
+                    },
                     "features": {
                         "VkPhysicalDevice16BitStorageFeatures": {
                             "storageBuffer16BitAccess": true
                         }
                     },
                     "properties": {
-                        "VkPhysicalDeviceVulkan11Properties": {
+                        "VkPhysicalDeviceMultiviewProperties": {
                             "maxMultiviewViewCount": 6
                         },
                         "VkPhysicalDeviceMultiviewPropertiesKHR": {
