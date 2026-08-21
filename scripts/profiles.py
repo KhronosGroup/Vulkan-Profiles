@@ -33,17 +33,36 @@ from source.main_library import main_library
 from source.main_doc import main_doc
 
 
+class ValidateAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        valid_modes = ['schema', 'analysis']
+        if values is None or len(values) == 0:
+            setattr(namespace, self.dest, valid_modes)
+        else:
+            res = []
+            for v in values:
+                for item in v.split(','):
+                    item = item.strip()
+                    if item:
+                        if item not in valid_modes:
+                            parser.error(f"argument {option_string}: invalid choice: '{item}' (choose from 'schema', 'analysis')")
+                        if item not in res:
+                            res.append(item)
+            setattr(namespace, self.dest, res)
+
+
 def main(argv):
     logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
     
     parser = argparse.ArgumentParser(description='Convert Vulkan profile JSON file')
     subparsers = parser.add_subparsers(dest='command', required=True)
 
-    validate_parser = subparsers.add_parser('validate', help='Validate a profile file against a profile schema.')
+    validate_parser = subparsers.add_parser('validate', help='Validate a profile file against a profile schema or perform static analysis.')
     validate_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     validate_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
     validate_parser.add_argument('--schema', '-s', action='store', help='Use a profile schema (profiles-*.json). By default, generate a profile schema vk.xml.')
     validate_parser.add_argument('--input', '-i', action='store', required=True, help='Path to the input profiles files.')
+    validate_parser.add_argument('--mode', '-m', nargs='*', action='store', choices=['schema', 'analysis'], default=['schema', 'analysis'], help="Validation mode(s) to execute (default: schema analysis).")
 
     schema_parser = subparsers.add_parser('schema', help='Generate a profile json schema file.')
     schema_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
@@ -57,7 +76,7 @@ def main(argv):
     convert_parser.add_argument('--output', '-o', action='store', required=True, help='Path to the output profiles files.')
     convert_parser.add_argument('--format', action='store', choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the profiles files (default: flatten).')
     convert_parser.add_argument('--mode', '-m', nargs='*', action='store', choices=list(ConvertBits), default=list(ConvertBits), help='List of conversion capabilities')
-    convert_parser.add_argument('--validate', '-v', action='store_true', help='Validate profile files before conversion against profile schema.')
+    convert_parser.add_argument('--validate', '-v', nargs='*', action=ValidateAction, default=None, help='Validate profile files before conversion (choices: schema, analysis).')
 
     solution_parser = subparsers.add_parser('merge', help='Generate merged Vulkan profile JSON files.')
     solution_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
@@ -87,7 +106,7 @@ def main(argv):
     library_parser.add_argument('--output-src', action='store', help='Output source directory for profile library.')
     library_parser.add_argument('--output-filename', action='store', default='vulkan_profiles', help='Output filename for profile library, default "vulkan_profiles".')
     library_parser.add_argument('--mode', nargs='*', action='store', choices=['header-only', 'header+source'], default=['header-only', 'header+source'], help='Library output generation mode.')
-    library_parser.add_argument('--validate', '-v', action='store_true', help='Validate generated JSON profile schema and JSON profiles against the schema.')
+    library_parser.add_argument('--validate', '-v', nargs='*', action=ValidateAction, default=None, help='Validate generated JSON profile schema and JSON profiles (choices: schema, analysis).')
     library_parser.add_argument('--convert', nargs='*', action='store', choices=list(ConvertBits), help='List of conversion capabilities to apply before generating the library.')
     library_parser.add_argument('--intermediate', action='store', help='Directory path for intermediate converted profiles (used when --convert is provided).')
     library_parser.add_argument('--debug', '-d', action='store_true', help='Also generate library variant with debug messages.')
@@ -99,7 +118,7 @@ def main(argv):
     doc_parser.add_argument('--input', '-i', action='store', required=True, help='Path to directory with profiles.')
     doc_parser.add_argument('--input-filenames', action='store', help='Comma separated list of profile filenames.')
     doc_parser.add_argument('--output', '-o', action='store', required=True, help='Output markdown file for profiles documentation.')
-    doc_parser.add_argument('--validate', '-v', action='store_true', help='Validate profile files before generating documentation against profile schema.')
+    doc_parser.add_argument('--validate', '-v', nargs='*', action=ValidateAction, default=None, help='Validate profile files before generating documentation (choices: schema, analysis).')
 
     layer_parser = subparsers.add_parser('layer', help='Generate the Vulkan profiles layer source file.')
     layer_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
