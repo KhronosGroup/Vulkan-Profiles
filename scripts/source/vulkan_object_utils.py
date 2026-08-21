@@ -30,7 +30,7 @@ from typing import Any
 from vulkan_object import VulkanObject, CapabilityAlias, StructCapabilityAlias, ExtensionCapabilityAlias
 from reg import Registry
 from base_generator import BaseGenerator, BaseGeneratorOptions, SetOutputDirectory, SetOutputFileName, SetTargetApiName, SetMergedApiNames
-from source.vulkan_object_version import VK_VERSION
+from source.vulkan_object_version import VK_VERSION, get_bundle_structure_core_version
 from source.vulkan_object_expression_parsing import collectExtensions, evalExpression
 
 __all__ = [
@@ -97,6 +97,94 @@ def getStructByName(structs_dict, struct_name):
 
 def getMemberByName(search_struct, member_name):
     return next((member for member in search_struct.members if member.name == member_name), None)
+
+def getExtensionPromotedTo(vk: VulkanObject, ext_name: str) -> list[str]:
+    """Retrieves the list of 'promotedto' targets for an extension from vk.xml."""
+    if hasattr(vk, 'extensions') and ext_name in vk.extensions:
+        ext_obj = vk.extensions[ext_name]
+        promoted = getattr(ext_obj, 'promotedTo', None)
+        if promoted is None:
+            promoted = getattr(ext_obj, 'promotedto', None)
+        if isinstance(promoted, list):
+            return [p for p in promoted if p]
+        elif isinstance(promoted, str) and promoted:
+            return [p.strip() for p in promoted.split(',') if p.strip()]
+    return []
+
+def getStructDefiningExtensions(vk: VulkanObject, struct_name: str) -> list[str]:
+    """Retrieves extension names defining a structure from vk.xml / vulkan_object."""
+    exts = set()
+
+    struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
+    if struct_obj:
+        if hasattr(struct_obj, 'definingRequirements') and struct_obj.definingRequirements:
+            exts.update(struct_obj.definingRequirements.keys())
+        if hasattr(struct_obj, 'extensions') and struct_obj.extensions:
+            exts.update(struct_obj.extensions)
+
+    if hasattr(vk, 'aliasTypeRequirements') and struct_name in vk.aliasTypeRequirements:
+        exts.update(vk.aliasTypeRequirements[struct_name].keys())
+
+    if hasattr(vk, 'extensions'):
+        for e_name, e_obj in vk.extensions.items():
+            e_structs = getattr(e_obj, 'structs', {})
+            if isinstance(e_structs, (dict, list, set)) and struct_name in e_structs:
+                exts.add(e_name)
+            e_features = getattr(e_obj, 'features', {})
+            if isinstance(e_features, (dict, list, set)) and struct_name in e_features:
+                exts.add(e_name)
+
+    return [e for e in exts if hasattr(vk, 'extensions') and e in vk.extensions]
+
+
+def is_extension_struct_name(vk: VulkanObject, struct_name: str) -> bool:
+    """Returns True if struct_name has a vendor or extension suffix (e.g. KHR, EXT, NV, AMD)."""
+    if struct_name.endswith("KHR") or struct_name.endswith("EXT"):
+        return True
+    if hasattr(vk, 'extensions'):
+        for ext_name in vk.extensions.keys():
+            parts = ext_name.split('_')
+            if len(parts) >= 2:
+                tag = parts[1]
+                if tag and struct_name.endswith(tag):
+                    return True
+    return False
+
+
+def getStructCoreVersion(vk: VulkanObject, struct_name: str) -> VK_VERSION:
+    """Returns the VK_VERSION where a structure was introduced into core Vulkan."""
+    bundle_ver = get_bundle_structure_core_version(struct_name)
+    if bundle_ver != VK_VERSION.NONE:
+        return bundle_ver
+
+    # Extension structs/aliases ending in vendor tags (KHR, EXT, etc.) are not core structures
+    if is_extension_struct_name(vk, struct_name):
+        return VK_VERSION.NONE
+
+    struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
+
+    if struct_obj:
+        def_ver = getattr(struct_obj, 'definedByVersion', None)
+        if def_ver is not None and def_ver != VK_VERSION.NONE:
+            return VK_VERSION.from_string(def_ver) if not isinstance(def_ver, VK_VERSION) else def_ver
+
+        obj_ver = getattr(struct_obj, 'version', None)
+        if obj_ver:
+            ver_enum = VK_VERSION.from_string(obj_ver)
+            if ver_enum != VK_VERSION.NONE:
+                return ver_enum
+
+    # Check if the structure's defining extension was promoted to a core version
+    def_exts = getStructDefiningExtensions(vk, struct_name)
+    for ext_name in def_exts:
+        promoted_targets = getExtensionPromotedTo(vk, ext_name)
+        for target in promoted_targets:
+            p_ver = VK_VERSION.from_string(target)
+            if p_ver != VK_VERSION.NONE:
+                return p_ver
+
+    return VK_VERSION.NONE
+
 
 def gatherCapabilityAliases(vk: VulkanObject, alias_id: CapabilityAlias) -> list[CapabilityAlias]:
     canonical_key = None
@@ -208,27 +296,6 @@ def gatherDependentCapabilityAliases2(vk: VulkanObject, version: VK_VERSION, ali
 
     return filtered_aliases
 
-def _get_struct_core_version(vk: VulkanObject, struct_name: str) -> tuple[int, int] | None:
-    if struct_name in vk.structs:
-        struct_obj = vk.structs[struct_name]
-        if getattr(struct_obj, 'version', None):
-            ver = _parse_version_tuple(struct_obj.version)
-            if ver > (0, 0):
-                return ver
-        if getattr(struct_obj, 'definingRequirements', None):
-            for req in struct_obj.definingRequirements:
-                ver = _get_promoted_core_version(vk, req)
-                if ver:
-                    return ver
-
-    if hasattr(vk, 'aliasTypeRequirements') and struct_name in vk.aliasTypeRequirements:
-        for req in vk.aliasTypeRequirements[struct_name]:
-            ver = _get_promoted_core_version(vk, req)
-            if ver:
-                return ver
-
-    return None
-
 def gatherDependentCapabilityAliases(vk: VulkanObject, version: VK_VERSION, alias_id: CapabilityAlias) -> list[CapabilityAlias]:
     aliases = gatherCapabilityAliases(vk, alias_id)
     target_ver_tuple = _parse_version_tuple(version)
@@ -239,8 +306,8 @@ def gatherDependentCapabilityAliases(vk: VulkanObject, version: VK_VERSION, alia
     filtered_aliases = []
     for alias in aliases:
         if isinstance(alias, StructCapabilityAlias):
-            struct_core_ver = _get_struct_core_version(vk, alias.struct)
-            if struct_core_ver is not None and target_ver_tuple < struct_core_ver:
+            struct_core_ver = getStructCoreVersion(vk, alias.struct)
+            if struct_core_ver != VK_VERSION.NONE and version < struct_core_ver:
                 continue
 
         if isinstance(alias, ExtensionCapabilityAlias):
@@ -480,4 +547,3 @@ def gatherSatisfiedExtensionRequiredFeatures(
                 satisfied_features.setdefault(req.struct, {})[field_name] = True
 
     return satisfied_features
-

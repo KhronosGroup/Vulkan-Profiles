@@ -40,7 +40,171 @@ class TestConvertStripDuplication(unittest.TestCase):
     def setUp(self):
         self.vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
 
-    def test_strip_duplication_from_inherited_parent_blocks(self):
+    def test_strip_features_duplication_combined_vulkan12(self):
+        """
+        Verifies stripping behavior when a Vulkan 1.2 capability block contains duplicate split
+        and bundle feature structures. Redundant split structures are stripped when covered by
+        active Vulkan 1.1/1.2 bundle structures (VkPhysicalDeviceVulkan11Features and VkPhysicalDeviceVulkan12Features).
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_LUNARG_profile": {
+                    "version": 1,
+                    "api-version": "1.2.0",
+                    "capabilities": [
+                        "caps_combined"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps_combined": {
+                    "extensions": {
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_imageless_framebuffer": 1
+                    },
+                    "features": {
+                        "VkPhysicalDevice16BitStorageFeatures": {
+                            "storageBuffer16BitAccess": true,
+                            "uniformAndStorageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                            "storageBuffer16BitAccess": true,
+                            "uniformAndStorageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVulkan11Features": {
+                            "storageBuffer16BitAccess": true,
+                            "uniformAndStorageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVulkan12Features": {
+                            "imagelessFramebuffer": true
+                        },
+                        "VkPhysicalDeviceImagelessFramebufferFeaturesKHR": {
+                            "imagelessFramebuffer": true
+                        },
+                        "VkPhysicalDeviceImagelessFramebufferFeatures": {
+                            "imagelessFramebuffer": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_LUNARG_profile": {
+                    "version": 1,
+                    "api-version": "1.2.0",
+                    "capabilities": [
+                        "caps_combined"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps_combined": {
+                    "extensions": {
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_imageless_framebuffer": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceVulkan11Features": {
+                            "storageBuffer16BitAccess": true,
+                            "uniformAndStorageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVulkan12Features": {
+                            "imagelessFramebuffer": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+    def test_strip_features_duplication_combined_vulkan11(self):
+        """
+        Verifies stripping behavior for a Vulkan 1.1 profile containing duplicate canonical
+        and extension alias structures. Because Vulkan 1.2 bundle structures are not active in Vulkan 1.1,
+        extension alias structures (VkPhysicalDevice16BitStorageFeaturesKHR) are stripped in favor
+        of the canonical Vulkan 1.1 core structure (VkPhysicalDevice16BitStorageFeatures).
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_LUNARG_profile": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": [
+                        "caps_combined"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps_combined": {
+                    "extensions": {
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_imageless_framebuffer": 1
+                    },
+                    "features": {
+                        "VkPhysicalDevice16BitStorageFeatures": {
+                            "storageBuffer16BitAccess": true,
+                            "uniformAndStorageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                            "storageBuffer16BitAccess": true,
+                            "uniformAndStorageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceImagelessFramebufferFeaturesKHR": {
+                            "imagelessFramebuffer": true
+                        },
+                        "VkPhysicalDeviceImagelessFramebufferFeatures": {
+                            "imagelessFramebuffer": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_LUNARG_profile": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": [
+                        "caps_combined"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps_combined": {
+                    "extensions": {
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_imageless_framebuffer": 1
+                    },
+                    "features": {
+                        "VkPhysicalDevice16BitStorageFeatures": {
+                            "storageBuffer16BitAccess": true,
+                            "uniformAndStorageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceImagelessFramebufferFeaturesKHR": {
+                            "imagelessFramebuffer": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+    def test_strip_features_duplication_from_inherited_parent_blocks(self):
         """
         Verifies that features and extensions already present in parent capability blocks
         are stripped from subsequent capability blocks unless a structure remaining in that block
@@ -183,8 +347,7 @@ class TestConvertStripDuplication(unittest.TestCase):
 
         self.assertEqual(generated_data, expected_data)
 
-        
-    def test_strip_duplication_from_inherited_parent_profile(self):
+    def test_strip_features_duplication_from_inherited_parent_profile(self):
         """
         Verifies that features and extensions already present in a required parent profile
         are stripped from the child profile. VK_KHR_imageless_framebuffer is declared in the parent
@@ -280,6 +443,538 @@ class TestConvertStripDuplication(unittest.TestCase):
                         },
                         "VkPhysicalDeviceImagelessFramebufferFeaturesKHR": {
                             "imagelessFramebuffer": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+    def test_strip_features_duplication_with_vulkan12_bundle_structure(self):
+        """
+        Verifies that duplicate feature entries inside Vulkan 1.2 bundle structures 
+        (e.g., VkPhysicalDeviceVulkan11Features and VkPhysicalDeviceVulkan12Features)
+        are properly stripped across inherited capability blocks.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_v12_profile": {
+                    "version": 1,
+                    "api-version": "1.2.0",
+                    "capabilities": [
+                        "caps1",
+                        "caps2"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps1": {
+                    "features": {
+                        "VkPhysicalDeviceVulkan11Features": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVulkan12Features": {
+                            "drawIndirectCount": true
+                        }
+                    }
+                },
+                "caps2": {
+                    "features": {
+                        "VkPhysicalDeviceVulkan11Features": {
+                            "storageBuffer16BitAccess": true,
+                            "uniformAndStorageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVulkan12Features": {
+                            "drawIndirectCount": true,
+                            "samplerMirrorClampToEdge": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_v12_profile": {
+                    "version": 1,
+                    "api-version": "1.2.0",
+                    "capabilities": [
+                        "caps1",
+                        "caps2"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps1": {
+                    "features": {
+                        "VkPhysicalDeviceVulkan11Features": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVulkan12Features": {
+                            "drawIndirectCount": true
+                        }
+                    }
+                },
+                "caps2": {
+                    "features": {
+                        "VkPhysicalDeviceVulkan11Features": {
+                            "uniformAndStorageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVulkan12Features": {
+                            "samplerMirrorClampToEdge": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+    def test_strip_properties_duplication_vulkan11(self):
+        """
+        Verifies property duplication stripping for a Vulkan 1.1 profile using valid Vulkan 1.1
+        property structures (VkPhysicalDeviceSubgroupProperties and VkPhysicalDeviceMultiviewProperties).
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_v11_properties_profile": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": [
+                        "caps1",
+                        "caps2"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps1": {
+                    "properties": {
+                        "VkPhysicalDeviceSubgroupProperties": {
+                            "subgroupSize": 32,
+                            "quadOperationsInAllStages": true
+                        },
+                        "VkPhysicalDeviceMultiviewProperties": {
+                            "maxMultiviewViewCount": 6
+                        }
+                    }
+                },
+                "caps2": {
+                    "properties": {
+                        "VkPhysicalDeviceSubgroupProperties": {
+                            "subgroupSize": 32,
+                            "quadOperationsInAllStages": false
+                        },
+                        "VkPhysicalDeviceMultiviewProperties": {
+                            "maxMultiviewViewCount": 6
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_v11_properties_profile": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": [
+                        "caps1",
+                        "caps2"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps1": {
+                    "properties": {
+                        "VkPhysicalDeviceSubgroupProperties": {
+                            "subgroupSize": 32,
+                            "quadOperationsInAllStages": true
+                        },
+                        "VkPhysicalDeviceMultiviewProperties": {
+                            "maxMultiviewViewCount": 6
+                        }
+                    }
+                },
+                "caps2": {
+                    "properties": {
+                        "VkPhysicalDeviceSubgroupProperties": {
+                            "quadOperationsInAllStages": false
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+    def test_strip_properties_duplication_vulkan12(self):
+        """
+        Verifies property duplication stripping for a Vulkan 1.2 profile using Vulkan 1.2 core 
+        bundle structures (VkPhysicalDeviceVulkan11Properties).
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_v12_properties_profile": {
+                    "version": 1,
+                    "api-version": "1.2.0",
+                    "capabilities": [
+                        "caps1",
+                        "caps2"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps1": {
+                    "properties": {
+                        "VkPhysicalDeviceVulkan11Properties": {
+                            "maxSubgroupSize": 64,
+                            "subgroupSize": 32
+                        },
+                        "VkPhysicalDeviceMultiviewProperties": {
+                            "maxMultiviewViewCount": 6
+                        }
+                    }
+                },
+                "caps2": {
+                    "properties": {
+                        "VkPhysicalDeviceVulkan11Properties": {
+                            "maxSubgroupSize": 64,
+                            "subgroupSize": 64
+                        },
+                        "VkPhysicalDeviceMultiviewProperties": {
+                            "maxMultiviewViewCount": 6
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_v12_properties_profile": {
+                    "version": 1,
+                    "api-version": "1.2.0",
+                    "capabilities": [
+                        "caps1",
+                        "caps2"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps1": {
+                    "properties": {
+                        "VkPhysicalDeviceVulkan11Properties": {
+                            "maxSubgroupSize": 64,
+                            "subgroupSize": 32
+                        },
+                        "VkPhysicalDeviceMultiviewProperties": {
+                            "maxMultiviewViewCount": 6
+                        }
+                    }
+                },
+                "caps2": {
+                    "properties": {
+                        "VkPhysicalDeviceVulkan11Properties": {
+                            "subgroupSize": 64
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+    def test_strip_formats_duplication_vulkan11(self):
+        """
+        Verifies format feature list duplication stripping for a Vulkan 1.1 profile
+        using VkFormatProperties. Duplicate list entries are stripped while unique entries remain.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_v11_formats_profile": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": [
+                        "caps1",
+                        "caps2"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps1": {
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties": {
+                                "linearTilingFeatures": [
+                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"
+                                ],
+                                "optimalTilingFeatures": [
+                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                                    "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "caps2": {
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties": {
+                                "linearTilingFeatures": [
+                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"
+                                ],
+                                "optimalTilingFeatures": [
+                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                                    "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
+                                    "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_v11_formats_profile": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": [
+                        "caps1",
+                        "caps2"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps1": {
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties": {
+                                "linearTilingFeatures": [
+                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"
+                                ],
+                                "optimalTilingFeatures": [
+                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                                    "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "caps2": {
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties": {
+                                "optimalTilingFeatures": [
+                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+                                    "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
+                                    "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+    def test_strip_formats_duplication_vulkan13(self):
+        """
+        Verifies format feature list duplication stripping for a Vulkan 1.3 profile
+        using VkFormatProperties3. Completely identical format definitions across capability blocks are fully stripped.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_v13_formats_profile": {
+                    "version": 1,
+                    "api-version": "1.3.0",
+                    "capabilities": [
+                        "caps1",
+                        "caps2"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps1": {
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties3": {
+                                "linearTilingFeatures": [
+                                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "caps2": {
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties3": {
+                                "linearTilingFeatures": [
+                                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_v13_formats_profile": {
+                    "version": 1,
+                    "api-version": "1.3.0",
+                    "capabilities": [
+                        "caps1",
+                        "caps2"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps1": {
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties3": {
+                                "linearTilingFeatures": [
+                                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "caps2": {
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+    def test_strip_formats_duplication_mixed_properties(self):
+        """
+        Verifies format feature duplication stripping when a capability block contains
+        both VkFormatProperties and VkFormatProperties3 for the same format. Duplicate 
+        VkFormatProperties structures are stripped when fully matched in parent blocks, 
+        leaving only updated VkFormatProperties3 structures.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_v13_mixed_formats_profile": {
+                    "version": 1,
+                    "api-version": "1.3.0",
+                    "capabilities": [
+                        "caps1",
+                        "caps2"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps1": {
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties": {
+                                "linearTilingFeatures": [
+                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"
+                                ]
+                            },
+                            "VkFormatProperties3": {
+                                "linearTilingFeatures": [
+                                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "caps2": {
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties": {
+                                "linearTilingFeatures": [
+                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"
+                                ]
+                            },
+                            "VkFormatProperties3": {
+                                "linearTilingFeatures": [
+                                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT",
+                                    "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_v13_mixed_formats_profile": {
+                    "version": 1,
+                    "api-version": "1.3.0",
+                    "capabilities": [
+                        "caps1",
+                        "caps2"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps1": {
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties": {
+                                "linearTilingFeatures": [
+                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"
+                                ]
+                            },
+                            "VkFormatProperties3": {
+                                "linearTilingFeatures": [
+                                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "caps2": {
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties3": {
+                                "linearTilingFeatures": [
+                                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT",
+                                    "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT"
+                                ]
+                            }
                         }
                     }
                 }

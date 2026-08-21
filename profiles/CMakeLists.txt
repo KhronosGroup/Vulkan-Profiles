@@ -131,6 +131,7 @@ add_custom_target(VpGenerate-Libraries
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}
+        --mode schema
     COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
