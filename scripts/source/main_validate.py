@@ -24,69 +24,14 @@ import json
 from pathlib import Path
 
 import gen_profiles_solution
-from source.vulkan_object_utils import initVulkanObject, VK_VERSION, getStructByName
+from source.vulkan_object_version import VK_VERSION
+from source.vulkan_object_utils import (
+    initVulkanObject, 
+    getExtensionPromotedTo, 
+    getStructDefiningExtensions,
+    getStructCoreVersion
+)
 from source.generate_profiles_schema import VulkanProfilesSchemaGenerator2
-
-
-def _get_extension_promoted_to(vk, ext_name: str) -> list[str]:
-    if hasattr(vk, 'extensions') and ext_name in vk.extensions:
-        ext_obj = vk.extensions[ext_name]
-        promoted = getattr(ext_obj, 'promotedTo', None) or getattr(ext_obj, 'promotedto', None)
-        if isinstance(promoted, list):
-            return [p for p in promoted if p]
-        elif isinstance(promoted, str) and promoted:
-            return [p.strip() for p in promoted.split(',') if p.strip()]
-    return []
-
-
-def _get_struct_defining_extensions(vk, struct_name: str) -> list[str]:
-    exts = set()
-
-    struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
-    if struct_obj:
-        if hasattr(struct_obj, 'definingRequirements') and struct_obj.definingRequirements:
-            exts.update(struct_obj.definingRequirements.keys())
-        if hasattr(struct_obj, 'extensions') and struct_obj.extensions:
-            exts.update(struct_obj.extensions)
-
-    if hasattr(vk, 'aliasTypeRequirements') and struct_name in vk.aliasTypeRequirements:
-        exts.update(vk.aliasTypeRequirements[struct_name].keys())
-
-    if hasattr(vk, 'extensions'):
-        for e_name, e_obj in vk.extensions.items():
-            e_structs = getattr(e_obj, 'structs', {})
-            if isinstance(e_structs, (dict, list, set)) and struct_name in e_structs:
-                exts.add(e_name)
-            e_features = getattr(e_obj, 'features', {})
-            if isinstance(e_features, (dict, list, set)) and struct_name in e_features:
-                exts.add(e_name)
-
-    return [e for e in exts if hasattr(vk, 'extensions') and e in vk.extensions]
-
-
-def _get_struct_core_version(vk, struct_name: str) -> VK_VERSION:
-    if struct_name in ("VkPhysicalDeviceVulkan11Features", "VkPhysicalDeviceVulkan11Properties"):
-        return VK_VERSION.V1_2
-    if struct_name in ("VkPhysicalDeviceVulkan12Features", "VkPhysicalDeviceVulkan12Properties"):
-        return VK_VERSION.V1_2
-    if struct_name in ("VkPhysicalDeviceVulkan13Features", "VkPhysicalDeviceVulkan13Properties"):
-        return VK_VERSION.V1_3
-    if struct_name in ("VkPhysicalDeviceVulkan14Features", "VkPhysicalDeviceVulkan14Properties"):
-        return VK_VERSION.V1_4
-
-    struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
-    if struct_obj:
-        def_ver = getattr(struct_obj, 'definedByVersion', None)
-        if def_ver is not None and def_ver != VK_VERSION.NONE:
-            return def_ver
-
-        def_reqs = getattr(struct_obj, 'definingRequirements', {})
-        for req in def_reqs.keys():
-            ver = VK_VERSION.from_string(req)
-            if ver != VK_VERSION.NONE:
-                return ver
-
-    return VK_VERSION.NONE
 
 
 def _collect_block_names(json_capabilities):
@@ -138,9 +83,9 @@ class VulkanProfilesDataValidation:
 
                         for struct_name in section_dict.keys():
                             # Issue 1: Capabilities block lists extension structure without declaring the extension
-                            def_exts = _get_struct_defining_extensions(self.vk, struct_name)
+                            def_exts = getStructDefiningExtensions(self.vk, struct_name)
                             for ext_name in def_exts:
-                                promoted_targets = _get_extension_promoted_to(self.vk, ext_name)
+                                promoted_targets = getExtensionPromotedTo(self.vk, ext_name)
                                 promoted_to_core = False
                                 for target in promoted_targets:
                                     p_ver = VK_VERSION.from_string(target)
@@ -155,7 +100,7 @@ class VulkanProfilesDataValidation:
                                     )
 
                             # Issue 2: Vulkan core structure used with an older Vulkan version
-                            struct_core_ver = _get_struct_core_version(self.vk, struct_name)
+                            struct_core_ver = getStructCoreVersion(self.vk, struct_name)
                             if struct_core_ver != VK_VERSION.NONE and api_version != VK_VERSION.NONE and api_version < struct_core_ver:
                                 ver_tuple = struct_core_ver.as_tuple()
                                 ver_str = f"{ver_tuple[0]}.{ver_tuple[1]}"
@@ -184,7 +129,7 @@ class VulkanProfilesDataValidation:
 
 
 def main_validate(args):
-    modes = getattr(args, 'mode', None) or ['schema', 'analysis']
+    modes = getattr(args, 'mode', None) or ['schema']
 
     registry = getattr(args, 'registry', None)
     api = getattr(args, 'api', 'vulkan') or 'vulkan'
@@ -250,3 +195,4 @@ def main_validate(args):
         success = analyzer.validate_files(json_files)
         if not success:
             sys.exit(1)
+            

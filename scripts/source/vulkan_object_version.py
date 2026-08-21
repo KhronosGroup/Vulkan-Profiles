@@ -60,6 +60,11 @@ class VK_VERSION(Enum):
 
         return cls.NONE
 
+    @classmethod
+    def core_versions(cls) -> list["VK_VERSION"]:
+        """Returns all Vulkan core versions that promote extensions (> Vulkan 1.0)."""
+        return [v for v in cls if v > cls.V1_0]
+
     def as_tuple(self) -> tuple[int, int]:
         """Converts enum value (e.g., 'VK_VERSION_1_3') to numeric tuple (1, 3) for comparisons."""
         if self == VK_VERSION.NONE:
@@ -95,4 +100,25 @@ class VK_VERSION(Enum):
     def __ge__(self, other) -> bool:
         other_ver = other if isinstance(other, VK_VERSION) else VK_VERSION.from_string(other)
         return self.as_tuple() >= other_ver.as_tuple()
-    
+
+
+BUNDLE_STRUCTURE_VERSIONS = {
+    "VkPhysicalDeviceVulkan11Features": VK_VERSION.V1_2,
+    "VkPhysicalDeviceVulkan11Properties": VK_VERSION.V1_2,
+    "VkPhysicalDeviceVulkan12Features": VK_VERSION.V1_2,
+    "VkPhysicalDeviceVulkan12Properties": VK_VERSION.V1_2,
+    "VkPhysicalDeviceVulkan13Features": VK_VERSION.V1_3,
+    "VkPhysicalDeviceVulkan13Properties": VK_VERSION.V1_3,
+    "VkPhysicalDeviceVulkan14Features": VK_VERSION.V1_4,
+    "VkPhysicalDeviceVulkan14Properties": VK_VERSION.V1_4,
+}
+
+
+def is_bundle_structure(struct_name: str) -> bool:
+    """Checks whether a structure is a core bundle structure (e.g. VkPhysicalDeviceVulkan11Features)."""
+    return struct_name in BUNDLE_STRUCTURE_VERSIONS or bool(re.match(r"^VkPhysicalDeviceVulkan1\d(Features|Properties)$", struct_name))
+
+
+def get_bundle_structure_core_version(struct_name: str) -> VK_VERSION:
+    """Returns the VK_VERSION where the bundle structure was introduced, or VK_VERSION.NONE if not a bundle."""
+    return BUNDLE_STRUCTURE_VERSIONS.get(struct_name, VK_VERSION.NONE)

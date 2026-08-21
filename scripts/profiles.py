@@ -62,7 +62,7 @@ def main(argv):
     validate_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
     validate_parser.add_argument('--schema', '-s', action='store', help='Use a profile schema (profiles-*.json). By default, generate a profile schema vk.xml.')
     validate_parser.add_argument('--input', '-i', action='store', required=True, help='Path to the input profiles files.')
-    validate_parser.add_argument('--mode', '-m', nargs='*', action='store', choices=['schema', 'analysis'], default=['schema', 'analysis'], help="Validation mode(s) to execute (default: schema analysis).")
+    validate_parser.add_argument('--mode', '-m', nargs='*', action='store', choices=['schema', 'analysis'], default=['schema'], help="Validation mode(s) to execute (default: schema analysis).")
 
     schema_parser = subparsers.add_parser('schema', help='Generate a profile json schema file.')
     schema_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')

@@ -33,7 +33,7 @@ from vulkan_object import VulkanObject
 from source.vulkan_object_utils import initVulkanObject
 from source.main_convert import (
     pull_profiles_files_dependencies,
-    pull_required_features_profiles_files
+    pull_required_capabilities_profiles_files
 )
 
 
@@ -138,7 +138,7 @@ class TestConvertPullDependences(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_required_features_profiles_files(self.vk, json_files_dict)
+        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
@@ -154,3 +154,4 @@ if __name__ == '__main__':
     TestConvertPullDependences.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
+    

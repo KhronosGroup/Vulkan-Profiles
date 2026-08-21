@@ -42,12 +42,38 @@ from source.vulkan_object_utils import (
     gatherSatisfiedExtensionRequiredFeatures,
     gatherPromotedExtensionsForVersion,
     gatherPromotedExtensionsForExactVersion,
-    gatherRequiredFeaturesForVersion
+    gatherRequiredFeaturesForVersion,
+    getExtensionPromotedTo,
+    getStructDefiningExtensions
 )
 
 
 class TestVulkanObjectUtils(unittest.TestCase):
     registry_path = None
+
+    def testGetExtensionPromotedTo(self):
+        vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
+
+        promoted_multiview = getExtensionPromotedTo(vk, "VK_KHR_multiview")
+        self.assertIn("VK_VERSION_1_1", promoted_multiview)
+
+        promoted_dynamic_rendering = getExtensionPromotedTo(vk, "VK_KHR_dynamic_rendering")
+        self.assertIn("VK_VERSION_1_3", promoted_dynamic_rendering)
+
+        promoted_none = getExtensionPromotedTo(vk, "VK_EXT_debug_report")
+        self.assertEqual(promoted_none, [])
+
+    def testGetStructDefiningExtensions(self):
+        vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
+
+        exts_imageless = getStructDefiningExtensions(vk, "VkPhysicalDeviceImagelessFramebufferFeaturesKHR")
+        self.assertIn("VK_KHR_imageless_framebuffer", exts_imageless)
+
+        exts_16bit = getStructDefiningExtensions(vk, "VkPhysicalDevice16BitStorageFeaturesKHR")
+        self.assertIn("VK_KHR_16bit_storage", exts_16bit)
+
+        exts_core = getStructDefiningExtensions(vk, "VkPhysicalDeviceFeatures")
+        self.assertEqual(exts_core, [])
 
     def testGatherSatisfiedCoreRequiredFeaturesVersionBoundaries(self):
         vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
