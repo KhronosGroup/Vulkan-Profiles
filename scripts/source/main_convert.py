@@ -803,12 +803,19 @@ def cleanup_and_sort_pulled_blocks(json_file_data: dict):
 # -----------------------------------------------------------------------------
 
 def main_convert(args):
-    if getattr(args, 'validate', False):
+    validate_val = getattr(args, 'validate', None)
+    if validate_val is not None and validate_val is not False:
+        if isinstance(validate_val, list):
+            validate_modes = validate_val
+        else:
+            validate_modes = ['schema', 'analysis']
+
         validate_args = argparse.Namespace(
             registry=getattr(args, 'registry', None),
             input=args.input,
             schema=getattr(args, 'schema', None),
-            api=getattr(args, 'api', 'vulkan') or 'vulkan'
+            api=getattr(args, 'api', 'vulkan') or 'vulkan',
+            mode=validate_modes
         )
         main_validate(validate_args)
 
