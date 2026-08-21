@@ -59,42 +59,64 @@ class ConvertBits(str, Enum):
 
 CORE_VERSIONS = [VK_VERSION.V1_1, VK_VERSION.V1_2, VK_VERSION.V1_3, VK_VERSION.V1_4]
 
-VENDOR_SUFFIXES = (
-    "KHR", "EXT", "NV", "NVX", "AMD", "AMDX", "ARM", "INTEL", "VALVE", "QCOM", 
-    "HUAWEI", "GOOGLE", "LUNARG", "MESA", "SEC", "IMG", "BRCM", "VIV", "VSI", 
-    "KDAB", "ANDROID", "CHROMIUM", "FUCHSIA", "GGP", "NZXT", "SAMSUNG", "TIZEN", 
-    "RENDERDOC", "NN", "MVK", "KHX", "QNX", "JUICE", "FB", "RASTERGRID", "MSFT", 
-    "SHADY", "FREDEMMOTT", "MTK", "OPENXR"
-)
-
 
 def is_bundle_structure(struct_name: str) -> bool:
     """Checks whether a structure is a core bundle structure (e.g. VkPhysicalDeviceVulkan11Features)."""
     return bool(re.match(r"^VkPhysicalDeviceVulkan1\d(Features|Properties)$", struct_name))
 
 
-def get_structure_priority(struct_name: str) -> int:
-    """
-    Returns priority rank for structure deduplication:
-    1: Core Bundle Structure (e.g. VkPhysicalDeviceVulkan11Features)
-    2: Core Split / Base Structure (e.g. VkPhysicalDevice16BitStorageFeatures, VkPhysicalDeviceFeatures)
-    3: KHR Extension Structure (e.g. VkPhysicalDevice16BitStorageFeaturesKHR)
-    4: EXT Extension Structure
-    5: Vendor-Specific Extension Structure (e.g. VALVE, NV, AMD)
-    """
-    if is_bundle_structure(struct_name):
-        return 1
-    
-    if not any(struct_name.endswith(suffix) for suffix in VENDOR_SUFFIXES):
-        return 2
-    
-    if struct_name.endswith("KHR"):
-        return 3
-    
-    if struct_name.endswith("EXT"):
-        return 4
-    
-    return 5
+def is_vulkan_version_target(target: str) -> bool:
+    """Returns True if the promotedto string represents a Vulkan core version."""
+    if not target:
+        return False
+    if target.startswith("VK_VERSION_") or target.startswith("VK_API_VERSION_") or target.startswith("vulkan"):
+        return True
+    return VK_VERSION.from_string(target) != VK_VERSION.NONE
+
+
+def get_extension_promoted_to(vk: VulkanObject, ext_name: str) -> list[str]:
+    """Retrieves the list of 'promotedto' targets for an extension from vk.xml."""
+    if hasattr(vk, 'extensions') and ext_name in vk.extensions:
+        ext_obj = vk.extensions[ext_name]
+        promoted = getattr(ext_obj, 'promotedTo', None)
+        if promoted is None:
+            promoted = getattr(ext_obj, 'promotedto', None)
+        if isinstance(promoted, list):
+            return [p for p in promoted if p]
+        elif isinstance(promoted, str) and promoted:
+            return [p.strip() for p in promoted.split(',') if p.strip()]
+    return []
+
+
+def get_struct_defining_extensions(vk: VulkanObject, struct_name: str) -> list[str]:
+    """Retrieves extensions defining a structure from vk.xml."""
+    exts = []
+    if hasattr(vk, 'structs') and struct_name in vk.structs:
+        s_def = vk.structs[struct_name]
+        exts = list(getattr(s_def, 'definedByExtensions', []))
+    if not exts and hasattr(vk, 'extensions'):
+        for e_name, e_obj in vk.extensions.items():
+            if hasattr(e_obj, 'features') and struct_name in e_obj.features:
+                exts.append(e_name)
+    return exts
+
+
+def are_structs_aliases(vk: VulkanObject, struct1: str, struct2: str) -> bool:
+    """Checks if two structures are aliases in vk.xml."""
+    if struct1 == struct2:
+        return True
+    if hasattr(vk, 'structs'):
+        if struct1 in vk.structs:
+            s1 = vk.structs[struct1]
+            aliases1 = getattr(s1, 'aliases', [])
+            if struct2 in aliases1:
+                return True
+        if struct2 in vk.structs:
+            s2 = vk.structs[struct2]
+            aliases2 = getattr(s2, 'aliases', [])
+            if struct1 in aliases2:
+                return True
+    return False
 
 
 def collect_block_names(json_capabilities):
@@ -112,11 +134,6 @@ def collect_block_names(json_capabilities):
 
 
 def parse_profile_capabilities(json_capabilities: list) -> list:
-    """
-    Parses a profile's capabilities list while preserving structure:
-    - str: Mandatory (AND) capability block name.
-    - list[str]: Alternative (OR) capability block names.
-    """
     parsed = []
     for entry in json_capabilities:
         if isinstance(entry, str):
@@ -131,11 +148,6 @@ def parse_profile_capabilities(json_capabilities: list) -> list:
 # -----------------------------------------------------------------------------
 
 def collect_profile_capabilities(json_files_dict: dict, json_file_data: dict, profile_obj: dict) -> dict:
-    """
-    Gathers all capabilities (extensions, features, properties, formats) across ALL mandatory (AND)
-    capability blocks in the profile and its inherited parent profiles.
-    Used for profile-wide context during alias expansion and 'depends' evaluation across sibling blocks.
-    """
     required_profile_names = profile_obj.get("profiles", [])
     combined_caps = collect_required_profiles_capabilities(json_files_dict, required_profile_names)
 
@@ -222,14 +234,13 @@ def pull_promoted_extensions_profiles_files(vk: VulkanObject, ignore_extension_v
 
 
 # -----------------------------------------------------------------------------
-# Phase 2: Late-Stage Required Features Evaluation (handling "depends")
+# Phase 2: Late-Stage Required Features Evaluation
 # -----------------------------------------------------------------------------
 
 def pull_required_features_profiles_file(vk: VulkanObject, json_files_dict: dict, json_file_data: dict):
     profiles_data = json_file_data.get("profiles", {})
     capabilities_dict = json_file_data.setdefault("capabilities", {})
 
-    # Clean up any stale or empty pulledrequirements blocks in capabilities_dict
     stale_pulled_blocks = [
         b for b, content in list(capabilities_dict.items())
         if isinstance(b, str) and b.endswith("pulledrequirements") and (not content or not any(content.values()))
@@ -256,7 +267,6 @@ def pull_required_features_profiles_file(vk: VulkanObject, json_files_dict: dict
                     if val:
                         enabled_features.add((struct_name, member_name))
 
-        # 1. Pull extension-specific feature requirements into the capability block defining the extension
         block_names = collect_block_names(profile_obj.get("capabilities", []))
         for block_name in block_names:
             if block_name in capabilities_dict:
@@ -272,7 +282,6 @@ def pull_required_features_profiles_file(vk: VulkanObject, json_files_dict: dict
                         block_features = block.setdefault("features", {})
                         deep_merge_dict(block_features, ext_satisfied)
 
-        # Re-collect aggregate features after pulling extension features
         profile_caps = collect_profile_capabilities(json_files_dict, json_file_data, profile_obj)
         profile_features_block = profile_caps.get("features", {})
         enabled_features = set()
@@ -282,7 +291,6 @@ def pull_required_features_profiles_file(vk: VulkanObject, json_files_dict: dict
                     if val:
                         enabled_features.add((struct_name, member_name))
 
-        # 2. Pull core version feature requirements into dedicated core block for that version
         for ver in CORE_VERSIONS:
             if ver != VK_VERSION.NONE and api_version != VK_VERSION.NONE and ver <= api_version:
                 satisfied_core_features = gatherSatisfiedCoreRequiredFeaturesForVersion(
@@ -325,7 +333,6 @@ def pull_aliases_capabilities_block(
 
     enabled_exts = profile_enabled_exts if profile_enabled_exts is not None else (block_exts | inherited_exts)
 
-    # 1. Process 2-level categories: "features" and "properties"
     for category in ("features", "properties"):
         category_block = {}
         if category in inherited_caps:
@@ -378,7 +385,6 @@ def pull_aliases_capabilities_block(
         if new_category_block:
             json_profiles_capabilities_block[category] = new_category_block
 
-    # 2. Process 3-level category: "formats" using FormatFeatureFlagConverter
     formats_block = {}
     if "formats" in inherited_caps:
         deep_merge_dict(formats_block, inherited_caps["formats"])
@@ -444,9 +450,6 @@ def pull_aliases_profiles_files(vk: VulkanObject, require_promoted_extensions: b
 # -----------------------------------------------------------------------------
 
 def deep_merge_dict(target: dict, source: dict):
-    """
-    Recursively merges `source` into `target`.
-    """
     for key, value in source.items():
         if key in target and isinstance(target[key], dict) and isinstance(value, dict):
             deep_merge_dict(target[key], value)
@@ -455,10 +458,6 @@ def deep_merge_dict(target: dict, source: dict):
 
 
 def strip_dict_duplication(target: dict, reference: dict):
-    """
-    Recursively removes keys from `target` if their values match `reference`.
-    Cleans up dictionary structures that become empty after stripping.
-    """
     keys_to_delete = []
 
     for key, value in list(target.items()):
@@ -506,7 +505,7 @@ def collect_required_profiles_capabilities(json_files_dict, required_profile_nam
 
         profile_obj, json_file_data = get_profile_and_file_data(json_files_dict, profile_name)
         if not profile_obj or not json_file_data:
-            logging.error(f"Required parent profile '{profile_name}' not found in loaded JSON files! Stripping will fail for this dependency.")
+            logging.error(f"Required parent profile '{profile_name}' not found in loaded JSON files!")
             continue
 
         ancestor_profiles = profile_obj.get("profiles", [])
@@ -583,66 +582,95 @@ def strip_profiles_files_capabilities_duplication(json_files_dict):
 
 
 # -----------------------------------------------------------------------------
-# Phase 4b: Unique Conversion (Remove split/extension structures covered by higher priority structures)
+# Phase 4b: Unique Conversion (Feature Structures Only)
 # -----------------------------------------------------------------------------
 
 def make_unique_capabilities_block(vk: VulkanObject, json_block: dict, profile_caps: dict = None):
     """
-    Strips duplicate capability members from lower-priority structures if a higher-priority
-    structure (Core bundle > Core split/base > KHR extension > EXT extension > Vendor EXT)
-    defined in the profile/block already covers the capability with a matching value.
-    """
-    context_block = {}
-    if profile_caps:
-        deep_merge_dict(context_block, profile_caps)
-    deep_merge_dict(context_block, json_block)
+    Deduplicates feature structures in json_block['features'] based on extension 'promotedto' attributes in vk.xml.
 
-    for category in ("features", "properties"):
-        if category not in json_block or not isinstance(json_block[category], dict):
+    Rules (applies ONLY on 'features'):
+    1. If an extension is promotedto another extension:
+       - Check if their feature structures are aliases.
+       - If they ARE aliases: keep the feature structure of the "promotedto" extension and strip the unpromoted extension's structure.
+       - If they are NOT aliases: keep both feature structures.
+    2. If an extension is promotedto a Vulkan core version:
+       - Strip the extension feature structure.
+       - Issue a warning for each feature value that differs from the core feature structure value or is missing in core structures.
+    """
+    if "features" not in json_block or not isinstance(json_block["features"], dict):
+        return
+
+    block_features = json_block["features"]
+
+    context_features = {}
+    if profile_caps and "features" in profile_caps:
+        deep_merge_dict(context_features, profile_caps["features"])
+    deep_merge_dict(context_features, block_features)
+
+    structs_to_remove = set()
+
+    for struct_name, members in list(block_features.items()):
+        if not isinstance(members, dict):
             continue
 
-        block_category = json_block[category]
-        context_category = context_block.get(category, {})
+        defining_exts = get_struct_defining_extensions(vk, struct_name)
 
-        structs_to_remove = []
+        for ext_name in defining_exts:
+            promoted_targets = get_extension_promoted_to(vk, ext_name)
 
-        for struct_name, members in list(block_category.items()):
-            if not isinstance(members, dict):
-                continue
+            for target in promoted_targets:
+                if is_vulkan_version_target(target):
+                    # Scenario 2: promotedto is a Vulkan version
+                    for member_name, member_val in members.items():
+                        found_in_core = False
+                        matching_core_val = None
 
-            struct_priority = get_structure_priority(struct_name)
-            members_to_remove = []
+                        for c_struct, c_members in context_features.items():
+                            if c_struct == struct_name:
+                                continue
+                            c_def = vk.structs.get(c_struct) if hasattr(vk, 'structs') else None
+                            is_core = (c_def and getattr(c_def, 'definedByVersion', None) is not None) or is_bundle_structure(c_struct)
+                            if is_core and isinstance(c_members, dict) and member_name in c_members:
+                                found_in_core = True
+                                matching_core_val = c_members[member_name]
+                                break
 
-            for member_name, member_val in list(members.items()):
-                query_id = StructCapabilityAlias(struct_name, member_name)
-                aliases = gatherCapabilityAliases(vk, query_id)
+                        if not found_in_core:
+                            logging.warning(
+                                f"Feature '{member_name}' in structure '{struct_name}' "
+                                f"(promoted to core version '{target}') is missing in core feature structures."
+                            )
+                        elif matching_core_val != member_val:
+                            logging.warning(
+                                f"Feature '{member_name}' in structure '{struct_name}' ({member_val}) "
+                                f"differs from core feature structure value ({matching_core_val}) for '{target}'."
+                            )
 
-                for alias in aliases:
-                    if isinstance(alias, StructCapabilityAlias):
-                        target_struct = alias.struct
-                        target_member = alias.member
+                    structs_to_remove.add(struct_name)
 
-                        if target_struct in context_category and isinstance(context_category[target_struct], dict):
-                            target_members = context_category[target_struct]
-                            if target_member in target_members:
-                                target_val = target_members[target_member]
-                                if target_val == member_val:
-                                    target_priority = get_structure_priority(target_struct)
-                                    if target_priority < struct_priority:
-                                        members_to_remove.append(member_name)
-                                        break
+                else:
+                    # Scenario 1: promotedto is an extension
+                    promoted_ext = target
+                    promoted_ext_structs = []
+                    if hasattr(vk, 'extensions') and promoted_ext in vk.extensions:
+                        for s_name, s_obj in vk.structs.items():
+                            if promoted_ext in getattr(s_obj, 'definedByExtensions', []):
+                                promoted_ext_structs.append(s_name)
 
-            for m in members_to_remove:
-                del members[m]
+                    for p_struct in promoted_ext_structs:
+                        if p_struct in context_features:
+                            if are_structs_aliases(vk, struct_name, p_struct):
+                                # Feature structures are aliases: keep the promotedto extension's feature structure
+                                structs_to_remove.add(struct_name)
 
-            if not members:
-                structs_to_remove.append(struct_name)
 
-        for s in structs_to_remove:
-            del block_category[s]
+    for s in structs_to_remove:
+        if s in block_features:
+            del block_features[s]
 
-        if not block_category:
-            del json_block[category]
+    if not block_features:
+        del json_block["features"]
 
 
 def make_unique_profiles_file(vk: VulkanObject, json_files_dict: dict, json_file_data: dict):
@@ -743,7 +771,6 @@ def cleanup_and_sort_pulled_blocks(json_file_data: dict):
             return int(nums[0]) if nums else 0
 
         pulled_blocks.sort(key=get_ver_key)
-        # Authored blocks MUST precede pulled blocks to maintain baseline precedence
         prof["capabilities"] = other_blocks + pulled_blocks
 
 
