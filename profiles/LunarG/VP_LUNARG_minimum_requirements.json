@@ -61,7 +61,6 @@
                         "maxFragmentOutputAttachments": 4,
                         "maxFragmentDualSrcAttachments": 0,
                         "maxFragmentCombinedOutputResources": 4,
-
                         "maxComputeSharedMemorySize": 16384,
                         "maxComputeWorkGroupCount": [
                             65535,
@@ -187,7 +186,6 @@
                     "maxPerSetDescriptors": 1024,
                     "maxMemoryAllocationSize": 1073741824
                 }
-
             }
         },
         "vulkan11requirements": {
@@ -443,7 +441,15 @@
                     }
                 },
                 "VkPhysicalDeviceVulkan11Properties": {
-                    "subgroupSupportedOperations": [ "VK_SUBGROUP_FEATURE_BASIC_BIT", "VK_SUBGROUP_FEATURE_CLUSTERED_BIT", "VK_SUBGROUP_FEATURE_ROTATE_CLUSTERED_BIT" ]
+                    "subgroupSupportedStages": [
+                        "VK_SHADER_STAGE_COMPUTE_BIT",
+                        "VK_SHADER_STAGE_FRAGMENT_BIT"
+                    ],
+                    "subgroupSupportedOperations": [
+                        "VK_SUBGROUP_FEATURE_BASIC_BIT",
+                        "VK_SUBGROUP_FEATURE_ROTATE_BIT",
+                        "VK_SUBGROUP_FEATURE_ROTATE_CLUSTERED_BIT"
+                    ]
                 },                
                 "VkPhysicalDeviceVulkan12Properties": {
                     "shaderSignedZeroInfNanPreserveFloat16": true,
