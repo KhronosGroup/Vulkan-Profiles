@@ -186,7 +186,22 @@ def getStructCoreVersion(vk: VulkanObject, struct_name: str) -> VK_VERSION:
     return VK_VERSION.NONE
 
 
+def _get_alias_key(alias_id: CapabilityAlias):
+    """Converts a CapabilityAlias object into a hashable tuple key for caching."""
+    if isinstance(alias_id, StructCapabilityAlias):
+        return ('struct', alias_id.struct, alias_id.member)
+    elif isinstance(alias_id, ExtensionCapabilityAlias):
+        return ('ext', alias_id.name)
+    return str(alias_id)
+
+
 def gatherCapabilityAliases(vk: VulkanObject, alias_id: CapabilityAlias) -> list[CapabilityAlias]:
+    alias_key = _get_alias_key(alias_id)
+    if not hasattr(vk, '_capability_aliases_cache'):
+        vk._capability_aliases_cache = {}
+    if alias_key in vk._capability_aliases_cache:
+        return vk._capability_aliases_cache[alias_key]
+
     canonical_key = None
 
     if isinstance(alias_id, StructCapabilityAlias):
@@ -211,6 +226,7 @@ def gatherCapabilityAliases(vk: VulkanObject, alias_id: CapabilityAlias) -> list
                 break
         
         if not canonical_key:
+            vk._capability_aliases_cache[alias_key] = []
             return []
 
     aliases = []
@@ -230,7 +246,44 @@ def gatherCapabilityAliases(vk: VulkanObject, alias_id: CapabilityAlias) -> list
                 if isinstance(member.capabilityAlias, ExtensionCapabilityAlias) and member.capabilityAlias.name in vk.extensions:
                     aliases.append(ExtensionCapabilityAlias(member.capabilityAlias.name))
 
-    return [item for item in aliases if item != alias_id]
+    result = [item for item in aliases if item != alias_id]
+    vk._capability_aliases_cache[alias_key] = result
+    return result
+
+
+def gatherDependentCapabilityAliases(vk: VulkanObject, version: VK_VERSION, alias_id: CapabilityAlias) -> list[CapabilityAlias]:
+    cache_key = (version, _get_alias_key(alias_id))
+    if not hasattr(vk, '_dependent_capability_aliases_cache'):
+        vk._dependent_capability_aliases_cache = {}
+    if cache_key in vk._dependent_capability_aliases_cache:
+        return vk._dependent_capability_aliases_cache[cache_key]
+
+    aliases = gatherCapabilityAliases(vk, alias_id)
+    target_ver_tuple = _parse_version_tuple(version)
+
+    if target_ver_tuple == (0, 0):
+        vk._dependent_capability_aliases_cache[cache_key] = aliases
+        return aliases
+
+    filtered_aliases = []
+    for alias in aliases:
+        if isinstance(alias, StructCapabilityAlias):
+            struct_core_ver = getStructCoreVersion(vk, alias.struct)
+            if struct_core_ver != VK_VERSION.NONE and version < struct_core_ver:
+                continue
+
+        if isinstance(alias, ExtensionCapabilityAlias):
+            if alias.name in vk.extensions:
+                ext = vk.extensions[alias.name]
+                promoted_core_ver = _get_promoted_core_version(vk, ext.promotedTo)
+                if promoted_core_ver is not None and target_ver_tuple >= promoted_core_ver:
+                    continue
+
+        filtered_aliases.append(alias)
+
+    vk._dependent_capability_aliases_cache[cache_key] = filtered_aliases
+    return filtered_aliases
+
 
 def _parse_version_tuple(v) -> tuple[int, int]:
     if v is None:
@@ -296,30 +349,6 @@ def gatherDependentCapabilityAliases2(vk: VulkanObject, version: VK_VERSION, ali
 
     return filtered_aliases
 
-def gatherDependentCapabilityAliases(vk: VulkanObject, version: VK_VERSION, alias_id: CapabilityAlias) -> list[CapabilityAlias]:
-    aliases = gatherCapabilityAliases(vk, alias_id)
-    target_ver_tuple = _parse_version_tuple(version)
-
-    if target_ver_tuple == (0, 0):
-        return aliases
-
-    filtered_aliases = []
-    for alias in aliases:
-        if isinstance(alias, StructCapabilityAlias):
-            struct_core_ver = getStructCoreVersion(vk, alias.struct)
-            if struct_core_ver != VK_VERSION.NONE and version < struct_core_ver:
-                continue
-
-        if isinstance(alias, ExtensionCapabilityAlias):
-            if alias.name in vk.extensions:
-                ext = vk.extensions[alias.name]
-                promoted_core_ver = _get_promoted_core_version(vk, ext.promotedTo)
-                if promoted_core_ver is not None and target_ver_tuple >= promoted_core_ver:
-                    continue
-
-        filtered_aliases.append(alias)
-
-    return filtered_aliases
 
 def findExtensionVersion(vk: VulkanObject, extension_name: str) -> int:
     if extension_name in vk.extensions:
