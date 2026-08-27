@@ -26,6 +26,103 @@ import re
 from pathlib import Path
 from enum import Enum
 
+
+def collect_block_names(json_capabilities) -> list[str]:
+    """Flattens capability block strings and nested lists into a 1D list of block names."""
+    block_names = []
+    if not isinstance(json_capabilities, list):
+        return block_names
+    for value in json_capabilities:
+        if isinstance(value, str):
+            block_names.append(value)
+        elif isinstance(value, list):
+            for val in value:
+                if isinstance(val, str):
+                    block_names.append(val)
+    return block_names
+
+
+def parse_profile_capabilities(json_capabilities: list) -> list:
+    """Parses profile capabilities, preserving nested capability sets while filtering string entries."""
+    parsed = []
+    if not isinstance(json_capabilities, list):
+        return parsed
+    for entry in json_capabilities:
+        if isinstance(entry, str):
+            parsed.append(entry)
+        elif isinstance(entry, list):
+            parsed.append([item for item in entry if isinstance(item, str)])
+    return parsed
+
+
+def deep_merge_dict(target: dict, source: dict):
+    """Recursively merges source dict into target dict."""
+    import copy
+    for key, value in source.items():
+        if key in target and isinstance(target[key], dict) and isinstance(value, dict):
+            deep_merge_dict(target[key], value)
+        else:
+            target[key] = copy.deepcopy(value)
+
+
+def get_profile_and_file_data(json_files_dict: dict, profile_name: str):
+    """Searches loaded profile files for a given profile name and returns (profile_obj, json_file_data)."""
+    for file_path, json_file_data in json_files_dict.items():
+        if isinstance(json_file_data, dict) and "profiles" in json_file_data:
+            if profile_name in json_file_data["profiles"]:
+                return json_file_data["profiles"][profile_name], json_file_data
+    return None, None
+
+
+def collect_required_profiles_capabilities(json_files_dict: dict, required_profile_names: list[str], visited_profiles: set[str] = None) -> dict:
+    """Traverses required parent profile hierarchies and aggregates their capabilities."""
+    import logging
+    if visited_profiles is None:
+        visited_profiles = set()
+
+    collected_capabilities: dict = {}
+
+    for profile_name in required_profile_names:
+        if profile_name in visited_profiles:
+            continue
+        visited_profiles.add(profile_name)
+
+        profile_obj, json_file_data = get_profile_and_file_data(json_files_dict, profile_name)
+        if not profile_obj or not json_file_data:
+            logging.error(f"Required parent profile '{profile_name}' not found in loaded JSON files!")
+            continue
+
+        ancestor_profiles = profile_obj.get("profiles", [])
+        if ancestor_profiles:
+            ancestor_caps = collect_required_profiles_capabilities(json_files_dict, ancestor_profiles, visited_profiles)
+            deep_merge_dict(collected_capabilities, ancestor_caps)
+
+        capabilities_dict = json_file_data.get("capabilities", {})
+        parsed_caps = parse_profile_capabilities(profile_obj.get("capabilities", []))
+
+        for item in parsed_caps:
+            if isinstance(item, str):
+                if item in capabilities_dict:
+                    deep_merge_dict(collected_capabilities, capabilities_dict[item])
+
+    return collected_capabilities
+
+
+def collect_profile_capabilities(json_files_dict: dict, json_file_data: dict, profile_obj: dict) -> dict:
+    """Aggregates all capabilities (parent profile requirements + local blocks) for a given profile."""
+    required_profile_names = profile_obj.get("profiles", [])
+    combined_caps = collect_required_profiles_capabilities(json_files_dict, required_profile_names)
+
+    capabilities_dict = json_file_data.get("capabilities", {})
+    parsed_caps = parse_profile_capabilities(profile_obj.get("capabilities", []))
+
+    for item in parsed_caps:
+        if isinstance(item, str) and item in capabilities_dict:
+            deep_merge_dict(combined_caps, capabilities_dict[item])
+
+    return combined_caps
+
+
 def _validate_profiles_json_data(json_data, schema_data) -> bool:
     try:
         import jsonschema
@@ -173,3 +270,4 @@ def save_profiles_jsons(json_files_dict, output_dir, format: OutputFormatType):
                 file.write(flat_json)
             else:
                 json.dump(value, file, indent=4)
+                
