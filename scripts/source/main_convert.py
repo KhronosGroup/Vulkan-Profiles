@@ -47,7 +47,17 @@ from source.vulkan_object_utils import (
     ExtensionCapabilityAlias, 
     CapabilityAlias
 )
-from source.profiles_parsing import load_profiles_jsons, save_profiles_jsons, OutputFormatType
+from source.profiles_parsing import (
+    load_profiles_jsons, 
+    save_profiles_jsons, 
+    OutputFormatType,
+    collect_block_names,
+    parse_profile_capabilities,
+    collect_profile_capabilities,
+    collect_required_profiles_capabilities,
+    get_profile_and_file_data,
+    deep_merge_dict
+)
 from source.format_flag_converter import FormatFeatureFlagConverter 
 
 
@@ -177,89 +187,6 @@ def get_required_extensions_for_struct(vk: VulkanObject, struct_name: str, versi
 
     vk._req_exts_for_struct_cache[cache_key] = req_exts
     return req_exts
-
-
-def is_struct_covered_by_bundle(vk: VulkanObject, bundle_struct: str, split_struct: str) -> bool:
-    """Checks if a split feature structure's members are covered by a core bundle structure."""
-    s_obj = vk.structs.get(split_struct) or getStructByName(vk.structs, split_struct)
-    if not s_obj or not hasattr(s_obj, 'members'):
-        return False
-
-    for member in s_obj.members:
-        aliases = gatherCapabilityAliases(vk, StructCapabilityAlias(split_struct, member.name))
-        for alias in aliases:
-            if isinstance(alias, StructCapabilityAlias) and alias.struct == bundle_struct:
-                return True
-    return False
-
-
-def should_remove_struct_a_in_favor_of_b(vk: VulkanObject, version: VK_VERSION, struct_a: str, struct_b: str) -> bool:
-    """
-    Returns True if struct_a should be removed in favor of struct_b when both are present in the same block/context.
-    """
-    rank_a = get_struct_rank(vk, version, struct_a)
-    rank_b = get_struct_rank(vk, version, struct_b)
-
-    if rank_a < rank_b:
-        return True
-    if rank_a > rank_b:
-        return False
-
-    a_in_structs = struct_a in vk.structs
-    b_in_structs = struct_b in vk.structs
-
-    if not a_in_structs and b_in_structs:
-        return True
-    if a_in_structs and not b_in_structs:
-        return False
-
-    s_a_obj = vk.structs.get(struct_a)
-    if s_a_obj and getattr(s_a_obj, 'alias', None) == struct_b:
-        return True
-
-    return False
-
-
-def collect_block_names(json_capabilities):
-    block_names = []
-    
-    for value in json_capabilities:
-        if isinstance(value, str):
-            block_names.append(value)
-        elif isinstance(value, list):
-            names = value
-            for val in names:
-                block_names.append(val)
-        
-    return block_names
-
-
-def parse_profile_capabilities(json_capabilities: list) -> list:
-    parsed = []
-    for entry in json_capabilities:
-        if isinstance(entry, str):
-            parsed.append(entry)
-        elif isinstance(entry, list):
-            parsed.append([item for item in entry if isinstance(item, str)])
-    return parsed
-
-
-# -----------------------------------------------------------------------------
-# Capability Aggregation Helpers
-# -----------------------------------------------------------------------------
-
-def collect_profile_capabilities(json_files_dict: dict, json_file_data: dict, profile_obj: dict) -> dict:
-    required_profile_names = profile_obj.get("profiles", [])
-    combined_caps = collect_required_profiles_capabilities(json_files_dict, required_profile_names)
-
-    capabilities_dict = json_file_data.get("capabilities", {})
-    parsed_caps = parse_profile_capabilities(profile_obj.get("capabilities", []))
-
-    for item in parsed_caps:
-        if isinstance(item, str) and item in capabilities_dict:
-            deep_merge_dict(combined_caps, capabilities_dict[item])
-
-    return combined_caps
 
 
 # -----------------------------------------------------------------------------
@@ -835,11 +762,8 @@ def cleanup_and_sort_pulled_blocks(json_file_data: dict):
 
 def main_convert(args):
     validate_val = getattr(args, 'validate', None)
-    if validate_val is not None and validate_val is not False:
-        if isinstance(validate_val, list):
-            validate_modes = validate_val
-        else:
-            validate_modes = ['schema']
+    if validate_val:
+        validate_modes = validate_val if isinstance(validate_val, list) else ['schema', 'analysis']
 
         validate_args = argparse.Namespace(
             registry=getattr(args, 'registry', None),

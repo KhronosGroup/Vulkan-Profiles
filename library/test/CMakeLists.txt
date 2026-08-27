@@ -37,7 +37,7 @@ add_custom_target(VpLibrary_test_generated_library
         --input ${PROJECT_SOURCE_DIR}/library/test/profiles
         --output ${PROJECT_SOURCE_DIR}/library/test
         --output-filename "test_vulkan_profiles"
-        --validate
+        --validate schema
     VERBATIM
     SOURCES ${CMAKE_CURRENT_LIST_DIR}/profiles
     DEPENDS ${CMAKE_CURRENT_LIST_DIR}/profiles

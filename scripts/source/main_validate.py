@@ -1,49 +1,19 @@
-#!/usr/bin/python3
-#
-# Copyright (c) 2026-2026 Google, Inc.
-# Copyright (C) 2026-2026 Valve Corporation
-# Copyright (c) 2026-2026 LunarG, Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License")
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-# Authors: 
-# - Christophe Riccio <christophe@lunarg.com>
-
 import sys
 import json
 from pathlib import Path
 
 import gen_profiles_solution
+from vulkan_object import StructCapabilityAlias, ExtensionCapabilityAlias
 from source.vulkan_object_version import VK_VERSION
 from source.vulkan_object_utils import (
     initVulkanObject, 
     getExtensionPromotedTo, 
     getStructDefiningExtensions,
-    getStructCoreVersion
+    getStructCoreVersion,
+    gatherCapabilityAliases
 )
+from source.profiles_parsing import collect_block_names
 from source.generate_profiles_schema import VulkanProfilesSchemaGenerator2
-
-
-def _collect_block_names(json_capabilities):
-    block_names = []
-    for value in json_capabilities:
-        if isinstance(value, str):
-            block_names.append(value)
-        elif isinstance(value, list):
-            for val in value:
-                if isinstance(val, str):
-                    block_names.append(val)
-    return block_names
 
 
 class VulkanProfilesDataValidation:
@@ -68,7 +38,7 @@ class VulkanProfilesDataValidation:
                 api_version_str = profile_obj.get('api-version', '1.0.0')
                 api_version = VK_VERSION.from_string(api_version_str)
 
-                block_names = _collect_block_names(profile_obj.get('capabilities', []))
+                block_names = collect_block_names(profile_obj.get('capabilities', []))
                 for block_name in block_names:
                     if block_name not in capabilities:
                         continue
@@ -80,6 +50,38 @@ class VulkanProfilesDataValidation:
                         section_dict = block.get(section, {})
                         if not isinstance(section_dict, dict):
                             continue
+
+                        # Check for capability value mismatches across aliased structures
+                        visited_caps = set()
+                        for struct_name, struct_members in section_dict.items():
+                            if not isinstance(struct_members, dict):
+                                continue
+                            for member_name, member_value in struct_members.items():
+                                if (struct_name, member_name) in visited_caps:
+                                    continue
+
+                                query_alias = StructCapabilityAlias(struct_name, member_name)
+                                aliases = [query_alias] + gatherCapabilityAliases(self.vk, query_alias)
+
+                                for a in aliases:
+                                    if isinstance(a, StructCapabilityAlias):
+                                        visited_caps.add((a.struct, a.member))
+
+                                entries = []
+                                for a in aliases:
+                                    if isinstance(a, StructCapabilityAlias):
+                                        if a.struct in section_dict and isinstance(section_dict[a.struct], dict):
+                                            if a.member in section_dict[a.struct]:
+                                                entries.append((a.struct, a.member, section_dict[a.struct][a.member]))
+
+                                if len(entries) > 1:
+                                    first_val = entries[0][2]
+                                    if any(val != first_val for _, _, val in entries):
+                                        details = ", ".join(f"'{s}::{m}': {v}" for s, m, v in entries)
+                                        issues.append(
+                                            f"Analysis Issue in '{filename}' (Profile '{profile_name}', Block '{block_name}'): "
+                                            f"Capability '{member_name}' in section '{section}' has mismatching values across aliased structures ({details})."
+                                        )
 
                         for struct_name in section_dict.keys():
                             # Issue 1: Capabilities block lists extension structure without declaring the extension

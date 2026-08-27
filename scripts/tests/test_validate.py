@@ -60,6 +60,12 @@ class TestValidate(unittest.TestCase):
                     "features": {
                         "VkPhysicalDeviceImagelessFramebufferFeaturesKHR": {
                             "imagelessFramebuffer": true
+                        }, 
+                        "VkPhysicalDeviceImagelessFramebufferFeatures": {
+                            "imagelessFramebuffer": true
+                        }, 
+                        "VkPhysicalDeviceVulkan12Features": {
+                            "imagelessFramebuffer": true
                         }
                     }
                 }
@@ -101,6 +107,38 @@ class TestValidate(unittest.TestCase):
 
         self.assertTrue(any("Core structure 'VkPhysicalDeviceVulkan12Features' requires Vulkan 1.2" in issue for issue in issues))
 
+    def test_aliased_capability_value_mismatch(self):
+        """
+        Verifies that static analysis uses gatherCapabilityAliases to detect value mismatches
+        across aliased capability structures (e.g., KHR extension vs Vulkan 1.2 core structure).
+        """
+        json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.2.0",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "features": {
+                        "VkPhysicalDeviceImagelessFramebufferFeaturesKHR": {
+                            "imagelessFramebuffer": true
+                        },
+                        "VkPhysicalDeviceVulkan12Features": {
+                            "imagelessFramebuffer": false
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(json_text)}
+        issues = self.validator.validate_data(json_files_dict)
+
+        self.assertTrue(any("has mismatching values across aliased structures" in issue for issue in issues))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

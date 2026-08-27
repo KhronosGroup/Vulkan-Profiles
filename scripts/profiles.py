@@ -62,7 +62,7 @@ def main(argv):
     validate_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
     validate_parser.add_argument('--schema', '-s', action='store', help='Use a profile schema (profiles-*.json). By default, generate a profile schema vk.xml.')
     validate_parser.add_argument('--input', '-i', action='store', required=True, help='Path to the input profiles files.')
-    validate_parser.add_argument('--mode', '-m', nargs='*', action='store', choices=['schema', 'analysis'], default=['schema'], help="Validation mode(s) to execute (default: schema analysis).")
+    validate_parser.add_argument('--mode', '-m', nargs='*', action=ValidateAction, default=['schema', 'analysis'], help="Validation mode(s) to execute (default: schema analysis).")
 
     schema_parser = subparsers.add_parser('schema', help='Generate a profile json schema file.')
     schema_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
@@ -96,6 +96,7 @@ def main(argv):
     merge_parser.add_argument('--mode', '-m', action='store', choices=['union', 'intersection'], default='intersection', help='Mode of profile combination.')
     merge_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the profiles files (default: pretty).')
     merge_parser.add_argument('--strip-duplicate-structs', action='store_true', help='Strip the duplicated structures in the generated profiles file.')
+    merge_parser.add_argument('--validate', '-v', nargs='*', action=ValidateAction, default=None, help='Validate profile files before merging (choices: schema, analysis).')
 
     library_parser = subparsers.add_parser('library', help='Generate the Vulkan profiles C/C++ API library headers and source files.')
     library_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")

@@ -19,6 +19,7 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
+import argparse
 import sys
 import re
 import json
@@ -26,8 +27,28 @@ import os
 
 import gen_profiles_solution
 import gen_profiles_file
+from source.main_validate import main_validate
 
 def main_merge(args):
+    validate_val = getattr(args, 'validate', None)
+    if validate_val:
+        validate_modes = validate_val if isinstance(validate_val, list) else ['schema', 'analysis']
+        
+        # Determine input directory for validation
+        input_path = getattr(args, 'input', None)
+        if not input_path and getattr(args, 'config', None):
+            input_path = os.path.dirname(args.config)
+
+        if input_path:
+            validate_args = argparse.Namespace(
+                registry=getattr(args, 'registry', None),
+                input=input_path,
+                schema=getattr(args, 'schema', None),
+                api=getattr(args, 'api', 'vulkan') or 'vulkan',
+                mode=validate_modes
+            )
+            main_validate(validate_args)
+
     if args.registry is None:
         gen_profiles_solution.Log.e('Merging the profiles requires specifying --registry')
         sys.exit(1)
