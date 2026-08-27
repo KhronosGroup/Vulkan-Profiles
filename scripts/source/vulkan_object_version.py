@@ -31,6 +31,9 @@ class VK_VERSION(Enum):
     V1_3 = "VK_VERSION_1_3"
     V1_4 = "VK_VERSION_1_4"
 
+    def __hash__(self) -> int:
+        return hash(self.value)
+
     @classmethod
     def from_string(cls, version_str: str) -> "VK_VERSION":
         if not version_str or version_str in ("NONE", "VK_NONE"):

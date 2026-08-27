@@ -69,56 +69,53 @@ def are_structs_aliases_for_version(vk: VulkanObject, version: VK_VERSION, struc
     if struct1 == struct2:
         return True
 
-    if hasattr(vk, 'structs'):
-        if struct1 in vk.structs:
-            s1 = vk.structs[struct1]
-            if struct2 in getattr(s1, 'aliases', []):
-                return True
-        if struct2 in vk.structs:
-            s2 = vk.structs[struct2]
-            if struct1 in getattr(s2, 'aliases', []):
-                return True
+    if not hasattr(vk, '_struct_aliases_for_ver_cache'):
+        vk._struct_aliases_for_ver_cache = {}
 
+    cache_key = (version, struct1, struct2)
+    if cache_key in vk._struct_aliases_for_ver_cache:
+        return vk._struct_aliases_for_ver_cache[cache_key]
+
+    # Fast direct alias checks
     s1_obj = vk.structs.get(struct1) or getStructByName(vk.structs, struct1)
-    if s1_obj and hasattr(s1_obj, 'members'):
-        for member in s1_obj.members:
-            valid_aliases = gatherDependentCapabilityAliases(vk, version, StructCapabilityAlias(struct1, member.name))
-            for alias in valid_aliases:
-                if isinstance(alias, StructCapabilityAlias) and alias.struct == struct2:
-                    return True
+    if s1_obj and hasattr(s1_obj, 'aliases') and struct2 in getattr(s1_obj, 'aliases', []):
+        vk._struct_aliases_for_ver_cache[cache_key] = True
+        return True
 
     s2_obj = vk.structs.get(struct2) or getStructByName(vk.structs, struct2)
-    if s2_obj and hasattr(s2_obj, 'members'):
-        for member in s2_obj.members:
-            valid_aliases = gatherDependentCapabilityAliases(vk, version, StructCapabilityAlias(struct2, member.name))
-            for alias in valid_aliases:
-                if isinstance(alias, StructCapabilityAlias) and alias.struct == struct1:
-                    return True
+    if s2_obj and hasattr(s2_obj, 'aliases') and struct1 in getattr(s2_obj, 'aliases', []):
+        vk._struct_aliases_for_ver_cache[cache_key] = True
+        return True
 
-    return False
+    # Representative sample check: checking the first member determines structural aliasing
+    res = False
+    if s1_obj and hasattr(s1_obj, 'members') and s1_obj.members:
+        sample_member = s1_obj.members[0].name
+        valid_aliases = gatherDependentCapabilityAliases(vk, version, StructCapabilityAlias(struct1, sample_member))
+        if any(isinstance(alias, StructCapabilityAlias) and alias.struct == struct2 for alias in valid_aliases):
+            res = True
 
+    if not res and s2_obj and hasattr(s2_obj, 'members') and s2_obj.members:
+        sample_member = s2_obj.members[0].name
+        valid_aliases = gatherDependentCapabilityAliases(vk, version, StructCapabilityAlias(struct2, sample_member))
+        if any(isinstance(alias, StructCapabilityAlias) and alias.struct == struct1 for alias in valid_aliases):
+            res = True
 
-def is_struct_covered_by_bundle(vk: VulkanObject, bundle_struct: str, split_struct: str) -> bool:
-    """Checks if a split feature structure's members are covered by a core bundle structure."""
-    s_obj = vk.structs.get(split_struct) or getStructByName(vk.structs, split_struct)
-    if not s_obj or not hasattr(s_obj, 'members'):
-        return False
-
-    for member in s_obj.members:
-        aliases = gatherCapabilityAliases(vk, StructCapabilityAlias(split_struct, member.name))
-        for alias in aliases:
-            if isinstance(alias, StructCapabilityAlias) and alias.struct == bundle_struct:
-                return True
-    return False
+    vk._struct_aliases_for_ver_cache[cache_key] = res
+    return res
 
 
 def get_struct_rank(vk: VulkanObject, version: VK_VERSION, struct_name: str) -> int:
     """
-    Returns the priority rank of a structure for a given target API version:
-    Rank 3: Core structure introduced in API version <= profile version (Valid Core)
-    Rank 2: Extension structure (or vendor/KHR alias) valid for profile version
-    Rank 1: Core structure introduced in API version > profile version (Future Core)
+    Returns the priority rank of a structure for a given target API version.
     """
+    if not hasattr(vk, '_struct_rank_cache'):
+        vk._struct_rank_cache = {}
+
+    cache_key = (version, struct_name)
+    if cache_key in vk._struct_rank_cache:
+        return vk._struct_rank_cache[cache_key]
+
     struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
 
     is_alias = False
@@ -126,40 +123,15 @@ def get_struct_rank(vk: VulkanObject, version: VK_VERSION, struct_name: str) -> 
         is_alias = True
 
     core_ver = getStructCoreVersion(vk, struct_name)
+    rank = 2
     if core_ver != VK_VERSION.NONE and not is_alias:
         if version != VK_VERSION.NONE and core_ver <= version:
-            return 3
+            rank = 3
         else:
-            return 1
+            rank = 1
 
-    return 2
-
-
-def should_remove_struct_a_in_favor_of_b(vk: VulkanObject, version: VK_VERSION, struct_a: str, struct_b: str) -> bool:
-    """
-    Returns True if struct_a should be removed in favor of struct_b when both are present in the same block/context.
-    """
-    rank_a = get_struct_rank(vk, version, struct_a)
-    rank_b = get_struct_rank(vk, version, struct_b)
-
-    if rank_a < rank_b:
-        return True
-    if rank_a > rank_b:
-        return False
-
-    a_in_structs = struct_a in vk.structs
-    b_in_structs = struct_b in vk.structs
-
-    if not a_in_structs and b_in_structs:
-        return True
-    if a_in_structs and not b_in_structs:
-        return False
-
-    s_a_obj = vk.structs.get(struct_a)
-    if s_a_obj and getattr(s_a_obj, 'alias', None) == struct_b:
-        return True
-
-    return False
+    vk._struct_rank_cache[cache_key] = rank
+    return rank
 
 
 def get_required_extensions_for_struct(vk: VulkanObject, struct_name: str, version: VK_VERSION) -> set[str]:
@@ -167,6 +139,13 @@ def get_required_extensions_for_struct(vk: VulkanObject, struct_name: str, versi
     Returns extension names required by struct_name (or its aliases)
     that are NOT core in the target Vulkan API version.
     """
+    if not hasattr(vk, '_req_exts_for_struct_cache'):
+        vk._req_exts_for_struct_cache = {}
+
+    cache_key = (struct_name, version)
+    if cache_key in vk._req_exts_for_struct_cache:
+        return vk._req_exts_for_struct_cache[cache_key]
+
     req_exts = set()
 
     struct_names = [struct_name]
@@ -196,7 +175,49 @@ def get_required_extensions_for_struct(vk: VulkanObject, struct_name: str, versi
             if not promoted_to_core:
                 req_exts.add(ext_name)
 
+    vk._req_exts_for_struct_cache[cache_key] = req_exts
     return req_exts
+
+
+def is_struct_covered_by_bundle(vk: VulkanObject, bundle_struct: str, split_struct: str) -> bool:
+    """Checks if a split feature structure's members are covered by a core bundle structure."""
+    s_obj = vk.structs.get(split_struct) or getStructByName(vk.structs, split_struct)
+    if not s_obj or not hasattr(s_obj, 'members'):
+        return False
+
+    for member in s_obj.members:
+        aliases = gatherCapabilityAliases(vk, StructCapabilityAlias(split_struct, member.name))
+        for alias in aliases:
+            if isinstance(alias, StructCapabilityAlias) and alias.struct == bundle_struct:
+                return True
+    return False
+
+
+def should_remove_struct_a_in_favor_of_b(vk: VulkanObject, version: VK_VERSION, struct_a: str, struct_b: str) -> bool:
+    """
+    Returns True if struct_a should be removed in favor of struct_b when both are present in the same block/context.
+    """
+    rank_a = get_struct_rank(vk, version, struct_a)
+    rank_b = get_struct_rank(vk, version, struct_b)
+
+    if rank_a < rank_b:
+        return True
+    if rank_a > rank_b:
+        return False
+
+    a_in_structs = struct_a in vk.structs
+    b_in_structs = struct_b in vk.structs
+
+    if not a_in_structs and b_in_structs:
+        return True
+    if a_in_structs and not b_in_structs:
+        return False
+
+    s_a_obj = vk.structs.get(struct_a)
+    if s_a_obj and getattr(s_a_obj, 'alias', None) == struct_b:
+        return True
+
+    return False
 
 
 def collect_block_names(json_capabilities):

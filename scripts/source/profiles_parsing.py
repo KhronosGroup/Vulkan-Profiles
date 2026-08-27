@@ -140,7 +140,7 @@ def load_profiles_jsons(input_dir):
 
     return json_files_dict
 
-class OutputFormatType(Enum):
+class OutputFormatType(str,Enum):
     PRETTY = 'pretty'
     FLATTEN = 'flatten'
 
