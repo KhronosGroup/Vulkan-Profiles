@@ -77,7 +77,7 @@ def main(argv):
     convert_parser.add_argument('--input', '-i', action='store', required=True, help='Path to the input profiles files.')
     convert_parser.add_argument('--output', '-o', action='store', required=True, help='Path to the output profiles files.')
     convert_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the profiles files (default: pretty).')
-    convert_parser.add_argument('--mode', '-m', nargs='*', action='store', choices=list(ConvertBits), default=list(ConvertBits), help='List of conversion capabilities')
+    convert_parser.add_argument('--mode', '-m', nargs='*', action='store', choices=list(ConvertBits), default=[], help='List of conversion capabilities')
     convert_parser.add_argument('--validate', nargs='*', action=ValidateAction, default=None, help='Validate profile files before conversion (choices: schema, analysis).')
 
     merge_parser = subparsers.add_parser('merge', help='Generate merged Vulkan profile JSON files.')
@@ -98,7 +98,7 @@ def main(argv):
     merge_parser.add_argument('--profile-required-profiles', action='store', help='Comma separated list of required profiles by the generated profile.')
     merge_parser.add_argument('--mode', '-m', action='store', choices=['union', 'intersection'], default='intersection', help='Mode of profile combination.')
     merge_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the profiles files (default: pretty).')
-    merge_parser.add_argument('--convert', nargs='*', action='store', choices=list(ConvertBits), help='List of conversion capabilities to apply to the merged profile output.')
+    merge_parser.add_argument('--convert', nargs='*', action='store', choices=list(ConvertBits), default=[], help='List of conversion capabilities to apply to the merged profile output.')
     merge_parser.add_argument('--validate', nargs='*', action=ValidateAction, default=None, help='Validate profile files before merging (choices: schema, analysis).')
 
     library_parser = subparsers.add_parser('library', help='Generate the Vulkan profiles C/C++ API library headers and source files.')
@@ -111,7 +111,7 @@ def main(argv):
     library_parser.add_argument('--output-filename', action='store', default='vulkan_profiles', help='Output filename for profile library, default "vulkan_profiles".')
     library_parser.add_argument('--mode', nargs='*', action='store', choices=['header-only', 'header+source'], default=['header-only', 'header+source'], help='Library output generation mode.')
     library_parser.add_argument('--validate', nargs='*', action=ValidateAction, default=None, help='Validate generated JSON profile schema and JSON profiles (choices: schema, analysis).')
-    library_parser.add_argument('--convert', nargs='*', action='store', choices=list(ConvertBits), help='List of conversion capabilities to apply before generating the library.')
+    library_parser.add_argument('--convert', nargs='*', action='store', choices=list(ConvertBits), default=[], help='List of conversion capabilities to apply before generating the library.')
     library_parser.add_argument('--intermediate', action='store', help='Directory path for intermediate converted profiles (used when --convert is provided).')
     library_parser.add_argument('--debug', '-d', action='store_true', help='Also generate library variant with debug messages.')
     library_parser.add_argument('--config', '-c', action='store', default='release', choices=['release', 'debug'], help='Select build configuration.')

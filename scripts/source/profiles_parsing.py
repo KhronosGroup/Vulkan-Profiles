@@ -262,18 +262,18 @@ def save_profiles_jsons(json_files_dict, output_path, format: OutputFormatType):
         logging.error('`output_path` is not a Path type')
         sys.exit(1)
 
-    # Handle output target whether it is a single file path or a directory
+    # Format array helper to keep spaces after '[' and before ']'
+    def flatten_array(match):
+        content = re.sub(r'\s+', ' ', match.group(1)).strip()
+        return f"[ {content} ]" if content else "[]"
+
     if output_path.suffix == '.json' or (len(json_files_dict) == 1 and not output_path.is_dir()):
         output_path.parent.mkdir(parents=True, exist_ok=True)
         for value in json_files_dict.values():
             with open(output_path, "w", encoding="utf-8") as file:
                 if format == OutputFormatType.FLATTEN:
                     pretty_json = json.dumps(value, indent=4)
-                    flat_json = re.sub(
-                        r'\[([^\[\]{}]*?)\]', 
-                        lambda m: '[' + re.sub(r'\s+', ' ', m.group(1)).strip() + ']', 
-                        pretty_json
-                    )
+                    flat_json = re.sub(r'\[([^\[\]{}]*?)\]', flatten_array, pretty_json)
                     file.write(flat_json)
                 else:
                     json.dump(value, file, indent=4)
@@ -286,12 +286,7 @@ def save_profiles_jsons(json_files_dict, output_path, format: OutputFormatType):
             with open(out_file, "w", encoding="utf-8") as file:
                 if format == OutputFormatType.FLATTEN:
                     pretty_json = json.dumps(value, indent=4)
-                    flat_json = re.sub(
-                        r'\[([^\[\]{}]*?)\]', 
-                        lambda m: '[' + re.sub(r'\s+', ' ', m.group(1)).strip() + ']', 
-                        pretty_json
-                    )
+                    flat_json = re.sub(r'\[([^\[\]{}]*?)\]', flatten_array, pretty_json)
                     file.write(flat_json)
                 else:
                     json.dump(value, file, indent=4)
-                    
