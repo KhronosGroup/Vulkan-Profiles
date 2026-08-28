@@ -5650,13 +5650,21 @@ class VulkanProfilesDatabase():
 
         return capabilities_list
 
+
 class VulkanProfilesFiles():
-    def __init__(self, registry, profiles_dir, profiles_files, validate, schema):
+    def __init__(self, registry, profiles_dir, profiles_files, validate, schema=None):
         self.profiles = dict()
         self.json_profiles_database = VulkanProfilesDatabase()
 
-        dirAbsPath = os.path.abspath(profiles_dir)
-        filenames = os.listdir(dirAbsPath)
+        if validate and schema is None:
+            schema = VulkanProfilesSchemaGenerator(registry).schema
+
+        if os.path.isfile(profiles_dir):
+            dirAbsPath = os.path.dirname(os.path.abspath(profiles_dir))
+            filenames = [os.path.basename(profiles_dir)]
+        else:
+            dirAbsPath = os.path.abspath(profiles_dir)
+            filenames = os.listdir(dirAbsPath)
 
         for filename in filenames:
             skip_file = False
@@ -5687,6 +5695,7 @@ class VulkanProfilesFiles():
             Log.i("Registering profile '{0}'".format(json_profile_key))
             if json_profile_key not in self.profiles:
                 self.profiles[json_profile_key] = VulkanProfile(registry, self.json_profiles_database, json_profile_key, json_profile_value, json_caps)
+
 
 class VulkanProfilesLibraryGenerator():
     def __init__(self, registry, input_profiles_files, output_filename, debugMessages = False):

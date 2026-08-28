@@ -65,6 +65,7 @@ layer/tests/tests_generated.cpp
 scripts/source/vulkan_object.py
 scripts/source/base_generator.py
 scripts/source/vk.xml
+scripts/source/baked_version.py
 scripts/profiles.spec
 vkprofiles.spec
 scripts/vkprofiles

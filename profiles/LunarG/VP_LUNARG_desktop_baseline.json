@@ -4039,8 +4039,62 @@
                 }
             },
             "properties": {
+                "VkPhysicalDeviceDepthStencilResolvePropertiesKHR": {
+                    "independentResolve": true,
+                    "independentResolveNone": true,
+                    "supportedDepthResolveModes": [
+                        "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT",
+                        "VK_RESOLVE_MODE_MIN_BIT",
+                        "VK_RESOLVE_MODE_MAX_BIT"
+                    ],
+                    "supportedStencilResolveModes": [
+                        "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT"
+                    ]
+                },
+                "VkPhysicalDeviceDescriptorIndexingPropertiesEXT": {
+                    "maxDescriptorSetUpdateAfterBindInputAttachments": 256,
+                    "maxDescriptorSetUpdateAfterBindSampledImages": 640,
+                    "maxDescriptorSetUpdateAfterBindSamplers": 80,
+                    "maxDescriptorSetUpdateAfterBindStorageBuffers": 155,
+                    "maxDescriptorSetUpdateAfterBindStorageBuffersDynamic": 8,
+                    "maxDescriptorSetUpdateAfterBindStorageImages": 40,
+                    "maxDescriptorSetUpdateAfterBindUniformBuffers": 155,
+                    "maxDescriptorSetUpdateAfterBindUniformBuffersDynamic": 8,
+                    "maxPerStageDescriptorUpdateAfterBindInputAttachments": 64,
+                    "maxPerStageDescriptorUpdateAfterBindSampledImages": 128,
+                    "maxPerStageDescriptorUpdateAfterBindSamplers": 16,
+                    "maxPerStageDescriptorUpdateAfterBindStorageBuffers": 31,
+                    "maxPerStageDescriptorUpdateAfterBindStorageImages": 8,
+                    "maxPerStageDescriptorUpdateAfterBindUniformBuffers": 15,
+                    "maxPerStageUpdateAfterBindResources": 159,
+                    "maxUpdateAfterBindDescriptorsInAllPools": 1048576,
+                    "quadDivergentImplicitLod": true,
+                    "robustBufferAccessUpdateAfterBind": true,
+                    "shaderInputAttachmentArrayNonUniformIndexingNative": true,
+                    "shaderSampledImageArrayNonUniformIndexingNative": true,
+                    "shaderStorageBufferArrayNonUniformIndexingNative": true,
+                    "shaderStorageImageArrayNonUniformIndexingNative": true,
+                    "shaderUniformBufferArrayNonUniformIndexingNative": true
+                },
                 "VkPhysicalDeviceExternalMemoryHostPropertiesEXT": {
                     "minImportedHostPointerAlignment": 4096
+                },
+                "VkPhysicalDeviceFloatControlsPropertiesKHR": {
+                    "shaderDenormFlushToZeroFloat16": false,
+                    "shaderDenormFlushToZeroFloat32": false,
+                    "shaderDenormFlushToZeroFloat64": false,
+                    "shaderDenormPreserveFloat16": true,
+                    "shaderDenormPreserveFloat32": false,
+                    "shaderDenormPreserveFloat64": false,
+                    "shaderRoundingModeRTEFloat16": true,
+                    "shaderRoundingModeRTEFloat32": true,
+                    "shaderRoundingModeRTEFloat64": true,
+                    "shaderRoundingModeRTZFloat16": false,
+                    "shaderRoundingModeRTZFloat32": true,
+                    "shaderRoundingModeRTZFloat64": true,
+                    "shaderSignedZeroInfNanPreserveFloat16": true,
+                    "shaderSignedZeroInfNanPreserveFloat32": true,
+                    "shaderSignedZeroInfNanPreserveFloat64": true
                 },
                 "VkPhysicalDeviceInlineUniformBlockPropertiesEXT": {
                     "maxDescriptorSetInlineUniformBlocks": 4,
@@ -4048,6 +4102,14 @@
                     "maxInlineUniformBlockSize": 256,
                     "maxPerStageDescriptorInlineUniformBlocks": 4,
                     "maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks": 4
+                },
+                "VkPhysicalDeviceMaintenance3PropertiesKHR": {
+                    "maxMemoryAllocationSize": 2147483648,
+                    "maxPerSetDescriptors": 1024
+                },
+                "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                    "maxMultiviewInstanceIndex": 134217727,
+                    "maxMultiviewViewCount": 6
                 },
                 "VkPhysicalDeviceProperties": {
                     "sparseProperties": {
@@ -4226,6 +4288,26 @@
                     "robustStorageBufferAccessSizeAlignment": 4,
                     "robustUniformBufferAccessSizeAlignment": 256
                 },
+                "VkPhysicalDeviceSubgroupProperties": {
+                    "subgroupSize": 32,
+                    "supportedStages": [
+                        "VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT",
+                        "VK_SHADER_STAGE_FRAGMENT_BIT",
+                        "VK_SHADER_STAGE_COMPUTE_BIT",
+                        "VK_SHADER_STAGE_ALL_GRAPHICS",
+                        "VK_SHADER_STAGE_ALL"
+                    ],
+                    "supportedOperations": [
+                        "VK_SUBGROUP_FEATURE_BASIC_BIT",
+                        "VK_SUBGROUP_FEATURE_VOTE_BIT",
+                        "VK_SUBGROUP_FEATURE_ARITHMETIC_BIT",
+                        "VK_SUBGROUP_FEATURE_BALLOT_BIT",
+                        "VK_SUBGROUP_FEATURE_SHUFFLE_BIT",
+                        "VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT",
+                        "VK_SUBGROUP_FEATURE_QUAD_BIT"
+                    ],
+                    "quadOperationsInAllStages": true
+                },
                 "VkPhysicalDeviceSubgroupSizeControlPropertiesEXT": {
                     "maxComputeWorkgroupSubgroups": 32,
                     "maxSubgroupSize": 32,
@@ -4235,6 +4317,9 @@
                 "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT": {
                     "storageTexelBufferOffsetAlignmentBytes": 16,
                     "uniformTexelBufferOffsetAlignmentBytes": 16
+                },
+                "VkPhysicalDeviceTimelineSemaphorePropertiesKHR": {
+                    "maxTimelineSemaphoreValueDifference": 2147483647
                 },
                 "VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT": {
                     "maxVertexAttribDivisor": 268435455
@@ -6276,8 +6361,75 @@
                 }
             },
             "properties": {
+                "VkPhysicalDeviceDepthStencilResolvePropertiesKHR": {
+                    "independentResolve": false,
+                    "independentResolveNone": false,
+                    "supportedDepthResolveModes": [
+                        "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT"
+                    ],
+                    "supportedStencilResolveModes": [
+                        "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT"
+                    ]
+                },
+                "VkPhysicalDeviceDescriptorIndexingPropertiesEXT": {
+                    "maxDescriptorSetUpdateAfterBindInputAttachments": 256,
+                    "maxDescriptorSetUpdateAfterBindSampledImages": 1000000,
+                    "maxDescriptorSetUpdateAfterBindSamplers": 1024,
+                    "maxDescriptorSetUpdateAfterBindStorageBuffers": 1000000,
+                    "maxDescriptorSetUpdateAfterBindStorageBuffersDynamic": 8,
+                    "maxDescriptorSetUpdateAfterBindStorageImages": 1000000,
+                    "maxDescriptorSetUpdateAfterBindUniformBuffers": 1000000,
+                    "maxDescriptorSetUpdateAfterBindUniformBuffersDynamic": 8,
+                    "maxPerStageDescriptorUpdateAfterBindInputAttachments": 64,
+                    "maxPerStageDescriptorUpdateAfterBindSampledImages": 1000000,
+                    "maxPerStageDescriptorUpdateAfterBindSamplers": 1024,
+                    "maxPerStageDescriptorUpdateAfterBindStorageBuffers": 1000000,
+                    "maxPerStageDescriptorUpdateAfterBindStorageImages": 1000000,
+                    "maxPerStageDescriptorUpdateAfterBindUniformBuffers": 1000000,
+                    "maxPerStageUpdateAfterBindResources": 1000000,
+                    "maxUpdateAfterBindDescriptorsInAllPools": 1048576,
+                    "quadDivergentImplicitLod": false,
+                    "robustBufferAccessUpdateAfterBind": true,
+                    "shaderInputAttachmentArrayNonUniformIndexingNative": false,
+                    "shaderSampledImageArrayNonUniformIndexingNative": false,
+                    "shaderStorageBufferArrayNonUniformIndexingNative": false,
+                    "shaderStorageImageArrayNonUniformIndexingNative": false,
+                    "shaderUniformBufferArrayNonUniformIndexingNative": false
+                },
+                "VkPhysicalDeviceFloatControlsPropertiesKHR": {
+                    "shaderDenormFlushToZeroFloat16": false,
+                    "shaderDenormFlushToZeroFloat32": false,
+                    "shaderDenormFlushToZeroFloat64": false,
+                    "shaderDenormPreserveFloat16": false,
+                    "shaderDenormPreserveFloat32": false,
+                    "shaderDenormPreserveFloat64": false,
+                    "shaderRoundingModeRTEFloat16": false,
+                    "shaderRoundingModeRTEFloat32": false,
+                    "shaderRoundingModeRTEFloat64": false,
+                    "shaderRoundingModeRTZFloat16": false,
+                    "shaderRoundingModeRTZFloat32": false,
+                    "shaderRoundingModeRTZFloat64": false,
+                    "shaderSignedZeroInfNanPreserveFloat16": false,
+                    "shaderSignedZeroInfNanPreserveFloat32": false,
+                    "shaderSignedZeroInfNanPreserveFloat64": false
+                },
+                "VkPhysicalDeviceInlineUniformBlockPropertiesEXT": {
+                    "maxDescriptorSetInlineUniformBlocks": 4,
+                    "maxDescriptorSetUpdateAfterBindInlineUniformBlocks": 4,
+                    "maxInlineUniformBlockSize": 256,
+                    "maxPerStageDescriptorInlineUniformBlocks": 4,
+                    "maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks": 4
+                },
+                "VkPhysicalDeviceMaintenance3PropertiesKHR": {
+                    "maxMemoryAllocationSize": 2147483648,
+                    "maxPerSetDescriptors": 1024
+                },
                 "VkPhysicalDeviceMaintenance4PropertiesKHR": {
                     "maxBufferSize": 2147483648
+                },
+                "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                    "maxMultiviewInstanceIndex": 134217727,
+                    "maxMultiviewViewCount": 6
                 },
                 "VkPhysicalDeviceProperties": {
                     "sparseProperties": {
@@ -6476,9 +6628,36 @@
                     "integerDotProductAccumulatingSaturating8BitSignedAccelerated": false,
                     "integerDotProductAccumulatingSaturating8BitUnsignedAccelerated": false
                 },
+                "VkPhysicalDeviceSubgroupProperties": {
+                    "subgroupSize": 4,
+                    "supportedStages": [
+                        "VK_SHADER_STAGE_FRAGMENT_BIT",
+                        "VK_SHADER_STAGE_COMPUTE_BIT",
+                        "VK_SHADER_STAGE_ALL_GRAPHICS",
+                        "VK_SHADER_STAGE_ALL"
+                    ],
+                    "supportedOperations": [
+                        "VK_SUBGROUP_FEATURE_BASIC_BIT",
+                        "VK_SUBGROUP_FEATURE_VOTE_BIT",
+                        "VK_SUBGROUP_FEATURE_BALLOT_BIT",
+                        "VK_SUBGROUP_FEATURE_SHUFFLE_BIT",
+                        "VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT",
+                        "VK_SUBGROUP_FEATURE_QUAD_BIT"
+                    ],
+                    "quadOperationsInAllStages": true
+                },
+                "VkPhysicalDeviceSubgroupSizeControlPropertiesEXT": {
+                    "maxComputeWorkgroupSubgroups": 32,
+                    "maxSubgroupSize": 4,
+                    "minSubgroupSize": 64,
+                    "requiredSubgroupSizeStages": []
+                },
                 "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT": {
                     "storageTexelBufferOffsetAlignmentBytes": 16,
                     "uniformTexelBufferOffsetAlignmentBytes": 16
+                },
+                "VkPhysicalDeviceTimelineSemaphorePropertiesKHR": {
+                    "maxTimelineSemaphoreValueDifference": 2147483647
                 },
                 "VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT": {
                     "maxVertexAttribDivisor": 268435455
