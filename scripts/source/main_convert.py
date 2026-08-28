@@ -298,15 +298,17 @@ def pull_capabilities_block_dependencies(
     version: VK_VERSION, 
     ignore_extension_versions: bool, 
     json_profiles_capabilities_block: dict,
-    context_extensions: set[str] = None
+    context_extensions: set[str] = None,
+    context_features: set[tuple[str, str]] = None
 ):
-    """Gather dependent extensions for a capability block, omitting any already provided in context_extensions."""
+    """Gather dependent extensions and required features for a capability block."""
     if "extensions" not in json_profiles_capabilities_block:
         return
 
     context_extensions = context_extensions or set()
+    context_features = context_features or set()
 
-    # Iteratively resolve transitive extension dependencies until fixed point
+    # 1. Resolve extension dependencies iteratively
     curr_exts = dict(json_profiles_capabilities_block["extensions"])
     while True:
         raw_deps = gatherDependentExtensions(
@@ -326,6 +328,26 @@ def pull_capabilities_block_dependencies(
 
     json_profiles_capabilities_block["extensions"] = filtered_deps
 
+    # 2. Gather features required by extensions in this block
+    profile_enabled_exts = context_extensions | set(filtered_deps.keys())
+    
+    block_features = json_profiles_capabilities_block.get("features", {})
+    enabled_features = set(context_features)
+    if isinstance(block_features, dict):
+        for s_name, members in block_features.items():
+            if isinstance(members, dict):
+                for m_name, val in members.items():
+                    if val:
+                        enabled_features.add((s_name, m_name))
+
+    for ext_name in filtered_deps.keys():
+        ext_satisfied = gatherSatisfiedExtensionRequiredFeatures(
+            vk, ext_name, version, profile_enabled_exts, enabled_features
+        )
+        if ext_satisfied:
+            features_dict = json_profiles_capabilities_block.setdefault("features", {})
+            deep_merge_dict(features_dict, ext_satisfied)
+
 
 def pull_profiles_file_dependencies(
     vk: VulkanObject, 
@@ -333,7 +355,7 @@ def pull_profiles_file_dependencies(
     json_file_data: dict, 
     json_files_dict: dict = None
 ):
-    """Process extension dependencies across blocks in sequential order, tracking precedent extensions."""
+    """Process extension dependencies across blocks in sequential order, tracking precedent extensions and features."""
     profiles_data = json_file_data.get("profiles", {})
     json_profiles_capabilities = json_file_data.get("capabilities", {})
 
@@ -341,20 +363,33 @@ def pull_profiles_file_dependencies(
         api_version = VK_VERSION.from_string(profile_obj.get("api-version", "1.0.0"))
 
         context_extensions = set()
+        context_features = set()
         parent_profiles = profile_obj.get("profiles", [])
         if json_files_dict and parent_profiles:
             parent_caps = collect_required_profiles_capabilities_recursive(json_files_dict, parent_profiles)
             context_extensions.update(parent_caps.get("extensions", {}).keys())
+            parent_features_dict = parent_caps.get("features", {})
+            for s_name, members in parent_features_dict.items():
+                if isinstance(members, dict):
+                    for m_name, val in members.items():
+                        if val:
+                            context_features.add((s_name, m_name))
 
         block_names = collect_block_names(profile_obj.get("capabilities", []))
         for block_name in block_names:
             if block_name in json_profiles_capabilities:
                 block = json_profiles_capabilities[block_name]
                 pull_capabilities_block_dependencies(
-                    vk, api_version, ignore_extension_versions, block, context_extensions
+                    vk, api_version, ignore_extension_versions, block, context_extensions, context_features
                 )
                 if "extensions" in block and isinstance(block["extensions"], dict):
                     context_extensions.update(block["extensions"].keys())
+                if "features" in block and isinstance(block["features"], dict):
+                    for s_name, members in block["features"].items():
+                        if isinstance(members, dict):
+                            for m_name, val in members.items():
+                                if val:
+                                    context_features.add((s_name, m_name))
 
 
 def pull_profiles_files_dependencies(vk: VulkanObject, ignore_extension_versions: bool, json_files_dict: dict):
@@ -418,7 +453,6 @@ def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: 
                         if satisfied:
                             deep_merge_dict(transition_features, satisfied)
 
-                # Filter out features that were ALREADY enabled/declared in the parent hierarchy
                 parent_features_dict = parent_inherited_caps.get("features", {})
                 parent_enabled_tuples: set[tuple[str, str]] = set()
                 for s_name, members in parent_features_dict.items():
