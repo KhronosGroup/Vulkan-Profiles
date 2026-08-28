@@ -4,7 +4,12 @@
 
 ```bash
 vkprofiles <command> [options]
+vkprofiles [--help | -h]
+vkprofiles [--version | -v]
 ```
+
+* `--help`, `-h`: Print help message and exit (available at top-level and for all subcommands).
+* `--version`, `-v`: Print `vkprofiles` version.
 
 ---
 
@@ -13,6 +18,8 @@ vkprofiles <command> [options]
 ### 1. `validate`
 
 Validates one or more profile JSON files against the Vulkan Profiles JSON schema and performs static analysis against `vk.xml`.
+
+By default, schema validation dynamically generates a schema from `vk.xml`. To validate profile JSON files against an explicit or externally published profile schema file (`profiles-*.json`), developers can supply the `--schema` (`-s`) parameter.
 
 ```bash
 vkprofiles validate --input path/to/profiles [options]
@@ -24,12 +31,20 @@ vkprofiles validate --input path/to/profiles [options]
 * `--mode`, `-m`: Validation mode(s) to execute (`schema`, `analysis`). Default: `schema analysis`.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
 
-**Example:**
+#### Validation Modes (`--mode`)
+
+| Mode Value | Description |
+| --- | --- |
+| `schema` | **Structural Validation:** Validates the JSON document layout and syntax against the Vulkan Profiles JSON Schema. It checks top-level key hierarchy, confirms required fields are present, verifies value data types (booleans, integers, arrays), and enforces value constraints and enumeration choices. |
+| `analysis` | **Static Semantic Analysis:** Performs deep semantic checks directly against the Vulkan Registry (`vk.xml`). It verifies that all referenced extension names, physical device feature/property structures, and format flags exist in `vk.xml`, checks that all capabilities are compatible with the target Vulkan `api-version`, and flags unrecognized struct members or unfulfilled specification dependencies. |
+
+**Example (Using explicit external schema and running both modes):**
 
 ```bash
 vkprofiles validate \
     --api vulkan \
     --registry vk.xml \
+    --schema schema/profiles-0.8-latest.json \
     --input profiles/LunarG \
     --mode schema analysis
 ```
@@ -73,7 +88,7 @@ vkprofiles convert --registry vk.xml --input path/to/input_dir --output path/to/
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
 * `--format`: Output formatting style (`flatten` or `tree`). Default: `flatten`.
 * `--mode`: Space-separated list of conversion capabilities to apply. Default: all flags.
-* `--validate`, `-v`: Validate profile files before conversion (choices: `schema`, `analysis`). Default: `schema analysis`.
+* `--validate`: Validate profile files before conversion (choices: `schema`, `analysis`). Default: `schema analysis`.
 
 #### Conversion Mode Flags (`--mode`)
 
@@ -117,7 +132,7 @@ vkprofiles merge --registry vk.xml --input path/to/profiles --output path/to/mer
 * `--mode`, `-m`: Combination mode (`intersection` or `union`). Default: `intersection`.
 * `--format`: Output formatting style (`flatten` or `pretty`). Default: `pretty`.
 * `--convert`: Apply conversion capabilities to the merged profile output (choices: `pull-extension-dependencies`, `pull-promoted-extensions`, `pull-required-capabilities`, `pull-aliases`, `strip-duplication`, `consolidate`, `ignore-extension-versions`).
-* `--validate`, `-v`: Validate profile files before merging (choices: `schema`, `analysis`). Default: `schema analysis`.
+* `--validate`: Validate profile files before merging (choices: `schema`, `analysis`). Default: `schema analysis`.
 * `--profile-name`: Override output profile name.
 * `--profile-version`: Set profile version number. Default: `1`.
 * `--profile-label`: Set profile label string.
@@ -190,10 +205,9 @@ vkprofiles library --registry vk.xml --input path/to/profiles --output path/to/i
 * `--output-src`: Target source output directory. If omitted in `header+source` mode, defaults to `--output`.
 * `--output-filename`: Base filename for generated files. Default: `vulkan_profiles`.
 * `--mode`: Library generation mode (`header-only`, `header+source`). Default: `header-only` and `header+source`.
-* `--output-schema`: Output file path for generated JSON schema.
 * `--convert`: Apply profiles data conversion prior to generation (choices: `pull-extension-dependencies`, `pull-promoted-extensions`, `pull-required-capabilities`, `pull-aliases`, `strip-duplication`, `consolidate`, `ignore-extension-versions`).
-* `--intermediate`: Directory path for intermediate converted JSON files (used with `--convert`).
-* `--validate`, `-v`: Validate profiles (choices: `schema`, `analysis`) during generation. Default: `schema analysis`.
+* `--intermediate`: Directory path for intermediate converted JSON files (used when `--convert` is provided).
+* `--validate`: Validate profiles (choices: `schema`, `analysis`) during generation. Default: `schema analysis`.
 * `--debug`, `-d`: Generate debug variant of library code.
 * `--config`, `-c`: Build configuration (`release` or `debug`).
 
@@ -238,7 +252,7 @@ vkprofiles doc --registry vk.xml --input path/to/profiles --output PROFILES.md [
 * `--input`, `-i`: *(Required)* Directory containing profile JSON files.
 * `--output`, `-o`: *(Required)* Output Markdown file path.
 * `--input-filenames`: Comma-separated list of profile filenames.
-* `--validate`, `-v`: Validate profile JSON files before generating documentation (choices: `schema`, `analysis`). Default: `schema analysis`.
+* `--validate`: Validate profile JSON files before generating documentation (choices: `schema`, `analysis`). Default: `schema analysis`.
 
 **Example:**
 
@@ -254,13 +268,29 @@ vkprofiles doc \
 
 ---
 
+### 7. `version`
+
+Prints the `vkprofiles` version string based on the Vulkan Headers version used when building the tool.
+
+```bash
+vkprofiles version
+```
+
+**Example:**
+
+```bash
+vkprofiles version
+```
+
+---
+
 ## Tool Developer Subcommands
 
 > [!NOTE]
 > **Internal Tool Developer Commands**
 > The `layer` and `tests` subcommands are designed exclusively for developers maintaining the Vulkan Profiles repository to generate layer and test code.
 
-### 7. `layer` *(Internal)*
+### 8. `layer` *(Internal)*
 
 Generates `profiles_generated.cpp` for the Vulkan Profiles layer (`VkLayer_khronos_profiles`).
 
@@ -283,7 +313,7 @@ vkprofiles layer \
 
 ---
 
-### 8. `tests` *(Internal)*
+### 9. `tests` *(Internal)*
 
 Generates synthetic test profile JSON (`VP_LUNARG_test_api_generated.json`) and C++ test suite (`tests_generated.cpp`).
 

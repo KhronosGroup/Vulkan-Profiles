@@ -24,8 +24,6 @@ import sys
 import tempfile
 import argparse
 import gen_profiles_solution
-from source.vulkan_object_utils import initVulkanObject
-from source.generate_profiles_schema import VulkanProfilesSchemaGenerator2
 from source.main_convert import main_convert, OutputFormatType
 from source.main_validate import main_validate
 
@@ -51,7 +49,6 @@ def main_library(args):
 
     registry = gen_profiles_solution.VulkanRegistry(args.registry, api)
 
-    output_schema = getattr(args, 'output_schema', None)
     out_inc = getattr(args, 'output_inc', None) or getattr(args, 'output', None)
     out_src = getattr(args, 'output_src', None)
 
@@ -64,16 +61,9 @@ def main_library(args):
     elif not out_src:
         out_src = out_inc
 
-    if not out_inc and not validate_val and not output_schema:
-        gen_profiles_solution.Log.e("At least one action (--output, --output-inc, --output-schema, or --validate) must be provided")
+    if not out_inc and not validate_val:
+        gen_profiles_solution.Log.e("At least one action (--output, --output-inc, or --validate) must be provided")
         sys.exit(1)
-
-    schema = None
-    if output_schema:
-        vk = initVulkanObject(api, args.registry or None, video=True)
-        schema_gen = VulkanProfilesSchemaGenerator2(vk)
-        schema_gen.generate(output_schema)
-        schema = schema_gen.schema
 
     if out_inc or out_src:
         input_dir = args.input
@@ -106,7 +96,7 @@ def main_library(args):
             profiles_filenames = input_filenames.split(',')
 
         input_profiles_files = gen_profiles_solution.VulkanProfilesFiles(
-            registry, input_dir, profiles_filenames, bool(validate_val), schema
+            registry, input_dir, profiles_filenames, False
         )
 
         debug = getattr(args, 'debug', False) or (getattr(args, 'config', 'release').lower() == 'debug')

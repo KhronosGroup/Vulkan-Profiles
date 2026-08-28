@@ -48,7 +48,7 @@ set(PROFILES_SCRIPT ${PROJECT_SOURCE_DIR}/scripts/profiles.py)
 find_package(Python3 3.10 REQUIRED COMPONENTS Interpreter)
 
 # Some Python-based build operations (e.g. turning a Python script into a standalone
-# executable) require custom Python modules.  Here we'll create a custom
+# executable) require custom Python modules. Here we'll create a custom
 # Python virtual environment with the modules we need.
 set(VENV_DIR "${CMAKE_CURRENT_BINARY_DIR}/python-venv")
 if(WIN32)
@@ -80,6 +80,9 @@ find_package(VulkanHeaders REQUIRED CONFIG QUIET)
 find_package(VulkanUtilityLibraries REQUIRED CONFIG QUIET)
 find_package(valijson REQUIRED CONFIG)
 find_package(jsoncpp REQUIRED CONFIG)
+
+# Write baked_version.py immediately after VulkanHeaders is found, BEFORE file(GLOB) is executed
+file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/baked_version.py" "BAKED_VERSION = \"${VulkanHeaders_VERSION}\"\n")
 
 # Workaround AppleClang using the wrong headers when there are headers in /usr/local/include
 if (CMAKE_CXX_COMPILER_ID STREQUAL AppleClang AND TARGET Vulkan::Headers AND TARGET Vulkan::LayerSettings AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
@@ -162,6 +165,9 @@ function(add_pyinstaller_target TARGET_NAME)
     endif()
 endfunction()
 
+# GLOB is evaluated here - after baked_version.py has already been created on disk
+file(GLOB PYTHON_SOURCE_FILES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/*.py")
+
 set(PYTHON_DEPENDENCIES
     "${PROFILES_SCRIPT}"
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/gen_profiles_file.py"
@@ -169,21 +175,7 @@ set(PYTHON_DEPENDENCIES
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/gen_profiles_solution.py"
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/gen_profiles_tests.py"
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/profiles.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/format_flag_converter.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/generate_profiles_schema.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/log.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/main_convert.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/main_doc.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/main_layer.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/main_library.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/main_merge.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/main_schema.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/main_tests.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/main_validate.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/profiles_parsing.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/vulkan_object_expression_parsing.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/vulkan_object_utils.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/vulkan_object_version.py"
+    ${PYTHON_SOURCE_FILES}
 )
 
 if(VULKAN_HEADERS_INSTALL_DIR)

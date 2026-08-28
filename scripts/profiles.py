@@ -31,6 +31,7 @@ from source.main_tests import main_tests
 from source.main_merge import main_merge
 from source.main_library import main_library
 from source.main_doc import main_doc
+from source.main_version import main_version, get_version_string
 
 
 class ValidateAction(argparse.Action):
@@ -55,6 +56,7 @@ def main(argv):
     logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
     
     parser = argparse.ArgumentParser(description='Convert Vulkan profile JSON file')
+    parser.add_argument('--version', '-v', action='version', version=get_version_string())
     subparsers = parser.add_subparsers(dest='command', required=True)
 
     validate_parser = subparsers.add_parser('validate', help='Validate a profile file against a profile schema or perform static analysis.')
@@ -76,7 +78,7 @@ def main(argv):
     convert_parser.add_argument('--output', '-o', action='store', required=True, help='Path to the output profiles files.')
     convert_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the profiles files (default: pretty).')
     convert_parser.add_argument('--mode', '-m', nargs='*', action='store', choices=list(ConvertBits), default=list(ConvertBits), help='List of conversion capabilities')
-    convert_parser.add_argument('--validate', '-v', nargs='*', action=ValidateAction, default=None, help='Validate profile files before conversion (choices: schema, analysis).')
+    convert_parser.add_argument('--validate', nargs='*', action=ValidateAction, default=None, help='Validate profile files before conversion (choices: schema, analysis).')
 
     merge_parser = subparsers.add_parser('merge', help='Generate merged Vulkan profile JSON files.')
     merge_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
@@ -97,7 +99,7 @@ def main(argv):
     merge_parser.add_argument('--mode', '-m', action='store', choices=['union', 'intersection'], default='intersection', help='Mode of profile combination.')
     merge_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the profiles files (default: pretty).')
     merge_parser.add_argument('--convert', nargs='*', action='store', choices=list(ConvertBits), help='List of conversion capabilities to apply to the merged profile output.')
-    merge_parser.add_argument('--validate', '-v', nargs='*', action=ValidateAction, default=None, help='Validate profile files before merging (choices: schema, analysis).')
+    merge_parser.add_argument('--validate', nargs='*', action=ValidateAction, default=None, help='Validate profile files before merging (choices: schema, analysis).')
 
     library_parser = subparsers.add_parser('library', help='Generate the Vulkan profiles C/C++ API library headers and source files.')
     library_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
@@ -108,7 +110,7 @@ def main(argv):
     library_parser.add_argument('--output-src', action='store', help='Output source directory for profile library.')
     library_parser.add_argument('--output-filename', action='store', default='vulkan_profiles', help='Output filename for profile library, default "vulkan_profiles".')
     library_parser.add_argument('--mode', nargs='*', action='store', choices=['header-only', 'header+source'], default=['header-only', 'header+source'], help='Library output generation mode.')
-    library_parser.add_argument('--validate', '-v', nargs='*', action=ValidateAction, default=None, help='Validate generated JSON profile schema and JSON profiles (choices: schema, analysis).')
+    library_parser.add_argument('--validate', nargs='*', action=ValidateAction, default=None, help='Validate generated JSON profile schema and JSON profiles (choices: schema, analysis).')
     library_parser.add_argument('--convert', nargs='*', action='store', choices=list(ConvertBits), help='List of conversion capabilities to apply before generating the library.')
     library_parser.add_argument('--intermediate', action='store', help='Directory path for intermediate converted profiles (used when --convert is provided).')
     library_parser.add_argument('--debug', '-d', action='store_true', help='Also generate library variant with debug messages.')
@@ -120,7 +122,7 @@ def main(argv):
     doc_parser.add_argument('--input', '-i', action='store', required=True, help='Path to directory with profiles.')
     doc_parser.add_argument('--input-filenames', action='store', help='Comma separated list of profile filenames.')
     doc_parser.add_argument('--output', '-o', action='store', required=True, help='Output markdown file for profiles documentation.')
-    doc_parser.add_argument('--validate', '-v', nargs='*', action=ValidateAction, default=None, help='Validate profile files before generating documentation (choices: schema, analysis).')
+    doc_parser.add_argument('--validate', nargs='*', action=ValidateAction, default=None, help='Validate profile files before generating documentation (choices: schema, analysis).')
 
     layer_parser = subparsers.add_parser('layer', help='Generate the Vulkan profiles layer source file.')
     layer_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
@@ -132,6 +134,8 @@ def main(argv):
     tests_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
     tests_parser.add_argument('--output-profile', action='store', required=True, help='Output profile test file.')
     tests_parser.add_argument('--output-cpp', action='store', help='Output C++ tests file.')
+
+    subparsers.add_parser('version', help='Print vkprofiles version.')
 
     args = parser.parse_args(argv)
 
@@ -151,6 +155,8 @@ def main(argv):
         main_layer(args)
     elif args.command == 'tests':
         main_tests(args)
+    elif args.command == 'version':
+        main_version(args)
     else:
         parser.print_help()
 
@@ -158,4 +164,3 @@ def main(argv):
 if __name__ == '__main__':
     print(sys.executable)
     sys.exit(main(sys.argv[1:]))
-    
