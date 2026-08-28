@@ -23,28 +23,22 @@ The *Vulkan Profiles Toolset* includes the following components:
 * Each revision of Vulkan API is represented by a schema that supersedes older versions of Vulkan API.
 * The schema covers Vulkan capabilities and all extensions.
 
-
-* ***[The `vkprofiles` command line tool](./profiles/README.md)***
+* ***[The `vkprofiles` command line tool](./scripts/README.md)***
 * A command-line utility to validate, convert, merge, generate schema files, generate C/C++ API libraries, and generate Markdown documentation.
 * Supports profile merging via `union` and `intersection` of Vulkan capabilities, as well as automatic capability conversion from `vk.xml`.
-
 
 * ***[The Vulkan Profiles API library](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_api_library.html)***
 * A header-only C++ library to use *Vulkan Profiles* in Vulkan applications.
 * The library allows checking Profiles support on a device and creating a `VkDevice` instance with the profile features and extensions enabled.
 * The library requires a Vulkan 1.1 driver.
 
-
 * ***[The Vulkan Profiles Layer](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_layer.html)***
 * A layer used during application development to ensure adherence to the requirements of a chosen *Vulkan Profile*.
 * [It simulates but doesn't emulate](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_layer.html%23technical-details) Vulkan capabilities. Hence, it is used with the [Validation layer](https://github.com/KhronosGroup/Vulkan-ValidationLayers) to clamp available capabilities on the Vulkan developer system.
 * The layer requires a Vulkan 1.1 driver.
 
-
 * ***[The Vulkan Profiles Comparison Table](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_definitions.html)***
 * Human-readable format of *Vulkan Profiles* in a table to enable comparison.
-
-
 
 ## Vulkan Profiles Files
 
@@ -91,7 +85,6 @@ The *Vulkan Profiles Toolset* is generated against [`vk.xml`](https://github.com
 This design guarantees that any Vulkan developer can regenerate the entire *Vulkan Profiles Toolset* solution with any new [Vulkan Header](https://github.com/KhronosGroup/Vulkan-Headers) update or any set of *Vulkan Profiles*.
 
 The following diagram shows the Vulkan Profiles Toolset generation pipeline with every produced components:
-
 
 Note: The *Profiles layer* is not yet code-generated but it will be in the future.
 
