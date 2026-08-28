@@ -24,17 +24,19 @@ import sys
 import re
 import json
 import os
+import tempfile
 
 import gen_profiles_solution
 import gen_profiles_file
 from source.main_validate import main_validate
+from source.main_convert import main_convert, OutputFormatType
 
 def main_merge(args):
     validate_val = getattr(args, 'validate', None)
     if validate_val:
         validate_modes = validate_val if isinstance(validate_val, list) else ['schema', 'analysis']
         
-        # Determine input directory for validation
+        # Determine the input path for validation
         input_path = getattr(args, 'input', None)
         if not input_path and getattr(args, 'config', None):
             input_path = os.path.dirname(args.config)
@@ -59,15 +61,12 @@ def main_merge(args):
         gen_profiles_solution.Log.e('Mode must be either union or intersection')
         sys.exit(1)
 
-    strip_duplicate_struct = bool(args.strip_duplicate_structs)
-
     if args.input_profiles is not None:
         input_profile_names = args.input_profiles.split(',')
     else:
         input_profile_names = list()
 
     profile_file = gen_profiles_file.ProfileFile()
-
     profile_configs = list()
 
     if args.config is None:
@@ -136,9 +135,28 @@ def main_merge(args):
             config,
             profile_file,
             args.mode,
-            strip_duplicate_struct
+            False
         )
 
-    format_type = getattr(args, 'format', None)
-    profile_file.dump(args.output, format_type)
-    
+    format_type = getattr(args, 'format', None) or OutputFormatType.PRETTY
+    convert_mode = getattr(args, 'convert', None)
+
+    if convert_mode is not None:
+        api = getattr(args, 'api', 'vulkan') or 'vulkan'
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_merged_path = os.path.join(temp_dir, "merged.json")
+            profile_file.dump(temp_merged_path, format_type)
+
+            convert_args = argparse.Namespace(
+                registry=args.registry,
+                input=temp_merged_path,
+                output=args.output,
+                mode=convert_mode,
+                format=format_type,
+                api=api,
+                validate=False
+            )
+            main_convert(convert_args)
+    else:
+        profile_file.dump(args.output, format_type)
+        

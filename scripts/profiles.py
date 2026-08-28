@@ -79,6 +79,7 @@ def main(argv):
     convert_parser.add_argument('--validate', '-v', nargs='*', action=ValidateAction, default=None, help='Validate profile files before conversion (choices: schema, analysis).')
 
     merge_parser = subparsers.add_parser('merge', help='Generate merged Vulkan profile JSON files.')
+    merge_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     merge_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
     merge_parser.add_argument('--config', '-c', action='store', help='Use specified a JSON merge config file path instead of using individual arguments.')
     merge_parser.add_argument('--input', '-i', action='store', help='Path to directory with profiles.')
@@ -95,7 +96,7 @@ def main(argv):
     merge_parser.add_argument('--profile-required-profiles', action='store', help='Comma separated list of required profiles by the generated profile.')
     merge_parser.add_argument('--mode', '-m', action='store', choices=['union', 'intersection'], default='intersection', help='Mode of profile combination.')
     merge_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the profiles files (default: pretty).')
-    merge_parser.add_argument('--strip-duplicate-structs', action='store_true', help='Strip the duplicated structures in the generated profiles file.')
+    merge_parser.add_argument('--convert', nargs='*', action='store', choices=list(ConvertBits), help='List of conversion capabilities to apply to the merged profile output.')
     merge_parser.add_argument('--validate', '-v', nargs='*', action=ValidateAction, default=None, help='Validate profile files before merging (choices: schema, analysis).')
 
     library_parser = subparsers.add_parser('library', help='Generate the Vulkan profiles C/C++ API library headers and source files.')

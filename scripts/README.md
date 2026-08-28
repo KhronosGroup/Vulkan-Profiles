@@ -10,71 +10,18 @@ vkprofiles <command> [options]
 
 ## Subcommands
 
-### 1. `convert`
+### 1. `validate`
 
-Converts implicit profile JSON files to explicit profile JSON files by pulling Vulkan capabilities, extension dependencies, and feature aliases directly from `vk.xml`.
-
-```bash
-vkprofiles convert --registry vk.xml --input path/to/input_dir --output path/to/output_dir [options]
-```
-
-* `--input`, `-i`: *(Required)* Path to input profile JSON file or directory.
-* `--output`, `-o`: *(Required)* Path to output directory or file.
-* `--registry`, `-r`: Path to `vk.xml`.
-* `--api`: Target API variant (`vulkan`). Default: `vulkan`.
-* `--format`: Output formatting style (`flatten` or `tree`). Default: `flatten`.
-* `--mode`: Space-separated list of conversion capabilities to apply. Default: all flags.
-* `--validate`, `-v`: Validate profile files against schema prior to conversion.
-
-#### Conversion Mode Flags (`--mode`)
-
-Conversion flags are processed in a deterministic internal pipeline order regardless of the order specified on the command line. This multi-phase sequence ensures that all extension dependencies and core promotions are populated first, structural feature/property/format aliases are subsequently expanded across all required structures, redundant inherited definitions are stripped, and capability blocks are consolidated as the final step.
-
-| Mode Value | Description |
-| --- | --- |
-| `pull-dependences` | Queries `vk.xml` to automatically pull in and append all dependent extensions required by any extensions listed in the capability blocks.
-
- |
-| `pull-promoted-extensions` | Adds version-specific `vulkan1Xpulledrequirements` capability blocks containing all extensions that were promoted into the target Vulkan core version.
-
- |
-| `pull-aliases` | Automatically expands structural capability aliases (features, properties, and format flags) across core version bundle structures and extension structs (e.g., mapping `VkPhysicalDevice16BitStorageFeatures` to `VkPhysicalDeviceVulkan11Features`).
-
- |
-| `strip-duplication` | Recursively removes duplicate extension requirements, features, properties, and format flags that are already satisfied by parent profiles in the inheritance chain.
-
- |
-| `consolidate` | Combines all mandatory capability blocks across a profile into a single consolidated requirement block (`<profile_name>_requirements`).
-
- |
-| `ignore-extension-versions` | Modifier flag: Forces all required extension spec versions to `1`, ignoring specific extension version numbers during extension pulling.
-
- |
-
-**Example:**
+Validates one or more profile JSON files against the Vulkan Profiles JSON schema and performs static analysis against `vk.xml`.
 
 ```bash
-vkprofiles convert \
-    --registry vk.xml \
-    --input profiles/LunarG \
-    --output profiles/generated \
-    --mode pull-dependences pull-aliases strip-duplication \
-    --validate
-```
-
----
-
-### 2. `validate`
-
-Validates one or more profile JSON files against the Vulkan Profiles JSON schema.
-
-```bash
-vkprofiles validate --registry vk.xml --input path/to/profiles [options]
+vkprofiles validate --input path/to/profiles [options]
 ```
 
 * `--input`, `-i`: *(Required)* Path to profile JSON file or directory to validate.
-* `--registry`, `-r`: Path to `vk.xml` (used to generate a schema if `--schema` is omitted).
-* `--schema`, `-s`: Path to an explicit JSON schema file (`profiles-*.json`).
+* `--registry`, `-r`: Path to `vk.xml` (used to generate schema if `--schema` is omitted and required for `analysis` mode).
+* `--schema`, `-s`: Path to an explicit JSON schema file (`profiles-*.json`). By default, generates schema from `vk.xml`.
+* `--mode`, `-m`: Validation mode(s) to execute (`schema`, `analysis`). Default: `schema analysis`.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
 
 **Example:**
@@ -83,12 +30,13 @@ vkprofiles validate --registry vk.xml --input path/to/profiles [options]
 vkprofiles validate \
     --api vulkan \
     --registry vk.xml \
-    --input profiles/LunarG
+    --input profiles/LunarG \
+    --mode schema analysis
 ```
 
 ---
 
-### 3. `schema`
+### 2. `schema`
 
 Generates a Vulkan Profiles JSON schema file from `vk.xml`.
 
@@ -111,6 +59,49 @@ vkprofiles schema \
 
 ---
 
+### 3. `convert`
+
+Converts implicit profile JSON files to explicit profile JSON files by pulling Vulkan capabilities, extension dependencies, and feature aliases directly from `vk.xml`.
+
+```bash
+vkprofiles convert --registry vk.xml --input path/to/input_dir --output path/to/output_dir [options]
+```
+
+* `--input`, `-i`: *(Required)* Path to input profile JSON file or directory.
+* `--output`, `-o`: *(Required)* Path to output directory or file.
+* `--registry`, `-r`: Path to `vk.xml`.
+* `--api`: Target API variant (`vulkan`). Default: `vulkan`.
+* `--format`: Output formatting style (`flatten` or `tree`). Default: `flatten`.
+* `--mode`: Space-separated list of conversion capabilities to apply. Default: all flags.
+* `--validate`, `-v`: Validate profile files before conversion (choices: `schema`, `analysis`). Default: `schema analysis`.
+
+#### Conversion Mode Flags (`--mode`)
+
+Conversion flags are processed in a deterministic internal pipeline order regardless of the order specified on the command line. This multi-phase sequence ensures that all extension dependencies and core promotions are populated first, structural feature/property/format aliases are subsequently expanded across all required structures, redundant inherited definitions are stripped, and capability blocks are consolidated as the final step.
+
+| Mode Value | Description |
+| --- | --- |
+| `pull-extension-dependencies` | Queries `vk.xml` to automatically pull in and append all dependent extensions required by any extensions listed in the capability blocks. |
+| `pull-promoted-extensions` | Adds version-specific `vulkan1Xpulledrequirements` capability blocks containing all extensions that were promoted into the target Vulkan core version. |
+| `pull-required-capabilities` | Evaluates and pulls satisfied core/extension required features into profile capability blocks. |
+| `pull-aliases` | Automatically expands structural capability aliases (features, properties, and format flags) across core version bundle structures and extension structs (e.g., mapping `VkPhysicalDevice16BitStorageFeatures` to `VkPhysicalDeviceVulkan11Features`). |
+| `strip-duplication` | Recursively removes duplicate extension requirements, features, properties, and format flags that are already satisfied by parent profiles in the inheritance chain. |
+| `consolidate` | Combines all mandatory capability blocks across a profile into a single consolidated requirement block (`<profile_name>_requirements`). |
+| `ignore-extension-versions` | Modifier flag: Forces all required extension spec versions to `1`, ignoring specific extension version numbers during extension pulling. |
+
+**Example:**
+
+```bash
+vkprofiles convert \
+    --registry vk.xml \
+    --input profiles/LunarG \
+    --output profiles/generated \
+    --mode pull-extension-dependencies pull-aliases strip-duplication \
+    --validate
+```
+
+---
+
 ### 4. `merge`
 
 Combines multiple profile JSON files into a single merged profile JSON file via `intersection` or `union`.
@@ -125,6 +116,8 @@ vkprofiles merge --registry vk.xml --input path/to/profiles --output path/to/mer
 * `--config`, `-c`: Path to JSON merge config file.
 * `--mode`, `-m`: Combination mode (`intersection` or `union`). Default: `intersection`.
 * `--format`: Output formatting style (`flatten` or `pretty`). Default: `pretty`.
+* `--convert`: Apply conversion capabilities to the merged profile output (choices: `pull-extension-dependencies`, `pull-promoted-extensions`, `pull-required-capabilities`, `pull-aliases`, `strip-duplication`, `consolidate`, `ignore-extension-versions`).
+* `--validate`, `-v`: Validate profile files before merging (choices: `schema`, `analysis`). Default: `schema analysis`.
 * `--profile-name`: Override output profile name.
 * `--profile-version`: Set profile version number. Default: `1`.
 * `--profile-label`: Set profile label string.
@@ -132,17 +125,28 @@ vkprofiles merge --registry vk.xml --input path/to/profiles --output path/to/mer
 * `--profile-date`: Set profile release date (`YYYY-MM-DD`).
 * `--profile-api-version`: Set target Vulkan API version (e.g., `1.3.280`).
 * `--profile-stage`: Set development stage (`ALPHA`, `BETA`, `STABLE`). Default: `STABLE`.
-* `--strip-duplicate-structs`: Strip duplicate structure entries.
 
-**Example (Creating `VP_LUNARG_desktop_baseline.json`):**
-In the repository build process, `VP_LUNARG_desktop_baseline.json` is constructed by calculating the intersection of historical desktop baseline profiles listed in `VP_LUNARG_desktop_baseline_config.json`:
+#### Merging Multiple Profiles into a Single Output File (`--config`)
+
+When passing a JSON configuration file via `--config`, the `merge` command can process multiple profile definitions at once and pack them into a single output JSON file. The configuration file specifies a `profiles` object mapping target profile names (e.g. `VP_LUNARG_desktop_baseline_2022`, `VP_LUNARG_desktop_baseline_2023`, `VP_LUNARG_desktop_baseline_2024`, `VP_LUNARG_desktop_baseline_2026`) to their respective source input directories, label, description, API version, and required profiles. Root-level metadata such as `contributors` and `history` are also embedded into the final merged file.
+
+#### Target Vulkan API Version Selection (`--profile-api-version`)
+
+When specifying `--profile-api-version` (or setting `api-version` within a `--config` JSON file), developers must specify a Vulkan API version that exposes all Vulkan capabilities defined by the profile data. Selecting a target API version lower than what is required by any included core structure or feature will result in an invalid profile definition.
+
+To assist developers in determining and verifying the correct API version:
+* **`vkprofiles validate`**: Running static analysis (`--mode analysis`) checks the profile data against `vk.xml` and explicitly reports any capabilities or core structures that are not supported by the designated Vulkan major/minor version.
+* **Published Vulkan Profiles Schemas**: Published for every Vulkan Header release in the [Khronos-Schemas repository](https://github.com/KhronosGroup/Khronos-Schemas/tree/main/vulkan), these schemas can be used to obtain detailed validation reports per Vulkan Header version.
+
+**Example (Creating `VP_LUNARG_desktop_baseline.json` with configuration file and conversion):**
 
 ```bash
 vkprofiles merge \
     --registry vk.xml \
     --config profiles/LunarG/VP_LUNARG_desktop_baseline_config.json \
     --output profiles/LunarG/VP_LUNARG_desktop_baseline.json \
-    --strip-duplicate-structs
+    --convert pull-aliases strip-duplication \
+    --validate
 ```
 
 **Example (Merging Directory to Single Profile):**
@@ -166,9 +170,14 @@ vkprofiles merge \
 Generates C/C++ Vulkan Profiles API library headers (`vulkan_profiles.h`, `vulkan_profiles.hpp`) and source file (`vulkan_profiles.cpp`).
 
 > [!IMPORTANT]
-> **Device Creation Requirements**
-> Generating a Vulkan Profiles API library suitable for creating a `VkDevice` instance requires that the input profile JSON files contain no duplicate Vulkan feature structures. The Vulkan specification prohibits passing superseded or duplicate feature structures simultaneously in the `pNext` chain during device creation.
-> If the source profile JSON files contain redundant or unexpanded feature structures, developers can use the `--convert` flag with `pull-aliases` and `strip-duplication` modes during library generation to automatically sanitize, expand, and deduplicate feature structures before C/C++ code generation.
+> **Device Creation Requirements & `pNext` Chain Structure Duplication**
+> When calling `vkCreateDevice`, the Vulkan specification prohibits passing duplicate or aliased feature structures simultaneously in the `VkDeviceCreateInfo` `pNext` chain. Specifically, two different structures enabling or configuring the same underlying Vulkan feature cannot both be present in `pNext`, even if their member boolean values match.
+> 
+> **Example:**
+> Enabling `timelineSemaphore` using both `VkPhysicalDeviceTimelineSemaphoreFeaturesKHR` (from `VK_KHR_timeline_semaphore`) and `VkPhysicalDeviceVulkan12Features` (the Vulkan 1.2 core structure into which the feature was promoted) simultaneously in the `pNext` chain during `vkCreateDevice` is invalid. Vulkan drivers and Validation Layers will generate an error.
+> 
+> **Resolution:**
+> To ensure the generated library creates valid `VkDevice` instances, input profile JSON files must not contain unexpanded or redundant feature structures across capability blocks. Developers can use the `--convert` option with `pull-aliases` and `strip-duplication` during library generation to automatically collapse aliased structures into their target core equivalents and deduplicate feature chains before C/C++ code generation.
 
 ```bash
 vkprofiles library --registry vk.xml --input path/to/profiles --output path/to/include [options]
@@ -182,9 +191,9 @@ vkprofiles library --registry vk.xml --input path/to/profiles --output path/to/i
 * `--output-filename`: Base filename for generated files. Default: `vulkan_profiles`.
 * `--mode`: Library generation mode (`header-only`, `header+source`). Default: `header-only` and `header+source`.
 * `--output-schema`: Output file path for generated JSON schema.
-* `--convert`: Apply profiles data conversion (e.g., `pull-aliases`, `strip-duplication`, `pull-dependences`) prior to generation.
+* `--convert`: Apply profiles data conversion prior to generation (choices: `pull-extension-dependencies`, `pull-promoted-extensions`, `pull-required-capabilities`, `pull-aliases`, `strip-duplication`, `consolidate`, `ignore-extension-versions`).
 * `--intermediate`: Directory path for intermediate converted JSON files (used with `--convert`).
-* `--validate`, `-v`: Validate profiles against schema during generation.
+* `--validate`, `-v`: Validate profiles (choices: `schema`, `analysis`) during generation. Default: `schema analysis`.
 * `--debug`, `-d`: Generate debug variant of library code.
 * `--config`, `-c`: Build configuration (`release` or `debug`).
 
@@ -229,7 +238,7 @@ vkprofiles doc --registry vk.xml --input path/to/profiles --output PROFILES.md [
 * `--input`, `-i`: *(Required)* Directory containing profile JSON files.
 * `--output`, `-o`: *(Required)* Output Markdown file path.
 * `--input-filenames`: Comma-separated list of profile filenames.
-* `--validate`, `-v`: Validate profile JSON files before generating documentation.
+* `--validate`, `-v`: Validate profile JSON files before generating documentation (choices: `schema`, `analysis`). Default: `schema analysis`.
 
 **Example:**
 
@@ -239,7 +248,8 @@ vkprofiles doc \
     --registry vk.xml \
     --input profiles \
     --input-filenames "VP_KHR_roadmap.json,VP_LUNARG_minimum_requirements.json" \
-    --output PROFILES.md
+    --output PROFILES.md \
+    --validate
 ```
 
 ---
@@ -249,8 +259,6 @@ vkprofiles doc \
 > [!NOTE]
 > **Internal Tool Developer Commands**
 > The `layer` and `tests` subcommands are designed exclusively for developers maintaining the Vulkan Profiles repository to generate layer and test code.
-> 
-> 
 
 ### 7. `layer` *(Internal)*
 
@@ -258,8 +266,8 @@ Generates `profiles_generated.cpp` for the Vulkan Profiles layer (`VkLayer_khron
 
 ```bash
 vkprofiles layer --registry vk.xml --output layer/profiles_generated.cpp
-
 ```
+
 * `--registry`, `-r`: Path to `vk.xml`.
 * `--output`, `-o`: Output path for generated layer source file.
 * `--api`: Target API variant (`vulkan`).
@@ -296,5 +304,4 @@ vkprofiles tests \
     --registry vk.xml \
     --output-profile profiles/test/data/VP_LUNARG_test_api_generated.json \
     --output-cpp layer/tests/tests_generated.cpp
-
 ```
