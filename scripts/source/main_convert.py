@@ -743,10 +743,6 @@ def cleanup_and_sort_pulled_blocks(json_file_data: dict):
         prof["capabilities"] = other_blocks + pulled_blocks
 
 
-# -----------------------------------------------------------------------------
-# Main Conversion Entry Point
-# -----------------------------------------------------------------------------
-
 def main_convert(args):
     validate_val = getattr(args, 'validate', None)
     if validate_val:
@@ -768,15 +764,11 @@ def main_convert(args):
     
     json_files_dict = load_profiles_jsons(Path(args.input))
 
-    mode_enums = [ConvertBits(m) for m in args.mode]
+    raw_modes = getattr(args, 'mode', None) or []
+    mode_enums = [ConvertBits(m) for m in raw_modes]
     
-    require_promoted_extensions = False
-    if ConvertBits.PULL_PROMOTED_EXTENSIONS in mode_enums:
-        require_promoted_extensions = True
-        
-    ignore_extension_versions = False
-    if ConvertBits.IGNORE_EXTENSION_VERSIONS in mode_enums:
-        ignore_extension_versions = True
+    require_promoted_extensions = ConvertBits.PULL_PROMOTED_EXTENSIONS in mode_enums
+    ignore_extension_versions = ConvertBits.IGNORE_EXTENSION_VERSIONS in mode_enums
     
     if ConvertBits.PULL_EXTENSION_DEPENDENCIES in mode_enums:
         pull_profiles_files_dependencies(vk, ignore_extension_versions, json_files_dict)
