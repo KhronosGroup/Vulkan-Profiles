@@ -69,6 +69,7 @@ class ConvertBits(str, Enum):
     PULL_ALIASES = 'pull-aliases'
     STRIP_DUPLICATION = 'strip-duplication'
     CONSOLIDATE = 'consolidate'                                # Consolidate all mandatory capability blocks into a single block per profile.
+    STRIP_PROMOTED_EXTENSIONS = 'strip-promoted-extensions'    # Strip extensions promoted to profile core version.
 
 
 def collect_required_profiles_capabilities_recursive(json_files_dict: dict, profile_names: list, visited: set = None) -> dict:
@@ -287,6 +288,15 @@ def should_remove_struct_a_in_favor_of_b(vk: VulkanObject, version: VK_VERSION, 
         return False
 
     return struct_a > struct_b
+
+
+def is_extension_promoted_to_version(vk: VulkanObject, ext_name: str, version: VK_VERSION) -> bool:
+    promoted_targets = getExtensionPromotedTo(vk, ext_name)
+    for target in promoted_targets:
+        p_ver = VK_VERSION.from_string(target)
+        if p_ver != VK_VERSION.NONE and version != VK_VERSION.NONE and p_ver <= version:
+            return True
+    return False
 
 
 # -----------------------------------------------------------------------------
@@ -762,6 +772,19 @@ def pull_aliases_profiles_file(vk: VulkanObject, require_promoted_extensions: bo
                 )
 
 
+def pull_aliases_profiles_files(vk: VulkanObject, require_promoted_extensions: bool, json_files_dict: dict):
+    if not isinstance(json_files_dict, dict):
+        return
+
+    if "profiles" in json_files_dict or "capabilities" in json_files_dict:
+        pull_aliases_profiles_file(vk, require_promoted_extensions, json_files_dict, json_files_dict)
+        return
+
+    sorted_file_keys = get_topologically_sorted_file_keys(json_files_dict)
+    for file_key in sorted_file_keys:
+        pull_aliases_profiles_file(vk, require_promoted_extensions, json_files_dict, json_files_dict[file_key])
+        
+
 # -----------------------------------------------------------------------------
 # Phase 5: Deep Duplication Stripping ('strip-duplication')
 # -----------------------------------------------------------------------------
@@ -894,6 +917,19 @@ def strip_profiles_file_capabilities_duplication(vk: VulkanObject, json_files_di
                         )
 
 
+def strip_profiles_files_capabilities_duplication(vk: VulkanObject, json_files_dict: dict):
+    if not isinstance(json_files_dict, dict):
+        return
+
+    if "profiles" in json_files_dict or "capabilities" in json_files_dict:
+        strip_profiles_file_capabilities_duplication(vk, json_files_dict, json_files_dict)
+        return
+
+    sorted_file_keys = get_topologically_sorted_file_keys(json_files_dict)
+    for file_key in sorted_file_keys:
+        strip_profiles_file_capabilities_duplication(vk, json_files_dict, json_files_dict[file_key])
+
+
 # -----------------------------------------------------------------------------
 # Phase 6: Consolidation ('consolidate')
 # -----------------------------------------------------------------------------
@@ -934,6 +970,69 @@ def consolidate_profiles_file(json_files_dict: dict, json_file_data: dict):
     for block_name in list(capabilities_dict.keys()):
         if block_name not in referenced_blocks:
             del capabilities_dict[block_name]
+
+def consolidate_profiles_files(json_files_dict: dict):
+    if not isinstance(json_files_dict, dict):
+        return
+
+    if "profiles" in json_files_dict or "capabilities" in json_files_dict:
+        consolidate_profiles_file(json_files_dict, json_files_dict)
+        return
+
+    sorted_file_keys = get_topologically_sorted_file_keys(json_files_dict)
+    for file_key in sorted_file_keys:
+        consolidate_profiles_file(json_files_dict, json_files_dict[file_key])
+        
+        
+# -----------------------------------------------------------------------------
+# Phase 7: Strip Promoted Extensions ('strip-promoted-extensions')
+# -----------------------------------------------------------------------------
+
+def strip_promoted_extensions_capabilities_block(
+    vk: VulkanObject, version: VK_VERSION, json_profiles_capabilities_block: dict
+):
+    if "extensions" not in json_profiles_capabilities_block or not isinstance(json_profiles_capabilities_block["extensions"], dict):
+        return
+
+    block_exts = json_profiles_capabilities_block["extensions"]
+    exts_to_remove = [
+        ext_name for ext_name in block_exts.keys()
+        if is_extension_promoted_to_version(vk, ext_name, version)
+    ]
+
+    for ext_name in exts_to_remove:
+        del block_exts[ext_name]
+
+    if not block_exts:
+        del json_profiles_capabilities_block["extensions"]
+
+
+def strip_promoted_extensions_profiles_file(vk: VulkanObject, json_file_data: dict):
+    profiles_data = json_file_data.get("profiles", {})
+    json_profiles_capabilities = json_file_data.get("capabilities", {})
+
+    for profile_key, profile_obj in profiles_data.items():
+        api_version = VK_VERSION.from_string(profile_obj.get("api-version", "1.0.0"))
+        block_names = collect_block_names(profile_obj.get("capabilities", []))
+
+        for block_name in block_names:
+            if block_name in json_profiles_capabilities:
+                strip_promoted_extensions_capabilities_block(
+                    vk, api_version, json_profiles_capabilities[block_name]
+                )
+
+
+def strip_promoted_extensions_profiles_files(vk: VulkanObject, json_files_dict: dict):
+    if not isinstance(json_files_dict, dict):
+        return
+
+    if "profiles" in json_files_dict or "capabilities" in json_files_dict:
+        strip_promoted_extensions_profiles_file(vk, json_files_dict)
+        return
+
+    sorted_file_keys = get_topologically_sorted_file_keys(json_files_dict)
+    for file_key in sorted_file_keys:
+        strip_promoted_extensions_profiles_file(vk, json_files_dict[file_key])
 
 
 # -----------------------------------------------------------------------------
@@ -987,20 +1086,23 @@ def main_convert(args):
     # Phase 4: Pull Capability Aliases
     if ConvertBits.PULL_ALIASES in mode_enums:
         logging.debug("Phase 4: Pulling capability aliases...")
-        for file_key in sorted_file_keys:
-            pull_aliases_profiles_file(vk, require_promoted_extensions, json_files_dict, json_files_dict[file_key])
+        pull_aliases_profiles_files(vk, require_promoted_extensions, json_files_dict)
 
     # Phase 5: Strip Duplication
     if ConvertBits.STRIP_DUPLICATION in mode_enums:
         logging.debug("Phase 5: Stripping capabilities duplication...")
         for file_key in sorted_file_keys:
-            strip_profiles_file_capabilities_duplication(vk, json_files_dict, json_files_dict[file_key])
+            strip_profiles_files_capabilities_duplication(vk, json_files_dict)
 
     # Phase 6: Consolidate
     if ConvertBits.CONSOLIDATE in mode_enums:
         logging.debug("Phase 6: Consolidating profile capability blocks...")
-        for file_key in sorted_file_keys:
-            consolidate_profiles_file(json_files_dict, json_files_dict[file_key])
+        consolidate_profiles_files(json_files_dict)
+
+    # Phase 7: Strip Promoted Extensions
+    if ConvertBits.STRIP_PROMOTED_EXTENSIONS in mode_enums:
+        logging.debug("Phase 7: Stripping extensions promoted to profile core version...")
+        strip_promoted_extensions_profiles_files(vk, json_files_dict)
 
     save_profiles_jsons(json_files_dict, Path(args.output), OutputFormatType(args.format))
     
