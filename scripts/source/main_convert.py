@@ -324,7 +324,7 @@ def pull_capabilities_block_dependencies(
     filtered_deps = {}
     for ext_name, ext_ver in raw_deps.items():
         if ext_name in original_extensions or ext_name not in context_extensions:
-            filtered_deps[ext_name] = ext_ver
+            filtered_deps[ext_name] = 1 if ignore_extension_versions else ext_ver
 
     json_profiles_capabilities_block["extensions"] = filtered_deps
 
@@ -345,8 +345,34 @@ def pull_capabilities_block_dependencies(
             vk, ext_name, version, profile_enabled_exts, enabled_features
         )
         if ext_satisfied:
-            features_dict = json_profiles_capabilities_block.setdefault("features", {})
-            deep_merge_dict(features_dict, ext_satisfied)
+            filtered_ext_satisfied = {}
+            for s_name, members in ext_satisfied.items():
+                if not isinstance(members, dict):
+                    continue
+                new_members = {}
+                for m_name, val in members.items():
+                    if not val:
+                        continue
+
+                    query_id = StructCapabilityAlias(s_name, m_name)
+                    aliases = [query_id] + gatherCapabilityAliases(vk, query_id)
+
+                    is_in_context = False
+                    for alias in aliases:
+                        if isinstance(alias, StructCapabilityAlias):
+                            if (alias.struct, alias.member) in context_features:
+                                is_in_context = True
+                                break
+
+                    if not is_in_context:
+                        new_members[m_name] = val
+
+                if new_members:
+                    filtered_ext_satisfied[s_name] = new_members
+
+            if filtered_ext_satisfied:
+                features_dict = json_profiles_capabilities_block.setdefault("features", {})
+                deep_merge_dict(features_dict, filtered_ext_satisfied)
 
 
 def pull_profiles_file_dependencies(
@@ -544,12 +570,31 @@ pull_required_features_profiles_files = pull_required_capabilities_profiles_file
 # Phase 3: Promoted Extensions ('pull-promoted-extensions')
 # -----------------------------------------------------------------------------
 
-def pull_promoted_extensions_profiles_file(vk: VulkanObject, ignore_extension_versions: bool, json_file_data: dict):
+def pull_promoted_extensions_profiles_file(
+    vk: VulkanObject, 
+    ignore_extension_versions: bool, 
+    json_file_data: dict, 
+    json_files_dict: dict = None
+):
     profiles_data = json_file_data.get("profiles", {})
     capabilities_dict = json_file_data.setdefault("capabilities", {})
 
     for key, profile_obj in profiles_data.items():
         api_version = VK_VERSION.from_string(profile_obj["api-version"])
+
+        context_extensions = set()
+        context_features = set()
+        parent_profiles = profile_obj.get("profiles", [])
+        if json_files_dict and parent_profiles:
+            parent_caps = collect_required_profiles_capabilities_recursive(json_files_dict, parent_profiles)
+            context_extensions.update(parent_caps.get("extensions", {}).keys())
+            parent_features_dict = parent_caps.get("features", {})
+            for s_name, members in parent_features_dict.items():
+                if isinstance(members, dict):
+                    for m_name, val in members.items():
+                        if val:
+                            context_features.add((s_name, m_name))
+
         primary_block = get_primary_capability_block(profile_obj, capabilities_dict)
         if primary_block is None:
             continue
@@ -560,16 +605,37 @@ def pull_promoted_extensions_profiles_file(vk: VulkanObject, ignore_extension_ve
             if ver != VK_VERSION.NONE and api_version != VK_VERSION.NONE and ver <= api_version:
                 promoted_exts = gatherPromotedExtensionsForExactVersion(vk, ver)
                 for ext_name, ext_ver in promoted_exts.items():
-                    if ext_name not in ext_dict:
+                    if ext_name not in ext_dict and ext_name not in context_extensions:
                         ext_dict[ext_name] = 1 if ignore_extension_versions else ext_ver
 
-        pull_capabilities_block_dependencies(vk, api_version, ignore_extension_versions, primary_block)
+        block_names = collect_block_names(profile_obj.get("capabilities", []))
+        for block_name in block_names:
+            if block_name in capabilities_dict:
+                block = capabilities_dict[block_name]
+                pull_capabilities_block_dependencies(
+                    vk, api_version, ignore_extension_versions, block, context_extensions, context_features
+                )
+                if "extensions" in block and isinstance(block["extensions"], dict):
+                    context_extensions.update(block["extensions"].keys())
+                if "features" in block and isinstance(block["features"], dict):
+                    for s_name, members in block["features"].items():
+                        if isinstance(members, dict):
+                            for m_name, val in members.items():
+                                if val:
+                                    context_features.add((s_name, m_name))
 
 
 def pull_promoted_extensions_profiles_files(vk: VulkanObject, ignore_extension_versions: bool, json_files_dict: dict):
+    if not isinstance(json_files_dict, dict):
+        return
+
+    if "profiles" in json_files_dict or "capabilities" in json_files_dict:
+        pull_promoted_extensions_profiles_file(vk, ignore_extension_versions, json_files_dict, None)
+        return
+
     sorted_file_keys = get_topologically_sorted_file_keys(json_files_dict)
     for file_key in sorted_file_keys:
-        pull_promoted_extensions_profiles_file(vk, ignore_extension_versions, json_files_dict[file_key])
+        pull_promoted_extensions_profiles_file(vk, ignore_extension_versions, json_files_dict[file_key], json_files_dict)
 
 
 # -----------------------------------------------------------------------------

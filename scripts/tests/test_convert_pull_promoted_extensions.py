@@ -49,7 +49,8 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
     def test_pull_promoted_extensions_block_unique_vulkan10(self):
         """
         Verifies that for Vulkan 1.0 profiles, pull_promoted_extensions_profiles_files pulls no core
-        promoted extensions (since core promotions start at Vulkan 1.1+), but still resolves dependencies.
+        promoted extensions (since core promotions start at Vulkan 1.1+), but still resolves dependencies
+        and required features for extensions in the primary capability block.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -86,9 +87,14 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "baseline": {
                     "extensions": {
-                        "VK_KHR_get_physical_device_properties2": 2,
-                        "VK_KHR_storage_buffer_storage_class": 1,
-                        "VK_KHR_variable_pointers": 1
+                        "VK_KHR_variable_pointers": 1,
+                        "VK_KHR_get_physical_device_properties2": 1,
+                        "VK_KHR_storage_buffer_storage_class": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        }
                     }
                 }
             }
@@ -100,7 +106,7 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_promoted_extensions_profiles_files(self.vk, False, json_files_dict)
+        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -108,7 +114,7 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
     def test_pull_promoted_extensions_block_inheritance_vulkan10(self):
         """
         Verifies that for Vulkan 1.0 profiles with block inheritance, promoted extension extraction
-        only targets the primary capability block and preserves non-primary blocks.
+        only targets primary capability block_a, leaving secondary block_b untouched.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -155,7 +161,13 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                 },
                 "block_b": {
                     "extensions": {
+                        "VK_KHR_storage_buffer_storage_class": 1,
                         "VK_KHR_variable_pointers": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        }
                     }
                 }
             }
@@ -175,7 +187,7 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
     def test_pull_promoted_extensions_profile_inheritance_vulkan10(self):
         """
         Verifies that for Vulkan 1.0 profiles with profile inheritance, dependency pulling
-        respects context extensions inherited from parent profiles.
+        operates independently per profile primary block.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -195,12 +207,18 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "block_a": {
                     "extensions": {
-                        "VK_KHR_get_physical_device_properties2": 2
+                        "VK_KHR_get_physical_device_properties2": 1
                     }
                 },
                 "block_b": {
                     "extensions": {
+                        "VK_KHR_storage_buffer_storage_class": 1,
                         "VK_KHR_variable_pointers": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        }
                     }
                 }
             }
@@ -229,13 +247,18 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "block_a": {
                     "extensions": {
-                        "VK_KHR_get_physical_device_properties2": 2
+                        "VK_KHR_get_physical_device_properties2": 1
                     }
                 },
                 "block_b": {
                     "extensions": {
-                        "VK_KHR_storage_buffer_storage_class": 1,
-                        "VK_KHR_variable_pointers": 1
+                        "VK_KHR_variable_pointers": 1,
+                        "VK_KHR_storage_buffer_storage_class": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        }
                     }
                 }
             }
@@ -247,18 +270,17 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_promoted_extensions_profiles_files(self.vk, False, json_files_dict)
+        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
     # -------------------------------------------------------------------------
-    # Vulkan 1.1 Tests (VK_KHR_variable_pointers - Core Promotion Injections)
+    # Vulkan 1.1 Tests (VK_KHR_variable_pointers)
     # -------------------------------------------------------------------------
 
     def test_pull_promoted_extensions_block_unique_vulkan11(self):
         """
-        Verifies that all extensions promoted to Vulkan 1.1 core (e.g. VK_KHR_multiview, VK_KHR_variable_pointers,
-        VK_KHR_get_physical_device_properties2, etc.) and their non-core dependencies (e.g. VK_KHR_surface)
+        Verifies that all extensions promoted to Vulkan 1.1 core and their dependencies (e.g. VK_KHR_surface)
         are automatically injected into a Vulkan 1.1 profile's primary capability block.
         """
         original_json_text = """{
@@ -296,31 +318,43 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "baseline": {
                     "extensions": {
-                        "VK_KHR_16bit_storage": 1,
-                        "VK_KHR_bind_memory2": 1,
-                        "VK_KHR_dedicated_allocation": 1,
-                        "VK_KHR_descriptor_update_template": 1,
-                        "VK_KHR_device_group": 1,
-                        "VK_KHR_device_group_creation": 1,
-                        "VK_KHR_external_fence": 1,
-                        "VK_KHR_external_fence_capabilities": 1,
-                        "VK_KHR_external_memory": 1,
-                        "VK_KHR_external_memory_capabilities": 1,
-                        "VK_KHR_external_semaphore": 1,
-                        "VK_KHR_external_semaphore_capabilities": 1,
-                        "VK_KHR_get_memory_requirements2": 1,
-                        "VK_KHR_get_physical_device_properties2": 2,
-                        "VK_KHR_get_surface_capabilities2": 1,
-                        "VK_KHR_maintenance1": 2,
-                        "VK_KHR_maintenance2": 1,
-                        "VK_KHR_maintenance3": 1,
+                        "VK_KHR_variable_pointers": 1,
                         "VK_KHR_multiview": 1,
-                        "VK_KHR_relaxed_block_layout": 1,
-                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_device_group": 1,
                         "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_get_physical_device_properties2": 1,
+                        "VK_KHR_maintenance1": 1,
+                        "VK_KHR_external_memory_capabilities": 1,
+                        "VK_KHR_external_memory": 1,
+                        "VK_KHR_external_semaphore_capabilities": 1,
+                        "VK_KHR_external_semaphore": 1,
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_descriptor_update_template": 1,
+                        "VK_KHR_external_fence_capabilities": 1,
+                        "VK_KHR_external_fence": 1,
+                        "VK_KHR_maintenance2": 1,
+                        "VK_KHR_dedicated_allocation": 1,
                         "VK_KHR_storage_buffer_storage_class": 1,
-                        "VK_KHR_surface": 25,
-                        "VK_KHR_variable_pointers": 1
+                        "VK_KHR_relaxed_block_layout": 1,
+                        "VK_KHR_get_memory_requirements2": 1,
+                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_bind_memory2": 1,
+                        "VK_KHR_maintenance3": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
+                        },
+                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
+                            "samplerYcbcrConversion": true
+                        }
                     }
                 }
             }
@@ -332,7 +366,7 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_promoted_extensions_profiles_files(self.vk, False, json_files_dict)
+        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -340,7 +374,7 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
     def test_pull_promoted_extensions_block_inheritance_vulkan11(self):
         """
         Verifies that Vulkan 1.1 promoted extensions are injected into the primary block (block_a),
-        leaving non-primary blocks untouched.
+        leaving non-primary blocks (block_b) untouched.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -382,31 +416,43 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "block_a": {
                     "extensions": {
-                        "VK_KHR_16bit_storage": 1,
-                        "VK_KHR_bind_memory2": 1,
-                        "VK_KHR_dedicated_allocation": 1,
-                        "VK_KHR_descriptor_update_template": 1,
-                        "VK_KHR_device_group": 1,
-                        "VK_KHR_device_group_creation": 1,
-                        "VK_KHR_external_fence": 1,
-                        "VK_KHR_external_fence_capabilities": 1,
-                        "VK_KHR_external_memory": 1,
-                        "VK_KHR_external_memory_capabilities": 1,
-                        "VK_KHR_external_semaphore": 1,
-                        "VK_KHR_external_semaphore_capabilities": 1,
-                        "VK_KHR_get_memory_requirements2": 1,
-                        "VK_KHR_get_physical_device_properties2": 2,
-                        "VK_KHR_get_surface_capabilities2": 1,
-                        "VK_KHR_maintenance1": 2,
-                        "VK_KHR_maintenance2": 1,
-                        "VK_KHR_maintenance3": 1,
+                        "VK_KHR_get_physical_device_properties2": 1,
                         "VK_KHR_multiview": 1,
-                        "VK_KHR_relaxed_block_layout": 1,
-                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_device_group": 1,
                         "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_maintenance1": 1,
+                        "VK_KHR_external_memory_capabilities": 1,
+                        "VK_KHR_external_memory": 1,
+                        "VK_KHR_external_semaphore_capabilities": 1,
+                        "VK_KHR_external_semaphore": 1,
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_descriptor_update_template": 1,
+                        "VK_KHR_external_fence_capabilities": 1,
+                        "VK_KHR_external_fence": 1,
+                        "VK_KHR_maintenance2": 1,
+                        "VK_KHR_variable_pointers": 1,
+                        "VK_KHR_dedicated_allocation": 1,
                         "VK_KHR_storage_buffer_storage_class": 1,
-                        "VK_KHR_surface": 25,
-                        "VK_KHR_variable_pointers": 1
+                        "VK_KHR_relaxed_block_layout": 1,
+                        "VK_KHR_get_memory_requirements2": 1,
+                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_bind_memory2": 1,
+                        "VK_KHR_maintenance3": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
+                        },
+                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
+                            "samplerYcbcrConversion": true
+                        }
                     }
                 },
                 "block_b": {
@@ -423,7 +469,7 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_promoted_extensions_profiles_files(self.vk, False, json_files_dict)
+        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -484,59 +530,47 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "block_a": {
                     "extensions": {
-                        "VK_KHR_16bit_storage": 1,
-                        "VK_KHR_bind_memory2": 1,
-                        "VK_KHR_dedicated_allocation": 1,
-                        "VK_KHR_descriptor_update_template": 1,
-                        "VK_KHR_device_group": 1,
-                        "VK_KHR_device_group_creation": 1,
-                        "VK_KHR_external_fence": 1,
-                        "VK_KHR_external_fence_capabilities": 1,
-                        "VK_KHR_external_memory": 1,
-                        "VK_KHR_external_memory_capabilities": 1,
-                        "VK_KHR_external_semaphore": 1,
-                        "VK_KHR_external_semaphore_capabilities": 1,
-                        "VK_KHR_get_memory_requirements2": 1,
-                        "VK_KHR_get_physical_device_properties2": 2,
-                        "VK_KHR_get_surface_capabilities2": 1,
-                        "VK_KHR_maintenance1": 2,
-                        "VK_KHR_maintenance2": 1,
-                        "VK_KHR_maintenance3": 1,
+                        "VK_KHR_get_physical_device_properties2": 1,
                         "VK_KHR_multiview": 1,
-                        "VK_KHR_relaxed_block_layout": 1,
-                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_device_group": 1,
                         "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_maintenance1": 1,
+                        "VK_KHR_external_memory_capabilities": 1,
+                        "VK_KHR_external_memory": 1,
+                        "VK_KHR_external_semaphore_capabilities": 1,
+                        "VK_KHR_external_semaphore": 1,
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_descriptor_update_template": 1,
+                        "VK_KHR_external_fence_capabilities": 1,
+                        "VK_KHR_external_fence": 1,
+                        "VK_KHR_maintenance2": 1,
+                        "VK_KHR_variable_pointers": 1,
+                        "VK_KHR_dedicated_allocation": 1,
                         "VK_KHR_storage_buffer_storage_class": 1,
-                        "VK_KHR_surface": 25,
-                        "VK_KHR_variable_pointers": 1
+                        "VK_KHR_relaxed_block_layout": 1,
+                        "VK_KHR_get_memory_requirements2": 1,
+                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_bind_memory2": 1,
+                        "VK_KHR_maintenance3": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
+                        },
+                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
+                            "samplerYcbcrConversion": true
+                        }
                     }
                 },
                 "block_b": {
                     "extensions": {
-                        "VK_KHR_16bit_storage": 1,
-                        "VK_KHR_bind_memory2": 1,
-                        "VK_KHR_dedicated_allocation": 1,
-                        "VK_KHR_descriptor_update_template": 1,
-                        "VK_KHR_device_group": 1,
-                        "VK_KHR_device_group_creation": 1,
-                        "VK_KHR_external_fence": 1,
-                        "VK_KHR_external_fence_capabilities": 1,
-                        "VK_KHR_external_memory": 1,
-                        "VK_KHR_external_memory_capabilities": 1,
-                        "VK_KHR_external_semaphore": 1,
-                        "VK_KHR_external_semaphore_capabilities": 1,
-                        "VK_KHR_get_memory_requirements2": 1,
-                        "VK_KHR_get_physical_device_properties2": 2,
-                        "VK_KHR_get_surface_capabilities2": 1,
-                        "VK_KHR_maintenance1": 2,
-                        "VK_KHR_maintenance2": 1,
-                        "VK_KHR_maintenance3": 1,
-                        "VK_KHR_multiview": 1,
-                        "VK_KHR_relaxed_block_layout": 1,
-                        "VK_KHR_sampler_ycbcr_conversion": 1,
-                        "VK_KHR_shader_draw_parameters": 1,
-                        "VK_KHR_storage_buffer_storage_class": 1,
-                        "VK_KHR_surface": 25,
                         "VK_KHR_variable_pointers": 1
                     }
                 }
@@ -549,7 +583,7 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_promoted_extensions_profiles_files(self.vk, False, json_files_dict)
+        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -560,7 +594,7 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
     def test_pull_promoted_extensions_block_unique_vulkan11_advanced(self):
         """
         Verifies that when pulling promoted extensions for a Vulkan 1.1 profile containing VK_KHR_swapchain_mutable_format,
-        all 1.1 promoted extensions plus transitive dependencies (VK_KHR_swapchain, VK_KHR_surface) are present.
+        all 1.1 promoted extensions plus transitive dependencies (VK_KHR_swapchain, VK_KHR_surface, VK_KHR_image_format_list) are present.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -597,34 +631,47 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "baseline": {
                     "extensions": {
-                        "VK_KHR_16bit_storage": 1,
-                        "VK_KHR_bind_memory2": 1,
-                        "VK_KHR_dedicated_allocation": 1,
-                        "VK_KHR_descriptor_update_template": 1,
-                        "VK_KHR_device_group": 1,
-                        "VK_KHR_device_group_creation": 1,
-                        "VK_KHR_external_fence": 1,
-                        "VK_KHR_external_fence_capabilities": 1,
-                        "VK_KHR_external_memory": 1,
-                        "VK_KHR_external_memory_capabilities": 1,
-                        "VK_KHR_external_semaphore": 1,
-                        "VK_KHR_external_semaphore_capabilities": 1,
-                        "VK_KHR_get_memory_requirements2": 1,
-                        "VK_KHR_get_physical_device_properties2": 2,
-                        "VK_KHR_get_surface_capabilities2": 1,
-                        "VK_KHR_image_format_list": 1,
-                        "VK_KHR_maintenance1": 2,
-                        "VK_KHR_maintenance2": 1,
-                        "VK_KHR_maintenance3": 1,
-                        "VK_KHR_multiview": 1,
-                        "VK_KHR_relaxed_block_layout": 1,
-                        "VK_KHR_sampler_ycbcr_conversion": 1,
-                        "VK_KHR_shader_draw_parameters": 1,
-                        "VK_KHR_storage_buffer_storage_class": 1,
-                        "VK_KHR_surface": 25,
-                        "VK_KHR_swapchain": 70,
                         "VK_KHR_swapchain_mutable_format": 1,
-                        "VK_KHR_variable_pointers": 1
+                        "VK_KHR_multiview": 1,
+                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_device_group": 1,
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_get_physical_device_properties2": 1,
+                        "VK_KHR_maintenance1": 1,
+                        "VK_KHR_external_memory_capabilities": 1,
+                        "VK_KHR_external_memory": 1,
+                        "VK_KHR_external_semaphore_capabilities": 1,
+                        "VK_KHR_external_semaphore": 1,
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_descriptor_update_template": 1,
+                        "VK_KHR_external_fence_capabilities": 1,
+                        "VK_KHR_external_fence": 1,
+                        "VK_KHR_maintenance2": 1,
+                        "VK_KHR_variable_pointers": 1,
+                        "VK_KHR_dedicated_allocation": 1,
+                        "VK_KHR_storage_buffer_storage_class": 1,
+                        "VK_KHR_relaxed_block_layout": 1,
+                        "VK_KHR_get_memory_requirements2": 1,
+                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_bind_memory2": 1,
+                        "VK_KHR_maintenance3": 1,
+                        "VK_KHR_surface": 1,
+                        "VK_KHR_swapchain": 1,
+                        "VK_KHR_image_format_list": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
+                        },
+                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
+                            "samplerYcbcrConversion": true
+                        }
                     }
                 }
             }
@@ -636,7 +683,7 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_promoted_extensions_profiles_files(self.vk, False, json_files_dict)
+        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -644,7 +691,7 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
     def test_pull_promoted_extensions_block_inheritance_vulkan11_advanced(self):
         """
         Verifies that when pulling promoted extensions for a Vulkan 1.1 profile with block inheritance,
-        promoted extensions and their dependencies are populated into primary block_a.
+        promoted extensions and their dependencies are populated into primary block_a, while block_b is untouched.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -686,36 +733,50 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "block_a": {
                     "extensions": {
-                        "VK_KHR_16bit_storage": 1,
-                        "VK_KHR_bind_memory2": 1,
-                        "VK_KHR_dedicated_allocation": 1,
-                        "VK_KHR_descriptor_update_template": 1,
-                        "VK_KHR_device_group": 1,
-                        "VK_KHR_device_group_creation": 1,
-                        "VK_KHR_external_fence": 1,
-                        "VK_KHR_external_fence_capabilities": 1,
-                        "VK_KHR_external_memory": 1,
-                        "VK_KHR_external_memory_capabilities": 1,
-                        "VK_KHR_external_semaphore": 1,
-                        "VK_KHR_external_semaphore_capabilities": 1,
-                        "VK_KHR_get_memory_requirements2": 1,
-                        "VK_KHR_get_physical_device_properties2": 2,
-                        "VK_KHR_get_surface_capabilities2": 1,
-                        "VK_KHR_maintenance1": 2,
-                        "VK_KHR_maintenance2": 1,
-                        "VK_KHR_maintenance3": 1,
+                        "VK_KHR_surface": 1,
+                        "VK_KHR_swapchain": 1,
                         "VK_KHR_multiview": 1,
-                        "VK_KHR_relaxed_block_layout": 1,
-                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_get_physical_device_properties2": 1,
+                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_device_group": 1,
                         "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_maintenance1": 1,
+                        "VK_KHR_external_memory_capabilities": 1,
+                        "VK_KHR_external_memory": 1,
+                        "VK_KHR_external_semaphore_capabilities": 1,
+                        "VK_KHR_external_semaphore": 1,
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_descriptor_update_template": 1,
+                        "VK_KHR_external_fence_capabilities": 1,
+                        "VK_KHR_external_fence": 1,
+                        "VK_KHR_maintenance2": 1,
+                        "VK_KHR_variable_pointers": 1,
+                        "VK_KHR_dedicated_allocation": 1,
                         "VK_KHR_storage_buffer_storage_class": 1,
-                        "VK_KHR_surface": 25,
-                        "VK_KHR_swapchain": 70,
-                        "VK_KHR_variable_pointers": 1
+                        "VK_KHR_relaxed_block_layout": 1,
+                        "VK_KHR_get_memory_requirements2": 1,
+                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_bind_memory2": 1,
+                        "VK_KHR_maintenance3": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
+                        },
+                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
+                            "samplerYcbcrConversion": true
+                        }
                     }
                 },
                 "block_b": {
                     "extensions": {
+                        "VK_KHR_image_format_list": 1,
                         "VK_KHR_swapchain_mutable_format": 1
                     }
                 }
@@ -728,15 +789,15 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_promoted_extensions_profiles_files(self.vk, False, json_files_dict)
+        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
 
-    def test_pull_promoted_extensions_profile_inheritance_vulkan11_advanced(self):
+def test_pull_promoted_extensions_profile_inheritance_vulkan11_advanced(self):
         """
         Verifies that when pulling promoted extensions for Vulkan 1.1 profiles with profile inheritance,
-        each profile's primary block receives promoted extensions while filtering dependencies already provided in parent profile_a.
+        each profile's primary block receives promoted extensions independently.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -790,61 +851,51 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "block_a": {
                     "extensions": {
-                        "VK_KHR_16bit_storage": 1,
-                        "VK_KHR_bind_memory2": 1,
-                        "VK_KHR_dedicated_allocation": 1,
-                        "VK_KHR_descriptor_update_template": 1,
-                        "VK_KHR_device_group": 1,
-                        "VK_KHR_device_group_creation": 1,
-                        "VK_KHR_external_fence": 1,
-                        "VK_KHR_external_fence_capabilities": 1,
-                        "VK_KHR_external_memory": 1,
-                        "VK_KHR_external_memory_capabilities": 1,
-                        "VK_KHR_external_semaphore": 1,
-                        "VK_KHR_external_semaphore_capabilities": 1,
-                        "VK_KHR_get_memory_requirements2": 1,
-                        "VK_KHR_get_physical_device_properties2": 2,
-                        "VK_KHR_get_surface_capabilities2": 1,
-                        "VK_KHR_maintenance1": 2,
-                        "VK_KHR_maintenance2": 1,
-                        "VK_KHR_maintenance3": 1,
+                        "VK_KHR_surface": 1,
+                        "VK_KHR_swapchain": 1,
                         "VK_KHR_multiview": 1,
-                        "VK_KHR_relaxed_block_layout": 1,
-                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_device_group": 1,
                         "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_get_physical_device_properties2": 1,
+                        "VK_KHR_maintenance1": 1,
+                        "VK_KHR_external_memory_capabilities": 1,
+                        "VK_KHR_external_memory": 1,
+                        "VK_KHR_external_semaphore_capabilities": 1,
+                        "VK_KHR_external_semaphore": 1,
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_descriptor_update_template": 1,
+                        "VK_KHR_external_fence_capabilities": 1,
+                        "VK_KHR_external_fence": 1,
+                        "VK_KHR_maintenance2": 1,
+                        "VK_KHR_variable_pointers": 1,
+                        "VK_KHR_dedicated_allocation": 1,
                         "VK_KHR_storage_buffer_storage_class": 1,
-                        "VK_KHR_surface": 25,
-                        "VK_KHR_swapchain": 70,
-                        "VK_KHR_variable_pointers": 1
+                        "VK_KHR_relaxed_block_layout": 1,
+                        "VK_KHR_get_memory_requirements2": 1,
+                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_bind_memory2": 1,
+                        "VK_KHR_maintenance3": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
+                        },
+                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
+                            "samplerYcbcrConversion": true
+                        }
                     }
                 },
                 "block_b": {
                     "extensions": {
-                        "VK_KHR_16bit_storage": 1,
-                        "VK_KHR_bind_memory2": 1,
-                        "VK_KHR_dedicated_allocation": 1,
-                        "VK_KHR_descriptor_update_template": 1,
-                        "VK_KHR_device_group": 1,
-                        "VK_KHR_device_group_creation": 1,
-                        "VK_KHR_external_fence": 1,
-                        "VK_KHR_external_fence_capabilities": 1,
-                        "VK_KHR_external_memory": 1,
-                        "VK_KHR_external_memory_capabilities": 1,
-                        "VK_KHR_external_semaphore": 1,
-                        "VK_KHR_external_semaphore_capabilities": 1,
-                        "VK_KHR_get_memory_requirements2": 1,
-                        "VK_KHR_get_physical_device_properties2": 2,
-                        "VK_KHR_get_surface_capabilities2": 1,
-                        "VK_KHR_maintenance1": 2,
-                        "VK_KHR_maintenance2": 1,
-                        "VK_KHR_maintenance3": 1,
-                        "VK_KHR_multiview": 1,
-                        "VK_KHR_relaxed_block_layout": 1,
-                        "VK_KHR_sampler_ycbcr_conversion": 1,
-                        "VK_KHR_shader_draw_parameters": 1,
-                        "VK_KHR_storage_buffer_storage_class": 1,
                         "VK_KHR_swapchain_mutable_format": 1,
-                        "VK_KHR_variable_pointers": 1
+                        "VK_KHR_image_format_list": 1
                     }
                 }
             }
@@ -856,7 +907,7 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_promoted_extensions_profiles_files(self.vk, False, json_files_dict)
+        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -872,4 +923,3 @@ if __name__ == '__main__':
     TestConvertPullPromotedExtensions.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
-    
