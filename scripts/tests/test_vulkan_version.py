@@ -66,6 +66,25 @@ class TestVulkanObjectVersion(unittest.TestCase):
         self.assertTrue(VK_VERSION.V1_1 < "1.2")
         self.assertTrue(VK_VERSION.V1_3 == "1.3.276")
 
+    def testVersionLists(self):
+        """Tests VK_VERSION.all_versions() and VK_VERSION.core_versions() helper methods."""
+        expected_all = [
+            VK_VERSION.V1_0,
+            VK_VERSION.V1_1,
+            VK_VERSION.V1_2,
+            VK_VERSION.V1_3,
+            VK_VERSION.V1_4,
+        ]
+        expected_core = [
+            VK_VERSION.V1_1,
+            VK_VERSION.V1_2,
+            VK_VERSION.V1_3,
+            VK_VERSION.V1_4,
+        ]
+
+        self.assertEqual(VK_VERSION.all_versions(), expected_all)
+        self.assertEqual(VK_VERSION.core_versions(), expected_core)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
