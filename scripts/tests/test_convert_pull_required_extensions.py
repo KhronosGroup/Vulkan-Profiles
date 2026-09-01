@@ -1405,6 +1405,127 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
 
+    # -------------------------------------------------------------------------
+    # Multi-Level Inheritance Tests (Vulkan 1.1 -> Vulkan 1.2 -> Vulkan 1.4)
+    # -------------------------------------------------------------------------
+
+    def test_pull_extension_dependencies_profile_inheritance_vulkan11_to_vulkan12_to_vulkan14(self):
+        """
+        Verifies multi-level profile inheritance across three version tiers:
+        Profile A (Vulkan 1.1) -> Profile B (Vulkan 1.2) -> Profile C (Vulkan 1.4).
+        Ensures that:
+        1. Profile A pulls VK_KHR_surface for VK_KHR_swapchain under Vulkan 1.1.
+        2. Profile B inherits Profile A's context and suppresses VK_KHR_image_format_list
+           for VK_KHR_swapchain_mutable_format due to Vulkan 1.2 core promotion.
+        3. Profile C inherits the combined context of A and B, pulling only unique remaining
+           dependencies (VK_KHR_present_id and required feature structs for VK_KHR_present_wait).
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-304.json#",
+            "profiles": {
+                "VP_TEST_profile_a": {
+                    "version": 1,
+                    "api-version": "1.1.106",
+                    "capabilities": [ "block_a" ]
+                },
+                "VP_TEST_profile_b": {
+                    "version": 1,
+                    "api-version": "1.2.131",
+                    "profiles": [ "VP_TEST_profile_a" ],
+                    "capabilities": [ "block_b" ]
+                },
+                "VP_TEST_profile_c": {
+                    "version": 1,
+                    "api-version": "1.4.304",
+                    "profiles": [ "VP_TEST_profile_b" ],
+                    "capabilities": [ "block_c" ]
+                }
+            },
+            "capabilities": {
+                "block_a": {
+                    "extensions": {
+                        "VK_KHR_swapchain": 70
+                    }
+                },
+                "block_b": {
+                    "extensions": {
+                        "VK_KHR_swapchain_mutable_format": 1
+                    }
+                },
+                "block_c": {
+                    "extensions": {
+                        "VK_KHR_present_wait": 1
+                    }
+                }
+            }
+        }"""
+
+        try:
+            original_data = json.loads(original_json_text)
+        except json.JSONDecodeError as e:
+            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-304.json#",
+            "profiles": {
+                "VP_TEST_profile_a": {
+                    "version": 1,
+                    "api-version": "1.1.106",
+                    "capabilities": [ "block_a" ]
+                },
+                "VP_TEST_profile_b": {
+                    "version": 1,
+                    "api-version": "1.2.131",
+                    "profiles": [ "VP_TEST_profile_a" ],
+                    "capabilities": [ "block_b" ]
+                },
+                "VP_TEST_profile_c": {
+                    "version": 1,
+                    "api-version": "1.4.304",
+                    "profiles": [ "VP_TEST_profile_b" ],
+                    "capabilities": [ "block_c" ]
+                }
+            },
+            "capabilities": {
+                "block_a": {
+                    "extensions": {
+                        "VK_KHR_surface": 25,
+                        "VK_KHR_swapchain": 70
+                    }
+                },
+                "block_b": {
+                    "extensions": {
+                        "VK_KHR_swapchain_mutable_format": 1
+                    }
+                },
+                "block_c": {
+                    "extensions": {
+                        "VK_KHR_present_id": 1,
+                        "VK_KHR_present_wait": 1
+                    },
+                    "features": {
+                        "VkPhysicalDevicePresentIdFeaturesKHR": {
+                            "presentId": true
+                        },
+                        "VkPhysicalDevicePresentWaitFeaturesKHR": {
+                            "presentWait": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        try:
+            expected_data = json.loads(expected_json_text)
+        except json.JSONDecodeError as e:
+            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+
+        json_files_dict = {"test_profile.json": original_data}
+        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], expected_data)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(

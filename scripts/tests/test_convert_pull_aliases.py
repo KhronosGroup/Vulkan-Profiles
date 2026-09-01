@@ -235,6 +235,160 @@ class TestConvertPullAliases(unittest.TestCase):
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
 
+    def test_pull_structural_feature_aliases_profile_inheritance_vulkan11_to_vulkan12(self):
+        """
+        Verifies alias expansion across profile inheritance where parent Profile A is Vulkan 1.1
+        and child Profile B is Vulkan 1.2.
+        - Profile A (V1.1) block_a populates V1.1 split structures and KHR extension aliases
+          for 16-bit storage and multiview features/properties.
+        - Profile B (V1.2) block_b inherits Profile A's capabilities and populates V1.2 bundle structures
+          (VkPhysicalDeviceVulkan11Features, VkPhysicalDeviceVulkan11Properties, and
+          VkPhysicalDeviceVulkan12Features) alongside split and extension alias structures.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_profile_a": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": ["block_a"]
+                },
+                "VP_TEST_profile_b": {
+                    "version": 1,
+                    "api-version": "1.2.0",
+                    "profiles": ["VP_TEST_profile_a"],
+                    "capabilities": ["block_b"]
+                }
+            },
+            "capabilities": {
+                "block_a": {
+                    "extensions": {
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_multiview": 1
+                    },
+                    "features": {
+                        "VkPhysicalDevice16BitStorageFeatures": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                            "maxMultiviewViewCount": 6
+                        }
+                    }
+                },
+                "block_b": {
+                    "extensions": {
+                        "VK_KHR_8bit_storage": 1
+                    },
+                    "features": {
+                        "VkPhysicalDevice8BitStorageFeaturesKHR": {
+                            "storageBuffer8BitAccess": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_profile_a": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": ["block_a"]
+                },
+                "VP_TEST_profile_b": {
+                    "version": 1,
+                    "api-version": "1.2.0",
+                    "profiles": ["VP_TEST_profile_a"],
+                    "capabilities": ["block_b"]
+                }
+            },
+            "capabilities": {
+                "block_a": {
+                    "extensions": {
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_multiview": 1
+                    },
+                    "features": {
+                        "VkPhysicalDevice16BitStorageFeatures": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceMultiviewFeatures": {
+                            "multiview": true
+                        },
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceMultiviewProperties": {
+                            "maxMultiviewViewCount": 6
+                        },
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                            "maxMultiviewViewCount": 6
+                        }
+                    }
+                },
+                "block_b": {
+                    "extensions": {
+                        "VK_KHR_8bit_storage": 1
+                    },
+                    "features": {
+                        "VkPhysicalDevice16BitStorageFeatures": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDevice8BitStorageFeatures": {
+                            "storageBuffer8BitAccess": true
+                        },
+                        "VkPhysicalDevice8BitStorageFeaturesKHR": {
+                            "storageBuffer8BitAccess": true
+                        },
+                        "VkPhysicalDeviceMultiviewFeatures": {
+                            "multiview": true
+                        },
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
+                        },
+                        "VkPhysicalDeviceVulkan11Features": {
+                            "storageBuffer16BitAccess": true,
+                            "multiview": true
+                        },
+                        "VkPhysicalDeviceVulkan12Features": {
+                            "storageBuffer8BitAccess": true
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceMultiviewProperties": {
+                            "maxMultiviewViewCount": 6
+                        },
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                            "maxMultiviewViewCount": 6
+                        },
+                        "VkPhysicalDeviceVulkan11Properties": {
+                            "maxMultiviewViewCount": 6
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_aliases_profiles_files(self.vk, False, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
