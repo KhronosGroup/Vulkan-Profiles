@@ -64,6 +64,11 @@ class VK_VERSION(Enum):
         return cls.NONE
 
     @classmethod
+    def all_versions(cls) -> list["VK_VERSION"]:
+        """Returns all valid Vulkan core versions from Vulkan 1.0 onwards (excluding NONE)."""
+        return [v for v in cls if v != cls.NONE]
+
+    @classmethod
     def core_versions(cls) -> list["VK_VERSION"]:
         """Returns all Vulkan core versions that promote extensions (> Vulkan 1.0)."""
         return [v for v in cls if v > cls.V1_0]

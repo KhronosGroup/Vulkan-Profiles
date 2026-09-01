@@ -26,8 +26,40 @@ import os
 import re
 from xml.etree import ElementTree
 from typing import Any
+from dataclasses import dataclass
 
-from vulkan_object import VulkanObject, CapabilityAlias, StructCapabilityAlias, ExtensionCapabilityAlias
+import vulkan_object
+
+try:
+    from vulkan_object import (
+        VulkanObject, CapabilityAlias, StructCapabilityAlias, ExtensionCapabilityAlias,
+        Version, FeatureRequirement, PropertyRequirement
+    )
+except ImportError:
+    from vulkan_object import (
+        VulkanObject, CapabilityAlias, StructCapabilityAlias, ExtensionCapabilityAlias,
+        Version
+    )
+
+    @dataclass
+    class FeatureRequirement:
+        """Fallback dataclass when FeatureRequirement is absent in external vulkan_object.py."""
+        struct: str
+        field: str
+        depends: (str | None)
+
+    @dataclass
+    class PropertyRequirement:
+        """Fallback dataclass when PropertyRequirement is absent in external vulkan_object.py."""
+        struct: str
+        name: str
+        value: str
+        depends: (str | None)
+
+    # Dynamically inject into vulkan_object module namespace
+    vulkan_object.FeatureRequirement = FeatureRequirement
+    vulkan_object.PropertyRequirement = PropertyRequirement
+
 from reg import Registry
 from base_generator import BaseGenerator, BaseGeneratorOptions, SetOutputDirectory, SetOutputFileName, SetTargetApiName, SetMergedApiNames
 from source.vulkan_object_version import VK_VERSION, get_bundle_structure_core_version
@@ -37,6 +69,325 @@ __all__ = [
     'getVulkanObject',
     'VulkanObject'
 ]
+
+
+DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
+    'VK_VERSION_1_0': [
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxImageDimension1D', '4096', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxImageDimension2D', '4096', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxImageDimension3D', '256', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxImageDimensionCube', '4096', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxImageArrayLayers', '256', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxTexelBufferElements', '65536', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxUniformBufferRange', '16384', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxStorageBufferRange', '134217728', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxPushConstantsSize', '128', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxMemoryAllocationCount', '4096', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxSamplerAllocationCount', '4000', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'bufferImageGranularity', '131072', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'sparseAddressSpaceSize', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxBoundDescriptorSets', '4', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxPerStageDescriptorSamplers', '16', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxPerStageDescriptorUniformBuffers', '12', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxPerStageDescriptorStorageBuffers', '4', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxPerStageDescriptorSampledImages', '16', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxPerStageDescriptorStorageImages', '4', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxPerStageDescriptorInputAttachments', '4', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxPerStageResources', '128', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxDescriptorSetSamplers', '96', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxDescriptorSetUniformBuffers', '72', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxDescriptorSetUniformBuffersDynamic', '8', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxDescriptorSetStorageBuffers', '24', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxDescriptorSetStorageBuffersDynamic', '4', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxDescriptorSetSampledImages', '96', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxDescriptorSetStorageImages', '24', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxDescriptorSetInputAttachments', '4', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxVertexInputAttributes', '16', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxVertexInputBindings', '16', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxVertexInputAttributeOffset', '2047', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxVertexInputBindingStride', '2048', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxVertexOutputComponents', '64', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxTessellationGenerationLevel', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxTessellationPatchSize', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxTessellationControlPerVertexInputComponents', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxTessellationControlPerVertexOutputComponents', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxTessellationControlPerPatchOutputComponents', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxTessellationControlTotalOutputComponents', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxTessellationEvaluationInputComponents', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxTessellationEvaluationOutputComponents', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxGeometryShaderInvocations', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxGeometryInputComponents', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxGeometryOutputComponents', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxGeometryOutputVertices', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxGeometryTotalOutputComponents', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxFragmentInputComponents', '64', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxFragmentOutputAttachments', '4', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxFragmentDualSrcAttachments', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxFragmentCombinedOutputResources', '4', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxComputeSharedMemorySize', '16384', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxComputeWorkGroupCount', '65535, 65535, 65535', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxComputeWorkGroupInvocations', '128', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxComputeWorkGroupSize', '128, 128, 64', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'subPixelPrecisionBits', '4', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'subTexelPrecisionBits', '4', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'mipmapPrecisionBits', '4', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxDrawIndexedIndexValue', '16777216', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxDrawIndirectCount', '1', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxSamplerLodBias', '2', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxSamplerAnisotropy', '1', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxViewports', '1', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxViewportDimensions', '4096, 4096', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'viewportBoundsRange', '-8192, 8192', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'viewportSubPixelBits', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'minMemoryMapAlignment', '64', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'minTexelBufferOffsetAlignment', '256', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'minUniformBufferOffsetAlignment', '256', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'minStorageBufferOffsetAlignment', '256', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'minTexelOffset', '-8', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxTexelOffset', '7', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'minTexelGatherOffset', '-8', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxTexelGatherOffset', '7', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'minInterpolationOffset', '0.0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxInterpolationOffset', '0.0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'subPixelInterpolationOffsetBits', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxFramebufferWidth', '4096', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxFramebufferHeight', '4096', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxFramebufferLayers', '256', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'framebufferColorSampleCounts', 'VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'framebufferDepthSampleCounts', 'VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'framebufferStencilSampleCounts', 'VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'framebufferNoAttachmentsSampleCounts', 'VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxColorAttachments', '4', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'sampledImageColorSampleCounts', 'VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'sampledImageIntegerSampleCounts', 'VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'sampledImageDepthSampleCounts', 'VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'sampledImageStencilSampleCounts', 'VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'storageImageSampleCounts', 'VK_SAMPLE_COUNT_1_BIT', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxSampleMaskWords', '1', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxClipDistances', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxCullDistances', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxCombinedClipAndCullDistances', '0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'discreteQueuePriorities', '2', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeRange', '1.0, 1.0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'lineWidthRange', '1.0, 1.0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeGranularity', '1.0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'lineWidthGranularity', '1.0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'nonCoherentAtomSize', '256', None),
+        PropertyRequirement('VkPhysicalDeviceSparseProperties', 'residencyStandard2DBlockShape', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceSparseProperties', 'residencyStandard2DMultisampleBlockShape', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceSparseProperties', 'residencyStandard3DBlockShape', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceSparseProperties', 'residencyNonResidentStrict', 'false', None),
+    ],
+    'VK_VERSION_1_1': [
+        PropertyRequirement('VkPhysicalDeviceSubgroupProperties', 'subgroupSize', '1', None),
+        PropertyRequirement('VkPhysicalDeviceSubgroupProperties', 'supportedStages', 'VK_SHADER_STAGE_COMPUTE_BIT', None),
+        PropertyRequirement('VkPhysicalDeviceSubgroupProperties', 'supportedOperations', 'VK_SUBGROUP_FEATURE_BASIC_BIT', None),
+        PropertyRequirement('VkPhysicalDeviceMultiviewProperties', 'maxMultiviewViewCount', '6', None),
+        PropertyRequirement('VkPhysicalDeviceMultiviewProperties', 'maxMultiviewInstanceIndex', '134217727', None),
+        PropertyRequirement('VkPhysicalDeviceMaintenance3Properties', 'maxPerSetDescriptors', '1024', None),
+        PropertyRequirement('VkPhysicalDeviceMaintenance3Properties', 'maxMemoryAllocationSize', '1073741824', None),
+    ],
+    'VK_VERSION_1_2': [
+        PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'subgroupSize', '1', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'subgroupSupportedStages', 'VK_SHADER_STAGE_COMPUTE_BIT', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'subgroupSupportedOperations', 'VK_SUBGROUP_FEATURE_BASIC_BIT', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'maxMultiviewViewCount', '6', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'maxMultiviewInstanceIndex', '134217727', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'maxPerSetDescriptors', '1024', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'maxMemoryAllocationSize', '1073741824', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSignedZeroInfNanPreserveFloat16', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSignedZeroInfNanPreserveFloat32', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSignedZeroInfNanPreserveFloat64', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderDenormPreserveFloat16', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderDenormPreserveFloat32', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderDenormPreserveFloat64', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderDenormFlushToZeroFloat16', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderDenormFlushToZeroFloat32', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderDenormFlushToZeroFloat64', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderRoundingModeRTEFloat16', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderRoundingModeRTEFloat32', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderRoundingModeRTEFloat64', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderRoundingModeRTZFloat16', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderRoundingModeRTZFloat32', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderRoundingModeRTZFloat64', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxUpdateAfterBindDescriptorsInAllPools', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderUniformBufferArrayNonUniformIndexingNative', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSampledImageArrayNonUniformIndexingNative', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderStorageBufferArrayNonUniformIndexingNative', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderStorageImageArrayNonUniformIndexingNative', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderInputAttachmentArrayNonUniformIndexingNative', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'robustBufferAccessUpdateAfterBind', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'quadDivergentImplicitLod', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxPerStageDescriptorUpdateAfterBindSamplers', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxPerStageDescriptorUpdateAfterBindUniformBuffers', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxPerStageDescriptorUpdateAfterBindStorageBuffers', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxPerStageDescriptorUpdateAfterBindSampledImages', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxPerStageDescriptorUpdateAfterBindStorageImages', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxPerStageDescriptorUpdateAfterBindInputAttachments', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxPerStageUpdateAfterBindResources', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxDescriptorSetUpdateAfterBindSamplers', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxDescriptorSetUpdateAfterBindUniformBuffers', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxDescriptorSetUpdateAfterBindUniformBuffersDynamic', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxDescriptorSetUpdateAfterBindStorageBuffers', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxDescriptorSetUpdateAfterBindStorageBuffersDynamic', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxDescriptorSetUpdateAfterBindSampledImages', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxDescriptorSetUpdateAfterBindStorageImages', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxDescriptorSetUpdateAfterBindInputAttachments', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'supportedDepthResolveModes', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'supportedStencilResolveModes', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'independentResolveNone', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'independentResolve', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'filterMinmaxSingleComponentFormats', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'filterMinmaxImageComponentMapping', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxTimelineSemaphoreValueDifference', '2147483647', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'framebufferIntegerColorSampleCounts', 'VK_SAMPLE_COUNT_1_BIT', None),
+    ],
+    'VK_VERSION_1_3': [
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'maxComputeWorkgroupSubgroups', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'requiredSubgroupSizeStages', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'maxInlineUniformBlockSize', '256', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'maxPerStageDescriptorInlineUniformBlocks', '4', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks', '4', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'maxDescriptorSetInlineUniformBlocks', '4', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'maxDescriptorSetUpdateAfterBindInlineUniformBlocks', '4', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'maxInlineUniformTotalSize', '256', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProduct8BitUnsignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProduct8BitSignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProduct8BitMixedSignednessAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProduct4x8BitPackedUnsignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProduct4x8BitPackedSignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProduct4x8BitPackedMixedSignednessAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProduct16BitUnsignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProduct16BitSignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProduct16BitMixedSignednessAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProduct32BitUnsignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProduct32BitSignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProduct32BitMixedSignednessAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProduct64BitUnsignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProduct64BitSignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProduct64BitMixedSignednessAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProductAccumulatingSaturating8BitUnsignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProductAccumulatingSaturating8BitSignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProductAccumulatingSaturating16BitUnsignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProductAccumulatingSaturating16BitSignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProductAccumulatingSaturating32BitUnsignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProductAccumulatingSaturating32BitSignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProductAccumulatingSaturating64BitUnsignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProductAccumulatingSaturating64BitSignedAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'maxBufferSize', '1073741824', None),
+    ],
+    'VK_VERSION_1_4': [
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxImageDimension1D', '8192', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxImageDimension2D', '8192', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxImageDimension3D', '512', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxImageDimensionCube', '8192', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxImageArrayLayers', '2048', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxUniformBufferRange', '65536', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxPushConstantsSize', '256', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'bufferImageGranularity', '4096', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxBoundDescriptorSets', '7', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxPerStageDescriptorUniformBuffers', '15', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxPerStageResources', '200', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxDescriptorSetUniformBuffers', '90', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxDescriptorSetStorageBuffers', '96', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxDescriptorSetStorageImages', '144', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxFragmentCombinedOutputResources', '16', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxComputeWorkGroupInvocations', '256', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxComputeWorkGroupSize', '256, 256, 64', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'subTexelPrecisionBits', '8', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'mipmapPrecisionBits', '6', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxSamplerLodBias', '14', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxViewportDimensions', '7680, 7680', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'viewportBoundsRange', '-15360, 15359', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxFramebufferWidth', '7680', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxFramebufferHeight', '7680', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxColorAttachments', '8', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'timestampComputeAndGraphics', 'true', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeRange', '1.0, 256.0', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeGranularity', '0.125', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'lineWidthGranularity', '0.5', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'standardSampleLocations', 'true', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'subgroupSupportedStages', 'VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'subgroupSupportedOperations', 'VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_ROTATE_BIT | VK_SUBGROUP_FEATURE_ROTATE_CLUSTERED_BIT', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSignedZeroInfNanPreserveFloat16', 'true', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSignedZeroInfNanPreserveFloat32', 'true', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'maxPushDescriptors', '32', None),
+    ]
+}
+
+
+def _bakeDefaultVersionsIfMissing(vk: VulkanObject):
+    if 'VK_VERSION_1_0' not in vk.versions:
+        try:
+            v10_obj = Version(
+                name='VK_VERSION_1_0',
+                nameString='"VK_VERSION_1_0"',
+                nameApi='VK_API_VERSION_1_0',
+                featureRequirement=[
+                    FeatureRequirement('VkPhysicalDeviceFeatures', 'robustBufferAccess', '!VK_KHR_portability_subset')
+                ],
+                propertyRequirement=[]
+            )
+        except TypeError:
+            v10_obj = Version(
+                name='VK_VERSION_1_0',
+                nameString='"VK_VERSION_1_0"',
+                nameApi='VK_API_VERSION_1_0',
+                featureRequirement=[
+                    FeatureRequirement('VkPhysicalDeviceFeatures', 'robustBufferAccess', '!VK_KHR_portability_subset')
+                ]
+            )
+            v10_obj.propertyRequirement = []
+        vk.versions['VK_VERSION_1_0'] = v10_obj
+    else:
+        v10_obj = vk.versions['VK_VERSION_1_0']
+        if not getattr(v10_obj, 'featureRequirement', None):
+            v10_obj.featureRequirement = [
+                FeatureRequirement('VkPhysicalDeviceFeatures', 'robustBufferAccess', '!VK_KHR_portability_subset')
+            ]
+
+
+def _bakeDefaultPropertiesIfMissing(vk: VulkanObject):
+    has_properties = any(
+        len(getattr(v, 'propertyRequirement', []) or []) > 0 
+        for v in vk.versions.values()
+    )
+    if has_properties:
+        return
+
+    for ver_name, default_props in DEFAULT_CORE_PROPERTY_REQUIREMENTS.items():
+        ver_obj = vk.versions.get(ver_name)
+        if ver_obj is None:
+            try:
+                ver_obj = Version(
+                    name=ver_name,
+                    nameString=f'"{ver_name}"',
+                    nameApi=ver_name.replace('VK_', 'VK_API_'),
+                    featureRequirement=[],
+                    propertyRequirement=[]
+                )
+            except TypeError:
+                ver_obj = Version(
+                    name=ver_name,
+                    nameString=f'"{ver_name}"',
+                    nameApi=ver_name.replace('VK_', 'VK_API_'),
+                    featureRequirement=[]
+                )
+                ver_obj.propertyRequirement = []
+            vk.versions[ver_name] = ver_obj
+        else:
+            if not hasattr(ver_obj, 'propertyRequirement') or ver_obj.propertyRequirement is None:
+                ver_obj.propertyRequirement = []
+
+        ver_obj.propertyRequirement.extend(default_props)
+
 
 @functools.lru_cache(maxsize=1)
 def initVulkanObject(target_api: str = 'vulkan', alternative_xml: str = None, video: bool = False) -> VulkanObject:
@@ -88,7 +439,11 @@ def initVulkanObject(target_api: str = 'vulkan', alternative_xml: str = None, vi
 
         reg.apiGen()
 
-        return generator.vk
+        vk = generator.vk
+        _bakeDefaultVersionsIfMissing(vk)
+        _bakeDefaultPropertiesIfMissing(vk)
+
+        return vk
 
 def getStructByName(structs_dict, struct_name):
     if struct_name in structs_dict:
@@ -500,6 +855,12 @@ def evaluateFeatureDepends(
         return True
 
     def is_symbol_enabled(token: str) -> bool:
+        token = token.strip()
+
+        # Handle negation operator '!'
+        if token.startswith("!"):
+            return not is_symbol_enabled(token[1:])
+
         if "::" in token:
             parts = token.split("::")
             return (parts[0], parts[1]) in enabled_features
@@ -511,12 +872,6 @@ def evaluateFeatureDepends(
 
         if token in enabled_exts:
             return True
-
-        ext_obj = vk.extensions.get(token)
-        if ext_obj and getattr(ext_obj, 'promotedTo', None):
-            promoted_ver = VK_VERSION.from_string(ext_obj.promotedTo)
-            if promoted_ver != VK_VERSION.NONE and api_version != VK_VERSION.NONE and api_version >= promoted_ver:
-                return True
 
         return False
 
@@ -538,7 +893,7 @@ def gatherSatisfiedCoreRequiredFeaturesForVersion(
     if not ver_obj:
         return satisfied_features
 
-    for req in getattr(ver_obj, 'featureRequirement', []):
+    for req in getattr(ver_obj, 'featureRequirement', []) or []:
         if req.depends:
             if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
                 fields = [f.strip() for f in req.field.split(',')] if req.field else []
@@ -550,6 +905,82 @@ def gatherSatisfiedCoreRequiredFeaturesForVersion(
                 satisfied_features.setdefault(req.struct, {})[field_name] = True
 
     return satisfied_features
+
+def parse_property_value(prop_name: str, val_str: str) -> Any:
+    if val_str is None:
+        return None
+    val_str = val_str.strip()
+    if val_str == 'true' or val_str == 'VK_TRUE':
+        return True
+    if val_str == 'false' or val_str == 'VK_FALSE':
+        return False
+
+    if val_str == '0' and prop_name in (
+        'supportedDepthResolveModes', 
+        'supportedStencilResolveModes', 
+        'requiredSubgroupSizeStages'
+    ):
+        return []
+
+    if '|' in val_str or val_str.startswith('VK_'):
+        flags = [f.strip() for f in val_str.split('|') if f.strip()]
+        return flags
+
+    if ',' in val_str:
+        parts = [p.strip() for p in val_str.split(',')]
+        parsed_parts = []
+        for p in parts:
+            try:
+                if '.' in p:
+                    parsed_parts.append(float(p))
+                else:
+                    parsed_parts.append(int(p))
+            except ValueError:
+                parsed_parts.append(p)
+        return parsed_parts
+
+    try:
+        if '.' in val_str:
+            return float(val_str)
+        return int(val_str)
+    except ValueError:
+        pass
+
+    return val_str
+
+
+def gatherSatisfiedCoreRequiredPropertiesForVersion(
+    vk: VulkanObject, 
+    exact_ver: VK_VERSION,
+    api_version: VK_VERSION, 
+    enabled_exts: set[str], 
+    enabled_features: set[tuple[str, str]]
+) -> dict[str, Any]:
+    satisfied_properties: dict[str, Any] = {}
+
+    if exact_ver == VK_VERSION.NONE or api_version == VK_VERSION.NONE or exact_ver > api_version:
+        return satisfied_properties
+
+    ver_obj = vk.versions.get(exact_ver.value)
+    if not ver_obj:
+        return satisfied_properties
+
+    for req in getattr(ver_obj, 'propertyRequirement', []) or []:
+        if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
+            parsed_val = parse_property_value(req.name, req.value)
+            if req.struct == 'VkPhysicalDeviceLimits':
+                vk_props = satisfied_properties.setdefault('VkPhysicalDeviceProperties', {})
+                limits = vk_props.setdefault('limits', {})
+                limits[req.name] = parsed_val
+            elif req.struct == 'VkPhysicalDeviceSparseProperties':
+                vk_props = satisfied_properties.setdefault('VkPhysicalDeviceProperties', {})
+                sparse = vk_props.setdefault('sparseProperties', {})
+                sparse[req.name] = parsed_val
+            else:
+                struct_dict = satisfied_properties.setdefault(req.struct, {})
+                struct_dict[req.name] = parsed_val
+
+    return satisfied_properties
 
 def gatherSatisfiedExtensionRequiredFeatures(
     vk: VulkanObject, 

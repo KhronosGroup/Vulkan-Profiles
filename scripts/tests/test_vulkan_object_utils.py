@@ -570,13 +570,12 @@ class TestVulkanObjectUtils(unittest.TestCase):
         self.assertIn("samplerMirrorClampToEdge", v12_features_ext)
         self.assertTrue(v12_features_ext["samplerMirrorClampToEdge"])
 
-        # Case 3: Core 1.2 feature evaluation on Vulkan 1.2 API gathers samplerMirrorClampToEdge due to core promotion
+        # Case 3: Core 1.2 feature evaluation on Vulkan 1.2 API without extension enabled strictly omits samplerMirrorClampToEdge
         features_v12 = gatherSatisfiedCoreRequiredFeaturesForVersion(
             vk, VK_VERSION.V1_2, VK_VERSION.V1_2, enabled_exts=set(), enabled_features=set()
         )
         v12_features_v12 = features_v12.get("VkPhysicalDeviceVulkan12Features", {})
-        self.assertIn("samplerMirrorClampToEdge", v12_features_v12)
-        self.assertTrue(v12_features_v12["samplerMirrorClampToEdge"])
+        self.assertNotIn("samplerMirrorClampToEdge", v12_features_v12)
 
     def testGatherSatisfiedRequiredFeaturesWithFeatureDepends(self):
         vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
