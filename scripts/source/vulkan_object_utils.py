@@ -355,13 +355,7 @@ def _bakeDefaultVersionsIfMissing(vk: VulkanObject):
 
 
 def _bakeDefaultPropertiesIfMissing(vk: VulkanObject):
-    has_properties = any(
-        len(getattr(v, 'propertyRequirement', []) or []) > 0 
-        for v in vk.versions.values()
-    )
-    if has_properties:
-        return
-
+    """Ensures all core version default property requirements are baked into vk.versions."""
     for ver_name, default_props in DEFAULT_CORE_PROPERTY_REQUIREMENTS.items():
         ver_obj = vk.versions.get(ver_name)
         if ver_obj is None:
@@ -386,7 +380,13 @@ def _bakeDefaultPropertiesIfMissing(vk: VulkanObject):
             if not hasattr(ver_obj, 'propertyRequirement') or ver_obj.propertyRequirement is None:
                 ver_obj.propertyRequirement = []
 
-        ver_obj.propertyRequirement.extend(default_props)
+        # Merge missing default property requirements for this version
+        existing_req_names = {
+            (req.struct, req.name) for req in ver_obj.propertyRequirement
+        }
+        for dp in default_props:
+            if (dp.struct, dp.name) not in existing_req_names:
+                ver_obj.propertyRequirement.append(dp)
 
 
 @functools.lru_cache(maxsize=1)
@@ -457,13 +457,13 @@ def getExtensionPromotedTo(vk: VulkanObject, ext_name: str) -> list[str]:
     """Retrieves the list of 'promotedto' targets for an extension from vk.xml."""
     if hasattr(vk, 'extensions') and ext_name in vk.extensions:
         ext_obj = vk.extensions[ext_name]
-        promoted = getattr(ext_obj, 'promotedTo', None)
-        if promoted is None:
-            promoted = getattr(ext_obj, 'promotedto', None)
+        promoted = getattr(ext_obj, 'promotedTo', None) or getattr(ext_obj, 'promotedto', None) or getattr(ext_obj, 'promoted_to', None)
         if isinstance(promoted, list):
-            return [p for p in promoted if p]
+            return [str(p.name if hasattr(p, 'name') else p) for p in promoted if p]
         elif isinstance(promoted, str) and promoted:
             return [p.strip() for p in promoted.split(',') if p.strip()]
+        elif promoted is not None and hasattr(promoted, 'name'):
+            return [str(promoted.name)]
     return []
 
 def getStructDefiningExtensions(vk: VulkanObject, struct_name: str) -> list[str]:
@@ -512,12 +512,29 @@ def getStructCoreVersion(vk: VulkanObject, struct_name: str) -> VK_VERSION:
     if bundle_ver != VK_VERSION.NONE:
         return bundle_ver
 
-    # Extension structs/aliases ending in vendor tags (KHR, EXT, etc.) are not core structures
     if is_extension_struct_name(vk, struct_name):
         return VK_VERSION.NONE
 
-    struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
+    # 1. Query core feature and property requirements in vk.versions
+    if hasattr(vk, 'versions'):
+        for ver_name, ver_obj in vk.versions.items():
+            ver_enum = VK_VERSION.from_string(ver_name)
+            if ver_enum == VK_VERSION.NONE:
+                continue
 
+            for req in getattr(ver_obj, 'featureRequirement', []) or []:
+                if getattr(req, 'struct', None) == struct_name:
+                    return ver_enum
+
+            for req in getattr(ver_obj, 'propertyRequirement', []) or []:
+                req_struct = getattr(req, 'struct', None)
+                if req_struct == struct_name:
+                    return ver_enum
+                if req_struct in ('VkPhysicalDeviceLimits', 'VkPhysicalDeviceSparseProperties') and struct_name == 'VkPhysicalDeviceProperties':
+                    return ver_enum
+
+    # 2. Check structure object definedByVersion or version attribute
+    struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
     if struct_obj:
         def_ver = getattr(struct_obj, 'definedByVersion', None)
         if def_ver is not None and def_ver != VK_VERSION.NONE:
@@ -529,7 +546,7 @@ def getStructCoreVersion(vk: VulkanObject, struct_name: str) -> VK_VERSION:
             if ver_enum != VK_VERSION.NONE:
                 return ver_enum
 
-    # Check if the structure's defining extension was promoted to a core version
+    # 3. Check defining extension promotion targets
     def_exts = getStructDefiningExtensions(vk, struct_name)
     for ext_name in def_exts:
         promoted_targets = getExtensionPromotedTo(vk, ext_name)
