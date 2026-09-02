@@ -72,12 +72,26 @@ class ConvertBits(str, Enum):
     STRIP_DUPLICATION = 'strip-duplication'
     CONSOLIDATE = 'consolidate'                                # Consolidate all mandatory capability blocks into a single block per profile.
     STRIP_PROMOTED_EXTENSIONS = 'strip-promoted-extensions'    # Strip extensions promoted to profile core version.
+    SORT = 'sort'                                              # Sort capabilities blocks and extensions.
 
 
 SPLIT_PROPERTY_STRUCTS_COVERED_BY_VULKAN11_PROPERTIES = {
     "VkPhysicalDeviceSubgroupProperties",
     "VkPhysicalDeviceMultiviewProperties",
     "VkPhysicalDeviceMaintenance3Properties"
+}
+
+BUNDLE_STRUCT_VERSIONS = {
+    "VkPhysicalDeviceFeatures": (1, 0),
+    "VkPhysicalDeviceProperties": (1, 0),
+    "VkPhysicalDeviceVulkan11Features": (1, 1),
+    "VkPhysicalDeviceVulkan11Properties": (1, 1),
+    "VkPhysicalDeviceVulkan12Features": (1, 2),
+    "VkPhysicalDeviceVulkan12Properties": (1, 2),
+    "VkPhysicalDeviceVulkan13Features": (1, 3),
+    "VkPhysicalDeviceVulkan13Properties": (1, 3),
+    "VkPhysicalDeviceVulkan14Features": (1, 4),
+    "VkPhysicalDeviceVulkan14Properties": (1, 4),
 }
 
 
@@ -365,6 +379,47 @@ def canonicalize_capabilities_for_version(
     return new_features, new_properties
 
 
+def are_property_values_equal(val1: Any, val2: Any) -> bool:
+    """Checks if two property requirement values are equal, accounting for list sorting."""
+    if val1 == val2:
+        return True
+    if isinstance(val1, list) and isinstance(val2, list):
+        try:
+            return sorted(val1) == sorted(val2)
+        except TypeError:
+            return val1 == val2
+    return False
+
+
+def get_parent_property_value(parent_props_dict: dict, struct_name: str, prop_name: str, vk: VulkanObject) -> tuple[bool, Any]:
+    """
+    Looks up parent_props_dict for struct_name::prop_name or any of its capability aliases.
+    Returns (True, parent_val) if found, or (False, None) if not found in parent.
+    """
+    query_id = StructCapabilityAlias(struct_name, prop_name)
+    aliases = [query_id] + gatherCapabilityAliases(vk, query_id)
+
+    for alias in aliases:
+        if not isinstance(alias, StructCapabilityAlias):
+            continue
+        a_struct = alias.struct
+        a_member = alias.member
+
+        if a_struct in parent_props_dict:
+            s_data = parent_props_dict[a_struct]
+            if isinstance(s_data, dict):
+                if a_struct == "VkPhysicalDeviceProperties":
+                    if "limits" in s_data and isinstance(s_data["limits"], dict) and a_member in s_data["limits"]:
+                        return (True, s_data["limits"][a_member])
+                    if "sparseProperties" in s_data and isinstance(s_data["sparseProperties"], dict) and a_member in s_data["sparseProperties"]:
+                        return (True, s_data["sparseProperties"][a_member])
+                else:
+                    if a_member in s_data:
+                        return (True, s_data[a_member])
+
+    return (False, None)
+
+
 # -----------------------------------------------------------------------------
 # Phase 1: Extension Dependencies ('pull-extension-dependencies')
 # -----------------------------------------------------------------------------
@@ -608,33 +663,38 @@ def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: 
 
                     # Filter Transition Properties against Parent Profile
                     parent_props_dict = parent_inherited_caps.get("properties", {})
-                    parent_enabled_props: set[tuple[str, str]] = set()
-                    for s_name, p_data in parent_props_dict.items():
-                        if isinstance(p_data, dict):
-                            for prop_name in p_data.keys():
-                                parent_enabled_props.add((s_name, prop_name))
 
                     filtered_transition_properties = {}
                     for s_name, p_data in transition_properties.items():
                         if not isinstance(p_data, dict):
                             continue
-                        new_p_data = {}
-                        for prop_name, prop_val in p_data.items():
-                            query_id = StructCapabilityAlias(s_name, prop_name)
-                            aliases = [query_id] + gatherCapabilityAliases(vk, query_id)
 
-                            is_in_parent = False
-                            for alias in aliases:
-                                if isinstance(alias, StructCapabilityAlias):
-                                    if (alias.struct, alias.member) in parent_enabled_props:
-                                        is_in_parent = True
-                                        break
-
-                            if not is_in_parent:
-                                new_p_data[prop_name] = prop_val
-
-                        if new_p_data:
-                            filtered_transition_properties[s_name] = new_p_data
+                        if s_name == "VkPhysicalDeviceProperties":
+                            new_s_data = {}
+                            for sub_group_name, sub_dict in p_data.items():
+                                if not isinstance(sub_dict, dict):
+                                    continue
+                                new_sub_dict = {}
+                                for prop_name, prop_val in sub_dict.items():
+                                    found_in_parent, parent_val = get_parent_property_value(
+                                        parent_props_dict, s_name, prop_name, vk
+                                    )
+                                    if not found_in_parent or not are_property_values_equal(parent_val, prop_val):
+                                        new_sub_dict[prop_name] = prop_val
+                                if new_sub_dict:
+                                    new_s_data[sub_group_name] = new_sub_dict
+                            if new_s_data:
+                                filtered_transition_properties[s_name] = new_s_data
+                        else:
+                            new_p_data = {}
+                            for prop_name, prop_val in p_data.items():
+                                found_in_parent, parent_val = get_parent_property_value(
+                                    parent_props_dict, s_name, prop_name, vk
+                                )
+                                if not found_in_parent or not are_property_values_equal(parent_val, prop_val):
+                                    new_p_data[prop_name] = prop_val
+                            if new_p_data:
+                                filtered_transition_properties[s_name] = new_p_data
 
                     transition_properties = filtered_transition_properties
 
@@ -752,7 +812,7 @@ def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: 
                     if ext_satisfied:
                         block_features = block.setdefault("features", {})
                         deep_merge_dict(block_features, ext_satisfied)
-                        
+
 
 def pull_required_capabilities_profiles_files(vk: VulkanObject, json_files_dict: dict):
     sorted_file_keys = get_topologically_sorted_file_keys(json_files_dict)
@@ -1231,6 +1291,147 @@ def strip_promoted_extensions_profiles_files(vk: VulkanObject, json_files_dict: 
 
 
 # -----------------------------------------------------------------------------
+# Phase 8: Sorting ('sort')
+# -----------------------------------------------------------------------------
+
+def get_struct_sort_key(vk: VulkanObject, struct_name: str) -> tuple:
+    """
+    Computes a sorting key for structures:
+    1. Core Bundle structures (Vulkan 1.0 -> 1.4)
+    2. Core Split structures (Vulkan 1.0 -> 1.4, alphabetical per version)
+    3. KHR extension structures (alphabetical)
+    4. EXT extension structures (alphabetical)
+    5. Vendor extension structures (alphabetical)
+    """
+    if struct_name in BUNDLE_STRUCT_VERSIONS:
+        ver_val = BUNDLE_STRUCT_VERSIONS[struct_name]
+        return (0, 0, ver_val, struct_name)
+
+    is_ext = is_extension_struct_name(vk, struct_name)
+
+    if not is_ext:
+        core_ver = getStructCoreVersion(vk, struct_name)
+        if core_ver == VK_VERSION.NONE:
+            core_ver = VK_VERSION.V1_0
+
+        ver_val = core_ver.as_tuple() if hasattr(core_ver, 'as_tuple') else (1, 0)
+        return (0, 1, ver_val, struct_name)
+
+    if struct_name.endswith("KHR"):
+        return (1, (0, 0), struct_name)
+    elif struct_name.endswith("EXT"):
+        return (2, (0, 0), struct_name)
+    else:
+        return (3, (0, 0), struct_name)
+
+
+def get_ext_priority_key(ext_name: str) -> tuple:
+    """Priority order for tie-breaking independent extensions: KHR -> EXT -> Vendor."""
+    if ext_name.startswith("VK_KHR_"):
+        return (0, ext_name)
+    elif ext_name.startswith("VK_EXT_"):
+        return (1, ext_name)
+    else:
+        return (2, ext_name)
+
+
+def sort_extensions(vk: VulkanObject, exts: dict | list) -> dict | list:
+    """
+    Sorts extensions ensuring dependent extensions are listed AFTER their prerequisite extensions,
+    with priority tie-breaking: KHR -> EXT -> Vendor.
+    """
+    is_dict = isinstance(exts, dict)
+    ext_names = list(exts.keys()) if is_dict else list(exts)
+    ext_set = set(ext_names)
+
+    # Build prerequisite graph: prereqs[e] contains items in ext_set that 'e' depends on
+    prereqs = {e: set() for e in ext_names}
+    for e in ext_names:
+        deps = gatherDependentExtensions(vk, VK_VERSION.V1_0, True, {e: 1})
+        for dep in deps:
+            if dep != e and dep in ext_set:
+                prereqs[e].add(dep)
+
+    in_degree = {e: len(prereqs[e]) for e in ext_names}
+    candidates = [e for e in ext_names if in_degree[e] == 0]
+
+    sorted_exts = []
+    while candidates:
+        candidates.sort(key=get_ext_priority_key)
+        curr = candidates.pop(0)
+        sorted_exts.append(curr)
+
+        for e in ext_names:
+            if curr in prereqs[e]:
+                prereqs[e].remove(curr)
+                in_degree[e] -= 1
+                if in_degree[e] == 0:
+                    candidates.append(e)
+
+    # Fallback for cycles/orphans
+    if len(sorted_exts) < len(ext_names):
+        remaining = [e for e in ext_names if e not in sorted_exts]
+        remaining.sort(key=get_ext_priority_key)
+        sorted_exts.extend(remaining)
+
+    if is_dict:
+        return {e: exts[e] for e in sorted_exts}
+    else:
+        return sorted_exts
+
+
+def sort_capabilities_block(vk: VulkanObject, json_block: dict):
+    if not isinstance(json_block, dict):
+        return
+
+    if "extensions" in json_block:
+        json_block["extensions"] = sort_extensions(vk, json_block["extensions"])
+
+    for category in ("features", "properties"):
+        if category in json_block and isinstance(json_block[category], dict):
+            sorted_cat = {}
+            sorted_struct_names = sorted(
+                json_block[category].keys(), 
+                key=lambda s: get_struct_sort_key(vk, s)
+            )
+            for s_name in sorted_struct_names:
+                sorted_cat[s_name] = json_block[category][s_name]
+            json_block[category] = sorted_cat
+
+    if "formats" in json_block and isinstance(json_block["formats"], dict):
+        sorted_formats = {}
+        for fmt_name in sorted(json_block["formats"].keys()):
+            fmt_structs = json_block["formats"][fmt_name]
+            if isinstance(fmt_structs, dict):
+                sorted_fmt_structs = {}
+                for s_name in sorted(fmt_structs.keys(), key=lambda s: get_struct_sort_key(vk, s)):
+                    sorted_fmt_structs[s_name] = fmt_structs[s_name]
+                sorted_formats[fmt_name] = sorted_fmt_structs
+            else:
+                sorted_formats[fmt_name] = fmt_structs
+        json_block["formats"] = sorted_formats
+
+
+def sort_profiles_file(vk: VulkanObject, json_file_data: dict):
+    capabilities_dict = json_file_data.get("capabilities", {})
+    for block_name, block in capabilities_dict.items():
+        sort_capabilities_block(vk, block)
+
+
+def sort_profiles_files(vk: VulkanObject, json_files_dict: dict):
+    if not isinstance(json_files_dict, dict):
+        return
+
+    if "profiles" in json_files_dict or "capabilities" in json_files_dict:
+        sort_profiles_file(vk, json_files_dict)
+        return
+
+    for file_key, json_file_data in json_files_dict.items():
+        if isinstance(json_file_data, dict):
+            sort_profiles_file(vk, json_file_data)
+
+
+# -----------------------------------------------------------------------------
 # Main Conversion Entry Point
 # -----------------------------------------------------------------------------
 
@@ -1295,5 +1496,10 @@ def main_convert(args):
     if ConvertBits.STRIP_PROMOTED_EXTENSIONS in mode_enums:
         logging.debug("Phase 7: Stripping extensions promoted to profile core version...")
         strip_promoted_extensions_profiles_files(vk, json_files_dict)
+
+    # Phase 8: Sort
+    if ConvertBits.SORT in mode_enums:
+        logging.debug("Phase 8: Sorting capability blocks and extensions...")
+        sort_profiles_files(vk, json_files_dict)
 
     save_profiles_jsons(json_files_dict, Path(args.output), OutputFormatType(args.format))
