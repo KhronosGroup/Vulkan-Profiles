@@ -380,7 +380,6 @@ def _bakeDefaultPropertiesIfMissing(vk: VulkanObject):
             if not hasattr(ver_obj, 'propertyRequirement') or ver_obj.propertyRequirement is None:
                 ver_obj.propertyRequirement = []
 
-        # Merge missing default property requirements for this version
         existing_req_names = {
             (req.struct, req.name) for req in ver_obj.propertyRequirement
         }

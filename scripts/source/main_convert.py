@@ -58,7 +58,8 @@ from source.profiles_parsing import (
     parse_profile_capabilities,
     collect_profile_capabilities,
     get_profile_and_file_data,
-    deep_merge_dict
+    deep_merge_dict,
+    is_property_satisfied
 )
 from source.format_flag_converter import FormatFeatureFlagConverter 
 
@@ -379,18 +380,6 @@ def canonicalize_capabilities_for_version(
     return new_features, new_properties
 
 
-def are_property_values_equal(val1: Any, val2: Any) -> bool:
-    """Checks if two property requirement values are equal, accounting for list sorting."""
-    if val1 == val2:
-        return True
-    if isinstance(val1, list) and isinstance(val2, list):
-        try:
-            return sorted(val1) == sorted(val2)
-        except TypeError:
-            return val1 == val2
-    return False
-
-
 def get_parent_property_value(parent_props_dict: dict, struct_name: str, prop_name: str, vk: VulkanObject) -> tuple[bool, Any]:
     """
     Looks up parent_props_dict for struct_name::prop_name or any of its capability aliases.
@@ -679,7 +668,7 @@ def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: 
                                     found_in_parent, parent_val = get_parent_property_value(
                                         parent_props_dict, s_name, prop_name, vk
                                     )
-                                    if not found_in_parent or not are_property_values_equal(parent_val, prop_val):
+                                    if not found_in_parent or not is_property_satisfied(parent_val, prop_val, prop_name):
                                         new_sub_dict[prop_name] = prop_val
                                 if new_sub_dict:
                                     new_s_data[sub_group_name] = new_sub_dict
@@ -691,7 +680,7 @@ def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: 
                                 found_in_parent, parent_val = get_parent_property_value(
                                     parent_props_dict, s_name, prop_name, vk
                                 )
-                                if not found_in_parent or not are_property_values_equal(parent_val, prop_val):
+                                if not found_in_parent or not is_property_satisfied(parent_val, prop_val, prop_name):
                                     new_p_data[prop_name] = prop_val
                             if new_p_data:
                                 filtered_transition_properties[s_name] = new_p_data
@@ -1344,7 +1333,6 @@ def sort_extensions(vk: VulkanObject, exts: dict | list) -> dict | list:
     ext_names = list(exts.keys()) if is_dict else list(exts)
     ext_set = set(ext_names)
 
-    # Build prerequisite graph: prereqs[e] contains items in ext_set that 'e' depends on
     prereqs = {e: set() for e in ext_names}
     for e in ext_names:
         deps = gatherDependentExtensions(vk, VK_VERSION.V1_0, True, {e: 1})
@@ -1368,7 +1356,6 @@ def sort_extensions(vk: VulkanObject, exts: dict | list) -> dict | list:
                 if in_degree[e] == 0:
                     candidates.append(e)
 
-    # Fallback for cycles/orphans
     if len(sorted_exts) < len(ext_names):
         remaining = [e for e in ext_names if e not in sorted_exts]
         remaining.sort(key=get_ext_priority_key)
@@ -1503,3 +1490,4 @@ def main_convert(args):
         sort_profiles_files(vk, json_files_dict)
 
     save_profiles_jsons(json_files_dict, Path(args.output), OutputFormatType(args.format))
+    

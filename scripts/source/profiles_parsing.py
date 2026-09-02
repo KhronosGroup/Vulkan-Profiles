@@ -26,6 +26,157 @@ import json
 import re
 from pathlib import Path
 from enum import Enum
+from typing import Any
+
+
+def is_min_limit_property(prop_name: str) -> bool:
+    """Returns True if smaller property value is a stricter requirement (min-type limit)."""
+    if prop_name.startswith("min"):
+        return True
+    if prop_name in ("bufferImageGranularity", "pointSizeGranularity", "lineWidthGranularity", "nonCoherentAtomSize"):
+        return True
+    return False
+
+
+def is_range_limit_property(prop_name: str) -> bool:
+    """Returns True if property value is a min/max range tuple/list."""
+    if prop_name.endswith("Range") or prop_name in ("pointSizeRange", "lineWidthRange", "viewportBoundsRange"):
+        return True
+    return False
+
+
+def get_flag_sort_key(flag_str: str) -> tuple:
+    """Sorts flag strings numerically by bit value (e.g., VK_SAMPLE_COUNT_1_BIT -> 4_BIT -> 8_BIT)."""
+    if not isinstance(flag_str, str):
+        return (2, 0, str(flag_str))
+    match = re.search(r'_(\d+)_BIT', flag_str)
+    if match:
+        return (0, int(match.group(1)), flag_str)
+    return (1, 0, flag_str)
+
+
+def merge_capability_value(prop_name: str, val1: Any, val2: Any) -> Any:
+    """Merges two capability values (e.g. profile requirement and core requirement), keeping the stricter requirement."""
+    import copy
+    if val1 is None:
+        return copy.deepcopy(val2)
+    if val2 is None:
+        return copy.deepcopy(val1)
+
+    # 1. Booleans
+    if isinstance(val1, bool) and isinstance(val2, bool):
+        return val1 or val2
+
+    # 2. Integers and Floats
+    if isinstance(val1, (int, float)) and isinstance(val2, (int, float)):
+        if type(val1) is bool or type(val2) is bool:
+            return bool(val1) or bool(val2)
+        if is_min_limit_property(prop_name):
+            return min(val1, val2)
+        else:
+            return max(val1, val2)
+
+    # 3. Lists / Arrays
+    if isinstance(val1, list) and isinstance(val2, list):
+        if not val1:
+            return copy.deepcopy(val2)
+        if not val2:
+            return copy.deepcopy(val1)
+
+        # 3a. Range lists [min, max]
+        if is_range_limit_property(prop_name) and len(val1) == 2 and len(val2) == 2:
+            try:
+                return [min(val1[0], val2[0]), max(val1[1], val2[1])]
+            except TypeError:
+                pass
+
+        # 3b. Numeric arrays
+        if all(isinstance(x, (int, float)) and not isinstance(x, bool) for x in val1) and \
+           all(isinstance(x, (int, float)) and not isinstance(x, bool) for x in val2) and \
+           len(val1) == len(val2):
+            if is_min_limit_property(prop_name):
+                return [min(a, b) for a, b in zip(val1, val2)]
+            else:
+                return [max(a, b) for a, b in zip(val1, val2)]
+
+        # 3c. Flag / Enum string lists
+        merged_list = list(val1)
+        for item in val2:
+            if item not in merged_list:
+                merged_list.append(item)
+        merged_list.sort(key=get_flag_sort_key)
+        return merged_list
+
+    # 4. Dicts
+    if isinstance(val1, dict) and isinstance(val2, dict):
+        merged_dict = copy.deepcopy(val1)
+        for k, v in val2.items():
+            if k in merged_dict:
+                merged_dict[k] = merge_capability_value(k, merged_dict[k], v)
+            else:
+                merged_dict[k] = copy.deepcopy(v)
+        return merged_dict
+
+    return copy.deepcopy(val1)
+
+
+def is_property_satisfied(actual_val: Any, required_val: Any, prop_name: str) -> bool:
+    """Returns True if actual_val satisfies required_val according to Vulkan limit comparison rules."""
+    if actual_val == required_val:
+        return True
+    if actual_val is None:
+        return False
+    if required_val is None:
+        return True
+
+    # 1. Booleans
+    if isinstance(actual_val, bool) and isinstance(required_val, bool):
+        return actual_val if required_val else True
+
+    # 2. Integers and Floats
+    if isinstance(actual_val, (int, float)) and isinstance(required_val, (int, float)):
+        if type(actual_val) is bool or type(required_val) is bool:
+            return bool(actual_val) if bool(required_val) else True
+        if is_min_limit_property(prop_name):
+            return actual_val <= required_val
+        else:
+            return actual_val >= required_val
+
+    # 3. Lists / Arrays
+    if isinstance(actual_val, list) and isinstance(required_val, list):
+        if not required_val:
+            return True
+        if not actual_val:
+            return False
+
+        # 3a. Range lists [min, max]
+        if is_range_limit_property(prop_name) and len(actual_val) == 2 and len(required_val) == 2:
+            try:
+                return actual_val[0] <= required_val[0] and actual_val[1] >= required_val[1]
+            except TypeError:
+                pass
+
+        # 3b. Numeric arrays
+        if all(isinstance(x, (int, float)) and not isinstance(x, bool) for x in actual_val) and \
+           all(isinstance(x, (int, float)) and not isinstance(x, bool) for x in required_val) and \
+           len(actual_val) == len(required_val):
+            if is_min_limit_property(prop_name):
+                return all(a <= r for a, r in zip(actual_val, required_val))
+            else:
+                return all(a >= r for a, r in zip(actual_val, required_val))
+
+        # 3c. Flag / Enum string lists
+        return set(required_val).issubset(set(actual_val))
+
+    # 4. Dicts
+    if isinstance(actual_val, dict) and isinstance(required_val, dict):
+        for k, req_v in required_val.items():
+            act_v = actual_val.get(k)
+            if not is_property_satisfied(act_v, req_v, k):
+                return False
+        return True
+
+    return False
 
 
 def collect_block_names(json_capabilities) -> list[str]:
@@ -57,11 +208,14 @@ def parse_profile_capabilities(json_capabilities: list) -> list:
 
 
 def deep_merge_dict(target: dict, source: dict):
-    """Recursively merges source dict into target dict."""
+    """Recursively merges source dict into target dict using capability limit comparison rules."""
     import copy
     for key, value in source.items():
-        if key in target and isinstance(target[key], dict) and isinstance(value, dict):
-            deep_merge_dict(target[key], value)
+        if key in target:
+            if isinstance(target[key], dict) and isinstance(value, dict):
+                deep_merge_dict(target[key], value)
+            else:
+                target[key] = merge_capability_value(key, target[key], value)
         else:
             target[key] = copy.deepcopy(value)
 
@@ -77,7 +231,6 @@ def get_profile_and_file_data(json_files_dict: dict, profile_name: str):
 
 def collect_required_profiles_capabilities(json_files_dict: dict, required_profile_names: list[str], visited_profiles: set[str] = None) -> dict:
     """Traverses required parent profile hierarchies and aggregates their capabilities."""
-    import logging
     if visited_profiles is None:
         visited_profiles = set()
 
@@ -262,7 +415,6 @@ def save_profiles_jsons(json_files_dict, output_path, format: OutputFormatType):
         logging.error('`output_path` is not a Path type')
         sys.exit(1)
 
-    # Format array helper to keep spaces after '[' and before ']'
     def flatten_array(match):
         content = re.sub(r'\s+', ' ', match.group(1)).strip()
         return f"[ {content} ]" if content else "[]"

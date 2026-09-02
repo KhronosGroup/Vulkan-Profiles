@@ -37,7 +37,7 @@ from source.main_convert import (
 )
 
 
-class TestConvertPullRequiredCapabilities(unittest.TestCase):
+class TestConvertPullRequiredCapabilitiesSpec(unittest.TestCase):
     registry_path = None
 
     def setUp(self):
@@ -3138,7 +3138,7 @@ if __name__ == '__main__':
     )
 
     args, unparsed = parser.parse_known_args()
-    TestConvertPullRequiredCapabilities.registry_path = args.registry
+    TestConvertPullRequiredCapabilitiesSpec.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
     
