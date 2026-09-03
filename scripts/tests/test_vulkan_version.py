@@ -28,7 +28,12 @@ scripts_dir = Path(__file__).resolve().parent.parent
 if str(scripts_dir) not in sys.path:
     sys.path.insert(0, str(scripts_dir))
 
-from source.vulkan_object_version import VK_VERSION
+from source.vulkan_object_version import (
+    VK_VERSION,
+    BUNDLE_STRUCT_VERSIONS,
+    is_bundle_structure,
+    get_bundle_structure_core_version
+)
 
 
 class TestVulkanObjectVersion(unittest.TestCase):
@@ -67,23 +72,79 @@ class TestVulkanObjectVersion(unittest.TestCase):
         self.assertTrue(VK_VERSION.V1_3 == "1.3.276")
 
     def testVersionLists(self):
-        """Tests VK_VERSION.all_versions() and VK_VERSION.core_versions() helper methods."""
-        expected_all = [
+        """Tests VK_VERSION.versions() helper method."""
+        expected_versions = [
             VK_VERSION.V1_0,
             VK_VERSION.V1_1,
             VK_VERSION.V1_2,
             VK_VERSION.V1_3,
             VK_VERSION.V1_4,
         ]
-        expected_core = [
+
+        self.assertEqual(VK_VERSION.versions(), expected_versions)
+
+    def testMetaclassIterationAndLen(self):
+        """Tests metaclass iteration list(VK_VERSION) and len(VK_VERSION)."""
+        expected_versions = [
+            VK_VERSION.V1_0,
             VK_VERSION.V1_1,
             VK_VERSION.V1_2,
             VK_VERSION.V1_3,
             VK_VERSION.V1_4,
         ]
 
-        self.assertEqual(VK_VERSION.all_versions(), expected_all)
-        self.assertEqual(VK_VERSION.core_versions(), expected_core)
+        self.assertEqual(len(VK_VERSION), len(expected_versions))
+        self.assertEqual(list(VK_VERSION), expected_versions)
+        self.assertIn(VK_VERSION.V1_0, VK_VERSION)
+        self.assertIn(VK_VERSION.V1_4, VK_VERSION)
+
+    def testMetaclassSubscript(self):
+        """Tests item indexing VK_VERSION[key] via attribute, version string, or version enum string."""
+        self.assertEqual(VK_VERSION["V1_1"], VK_VERSION.V1_1)
+        self.assertEqual(VK_VERSION["VK_VERSION_1_2"], VK_VERSION.V1_2)
+        self.assertEqual(VK_VERSION["1.3"], VK_VERSION.V1_3)
+        self.assertEqual(VK_VERSION["VK_NONE"], VK_VERSION.NONE)
+
+        with self.assertRaises(KeyError):
+            _ = VK_VERSION["INVALID_VERSION_NAME"]
+
+    def testInstantiation(self):
+        """Tests instantiating VK_VERSION via single string token, major/minor arguments, or tuple."""
+        self.assertEqual(VK_VERSION("VK_VERSION_1_1"), VK_VERSION.V1_1)
+        self.assertEqual(VK_VERSION("1.2"), VK_VERSION.V1_2)
+        self.assertEqual(VK_VERSION(1, 3), VK_VERSION.V1_3)
+        self.assertEqual(VK_VERSION(VK_VERSION.V1_4), VK_VERSION.V1_4)
+
+        with self.assertRaises(ValueError):
+            _ = VK_VERSION("INVALID_VERSION_NAME")
+
+    def testDynamicVersions(self):
+        """Tests dynamic resolution and comparison of future Vulkan core versions (e.g. 1.5, 2.0)."""
+        v1_5 = VK_VERSION.from_string("1.5.100")
+        v2_0 = VK_VERSION.from_string("VK_VERSION_2_0")
+
+        self.assertEqual(v1_5.as_tuple(), (1, 5))
+        self.assertEqual(v2_0.as_tuple(), (2, 0))
+
+        self.assertTrue(v1_5 > VK_VERSION.V1_4)
+        self.assertTrue(v2_0 > v1_5)
+        self.assertTrue(v1_5 >= "1.5.0")
+
+    def testBundleStructureDetection(self):
+        """Tests dynamic bundle structure detection and version mapping for current and future versions."""
+        self.assertTrue(is_bundle_structure("VkPhysicalDeviceFeatures"))
+        self.assertTrue(is_bundle_structure("VkPhysicalDeviceVulkan11Features"))
+        self.assertTrue(is_bundle_structure("VkPhysicalDeviceVulkan15Features"))
+        self.assertTrue(is_bundle_structure("VkPhysicalDeviceVulkan20Properties"))
+        self.assertFalse(is_bundle_structure("VkPhysicalDeviceCustomBorderColorFeaturesEXT"))
+
+        self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceFeatures"), VK_VERSION.V1_0)
+        self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceVulkan11Features"), VK_VERSION.V1_2)
+        self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceVulkan14Properties"), VK_VERSION.V1_4)
+        self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceVulkan15Features"), VK_VERSION.from_string("1.5"))
+
+        self.assertEqual(BUNDLE_STRUCT_VERSIONS["VkPhysicalDeviceVulkan11Features"], (1, 2))
+        self.assertEqual(BUNDLE_STRUCT_VERSIONS["VkPhysicalDeviceVulkan15Features"], (1, 5))
 
 
 if __name__ == '__main__':
