@@ -28,7 +28,13 @@ from enum import Enum
 from typing import Any
 
 from source.main_validate import main_validate
-from source.vulkan_object_version import is_bundle_structure, get_bundle_structure_core_version
+from source.vulkan_object_version import (
+    BUNDLE_STRUCT_VERSIONS,
+    is_bundle_structure, 
+    get_bundle_structure_core_version,
+    get_active_feature_bundles,
+    get_active_property_bundles
+)
 from source.vulkan_object_utils import (
     VulkanObject, 
     initVulkanObject, 
@@ -74,26 +80,6 @@ class ConvertBits(str, Enum):
     CONSOLIDATE = 'consolidate'                                # Consolidate all mandatory capability blocks into a single block per profile.
     STRIP_PROMOTED_EXTENSIONS = 'strip-promoted-extensions'    # Strip extensions promoted to profile core version.
     SORT = 'sort'                                              # Sort capabilities blocks and extensions.
-
-
-SPLIT_PROPERTY_STRUCTS_COVERED_BY_VULKAN11_PROPERTIES = {
-    "VkPhysicalDeviceSubgroupProperties",
-    "VkPhysicalDeviceMultiviewProperties",
-    "VkPhysicalDeviceMaintenance3Properties"
-}
-
-BUNDLE_STRUCT_VERSIONS = {
-    "VkPhysicalDeviceFeatures": (1, 0),
-    "VkPhysicalDeviceProperties": (1, 0),
-    "VkPhysicalDeviceVulkan11Features": (1, 1),
-    "VkPhysicalDeviceVulkan11Properties": (1, 1),
-    "VkPhysicalDeviceVulkan12Features": (1, 2),
-    "VkPhysicalDeviceVulkan12Properties": (1, 2),
-    "VkPhysicalDeviceVulkan13Features": (1, 3),
-    "VkPhysicalDeviceVulkan13Properties": (1, 3),
-    "VkPhysicalDeviceVulkan14Features": (1, 4),
-    "VkPhysicalDeviceVulkan14Properties": (1, 4),
-}
 
 
 def collect_required_profiles_capabilities_recursive(json_files_dict: dict, profile_names: list, visited: set = None) -> dict:
@@ -295,6 +281,37 @@ def is_struct_covered_by_bundle(vk: VulkanObject, bundle_name: str, struct_name:
     return struct_members.issubset(bundle_members)
 
 
+def is_property_struct_covered_by_bundle(vk: VulkanObject, bundle_name: str, struct_name: str) -> bool:
+    """Checks if all property members of a split structure are covered or aliased in bundle_name."""
+    if is_struct_covered_by_bundle(vk, bundle_name, struct_name):
+        return True
+
+    struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
+    bundle_obj = vk.structs.get(bundle_name) or getStructByName(vk.structs, bundle_name)
+
+    if not struct_obj or not bundle_obj:
+        return False
+
+    bundle_members = {m.name for m in getattr(bundle_obj, 'members', [])}
+    for member in getattr(struct_obj, 'members', []):
+        if member.name in ('sType', 'pNext'):
+            continue
+
+        if member.name in bundle_members:
+            continue
+
+        query_id = StructCapabilityAlias(struct_name, member.name)
+        aliases = gatherCapabilityAliases(vk, query_id)
+        is_aliased_in_bundle = any(
+            isinstance(a, StructCapabilityAlias) and a.struct == bundle_name
+            for a in aliases
+        )
+        if not is_aliased_in_bundle:
+            return False
+
+    return True
+
+
 def should_remove_struct_a_in_favor_of_b(vk: VulkanObject, version: VK_VERSION, struct_a: str, struct_b: str) -> bool:
     rank_a = get_struct_rank(vk, version, struct_a)
     rank_b = get_struct_rank(vk, version, struct_b)
@@ -336,17 +353,8 @@ def canonicalize_capabilities_for_version(
     new_features: dict[str, dict[str, bool]] = {}
     new_properties: dict[str, Any] = {}
 
-    active_feature_bundles = [
-        b for b in ("VkPhysicalDeviceVulkan11Features", "VkPhysicalDeviceVulkan12Features",
-                    "VkPhysicalDeviceVulkan13Features", "VkPhysicalDeviceVulkan14Features")
-        if api_version >= get_bundle_structure_core_version(b)
-    ]
-
-    active_property_bundles = [
-        b for b in ("VkPhysicalDeviceVulkan11Properties", "VkPhysicalDeviceVulkan12Properties",
-                    "VkPhysicalDeviceVulkan13Properties", "VkPhysicalDeviceVulkan14Properties")
-        if api_version >= get_bundle_structure_core_version(b)
-    ]
+    active_feature_bundles = get_active_feature_bundles(api_version)
+    active_property_bundles = get_active_property_bundles(api_version)
 
     # 1. Features remapping and deduplication
     for struct_name, members in features_dict.items():
@@ -369,13 +377,16 @@ def canonicalize_capabilities_for_version(
                     new_features.setdefault(struct_name, {})[member_name] = True
 
     # 2. Properties remapping and deduplication
-    has_vulkan11_props_bundle = "VkPhysicalDeviceVulkan11Properties" in active_property_bundles
-
     for struct_name, prop_data in properties_dict.items():
-        if has_vulkan11_props_bundle and struct_name in SPLIT_PROPERTY_STRUCTS_COVERED_BY_VULKAN11_PROPERTIES:
-            continue
+        is_covered = False
+        if active_property_bundles and not is_bundle_structure(struct_name):
+            for bundle in active_property_bundles:
+                if is_property_struct_covered_by_bundle(vk, bundle, struct_name):
+                    is_covered = True
+                    break
 
-        new_properties[struct_name] = prop_data
+        if not is_covered:
+            new_properties[struct_name] = prop_data
 
     return new_features, new_properties
 
@@ -1066,9 +1077,8 @@ def strip_intra_block_feature_duplication(vk: VulkanObject, version: VK_VERSION,
     structs_to_remove = set()
 
     active_bundles = [
-        b for b in ("VkPhysicalDeviceVulkan11Features", "VkPhysicalDeviceVulkan12Features",
-                    "VkPhysicalDeviceVulkan13Features", "VkPhysicalDeviceVulkan14Features")
-        if b in all_features and version >= get_bundle_structure_core_version(b)
+        b for b in get_active_feature_bundles(version)
+        if b in all_features
     ]
 
     for struct_name in list(block_features.keys()):
