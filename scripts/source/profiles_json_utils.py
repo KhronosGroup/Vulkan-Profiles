@@ -442,3 +442,4 @@ def save_profiles_jsons(json_files_dict, output_path, format: OutputFormatType):
                     file.write(flat_json)
                 else:
                     json.dump(value, file, indent=4)
+                    

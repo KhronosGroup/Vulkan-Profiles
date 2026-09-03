@@ -56,7 +56,7 @@ from source.vulkan_object_utils import (
     ExtensionCapabilityAlias, 
     CapabilityAlias
 )
-from source.profiles_parsing import (
+from source.profiles_json_utils import (
     load_profiles_jsons, 
     save_profiles_jsons, 
     OutputFormatType,
