@@ -71,15 +71,14 @@ from source.format_flag_converter import FormatFeatureFlagConverter
 
 
 class ConvertBits(str, Enum):
-    PULL_EXTENSION_DEPENDENCIES = 'pull-extension-dependencies'
-    PULL_REQUIRED_CAPABILITIES = 'pull-required-capabilities'  # Evaluate & pull satisfied required features into capability blocks.
-    PULL_PROMOTED_EXTENSIONS = 'pull-promoted-extensions'      # Require all extensions promoted to a core version.
-    IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions'    # Set all required extensions to version 1, ignoring extension versions.
-    PULL_ALIASES = 'pull-aliases'
-    STRIP_DUPLICATION = 'strip-duplication'
-    CONSOLIDATE = 'consolidate'                                # Consolidate all mandatory capability blocks into a single block per profile.
-    STRIP_PROMOTED_EXTENSIONS = 'strip-promoted-extensions'    # Strip extensions promoted to profile core version.
-    SORT = 'sort'                                              # Sort capabilities blocks and extensions.
+    PULL_REQUIRED_CAPABILITIES = 'pull-required-capabilities'  # Evaluates extension dependencies and pulls satisfied core/extension feature and property requirements into capability blocks.
+    PULL_PROMOTED_EXTENSIONS = 'pull-promoted-extensions'      # Requires all extensions promoted to core up to the profile's target Vulkan version.
+    IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions'    # Sets all required extension versions to 1, overriding specific extension spec versions.
+    PULL_ALIASES = 'pull-aliases'                              # Resolves and populates all equivalent capability aliases across core structures and extensions.
+    STRIP_DUPLICATION = 'strip-duplication'                    # Removes redundant duplicate features, properties, and extension requirements across inheritance trees and within blocks.
+    CONSOLIDATE = 'consolidate'                                # Merges all mandatory capability blocks into a single consolidated requirements block per profile.
+    STRIP_PROMOTED_EXTENSIONS = 'strip-promoted-extensions'    # Removes extensions that are already promoted to the profile's target core Vulkan version.
+    SORT = 'sort'                                              # Sorts capability blocks, structures, and extension lists into canonical Vulkan order.
 
 
 def collect_required_profiles_capabilities_recursive(json_files_dict: dict, profile_names: list, visited: set = None) -> dict:
@@ -421,7 +420,7 @@ def get_parent_property_value(parent_props_dict: dict, struct_name: str, prop_na
 
 
 # -----------------------------------------------------------------------------
-# Phase 1: Extension Dependencies ('pull-extension-dependencies')
+# Extension Dependencies
 # -----------------------------------------------------------------------------
 
 def pull_extension_dependencies_capabilities_block(
@@ -572,7 +571,7 @@ pull_capabilities_block_dependencies = pull_extension_dependencies_capabilities_
 
 
 # -----------------------------------------------------------------------------
-# Phase 2: Required Capabilities Evaluation & Transition Blocks ('pull-required-capabilities')
+# Required Capabilities Evaluation & Transition Blocks
 # -----------------------------------------------------------------------------
 
 def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: dict, json_file_data: dict):
@@ -825,7 +824,7 @@ pull_required_features_profiles_files = pull_required_capabilities_profiles_file
 
 
 # -----------------------------------------------------------------------------
-# Phase 3: Promoted Extensions ('pull-promoted-extensions')
+# Promoted Extensions
 # -----------------------------------------------------------------------------
 
 def pull_promoted_extensions_profiles_file(
@@ -897,7 +896,7 @@ def pull_promoted_extensions_profiles_files(vk: VulkanObject, ignore_extension_v
 
 
 # -----------------------------------------------------------------------------
-# Phase 4: Capability Aliases ('pull-aliases')
+# Capability Aliases ('pull-aliases')
 # -----------------------------------------------------------------------------
 
 def pull_aliases_capabilities_block(
@@ -1034,7 +1033,7 @@ def pull_aliases_profiles_files(vk: VulkanObject, require_promoted_extensions: b
 
 
 # -----------------------------------------------------------------------------
-# Phase 5: Deep Duplication Stripping ('strip-duplication')
+# Deep Duplication Stripping ('strip-duplication')
 # -----------------------------------------------------------------------------
 
 def strip_dict_duplication(target: dict, reference: dict):
@@ -1184,7 +1183,7 @@ strip_capabilities_block_duplication = strip_duplication_capabilities_block
 
 
 # -----------------------------------------------------------------------------
-# Phase 6: Consolidation ('consolidate')
+# Consolidation ('consolidate')
 # -----------------------------------------------------------------------------
 
 def consolidate_profiles_file(json_files_dict: dict, json_file_data: dict):
@@ -1239,7 +1238,7 @@ def consolidate_profiles_files(json_files_dict: dict):
 
 
 # -----------------------------------------------------------------------------
-# Phase 7: Strip Promoted Extensions ('strip-promoted-extensions')
+# Strip Promoted Extensions ('strip-promoted-extensions')
 # -----------------------------------------------------------------------------
 
 def strip_promoted_extensions_capabilities_block(
@@ -1290,7 +1289,7 @@ def strip_promoted_extensions_profiles_files(vk: VulkanObject, json_files_dict: 
 
 
 # -----------------------------------------------------------------------------
-# Phase 8: Sorting ('sort')
+# Sorting ('sort')
 # -----------------------------------------------------------------------------
 
 def get_struct_sort_key(vk: VulkanObject, struct_name: str) -> tuple:
@@ -1459,45 +1458,42 @@ def main_convert(args):
     require_promoted_extensions = ConvertBits.PULL_PROMOTED_EXTENSIONS in mode_enums
     ignore_extension_versions = ConvertBits.IGNORE_EXTENSION_VERSIONS in mode_enums
 
-    # Phase 1: Pull Extension Dependencies
-    if ConvertBits.PULL_EXTENSION_DEPENDENCIES in mode_enums:
-        logging.debug("Phase 1: Pulling extension dependencies...")
+    # Pull Required Capabilities (Dependencies + Core/Extension Requirements)
+    if ConvertBits.PULL_REQUIRED_CAPABILITIES in mode_enums:
+        logging.debug("Pulling extension dependencies...")
         pull_extension_dependencies_profiles_files(vk, ignore_extension_versions, json_files_dict)
 
-    # Phase 2: Pull Required Capabilities (Core & Extension Feature Requirements)
-    if ConvertBits.PULL_REQUIRED_CAPABILITIES in mode_enums:
-        logging.debug("Phase 2: Evaluating and pulling required capabilities...")
+        logging.debug("Evaluating and pulling required capabilities...")
         pull_required_capabilities_profiles_files(vk, json_files_dict)
 
-    # Phase 3: Pull Promoted Extensions
+    # Pull Promoted Extensions
     if ConvertBits.PULL_PROMOTED_EXTENSIONS in mode_enums:
-        logging.debug("Phase 3: Pulling promoted extensions for core versions...")
+        logging.debug("Pulling promoted extensions for core versions...")
         pull_promoted_extensions_profiles_files(vk, ignore_extension_versions, json_files_dict)
 
-    # Phase 4: Pull Capability Aliases
+    # Pull Capability Aliases
     if ConvertBits.PULL_ALIASES in mode_enums:
-        logging.debug("Phase 4: Pulling capability aliases...")
+        logging.debug("Pulling capability aliases...")
         pull_aliases_profiles_files(vk, require_promoted_extensions, json_files_dict)
 
-    # Phase 5: Strip Duplication
+    # Strip Duplication
     if ConvertBits.STRIP_DUPLICATION in mode_enums:
-        logging.debug("Phase 5: Stripping capabilities duplication...")
+        logging.debug("Stripping capabilities duplication...")
         strip_duplication_profiles_files(vk, json_files_dict)
 
-    # Phase 6: Consolidate
+    # Consolidate
     if ConvertBits.CONSOLIDATE in mode_enums:
-        logging.debug("Phase 6: Consolidating profile capability blocks...")
+        logging.debug("Consolidating profile capability blocks...")
         consolidate_profiles_files(json_files_dict)
 
-    # Phase 7: Strip Promoted Extensions
+    # Strip Promoted Extensions
     if ConvertBits.STRIP_PROMOTED_EXTENSIONS in mode_enums:
-        logging.debug("Phase 7: Stripping extensions promoted to profile core version...")
+        logging.debug("Stripping extensions promoted to profile core version...")
         strip_promoted_extensions_profiles_files(vk, json_files_dict)
 
-    # Phase 8: Sort
+    # Sort
     if ConvertBits.SORT in mode_enums:
-        logging.debug("Phase 8: Sorting capability blocks and extensions...")
+        logging.debug("Sorting capability blocks and extensions...")
         sort_profiles_files(vk, json_files_dict)
 
     save_profiles_jsons(json_files_dict, Path(args.output), OutputFormatType(args.format))
-    
