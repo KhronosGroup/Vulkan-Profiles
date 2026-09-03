@@ -86,7 +86,7 @@ vkprofiles convert --registry vk.xml --input path/to/input_dir --output path/to/
 * `--output`, `-o`: *(Required)* Path to output directory or file.
 * `--registry`, `-r`: Path to `vk.xml`.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
-* `--format`: Output formatting style (`flatten` or `tree`). Default: `flatten`.
+* `--format`: Output formatting style (`flatten` or `pretty`). Default: `flatten`.
 * `--mode`: Space-separated list of conversion capabilities to apply. Default: all flags.
 * `--validate`: Validate profile files before conversion (choices: `schema`, `analysis`). Default: `schema analysis`.
 
@@ -96,14 +96,14 @@ Conversion flags are processed in a deterministic internal pipeline order regard
 
 | Mode Value | Description |
 | --- | --- |
-| `pull-extension-dependencies` | Queries `vk.xml` to automatically pull in and append all dependent extensions required by any extensions listed in the capability blocks. |
-| `pull-promoted-extensions` | Adds version-specific `vulkan1Xpulledrequirements` capability blocks containing all extensions that were promoted into the target Vulkan core version. |
-| `pull-required-capabilities` | Evaluates and pulls satisfied core/extension required features into profile capability blocks. |
-| `pull-aliases` | Automatically expands structural capability aliases (features, properties, and format flags) across core version bundle structures and extension structs (e.g., mapping `VkPhysicalDevice16BitStorageFeatures` to `VkPhysicalDeviceVulkan11Features`). |
-| `strip-duplication` | Recursively removes duplicate extension requirements, features, properties, and format flags that are already satisfied by parent profiles in the inheritance chain. |
-| `consolidate` | Combines all mandatory capability blocks across a profile into a single consolidated requirement block (`<profile_name>_requirements`). |
-| `strip-promoted-extensions` | Strips extensions and their extension-specific feature structures that were promoted to the core API version of the profile. |
-| `ignore-extension-versions` | Modifier flag: Forces all required extension spec versions to `1`, ignoring specific extension version numbers during extension pulling. |
+| `pull-required-capabilities` | Evaluates extension dependencies and pulls satisfied core/extension feature and property requirements into capability blocks. |
+| `pull-promoted-extensions` | Requires all extensions promoted to core up to the profile's target Vulkan version. |
+| `ignore-extension-versions` | Sets all required extension versions to 1, overriding specific extension spec versions. |
+| `pull-aliases` | Resolves and populates all equivalent capability aliases across core structures and extensions. |
+| `strip-duplication` | Removes redundant duplicate features, properties, and extension requirements across inheritance trees and within blocks. |
+| `consolidate` | Merges all mandatory capability blocks into a single consolidated requirements block per profile. |
+| `strip-promoted-extensions` | Removes extensions that are already promoted to the profile's target core Vulkan version. |
+| `sort` | Sorts capability blocks, structures, and extension lists into canonical Vulkan order. |
 
 **Example:**
 
@@ -112,7 +112,7 @@ vkprofiles convert \
     --registry vk.xml \
     --input profiles/LunarG \
     --output profiles/generated \
-    --mode pull-extension-dependencies pull-aliases strip-duplication strip-promoted-extensions \
+    --mode pull-required-capabilities pull-aliases strip-duplication strip-promoted-extensions \
     --validate
 ```
 
@@ -132,7 +132,7 @@ vkprofiles merge --registry vk.xml --input path/to/profiles --output path/to/mer
 * `--config`, `-c`: Path to JSON merge config file.
 * `--mode`, `-m`: Combination mode (`intersection` or `union`). Default: `intersection`.
 * `--format`: Output formatting style (`flatten` or `pretty`). Default: `pretty`.
-* `--convert`: Apply conversion capabilities to the merged profile output (choices: `pull-extension-dependencies`, `pull-promoted-extensions`, `pull-required-capabilities`, `pull-aliases`, `strip-duplication`, `consolidate`, `strip-promoted-extensions`, `ignore-extension-versions`).
+* `--convert`: Apply conversion capabilities to the merged profile output (choices: `pull-required-capabilities`, `pull-promoted-extensions`, `ignore-extension-versions`, `pull-aliases`, `strip-duplication`, `consolidate`, `strip-promoted-extensions`, `sort`).
 * `--validate`: Validate profile files before merging (choices: `schema`, `analysis`). Default: `schema analysis`.
 * `--profile-name`: Override output profile name.
 * `--profile-version`: Set profile version number. Default: `1`.
@@ -206,7 +206,7 @@ vkprofiles library --registry vk.xml --input path/to/profiles --output path/to/i
 * `--output-src`: Target source output directory. If omitted in `header+source` mode, defaults to `--output`.
 * `--output-filename`: Base filename for generated files. Default: `vulkan_profiles`.
 * `--mode`: Library generation mode (`header-only`, `header+source`). Default: `header-only` and `header+source`.
-* `--convert`: Apply profiles data conversion prior to generation (choices: `pull-extension-dependencies`, `pull-promoted-extensions`, `pull-required-capabilities`, `pull-aliases`, `strip-duplication`, `consolidate`, `strip-promoted-extensions`, `ignore-extension-versions`).
+* `--convert`: Apply profiles data conversion prior to generation (choices: `pull-required-capabilities`, `pull-promoted-extensions`, `ignore-extension-versions`, `pull-aliases`, `strip-duplication`, `consolidate`, `strip-promoted-extensions`, `sort`).
 * `--intermediate`: Directory path for intermediate converted JSON files (used when `--convert` is provided).
 * `--validate`: Validate profiles (choices: `schema`, `analysis`) during generation. Default: `schema analysis`.
 * `--debug`, `-d`: Generate debug variant of library code.
