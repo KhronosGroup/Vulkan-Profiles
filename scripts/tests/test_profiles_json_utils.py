@@ -31,11 +31,13 @@ if str(scripts_dir) not in sys.path:
 import logging
 import shutil
 
-from source.profiles_parsing import OutputFormatType
-from source.profiles_parsing import load_profiles_jsons
-from source.profiles_parsing import save_profiles_jsons
-from source.profiles_parsing import validate_profiles_json
-from source.profiles_parsing import validate_profiles_jsons
+from source.profiles_json_utils import (
+    OutputFormatType,
+    load_profiles_jsons,
+    save_profiles_jsons,
+    validate_profiles_json,
+    validate_profiles_jsons
+)
 
 class TestJsonMethods(unittest.TestCase):
     registry_path = None
@@ -104,4 +106,3 @@ if __name__ == '__main__':
     TestJsonMethods.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
-

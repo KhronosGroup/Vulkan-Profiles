@@ -27,7 +27,8 @@ import tempfile
 import gen_profiles_solution
 import gen_profiles_file
 from source.main_validate import main_validate
-from source.main_convert import main_convert, OutputFormatType
+from source.main_convert import main_convert
+from source.profiles_json_utils import OutputFormatType
 
 
 def main_merge(args):
@@ -132,3 +133,4 @@ def main_merge(args):
             main_convert(convert_args)
     else:
         profile_file.dump(output_path, getattr(args, 'format', None))
+        

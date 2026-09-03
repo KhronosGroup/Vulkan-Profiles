@@ -25,6 +25,7 @@ from pathlib import Path
 import sys
 import unittest
 
+# Ensure the 'scripts' directory is in Python's import search path
 scripts_dir = Path(__file__).resolve().parent.parent
 if str(scripts_dir) not in sys.path:
     sys.path.insert(0, str(scripts_dir))
@@ -140,6 +141,7 @@ class TestValidate(unittest.TestCase):
 
         self.assertTrue(any("has mismatching values across aliased structures" in issue for issue in issues))
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -151,3 +153,4 @@ if __name__ == '__main__':
     TestValidate.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
+    
