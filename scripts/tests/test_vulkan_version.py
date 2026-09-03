@@ -38,6 +38,13 @@ from source.vulkan_object_version import (
 
 class TestVulkanObjectVersion(unittest.TestCase):
 
+    def tearDown(self):
+        """Cleans up non-standard dynamic version instances to prevent test pollution."""
+        standard_keys = {(-1, -1), (1, 0), (1, 1), (1, 2), (1, 3), (1, 4)}
+        for key in list(VK_VERSION._instances.keys()):
+            if key not in standard_keys:
+                del VK_VERSION._instances[key]
+
     def testFromString(self):
         """Tests VK_VERSION.from_string across various string formats."""
         self.assertEqual(VK_VERSION.from_string("1.3.276"), VK_VERSION.V1_3)
