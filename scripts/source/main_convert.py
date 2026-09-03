@@ -611,7 +611,7 @@ def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: 
 
                     transition_features = {}
                     transition_properties = {}
-                    for ver in VK_VERSION.all_versions():
+                    for ver in VK_VERSION.versions():
                         if parent_api_version < ver <= api_version:
                             satisfied_feat = gatherSatisfiedCoreRequiredFeaturesForVersion(
                                 vk, ver, api_version, all_exts, enabled_features_set
@@ -757,7 +757,7 @@ def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: 
 
                 core_satisfied_features = {}
                 core_satisfied_properties = {}
-                for ver in VK_VERSION.all_versions():
+                for ver in VK_VERSION.versions():
                     if ver <= api_version:
                         satisfied_feat = gatherSatisfiedCoreRequiredFeaturesForVersion(
                             vk, ver, api_version, profile_enabled_exts, enabled_features_set
@@ -859,7 +859,7 @@ def pull_promoted_extensions_profiles_file(
 
         ext_dict = primary_block.setdefault("extensions", {})
 
-        for ver in VK_VERSION.core_versions():
+        for ver in VK_VERSION.versions():
             if ver != VK_VERSION.NONE and api_version != VK_VERSION.NONE and ver <= api_version:
                 promoted_exts = gatherPromotedExtensionsForExactVersion(vk, ver)
                 for ext_name, ext_ver in promoted_exts.items():
