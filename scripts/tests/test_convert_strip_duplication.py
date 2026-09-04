@@ -1094,6 +1094,351 @@ class TestConvertStripDuplication(unittest.TestCase):
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
+    def test_strip_robustness2_extension_alias_duplication(self):
+        """
+        Verifies stripping behavior when a capability block contains duplicate robustness2
+        features and extension aliases (VK_EXT_robustness2 and VK_KHR_robustness2).
+        The EXT extension and structure are stripped in favor of the KHR variants.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_LUNARG_test_robustness2": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": [
+                        "caps_robustness2"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps_robustness2": {
+                    "extensions": {
+                        "VK_EXT_robustness2": 1,
+                        "VK_KHR_robustness2": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceRobustness2FeaturesEXT": {
+                            "robustBufferAccess2": true,
+                            "robustImageAccess2": true,
+                            "nullDescriptor": true
+                        },
+                        "VkPhysicalDeviceRobustness2FeaturesKHR": {
+                            "robustBufferAccess2": true,
+                            "robustImageAccess2": true,
+                            "nullDescriptor": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_LUNARG_test_robustness2": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": [
+                        "caps_robustness2"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps_robustness2": {
+                    "extensions": {
+                        "VK_EXT_robustness2": 1,
+                        "VK_KHR_robustness2": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceRobustness2FeaturesKHR": {
+                            "robustBufferAccess2": true,
+                            "robustImageAccess2": true,
+                            "nullDescriptor": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+    def test_strip_multiple_aliases_single_block_version11(self):
+        """
+        Verifies that when a single capability block contains duplicate feature aliases
+        for shader draw parameters (VkPhysicalDeviceShaderDrawParameterFeatures vs
+        VkPhysicalDeviceShaderDrawParametersFeatures) and variable pointers
+        (VkPhysicalDeviceVariablePointerFeatures vs VkPhysicalDeviceVariablePointersFeatures),
+        the redundant/non-canonical alias structures are stripped.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_LUNARG_test_draw_and_pointers": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": [
+                        "caps_draw_and_pointers"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps_draw_and_pointers": {
+                    "extensions": {
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_variable_pointers": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceShaderDrawParameterFeatures": {
+                            "shaderDrawParameters": true
+                        },
+                        "VkPhysicalDeviceShaderDrawParametersFeatures": {
+                            "shaderDrawParameters": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeatures": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceVariablePointersFeatures": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceVariablePointersFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_LUNARG_test_draw_and_pointers": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": [
+                        "caps_draw_and_pointers"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps_draw_and_pointers": {
+                    "extensions": {
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_variable_pointers": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceShaderDrawParametersFeatures": {
+                            "shaderDrawParameters": true
+                        },
+                        "VkPhysicalDeviceVariablePointersFeatures": {
+                            "variablePointersStorageBuffer": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+    def test_strip_multiple_aliases_single_block_version12(self):
+        """
+        Verifies that when a Vulkan 1.2 capability block contains duplicate feature aliases
+        for shader draw parameters and variable pointers alongside the core bundle structure
+        (VkPhysicalDeviceVulkan11Features), all redundant split and extension alias structures
+        are stripped in favor of the active bundle structure.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_LUNARG_test_draw_and_pointers_v12": {
+                    "version": 1,
+                    "api-version": "1.2.0",
+                    "capabilities": [
+                        "caps_draw_and_pointers"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps_draw_and_pointers": {
+                    "extensions": {
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_variable_pointers": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceVulkan11Features": {
+                            "shaderDrawParameters": true,
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceShaderDrawParameterFeatures": {
+                            "shaderDrawParameters": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceVariablePointersFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_LUNARG_test_draw_and_pointers_v12": {
+                    "version": 1,
+                    "api-version": "1.2.0",
+                    "capabilities": [
+                        "caps_draw_and_pointers"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps_draw_and_pointers": {
+                    "extensions": {
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_variable_pointers": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceVulkan11Features": {
+                            "shaderDrawParameters": true,
+                            "variablePointersStorageBuffer": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+    def test_strip_multiple_aliases_inherited_profile_version12(self):
+        """
+        Verifies that when a child Vulkan 1.2 profile inherits from a parent profile containing
+        the core bundle structure (VkPhysicalDeviceVulkan11Features with shaderDrawParameters and 
+        variablePointersStorageBuffer), all duplicate split and extension alias feature structures 
+        in the child profile are stripped against the parent profile.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_PARENT_profile": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": [
+                        "caps_parent"
+                    ]
+                },
+                "VP_CHILD_profile": {
+                    "version": 1,
+                    "api-version": "1.2.0",
+                    "profiles": [
+                        "VP_PARENT_profile"
+                    ],
+                    "capabilities": [
+                        "caps_child"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps_parent": {
+                    "extensions": {
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_variable_pointers": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceVariablePointersFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        }
+                    }
+                },
+                "caps_child": {
+                    "features": {
+                        "VkPhysicalDeviceVulkan12Features": {
+                            "drawIndirectCount": true
+                        },
+                        "VkPhysicalDeviceShaderDrawParameterFeatures": {
+                            "shaderDrawParameters": true
+                        },
+                        "VkPhysicalDeviceShaderDrawParametersFeatures": {
+                            "shaderDrawParameters": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeatures": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceVariablePointersFeatures": {
+                            "variablePointersStorageBuffer": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_PARENT_profile": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": [
+                        "caps_parent"
+                    ]
+                },
+                "VP_CHILD_profile": {
+                    "version": 1,
+                    "api-version": "1.2.0",
+                    "profiles": [
+                        "VP_PARENT_profile"
+                    ],
+                    "capabilities": [
+                        "caps_child"
+                    ]
+                }
+            },
+            "capabilities": {
+                "caps_parent": {
+                    "extensions": {
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_variable_pointers": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        }
+                    }
+                },
+                "caps_child": {
+                    "features": {
+                        "VkPhysicalDeviceVulkan12Features": {
+                            "drawIndirectCount": true
+                        },
+                        "VkPhysicalDeviceShaderDrawParametersFeatures": {
+                            "shaderDrawParameters": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
