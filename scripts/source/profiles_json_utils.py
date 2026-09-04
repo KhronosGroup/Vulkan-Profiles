@@ -229,6 +229,58 @@ def get_profile_and_file_data(json_files_dict: dict, profile_name: str):
     return None, None
 
 
+def get_primary_capability_block(profile_obj: dict, capabilities_dict: dict) -> dict | None:
+    """Returns the primary (first mandatory) capability block dictionary for a profile."""
+    caps = profile_obj.get("capabilities", [])
+    for cap_item in caps:
+        if isinstance(cap_item, str) and cap_item in capabilities_dict:
+            return capabilities_dict[cap_item]
+        elif isinstance(cap_item, list) and cap_item:
+            if cap_item[0] in capabilities_dict:
+                return capabilities_dict[cap_item[0]]
+    return None
+
+
+def get_topologically_sorted_file_keys(json_files_dict: dict) -> list:
+    """Sorts file keys topologically based on profile inheritance graph ("profiles": [...])."""
+    profile_to_file = {}
+    for file_key, file_data in json_files_dict.items():
+        if isinstance(file_data, dict) and "profiles" in file_data:
+            for profile_name in file_data["profiles"].keys():
+                profile_to_file[profile_name] = file_key
+
+    adj = {fk: set() for fk in json_files_dict.keys()}
+    in_degree = {fk: 0 for fk in json_files_dict.keys()}
+
+    for file_key, file_data in json_files_dict.items():
+        if not isinstance(file_data, dict) or "profiles" not in file_data:
+            continue
+        for profile_obj in file_data["profiles"].values():
+            req_profiles = profile_obj.get("profiles", [])
+            for parent_pname in req_profiles:
+                parent_fk = profile_to_file.get(parent_pname)
+                if parent_fk and parent_fk != file_key and file_key not in adj[parent_fk]:
+                    adj[parent_fk].add(file_key)
+                    in_degree[file_key] += 1
+
+    queue = [fk for fk, deg in in_degree.items() if deg == 0]
+    sorted_keys = []
+
+    while queue:
+        curr = queue.pop(0)
+        sorted_keys.append(curr)
+        for neighbor in adj[curr]:
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                queue.append(neighbor)
+
+    for fk in json_files_dict.keys():
+        if fk not in sorted_keys:
+            sorted_keys.append(fk)
+
+    return sorted_keys
+
+
 def collect_required_profiles_capabilities(json_files_dict: dict, required_profile_names: list[str], visited_profiles: set[str] = None) -> dict:
     """Traverses required parent profile hierarchies and aggregates their capabilities."""
     if visited_profiles is None:
@@ -442,4 +494,3 @@ def save_profiles_jsons(json_files_dict, output_path, format: OutputFormatType):
                     file.write(flat_json)
                 else:
                     json.dump(value, file, indent=4)
-                    

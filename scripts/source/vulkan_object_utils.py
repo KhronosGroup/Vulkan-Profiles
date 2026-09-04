@@ -63,7 +63,7 @@ except ImportError:
 
 from reg import Registry
 from base_generator import BaseGenerator, BaseGeneratorOptions, SetOutputDirectory, SetOutputFileName, SetTargetApiName, SetMergedApiNames
-from source.vulkan_object_version import VK_VERSION, get_bundle_structure_core_version
+from source.vulkan_object_version import VK_VERSION, get_bundle_structure_core_version, is_bundle_structure
 from source.vulkan_object_expression_parsing import collectExtensions, evalExpression
 
 __all__ = [
@@ -295,11 +295,6 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceLimits', 'bufferImageGranularity', '4096', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxBoundDescriptorSets', '7', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxPerStageDescriptorUniformBuffers', '15', None),
-        PropertyRequirement('VkPhysicalDeviceLimits', 'maxPerStageResources', '200', None),
-        PropertyRequirement('VkPhysicalDeviceLimits', 'maxDescriptorSetUniformBuffers', '90', None),
-        PropertyRequirement('VkPhysicalDeviceLimits', 'maxDescriptorSetStorageBuffers', '96', None),
-        PropertyRequirement('VkPhysicalDeviceLimits', 'maxDescriptorSetStorageImages', '144', None),
-        PropertyRequirement('VkPhysicalDeviceLimits', 'maxFragmentCombinedOutputResources', '16', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxComputeWorkGroupInvocations', '256', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxComputeWorkGroupSize', '256, 256, 64', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'subTexelPrecisionBits', '8', None),
@@ -457,7 +452,7 @@ def getExtensionPromotedTo(vk: VulkanObject, ext_name: str) -> list[str]:
     """Retrieves the list of 'promotedto' targets for an extension from vk.xml."""
     if hasattr(vk, 'extensions') and ext_name in vk.extensions:
         ext_obj = vk.extensions[ext_name]
-        promoted = getattr(ext_obj, 'promotedTo', None) or getattr(ext_obj, 'promotedto', None) or getattr(ext_obj, 'promoted_to', None)
+        promoted = getattr(ext_obj, 'promotedTo', None) or getattr(ext_obj, 'promoted_to', None) or getattr(ext_obj, 'promotedto', None)
         if isinstance(promoted, list):
             return [str(p.name if hasattr(p, 'name') else p) for p in promoted if p]
         elif isinstance(promoted, str) and promoted:
@@ -556,6 +551,148 @@ def getStructCoreVersion(vk: VulkanObject, struct_name: str) -> VK_VERSION:
                 return p_ver
 
     return VK_VERSION.NONE
+
+
+def is_extension_promoted_to_version(vk: VulkanObject, ext_name: str, version: VK_VERSION) -> bool:
+    """Returns True if extension ext_name was promoted to or before core version."""
+    promoted_targets = getExtensionPromotedTo(vk, ext_name)
+    for target in promoted_targets:
+        p_ver = VK_VERSION.from_string(target)
+        if p_ver != VK_VERSION.NONE and version != VK_VERSION.NONE and p_ver <= version:
+            return True
+    return False
+
+
+def are_structs_aliases_for_version(vk: VulkanObject, version: VK_VERSION, struct1: str, struct2: str) -> bool:
+    """Returns True if struct1 and struct2 are equivalent aliases under version."""
+    if struct1 == struct2:
+        return True
+
+    if not hasattr(vk, '_struct_aliases_for_ver_cache'):
+        vk._struct_aliases_for_ver_cache = {}
+
+    cache_key = (version, struct1, struct2)
+    if cache_key in vk._struct_aliases_for_ver_cache:
+        return vk._struct_aliases_for_ver_cache[cache_key]
+
+    s1_obj = vk.structs.get(struct1) or getStructByName(vk.structs, struct1)
+    if s1_obj and hasattr(s1_obj, 'aliases') and struct2 in getattr(s1_obj, 'aliases', []):
+        vk._struct_aliases_for_ver_cache[cache_key] = True
+        return True
+
+    s2_obj = vk.structs.get(struct2) or getStructByName(vk.structs, struct2)
+    if s2_obj and hasattr(s2_obj, 'aliases') and struct1 in getattr(s2_obj, 'aliases', []):
+        vk._struct_aliases_for_ver_cache[cache_key] = True
+        return True
+
+    res = False
+    if s1_obj and hasattr(s1_obj, 'members') and s1_obj.members:
+        sample_member = s1_obj.members[0].name
+        valid_aliases = gatherDependentCapabilityAliases(vk, version, StructCapabilityAlias(struct1, sample_member))
+        if any(isinstance(alias, StructCapabilityAlias) and alias.struct == struct2 for alias in valid_aliases):
+            res = True
+
+    if not res and s2_obj and hasattr(s2_obj, 'members') and s2_obj.members:
+        sample_member = s2_obj.members[0].name
+        valid_aliases = gatherDependentCapabilityAliases(vk, version, StructCapabilityAlias(struct2, sample_member))
+        if any(isinstance(alias, StructCapabilityAlias) and alias.struct == struct1 for alias in valid_aliases):
+            res = True
+
+    vk._struct_aliases_for_ver_cache[cache_key] = res
+    return res
+
+
+def get_required_extensions_for_struct(vk: VulkanObject, struct_name: str, version: VK_VERSION) -> set[str]:
+    """Retrieves all non-promoted extensions required to enable struct_name for version."""
+    if not hasattr(vk, '_req_exts_for_struct_cache'):
+        vk._req_exts_for_struct_cache = {}
+
+    cache_key = (struct_name, version)
+    if cache_key in vk._req_exts_for_struct_cache:
+        return vk._req_exts_for_struct_cache[cache_key]
+
+    req_exts = set()
+
+    struct_names = [struct_name]
+    struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
+    if struct_obj and hasattr(struct_obj, 'aliases'):
+        for alias in struct_obj.aliases:
+            if alias not in struct_names:
+                struct_names.append(alias)
+
+    for s_name in struct_names:
+        s_obj = vk.structs.get(s_name) or getStructByName(vk.structs, s_name)
+        if s_obj:
+            def_ver = getattr(s_obj, 'definedByVersion', None)
+            if def_ver is not None and def_ver != VK_VERSION.NONE and version != VK_VERSION.NONE and def_ver <= version:
+                continue
+
+        def_exts = getStructDefiningExtensions(vk, s_name)
+        for ext_name in def_exts:
+            promoted_targets = getExtensionPromotedTo(vk, ext_name)
+            promoted_to_core = False
+            for target in promoted_targets:
+                p_ver = VK_VERSION.from_string(target)
+                if p_ver != VK_VERSION.NONE and version != VK_VERSION.NONE and p_ver <= version:
+                    promoted_to_core = True
+                    break
+
+            if not promoted_to_core:
+                req_exts.add(ext_name)
+
+    vk._req_exts_for_struct_cache[cache_key] = req_exts
+    return req_exts
+
+
+def is_struct_covered_by_bundle(vk: VulkanObject, bundle_name: str, struct_name: str) -> bool:
+    """Returns True if struct_name's members are a subset of bundle_name's members."""
+    if struct_name == bundle_name or is_bundle_structure(struct_name):
+        return False
+
+    bundle_obj = vk.structs.get(bundle_name) or getStructByName(vk.structs, bundle_name)
+    struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
+
+    if not bundle_obj or not struct_obj:
+        return False
+
+    bundle_members = {m.name for m in getattr(bundle_obj, 'members', [])}
+    struct_members = {m.name for m in getattr(struct_obj, 'members', []) if m.name not in ('sType', 'pNext')}
+
+    if not struct_members:
+        return False
+
+    return struct_members.issubset(bundle_members)
+
+
+def is_property_struct_covered_by_bundle(vk: VulkanObject, bundle_name: str, struct_name: str) -> bool:
+    """Checks if all property members of struct_name are covered or aliased in bundle_name."""
+    if is_struct_covered_by_bundle(vk, bundle_name, struct_name):
+        return True
+
+    struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
+    bundle_obj = vk.structs.get(bundle_name) or getStructByName(vk.structs, bundle_name)
+
+    if not struct_obj or not bundle_obj:
+        return False
+
+    bundle_members = {m.name for m in getattr(bundle_obj, 'members', [])}
+    for member in getattr(struct_obj, 'members', []):
+        if member.name in ('sType', 'pNext'):
+            continue
+
+        if member.name in bundle_members:
+            continue
+
+        query_id = StructCapabilityAlias(struct_name, member.name)
+        aliases = gatherCapabilityAliases(vk, query_id)
+        is_aliased_in_bundle = any(
+            isinstance(a, StructCapabilityAlias) and a.struct == bundle_name
+            for a in aliases
+        )
+        if not is_aliased_in_bundle:
+            return False
+
+    return True
 
 
 def _get_alias_key(alias_id: CapabilityAlias):
