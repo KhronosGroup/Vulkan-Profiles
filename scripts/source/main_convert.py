@@ -29,9 +29,9 @@ from typing import Any
 
 from source.main_validate import main_validate
 from source.vulkan_object_version import (
-    BUNDLE_STRUCT_VERSIONS,
     is_bundle_structure, 
     get_bundle_structure_core_version,
+    get_bundle_structures,
     get_active_feature_bundles,
     get_active_property_bundles
 )
@@ -53,8 +53,7 @@ from source.vulkan_object_utils import (
     getStructDefiningExtensions,
     is_extension_struct_name,
     StructCapabilityAlias, 
-    ExtensionCapabilityAlias, 
-    CapabilityAlias
+    ExtensionCapabilityAlias
 )
 from source.profiles_json_utils import (
     load_profiles_jsons, 
@@ -585,12 +584,6 @@ def pull_extension_dependencies_profiles_files(vk: VulkanObject, ignore_extensio
             pull_extension_dependencies_profiles_file(vk, ignore_extension_versions, json_file_data, json_files_dict)
 
 
-# Backward-compatibility aliases
-pull_profiles_files_dependencies = pull_extension_dependencies_profiles_files
-pull_profiles_file_dependencies = pull_extension_dependencies_profiles_file
-pull_capabilities_block_dependencies = pull_extension_dependencies_capabilities_block
-
-
 # -----------------------------------------------------------------------------
 # Required Capabilities Evaluation & Transition Blocks
 # -----------------------------------------------------------------------------
@@ -838,10 +831,6 @@ def pull_required_capabilities_profiles_files(vk: VulkanObject, json_files_dict:
     sorted_file_keys = get_topologically_sorted_file_keys(json_files_dict)
     for file_key in sorted_file_keys:
         pull_required_capabilities_profiles_file(vk, json_files_dict, json_files_dict[file_key])
-
-
-# Backward-compatibility alias
-pull_required_features_profiles_files = pull_required_capabilities_profiles_files
 
 
 # -----------------------------------------------------------------------------
@@ -1534,12 +1523,6 @@ def strip_duplication_profiles_files(vk: VulkanObject, json_files_dict: dict):
         strip_duplication_profiles_file(vk, json_files_dict, json_files_dict[file_key])
 
 
-# Backward-compatibility aliases
-strip_profiles_files_capabilities_duplication = strip_duplication_profiles_files
-strip_profiles_file_capabilities_duplication = strip_duplication_profiles_file
-strip_capabilities_block_duplication = strip_duplication_capabilities_block
-
-
 # -----------------------------------------------------------------------------
 # Consolidation ('consolidate')
 # -----------------------------------------------------------------------------
@@ -1659,8 +1642,8 @@ def get_struct_sort_key(vk: VulkanObject, struct_name: str) -> tuple:
     4. EXT extension structures (alphabetical)
     5. Vendor extension structures (alphabetical)
     """
-    if struct_name in BUNDLE_STRUCT_VERSIONS:
-        ver_val = BUNDLE_STRUCT_VERSIONS[struct_name]
+    if struct_name in get_bundle_structures(vk=vk):
+        ver_val = get_bundle_structure_core_version(struct_name).as_tuple()
         return (0, 0, ver_val, struct_name)
 
     is_ext = is_extension_struct_name(vk, struct_name)

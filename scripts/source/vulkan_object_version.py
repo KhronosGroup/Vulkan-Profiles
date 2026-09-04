@@ -191,29 +191,6 @@ def is_bundle_structure(struct_name: str) -> bool:
     return get_bundle_structure_core_version(struct_name) != VK_VERSION.NONE
 
 
-class _BundleStructVersionsDict(dict):
-    def __contains__(self, key: object) -> bool:
-        if super().__contains__(key):
-            return True
-        return is_bundle_structure(str(key))
-
-    def __getitem__(self, key: str) -> tuple[int, int]:
-        if super().__contains__(key):
-            return super().__getitem__(key)
-        ver = get_bundle_structure_core_version(key)
-        if ver != VK_VERSION.NONE:
-            return ver.as_tuple()
-        raise KeyError(key)
-
-    def get(self, key: str, default: Any = None) -> Any:
-        if key in self:
-            return self[key]
-        return default
-
-
-BUNDLE_STRUCT_VERSIONS: dict[str, tuple[int, int]] = _BundleStructVersionsDict()
-
-
 def get_feature_bundle_structures(api_version: VK_VERSION = None, vk: Any = None) -> list[str]:
     """Returns feature bundle structure names introduced in Vulkan 1.1+ up to api_version."""
     bundles = []
@@ -252,6 +229,14 @@ def get_property_bundle_structures(api_version: VK_VERSION = None, vk: Any = Non
     return sorted(list(set(bundles)), key=lambda s: get_bundle_structure_core_version(s).as_tuple())
 
 
+def get_bundle_structures(api_version: VK_VERSION = None, vk: Any = None) -> list[str]:
+    """Returns all core bundle structure names (features and properties)."""
+    base = ["VkPhysicalDeviceFeatures", "VkPhysicalDeviceProperties"]
+    features = get_feature_bundle_structures(api_version, vk)
+    properties = get_property_bundle_structures(api_version, vk)
+    return sorted(list(set(base + features + properties)), key=lambda s: get_bundle_structure_core_version(s).as_tuple())
+
+
 def get_active_feature_bundles(api_version: VK_VERSION, vk: Any = None) -> list[str]:
     """Returns active feature bundle structure names for the given API version."""
     return [
@@ -267,28 +252,3 @@ def get_active_property_bundles(api_version: VK_VERSION, vk: Any = None) -> list
         if api_version >= get_bundle_structure_core_version(b)
     ]
 
-
-def get_version_string() -> str:
-    """
-    Returns the vkprofiles version string based on the baked build version.
-    """
-    try:
-        from source.baked_version import BAKED_VERSION
-        if BAKED_VERSION:
-            return f"vkprofiles version {BAKED_VERSION} (ALPHA)"
-    except ImportError:
-        pass
-
-    return "vkprofiles version unknown"
-
-
-def main_version(args=None) -> str:
-    """
-    Handler for the 'version' subcommand and top-level --version option.
-    """
-    version_str = get_version_string()
-
-    if args is not None:
-        print(version_str)
-
-    return version_str

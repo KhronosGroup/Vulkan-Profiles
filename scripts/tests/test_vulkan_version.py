@@ -30,9 +30,9 @@ if str(scripts_dir) not in sys.path:
 
 from source.vulkan_object_version import (
     VK_VERSION,
-    BUNDLE_STRUCT_VERSIONS,
     is_bundle_structure,
-    get_bundle_structure_core_version
+    get_bundle_structure_core_version,
+    get_bundle_structures
 )
 
 
@@ -150,8 +150,12 @@ class TestVulkanObjectVersion(unittest.TestCase):
         self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceVulkan14Properties"), VK_VERSION.V1_4)
         self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceVulkan15Features"), VK_VERSION.from_string("1.5"))
 
-        self.assertEqual(BUNDLE_STRUCT_VERSIONS["VkPhysicalDeviceVulkan11Features"], (1, 2))
-        self.assertEqual(BUNDLE_STRUCT_VERSIONS["VkPhysicalDeviceVulkan15Features"], (1, 5))
+        bundle_structs = get_bundle_structures()
+        self.assertIn("VkPhysicalDeviceFeatures", bundle_structs)
+        self.assertIn("VkPhysicalDeviceProperties", bundle_structs)
+        self.assertIn("VkPhysicalDeviceVulkan11Features", bundle_structs)
+        self.assertIn("VkPhysicalDeviceVulkan14Properties", bundle_structs)
+        self.assertNotIn("VkPhysicalDeviceCustomBorderColorFeaturesEXT", bundle_structs)
 
 
 if __name__ == '__main__':
