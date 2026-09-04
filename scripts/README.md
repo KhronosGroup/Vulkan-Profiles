@@ -100,8 +100,8 @@ Conversion flags are processed in a deterministic internal pipeline order regard
 | `pull-promoted-extensions` | Requires all extensions promoted to core up to the profile's target Vulkan version. |
 | `ignore-extension-versions` | Sets all required extension versions to 1, overriding specific extension spec versions. |
 | `pull-aliases` | Resolves and populates all equivalent capability aliases across core structures and extensions. |
-| `strip-duplication` | Removes redundant duplicate features, properties, and extension requirements across inheritance trees and within blocks. |
 | `consolidate` | Merges all mandatory capability blocks into a single consolidated requirements block per profile. |
+| `strip-duplication` | Removes redundant duplicate features, properties, and extension requirements across inheritance trees and within blocks. |
 | `strip-promoted-extensions` | Removes extensions that are already promoted to the profile's target core Vulkan version. |
 | `sort` | Sorts capability blocks, structures, and extension lists into canonical Vulkan order. |
 
