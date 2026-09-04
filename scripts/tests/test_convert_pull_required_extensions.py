@@ -32,7 +32,7 @@ if str(scripts_dir) not in sys.path:
 from vulkan_object import VulkanObject
 from source.vulkan_object_utils import initVulkanObject
 from source.main_convert import (
-    pull_profiles_files_dependencies
+    pull_extension_dependencies_profiles_files
 )
 
 
@@ -105,7 +105,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -178,7 +178,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -263,7 +263,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -328,7 +328,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -400,7 +400,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -484,7 +484,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -547,7 +547,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -616,7 +616,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -697,7 +697,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -762,7 +762,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -834,7 +834,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -918,7 +918,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -989,7 +989,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -1066,7 +1066,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -1155,7 +1155,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -1229,7 +1229,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -1308,7 +1308,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -1400,7 +1400,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -1521,7 +1521,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_profiles_files_dependencies(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 

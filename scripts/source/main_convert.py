@@ -564,12 +564,6 @@ def pull_extension_dependencies_profiles_files(vk: VulkanObject, ignore_extensio
             pull_extension_dependencies_profiles_file(vk, ignore_extension_versions, json_file_data, json_files_dict)
 
 
-# Backward-compatibility aliases
-pull_profiles_files_dependencies = pull_extension_dependencies_profiles_files
-pull_profiles_file_dependencies = pull_extension_dependencies_profiles_file
-pull_capabilities_block_dependencies = pull_extension_dependencies_capabilities_block
-
-
 # -----------------------------------------------------------------------------
 # Required Capabilities Evaluation & Transition Blocks
 # -----------------------------------------------------------------------------
@@ -817,10 +811,6 @@ def pull_required_capabilities_profiles_files(vk: VulkanObject, json_files_dict:
     sorted_file_keys = get_topologically_sorted_file_keys(json_files_dict)
     for file_key in sorted_file_keys:
         pull_required_capabilities_profiles_file(vk, json_files_dict, json_files_dict[file_key])
-
-
-# Backward-compatibility alias
-pull_required_features_profiles_files = pull_required_capabilities_profiles_files
 
 
 # -----------------------------------------------------------------------------
@@ -1254,12 +1244,6 @@ def strip_duplication_profiles_files(vk: VulkanObject, json_files_dict: dict):
     sorted_file_keys = get_topologically_sorted_file_keys(json_files_dict)
     for file_key in sorted_file_keys:
         strip_duplication_profiles_file(vk, json_files_dict, json_files_dict[file_key])
-
-
-# Backward-compatibility aliases
-strip_profiles_files_capabilities_duplication = strip_duplication_profiles_files
-strip_profiles_file_capabilities_duplication = strip_duplication_profiles_file
-strip_capabilities_block_duplication = strip_duplication_capabilities_block
 
 
 # -----------------------------------------------------------------------------
