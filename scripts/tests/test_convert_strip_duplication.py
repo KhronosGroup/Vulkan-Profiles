@@ -643,10 +643,8 @@ class TestConvertStripDuplication(unittest.TestCase):
                     "properties": {
                         "VkPhysicalDeviceVulkan11Properties": {
                             "maxSubgroupSize": 64,
-                            "subgroupSize": 32
-                        },
-                        "VkPhysicalDeviceMultiviewProperties": {
-                            "maxMultiviewViewCount": 6
+                            "subgroupSize": 32,
+                            "maxMultiviewViewCount": 12
                         }
                     }
                 },
@@ -654,9 +652,7 @@ class TestConvertStripDuplication(unittest.TestCase):
                     "properties": {
                         "VkPhysicalDeviceVulkan11Properties": {
                             "maxSubgroupSize": 64,
-                            "subgroupSize": 64
-                        },
-                        "VkPhysicalDeviceMultiviewProperties": {
+                            "subgroupSize": 64,
                             "maxMultiviewViewCount": 6
                         }
                     }
@@ -681,17 +677,16 @@ class TestConvertStripDuplication(unittest.TestCase):
                     "properties": {
                         "VkPhysicalDeviceVulkan11Properties": {
                             "maxSubgroupSize": 64,
-                            "subgroupSize": 32
-                        },
-                        "VkPhysicalDeviceMultiviewProperties": {
-                            "maxMultiviewViewCount": 6
+                            "subgroupSize": 32,
+                            "maxMultiviewViewCount": 12
                         }
                     }
                 },
                 "caps2": {
                     "properties": {
                         "VkPhysicalDeviceVulkan11Properties": {
-                            "subgroupSize": 64
+                            "subgroupSize": 64,
+                            "maxMultiviewViewCount": 6
                         }
                     }
                 }
@@ -974,6 +969,119 @@ class TestConvertStripDuplication(unittest.TestCase):
                                     "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT",
                                     "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT"
                                 ]
+                            }
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+
+    def test_strip_intra_block_property_alias_duplication(self):
+        """
+        Verifies that when a single capability block contains duplicate property aliases
+        (e.g., VkPhysicalDeviceMultiviewProperties and VkPhysicalDeviceMultiviewPropertiesKHR),
+        the extension alias structure is stripped in favor of the canonical core structure.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_LUNARG_test": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": ["caps_multiview"]
+                }
+            },
+            "capabilities": {
+                "caps_multiview": {
+                    "properties": {
+                        "VkPhysicalDeviceMultiviewProperties": {
+                            "maxMultiviewViewCount": 6
+                        },
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                            "maxMultiviewViewCount": 6
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_LUNARG_test": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": ["caps_multiview"]
+                }
+            },
+            "capabilities": {
+                "caps_multiview": {
+                    "properties": {
+                        "VkPhysicalDeviceMultiviewProperties": {
+                            "maxMultiviewViewCount": 6
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+    def test_strip_intra_block_format_alias_duplication(self):
+        """
+        Verifies that when a single capability block contains duplicate format property structure
+        aliases (e.g., VkFormatProperties3 and VkFormatProperties3KHR), the extension alias structure
+        is stripped in favor of the canonical core structure.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_LUNARG_test": {
+                    "version": 1,
+                    "api-version": "1.3.0",
+                    "capabilities": ["caps_format"]
+                }
+            },
+            "capabilities": {
+                "caps_format": {
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties3": {
+                                "linearTilingFeatures": ["VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"]
+                            },
+                            "VkFormatProperties3KHR": {
+                                "linearTilingFeatures": ["VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"]
+                            }
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_LUNARG_test": {
+                    "version": 1,
+                    "api-version": "1.3.0",
+                    "capabilities": ["caps_format"]
+                }
+            },
+            "capabilities": {
+                "caps_format": {
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties3": {
+                                "linearTilingFeatures": ["VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"]
                             }
                         }
                     }

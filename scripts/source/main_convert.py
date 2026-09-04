@@ -1102,9 +1102,89 @@ def strip_intra_block_feature_duplication(vk: VulkanObject, version: VK_VERSION,
         del json_block["features"]
 
 
+def strip_intra_block_property_duplication(vk: VulkanObject, version: VK_VERSION, json_block: dict, context_properties: dict):
+    if "properties" not in json_block or not isinstance(json_block["properties"], dict):
+        return
+
+    block_properties = json_block["properties"]
+
+    all_properties = {}
+    deep_merge_dict(all_properties, context_properties)
+    deep_merge_dict(all_properties, block_properties)
+
+    structs_to_remove = set()
+
+    active_bundles = [
+        b for b in get_active_property_bundles(version)
+        if b in all_properties
+    ]
+
+    for struct_name in list(block_properties.keys()):
+        if is_bundle_structure(struct_name):
+            continue
+
+        if active_bundles and any(is_property_struct_covered_by_bundle(vk, bundle, struct_name) for bundle in active_bundles):
+            structs_to_remove.add(struct_name)
+            continue
+
+        for other_struct in all_properties.keys():
+            if other_struct != struct_name and are_structs_aliases_for_version(vk, version, struct_name, other_struct):
+                if should_remove_struct_a_in_favor_of_b(vk, version, struct_name, other_struct):
+                    structs_to_remove.add(struct_name)
+                    break
+
+    for s in structs_to_remove:
+        if s in block_properties:
+            del block_properties[s]
+
+    if not block_properties:
+        del json_block["properties"]
+
+
+def strip_intra_block_format_duplication(vk: VulkanObject, version: VK_VERSION, json_block: dict, context_formats: dict):
+    if "formats" not in json_block or not isinstance(json_block["formats"], dict):
+        return
+
+    block_formats = json_block["formats"]
+
+    for fmt_name, structs_dict in list(block_formats.items()):
+        if not isinstance(structs_dict, dict):
+            continue
+
+        ctx_structs = context_formats.get(fmt_name, {}) if isinstance(context_formats, dict) else {}
+        all_structs = {}
+        if isinstance(ctx_structs, dict):
+            deep_merge_dict(all_structs, ctx_structs)
+        deep_merge_dict(all_structs, structs_dict)
+
+        structs_to_remove = set()
+        for struct_name in list(structs_dict.keys()):
+            for other_struct in all_structs.keys():
+                if other_struct != struct_name and are_structs_aliases_for_version(vk, version, struct_name, other_struct):
+                    if should_remove_struct_a_in_favor_of_b(vk, version, struct_name, other_struct):
+                        structs_to_remove.add(struct_name)
+                        break
+
+        for s in structs_to_remove:
+            if s in structs_dict:
+                del structs_dict[s]
+
+        if not structs_dict:
+            del block_formats[fmt_name]
+
+    if not block_formats:
+        del json_block["formats"]
+
+
 def strip_duplication_capabilities_block(vk: VulkanObject, json_files_dict, version: VK_VERSION, json_profiles_capabilities_block: dict, collected_capabilities: dict):
     context_features = collected_capabilities.get("features", {})
     strip_intra_block_feature_duplication(vk, version, json_profiles_capabilities_block, context_features)
+
+    context_properties = collected_capabilities.get("properties", {})
+    strip_intra_block_property_duplication(vk, version, json_profiles_capabilities_block, context_properties)
+
+    context_formats = collected_capabilities.get("formats", {})
+    strip_intra_block_format_duplication(vk, version, json_profiles_capabilities_block, context_formats)
 
     for section in ("features", "properties", "formats"):
         if section in json_profiles_capabilities_block and section in collected_capabilities:
