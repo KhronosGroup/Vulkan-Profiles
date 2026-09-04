@@ -198,6 +198,16 @@ add_pyinstaller_target(VpProfilesProcessor
     FOLDER "Profiles generator"
 )
 
+if(WIN32)
+    set(VKPROFILES_INSTALL_DIR "Bin")
+else()
+    set(VKPROFILES_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/vulkan/bin")
+endif()
+
+install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/scripts/vkprofiles${CMAKE_EXECUTABLE_SUFFIX}"
+    DESTINATION "${VKPROFILES_INSTALL_DIR}"
+)
+
 # The profiles directory regenerates the Profiles source and headers.
 add_subdirectory(profiles)
 add_subdirectory(library)
