@@ -75,8 +75,8 @@ class ConvertBits(str, Enum):
     PULL_PROMOTED_EXTENSIONS = 'pull-promoted-extensions'      # Requires all extensions promoted to core up to the profile's target Vulkan version.
     IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions'    # Sets all required extension versions to 1, overriding specific extension spec versions.
     PULL_ALIASES = 'pull-aliases'                              # Resolves and populates all equivalent capability aliases across core structures and extensions.
-    CONSOLIDATE = 'consolidate'                                # Merges all mandatory capability blocks into a single consolidated requirements block per profile.
     STRIP_DUPLICATION = 'strip-duplication'                    # Removes redundant duplicate features, properties, and extension requirements across inheritance trees and within blocks.
+    CONSOLIDATE = 'consolidate'                                # Merges all mandatory capability blocks into a single consolidated requirements block per profile.
     STRIP_PROMOTED_EXTENSIONS = 'strip-promoted-extensions'    # Removes extensions that are already promoted to the profile's target core Vulkan version.
     SORT = 'sort'                                              # Sorts capability blocks, structures, and extension lists into canonical Vulkan order.
 
@@ -1075,6 +1075,34 @@ def strip_dict_duplication(target: dict, reference: dict):
         del target[key]
 
 
+def is_feature_member_covered(
+    vk: VulkanObject,
+    version: VK_VERSION,
+    struct_name: str,
+    m_name: str,
+    val: bool,
+    ref_features: dict
+) -> bool:
+    """Checks if (struct_name, m_name, val) is covered in ref_features across any alias or bundle structure."""
+    if not ref_features or not val:
+        return False
+
+    query_id = StructCapabilityAlias(struct_name, m_name)
+    aliases = [query_id] + gatherCapabilityAliases(vk, query_id)
+
+    for alias in aliases:
+        if not isinstance(alias, StructCapabilityAlias):
+            continue
+        a_struct = alias.struct
+        a_member = alias.member
+
+        if a_struct in ref_features and isinstance(ref_features[a_struct], dict):
+            if ref_features[a_struct].get(a_member) == val:
+                return True
+
+    return False
+
+
 def is_feature_struct_members_covered_by_bundle(vk: VulkanObject, bundle_name: str, struct_name: str, members: dict, all_features: dict) -> bool:
     if bundle_name not in all_features or not isinstance(all_features[bundle_name], dict):
         return False
@@ -1120,37 +1148,51 @@ def strip_intra_block_feature_duplication(vk: VulkanObject, version: VK_VERSION,
 
     block_features = json_block["features"]
 
-    all_features = {}
-    deep_merge_dict(all_features, context_features)
-    deep_merge_dict(all_features, block_features)
+    # Pass 1: Strip members/structs already covered in context_features (parent profile / previous blocks)
+    if context_features:
+        for struct_name in list(block_features.keys()):
+            members = block_features[struct_name]
+            if not isinstance(members, dict):
+                continue
 
-    structs_to_remove = set()
+            for m_name in list(members.keys()):
+                val = members[m_name]
+                if is_feature_member_covered(vk, version, struct_name, m_name, val, context_features):
+                    del members[m_name]
 
+            if not members:
+                del block_features[struct_name]
+
+    if not block_features:
+        del json_block["features"]
+        return
+
+    # Pass 2: Intra-block deduplication among structures within block_features itself
     active_bundles = [
         b for b in get_active_feature_bundles(version)
-        if b in all_features
+        if b in block_features
     ]
+
+    structs_to_remove = set()
 
     for struct_name, members in list(block_features.items()):
         if is_bundle_structure(struct_name) or not isinstance(members, dict):
             continue
 
-        # 1. Check if covered by an active bundle structure
         if active_bundles:
             covered_by_bundle = False
             for bundle in active_bundles:
-                if is_feature_struct_members_covered_by_bundle(vk, bundle, struct_name, members, all_features):
+                if is_feature_struct_members_covered_by_bundle(vk, bundle, struct_name, members, block_features):
                     covered_by_bundle = True
                     break
             if covered_by_bundle:
                 structs_to_remove.add(struct_name)
                 continue
 
-        # 2. Check if covered by another aliased structure
-        for other_struct in all_features.keys():
+        for other_struct in block_features.keys():
             if other_struct != struct_name and are_structs_aliases_for_version(vk, version, struct_name, other_struct):
                 if should_remove_struct_a_in_favor_of_b(vk, version, struct_name, other_struct):
-                    if is_feature_struct_covered_by_alias(vk, struct_name, members, other_struct, all_features):
+                    if is_feature_struct_covered_by_alias(vk, struct_name, members, other_struct, block_features):
                         structs_to_remove.add(struct_name)
                         break
 
@@ -1160,6 +1202,24 @@ def strip_intra_block_feature_duplication(vk: VulkanObject, version: VK_VERSION,
 
     if not block_features:
         del json_block["features"]
+
+
+def is_property_member_covered(
+    vk: VulkanObject,
+    version: VK_VERSION,
+    struct_name: str,
+    prop_name: str,
+    prop_val: Any,
+    ref_properties: dict
+) -> bool:
+    if not ref_properties:
+        return False
+
+    found, parent_val = get_parent_property_value(ref_properties, struct_name, prop_name, vk)
+    if found and parent_val == prop_val:
+        return True
+
+    return False
 
 
 def is_property_struct_members_covered_by_bundle(vk: VulkanObject, bundle_name: str, struct_name: str, prop_data: dict, all_properties: dict) -> bool:
@@ -1224,37 +1284,62 @@ def strip_intra_block_property_duplication(vk: VulkanObject, version: VK_VERSION
 
     block_properties = json_block["properties"]
 
-    all_properties = {}
-    deep_merge_dict(all_properties, context_properties)
-    deep_merge_dict(all_properties, block_properties)
+    # Pass 1: Strip properties covered in context_properties
+    if context_properties:
+        for struct_name in list(block_properties.keys()):
+            prop_data = block_properties[struct_name]
+            if not isinstance(prop_data, dict):
+                continue
 
-    structs_to_remove = set()
+            if struct_name == "VkPhysicalDeviceProperties":
+                for sub_group in list(prop_data.keys()):
+                    sub_dict = prop_data[sub_group]
+                    if isinstance(sub_dict, dict):
+                        for p_name in list(sub_dict.keys()):
+                            p_val = sub_dict[p_name]
+                            if is_property_member_covered(vk, version, struct_name, p_name, p_val, context_properties):
+                                del sub_dict[p_name]
+                        if not sub_dict:
+                            del prop_data[sub_group]
+            else:
+                for p_name in list(prop_data.keys()):
+                    p_val = prop_data[p_name]
+                    if is_property_member_covered(vk, version, struct_name, p_name, p_val, context_properties):
+                        del prop_data[p_name]
 
+            if not prop_data:
+                del block_properties[struct_name]
+
+    if not block_properties:
+        del json_block["properties"]
+        return
+
+    # Pass 2: Intra-block deduplication within block_properties
     active_bundles = [
         b for b in get_active_property_bundles(version)
-        if b in all_properties
+        if b in block_properties
     ]
+
+    structs_to_remove = set()
 
     for struct_name, prop_data in list(block_properties.items()):
         if is_bundle_structure(struct_name) or not isinstance(prop_data, dict):
             continue
 
-        # 1. Check if covered by an active bundle structure
         if active_bundles:
             covered_by_bundle = False
             for bundle in active_bundles:
-                if is_property_struct_members_covered_by_bundle(vk, bundle, struct_name, prop_data, all_properties):
+                if is_property_struct_members_covered_by_bundle(vk, bundle, struct_name, prop_data, block_properties):
                     covered_by_bundle = True
                     break
             if covered_by_bundle:
                 structs_to_remove.add(struct_name)
                 continue
 
-        # 2. Check if covered by another aliased structure
-        for other_struct in all_properties.keys():
+        for other_struct in block_properties.keys():
             if other_struct != struct_name and are_structs_aliases_for_version(vk, version, struct_name, other_struct):
                 if should_remove_struct_a_in_favor_of_b(vk, version, struct_name, other_struct):
-                    if is_property_struct_covered_by_alias(vk, struct_name, prop_data, other_struct, all_properties):
+                    if is_property_struct_covered_by_alias(vk, struct_name, prop_data, other_struct, block_properties):
                         structs_to_remove.add(struct_name)
                         break
 
@@ -1272,25 +1357,60 @@ def strip_intra_block_format_duplication(vk: VulkanObject, version: VK_VERSION, 
 
     block_formats = json_block["formats"]
 
+    # Pass 1: Strip format structs covered by context_formats
+    if context_formats:
+        for fmt_name in list(block_formats.keys()):
+            structs_dict = block_formats[fmt_name]
+            if not isinstance(structs_dict, dict):
+                continue
+
+            ctx_structs = context_formats.get(fmt_name, {}) if isinstance(context_formats, dict) else {}
+            if isinstance(ctx_structs, dict) and ctx_structs:
+                for struct_name in list(structs_dict.keys()):
+                    members_dict = structs_dict[struct_name]
+                    if not isinstance(members_dict, dict):
+                        continue
+
+                    covered_in_ctx = False
+                    for ctx_struct_name, ctx_members in ctx_structs.items():
+                        if are_structs_aliases_for_version(vk, version, struct_name, ctx_struct_name):
+                            if isinstance(ctx_members, dict):
+                                all_covered = True
+                                for f_key, f_list in members_dict.items():
+                                    if f_key in ctx_members and isinstance(f_list, list) and isinstance(ctx_members[f_key], list):
+                                        if not set(f_list).issubset(set(ctx_members[f_key])):
+                                            all_covered = False
+                                            break
+                                    elif f_key not in ctx_members:
+                                        all_covered = False
+                                        break
+                                if all_covered:
+                                    covered_in_ctx = True
+                                    break
+                    if covered_in_ctx:
+                        del structs_dict[struct_name]
+
+            if not structs_dict:
+                del block_formats[fmt_name]
+
+    if not block_formats:
+        del json_block["formats"]
+        return
+
+    # Pass 2: Intra-block format deduplication within block_formats
     for fmt_name, structs_dict in list(block_formats.items()):
         if not isinstance(structs_dict, dict):
             continue
-
-        ctx_structs = context_formats.get(fmt_name, {}) if isinstance(context_formats, dict) else {}
-        all_structs = {}
-        if isinstance(ctx_structs, dict):
-            deep_merge_dict(all_structs, ctx_structs)
-        deep_merge_dict(all_structs, structs_dict)
 
         structs_to_remove = set()
         for struct_name, members_dict in list(structs_dict.items()):
             if not isinstance(members_dict, dict):
                 continue
 
-            for other_struct in all_structs.keys():
+            for other_struct in structs_dict.keys():
                 if other_struct != struct_name and are_structs_aliases_for_version(vk, version, struct_name, other_struct):
                     if should_remove_struct_a_in_favor_of_b(vk, version, struct_name, other_struct):
-                        other_members = all_structs[other_struct]
+                        other_members = structs_dict[other_struct]
                         if isinstance(other_members, dict):
                             all_covered = True
                             for f_key, f_list in members_dict.items():
@@ -1717,3 +1837,4 @@ def main_convert(args):
         sort_profiles_files(vk, json_files_dict)
 
     save_profiles_jsons(json_files_dict, Path(args.output), OutputFormatType(args.format))
+    
