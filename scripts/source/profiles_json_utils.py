@@ -220,6 +220,34 @@ def deep_merge_dict(target: dict, source: dict):
             target[key] = copy.deepcopy(value)
 
 
+def strip_dict_duplication(target: dict, reference: dict):
+    """Recursively removes key-value pairs from target dict that match reference dict."""
+    keys_to_delete = []
+
+    for key, value in list(target.items()):
+        if key in reference:
+            ref_value = reference[key]
+
+            if isinstance(value, dict) and isinstance(ref_value, dict):
+                strip_dict_duplication(value, ref_value)
+                if not value:
+                    keys_to_delete.append(key)
+
+            elif value == ref_value:
+                keys_to_delete.append(key)
+
+            elif isinstance(value, list) and isinstance(ref_value, list):
+                try:
+                    if sorted(value) == sorted(ref_value):
+                        keys_to_delete.append(key)
+                except TypeError:
+                    if value == ref_value:
+                        keys_to_delete.append(key)
+
+    for key in keys_to_delete:
+        del target[key]
+
+
 def get_profile_and_file_data(json_files_dict: dict, profile_name: str):
     """Searches loaded profile files for a given profile name and returns (profile_obj, json_file_data)."""
     for file_path, json_file_data in json_files_dict.items():
@@ -229,37 +257,87 @@ def get_profile_and_file_data(json_files_dict: dict, profile_name: str):
     return None, None
 
 
+def get_primary_capability_block(profile_obj: dict, capabilities_dict: dict) -> dict | None:
+    """Returns the primary (first mandatory) capability block dictionary for a profile."""
+    caps = profile_obj.get("capabilities", [])
+    for cap_item in caps:
+        if isinstance(cap_item, str) and cap_item in capabilities_dict:
+            return capabilities_dict[cap_item]
+        elif isinstance(cap_item, list) and cap_item:
+            if cap_item[0] in capabilities_dict:
+                return capabilities_dict[cap_item[0]]
+    return None
+
+
+def get_topologically_sorted_file_keys(json_files_dict: dict) -> list:
+    """Sorts file keys topologically based on profile inheritance graph ("profiles": [...])."""
+    profile_to_file = {}
+    for file_key, file_data in json_files_dict.items():
+        if isinstance(file_data, dict) and "profiles" in file_data:
+            for profile_name in file_data["profiles"].keys():
+                profile_to_file[profile_name] = file_key
+
+    adj = {fk: set() for fk in json_files_dict.keys()}
+    in_degree = {fk: 0 for fk in json_files_dict.keys()}
+
+    for file_key, file_data in json_files_dict.items():
+        if not isinstance(file_data, dict) or "profiles" not in file_data:
+            continue
+        for profile_obj in file_data["profiles"].values():
+            req_profiles = profile_obj.get("profiles", [])
+            for parent_pname in req_profiles:
+                parent_fk = profile_to_file.get(parent_pname)
+                if parent_fk and parent_fk != file_key and file_key not in adj[parent_fk]:
+                    adj[parent_fk].add(file_key)
+                    in_degree[file_key] += 1
+
+    queue = [fk for fk, deg in in_degree.items() if deg == 0]
+    sorted_keys = []
+
+    while queue:
+        curr = queue.pop(0)
+        sorted_keys.append(curr)
+        for neighbor in adj[curr]:
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                queue.append(neighbor)
+
+    for fk in json_files_dict.keys():
+        if fk not in sorted_keys:
+            sorted_keys.append(fk)
+
+    return sorted_keys
+
+
+def collect_required_profiles_capabilities_recursive(json_files_dict: dict, profile_names: list, visited: set = None) -> dict:
+    """Recursively aggregates capability blocks across parent profile inheritance hierarchies."""
+    if visited is None:
+        visited = set()
+
+    aggregated_caps = {}
+    for pname in profile_names:
+        if pname in visited:
+            continue
+        visited.add(pname)
+
+        p_obj, p_file_data = get_profile_and_file_data(json_files_dict, pname)
+        if not p_obj or not p_file_data:
+            continue
+
+        parent_profiles = p_obj.get("profiles", [])
+        if parent_profiles:
+            parent_caps = collect_required_profiles_capabilities_recursive(json_files_dict, parent_profiles, visited)
+            deep_merge_dict(aggregated_caps, parent_caps)
+
+        direct_caps = collect_profile_capabilities(json_files_dict, p_file_data, p_obj)
+        deep_merge_dict(aggregated_caps, direct_caps)
+
+    return aggregated_caps
+
+
 def collect_required_profiles_capabilities(json_files_dict: dict, required_profile_names: list[str], visited_profiles: set[str] = None) -> dict:
     """Traverses required parent profile hierarchies and aggregates their capabilities."""
-    if visited_profiles is None:
-        visited_profiles = set()
-
-    collected_capabilities: dict = {}
-
-    for profile_name in required_profile_names:
-        if profile_name in visited_profiles:
-            continue
-        visited_profiles.add(profile_name)
-
-        profile_obj, json_file_data = get_profile_and_file_data(json_files_dict, profile_name)
-        if not profile_obj or not json_file_data:
-            logging.error(f"Required parent profile '{profile_name}' not found in loaded JSON files!")
-            continue
-
-        ancestor_profiles = profile_obj.get("profiles", [])
-        if ancestor_profiles:
-            ancestor_caps = collect_required_profiles_capabilities(json_files_dict, ancestor_profiles, visited_profiles)
-            deep_merge_dict(collected_capabilities, ancestor_caps)
-
-        capabilities_dict = json_file_data.get("capabilities", {})
-        parsed_caps = parse_profile_capabilities(profile_obj.get("capabilities", []))
-
-        for item in parsed_caps:
-            if isinstance(item, str):
-                if item in capabilities_dict:
-                    deep_merge_dict(collected_capabilities, capabilities_dict[item])
-
-    return collected_capabilities
+    return collect_required_profiles_capabilities_recursive(json_files_dict, required_profile_names, visited_profiles)
 
 
 def collect_profile_capabilities(json_files_dict: dict, json_file_data: dict, profile_obj: dict) -> dict:

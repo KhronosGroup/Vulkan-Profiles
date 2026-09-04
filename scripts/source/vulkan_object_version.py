@@ -267,28 +267,3 @@ def get_active_property_bundles(api_version: VK_VERSION, vk: Any = None) -> list
         if api_version >= get_bundle_structure_core_version(b)
     ]
 
-
-def get_version_string() -> str:
-    """
-    Returns the vkprofiles version string based on the baked build version.
-    """
-    try:
-        from source.baked_version import BAKED_VERSION
-        if BAKED_VERSION:
-            return f"vkprofiles version {BAKED_VERSION} (ALPHA)"
-    except ImportError:
-        pass
-
-    return "vkprofiles version unknown"
-
-
-def main_version(args=None) -> str:
-    """
-    Handler for the 'version' subcommand and top-level --version option.
-    """
-    version_str = get_version_string()
-
-    if args is not None:
-        print(version_str)
-
-    return version_str
