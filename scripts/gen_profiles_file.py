@@ -23,8 +23,10 @@
 from datetime import datetime
 import argparse
 import json
+import logging
 import re
 import os
+import sys
 import collections
 
 import gen_profiles_solution
@@ -130,7 +132,7 @@ class ProfileConfig():
             paths = [input_dir + '/' + pos_json for pos_json in os.listdir(input_dir) if pos_json.endswith('.json')]
             json_files = list()
             for i in range(len(paths)):
-                print('Opening: ' + paths[i])
+                logging.debug('Opening: ' + paths[i])
                 file = open(paths[i], "r")
                 json_files.append(json.load(file))
             # We need to iterate through profile names first, so the indices of jsons and profiles lists will match
@@ -144,8 +146,8 @@ class ProfileConfig():
                             profiles_not_found.remove(profile_name)
                             break
                 if profiles_not_found:
-                    print('Profiles: ' + ' '.join(profiles_not_found) + ' not found in directory ' + input_dir)
-                    exit()
+                    logging.error('Profiles: ' + ' '.join(profiles_not_found) + ' not found in directory ' + input_dir)
+                    sys.exit(1)
             else:
                 for json_file in json_files:
                     if 'profiles' in json_file:
@@ -154,8 +156,8 @@ class ProfileConfig():
                             self.input_profile_values.append(json_file['profiles'][profile])
                             self.input_profile_names.append(profile)
         else:
-            print('ERROR: No input directory set, use --input')
-            exit()
+            logging.error('No input directory set, use --input')
+            sys.exit(1)
 
     def get_api_version(self, profiles, merge_mode):
         api_version = self.get_api_version_list(profiles[0]['api-version'])
@@ -176,7 +178,7 @@ class ProfileConfig():
                         api_version = current_api_version
                         break
             else:
-                print('ERROR: Unknown mode when computing api-version')
+                logging.error('Unknown mode when computing api-version')
         return api_version
 
     def get_api_version_list(self, ver):
@@ -201,7 +203,7 @@ class ProfileMerger():
     def merge(self, profile_config, profile_file, mode, strip_duplicate_struct):
         self.mode = mode
 
-        print('Building a Vulkan ' + '.'.join(profile_config.api_version) + ' profile')
+        logging.info('Building a Vulkan ' + '.'.join(profile_config.api_version) + ' profile')
 
         capabilities_key = profile_config.name + "_block"
 
@@ -251,7 +253,7 @@ class ProfileMerger():
                             if not extension in capability['extensions']:
                                 del merged_extensions[extension]
                     else:
-                        print("ERROR: Unknown combination mode: " + self.mode)
+                        logging.error("Unknown combination mode: " + self.mode)
                         
                 if 'features' in capability:
                     for feature in capability['features']:
@@ -378,7 +380,7 @@ class ProfileMerger():
                                         merged_qfp.append(qfp)
 
                     else:
-                        print("ERROR: Unknown combination mode: " + self.mode)
+                        logging.error("Unknown combination mode: " + self.mode)
 
                 if 'videoProfiles' in capability:
                     if self.mode == 'intersection':
@@ -422,7 +424,7 @@ class ProfileMerger():
                             merged_video_profiles.append(video_profile)
 
                     else:
-                        print("ERROR: Unknown combination mode: " + self.mode)
+                        logging.error("Unknown combination mode: " + self.mode)
 
         capabilities = dict()
         if merged_extensions:
@@ -594,7 +596,7 @@ class ProfileMerger():
                     elif struct[member] != merged[struct_name][member]:
                         del merged[struct_name][member]
             else:
-                print("ERROR: Unknown combination mode: " + self.mode)
+                logging.error("Unknown combination mode: " + self.mode)
         else:
             if self.mode == 'union' or self.first is True:
                 merged[struct_name] = struct
@@ -604,7 +606,7 @@ class ProfileMerger():
         if property != None:
             for member in list(merged):
                 if (member not in self.registry.structs[property].members):
-                    print('member: ' + member)
+                    logging.debug('member: ' + member)
                     continue
 
                 xmlmember = self.registry.structs[property].members[member]
@@ -709,7 +711,7 @@ class ProfileMerger():
                 union_set = merged_set.union(entry_set)
                 merged[member] = list(union_set)
             else:
-                print("ERROR: Unknown limitype: " + xmlmember.limittype + " for " + member)
+                logging.error("Unknown limittype: " + xmlmember.limittype + " for " + member)
         elif self.mode == 'intersection':
             if 'max' in xmlmember.limittype or xmlmember.limittype == 'bits':
                 if xmlmember.type == 'VkExtent2D':
@@ -743,7 +745,7 @@ class ProfileMerger():
                     if entry[member] < merged[member]:
                         merged[member] = entry[member]
                 else:
-                    print("ERROR: '" + member + " 'values with 'max' limittype unknown case.")
+                    logging.error("'" + member + "' values with 'max' limittype unknown case.")
             elif 'min' in xmlmember.limittype:
                 if xmlmember.type == 'VkExtent2D':
                     if entry[member]['width'] < merged[member]['width']:
@@ -776,7 +778,7 @@ class ProfileMerger():
                     if entry[member] > merged[member]:
                         merged[member] = entry[member]
                 else:
-                    print("ERROR: '" + member + " 'values with 'min' limittype unknown case.")
+                    logging.error("'" + member + "' values with 'min' limittype unknown case.")
             elif xmlmember.limittype == 'bitmask':
                 remove_list = []
                 for value in merged[member]:
@@ -795,9 +797,9 @@ class ProfileMerger():
                 intersection_set = merged_set.intersection(entry_set)
                 merged[member] = list(intersection_set)
             else:
-                print("ERROR: Unknown limitype: " + xmlmember.limittype + " for " + member)
+                logging.error("Unknown limittype: " + xmlmember.limittype + " for " + member)
         else:
-            print("ERROR: Unknown combination mode: " + self.mode)
+            logging.error("Unknown combination mode: " + self.mode)
 
     def find_higher_struct(self, struct1, struct2):
         if self.registry.structs[struct1].definedByVersion:
@@ -897,19 +899,19 @@ if __name__ == '__main__':
     profile_configs = list()
 
     if args.registry is None:
-        gen_profiles_solution.Log.e('Merging the profiles requires specifying --registry')
+        logging.error('Merging the profiles requires specifying --registry')
         parser.print_help()
-        exit()
+        sys.exit(1)
 
     registry = gen_profiles_solution.VulkanRegistry(args.registry)
 
     if (args.mode.lower() != 'union' and args.mode.lower() != 'intersection'):
-        gen_profiles_solution.Log.e('Mode must be either union or intersection')
+        logging.error('Mode must be either union or intersection')
         parser.print_help()
-        exit()
+        sys.exit(1)
 
     if args.strip_duplicate_structs:
-        gen_profiles_solution.Log.i('Stripping duplicated structures. `--strip-duplicate-structs` is set. Eg the output profiles file will contain VkPhysicalDeviceVulkan11Properties not VkPhysicalDeviceMultiviewPropertiesKHR.')
+        logging.info('Stripping duplicated structures. `--strip-duplicate-structs` is set. Eg the output profiles file will contain VkPhysicalDeviceVulkan11Properties not VkPhysicalDeviceMultiviewPropertiesKHR.')
         strip_duplicate_struct = True
     else:
         strip_duplicate_struct = False
@@ -926,14 +928,14 @@ if __name__ == '__main__':
 
         if args.profile_name is not None:
             if not re.match('^VP_[A-Z0-9]+[A-Za-z0-9]+', args.profile_name):
-                gen_profiles_solution.Log.e('Invalid profile_name, must follow regex pattern ^VP_[A-Z0-9]+[A-Za-z0-9]+')
-                exit()
+                logging.error('Invalid profile_name, must follow regex pattern ^VP_[A-Z0-9]+[A-Za-z0-9]+')
+                sys.exit(1)
             else:
                 profile_config.name = args.profile_name
         elif args.output_profile is not None:
             if not re.match('^VP_[A-Z0-9]+[A-Za-z0-9]+', args.output_profile):
-                gen_profiles_solution.Log.e('Invalid output_profile, must follow regex pattern ^VP_[A-Z0-9]+[A-Za-z0-9]+')
-                exit()
+                logging.error('Invalid output_profile, must follow regex pattern ^VP_[A-Z0-9]+[A-Za-z0-9]+')
+                sys.exit(1)
             else:
                 profile_config.name = args.output_profile
 
@@ -983,4 +985,3 @@ if __name__ == '__main__':
             strip_duplicate_struct)
 
     profile_file.dump(args.output_path)
-    

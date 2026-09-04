@@ -5,19 +5,7 @@
 # Copyright (c) 2026-2026 LunarG, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License")
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-# Authors: 
-# - Christophe Riccio <christophe@lunarg.com>
+# ...
 
 import logging
 import argparse
@@ -53,10 +41,14 @@ class ValidateAction(argparse.Action):
 
 
 def main(argv):
-    logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
-    
     parser = argparse.ArgumentParser(description='Convert Vulkan profile JSON file')
+    
     parser.add_argument('--version', '-v', action='version', version=get_version_string())
+
+    log_group = parser.add_mutually_exclusive_group()
+    log_group.add_argument('--verbose', action='store_true', help='Enable verbose output including debug messages.')
+    log_group.add_argument('--quiet', action='store_true', help='Suppress warning and informational messages.')
+
     subparsers = parser.add_subparsers(dest='command', required=True)
 
     validate_parser = subparsers.add_parser('validate', help='Validate a profile file against a profile schema or perform static analysis.')
@@ -139,6 +131,15 @@ def main(argv):
 
     args = parser.parse_args(argv)
 
+    if args.quiet:
+        log_level = logging.ERROR
+    elif args.verbose:
+        log_level = logging.DEBUG
+    else:
+        log_level = logging.WARNING
+
+    logging.basicConfig(level=log_level, format='%(levelname)s: %(message)s', force=True)
+
     if args.command == 'convert':
         main_convert(args)
     elif args.command == 'validate':
@@ -162,5 +163,5 @@ def main(argv):
 
 
 if __name__ == '__main__':
-    print(sys.executable)
     sys.exit(main(sys.argv[1:]))
+    

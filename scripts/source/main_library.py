@@ -21,6 +21,7 @@
 
 import os
 import sys
+import logging
 import tempfile
 import argparse
 import gen_profiles_solution
@@ -30,7 +31,7 @@ from source.main_validate import main_validate
 
 def main_library(args):
     if not args.registry or not args.input:
-        gen_profiles_solution.Log.e("Generating the profile library requires specifying --registry and --input")
+        logging.error("Generating the profile library requires specifying --registry and --input")
         sys.exit(1)
 
     api = getattr(args, 'api', 'vulkan') or 'vulkan'
@@ -62,7 +63,7 @@ def main_library(args):
         out_src = out_inc
 
     if not out_inc and not validate_val:
-        gen_profiles_solution.Log.e("At least one action (--output, --output-inc, or --validate) must be provided")
+        logging.error("At least one action (--output, --output-inc, or --validate) must be provided")
         sys.exit(1)
 
     if out_inc or out_src:
