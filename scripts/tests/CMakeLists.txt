@@ -72,6 +72,5 @@ add_custom_target(convert_android ALL
         --format flatten
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     COMMENT "Testing vkprofiles with Android Vulkan profiles..."
-    VERBATIM
-)
-
+    VERBATIM)
+add_dependencies(convert_android VpProfilesProcessor python_venv)

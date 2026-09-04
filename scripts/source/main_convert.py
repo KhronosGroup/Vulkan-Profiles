@@ -462,11 +462,20 @@ def pull_extension_dependencies_capabilities_block(
 
     block_exts = json_profiles_capabilities_block["extensions"]
     original_extensions = set(block_exts.keys()) if isinstance(block_exts, dict) else set(block_exts)
+    original_order = list(block_exts.keys()) if isinstance(block_exts, dict) else list(block_exts)
 
     filtered_deps = {}
+    # Preserve original extension order
+    for ext_name in original_order:
+        if ext_name in raw_deps:
+            if ext_name in original_extensions or ext_name not in context_extensions:
+                filtered_deps[ext_name] = 1 if ignore_extension_versions else raw_deps[ext_name]
+
+    # Append newly added dependent extensions at the end in discovery order
     for ext_name, ext_ver in raw_deps.items():
-        if ext_name in original_extensions or ext_name not in context_extensions:
-            filtered_deps[ext_name] = 1 if ignore_extension_versions else ext_ver
+        if ext_name not in filtered_deps:
+            if ext_name in original_extensions or ext_name not in context_extensions:
+                filtered_deps[ext_name] = 1 if ignore_extension_versions else ext_ver
 
     json_profiles_capabilities_block["extensions"] = filtered_deps
 
@@ -926,18 +935,27 @@ def pull_aliases_capabilities_block(
     enabled_exts = profile_enabled_exts if profile_enabled_exts is not None else (block_exts | inherited_exts)
 
     for category in ("features", "properties"):
-        category_block = {}
-        if category in inherited_caps:
-            deep_merge_dict(category_block, inherited_caps[category])
-        if category in json_profiles_capabilities_block:
-            deep_merge_dict(category_block, json_profiles_capabilities_block[category])
+        block_cat = json_profiles_capabilities_block.get(category, {})
+        inh_cat = inherited_caps.get(category, {})
 
-        if not category_block:
+        if not block_cat and not inh_cat:
             continue
+
+        category_block = {}
+        if inh_cat:
+            deep_merge_dict(category_block, inh_cat)
+        if block_cat:
+            deep_merge_dict(category_block, block_cat)
+
+        ordered_struct_names = list(block_cat.keys()) if isinstance(block_cat, dict) else []
+        for s_name in category_block.keys():
+            if s_name not in ordered_struct_names:
+                ordered_struct_names.append(s_name)
 
         new_category_block = {}
 
-        for struct_name, members in category_block.items():
+        for struct_name in ordered_struct_names:
+            members = category_block[struct_name]
             is_dict = isinstance(members, dict)
 
             for member in members:
