@@ -142,7 +142,6 @@ add_custom_target(VpGenerate-Libraries
         --output-src ${PROJECT_SOURCE_DIR}/library/source
         --output-filename "vulkan_profiles"
         --mode header+source
-        --convert pull-required-capabilities ignore-extension-versions pull-aliases strip-duplication
         --config release
     COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
@@ -153,7 +152,6 @@ add_custom_target(VpGenerate-Libraries
         --output-src ${PROJECT_SOURCE_DIR}/library/source/debug
         --output-filename "vulkan_profiles"
         --mode header+source
-        --convert pull-required-capabilities ignore-extension-versions pull-aliases strip-duplication
         --config debug
     COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
@@ -164,7 +162,6 @@ add_custom_target(VpGenerate-Libraries
         --output-src ${PROJECT_SOURCE_DIR}/library/test
         --output-filename "generated_vulkan_profiles"
         --mode header+source
-        --convert pull-required-capabilities ignore-extension-versions pull-aliases strip-duplication
         --config release
     COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
@@ -175,7 +172,6 @@ add_custom_target(VpGenerate-Libraries
         --output-src ${PROJECT_SOURCE_DIR}/library/test
         --output-filename "generated_vulkan_profiles_debug"
         --mode header+source
-        --convert pull-required-capabilities ignore-extension-versions pull-aliases strip-duplication
         --config debug
     COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
@@ -185,6 +181,7 @@ add_custom_target(VpGenerate-Libraries
         --output ${PROJECT_SOURCE_DIR}/library/test
         --output-src ${PROJECT_SOURCE_DIR}/library/test
         --output-filename "generated_vulkan_profiles_android"
+        --convert strip-duplication
         --mode header+source
         --config release
     VERBATIM
