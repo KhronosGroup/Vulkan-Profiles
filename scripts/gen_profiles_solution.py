@@ -22,6 +22,7 @@
 import os
 import re
 import copy
+import logging
 import itertools
 import functools
 import argparse
@@ -3173,21 +3174,6 @@ def genCConditionForFlags(condition, variable):
     return c_cond
 
 
-class Log():
-    def f(msg):
-        print('FATAL: ' + msg)
-        raise Exception(msg)
-
-    def e(msg):
-        print('ERROR: ' + msg)
-
-    def w(msg):
-        print('WARNING: ' + msg)
-
-    def i(msg):
-        print(msg)
-
-
 class VulkanPlatform():
     def __init__(self, data):
         self.name = data.get('name')
@@ -3347,11 +3333,11 @@ class VulkanVideoCodec():
                 result.append(videoFormatCategory)
             if not foundVideoFormatCategory:
                 if hadMatchWithMissingPrerequisities is not None:
-                    Log.e("Video format from category {0} with missing prerequisites:\n{1}".format(hadMatchWithMissingPrerequisities.name, json.dumps(videoFormat, indent=4)))
+                    logging.error("Video format from category {0} with missing prerequisites:\n{1}".format(hadMatchWithMissingPrerequisities.name, json.dumps(videoFormat, indent=4)))
                 else:
-                    Log.e("Unrecognized video format category for imageUsageFlags in video format:\n{0}".format(json.dumps(videoFormat, indent=4)))
+                    logging.error("Unrecognized video format category for imageUsageFlags in video format:\n{0}".format(json.dumps(videoFormat, indent=4)))
         else:
-            Log.f("Missing imageUsageFlags from video format:\n{0}".format(json.dumps(videoFormat, indent=4)))
+            logging.error("Missing imageUsageFlags from video format:\n{0}".format(json.dumps(videoFormat, indent=4)))
 
         return result
 
@@ -3372,7 +3358,7 @@ class VulkanVersionNumber():
                 self.minor = int(match.group(2))
                 self.patch = int(match.group(3))
             else:
-                Log.f("Invalid API version string: '{0}'".format(versionStr))
+                logging.error("Invalid API version string: '{0}'".format(versionStr))
 
         # Construct version number pre-processor definition's name
         if targetApi == 'vulkan':
@@ -3381,7 +3367,7 @@ class VulkanVersionNumber():
             self.versionStructSuffic = '{0}{1}'.format(self.major, self.minor)
 
         elif targetApi is not None:
-            Log.f("Unknown target API '{0}'".format(targetApi))
+            logging.error("Unknown target API '{0}'".format(targetApi))
 
     def get_api_version_string(self):
         return 'VK_API_VERSION_' + str(self.major) + '_' + str(self.minor)
@@ -3499,16 +3485,16 @@ struct_with_dynamic_array_size_cap = ["VkPhysicalDeviceHostImageCopyProperties",
 
 class VulkanRegistry():
     def __init__(self, registryFile, api = 'vulkan'):
-        Log.i("Loading registry file: '{0}'".format(registryFile))
+        logging.info("Loading registry file: '{0}'".format(registryFile))
         xml = etree.parse(registryFile)
         stripNonmatchingAPIs(xml.getroot(), api, actuallyDelete = True)
 
         videoRegistryFile = registryFile.replace('vk.xml', 'video.xml')
         if os.path.isfile(videoRegistryFile):
-            Log.i("Loading video registry file: '{0}'".format(videoRegistryFile))
+            logging.info("Loading video registry file: '{0}'".format(videoRegistryFile))
             videoxml = etree.parse(videoRegistryFile)
         else:
-            Log.w("Video registry file '{0}' does not exist, building without video support".format(videoRegistryFile))
+            logging.warning("Video registry file '{0}' does not exist, building without video support".format(videoRegistryFile))
             videoxml = None
 
         self.api = api
@@ -3573,7 +3559,7 @@ class VulkanRegistry():
                 self.versions[feature.get('name')] = VulkanVersion(feature, self.api)
                 self.parseRequireRemove(feature)
             else:
-                Log.f("Unsupported feature with number '{0}'".format(feature.get('number')))
+                logging.error("Unsupported feature with number '{0}'".format(feature.get('number')))
 
     def parseExtensionInfo(self, xml):
         self.extensions = dict()
@@ -3590,7 +3576,7 @@ class VulkanRegistry():
                     foundNameEnum = True
                     break
             if not foundNameEnum:
-                Log.f("Cannot find name enum for extension '{0}'".format(name))
+                logging.error("Cannot find name enum for extension '{0}'".format(name))
 
             self.parseRequireRemove(ext)
 
@@ -3650,7 +3636,7 @@ class VulkanRegistry():
                             # Handle xml bug
                             structDef.members['name'].arraySize = 'VK_MAX_PHYSICAL_DEVICE_DATA_GRAPH_OPERATION_SET_NAME_SIZE_ARM'
                         else:
-                            Log.f("Unsupported array format for struct member '{0}::{1}'".format(structDef.name, name))
+                            logging.error("Unsupported array format for struct member '{0}::{1}'".format(structDef.name, name))
 
                     # If it has a "len" attribute then it's also an array, just a dynamically sized one
                     if member.get('len') != None:
@@ -3768,7 +3754,7 @@ class VulkanRegistry():
                     if bitsName in self.enums:
                         bitmaskDef.bitsType = self.enums[bitsName]
                     else:
-                        Log.f("Could not find bits enum '{0}' for bitmask '{1}'".format(bitsName, bitmaskDef.name))
+                        logging.error("Could not find bits enum '{0}' for bitmask '{1}'".format(bitsName, bitmaskDef.name))
                 else:
                     # This bitmask doesn't have any bits defined
                     pass
@@ -3784,7 +3770,7 @@ class VulkanRegistry():
             for constant in constants:
                 self.constants[constant.get('name')] = constant.get('value')
         else:
-            Log.f("Failed to find API constants in the registry")
+            logging.error("Failed to find API constants in the registry")
 
     def parseAliases(self, xml):
         # Find any struct aliases
@@ -3878,7 +3864,7 @@ class VulkanRegistry():
                             baseEnumDef.values.append(value)
                     aliasEnumDef.values = baseEnumDef.values
                 else:
-                    Log.f("Failed to find alias '{0}' of enum '{1}'".format(alias, enum.get('name')))
+                    logging.error("Failed to find alias '{0}' of enum '{1}'".format(alias, enum.get('name')))
 
         # Find any enum value aliases
         for enum in xml.findall("./enums"):
@@ -3924,7 +3910,7 @@ class VulkanRegistry():
                     aliasBitmaskDef.aliases = baseBitmaskDef.aliases
                     aliasBitmaskDef.aliases.append(name)
                 else:
-                    Log.f("Failed to find alias '{0}' of bitmask '{1}'".format(alias, bitmask.get('name')))
+                    logging.error("Failed to find alias '{0}' of bitmask '{1}'".format(alias, bitmask.get('name')))
 
         # Find any constant aliases
         for constant in xml.find("./enums[@name='API Constants']").findall("./enum[@alias]"):
@@ -4150,9 +4136,9 @@ class VulkanRegistry():
                     if videoFormatExtend in videoCodec.formats:
                         videoFormat = videoCodec.formats[videoFormatExtend]
                     else:
-                        Log.f("Video format category '{0}' not found but it is attempted to be extended".format(videoFormatExtend))
+                        logging.error("Video format category '{0}' not found but it is attempted to be extended".format(videoFormatExtend))
                 else:
-                    Log.f('"name" or "extend" is attribute is required for "videoformat" element')
+                    logging.error('"name" or "extend" is attribute is required for "videoformat" element')
 
                 for xmlVideoFormatProperties in xmlVideoFormat.findall("./videoformatproperties"):
                     propertiesStructName = xmlVideoFormatProperties.get('struct')
@@ -4186,14 +4172,14 @@ class VulkanRegistry():
             for alias in self.structs['VkVideoFormatPropertiesKHR'].aliases:
                 if alias in format:
                     return format[alias]
-            Log.f("Did not find base video format properties in video format:\n{0}".format(json.dumps(format, indent=4)))
+            logging.error("Did not find base video format properties in video format:\n{0}".format(json.dumps(format, indent=4)))
             return None
 
     def getVideoCodecFromVideoProfile(self, videoProfile):
         base = self.getBaseVideoProfileInfoFromVideoProfile(videoProfile)
         if base is not None and 'videoCodecOperation' in base:
             if base['videoCodecOperation'] not in self.videoCodecsByValue:
-                Log.f("Unrecognized videoCodecOperation in video profile:\n{0}".format(json.dumps(videoProfile['profile'], indent=4)))
+                logging.error("Unrecognized videoCodecOperation in video profile:\n{0}".format(json.dumps(videoProfile['profile'], indent=4)))
             return self.videoCodecsByValue[base['videoCodecOperation']]
         else:
             # No VkVideoProfileInfoKHR in the profile definition or no videoCodecOperation specified
@@ -4250,9 +4236,9 @@ class VulkanRegistry():
             if 'chromaSubsampling' in base:
                 # Include chroma subsampling info in the name as it is present
                 if len(base['chromaSubsampling']) != 1:
-                    Log.f("Expected chromaSubsampling to only contain a single value in video profile:\n{0}".format(json.dumps(profile, indent=4)))
+                    logging.error("Expected chromaSubsampling to only contain a single value in video profile:\n{0}".format(json.dumps(profile, indent=4)))
                 if base['chromaSubsampling'][0] not in chromaSubsamplingMap:
-                    Log.f("Unrecognized chromaSubsampling in video profile:\n%s".format(json.dumps(profile, indent=4)))
+                    logging.error("Unrecognized chromaSubsampling in video profile:\n%s".format(json.dumps(profile, indent=4)))
                 chromaSubsampling = chromaSubsamplingMap[base['chromaSubsampling'][0]]
             else:
                 chromaSubsampling = None
@@ -4267,18 +4253,18 @@ class VulkanRegistry():
             })
             if 'lumaBitDepth' in base:
                 if len(base['lumaBitDepth']) != 1:
-                    Log.f("Expected lumaBitDepth to only contain a single value in video profile:\n{0}".format(json.dumps(profile, indent=4)))
+                    logging.error("Expected lumaBitDepth to only contain a single value in video profile:\n{0}".format(json.dumps(profile, indent=4)))
                 if base['lumaBitDepth'][0] not in bitDepthMap:
-                    Log.f("Unrecognized lumaBitDepth in profile:\n{0}".format(json.dumps(profile, indent=4)))
+                    logging.error("Unrecognized lumaBitDepth in profile:\n{0}".format(json.dumps(profile, indent=4)))
                 lumaBitDepth = bitDepthMap[base['lumaBitDepth'][0]]
             else:
                 lumaBitDepth = None
 
             if chromaSubsampling != 'monochrome' and 'chromaBitDepth' in base:
                 if len(base['chromaBitDepth']) != 1:
-                    Log.f("Expected chromaBitDepth to only contain a single value in video profile:\n{0}".format(json.dumps(profile, indent=4)))
+                    logging.error("Expected chromaBitDepth to only contain a single value in video profile:\n{0}".format(json.dumps(profile, indent=4)))
                 if base['chromaBitDepth'][0] not in bitDepthMap:
-                    Log.f("Unrecognized chromaBitDepth in profile:\n{0}".format(json.dumps(profile, indent=4)))
+                    logging.error("Unrecognized chromaBitDepth in profile:\n{0}".format(json.dumps(profile, indent=4)))
                 chromaBitDepth = bitDepthMap[base['chromaBitDepth'][0]]
             else:
                 # For monochrome chromaBitDepth is ignored
@@ -4319,7 +4305,7 @@ class VulkanRegistry():
                 if isinstance(profileStructMemberValue, bool):
                     profileStructMemberValue = 'VK_TRUE' if profileStructMemberValue else 'VK_FALSE'
                 if profileStructMemberValue not in profileStructMember.values:
-                    Log.f("Unrecognized profile struct member value for '{0}::{1}' in video profile:\n{2}".format(profileStruct.struct, profileStructMember.name, json.dumps(profile, indent=4)))
+                    logging.error("Unrecognized profile struct member value for '{0}::{1}' in video profile:\n{2}".format(profileStruct.struct, profileStructMember.name, json.dumps(profile, indent=4)))
 
                 # Append codec-specific profile information to the profile name
                 profileName += " {0}".format(profileStructMember.values[profileStructMemberValue])
@@ -4332,7 +4318,7 @@ class VulkanRegistry():
                 self.structs[structName].members[memberName].limittype in invalid_values):
                 self.structs[structName].members[memberName].limittype = correct_value
             elif (self.structs[structName].members[memberName].limittype != correct_value):
-                Log.w("Profiles is overwriting {0}::{1} to {2}, but current XML value is {3}".format(structName, memberName, correct_value, self.structs[structName].members[memberName].limittype))
+                logging.warning("Profiles is overwriting {0}::{1} to {2}, but current XML value is {3}".format(structName, memberName, correct_value, self.structs[structName].members[memberName].limittype))
 
     def applyWorkarounds(self):
         if self.headerVersionNumber.patch < 207: # vk.xml declares maxColorAttachments with 'bitmask' limittype before header 207
@@ -4591,11 +4577,11 @@ class VulkanRegistry():
     def getChainableStructDef(self, name, extends):
         structDef = self.structs.get(name)
         if structDef == None:
-            Log.f("Structure '{0}' does not exist".format(name))
+            logging.error("Structure '{0}' does not exist".format(name))
         if structDef.sType == None:
-            Log.f("Structure '{0}' is not chainable".format(name))
+            logging.error("Structure '{0}' is not chainable".format(name))
         if not extends in structDef.extends + [ name ]:
-            Log.f("Structure '{0}' does not extend '{1}'".format(name, extends))
+            logging.error("Structure '{0}' does not extend '{1}'".format(name, extends))
         return structDef
 
     def evalArraySize(self, arraySize):
@@ -4603,7 +4589,7 @@ class VulkanRegistry():
             if arraySize in self.constants:
                 return int(self.constants[arraySize])
             else:
-                Log.f("Invalid array size '{0}'".format(arraySize))
+                logging.error("Invalid array size '{0}'".format(arraySize))
         else:
             return arraySize
 
@@ -4649,7 +4635,7 @@ class VulkanProfileCapabilities():
 
     def mergeProfileCapData(self, dst, src):
         if type(src) != type(dst):
-            Log.f("Data type confict during profile capability data merge (src is '{0}', dst is '{1}')".format(type(src), type(dst)))
+            logging.error("Data type confict during profile capability data merge (src is '{0}', dst is '{1}')".format(type(src), type(dst)))
         elif type(src) == dict:
             for key, val in src.items():
                 if type(val) == dict:
@@ -4670,11 +4656,11 @@ class VulkanProfileCapabilities():
                         elif type(val) is float and type(dst[key]) is int:
                             dst[key] = float(val)
                         else:
-                            Log.f("'{0}' data type conflict during profile capability data merge (src is '{1}', dst is '{2}')".format(key, type(val), type(dst[key])))
+                            logging.error("'{0}' data type conflict during profile capability data merge (src is '{1}', dst is '{2}')".format(key, type(val), type(dst[key])))
                     else:
                         dst[key] = val
         else:
-            Log.f("Unexpected data type during profile capability data merge (src is '{0}', dst is '{1}')".format(type(src), type(dst)))
+            logging.error("Unexpected data type during profile capability data merge (src is '{0}', dst is '{1}')".format(type(src), type(dst)))
 
     def mergeProfileExtensions(self, registry, data):
         if data.get('extensions') != None:
@@ -4687,9 +4673,9 @@ class VulkanProfileCapabilities():
                     elif extInfo.type == 'device':
                         self.deviceExtensions[extName] = specVer
                     else:
-                        Log.f("Extension '{0}' has invalid type '{1}'".format(extName, extInfo.type))
+                        logging.error("Extension '{0}' has invalid type '{1}'".format(extName, extInfo.type))
                 else:
-                    Log.f("Extension '{0}' does not exist".format(extName))
+                    logging.error("Extension '{0}' does not exist".format(extName))
 
     def mergeProfileFeatures(self, data):
         if data.get('features') != None:
@@ -4907,7 +4893,7 @@ class VulkanProfile():
         if versionName in self.registry.versions:
             self.versionRequirements.append(versionName)
         else:
-            Log.f("No version '{0}' found in registry required by profile '{1}'".format(str(self.apiVersionNumber), self.key))
+            logging.error("No version '{0}' found in registry required by profile '{1}'".format(str(self.apiVersionNumber), self.key))
 
         # Add any required extension to the list of requirements
         for key, value in self.split_capabilities.items():
@@ -4915,7 +4901,7 @@ class VulkanProfile():
                 if extName in self.registry.extensions:
                     self.extensionRequirements.append(extName)
                 else:
-                    Log.f("Extension '{0}' required by profile '{1}' does not exist".format(extName, self.key))
+                    logging.error("Extension '{0}' required by profile '{1}' does not exist".format(extName, self.key))
 
 
     def validate(self):
@@ -4965,15 +4951,15 @@ class VulkanProfile():
 
             if not depFound:
                 if structDef.definedByExtensions and structDef.definedByVersion:
-                    Log.e("Unexpected required struct '{0}' in profile '{1}', this struct requires API version '{2}' or an extension '{3}' which are not required in the capabilities block '{4}'.\n".format(structName, self.key, structDef.definedByVersion, ', '.join(structDef.definedByExtensions), capabilities_key))
+                    logging.error("Unexpected required struct '{0}' in profile '{1}', this struct requires API version '{2}' or an extension '{3}' which are not required in the capabilities block '{4}'.\n".format(structName, self.key, structDef.definedByVersion, ', '.join(structDef.definedByExtensions), capabilities_key))
                 elif structDef.definedByExtensions:
-                    Log.e("Unexpected required struct '{0}' in profile '{1}', this struct requires an extension '{2}' which is not required in the capabilities block '{3}'.\n".format(structName, self.key, ', '.join(structDef.definedByExtensions), capabilities_key))
+                    logging.error("Unexpected required struct '{0}' in profile '{1}', this struct requires an extension '{2}' which is not required in the capabilities block '{3}'.\n".format(structName, self.key, ', '.join(structDef.definedByExtensions), capabilities_key))
                 elif structDef.definedByVersion:
-                    Log.e("Unexpected required struct '{0}' in profile '{1}', this struct requires API version '{2}' which is not required in the capabilities block '{3}'.\n".format(structName, self.key, structDef.definedByVersion, capabilities_key))
+                    logging.error("Unexpected required struct '{0}' in profile '{1}', this struct requires API version '{2}' which is not required in the capabilities block '{3}'.\n".format(structName, self.key, structDef.definedByVersion, capabilities_key))
                 else:
-                    Log.e("Unexpected required struct '{0}' in capabilities block '{1}' of profile '{2}'.\n".format(structName, capabilities_key, self.key))
+                    logging.error("Unexpected required struct '{0}' in capabilities block '{1}' of profile '{2}'.\n".format(structName, capabilities_key, self.key))
         else:
-            Log.f("Struct '{0}' in profile '{1}' does not exist in the registry".format(structName, self.key))
+            logging.error("Struct '{0}' in profile '{1}' does not exist in the registry".format(structName, self.key))
 
 
     def validateVideoProfiles(self, capabilities_key, capabilities_value):
@@ -4996,13 +4982,13 @@ class VulkanProfile():
             if 'profile' in videoProfile:
                 for videoProfileInfoStruct in videoProfile['profile']:
                     if not isStructInList(videoProfileInfoStruct, ['VkVideoProfileInfoKHR'] + list(videoCodec.profileStructs.keys())):
-                        Log.e("Unexpected video profile info structure '{0}' in video profile '{1}' in profile '{2}'.".format(videoProfileInfoStruct, videoProfileName, self.key))
+                        logging.error("Unexpected video profile info structure '{0}' in video profile '{1}' in profile '{2}'.".format(videoProfileInfoStruct, videoProfileName, self.key))
 
             # Validate that the video capabilities contain only video capability structures allowed by the video codec
             if 'capabilities' in videoProfile:
                 for videoCapabilityStruct in videoProfile['capabilities']:
                     if not isStructInList(videoCapabilityStruct, ['VkVideoCapabilitiesKHR'] + list(videoCodec.capabilities.keys())):
-                        Log.e("Unexpected video capability structure '{0}' in video profile '{1}' in profile '{2}'.".format(videoCapabilityStruct, videoProfileName, self.key))
+                        logging.error("Unexpected video capability structure '{0}' in video profile '{1}' in profile '{2}'.".format(videoCapabilityStruct, videoProfileName, self.key))
 
             # Validate that the video format properties of all video formats contain only video format properties structures allowed by
             # the video format categories of the video codec that the video format falls into
@@ -5012,7 +4998,7 @@ class VulkanProfile():
                     for videoFormatCategory in videoFormatCategories:
                         for videoFormatPropStruct in videoFormat:
                             if not isStructInList(videoFormatPropStruct, ['VkVideoFormatPropertiesKHR'] + list(videoFormatCategory.properties.keys())):
-                                Log.e("Unexpected video format properties structure '{0}' for video format category '{1}' in video profile '{2}' in profile '{3}'.".format(videoFormatPropStruct, videoFormatCategory.name, videoProfileName, self.key))
+                                logging.error("Unexpected video format properties structure '{0}' for video format category '{1}' in video profile '{2}' in profile '{3}'.".format(videoFormatPropStruct, videoFormatCategory.name, videoProfileName, self.key))
 
 
     def generatePrivateImpl(self, debugMessages):
@@ -5107,7 +5093,7 @@ class VulkanProfile():
                     if memberDef != None:
                         gen += self.gen_structFill(fmt, memberDef, var + member + '.', value)
                     else:
-                        Log.f("Member '{0}' in structure '{1}' is not a struct".format(member, structDef.name))
+                        logging.error("Member '{0}' in structure '{1}' is not a struct".format(member, structDef.name))
 
                 elif type(value) == list:
                     # Some sort of list (enums or integer/float list for structure initialization)
@@ -5116,7 +5102,7 @@ class VulkanProfile():
                         continue
                     if structDef.members[member].isArray:
                         if not isinstance(self.registry.evalArraySize(structDef.members[member].arraySize), int):
-                            Log.f("Unsupported array member '{0}' in structure '{1}'".format(member, structDef.name) +
+                            logging.error("Unsupported array member '{0}' in structure '{1}'".format(member, structDef.name) +
                                   "(currently only 1D non-dynamic arrays are supported in this context)")
                         # If it's an array we have to generate per-element assignment code
                         for i, v in enumerate(value):
@@ -5150,7 +5136,7 @@ class VulkanProfile():
                     # Everything else
                     gen += fmt.format('{0}{1} = {2}'.format(var, member, value))
             else:
-                Log.f("No member '{0}' in structure '{1}'".format(member, structDef.name))
+                logging.error("No member '{0}' in structure '{1}'".format(member, structDef.name))
         return gen
 
 
@@ -5212,7 +5198,7 @@ class VulkanProfile():
                     # Compare everything else with equality
                     comparePredFmt = '{0} == {1}'
                 else:
-                    Log.f("Unsupported limittype '{0}' in member '{1}' of structure '{2}'".format(limittype, member, structDef.name))
+                    logging.error("Unsupported limittype '{0}' in member '{1}' of structure '{2}'".format(limittype, member, structDef.name))
 
                 if type(value) == dict:
                     # Nested structure
@@ -5220,7 +5206,7 @@ class VulkanProfile():
                     if memberDef != None:
                         gen += self.gen_structCompare(fmt, memberDef, var + member + '.', value, limittype)
                     else:
-                        Log.f("Member '{0}' in structure '{1}' is not a struct".format(member, structDef.name))
+                        logging.error("Member '{0}' in structure '{1}' is not a struct".format(member, structDef.name))
 
                 elif type(value) == list:
                     # Some sort of list (enums or integer/float list for structure initialization)
@@ -5229,7 +5215,7 @@ class VulkanProfile():
                         continue
                     if structDef.members[member].isArray:
                         if not isinstance(self.registry.evalArraySize(structDef.members[member].arraySize), int):
-                            Log.f("Unsupported array member '{0}' in structure '{1}'".format(member, structDef.name) +
+                            logging.error("Unsupported array member '{0}' in structure '{1}'".format(member, structDef.name) +
                                   "(currently only 1D non-dynamic arrays are supported in this context)")
                         # If it's an array we have to generate per-element comparison code
                         for i in range(len(value)):
@@ -5254,7 +5240,7 @@ class VulkanProfile():
                     elif comparePredFmt is not None:
                         gen += fmt.format(comparePredFmt.format('{0}{1}'.format(var, member), value))
             else:
-                Log.f("No member '{0}' in structure '{1}'".format(member, structDef.name))
+                logging.error("No member '{0}' in structure '{1}'".format(member, structDef.name))
         return gen
 
 
@@ -5608,13 +5594,13 @@ class VulkanProfilesDatabase():
         results = []
         self.recurseRequiredProfiles(self.json_files, results, profile_key)
         if len(results) > 1:
-            Log.i('Required profiles by the {0} profile:'.format(profile_key))
+            logging.info('Required profiles by the {0} profile:'.format(profile_key))
             for result in results:
                 if result != profile_key:
-                    Log.i('- {0}'.format(result))
+                    logging.info('- {0}'.format(result))
 
         else:
-            Log.i('Required profiles by the {0} profile: None'.format(profile_key))
+            logging.info('Required profiles by the {0} profile: None'.format(profile_key))
         return results
 
     def gatherProfileCapabilities(self, json_profile_key, json_profile_value, json_capabilities_value):
@@ -5624,16 +5610,16 @@ class VulkanProfilesDatabase():
             # When we have multiple possible capabilities blocks, we load them all but effectively the API library can't effectively implement this behavior.
             if type(cap_key).__name__ == 'list':
                 for cap_key_case in cap_key:
-                    Log.i('- {0}::{1}'.format(json_profile_key, cap_key_case))
+                    logging.info('- {0}::{1}'.format(json_profile_key, cap_key_case))
                     capabilities_list.append(json_capabilities_value[cap_key_case])
             elif cap_key in json_capabilities_value:
                 capabilities_list.append(json_capabilities_value[cap_key])
-                Log.i('- {0}::{1}'.format(json_profile_key, cap_key))
+                logging.info('- {0}::{1}'.format(json_profile_key, cap_key))
 
         return capabilities_list
 
     def collectProfileCapabilities(self, profile_requirements):
-        Log.i('Required capabilities blocks by the {0} profile:'.format(profile_requirements[0]))
+        logging.info('Required capabilities blocks by the {0} profile:'.format(profile_requirements[0]))
         
         capabilities_list = []
         for required_profile in profile_requirements:
@@ -5675,16 +5661,16 @@ class VulkanProfilesFiles():
                 continue
             fileAbsPath = os.path.join(dirAbsPath, filename)
             if os.path.isfile(fileAbsPath) and os.path.splitext(filename)[-1] == '.json':
-                Log.i("Loading profile file: '{0}'".format(filename))
+                logging.info("Loading profile file: '{0}'".format(filename))
                 with open(fileAbsPath, 'r') as f:
                     json_root = json.load(f)
                     if validate:
                         try:
                             import jsonschema
-                            Log.i("Validating profile file: '{0}'".format(filename))
+                            logging.info("Validating profile file: '{0}'".format(filename))
                             jsonschema.validate(json_root, schema)
                         except ModuleNotFoundError:
-                            Log.w("`jsonschema` module is not installed, schema validation skip")
+                            logging.warning("`jsonschema` module is not installed, schema validation skip")
                     self.json_profiles_database.json_files.append(json_root)
 
         for json_file_data in self.json_profiles_database.json_files:
@@ -5692,7 +5678,7 @@ class VulkanProfilesFiles():
 
     def parseProfiles(self, registry, json_profiles, json_caps):
         for json_profile_key, json_profile_value in json_profiles.items():
-            Log.i("Registering profile '{0}'".format(json_profile_key))
+            logging.info("Registering profile '{0}'".format(json_profile_key))
             if json_profile_key not in self.profiles:
                 self.profiles[json_profile_key] = VulkanProfile(registry, self.json_profiles_database, json_profile_key, json_profile_value, json_caps)
 
@@ -5727,7 +5713,7 @@ class VulkanProfilesLibraryGenerator():
 
     def generate_h(self, outDir):
         fileAbsPath = os.path.join(os.path.abspath(outDir), "{0}.h".format(self.outputFilename))
-        Log.i("Generating '{0}'...".format(fileAbsPath))
+        logging.info("Generating '{0}'...".format(fileAbsPath))
         with open(fileAbsPath, 'w') as f:
             f.write(COPYRIGHT_HEADER)
             f.write(H_HEADER)
@@ -5738,7 +5724,7 @@ class VulkanProfilesLibraryGenerator():
 
     def generate_cpp(self, outDir):
         fileAbsPath = os.path.join(os.path.abspath(outDir), "{0}.cpp".format(self.outputFilename))
-        Log.i("Generating '{0}'...".format(fileAbsPath))
+        logging.info("Generating '{0}'...".format(fileAbsPath))
         with open(fileAbsPath, 'w') as f:
             f.write(COPYRIGHT_HEADER)
             f.write(SHARED_INCLUDE)
@@ -5753,7 +5739,7 @@ class VulkanProfilesLibraryGenerator():
 
     def generate_hpp(self, outDir):
         fileAbsPath = os.path.join(os.path.abspath(outDir), '{0}.hpp'.format(self.outputFilename))
-        Log.i("Generating '{0}'...".format(fileAbsPath))
+        logging.info("Generating '{0}'...".format(fileAbsPath))
         with open(fileAbsPath, 'w') as f:
             f.write(COPYRIGHT_HEADER)
             f.write(HPP_HEADER)
@@ -6179,13 +6165,13 @@ class VulkanProfilesSchemaGenerator():
     def validate(self):
         try:
             import jsonschema
-            Log.i("Validating JSON profiles schema...")
+            logging.info("Validating JSON profiles schema...")
             jsonschema.Draft7Validator.check_schema(self.schema)
         except ModuleNotFoundError:
-            Log.w("`jsonschema` module is not installed, schema validation skip")
+            logging.warning("`jsonschema` module is not installed, schema validation skip")
 
     def generate(self, outSchema):
-        Log.i("Generating '{0}'...".format(outSchema))
+        logging.info("Generating '{0}'...".format(outSchema))
         with open(outSchema, 'w') as f:
             f.write(json.dumps(self.schema, indent=4))
 
@@ -6560,7 +6546,7 @@ class VulkanProfilesSchemaGenerator():
                 # Generate bitmask definition
                 self.gen_bitmask(type, definitions)
             else:
-                Log.f("Unknown type '{0}'".format(type))
+                logging.error("Unknown type '{0}'".format(type))
 
         return gen
 
@@ -6650,7 +6636,7 @@ class VulkanProfilesSchemaGenerator():
 
             if memberDef.type in self.registry.externalTypes and not memberDef.type in definitions:
                 # Members with types defined externally and aren't manually defined are ignored
-                Log.w("Ignoring member '{0}' in struct '{1}' with external type '{2}'".format(memberName, name, memberDef.type))
+                logging.warning("Ignoring member '{0}' in struct '{1}' with external type '{2}'".format(memberName, name, memberDef.type))
                 continue
 
             if memberDef.isArray:
@@ -6658,10 +6644,10 @@ class VulkanProfilesSchemaGenerator():
                     # This array is a dynamic one (count + pointer to array) which is not allowed
                     # for return structures. Such structures hence are ill-formed and shouldn't
                     # be included in the schema
-                    Log.w("Ignoring member '{0}' in struct '{1}' containing ill-formed pointer to array".format(memberName, name))
+                    logging.warning("Ignoring member '{0}' in struct '{1}' containing ill-formed pointer to array".format(memberName, name))
                 else:
                     if memberDef.arraySizeMember != None and name in struct_with_dynamic_array_size_cap:
-                        Log.w("Member '{0}' in struct '{1}' is a pointer to array with a known maximum size, it will be ignored in the API library, but supported in the layer".format(memberName, name))
+                        logging.warning("Member '{0}' in struct '{1}' is a pointer to array with a known maximum size, it will be ignored in the API library, but supported in the layer".format(memberName, name))
                     members[memberDef.name] = self.gen_array(memberDef.type, memberDef.arraySize, memberDef.arraySizeCap, definitions)
             else:
                 members[memberDef.name] = self.gen_type(memberDef.type, definitions)
@@ -6813,7 +6799,7 @@ class VulkanProfilesDocGenerator():
 
 
     def generate(self, outDoc):
-        Log.i("Generating '{0}'...".format(outDoc))
+        logging.info("Generating '{0}'...".format(outDoc))
         with open(outDoc, 'w') as f:
             f.write(self.gen_doc())
 
@@ -7057,7 +7043,7 @@ class VulkanProfilesDocGenerator():
                     featureStructName = 'VkPhysicalDeviceFeatures'
                     features = features['features']
                 elif self.has_nestedFeatureData(features):
-                    Log.f("Unexpected nested feature data in profile '{0}' structure '{1}'".format(profile.name, featureStructName))
+                    logging.error("Unexpected nested feature data in profile '{0}' structure '{1}'".format(profile.name, featureStructName))
                 # If this is an alias structure then find the non-alias one and use that
                 featureStructName = self.registry.getNonAliasTypeName(featureStructName, self.registry.structs)
                 # Copy defined feature structure data
@@ -7174,7 +7160,7 @@ class VulkanProfilesDocGenerator():
         elif limittype == 'range':
             return member + ' (min-max)'
         else:
-            Log.f("Unexpected limittype '{0}'".format(limittype))
+            logging.error("Unexpected limittype '{0}'".format(limittype))
 
 
     def getLimitStructSynonyms(self, struct, member):
@@ -7890,19 +7876,19 @@ if __name__ == '__main__':
 
     if args.output_library_inc != None:
         if args.registry is None or args.input is None or args.output_library_inc is None:
-            Log.e("Generating the profile library requires specifying --registry, --input and --output-library-inc arguments")
+            logging.error("Generating the profile library requires specifying --registry, --input and --output-library-inc arguments")
             parser.print_help()
             exit()
 
     if args.output_schema != None:
         if args.registry is None:
-            Log.e("Generating the profile schema requires specifying --registry and ---output-schema arguments")
+            logging.error("Generating the profile schema requires specifying --registry and ---output-schema arguments")
             parser.print_help()
             exit()
 
     if args.output_doc != None:
         if args.registry is None or args.input is None:
-            Log.e("Generating the profile schema requires specifying --registry, --input and --output-doc arguments")
+            logging.error("Generating the profile schema requires specifying --registry, --input and --output-doc arguments")
             parser.print_help()
             exit()
 

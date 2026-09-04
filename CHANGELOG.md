@@ -16,8 +16,8 @@
 ### Features:
 - Implement `VK_NO_PROTOTYPES` support #734
 - Add `vkprofiles` executable which bundles the python scripts in a standalone executable
-  - Validate profiles JSON file with `validate` command
-  - Generate profiles schema file with `schema` command
+  - Add `convert` command to pull Vulkan requirements and aliases capabilities on JSON profiles
+  - Add `validate` command and add profiles analysis to check semantics
 
 ### Improvements:
 - Improve profiles schema to support capabilities dynamic structures

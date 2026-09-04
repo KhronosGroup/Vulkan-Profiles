@@ -20,6 +20,7 @@
 # - Christophe Riccio <christophe@lunarg.com>
 
 import sys
+import logging
 import argparse
 import gen_profiles_solution
 from source.main_validate import main_validate
@@ -27,7 +28,7 @@ from source.main_validate import main_validate
 
 def main_doc(args):
     if not args.registry or not args.input or not args.output:
-        gen_profiles_solution.Log.e("Generating markdown documentation requires specifying --registry, --input, and --output")
+        logging.error("Generating markdown documentation requires specifying --registry, --input, and --output")
         sys.exit(1)
 
     if getattr(args, 'validate', False):
