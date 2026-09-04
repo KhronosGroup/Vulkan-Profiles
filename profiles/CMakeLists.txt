@@ -118,7 +118,7 @@ add_custom_target(VpGenerate-ProfilesDesktopBaseline ALL
 set_target_properties(VpGenerate-ProfilesDesktopBaseline PROPERTIES FOLDER "Profiles generator")
 add_dependencies(VpGenerate-ProfilesDesktopBaseline VpProfilesProcessor VpGenerate-ProfilesSchema)
 
-add_custom_target(VpGenerate-Libraries
+add_custom_target(VpGenerate-Libraries ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/library/include/vulkan
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/library/include/vulkan/debug
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/library/source
