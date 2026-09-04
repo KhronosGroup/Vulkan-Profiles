@@ -31,7 +31,7 @@ if str(scripts_dir) not in sys.path:
 
 from vulkan_object import VulkanObject
 from source.vulkan_object_utils import initVulkanObject
-from source.main_convert import strip_profiles_files_capabilities_duplication
+from source.main_convert import strip_duplication_profiles_files
 
 
 class TestConvertStripDuplication(unittest.TestCase):
@@ -121,7 +121,7 @@ class TestConvertStripDuplication(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+        strip_duplication_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
@@ -200,7 +200,7 @@ class TestConvertStripDuplication(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+        strip_duplication_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
@@ -334,7 +334,7 @@ class TestConvertStripDuplication(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+        strip_duplication_profiles_files(self.vk, json_files_dict)
 
         generated_data = json_files_dict["test_profile.json"]
         expected_data = json.loads(expected_json_text)
@@ -450,7 +450,7 @@ class TestConvertStripDuplication(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+        strip_duplication_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
@@ -535,7 +535,7 @@ class TestConvertStripDuplication(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+        strip_duplication_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
@@ -617,7 +617,7 @@ class TestConvertStripDuplication(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+        strip_duplication_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
@@ -694,7 +694,7 @@ class TestConvertStripDuplication(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+        strip_duplication_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
@@ -795,7 +795,7 @@ class TestConvertStripDuplication(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+        strip_duplication_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
@@ -872,7 +872,7 @@ class TestConvertStripDuplication(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+        strip_duplication_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
@@ -977,7 +977,7 @@ class TestConvertStripDuplication(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+        strip_duplication_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
@@ -1032,7 +1032,7 @@ class TestConvertStripDuplication(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+        strip_duplication_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
@@ -1090,7 +1090,7 @@ class TestConvertStripDuplication(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        strip_profiles_files_capabilities_duplication(self.vk, json_files_dict)
+        strip_duplication_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
