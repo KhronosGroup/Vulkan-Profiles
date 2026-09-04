@@ -57,17 +57,16 @@ set(REGISTRY_PATH "${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan
 set(PROFILES_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../profiles/Android")
 set(PROFILES_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/profiles")
 
-add_custom_target(convert_android
+add_custom_target(convert_android ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory "${PROFILES_OUTPUT_DIR}"
     COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${REGISTRY_PATH}"
         ${VENV_PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/../profiles.py" convert
         --registry "${REGISTRY_PATH}/vk.xml"
         --input "${PROFILES_INPUT_DIR}"
         --output "${PROFILES_OUTPUT_DIR}"
-        --mode pull-extension-dependencies
-               pull-promoted-extensions
+        --mode pull-required-capabilities
                ignore-extension-versions
-               pull-required-capabilities
+               pull-promoted-extensions               
                pull-aliases
                strip-duplication
         --format flatten
