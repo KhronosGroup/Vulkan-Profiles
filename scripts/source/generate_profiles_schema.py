@@ -20,10 +20,10 @@
 # - Christophe Riccio <christophe@lunarg.com>
 
 import json
+import logging
 from collections import OrderedDict
 
 from source.vulkan_object_utils import gatherDynamicStructs
-from source.log import Log
 
 EXTERNAL_TYPES = {
     "Display", "VisualID", "Window", "ANativeWindow", "wl_display", "wl_surface",
@@ -45,13 +45,13 @@ class VulkanProfilesSchemaGenerator2():
     def validate(self):
         try:
             import jsonschema
-            Log.i("Validating JSON profiles schema...")
+            logging.info("Validating JSON profiles schema...")
             jsonschema.Draft7Validator.check_schema(self.schema)
         except ModuleNotFoundError:
-            Log.w("`jsonschema` module is not installed, schema validation skip")
+            logging.warning("`jsonschema` module is not installed, schema validation skip")
 
     def generate(self, outSchema):
-        Log.i("Generating '{0}'...".format(outSchema))
+        logging.info("Generating '{0}'...".format(outSchema))
         with open(outSchema, 'w') as f:
             f.write(json.dumps(self.schema, indent=4))
 
@@ -587,3 +587,4 @@ class VulkanProfilesSchemaGenerator2():
 
     def gen_videoFormats(self, definitions):
         return self.gen_structChainDefinitions("VkVideoFormatPropertiesKHR", definitions)
+    

@@ -142,6 +142,7 @@ add_custom_target(VpGenerate-Libraries
         --output-src ${PROJECT_SOURCE_DIR}/library/source
         --output-filename "vulkan_profiles"
         --mode header+source
+        --convert pull-required-capabilities ignore-extension-versions pull-aliases strip-duplication
         --config release
     COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
@@ -152,6 +153,29 @@ add_custom_target(VpGenerate-Libraries
         --output-src ${PROJECT_SOURCE_DIR}/library/source/debug
         --output-filename "vulkan_profiles"
         --mode header+source
+        --convert pull-required-capabilities ignore-extension-versions pull-aliases strip-duplication
+        --config debug
+    COMMAND ${VKPROFILES_EXE} library
+        --api ${API_TYPE}
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_LIST_DIR}
+        --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY_TEST}
+        --output ${PROJECT_SOURCE_DIR}/library/test
+        --output-src ${PROJECT_SOURCE_DIR}/library/test
+        --output-filename "generated_vulkan_profiles"
+        --mode header+source
+        --convert pull-required-capabilities ignore-extension-versions pull-aliases strip-duplication
+        --config release
+    COMMAND ${VKPROFILES_EXE} library
+        --api ${API_TYPE}
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_LIST_DIR}
+        --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY_TEST}
+        --output ${PROJECT_SOURCE_DIR}/library/test
+        --output-src ${PROJECT_SOURCE_DIR}/library/test
+        --output-filename "generated_vulkan_profiles_debug"
+        --mode header+source
+        --convert pull-required-capabilities ignore-extension-versions pull-aliases strip-duplication
         --config debug
     COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
@@ -163,26 +187,6 @@ add_custom_target(VpGenerate-Libraries
         --output-filename "generated_vulkan_profiles_android"
         --mode header+source
         --config release
-    COMMAND ${VKPROFILES_EXE} library
-        --api ${API_TYPE}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-        --input ${CMAKE_CURRENT_LIST_DIR}
-        --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY_TEST}
-        --output ${PROJECT_SOURCE_DIR}/library/test
-        --output-src ${PROJECT_SOURCE_DIR}/library/test
-        --output-filename "generated_vulkan_profiles"
-        --mode header+source
-        --config release
-    COMMAND ${VKPROFILES_EXE} library
-        --api ${API_TYPE}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-        --input ${CMAKE_CURRENT_LIST_DIR}
-        --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY_TEST}
-        --output ${PROJECT_SOURCE_DIR}/library/test
-        --output-src ${PROJECT_SOURCE_DIR}/library/test
-        --output-filename "generated_vulkan_profiles_debug"
-        --mode header+source
-        --config debug
     VERBATIM
     SOURCES ${PROFILES_FILES}
     DEPENDS ${PROFILES_FILES} python_venv)

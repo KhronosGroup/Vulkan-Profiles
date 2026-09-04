@@ -22,6 +22,7 @@
 import os
 import sys
 import json
+import logging
 import argparse
 import tempfile
 import gen_profiles_solution
@@ -47,7 +48,7 @@ def main_merge(args):
         main_validate(validate_args)
 
     if not args.registry:
-        gen_profiles_solution.Log.e("Merging profiles requires specifying --registry")
+        logging.error("Merging profiles requires specifying --registry")
         sys.exit(1)
 
     registry = gen_profiles_solution.VulkanRegistry(args.registry, api)
@@ -57,7 +58,7 @@ def main_merge(args):
     input_profiles = getattr(args, 'input_profiles', None)
 
     if not config_path and not input_dir:
-        gen_profiles_solution.Log.e("Merging profiles requires specifying either --config or --input")
+        logging.error("Merging profiles requires specifying either --config or --input")
         sys.exit(1)
 
     profile_file = gen_profiles_file.ProfileFile()
@@ -133,4 +134,3 @@ def main_merge(args):
             main_convert(convert_args)
     else:
         profile_file.dump(output_path, getattr(args, 'format', None))
-        
