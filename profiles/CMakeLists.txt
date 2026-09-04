@@ -30,6 +30,7 @@ set(PROFILES_FILES_FOR_INSTALL
     LunarG/VP_LUNARG_desktop_baseline.json
     Android/VP_ANDROID_vulkan_profile_2021.json
     Android/VP_ANDROID_vulkan_profile_2022.json
+    Android/VP_ANDROID_vulkan_profile_2025.json
 )
 
 set(PROFILES_FILES_FOR_API_LIBRARY
@@ -45,7 +46,7 @@ set(PROFILES_FILES_FOR_VULKAN_HEADER_DOC
 )
 
 set(PROFILES_FILES_FOR_ANDROID_DOC
-    "VP_ANDROID_15_requirements.json,VP_ANDROID_16_requirements.json,VP_ANDROID_vulkan_profile_2021.json,VP_ANDROID_vulkan_profile_2022.json"
+    "VP_ANDROID_vulkan_profile_2021.json,VP_ANDROID_vulkan_profile_2022.json,VP_ANDROID_vulkan_profile_2025.json"
 )
 
 # Generate profiles schema
@@ -101,7 +102,7 @@ add_custom_target(VpGenerate-ProfilesDesktopMax ALL
     SOURCES ${PROFILES_FILES}
     DEPENDS ${PROFILES_FILES} python_venv)
 set_target_properties(VpGenerate-ProfilesDesktopMax PROPERTIES FOLDER "Profiles generator")
-add_dependencies(VpGenerate-ProfilesDesktopMax VpGenerate-ProfilesSchema)
+add_dependencies(VpGenerate-ProfilesDesktopMax VpProfilesProcessor VpGenerate-ProfilesSchema)
 
 add_custom_target(VpGenerate-ProfilesDesktopBaseline ALL
     COMMAND ${VKPROFILES_EXE} merge
@@ -115,7 +116,7 @@ add_custom_target(VpGenerate-ProfilesDesktopBaseline ALL
     SOURCES ${PROFILES_FILES}
     DEPENDS ${PROFILES_FILES} python_venv)
 set_target_properties(VpGenerate-ProfilesDesktopBaseline PROPERTIES FOLDER "Profiles generator")
-add_dependencies(VpGenerate-ProfilesDesktopBaseline VpGenerate-ProfilesSchema)
+add_dependencies(VpGenerate-ProfilesDesktopBaseline VpProfilesProcessor VpGenerate-ProfilesSchema)
 
 add_custom_target(VpGenerate-Libraries
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/library/include/vulkan
@@ -186,7 +187,7 @@ add_custom_target(VpGenerate-Libraries
     SOURCES ${PROFILES_FILES}
     DEPENDS ${PROFILES_FILES} python_venv)
 set_target_properties(VpGenerate-Libraries PROPERTIES FOLDER "Profiles generator")
-add_dependencies(VpGenerate-Libraries VpGenerate-ProfilesDesktopBaseline VpGenerate-ProfilesDesktopMax)
+add_dependencies(VpGenerate-Libraries VpProfilesProcessor VpGenerate-ProfilesDesktopBaseline VpGenerate-ProfilesDesktopMax)
 
 add_custom_target(VpGenerate-Markdown
     COMMAND ${VKPROFILES_EXE} doc
@@ -211,7 +212,7 @@ add_custom_target(VpGenerate-Markdown
     SOURCES ${PROFILES_FILES}
     DEPENDS ${PROFILES_FILES} python_venv)
 set_target_properties(VpGenerate-Markdown PROPERTIES FOLDER "Profiles generator")
-add_dependencies(VpGenerate-Markdown VpGenerate-ProfilesDesktopBaseline VpGenerate-ProfilesDesktopMax)
+add_dependencies(VpGenerate-Markdown VpProfilesProcessor VpGenerate-ProfilesDesktopBaseline VpGenerate-ProfilesDesktopMax)
 
 add_custom_target(VpTestIntersect ALL
     COMMAND ${VKPROFILES_EXE} merge
