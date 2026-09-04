@@ -389,6 +389,85 @@ class TestConvertPullAliases(unittest.TestCase):
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
 
+    def test_pull_aliases_core_and_extension_features(self):
+        """
+        Verifies that expanding feature aliases in a single Vulkan 1.1 profile block
+        populates all corresponding structural and extension aliases for:
+        - VkPhysicalDeviceShaderDrawParameterFeatures <-> VkPhysicalDeviceShaderDrawParametersFeatures
+        - VkPhysicalDeviceVariablePointerFeatures <-> VkPhysicalDeviceVariablePointersFeatures (and KHR variants)
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_profile_combined_aliases": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "extensions": {
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_variable_pointers": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceShaderDrawParameterFeatures": {
+                            "shaderDrawParameters": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeatures": {
+                            "variablePointersStorageBuffer": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_profile_combined_aliases": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "extensions": {
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_variable_pointers": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceShaderDrawParameterFeatures": {
+                            "shaderDrawParameters": true
+                        },
+                        "VkPhysicalDeviceShaderDrawParametersFeatures": {
+                            "shaderDrawParameters": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeatures": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceVariablePointersFeatures": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceVariablePointersFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_aliases_profiles_files(self.vk, False, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
