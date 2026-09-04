@@ -75,8 +75,8 @@ class ConvertBits(str, Enum):
     PULL_PROMOTED_EXTENSIONS = 'pull-promoted-extensions'      # Requires all extensions promoted to core up to the profile's target Vulkan version.
     IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions'    # Sets all required extension versions to 1, overriding specific extension spec versions.
     PULL_ALIASES = 'pull-aliases'                              # Resolves and populates all equivalent capability aliases across core structures and extensions.
-    STRIP_DUPLICATION = 'strip-duplication'                    # Removes redundant duplicate features, properties, and extension requirements across inheritance trees and within blocks.
     CONSOLIDATE = 'consolidate'                                # Merges all mandatory capability blocks into a single consolidated requirements block per profile.
+    STRIP_DUPLICATION = 'strip-duplication'                    # Removes redundant duplicate features, properties, and extension requirements across inheritance trees and within blocks.
     STRIP_PROMOTED_EXTENSIONS = 'strip-promoted-extensions'    # Removes extensions that are already promoted to the profile's target core Vulkan version.
     SORT = 'sort'                                              # Sorts capability blocks, structures, and extension lists into canonical Vulkan order.
 
@@ -1556,15 +1556,15 @@ def main_convert(args):
         logging.debug("Pulling capability aliases...")
         pull_aliases_profiles_files(vk, require_promoted_extensions, json_files_dict)
 
-    # Strip Duplication
-    if ConvertBits.STRIP_DUPLICATION in mode_enums:
-        logging.debug("Stripping capabilities duplication...")
-        strip_duplication_profiles_files(vk, json_files_dict)
-
     # Consolidate
     if ConvertBits.CONSOLIDATE in mode_enums:
         logging.debug("Consolidating profile capability blocks...")
         consolidate_profiles_files(json_files_dict)
+
+    # Strip Duplication
+    if ConvertBits.STRIP_DUPLICATION in mode_enums:
+        logging.debug("Stripping capabilities duplication...")
+        strip_duplication_profiles_files(vk, json_files_dict)
 
     # Strip Promoted Extensions
     if ConvertBits.STRIP_PROMOTED_EXTENSIONS in mode_enums:
