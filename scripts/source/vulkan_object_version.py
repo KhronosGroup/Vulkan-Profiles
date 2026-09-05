@@ -230,7 +230,7 @@ def get_feature_bundle_structures(api_version: VK_VERSION = None, vk: Any = None
             for maj in range(2, max_ver.major + 1):
                 for min_v in range(0, (max_ver.minor + 1) if maj == max_ver.major else 5):
                     bundles.append(f"VkPhysicalDeviceVulkan{maj}{min_v}Features")
-    return sorted(list(set(bundles)), key=lambda s: get_bundle_structure_core_version(s).as_tuple())
+    return sorted(list(set(bundles)), key=lambda s: (get_bundle_structure_core_version(s).as_tuple(), s))
 
 
 def get_property_bundle_structures(api_version: VK_VERSION = None, vk: Any = None) -> list[str]:
@@ -249,7 +249,7 @@ def get_property_bundle_structures(api_version: VK_VERSION = None, vk: Any = Non
             for maj in range(2, max_ver.major + 1):
                 for min_v in range(0, (max_ver.minor + 1) if maj == max_ver.major else 5):
                     bundles.append(f"VkPhysicalDeviceVulkan{maj}{min_v}Properties")
-    return sorted(list(set(bundles)), key=lambda s: get_bundle_structure_core_version(s).as_tuple())
+    return sorted(list(set(bundles)), key=lambda s: (get_bundle_structure_core_version(s).as_tuple(), s))
 
 
 def get_active_feature_bundles(api_version: VK_VERSION, vk: Any = None) -> list[str]:
@@ -266,4 +266,4 @@ def get_active_property_bundles(api_version: VK_VERSION, vk: Any = None) -> list
         b for b in get_property_bundle_structures(api_version, vk)
         if api_version >= get_bundle_structure_core_version(b)
     ]
-
+    

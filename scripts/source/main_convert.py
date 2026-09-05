@@ -22,7 +22,7 @@
 import argparse
 import logging
 from pathlib import Path
-from enum import Enum
+from enum import Enum, IntEnum
 from typing import Any
 
 from source.main_validate import main_validate
@@ -85,9 +85,30 @@ class ConvertBits(str, Enum):
     SORT = 'sort'                                              # Sorts capability blocks, structures, and extension lists into canonical Vulkan order.
 
 
-def is_bundle_or_main_core(s: str) -> bool:
-    """Returns True if s is a version bundle structure or main core structure (VkPhysicalDeviceFeatures/Properties)."""
-    return is_bundle_structure(s) or s in ("VkPhysicalDeviceFeatures", "VkPhysicalDeviceProperties")
+class CategoryPriority(IntEnum):
+    """Defines structure category sorting precedence during capability block sorting (lower value = higher priority)."""
+    CORE = 0    # Standard Vulkan core structures (version bundle and split core).
+    KHR = 1     # Khronos-ratified extension structures (*KHR).
+    EXT = 2     # Multivendor extension structures (*EXT).
+    VENDOR = 3  # Single-vendor extension structures (*NV, *AMD, *QCOM, *ARM, etc.).
+
+
+class CoreStructTier(IntEnum):
+    """Categorizes core structures by structural group type when sorting capability blocks."""
+    BUNDLE = 0  # Aggregated versioned bundle structures (e.g., 'VkPhysicalDeviceVulkan12Features').
+    SPLIT = 1   # Fine-grained split core structures (e.g., 'VkPhysicalDeviceMultiviewFeatures').
+
+
+class ExtensionPriority(IntEnum):
+    """Priority order for tie-breaking independent extensions when sorting extension lists."""
+    KHR = 0     # Khronos-ratified extensions (VK_KHR_*).
+    EXT = 1     # Multivendor extensions (VK_EXT_*).
+    VENDOR = 2  # Single-vendor extensions (VK_VENDOR_*).
+
+
+class MemberSortFallback(IntEnum):
+    """Fallback index position for structure members not found in C struct definitions."""
+    UNKNOWN_MEMBER_INDEX = 9999  # Members missing from the vk.xml struct definition are sorted to the end of the dictionary.
 
 
 def canonicalize_capabilities_for_version(
@@ -115,7 +136,7 @@ def canonicalize_capabilities_for_version(
     # 1. Features remapping and deduplication
     sorted_feature_structs = sorted(
         features_dict.keys(),
-        key=lambda s: (0 if is_bundle_or_main_core(s) else 1)
+        key=lambda s: (0 if is_bundle_structure(s) else 1)
     )
 
     for struct_name in sorted_feature_structs:
@@ -157,7 +178,7 @@ def canonicalize_capabilities_for_version(
 
     sorted_property_structs = sorted(
         properties_dict.keys(),
-        key=lambda s: (0 if is_bundle_or_main_core(s) else 1)
+        key=lambda s: (0 if is_bundle_structure(s) else 1)
     )
 
     for struct_name in sorted_property_structs:
@@ -257,7 +278,7 @@ def pull_extension_dependencies_capabilities_block(
     for ext_name, ext_ver in raw_deps.items():
         if ext_name not in filtered_deps:
             if ext_name in original_extensions or ext_name not in context_extensions:
-                filtered_deps[ext_name] = 1 if ignore_extension_versions else ext_ver
+                filtered_deps[ext_name] = 1 if ignore_extension_versions else raw_deps[ext_ver]
 
     json_profiles_capabilities_block["extensions"] = filtered_deps
 
@@ -766,6 +787,7 @@ def pull_aliases_capabilities_block(
                                 target_ext_block.append(alias.name)
 
         if new_category_block:
+            # Preserve original member ordering for existing structures
             for s_name, members_data in new_category_block.items():
                 if isinstance(members_data, dict) and s_name in original_member_orders:
                     orig_order = original_member_orders[s_name]
@@ -1174,7 +1196,7 @@ def get_struct_sort_key(vk: VulkanObject, struct_name: str) -> tuple:
     """
     if struct_name in BUNDLE_STRUCT_VERSIONS:
         ver_val = BUNDLE_STRUCT_VERSIONS[struct_name]
-        return (0, 0, ver_val, struct_name)
+        return (CategoryPriority.CORE, CoreStructTier.BUNDLE, ver_val, struct_name)
 
     is_ext = is_extension_struct_name(vk, struct_name)
 
@@ -1184,24 +1206,24 @@ def get_struct_sort_key(vk: VulkanObject, struct_name: str) -> tuple:
             core_ver = VK_VERSION.V1_0
 
         ver_val = core_ver.as_tuple() if hasattr(core_ver, 'as_tuple') else (1, 0)
-        return (0, 1, ver_val, struct_name)
+        return (CategoryPriority.CORE, CoreStructTier.SPLIT, ver_val, struct_name)
 
     if struct_name.endswith("KHR"):
-        return (1, (0, 0), struct_name)
+        return (CategoryPriority.KHR, (0, 0), struct_name)
     elif struct_name.endswith("EXT"):
-        return (2, (0, 0), struct_name)
+        return (CategoryPriority.EXT, (0, 0), struct_name)
     else:
-        return (3, (0, 0), struct_name)
+        return (CategoryPriority.VENDOR, (0, 0), struct_name)
 
 
 def get_ext_priority_key(ext_name: str) -> tuple:
     """Priority order for tie-breaking independent extensions: KHR -> EXT -> Vendor."""
     if ext_name.startswith("VK_KHR_"):
-        return (0, ext_name)
+        return (ExtensionPriority.KHR, ext_name)
     elif ext_name.startswith("VK_EXT_"):
-        return (1, ext_name)
+        return (ExtensionPriority.EXT, ext_name)
     else:
-        return (2, ext_name)
+        return (ExtensionPriority.VENDOR, ext_name)
 
 
 def sort_extensions(vk: VulkanObject, exts: dict | list) -> dict | list:
@@ -1269,7 +1291,7 @@ def sort_capabilities_block(vk: VulkanObject, json_block: dict):
                         if struct_obj and hasattr(struct_obj, 'members'):
                             member_idx_map = {m.name: idx for idx, m in enumerate(struct_obj.members)}
                             sorted_cat[s_name] = dict(
-                                sorted(struct_data.items(), key=lambda item: member_idx_map.get(item[0], 9999))
+                                sorted(struct_data.items(), key=lambda item: member_idx_map.get(item[0], MemberSortFallback.UNKNOWN_MEMBER_INDEX))
                             )
                         else:
                             sorted_cat[s_name] = struct_data
