@@ -95,7 +95,7 @@ class CategoryPriority(IntEnum):
 
 class CoreStructTier(IntEnum):
     """Categorizes core structures by structural group type when sorting capability blocks."""
-    BUNDLE = 0  # Aggregated versioned bundle structures (e.g., 'VkPhysicalDeviceVulkan12Features').
+    BUNDLE = 0  # Aggregated versioned bundle structures (e.g., 'VkPhysicalDeviceFeatures', 'VkPhysicalDeviceVulkan12Features').
     SPLIT = 1   # Fine-grained split core structures (e.g., 'VkPhysicalDeviceMultiviewFeatures').
 
 
@@ -109,6 +109,21 @@ class ExtensionPriority(IntEnum):
 class MemberSortFallback(IntEnum):
     """Fallback index position for structure members not found in C struct definitions."""
     UNKNOWN_MEMBER_INDEX = 9999  # Members missing from the vk.xml struct definition are sorted to the end of the dictionary.
+
+
+def _restore_member_orders(target_dict: dict[str, dict], original_orders: dict[str, list[str]]):
+    """Restores pre-existing member key insertion sequence for non-bundle structures."""
+    for struct_name, members in target_dict.items():
+        if isinstance(members, dict) and struct_name in original_orders:
+            orig_order = original_orders[struct_name]
+            reordered = {}
+            for m_name in orig_order:
+                if m_name in members:
+                    reordered[m_name] = members[m_name]
+            for m_name, val in members.items():
+                if m_name not in reordered:
+                    reordered[m_name] = val
+            target_dict[struct_name] = reordered
 
 
 def canonicalize_capabilities_for_version(
@@ -128,12 +143,11 @@ def canonicalize_capabilities_for_version(
     active_feature_bundles = get_active_feature_bundles(api_version)
     active_property_bundles = get_active_property_bundles(api_version)
 
-    # Capture original member key sequence for pre-existing structures
-    original_feature_member_orders = {
-        s: list(m.keys()) for s, m in features_dict.items() if isinstance(m, dict)
-    }
+    # Capture original member key sequence for pre-existing structures[cite: 21]
+    orig_feature_orders = {s: list(m.keys()) for s, m in features_dict.items() if isinstance(m, dict)}
+    orig_property_orders = {s: list(p.keys()) for s, p in properties_dict.items() if isinstance(p, dict)}
 
-    # 1. Features remapping and deduplication
+    # 1. Features remapping and deduplication[cite: 21]
     sorted_feature_structs = sorted(
         features_dict.keys(),
         key=lambda s: (0 if is_bundle_structure(s) else 1)
@@ -158,24 +172,9 @@ def canonicalize_capabilities_for_version(
             for member_name, val in members.items():
                 new_features.setdefault(struct_name, {})[member_name] = val
 
-    # Restore original input member key sequence for non-sorted operations
-    for struct_name, members in new_features.items():
-        if isinstance(members, dict) and struct_name in original_feature_member_orders:
-            orig_order = original_feature_member_orders[struct_name]
-            reordered = {}
-            for m_name in orig_order:
-                if m_name in members:
-                    reordered[m_name] = members[m_name]
-            for m_name, val in members.items():
-                if m_name not in reordered:
-                    reordered[m_name] = val
-            new_features[struct_name] = reordered
+    _restore_member_orders(new_features, orig_feature_orders)
 
-    # 2. Properties remapping and deduplication
-    original_property_member_orders = {
-        s: list(p.keys()) for s, p in properties_dict.items() if isinstance(p, dict)
-    }
-
+    # 2. Properties remapping and deduplication[cite: 21]
     sorted_property_structs = sorted(
         properties_dict.keys(),
         key=lambda s: (0 if is_bundle_structure(s) else 1)
@@ -193,17 +192,7 @@ def canonicalize_capabilities_for_version(
         if not is_covered:
             new_properties[struct_name] = prop_data
 
-    for struct_name, prop_data in new_properties.items():
-        if isinstance(prop_data, dict) and struct_name in original_property_member_orders:
-            orig_order = original_property_member_orders[struct_name]
-            reordered = {}
-            for p_name in orig_order:
-                if p_name in prop_data:
-                    reordered[p_name] = prop_data[p_name]
-            for p_name, val in prop_data.items():
-                if p_name not in reordered:
-                    reordered[p_name] = val
-            new_properties[struct_name] = reordered
+    _restore_member_orders(new_properties, orig_property_orders)
 
     return new_features, new_properties
 
@@ -278,7 +267,7 @@ def pull_extension_dependencies_capabilities_block(
     for ext_name, ext_ver in raw_deps.items():
         if ext_name not in filtered_deps:
             if ext_name in original_extensions or ext_name not in context_extensions:
-                filtered_deps[ext_name] = 1 if ignore_extension_versions else raw_deps[ext_ver]
+                filtered_deps[ext_name] = 1 if ignore_extension_versions else ext_ver
 
     json_profiles_capabilities_block["extensions"] = filtered_deps
 
@@ -787,19 +776,7 @@ def pull_aliases_capabilities_block(
                                 target_ext_block.append(alias.name)
 
         if new_category_block:
-            # Preserve original member ordering for existing structures
-            for s_name, members_data in new_category_block.items():
-                if isinstance(members_data, dict) and s_name in original_member_orders:
-                    orig_order = original_member_orders[s_name]
-                    reordered = {}
-                    for m_name in orig_order:
-                        if m_name in members_data:
-                            reordered[m_name] = members_data[m_name]
-                    for m_name, val in members_data.items():
-                        if m_name not in reordered:
-                            reordered[m_name] = val
-                    new_category_block[s_name] = reordered
-
+            _restore_member_orders(new_category_block, original_member_orders)
             json_profiles_capabilities_block[category] = new_category_block
 
     formats_block = {}
