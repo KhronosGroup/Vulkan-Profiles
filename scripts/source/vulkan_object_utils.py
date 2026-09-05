@@ -476,6 +476,23 @@ def is_property_struct_covered_by_bundle(vk: VulkanObject, bundle_name: str, str
     return True
 
 
+def get_struct_vendor_priority(vk: VulkanObject, struct_name: str) -> int:
+    """
+    Returns precedence tier (lower value = higher precedence):
+    0: Core (no vendor/ext suffix)
+    1: KHR extension (*KHR)
+    2: EXT extension (*EXT)
+    3: Vendor extension (*NV, *AMD, *QCOM, *ARM, etc.)
+    """
+    if not is_extension_struct_name(vk, struct_name):
+        return 0
+    if struct_name.endswith("KHR"):
+        return 1
+    if struct_name.endswith("EXT"):
+        return 2
+    return 3
+
+
 def should_remove_struct_a_in_favor_of_b(vk: VulkanObject, version: VK_VERSION, struct_a: str, struct_b: str) -> bool:
     """Determines whether struct_a should be removed in favor of struct_b based on rank, vendor tier, and name."""
     rank_a = get_struct_rank(vk, version, struct_a)
@@ -486,11 +503,12 @@ def should_remove_struct_a_in_favor_of_b(vk: VulkanObject, version: VK_VERSION, 
     elif rank_a > rank_b:
         return False
 
-    is_ext_a = is_extension_struct_name(vk, struct_a)
-    is_ext_b = is_extension_struct_name(vk, struct_b)
-    if is_ext_a and not is_ext_b:
+    tier_a = get_struct_vendor_priority(vk, struct_a)
+    tier_b = get_struct_vendor_priority(vk, struct_b)
+
+    if tier_a > tier_b:
         return True
-    if not is_ext_a and is_ext_b:
+    elif tier_a < tier_b:
         return False
 
     return struct_a > struct_b

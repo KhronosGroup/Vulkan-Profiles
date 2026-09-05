@@ -136,7 +136,7 @@ def canonicalize_capabilities_for_version(
             for member_name, val in members.items():
                 new_features.setdefault(struct_name, {})[member_name] = val
 
-    # Re-order members of feature bundle structures according to C struct definition order in vk.xml
+    # Re-order members of feature bundle structures according to C struct definition order in vk.xml[cite: 13, 15]
     for struct_name, members in new_features.items():
         if is_bundle_structure(struct_name) and isinstance(members, dict):
             struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
@@ -164,7 +164,7 @@ def canonicalize_capabilities_for_version(
         if not is_covered:
             new_properties[struct_name] = prop_data
 
-    # Re-order members of property bundle structures according to C struct definition order in vk.xml
+    # Re-order members of property bundle structures according to C struct definition order in vk.xml[cite: 13, 15]
     for struct_name, prop_data in new_properties.items():
         if is_bundle_structure(struct_name) and isinstance(prop_data, dict):
             struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
@@ -846,7 +846,10 @@ def strip_intra_block_feature_duplication(vk: VulkanObject, version: VK_VERSION,
 
         for other_struct in all_features.keys():
             if other_struct != struct_name and are_structs_aliases_for_version(vk, version, struct_name, other_struct):
-                if should_remove_struct_a_in_favor_of_b(vk, version, struct_name, other_struct):
+                if other_struct in context_features:
+                    structs_to_remove.add(struct_name)
+                    break
+                elif should_remove_struct_a_in_favor_of_b(vk, version, struct_name, other_struct):
                     structs_to_remove.add(struct_name)
                     break
 
@@ -885,7 +888,10 @@ def strip_intra_block_property_duplication(vk: VulkanObject, version: VK_VERSION
 
         for other_struct in all_properties.keys():
             if other_struct != struct_name and are_structs_aliases_for_version(vk, version, struct_name, other_struct):
-                if should_remove_struct_a_in_favor_of_b(vk, version, struct_name, other_struct):
+                if other_struct in context_properties:
+                    structs_to_remove.add(struct_name)
+                    break
+                elif should_remove_struct_a_in_favor_of_b(vk, version, struct_name, other_struct):
                     structs_to_remove.add(struct_name)
                     break
 
@@ -917,7 +923,10 @@ def strip_intra_block_format_duplication(vk: VulkanObject, version: VK_VERSION, 
         for struct_name in list(structs_dict.keys()):
             for other_struct in all_structs.keys():
                 if other_struct != struct_name and are_structs_aliases_for_version(vk, version, struct_name, other_struct):
-                    if should_remove_struct_a_in_favor_of_b(vk, version, struct_name, other_struct):
+                    if isinstance(ctx_structs, dict) and other_struct in ctx_structs:
+                        structs_to_remove.add(struct_name)
+                        break
+                    elif should_remove_struct_a_in_favor_of_b(vk, version, struct_name, other_struct):
                         structs_to_remove.add(struct_name)
                         break
 
