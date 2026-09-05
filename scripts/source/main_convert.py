@@ -136,7 +136,7 @@ def canonicalize_capabilities_for_version(
             for member_name, val in members.items():
                 new_features.setdefault(struct_name, {})[member_name] = val
 
-    # Re-order members of feature bundle structures according to C struct definition order in vk.xml[cite: 13, 15]
+    # Re-order members of feature bundle structures according to C struct definition order in vk.xml
     for struct_name, members in new_features.items():
         if is_bundle_structure(struct_name) and isinstance(members, dict):
             struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
@@ -164,7 +164,7 @@ def canonicalize_capabilities_for_version(
         if not is_covered:
             new_properties[struct_name] = prop_data
 
-    # Re-order members of property bundle structures according to C struct definition order in vk.xml[cite: 13, 15]
+    # Re-order members of property bundle structures according to C struct definition order in vk.xml
     for struct_name, prop_data in new_properties.items():
         if is_bundle_structure(struct_name) and isinstance(prop_data, dict):
             struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
@@ -235,11 +235,21 @@ def pull_extension_dependencies_capabilities_block(
 
     block_exts = json_profiles_capabilities_block["extensions"]
     original_extensions = set(block_exts.keys()) if isinstance(block_exts, dict) else set(block_exts)
+    original_order = list(block_exts.keys()) if isinstance(block_exts, dict) else list(block_exts)
 
     filtered_deps = {}
+
+    # 1. Preserve original declaration order for pre-existing extensions
+    for ext_name in original_order:
+        if ext_name in raw_deps:
+            if ext_name in original_extensions or ext_name not in context_extensions:
+                filtered_deps[ext_name] = 1 if ignore_extension_versions else raw_deps[ext_name]
+
+    # 2. Append newly pulled-in extension dependencies at the end
     for ext_name, ext_ver in raw_deps.items():
-        if ext_name in original_extensions or ext_name not in context_extensions:
-            filtered_deps[ext_name] = 1 if ignore_extension_versions else ext_ver
+        if ext_name not in filtered_deps:
+            if ext_name in original_extensions or ext_name not in context_extensions:
+                filtered_deps[ext_name] = 1 if ignore_extension_versions else ext_ver
 
     json_profiles_capabilities_block["extensions"] = filtered_deps
 
