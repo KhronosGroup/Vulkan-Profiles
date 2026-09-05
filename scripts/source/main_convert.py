@@ -20,9 +20,7 @@
 # - Christophe Riccio <christophe@lunarg.com>
 
 import argparse
-import copy
 import logging
-import re
 from pathlib import Path
 from enum import Enum
 from typing import Any
@@ -31,7 +29,6 @@ from source.main_validate import main_validate
 from source.vulkan_object_version import (
     BUNDLE_STRUCT_VERSIONS,
     is_bundle_structure, 
-    get_bundle_structure_core_version,
     get_active_feature_bundles,
     get_active_property_bundles
 )
@@ -49,19 +46,15 @@ from source.vulkan_object_utils import (
     isStructExtensionEnabled,
     getStructByName,
     getStructCoreVersion,
-    getExtensionPromotedTo,
-    getStructDefiningExtensions,
     is_extension_struct_name,
     are_structs_aliases_for_version,
-    get_struct_rank,
     get_required_extensions_for_struct,
     is_struct_covered_by_bundle,
     is_property_struct_covered_by_bundle,
     should_remove_struct_a_in_favor_of_b,
     is_extension_promoted_to_version,
     StructCapabilityAlias, 
-    ExtensionCapabilityAlias, 
-    CapabilityAlias
+    ExtensionCapabilityAlias
 )
 from source.profiles_json_utils import (
     load_profiles_jsons, 
@@ -92,6 +85,11 @@ class ConvertBits(str, Enum):
     SORT = 'sort'                                              # Sorts capability blocks, structures, and extension lists into canonical Vulkan order.
 
 
+def is_bundle_or_main_core(s: str) -> bool:
+    """Returns True if s is a version bundle structure or main core structure (VkPhysicalDeviceFeatures/Properties)."""
+    return is_bundle_structure(s) or s in ("VkPhysicalDeviceFeatures", "VkPhysicalDeviceProperties")
+
+
 def canonicalize_capabilities_for_version(
     vk: VulkanObject, 
     api_version: VK_VERSION, 
@@ -101,6 +99,7 @@ def canonicalize_capabilities_for_version(
     """
     Remaps split structure capabilities into active bundle structures for api_version
     and removes redundant split structures covered by active bundle structures.
+    Preserves original member key insertion order from input JSON files.
     """
     new_features: dict[str, dict[str, bool]] = {}
     new_properties: dict[str, Any] = {}
@@ -108,13 +107,15 @@ def canonicalize_capabilities_for_version(
     active_feature_bundles = get_active_feature_bundles(api_version)
     active_property_bundles = get_active_property_bundles(api_version)
 
-    def _is_bundle_or_main_core(s: str) -> bool:
-        return is_bundle_structure(s) or s in ("VkPhysicalDeviceFeatures", "VkPhysicalDeviceProperties")
+    # Capture original member key sequence for pre-existing structures
+    original_feature_member_orders = {
+        s: list(m.keys()) for s, m in features_dict.items() if isinstance(m, dict)
+    }
 
     # 1. Features remapping and deduplication
     sorted_feature_structs = sorted(
         features_dict.keys(),
-        key=lambda s: (0 if _is_bundle_or_main_core(s) else 1)
+        key=lambda s: (0 if is_bundle_or_main_core(s) else 1)
     )
 
     for struct_name in sorted_feature_structs:
@@ -136,20 +137,27 @@ def canonicalize_capabilities_for_version(
             for member_name, val in members.items():
                 new_features.setdefault(struct_name, {})[member_name] = val
 
-    # Re-order members of feature bundle structures according to C struct definition order in vk.xml
+    # Restore original input member key sequence for non-sorted operations
     for struct_name, members in new_features.items():
-        if is_bundle_structure(struct_name) and isinstance(members, dict):
-            struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
-            if struct_obj and hasattr(struct_obj, 'members'):
-                member_idx_map = {m.name: idx for idx, m in enumerate(struct_obj.members)}
-                new_features[struct_name] = dict(
-                    sorted(members.items(), key=lambda item: member_idx_map.get(item[0], 9999))
-                )
+        if isinstance(members, dict) and struct_name in original_feature_member_orders:
+            orig_order = original_feature_member_orders[struct_name]
+            reordered = {}
+            for m_name in orig_order:
+                if m_name in members:
+                    reordered[m_name] = members[m_name]
+            for m_name, val in members.items():
+                if m_name not in reordered:
+                    reordered[m_name] = val
+            new_features[struct_name] = reordered
 
     # 2. Properties remapping and deduplication
+    original_property_member_orders = {
+        s: list(p.keys()) for s, p in properties_dict.items() if isinstance(p, dict)
+    }
+
     sorted_property_structs = sorted(
         properties_dict.keys(),
-        key=lambda s: (0 if _is_bundle_or_main_core(s) else 1)
+        key=lambda s: (0 if is_bundle_or_main_core(s) else 1)
     )
 
     for struct_name in sorted_property_structs:
@@ -164,15 +172,17 @@ def canonicalize_capabilities_for_version(
         if not is_covered:
             new_properties[struct_name] = prop_data
 
-    # Re-order members of property bundle structures according to C struct definition order in vk.xml
     for struct_name, prop_data in new_properties.items():
-        if is_bundle_structure(struct_name) and isinstance(prop_data, dict):
-            struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
-            if struct_obj and hasattr(struct_obj, 'members'):
-                member_idx_map = {m.name: idx for idx, m in enumerate(struct_obj.members)}
-                new_properties[struct_name] = dict(
-                    sorted(prop_data.items(), key=lambda item: member_idx_map.get(item[0], 9999))
-                )
+        if isinstance(prop_data, dict) and struct_name in original_property_member_orders:
+            orig_order = original_property_member_orders[struct_name]
+            reordered = {}
+            for p_name in orig_order:
+                if p_name in prop_data:
+                    reordered[p_name] = prop_data[p_name]
+            for p_name, val in prop_data.items():
+                if p_name not in reordered:
+                    reordered[p_name] = val
+            new_properties[struct_name] = reordered
 
     return new_features, new_properties
 
@@ -239,13 +249,11 @@ def pull_extension_dependencies_capabilities_block(
 
     filtered_deps = {}
 
-    # 1. Preserve original declaration order for pre-existing extensions
     for ext_name in original_order:
         if ext_name in raw_deps:
             if ext_name in original_extensions or ext_name not in context_extensions:
                 filtered_deps[ext_name] = 1 if ignore_extension_versions else raw_deps[ext_name]
 
-    # 2. Append newly pulled-in extension dependencies at the end
     for ext_name, ext_ver in raw_deps.items():
         if ext_name not in filtered_deps:
             if ext_name in original_extensions or ext_name not in context_extensions:
@@ -410,7 +418,6 @@ def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: 
                             if satisfied_prop:
                                 deep_merge_dict(transition_properties, satisfied_prop)
 
-                    # Filter Transition Features against Parent Profile
                     parent_features_dict = parent_inherited_caps.get("features", {})
                     parent_enabled_features: set[tuple[str, str]] = set()
                     for s_name, members in parent_features_dict.items():
@@ -445,8 +452,6 @@ def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: 
                             filtered_transition_features[s_name] = new_members
 
                     transition_features = filtered_transition_features
-
-                    # Filter Transition Properties against Parent Profile
                     parent_props_dict = parent_inherited_caps.get("properties", {})
 
                     filtered_transition_properties = {}
@@ -716,6 +721,11 @@ def pull_aliases_capabilities_block(
         if not category_block:
             continue
 
+        original_member_orders = {
+            s: list(m.keys()) for s, m in json_profiles_capabilities_block.get(category, {}).items()
+            if isinstance(m, dict)
+        }
+
         new_category_block = {}
 
         for struct_name, members in category_block.items():
@@ -756,6 +766,18 @@ def pull_aliases_capabilities_block(
                                 target_ext_block.append(alias.name)
 
         if new_category_block:
+            for s_name, members_data in new_category_block.items():
+                if isinstance(members_data, dict) and s_name in original_member_orders:
+                    orig_order = original_member_orders[s_name]
+                    reordered = {}
+                    for m_name in orig_order:
+                        if m_name in members_data:
+                            reordered[m_name] = members_data[m_name]
+                    for m_name, val in members_data.items():
+                        if m_name not in reordered:
+                            reordered[m_name] = val
+                    new_category_block[s_name] = reordered
+
             json_profiles_capabilities_block[category] = new_category_block
 
     formats_block = {}
@@ -1240,7 +1262,21 @@ def sort_capabilities_block(vk: VulkanObject, json_block: dict):
                 key=lambda s: get_struct_sort_key(vk, s)
             )
             for s_name in sorted_struct_names:
-                sorted_cat[s_name] = json_block[category][s_name]
+                struct_data = json_block[category][s_name]
+                if isinstance(struct_data, dict):
+                    if is_bundle_structure(s_name):
+                        struct_obj = vk.structs.get(s_name) or getStructByName(vk.structs, s_name)
+                        if struct_obj and hasattr(struct_obj, 'members'):
+                            member_idx_map = {m.name: idx for idx, m in enumerate(struct_obj.members)}
+                            sorted_cat[s_name] = dict(
+                                sorted(struct_data.items(), key=lambda item: member_idx_map.get(item[0], 9999))
+                            )
+                        else:
+                            sorted_cat[s_name] = struct_data
+                    else:
+                        sorted_cat[s_name] = dict(sorted(struct_data.items(), key=lambda item: item[0]))
+                else:
+                    sorted_cat[s_name] = struct_data
             json_block[category] = sorted_cat
 
     if "formats" in json_block and isinstance(json_block["formats"], dict):
@@ -1250,7 +1286,11 @@ def sort_capabilities_block(vk: VulkanObject, json_block: dict):
             if isinstance(fmt_structs, dict):
                 sorted_fmt_structs = {}
                 for s_name in sorted(fmt_structs.keys(), key=lambda s: get_struct_sort_key(vk, s)):
-                    sorted_fmt_structs[s_name] = fmt_structs[s_name]
+                    s_data = fmt_structs[s_name]
+                    if isinstance(s_data, dict):
+                        sorted_fmt_structs[s_name] = dict(sorted(s_data.items(), key=lambda item: item[0]))
+                    else:
+                        sorted_fmt_structs[s_name] = s_data
                 sorted_formats[fmt_name] = sorted_fmt_structs
             else:
                 sorted_formats[fmt_name] = fmt_structs
