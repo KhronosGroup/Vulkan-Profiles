@@ -32,7 +32,11 @@ from source.vulkan_object_version import (
     VK_VERSION,
     BUNDLE_STRUCT_VERSIONS,
     is_bundle_structure,
-    get_bundle_structure_core_version
+    get_bundle_structure_core_version,
+    get_feature_bundle_structures,
+    get_property_bundle_structures,
+    get_active_feature_bundles,
+    get_active_property_bundles
 )
 
 
@@ -138,20 +142,67 @@ class TestVulkanObjectVersion(unittest.TestCase):
         self.assertTrue(v1_5 >= "1.5.0")
 
     def testBundleStructureDetection(self):
-        """Tests dynamic bundle structure detection and version mapping for current and future versions."""
+        """Tests bundle structure detection and core version mappings for Vulkan 1.0, 1.1-1.4, and future versions."""
+        # Vulkan 1.0 main core bundle structures
         self.assertTrue(is_bundle_structure("VkPhysicalDeviceFeatures"))
+        self.assertTrue(is_bundle_structure("VkPhysicalDeviceProperties"))
+        self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceFeatures"), VK_VERSION.V1_0)
+        self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceProperties"), VK_VERSION.V1_0)
+        self.assertEqual(BUNDLE_STRUCT_VERSIONS["VkPhysicalDeviceFeatures"], (1, 0))
+        self.assertEqual(BUNDLE_STRUCT_VERSIONS["VkPhysicalDeviceProperties"], (1, 0))
+
+        # Vulkan 1.1-1.4 core version bundle structures
         self.assertTrue(is_bundle_structure("VkPhysicalDeviceVulkan11Features"))
+        self.assertTrue(is_bundle_structure("VkPhysicalDeviceVulkan11Properties"))
+        self.assertTrue(is_bundle_structure("VkPhysicalDeviceVulkan12Features"))
+        self.assertTrue(is_bundle_structure("VkPhysicalDeviceVulkan12Properties"))
+        self.assertTrue(is_bundle_structure("VkPhysicalDeviceVulkan13Features"))
+        self.assertTrue(is_bundle_structure("VkPhysicalDeviceVulkan13Properties"))
+        self.assertTrue(is_bundle_structure("VkPhysicalDeviceVulkan14Features"))
+        self.assertTrue(is_bundle_structure("VkPhysicalDeviceVulkan14Properties"))
+
+        # Vulkan 1.1 bundle structures introduced in Vulkan 1.2
+        self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceVulkan11Features"), VK_VERSION.V1_2)
+        self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceVulkan11Properties"), VK_VERSION.V1_2)
+        self.assertEqual(BUNDLE_STRUCT_VERSIONS["VkPhysicalDeviceVulkan11Features"], (1, 2))
+        self.assertEqual(BUNDLE_STRUCT_VERSIONS["VkPhysicalDeviceVulkan11Properties"], (1, 2))
+
+        # Vulkan 1.2-1.4 bundle structures
+        self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceVulkan12Features"), VK_VERSION.V1_2)
+        self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceVulkan13Features"), VK_VERSION.V1_3)
+        self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceVulkan14Properties"), VK_VERSION.V1_4)
+
+        # Dynamic future version bundle structures
         self.assertTrue(is_bundle_structure("VkPhysicalDeviceVulkan15Features"))
         self.assertTrue(is_bundle_structure("VkPhysicalDeviceVulkan20Properties"))
+        self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceVulkan15Features"), VK_VERSION.from_string("1.5"))
+        self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceVulkan20Properties"), VK_VERSION.from_string("2.0"))
+        self.assertEqual(BUNDLE_STRUCT_VERSIONS["VkPhysicalDeviceVulkan15Features"], (1, 5))
+
+        # Non-bundle split/extension structures
+        self.assertFalse(is_bundle_structure("VkPhysicalDeviceMultiviewFeatures"))
         self.assertFalse(is_bundle_structure("VkPhysicalDeviceCustomBorderColorFeaturesEXT"))
 
-        self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceFeatures"), VK_VERSION.V1_0)
-        self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceVulkan11Features"), VK_VERSION.V1_2)
-        self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceVulkan14Properties"), VK_VERSION.V1_4)
-        self.assertEqual(get_bundle_structure_core_version("VkPhysicalDeviceVulkan15Features"), VK_VERSION.from_string("1.5"))
+    def testActiveBundleRetrieval(self):
+        """Tests active feature/property bundle structure retrieval based on target Vulkan API version."""
+        # Vulkan 1.0 / 1.1: No 1.1+ version bundle structures active
+        self.assertEqual(get_active_feature_bundles(VK_VERSION.V1_0), [])
+        self.assertEqual(get_active_property_bundles(VK_VERSION.V1_1), [])
 
-        self.assertEqual(BUNDLE_STRUCT_VERSIONS["VkPhysicalDeviceVulkan11Features"], (1, 2))
-        self.assertEqual(BUNDLE_STRUCT_VERSIONS["VkPhysicalDeviceVulkan15Features"], (1, 5))
+        # Vulkan 1.2: Vulkan 1.1 and 1.2 bundles active
+        expected_v12_features = ["VkPhysicalDeviceVulkan11Features", "VkPhysicalDeviceVulkan12Features"]
+        expected_v12_properties = ["VkPhysicalDeviceVulkan11Properties", "VkPhysicalDeviceVulkan12Properties"]
+        self.assertEqual(get_active_feature_bundles(VK_VERSION.V1_2), expected_v12_features)
+        self.assertEqual(get_active_property_bundles(VK_VERSION.V1_2), expected_v12_properties)
+
+        # Vulkan 1.4: Vulkan 1.1 through 1.4 bundles active
+        expected_v14_features = [
+            "VkPhysicalDeviceVulkan11Features",
+            "VkPhysicalDeviceVulkan12Features",
+            "VkPhysicalDeviceVulkan13Features",
+            "VkPhysicalDeviceVulkan14Features"
+        ]
+        self.assertEqual(get_active_feature_bundles(VK_VERSION.V1_4), expected_v14_features)
 
 
 if __name__ == '__main__':
