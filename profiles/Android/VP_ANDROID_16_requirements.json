@@ -17,22 +17,12 @@
                 "VK_EXT_image_2d_view_of_3d": 1,
                 "VK_EXT_pipeline_protected_access": 1,
                 "VK_EXT_pipeline_robustness": 1,
-                "VK_EXT_transform_feedback": 1
+                "VK_EXT_transform_feedback": 1,
+                "VK_KHR_shader_float_controls": 1
             },
             "features": {
-                "VkPhysicalDeviceFeatures": {
-                    "fullDrawIndexUint32": true,
-                    "shaderInt16": true
-                },
-                "VkPhysicalDeviceVulkan12Features": {
-                    "samplerMirrorClampToEdge": true,
-                    "scalarBlockLayout": true
-                },
-                "VkPhysicalDeviceProtectedMemoryFeatures": {
+                "VkPhysicalDeviceVulkan11Features": {
                     "protectedMemory": true
-                },
-                "VkPhysicalDeviceShaderIntegerDotProductFeatures": {
-                    "shaderIntegerDotProduct": true
                 },
                 "VkPhysicalDeviceTransformFeedbackFeaturesEXT": {
                     "transformFeedback": true
@@ -42,52 +32,117 @@
                 },
                 "VkPhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR": {
                     "shaderSubgroupUniformControlFlow": true
+                },
+                "VkPhysicalDeviceMaintenance6FeaturesKHR": {
+                    "maintenance6": true
+                },
+                "VkPhysicalDeviceShaderExpectAssumeFeaturesKHR": {
+                    "shaderExpectAssume": true
+                },
+                "VkPhysicalDeviceShaderFloatControls2FeaturesKHR": {
+                    "shaderFloatControls2": true
+                },
+                "VkPhysicalDeviceShaderMaximalReconvergenceFeaturesKHR": {
+                    "shaderMaximalReconvergence": true
+                },
+                "VkPhysicalDeviceShaderSubgroupRotateFeaturesKHR": {
+                    "shaderSubgroupRotate": true
+                },
+                "VkPhysicalDeviceHostImageCopyFeaturesEXT": {
+                    "hostImageCopy": true
+                },
+                "VkPhysicalDevicePipelineProtectedAccessFeaturesEXT": {
+                    "pipelineProtectedAccess": true
+                },
+                "VkPhysicalDevicePipelineRobustnessFeaturesEXT": {
+                    "pipelineRobustness": true
                 }
             },
             "properties": {
                 "VkPhysicalDeviceProperties": {
                     "limits": {
-                        "bufferImageGranularity": 4096,
-                        "lineWidthGranularity": 0.5,
-                        "maxColorAttachments": 8,
-                        "maxComputeWorkGroupInvocations": 256,
-                        "maxComputeWorkGroupSize": [256, 256, 64],
-                        "maxImageArrayLayers": 2048,
                         "maxImageDimension1D": 8192,
                         "maxImageDimension2D": 8192,
                         "maxImageDimensionCube": 8192,
-                        "maxDescriptorSetStorageBuffers": 96,
-                        "maxDescriptorSetUniformBuffers": 90,
-                        "maxFragmentCombinedOutputResources": 16,
+                        "maxImageArrayLayers": 2048,
+                        "maxUniformBufferRange": 65536,
                         "maxPerStageDescriptorUniformBuffers": 15,
                         "maxPerStageResources": 200,
-                        "maxSamplerLodBias": 14,
-                        "maxUniformBufferRange": 65536,
+                        "maxDescriptorSetUniformBuffers": 90,
+                        "maxDescriptorSetStorageBuffers": 96,
                         "maxVertexOutputComponents": 72,
-                        "mipmapPrecisionBits": 6,
-                        "pointSizeGranularity": 0.125,
-                        "standardSampleLocations": true,
+                        "maxFragmentCombinedOutputResources": 16,
+                        "maxComputeWorkGroupInvocations": 256,
+                        "maxComputeWorkGroupSize": [ 256, 256, 64 ],
                         "subTexelPrecisionBits": 8,
+                        "mipmapPrecisionBits": 6,
+                        "maxSamplerLodBias": 14,
+                        "pointSizeGranularity": 0.125,
+                        "bufferImageGranularity": 4096,
+                        "lineWidthGranularity": 0.5,
                         "timestampComputeAndGraphics": true
                     }
-                },
-                "VkPhysicalDeviceFloatControlsProperties": {
-                    "shaderSignedZeroInfNanPreserveFloat16": true,
-                    "shaderSignedZeroInfNanPreserveFloat32": true
-                },
-                "VkPhysicalDeviceVulkan11Properties": {
-                    "subgroupSupportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT"]
                 }
             }
         },
         "multisampledToSingleSampled": {
             "extensions": {
                 "VK_EXT_multisampled_render_to_single_sampled": 1
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxImageDimension1D": 4096,
+                        "maxImageDimension2D": 4096,
+                        "maxImageDimensionCube": 4096,
+                        "maxImageArrayLayers": 256,
+                        "maxUniformBufferRange": 16384,
+                        "maxPerStageDescriptorUniformBuffers": 13,
+                        "maxPerStageResources": 128,
+                        "maxDescriptorSetUniformBuffers": 72,
+                        "maxDescriptorSetStorageBuffers": 24,
+                        "maxVertexOutputComponents": 64,
+                        "maxFragmentCombinedOutputResources": 8,
+                        "maxComputeWorkGroupInvocations": 128,
+                        "maxComputeWorkGroupSize": [ 128, 128, 64 ],
+                        "subTexelPrecisionBits": 4,
+                        "mipmapPrecisionBits": 4,
+                        "maxSamplerLodBias": 2.0,
+                        "pointSizeGranularity": 1,
+                        "bufferImageGranularity": 131072,
+                        "lineWidthGranularity": 1.0
+                    }
+                }
             }
         },
         "shaderStencilExport": {
             "extensions": {
                 "VK_EXT_shader_stencil_export": 1
+            },
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "maxImageDimension1D": 4096,
+                        "maxImageDimension2D": 4096,
+                        "maxImageDimensionCube": 4096,
+                        "maxImageArrayLayers": 256,
+                        "maxUniformBufferRange": 16384,
+                        "maxPerStageDescriptorUniformBuffers": 13,
+                        "maxPerStageResources": 128,
+                        "maxDescriptorSetUniformBuffers": 72,
+                        "maxDescriptorSetStorageBuffers": 24,
+                        "maxVertexOutputComponents": 64,
+                        "maxFragmentCombinedOutputResources": 8,
+                        "maxComputeWorkGroupInvocations": 128,
+                        "maxComputeWorkGroupSize": [ 128, 128, 64 ],
+                        "subTexelPrecisionBits": 4,
+                        "mipmapPrecisionBits": 4,
+                        "maxSamplerLodBias": 2.0,
+                        "pointSizeGranularity": 1,
+                        "bufferImageGranularity": 131072,
+                        "lineWidthGranularity": 1.0
+                    }
+                }
             }
         }
     },
@@ -148,10 +203,10 @@
                     "comment": "Renamed/rebranded from 'VP_ANDROID_16_minimums' (a.k.a. Vulkan Profile for Android 16 or VPA16) to 'VP_ANDROID_16_requirements' (a.k.a. Vulkan Requirements for Android 16 or VRA16)"
                 }
             ],
-            "profiles": ["VP_ANDROID_15_requirements"],
+            "profiles": [ "VP_ANDROID_15_requirements" ],
             "capabilities": [
                 "MUST",
-                ["multisampledToSingleSampled", "shaderStencilExport"]
+                [ "multisampledToSingleSampled", "shaderStencilExport" ]
             ]
         }
     }
