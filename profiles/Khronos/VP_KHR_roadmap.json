@@ -703,18 +703,6 @@
                 "VP_KHR_roadmap_2024"
             ],
             "capabilities": [
-                "vulkan10requirements",
-                "vulkan11requirements",
-                "vulkan12requirements",
-                "vulkan13requirements",
-                "vulkan10requirements_roadmap2022",
-                "vulkan11requirements_roadmap2022",
-                "vulkan12requirements_roadmap2022",
-                "vulkan13requirements_roadmap2022",
-                "vulkan10requirements_roadmap2024",
-                "vulkan11requirements_roadmap2024",
-                "vulkan12requirements_roadmap2024",
-                "vulkanextensionrequirements_roadmap2024",
                 "vulkan10requirements_roadmap2026",
                 "vulkan14requirements_roadmap2026",
                 [
@@ -760,10 +748,6 @@
             "label": "Khronos Vulkan Roadmap 2022 profile",
             "description": "This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices.",
             "capabilities": [
-                "vulkan10requirements",
-                "vulkan11requirements",
-                "vulkan12requirements",
-                "vulkan13requirements",
                 "vulkan10requirements_roadmap2022",
                 "vulkan11requirements_roadmap2022",
                 "vulkan12requirements_roadmap2022",
