@@ -44,7 +44,7 @@ class TestConvertPullAliases(unittest.TestCase):
         """
         Verifies that expanding feature aliases in a Vulkan 1.0 profile populates 
         structural aliases (e.g. VkPhysicalDeviceVariablePointerFeaturesKHR and 
-        VkPhysicalDeviceVariablePointersFeaturesKHR).
+        VkPhysicalDeviceVariablePointersFeaturesKHR) only when the defining extension is enabled.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -103,8 +103,8 @@ class TestConvertPullAliases(unittest.TestCase):
     def test_pull_structural_feature_aliases_vulkan_11(self):
         """
         Verifies that expanding feature aliases in a Vulkan 1.1 profile populates 
-        Core 1.1 split structures and extension aliases, but NOT VkPhysicalDeviceVulkan11Features
-        (which requires Vulkan 1.2+).
+        Core 1.1 split structures and extension aliases for enabled extensions,
+        but NOT VkPhysicalDeviceVulkan11Features (which requires Vulkan 1.2+).
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -174,8 +174,8 @@ class TestConvertPullAliases(unittest.TestCase):
     def test_pull_structural_feature_aliases_vulkan_12(self):
         """
         Verifies that expanding feature aliases in a Vulkan 1.2 profile populates 
-        Core 1.2 bundle structures (VkPhysicalDeviceVulkan12Features), Core 1.2 split structures,
-        and extension aliases.
+        Core 1.2 bundle structures (VkPhysicalDeviceVulkan12Features) and Core 1.2 split structures.
+        Extension KHR aliases are populated only when the corresponding extension is enabled.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -234,16 +234,16 @@ class TestConvertPullAliases(unittest.TestCase):
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
-
     def test_pull_structural_feature_aliases_profile_inheritance_vulkan11_to_vulkan12(self):
         """
         Verifies alias expansion across profile inheritance where parent Profile A is Vulkan 1.1
         and child Profile B is Vulkan 1.2.
-        - Profile A (V1.1) block_a populates V1.1 split structures and KHR extension aliases
-          for 16-bit storage and multiview features/properties.
+        - Profile A (V1.1) block_a populates V1.1 core split structures and KHR extension aliases
+          for enabled extensions (VK_KHR_16bit_storage, VK_KHR_multiview).
         - Profile B (V1.2) block_b inherits Profile A's capabilities and populates V1.2 bundle structures
           (VkPhysicalDeviceVulkan11Features, VkPhysicalDeviceVulkan11Properties, and
-          VkPhysicalDeviceVulkan12Features) alongside split and extension alias structures.
+          VkPhysicalDeviceVulkan12Features) alongside core split structures. KHR extension structures
+          are generated only for extensions present in inherited or local extension scope.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -263,7 +263,6 @@ class TestConvertPullAliases(unittest.TestCase):
             "capabilities": {
                 "block_a": {
                     "extensions": {
-                        "VK_KHR_16bit_storage": 1,
                         "VK_KHR_multiview": 1
                     },
                     "features": {
@@ -311,14 +310,10 @@ class TestConvertPullAliases(unittest.TestCase):
             "capabilities": {
                 "block_a": {
                     "extensions": {
-                        "VK_KHR_16bit_storage": 1,
                         "VK_KHR_multiview": 1
                     },
                     "features": {
                         "VkPhysicalDevice16BitStorageFeatures": {
-                            "storageBuffer16BitAccess": true
-                        },
-                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
                             "storageBuffer16BitAccess": true
                         },
                         "VkPhysicalDeviceMultiviewFeatures": {
@@ -343,9 +338,6 @@ class TestConvertPullAliases(unittest.TestCase):
                     },
                     "features": {
                         "VkPhysicalDevice16BitStorageFeatures": {
-                            "storageBuffer16BitAccess": true
-                        },
-                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
                             "storageBuffer16BitAccess": true
                         },
                         "VkPhysicalDevice8BitStorageFeatures": {
@@ -388,13 +380,10 @@ class TestConvertPullAliases(unittest.TestCase):
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
-
     def test_pull_aliases_core_and_extension_features(self):
         """
         Verifies that expanding feature aliases in a single Vulkan 1.1 profile block
-        populates all corresponding structural and extension aliases for:
-        - VkPhysicalDeviceShaderDrawParameterFeatures <-> VkPhysicalDeviceShaderDrawParametersFeatures
-        - VkPhysicalDeviceVariablePointerFeatures <-> VkPhysicalDeviceVariablePointersFeatures (and KHR variants)
+        populates core split structures and extension aliases ONLY for enabled extensions.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
