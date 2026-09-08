@@ -45,6 +45,9 @@ profiles/test/data/VP_LUNARG_desktop_max_2026.json
 profiles/VP_KHR_roadmap.json
 profiles/VP_LUNARG_minimum_requirements.json
 profiles/VP_LUNARG_desktop_baseline.json
+profiles/LunarG/VP_LUNARG_desktop_baseline.json
+profiles/LunarG/VP_LUNARG_desktop_baseline_vulkan_object.json
+profiles/LunarG/VP_LUNARG_desktop_baseline_vulkan_registry.json
 profiles/Android/VP_ANDROID_18_requirements.json
 profiles/Android/VP_ANDROID_19_requirements.json
 PROFILES.md

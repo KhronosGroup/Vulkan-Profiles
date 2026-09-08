@@ -11,7 +11,7 @@
 
 # Release Notes
 
-## [Vulkan Profiles Tools 1.4.3XX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - September 2026
+## [Vulkan Profiles Tools 1.4.362](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - September 2026
 
 ### Features:
 - Implement `VK_NO_PROTOTYPES` support #734
@@ -22,6 +22,10 @@
 ### Improvements:
 - Improve profiles schema to support capabilities dynamic structures
 - Optimize profiles schema to avoid duplicated values
+
+### Bugfixes:
+- Fix `merge` missing some structures, updated desktop profiles
+
 
 ### Deprecation:
 - `gen_profiles*.py` file are all deprecated and replaced by `vkprofiles`
