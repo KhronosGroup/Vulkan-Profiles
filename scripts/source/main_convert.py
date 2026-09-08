@@ -43,7 +43,6 @@ from source.vulkan_object_utils import (
     gatherSatisfiedCoreRequiredFeaturesForVersion,
     gatherSatisfiedCoreRequiredPropertiesForVersion,
     gatherSatisfiedExtensionRequiredFeatures,
-    isStructExtensionEnabled,
     getStructByName,
     getStructCoreVersion,
     is_extension_struct_name,
@@ -111,6 +110,23 @@ class MemberSortFallback(IntEnum):
     UNKNOWN_MEMBER_INDEX = 9999  # Members missing from the vk.xml struct definition are sorted to the end of the dictionary.
 
 
+BUNDLE_FEATURE_ORDER = [
+    'VkPhysicalDeviceFeatures',
+    'VkPhysicalDeviceVulkan11Features',
+    'VkPhysicalDeviceVulkan12Features',
+    'VkPhysicalDeviceVulkan13Features',
+    'VkPhysicalDeviceVulkan14Features'
+]
+
+BUNDLE_PROPERTY_ORDER = [
+    'VkPhysicalDeviceProperties',
+    'VkPhysicalDeviceVulkan11Properties',
+    'VkPhysicalDeviceVulkan12Properties',
+    'VkPhysicalDeviceVulkan13Properties',
+    'VkPhysicalDeviceVulkan14Properties'
+]
+
+
 def _restore_member_orders(target_dict: dict[str, dict], original_orders: dict[str, list[str]]):
     """Restores pre-existing member key insertion sequence for non-bundle structures."""
     for struct_name, members in target_dict.items():
@@ -136,6 +152,7 @@ def canonicalize_capabilities_for_version(
     Remaps split structure capabilities into active bundle structures for api_version
     and removes redundant split structures covered by active bundle structures.
     Preserves original member key insertion order from input JSON files.
+    Ensures version bundle structures are ordered strictly by Vulkan version.
     """
     new_features: dict[str, dict[str, bool]] = {}
     new_properties: dict[str, Any] = {}
@@ -143,11 +160,10 @@ def canonicalize_capabilities_for_version(
     active_feature_bundles = get_active_feature_bundles(api_version)
     active_property_bundles = get_active_property_bundles(api_version)
 
-    # Capture original member key sequence for pre-existing structures[cite: 21]
     orig_feature_orders = {s: list(m.keys()) for s, m in features_dict.items() if isinstance(m, dict)}
     orig_property_orders = {s: list(p.keys()) for s, p in properties_dict.items() if isinstance(p, dict)}
 
-    # 1. Features remapping and deduplication[cite: 21]
+    # 1. Features remapping and deduplication
     sorted_feature_structs = sorted(
         features_dict.keys(),
         key=lambda s: (0 if is_bundle_structure(s) else 1)
@@ -172,9 +188,19 @@ def canonicalize_capabilities_for_version(
             for member_name, val in members.items():
                 new_features.setdefault(struct_name, {})[member_name] = val
 
+    # Order bundle feature structures strictly by Vulkan version (1.0 -> 1.4)
+    ordered_new_features = {}
+    for b_name in BUNDLE_FEATURE_ORDER:
+        if b_name in new_features:
+            ordered_new_features[b_name] = new_features[b_name]
+    for s_name, members in new_features.items():
+        if s_name not in ordered_new_features:
+            ordered_new_features[s_name] = members
+    new_features = ordered_new_features
+
     _restore_member_orders(new_features, orig_feature_orders)
 
-    # 2. Properties remapping and deduplication[cite: 21]
+    # 2. Properties remapping and deduplication
     sorted_property_structs = sorted(
         properties_dict.keys(),
         key=lambda s: (0 if is_bundle_structure(s) else 1)
@@ -191,6 +217,16 @@ def canonicalize_capabilities_for_version(
 
         if not is_covered:
             new_properties[struct_name] = prop_data
+
+    # Order bundle property structures strictly by Vulkan version (1.0 -> 1.4)
+    ordered_new_properties = {}
+    for b_name in BUNDLE_PROPERTY_ORDER:
+        if b_name in new_properties:
+            ordered_new_properties[b_name] = new_properties[b_name]
+    for s_name, prop_data in new_properties.items():
+        if s_name not in ordered_new_properties:
+            ordered_new_properties[s_name] = prop_data
+    new_properties = ordered_new_properties
 
     _restore_member_orders(new_properties, orig_property_orders)
 
@@ -224,6 +260,144 @@ def get_parent_property_value(parent_props_dict: dict, struct_name: str, prop_na
                         return (True, s_data[a_member])
 
     return (False, None)
+
+
+def isStructExtensionEnabled(vk: VulkanObject, struct_name: str, version: VK_VERSION, enabled_exts: set[str]) -> bool:
+    """
+    Returns True if struct_name is enabled for the given version and enabled extensions.
+    - Core structures (no extension suffix) are enabled if core version >= struct core version.
+    - Extension structures (with KHR/EXT/vendor suffix) require the defining extension to be in enabled_exts.
+    """
+    is_ext_struct = is_extension_struct_name(vk, struct_name)
+
+    if not is_ext_struct:
+        core_ver = getStructCoreVersion(vk, struct_name)
+        if core_ver != VK_VERSION.NONE and version != VK_VERSION.NONE and version >= core_ver:
+            return True
+
+    req_keys = set()
+    struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
+    if struct_obj:
+        if hasattr(struct_obj, 'definingRequirements') and struct_obj.definingRequirements:
+            req_keys.update(struct_obj.definingRequirements.keys())
+        elif hasattr(struct_obj, 'extensions') and struct_obj.extensions:
+            req_keys.update(struct_obj.extensions)
+
+    if hasattr(vk, 'aliasTypeRequirements') and struct_name in vk.aliasTypeRequirements:
+        req_keys.update(vk.aliasTypeRequirements[struct_name].keys())
+
+    if struct_obj and hasattr(struct_obj, 'aliases'):
+        for alias in struct_obj.aliases:
+            if hasattr(vk, 'aliasTypeRequirements') and alias in vk.aliasTypeRequirements:
+                req_keys.update(vk.aliasTypeRequirements[alias].keys())
+
+    if not req_keys:
+        return not is_ext_struct
+
+    for req in req_keys:
+        if req in enabled_exts:
+            return True
+
+        if not is_ext_struct and (req.startswith("VK_VERSION_") or req.startswith("VK_API_VERSION_")):
+            ver = VK_VERSION.from_string(req)
+            if ver != VK_VERSION.NONE and version != VK_VERSION.NONE and version >= ver:
+                return True
+
+    return False
+
+
+def filter_features_against_context(
+    vk: VulkanObject,
+    features_dict: dict[str, dict[str, bool]],
+    context_features: set[tuple[str, str]]
+) -> dict[str, dict[str, bool]]:
+    """Filters candidate feature requirements against accumulated context features (including structural aliases)."""
+    filtered_features = {}
+    for s_name, members in features_dict.items():
+        if not isinstance(members, dict):
+            continue
+        new_members = {}
+        for m_name, val in members.items():
+            if not val:
+                continue
+
+            query_id = StructCapabilityAlias(s_name, m_name)
+            aliases = [query_id] + gatherCapabilityAliases(vk, query_id)
+
+            is_in_context = False
+            for alias in aliases:
+                if isinstance(alias, StructCapabilityAlias):
+                    if (alias.struct, alias.member) in context_features:
+                        is_in_context = True
+                        break
+
+            if not is_in_context:
+                new_members[m_name] = val
+
+        if new_members:
+            filtered_features[s_name] = new_members
+    return filtered_features
+
+
+def filter_properties_against_context(
+    vk: VulkanObject,
+    properties_dict: dict[str, Any],
+    context_properties: dict[str, Any]
+) -> dict[str, Any]:
+    """Filters candidate property requirements against accumulated context properties."""
+    filtered_properties = {}
+    for s_name, p_data in properties_dict.items():
+        if not isinstance(p_data, dict):
+            continue
+
+        if s_name == "VkPhysicalDeviceProperties":
+            new_s_data = {}
+            for sub_group_name, sub_dict in p_data.items():
+                if not isinstance(sub_dict, dict):
+                    continue
+                new_sub_dict = {}
+                for prop_name, prop_val in sub_dict.items():
+                    found_in_ctx, ctx_val = get_parent_property_value(
+                        context_properties, s_name, prop_name, vk
+                    )
+                    if not found_in_ctx or not is_property_satisfied(ctx_val, prop_val, prop_name):
+                        new_sub_dict[prop_name] = prop_val
+                if new_sub_dict:
+                    new_s_data[sub_group_name] = new_sub_dict
+            if new_s_data:
+                filtered_properties[s_name] = new_s_data
+        else:
+            new_p_data = {}
+            for prop_name, prop_val in p_data.items():
+                found_in_ctx, ctx_val = get_parent_property_value(
+                    context_properties, s_name, prop_name, vk
+                )
+                if not found_in_ctx or not is_property_satisfied(ctx_val, prop_val, prop_name):
+                    new_p_data[prop_name] = prop_val
+            if new_p_data:
+                filtered_properties[s_name] = new_p_data
+    return filtered_properties
+
+
+def update_context_from_capabilities(
+    caps_dict: dict,
+    context_features: set[tuple[str, str]],
+    context_properties: dict[str, Any],
+    context_extensions: set[str]
+):
+    """Updates accumulated capabilities context with entries from caps_dict."""
+    if "extensions" in caps_dict and isinstance(caps_dict["extensions"], dict):
+        context_extensions.update(caps_dict["extensions"].keys())
+
+    if "features" in caps_dict and isinstance(caps_dict["features"], dict):
+        for s_name, members in caps_dict["features"].items():
+            if isinstance(members, dict):
+                for m_name, val in members.items():
+                    if val:
+                        context_features.add((s_name, m_name))
+
+    if "properties" in caps_dict and isinstance(caps_dict["properties"], dict):
+        deep_merge_dict(context_properties, caps_dict["properties"])
 
 
 # -----------------------------------------------------------------------------
@@ -388,6 +562,14 @@ def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: 
 
         required_parent_profiles = profile_obj.get("profiles", [])
 
+        context_features: set[tuple[str, str]] = set()
+        context_properties: dict[str, Any] = {}
+        context_extensions: set[str] = set()
+
+        if required_parent_profiles:
+            inherited_caps = collect_required_profiles_capabilities_recursive(json_files_dict, required_parent_profiles)
+            update_context_from_capabilities(inherited_caps, context_features, context_properties, context_extensions)
+
         # 1. Process Parent Profile API Version Upgrade Transition Blocks
         if required_parent_profiles:
             for parent_pname in required_parent_profiles:
@@ -397,106 +579,39 @@ def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: 
 
                 parent_api_version = VK_VERSION.from_string(parent_obj.get("api-version", "1.0.0"))
                 if api_version > parent_api_version:
-                    parent_inherited_caps = collect_required_profiles_capabilities_recursive(json_files_dict, [parent_pname])
                     current_caps = collect_profile_capabilities(json_files_dict, json_file_data, profile_obj)
+                    all_exts = context_extensions | set(current_caps.get("extensions", {}).keys())
 
-                    all_exts = set(parent_inherited_caps.get("extensions", {}).keys()) | set(current_caps.get("extensions", {}).keys())
                     all_features_dict = {}
-                    deep_merge_dict(all_features_dict, parent_inherited_caps.get("features", {}))
+                    if inherited_caps:
+                        deep_merge_dict(all_features_dict, inherited_caps.get("features", {}))
                     deep_merge_dict(all_features_dict, current_caps.get("features", {}))
 
-                    enabled_features_set: set[tuple[str, str]] = set()
+                    all_enabled_features_set: set[tuple[str, str]] = set()
                     for struct_name, members in all_features_dict.items():
                         if isinstance(members, dict):
                             for member_name, val in members.items():
                                 if val:
-                                    enabled_features_set.add((struct_name, member_name))
+                                    all_enabled_features_set.add((struct_name, member_name))
 
                     transition_features = {}
                     transition_properties = {}
                     for ver in VK_VERSION.versions():
                         if parent_api_version < ver <= api_version:
                             satisfied_feat = gatherSatisfiedCoreRequiredFeaturesForVersion(
-                                vk, ver, api_version, all_exts, enabled_features_set
+                                vk, ver, api_version, all_exts, all_enabled_features_set
                             )
                             if satisfied_feat:
                                 deep_merge_dict(transition_features, satisfied_feat)
 
                             satisfied_prop = gatherSatisfiedCoreRequiredPropertiesForVersion(
-                                vk, ver, api_version, all_exts, enabled_features_set
+                                vk, ver, api_version, all_exts, all_enabled_features_set
                             )
                             if satisfied_prop:
                                 deep_merge_dict(transition_properties, satisfied_prop)
 
-                    parent_features_dict = parent_inherited_caps.get("features", {})
-                    parent_enabled_features: set[tuple[str, str]] = set()
-                    for s_name, members in parent_features_dict.items():
-                        if isinstance(members, dict):
-                            for m_name, val in members.items():
-                                if val:
-                                    parent_enabled_features.add((s_name, m_name))
-
-                    filtered_transition_features = {}
-                    for s_name, members in transition_features.items():
-                        if not isinstance(members, dict):
-                            continue
-                        new_members = {}
-                        for m_name, val in members.items():
-                            if not val:
-                                continue
-
-                            query_id = StructCapabilityAlias(s_name, m_name)
-                            aliases = [query_id] + gatherCapabilityAliases(vk, query_id)
-
-                            is_in_parent = False
-                            for alias in aliases:
-                                if isinstance(alias, StructCapabilityAlias):
-                                    if (alias.struct, alias.member) in parent_enabled_features:
-                                        is_in_parent = True
-                                        break
-
-                            if not is_in_parent:
-                                new_members[m_name] = val
-
-                        if new_members:
-                            filtered_transition_features[s_name] = new_members
-
-                    transition_features = filtered_transition_features
-                    parent_props_dict = parent_inherited_caps.get("properties", {})
-
-                    filtered_transition_properties = {}
-                    for s_name, p_data in transition_properties.items():
-                        if not isinstance(p_data, dict):
-                            continue
-
-                        if s_name == "VkPhysicalDeviceProperties":
-                            new_s_data = {}
-                            for sub_group_name, sub_dict in p_data.items():
-                                if not isinstance(sub_dict, dict):
-                                    continue
-                                new_sub_dict = {}
-                                for prop_name, prop_val in sub_dict.items():
-                                    found_in_parent, parent_val = get_parent_property_value(
-                                        parent_props_dict, s_name, prop_name, vk
-                                    )
-                                    if not found_in_parent or not is_property_satisfied(parent_val, prop_val, prop_name):
-                                        new_sub_dict[prop_name] = prop_val
-                                if new_sub_dict:
-                                    new_s_data[sub_group_name] = new_sub_dict
-                            if new_s_data:
-                                filtered_transition_properties[s_name] = new_s_data
-                        else:
-                            new_p_data = {}
-                            for prop_name, prop_val in p_data.items():
-                                found_in_parent, parent_val = get_parent_property_value(
-                                    parent_props_dict, s_name, prop_name, vk
-                                )
-                                if not found_in_parent or not is_property_satisfied(parent_val, prop_val, prop_name):
-                                    new_p_data[prop_name] = prop_val
-                            if new_p_data:
-                                filtered_transition_properties[s_name] = new_p_data
-
-                    transition_properties = filtered_transition_properties
+                    transition_features = filter_features_against_context(vk, transition_features, context_features)
+                    transition_properties = filter_properties_against_context(vk, transition_properties, context_properties)
 
                     transition_features, transition_properties = canonicalize_capabilities_for_version(
                         vk, api_version, transition_features, transition_properties
@@ -540,6 +655,8 @@ def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: 
                             profile_caps_list.remove(transition_block_name)
                         profile_caps_list.insert(0, transition_block_name)
 
+                        update_context_from_capabilities(trans_block, context_features, context_properties, context_extensions)
+
         # 2. Standalone profile: pull core required features and properties directly into primary block
         else:
             primary_block = get_primary_capability_block(profile_obj, capabilities_dict)
@@ -548,28 +665,31 @@ def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: 
                 profile_enabled_exts = set(profile_caps.get("extensions", {}).keys())
                 profile_features_block = profile_caps.get("features", {})
 
-                enabled_features_set: set[tuple[str, str]] = set()
+                all_enabled_features_set: set[tuple[str, str]] = set()
                 for struct_name, members in profile_features_block.items():
                     if isinstance(members, dict):
                         for member_name, val in members.items():
                             if val:
-                                enabled_features_set.add((struct_name, member_name))
+                                all_enabled_features_set.add((struct_name, member_name))
 
                 core_satisfied_features = {}
                 core_satisfied_properties = {}
                 for ver in VK_VERSION.versions():
                     if ver <= api_version:
                         satisfied_feat = gatherSatisfiedCoreRequiredFeaturesForVersion(
-                            vk, ver, api_version, profile_enabled_exts, enabled_features_set
+                            vk, ver, api_version, profile_enabled_exts, all_enabled_features_set
                         )
                         if satisfied_feat:
                             deep_merge_dict(core_satisfied_features, satisfied_feat)
 
                         satisfied_prop = gatherSatisfiedCoreRequiredPropertiesForVersion(
-                            vk, ver, api_version, profile_enabled_exts, enabled_features_set
+                            vk, ver, api_version, profile_enabled_exts, all_enabled_features_set
                         )
                         if satisfied_prop:
                             deep_merge_dict(core_satisfied_properties, satisfied_prop)
+
+                core_satisfied_features = filter_features_against_context(vk, core_satisfied_features, context_features)
+                core_satisfied_properties = filter_properties_against_context(vk, core_satisfied_properties, context_properties)
 
                 core_satisfied_features, core_satisfied_properties = canonicalize_capabilities_for_version(
                     vk, api_version, core_satisfied_features, core_satisfied_properties
@@ -594,35 +714,36 @@ def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: 
                     if p_prop:
                         primary_block["properties"] = p_prop
 
-        # 3. Process Extension-satisfied requirements in existing blocks
-        profile_caps = collect_profile_capabilities(json_files_dict, json_file_data, profile_obj)
-        profile_enabled_exts = set(profile_caps.get("extensions", {}).keys())
-        profile_features_block = profile_caps.get("features", {})
-
-        enabled_features: set[tuple[str, str]] = set()
-        for struct_name, members in profile_features_block.items():
-            if isinstance(members, dict):
-                for member_name, val in members.items():
-                    if val:
-                        enabled_features.add((struct_name, member_name))
-
-        ver_tuple = api_version.as_tuple()
-        curr_trans_suffix = f"_to_vulkan{ver_tuple[0]}{ver_tuple[1]}"
-
+        # 3. Process Extension-satisfied requirements in existing blocks & update context block-by-block
         block_names = collect_block_names(profile_obj.get("capabilities", []))
         for block_name in block_names:
-            if block_name in capabilities_dict and not block_name.endswith(curr_trans_suffix):
+            if block_name in capabilities_dict:
                 block = capabilities_dict[block_name]
                 ext_dict = block.get("extensions", {})
                 ext_list = list(ext_dict.keys()) if isinstance(ext_dict, dict) else (ext_dict if isinstance(ext_dict, list) else [])
 
+                profile_caps = collect_profile_capabilities(json_files_dict, json_file_data, profile_obj)
+                profile_enabled_exts = set(profile_caps.get("extensions", {}).keys())
+
+                current_enabled_features: set[tuple[str, str]] = set(context_features)
+                if "features" in block and isinstance(block["features"], dict):
+                    for struct_name, members in block["features"].items():
+                        if isinstance(members, dict):
+                            for member_name, val in members.items():
+                                if val:
+                                    current_enabled_features.add((struct_name, member_name))
+
                 for ext_name in ext_list:
                     ext_satisfied = gatherSatisfiedExtensionRequiredFeatures(
-                        vk, ext_name, api_version, profile_enabled_exts, enabled_features
+                        vk, ext_name, api_version, profile_enabled_exts, current_enabled_features
                     )
                     if ext_satisfied:
-                        block_features = block.setdefault("features", {})
-                        deep_merge_dict(block_features, ext_satisfied)
+                        filtered_ext_satisfied = filter_features_against_context(vk, ext_satisfied, context_features)
+                        if filtered_ext_satisfied:
+                            block_features = block.setdefault("features", {})
+                            deep_merge_dict(block_features, filtered_ext_satisfied)
+
+                update_context_from_capabilities(block, context_features, context_properties, context_extensions)
 
 
 def pull_required_capabilities_profiles_files(vk: VulkanObject, json_files_dict: dict):
@@ -1385,4 +1506,3 @@ def main_convert(args):
         sort_profiles_files(vk, json_files_dict)
 
     save_profiles_jsons(json_files_dict, Path(args.output), OutputFormatType(args.format))
-    
