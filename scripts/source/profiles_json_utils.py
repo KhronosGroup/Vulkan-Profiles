@@ -351,6 +351,10 @@ def collect_profile_capabilities(json_files_dict: dict, json_file_data: dict, pr
     for item in parsed_caps:
         if isinstance(item, str) and item in capabilities_dict:
             deep_merge_dict(combined_caps, capabilities_dict[item])
+        elif isinstance(item, list):
+            for sub_item in item:
+                if isinstance(sub_item, str) and sub_item in capabilities_dict:
+                    deep_merge_dict(combined_caps, capabilities_dict[sub_item])
 
     return combined_caps
 

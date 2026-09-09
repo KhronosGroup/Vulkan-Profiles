@@ -850,6 +850,22 @@ def evaluateFeatureDepends(
 
     return evalExpression(depends_expr, is_symbol_enabled)
 
+def is_any_feature_enabled(
+    vk: VulkanObject, 
+    struct_name: str, 
+    fields: list[str], 
+    enabled_features: set[tuple[str, str]]
+) -> bool:
+    """Checks if any feature in fields or its aliases is present in enabled_features."""
+    for field_name in fields:
+        query_id = StructCapabilityAlias(struct_name, field_name)
+        aliases = [query_id] + gatherCapabilityAliases(vk, query_id)
+        for alias in aliases:
+            if isinstance(alias, StructCapabilityAlias):
+                if (alias.struct, alias.member) in enabled_features:
+                    return True
+    return False
+
 def gatherSatisfiedCoreRequiredFeaturesForVersion(
     vk: VulkanObject, 
     exact_ver: VK_VERSION,
@@ -867,13 +883,11 @@ def gatherSatisfiedCoreRequiredFeaturesForVersion(
         return satisfied_features
 
     for req in getattr(ver_obj, 'featureRequirement', []) or []:
-        if req.depends:
-            if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
-                fields = [f.strip() for f in req.field.split(',')] if req.field else []
-                for field_name in fields:
-                    satisfied_features.setdefault(req.struct, {})[field_name] = True
-        else:
+        if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
             fields = [f.strip() for f in req.field.split(',')] if req.field else []
+            if len(fields) > 1:
+                if is_any_feature_enabled(vk, req.struct, fields, enabled_features):
+                    continue
             for field_name in fields:
                 satisfied_features.setdefault(req.struct, {})[field_name] = True
 
@@ -969,13 +983,11 @@ def gatherSatisfiedExtensionRequiredFeatures(
 
     ext_obj = vk.extensions[ext_name]
     for req in getattr(ext_obj, 'featureRequirement', []):
-        if req.depends:
-            if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
-                fields = [f.strip() for f in req.field.split(',')] if req.field else []
-                for field_name in fields:
-                    satisfied_features.setdefault(req.struct, {})[field_name] = True
-        else:
+        if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
             fields = [f.strip() for f in req.field.split(',')] if req.field else []
+            if len(fields) > 1:
+                if is_any_feature_enabled(vk, req.struct, fields, enabled_features):
+                    continue
             for field_name in fields:
                 satisfied_features.setdefault(req.struct, {})[field_name] = True
 

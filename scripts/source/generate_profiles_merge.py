@@ -305,8 +305,8 @@ class VulkanProfilesMergeGenerator:
                     if prop_name in capabilities['formats'][fmt_name]:
                         if not capabilities['formats'][fmt_name][prop_name]:
                             del capabilities['formats'][fmt_name][prop_name]
-                if not capabilities['formats'][fmt_name]:
-                    formats_to_remove.append(fmt_name)
+            if not capabilities['formats'][fmt_name]:
+                formats_to_remove.append(fmt_name)
 
             for fmt_name in formats_to_remove:
                 del capabilities['formats'][fmt_name]

@@ -47,9 +47,8 @@ add_custom_target(VpLibrary_test_generated_library
 set_target_properties(VpLibrary_test_generated_library PROPERTIES FOLDER "Profiles API library")
 add_dependencies(VpLibrary_test_generated_library VpGenerate-Libraries)
 
-# The release source is in ../source/vulkan_profiles.cpp, but the debug source (with
-# verbose messages during profile validation) is in ../source/debug/vulkan_profiles.cpp.
-set(vulkan_profiles_source ../source$<$<CONFIG:Debug>:/debug>/vulkan_profiles.cpp)
+# Use generated profile source files from the current CMake directory based on build configuration
+set(vulkan_profiles_source ${CMAKE_CURRENT_LIST_DIR}/generated_vulkan_profiles$<$<CONFIG:Debug>:_debug>.cpp)
 
 function(add_unit_test NAME)
     set(TEST_FILE ./${NAME}.cpp)

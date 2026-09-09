@@ -34,7 +34,7 @@ set(PROFILES_FILES_FOR_INSTALL
 )
 
 set(PROFILES_FILES_FOR_API_LIBRARY
-    "VP_KHR_roadmap.json,VP_LUNARG_minimum_requirements.json,VP_LUNARG_desktop_baseline.json"
+    "VP_KHR_roadmap.json,VP_LUNARG_desktop_baseline.json"
 )
 
 set(PROFILES_FILES_FOR_API_LIBRARY_TEST
@@ -159,7 +159,6 @@ add_custom_target(VpGenerate-Libraries
         --input ${CMAKE_CURRENT_LIST_DIR}
         --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY_TEST}
         --output ${PROJECT_SOURCE_DIR}/library/test
-        --output-src ${PROJECT_SOURCE_DIR}/library/test
         --output-filename "generated_vulkan_profiles"
         --mode header+source
         --config release
@@ -169,7 +168,6 @@ add_custom_target(VpGenerate-Libraries
         --input ${CMAKE_CURRENT_LIST_DIR}
         --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY_TEST}
         --output ${PROJECT_SOURCE_DIR}/library/test
-        --output-src ${PROJECT_SOURCE_DIR}/library/test
         --output-filename "generated_vulkan_profiles_debug"
         --mode header+source
         --config debug
