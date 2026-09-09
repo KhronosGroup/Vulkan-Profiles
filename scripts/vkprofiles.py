@@ -119,6 +119,7 @@ def main(argv):
     library_parser.add_argument('--intermediate', action='store', help='Directory path for intermediate converted profiles (used when --convert is provided).')
     library_parser.add_argument('--debug', '-d', action='store_true', help='Also generate library variant with debug messages.')
     library_parser.add_argument('--config', '-c', action='store', default='release', choices=['release', 'debug'], help='Select build configuration.')
+    library_parser.add_argument('--include-header', action='store', help='Override the header file include directive in generated C++ source files.')
 
     doc_parser = subparsers.add_parser('doc', help='Generate markdown documentation for Vulkan profiles.')
     doc_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
