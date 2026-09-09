@@ -843,17 +843,14 @@ def pull_aliases_capabilities_block(
     enabled_exts = profile_enabled_exts if profile_enabled_exts is not None else (block_exts | inherited_exts)
 
     for category in ("features", "properties"):
-        category_block = {}
-        if category in inherited_caps:
-            deep_merge_dict(category_block, inherited_caps[category])
-        if category in json_profiles_capabilities_block:
-            deep_merge_dict(category_block, json_profiles_capabilities_block[category])
+        # Operates exclusively on local block capabilities to preserve profile inheritance boundary
+        category_block = json_profiles_capabilities_block.get(category, {})
 
         if not category_block:
             continue
 
         original_member_orders = {
-            s: list(m.keys()) for s, m in json_profiles_capabilities_block.get(category, {}).items()
+            s: list(m.keys()) for s, m in category_block.items()
             if isinstance(m, dict)
         }
 
@@ -900,11 +897,7 @@ def pull_aliases_capabilities_block(
             _restore_member_orders(new_category_block, original_member_orders)
             json_profiles_capabilities_block[category] = new_category_block
 
-    formats_block = {}
-    if "formats" in inherited_caps:
-        deep_merge_dict(formats_block, inherited_caps["formats"])
-    if "formats" in json_profiles_capabilities_block:
-        deep_merge_dict(formats_block, json_profiles_capabilities_block["formats"])
+    formats_block = json_profiles_capabilities_block.get("formats", {})
 
     if formats_block:
         new_formats_block = {}
