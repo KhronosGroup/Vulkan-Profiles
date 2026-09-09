@@ -539,15 +539,18 @@ def gatherCapabilityAliases(vk: VulkanObject, alias_id: CapabilityAlias) -> list
         
         if canonical_struct in vk.structs:
             for member in vk.structs[canonical_struct].members:
-                if member.name == alias_id.member and isinstance(member.capabilityAlias, StructCapabilityAlias):
-                    target_struct_obj = getStructByName(vk.structs, member.capabilityAlias.struct)
-                    canonical_key = (target_struct_obj.name if target_struct_obj else member.capabilityAlias.struct, member.capabilityAlias.member)
+                if member.name == alias_id.member:
+                    cap_alias = getattr(member, 'capabilityAlias', None)
+                    if isinstance(cap_alias, StructCapabilityAlias):
+                        target_struct_obj = getStructByName(vk.structs, cap_alias.struct)
+                        canonical_key = (target_struct_obj.name if target_struct_obj else cap_alias.struct, cap_alias.member)
                     break
     
     elif isinstance(alias_id, ExtensionCapabilityAlias):
         for struct_name, struct_obj in vk.structs.items():
             for member in struct_obj.members:
-                if isinstance(member.capabilityAlias, ExtensionCapabilityAlias) and member.capabilityAlias.name == alias_id.name:
+                cap_alias = getattr(member, 'capabilityAlias', None)
+                if isinstance(cap_alias, ExtensionCapabilityAlias) and cap_alias.name == alias_id.name:
                     canonical_key = (struct_name, member.name)
                     break
             if canonical_key:
@@ -560,19 +563,27 @@ def gatherCapabilityAliases(vk: VulkanObject, alias_id: CapabilityAlias) -> list
     aliases = []
     for struct_name, struct_obj in vk.structs.items():
         for member in struct_obj.members:
-            if isinstance(member.capabilityAlias, StructCapabilityAlias):
-                target_struct_obj = getStructByName(vk.structs, member.capabilityAlias.struct)
-                current_key = (target_struct_obj.name if target_struct_obj else member.capabilityAlias.struct, member.capabilityAlias.member)
+            cap_alias = getattr(member, 'capabilityAlias', None)
+            if isinstance(cap_alias, StructCapabilityAlias):
+                target_struct_obj = getStructByName(vk.structs, cap_alias.struct)
+                current_key = (target_struct_obj.name if target_struct_obj else cap_alias.struct, cap_alias.member)
             else:
                 current_key = (struct_name, member.name)
 
             if current_key == canonical_key:
-                aliases.append(StructCapabilityAlias(struct_name, member.name))
-                for alias_struct in struct_obj.aliases:
-                    aliases.append(StructCapabilityAlias(alias_struct, member.name))
+                item = StructCapabilityAlias(struct_name, member.name)
+                if item not in aliases:
+                    aliases.append(item)
 
-                if isinstance(member.capabilityAlias, ExtensionCapabilityAlias) and member.capabilityAlias.name in vk.extensions:
-                    aliases.append(ExtensionCapabilityAlias(member.capabilityAlias.name))
+                for alias_struct in struct_obj.aliases:
+                    alias_item = StructCapabilityAlias(alias_struct, member.name)
+                    if alias_item not in aliases:
+                        aliases.append(alias_item)
+
+                if isinstance(cap_alias, ExtensionCapabilityAlias) and cap_alias.name in vk.extensions:
+                    ext_item = ExtensionCapabilityAlias(cap_alias.name)
+                    if ext_item not in aliases:
+                        aliases.append(ext_item)
 
     result = [item for item in aliases if item != alias_id]
     vk._capability_aliases_cache[alias_key] = result
@@ -888,6 +899,15 @@ def gatherSatisfiedCoreRequiredFeaturesForVersion(
             if len(fields) > 1:
                 if is_any_feature_enabled(vk, req.struct, fields, enabled_features):
                     continue
+                else:
+                    msg = (
+                        f"WARNING: Core version '{exact_ver}' requires one of the OR-features in "
+                        f"'{req.struct}' ({req.field}), but none are enabled in context. "
+                        f"Skipping automatic feature pull. One feature option must be explicitly enabled in the profile."
+                    )
+                    logging.warning(msg)
+                    print(msg)
+                    continue
             for field_name in fields:
                 satisfied_features.setdefault(req.struct, {})[field_name] = True
 
@@ -987,6 +1007,15 @@ def gatherSatisfiedExtensionRequiredFeatures(
             fields = [f.strip() for f in req.field.split(',')] if req.field else []
             if len(fields) > 1:
                 if is_any_feature_enabled(vk, req.struct, fields, enabled_features):
+                    continue
+                else:
+                    msg = (
+                        f"WARNING: Extension '{ext_name}' requires one of the OR-features in "
+                        f"'{req.struct}' ({req.field}), but none are enabled in context. "
+                        f"Skipping automatic feature pull. One feature option must be explicitly enabled in the profile."
+                    )
+                    logging.warning(msg)
+                    print(msg)
                     continue
             for field_name in fields:
                 satisfied_features.setdefault(req.struct, {})[field_name] = True

@@ -316,18 +316,18 @@ class TestConvertPullAliases(unittest.TestCase):
                         "VkPhysicalDevice16BitStorageFeatures": {
                             "storageBuffer16BitAccess": true
                         },
-                        "VkPhysicalDeviceMultiviewFeatures": {
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
                             "multiview": true
                         },
-                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                        "VkPhysicalDeviceMultiviewFeatures": {
                             "multiview": true
                         }
                     },
                     "properties": {
-                        "VkPhysicalDeviceMultiviewProperties": {
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
                             "maxMultiviewViewCount": 6
                         },
-                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                        "VkPhysicalDeviceMultiviewProperties": {
                             "maxMultiviewViewCount": 6
                         }
                     }
@@ -337,38 +337,14 @@ class TestConvertPullAliases(unittest.TestCase):
                         "VK_KHR_8bit_storage": 1
                     },
                     "features": {
-                        "VkPhysicalDevice16BitStorageFeatures": {
-                            "storageBuffer16BitAccess": true
-                        },
-                        "VkPhysicalDevice8BitStorageFeatures": {
-                            "storageBuffer8BitAccess": true
-                        },
                         "VkPhysicalDevice8BitStorageFeaturesKHR": {
                             "storageBuffer8BitAccess": true
                         },
-                        "VkPhysicalDeviceMultiviewFeatures": {
-                            "multiview": true
-                        },
-                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
-                            "multiview": true
-                        },
-                        "VkPhysicalDeviceVulkan11Features": {
-                            "storageBuffer16BitAccess": true,
-                            "multiview": true
-                        },
                         "VkPhysicalDeviceVulkan12Features": {
                             "storageBuffer8BitAccess": true
-                        }
-                    },
-                    "properties": {
-                        "VkPhysicalDeviceMultiviewProperties": {
-                            "maxMultiviewViewCount": 6
                         },
-                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
-                            "maxMultiviewViewCount": 6
-                        },
-                        "VkPhysicalDeviceVulkan11Properties": {
-                            "maxMultiviewViewCount": 6
+                        "VkPhysicalDevice8BitStorageFeatures": {
+                            "storageBuffer8BitAccess": true
                         }
                     }
                 }

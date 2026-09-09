@@ -5684,11 +5684,12 @@ class VulkanProfilesFiles():
 
 
 class VulkanProfilesLibraryGenerator():
-    def __init__(self, registry, input_profiles_files, output_filename, debugMessages = False):
+    def __init__(self, registry, input_profiles_files, output_filename, debugMessages = False, include_header = None):
         self.registry = registry
         self.profiles_files = input_profiles_files
         self.debugMessages = debugMessages
         self.outputFilename = output_filename
+        self.includeHeader = include_header
 
 
     def patch_code(self, code):
@@ -5728,11 +5729,20 @@ class VulkanProfilesLibraryGenerator():
         with open(fileAbsPath, 'w') as f:
             f.write(COPYRIGHT_HEADER)
             f.write(SHARED_INCLUDE)
-            if self.debugMessages:
+
+            if self.includeHeader:
+                header_str = self.includeHeader.strip()
+                if not (header_str.startswith('<') or header_str.startswith('"')):
+                    header_str = f'"{header_str}"'
+                f.write(f'#include {header_str}\n')
+            elif self.debugMessages:
                 f.write('#include <vulkan/debug/{0}.h>\n'.format(self.outputFilename))
-                f.write(DEBUG_MSG_CB_DEFINE)
             else:
                 f.write('#include <vulkan/{0}.h>\n'.format(self.outputFilename))
+
+            if self.debugMessages:
+                f.write(DEBUG_MSG_CB_DEFINE)
+
             f.write(self.gen_privateImpl())
             f.write(self.gen_publicImpl())
 

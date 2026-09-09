@@ -49,6 +49,11 @@ add_dependencies(VpLibrary_test_generated_library VpGenerate-Libraries)
 
 # Use generated profile source files from the current CMake directory based on build configuration
 set(vulkan_profiles_source ${CMAKE_CURRENT_LIST_DIR}/generated_vulkan_profiles$<$<CONFIG:Debug>:_debug>.cpp)
+set_source_files_properties(
+    ${CMAKE_CURRENT_LIST_DIR}/generated_vulkan_profiles.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/generated_vulkan_profiles_debug.cpp
+    PROPERTIES GENERATED TRUE
+)
 
 function(add_unit_test NAME)
     set(TEST_FILE ./${NAME}.cpp)

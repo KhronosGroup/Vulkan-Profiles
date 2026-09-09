@@ -102,9 +102,10 @@ def main_library(args):
 
         debug = getattr(args, 'debug', False) or (getattr(args, 'config', 'release').lower() == 'debug')
         output_filename = getattr(args, 'output_filename', None) or 'vulkan_profiles'
+        include_header = getattr(args, 'include_header', None)
 
         generator = gen_profiles_solution.VulkanProfilesLibraryGenerator(
-            registry, input_profiles_files, output_filename, debug
+            registry, input_profiles_files, output_filename, debug, include_header=include_header
         )
         generator.generate(out_inc, out_src)
 
