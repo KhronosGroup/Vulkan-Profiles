@@ -1575,6 +1575,284 @@ class TestConvertPullRequiredCapabilitiesCore(unittest.TestCase):
         self.assertProfileDataEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
 
+    def test_pull_required_capabilities_profile_inheritance_vulkan10_to_vulkan12(self):
+        """
+        Verifies core capability pulling across a 3-level profile chain (Vulkan 1.0 -> 1.1 -> 1.2).
+        - VP_TEST_profile_v10 (V1.0) pulls Vulkan 1.0 core capabilities into baseline_v10.
+        - VP_TEST_profile_v11 (V1.1) inherits VP_TEST_profile_v10 and generates transition block 'VP_TEST_profile_v10_to_vulkan11'.
+        - VP_TEST_profile_v12 (V1.2) inherits VP_TEST_profile_v11 and generates transition block 'VP_TEST_profile_v11_to_vulkan12'.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-131.json#",
+            "profiles": {
+                "VP_TEST_profile_v10": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["baseline_v10"]
+                },
+                "VP_TEST_profile_v11": {
+                    "version": 1,
+                    "api-version": "1.1.108",
+                    "profiles": ["VP_TEST_profile_v10"],
+                    "capabilities": ["baseline_v11"]
+                },
+                "VP_TEST_profile_v12": {
+                    "version": 1,
+                    "api-version": "1.2.131",
+                    "profiles": ["VP_TEST_profile_v11"],
+                    "capabilities": ["baseline_v12"]
+                }
+            },
+            "capabilities": {
+                "baseline_v10": {},
+                "baseline_v11": {},
+                "baseline_v12": {}
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-131.json#",
+            "profiles": {
+                "VP_TEST_profile_v10": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["baseline_v10"]
+                },
+                "VP_TEST_profile_v11": {
+                    "version": 1,
+                    "api-version": "1.1.108",
+                    "profiles": ["VP_TEST_profile_v10"],
+                    "capabilities": [
+                        "VP_TEST_profile_v10_to_vulkan11",
+                        "baseline_v11"
+                    ]
+                },
+                "VP_TEST_profile_v12": {
+                    "version": 1,
+                    "api-version": "1.2.131",
+                    "profiles": ["VP_TEST_profile_v11"],
+                    "capabilities": [
+                        "VP_TEST_profile_v11_to_vulkan12",
+                        "baseline_v12"
+                    ]
+                }
+            },
+            "capabilities": {
+                "baseline_v10": {
+                    "features": {
+                        "VkPhysicalDeviceFeatures": {
+                            "robustBufferAccess": true
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceProperties": {
+                            "limits": {
+                                "maxImageDimension1D": 4096,
+                                "maxImageDimension2D": 4096,
+                                "maxImageDimension3D": 256,
+                                "maxImageDimensionCube": 4096,
+                                "maxImageArrayLayers": 256,
+                                "maxTexelBufferElements": 65536,
+                                "maxUniformBufferRange": 16384,
+                                "maxStorageBufferRange": 134217728,
+                                "maxPushConstantsSize": 128,
+                                "maxMemoryAllocationCount": 4096,
+                                "maxSamplerAllocationCount": 4000,
+                                "bufferImageGranularity": 131072,
+                                "sparseAddressSpaceSize": 0,
+                                "maxBoundDescriptorSets": 4,
+                                "maxPerStageDescriptorSamplers": 16,
+                                "maxPerStageDescriptorUniformBuffers": 12,
+                                "maxPerStageDescriptorStorageBuffers": 4,
+                                "maxPerStageDescriptorSampledImages": 16,
+                                "maxPerStageDescriptorStorageImages": 4,
+                                "maxPerStageDescriptorInputAttachments": 4,
+                                "maxPerStageResources": 128,
+                                "maxDescriptorSetSamplers": 96,
+                                "maxDescriptorSetUniformBuffers": 72,
+                                "maxDescriptorSetUniformBuffersDynamic": 8,
+                                "maxDescriptorSetStorageBuffers": 24,
+                                "maxDescriptorSetStorageBuffersDynamic": 4,
+                                "maxDescriptorSetSampledImages": 96,
+                                "maxDescriptorSetStorageImages": 24,
+                                "maxDescriptorSetInputAttachments": 4,
+                                "maxVertexInputAttributes": 16,
+                                "maxVertexInputBindings": 16,
+                                "maxVertexInputAttributeOffset": 2047,
+                                "maxVertexInputBindingStride": 2048,
+                                "maxVertexOutputComponents": 64,
+                                "maxTessellationGenerationLevel": 0,
+                                "maxTessellationPatchSize": 0,
+                                "maxTessellationControlPerVertexInputComponents": 0,
+                                "maxTessellationControlPerVertexOutputComponents": 0,
+                                "maxTessellationControlPerPatchOutputComponents": 0,
+                                "maxTessellationControlTotalOutputComponents": 0,
+                                "maxTessellationEvaluationInputComponents": 0,
+                                "maxTessellationEvaluationOutputComponents": 0,
+                                "maxGeometryShaderInvocations": 0,
+                                "maxGeometryInputComponents": 0,
+                                "maxGeometryOutputComponents": 0,
+                                "maxGeometryOutputVertices": 0,
+                                "maxGeometryTotalOutputComponents": 0,
+                                "maxFragmentInputComponents": 64,
+                                "maxFragmentOutputAttachments": 4,
+                                "maxFragmentDualSrcAttachments": 0,
+                                "maxFragmentCombinedOutputResources": 4,
+                                "maxComputeSharedMemorySize": 16384,
+                                "maxComputeWorkGroupCount": [65535, 65535, 65535],
+                                "maxComputeWorkGroupInvocations": 128,
+                                "maxComputeWorkGroupSize": [128, 128, 64],
+                                "subPixelPrecisionBits": 4,
+                                "subTexelPrecisionBits": 4,
+                                "mipmapPrecisionBits": 4,
+                                "maxDrawIndexedIndexValue": 16777216,
+                                "maxDrawIndirectCount": 1,
+                                "maxSamplerLodBias": 2,
+                                "maxSamplerAnisotropy": 1,
+                                "maxViewports": 1,
+                                "maxViewportDimensions": [4096, 4096],
+                                "viewportBoundsRange": [-8192, 8192],
+                                "viewportSubPixelBits": 0,
+                                "minMemoryMapAlignment": 64,
+                                "minTexelBufferOffsetAlignment": 256,
+                                "minUniformBufferOffsetAlignment": 256,
+                                "minStorageBufferOffsetAlignment": 256,
+                                "minTexelOffset": -8,
+                                "maxTexelOffset": 7,
+                                "minTexelGatherOffset": -8,
+                                "maxTexelGatherOffset": 7,
+                                "minInterpolationOffset": 0.0,
+                                "maxInterpolationOffset": 0.0,
+                                "subPixelInterpolationOffsetBits": 0,
+                                "maxFramebufferWidth": 4096,
+                                "maxFramebufferHeight": 4096,
+                                "maxFramebufferLayers": 256,
+                                "framebufferColorSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "framebufferDepthSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "framebufferStencilSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "framebufferNoAttachmentsSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "maxColorAttachments": 4,
+                                "sampledImageColorSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "sampledImageIntegerSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "sampledImageDepthSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "sampledImageStencilSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "storageImageSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
+                                "maxSampleMaskWords": 1,
+                                "maxClipDistances": 0,
+                                "maxCullDistances": 0,
+                                "maxCombinedClipAndCullDistances": 0,
+                                "discreteQueuePriorities": 2,
+                                "pointSizeRange": [1.0, 1.0],
+                                "lineWidthRange": [1.0, 1.0],
+                                "pointSizeGranularity": 1.0,
+                                "lineWidthGranularity": 1.0,
+                                "nonCoherentAtomSize": 256
+                            },
+                            "sparseProperties": {
+                                "residencyStandard2DBlockShape": false,
+                                "residencyStandard2DMultisampleBlockShape": false,
+                                "residencyStandard3DBlockShape": false,
+                                "residencyNonResidentStrict": false
+                            }
+                        }
+                    }
+                },
+                "VP_TEST_profile_v10_to_vulkan11": {
+                    "features": {
+                        "VkPhysicalDeviceMultiviewFeatures": {
+                            "multiview": true
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceMaintenance3Properties": {
+                            "maxMemoryAllocationSize": 1073741824,
+                            "maxPerSetDescriptors": 1024
+                        },
+                        "VkPhysicalDeviceMultiviewProperties": {
+                            "maxMultiviewInstanceIndex": 134217727,
+                            "maxMultiviewViewCount": 6
+                        },
+                        "VkPhysicalDeviceSubgroupProperties": {
+                            "subgroupSize": 1,
+                            "supportedOperations": ["VK_SUBGROUP_FEATURE_BASIC_BIT"],
+                            "supportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT"]
+                        }
+                    }
+                },
+                "baseline_v11": {},
+                "VP_TEST_profile_v11_to_vulkan12": {
+                    "features": {
+                        "VkPhysicalDeviceVulkan12Features": {
+                            "imagelessFramebuffer": true,
+                            "uniformBufferStandardLayout": true,
+                            "shaderSubgroupExtendedTypes": true,
+                            "separateDepthStencilLayouts": true,
+                            "hostQueryReset": true,
+                            "timelineSemaphore": true,
+                            "subgroupBroadcastDynamicId": true
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceVulkan12Properties": {
+                            "shaderSignedZeroInfNanPreserveFloat16": false,
+                            "shaderSignedZeroInfNanPreserveFloat32": false,
+                            "shaderSignedZeroInfNanPreserveFloat64": false,
+                            "shaderDenormPreserveFloat16": false,
+                            "shaderDenormPreserveFloat32": false,
+                            "shaderDenormPreserveFloat64": false,
+                            "shaderDenormFlushToZeroFloat16": false,
+                            "shaderDenormFlushToZeroFloat32": false,
+                            "shaderDenormFlushToZeroFloat64": false,
+                            "shaderRoundingModeRTEFloat16": false,
+                            "shaderRoundingModeRTEFloat32": false,
+                            "shaderRoundingModeRTEFloat64": false,
+                            "shaderRoundingModeRTZFloat16": false,
+                            "shaderRoundingModeRTZFloat32": false,
+                            "shaderRoundingModeRTZFloat64": false,
+                            "maxUpdateAfterBindDescriptorsInAllPools": 0,
+                            "shaderUniformBufferArrayNonUniformIndexingNative": false,
+                            "shaderSampledImageArrayNonUniformIndexingNative": false,
+                            "shaderStorageBufferArrayNonUniformIndexingNative": false,
+                            "shaderStorageImageArrayNonUniformIndexingNative": false,
+                            "shaderInputAttachmentArrayNonUniformIndexingNative": false,
+                            "robustBufferAccessUpdateAfterBind": false,
+                            "quadDivergentImplicitLod": false,
+                            "maxPerStageDescriptorUpdateAfterBindSamplers": 0,
+                            "maxPerStageDescriptorUpdateAfterBindUniformBuffers": 0,
+                            "maxPerStageDescriptorUpdateAfterBindStorageBuffers": 0,
+                            "maxPerStageDescriptorUpdateAfterBindSampledImages": 0,
+                            "maxPerStageDescriptorUpdateAfterBindStorageImages": 0,
+                            "maxPerStageDescriptorUpdateAfterBindInputAttachments": 0,
+                            "maxPerStageUpdateAfterBindResources": 0,
+                            "maxDescriptorSetUpdateAfterBindSamplers": 0,
+                            "maxDescriptorSetUpdateAfterBindUniformBuffers": 0,
+                            "maxDescriptorSetUpdateAfterBindUniformBuffersDynamic": 0,
+                            "maxDescriptorSetUpdateAfterBindStorageBuffers": 0,
+                            "maxDescriptorSetUpdateAfterBindStorageBuffersDynamic": 0,
+                            "maxDescriptorSetUpdateAfterBindSampledImages": 0,
+                            "maxDescriptorSetUpdateAfterBindStorageImages": 0,
+                            "maxDescriptorSetUpdateAfterBindInputAttachments": 0,
+                            "supportedDepthResolveModes": [],
+                            "supportedStencilResolveModes": [],
+                            "independentResolveNone": false,
+                            "independentResolve": false,
+                            "filterMinmaxSingleComponentFormats": false,
+                            "filterMinmaxImageComponentMapping": false,
+                            "maxTimelineSemaphoreValueDifference": 2147483647,
+                            "framebufferIntegerColorSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"]
+                        }
+                    }
+                },
+                "baseline_v12": {}
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
+        sort_profiles_files(self.vk, json_files_dict)
+        self.assertProfileDataEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
