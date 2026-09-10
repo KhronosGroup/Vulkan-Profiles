@@ -29,43 +29,16 @@ from xml.etree import ElementTree
 from typing import Any
 from dataclasses import dataclass
 
-import vulkan_object
-
-try:
-    from vulkan_object import (
-        VulkanObject, CapabilityAlias, StructCapabilityAlias, ExtensionCapabilityAlias,
-        Version, FeatureRequirement, PropertyRequirement
-    )
-except ImportError:
-    from vulkan_object import (
-        VulkanObject, CapabilityAlias, StructCapabilityAlias, ExtensionCapabilityAlias,
-        Version
-    )
-
-    @dataclass
-    class FeatureRequirement:
-        """Fallback dataclass when FeatureRequirement is absent in external vulkan_object.py."""
-        struct: str
-        field: str
-        depends: (str | None)
-
-    @dataclass
-    class PropertyRequirement:
-        """Fallback dataclass when PropertyRequirement is absent in external vulkan_object.py."""
-        struct: str
-        name: str
-        value: str
-        depends: (str | None)
-
-    # Dynamically inject into vulkan_object module namespace
-    vulkan_object.FeatureRequirement = FeatureRequirement
-    vulkan_object.PropertyRequirement = PropertyRequirement
+from vulkan_object import (
+    VulkanObject, CapabilityAlias, StructCapabilityAlias, ExtensionCapabilityAlias,
+    Version, FeatureRequirement
+)
 
 from reg import Registry
 from base_generator import BaseGenerator, BaseGeneratorOptions, SetOutputDirectory, SetOutputFileName, SetTargetApiName, SetMergedApiNames
 from source.vulkan_object_version import VK_VERSION, get_bundle_structure_core_version, is_bundle_structure
 from source.vulkan_object_expression_parsing import collectExtensions, evalExpression
-from source.vulkan_object_data import DEFAULT_CORE_PROPERTY_REQUIREMENTS
+from source.vulkan_object_data import DEFAULT_CORE_PROPERTY_REQUIREMENTS, PropertyRequirement
 
 __all__ = [
     'getVulkanObject',
@@ -883,15 +856,16 @@ def gatherSatisfiedCoreRequiredFeaturesForVersion(
     api_version: VK_VERSION, 
     enabled_exts: set[str], 
     enabled_features: set[tuple[str, str]]
-) -> dict[str, dict[str, bool]]:
+) -> tuple[dict[str, dict[str, bool]], list[dict]]:
     satisfied_features: dict[str, dict[str, bool]] = {}
+    or_disjunctions: list[dict] = []
 
     if exact_ver == VK_VERSION.NONE or api_version == VK_VERSION.NONE or exact_ver > api_version:
-        return satisfied_features
+        return satisfied_features, or_disjunctions
 
     ver_obj = vk.versions.get(exact_ver.value)
     if not ver_obj:
-        return satisfied_features
+        return satisfied_features, or_disjunctions
 
     for req in getattr(ver_obj, 'featureRequirement', []) or []:
         if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
@@ -900,18 +874,51 @@ def gatherSatisfiedCoreRequiredFeaturesForVersion(
                 if is_any_feature_enabled(vk, req.struct, fields, enabled_features):
                     continue
                 else:
-                    msg = (
-                        f"WARNING: Core version '{exact_ver}' requires one of the OR-features in "
-                        f"'{req.struct}' ({req.field}), but none are enabled in context. "
-                        f"Skipping automatic feature pull. One feature option must be explicitly enabled in the profile."
-                    )
-                    logging.warning(msg)
-                    print(msg)
+                    or_disjunctions.append({
+                        "struct": req.struct,
+                        "fields": fields,
+                        "ver": exact_ver,
+                        "depends": req.depends
+                    })
                     continue
             for field_name in fields:
                 satisfied_features.setdefault(req.struct, {})[field_name] = True
 
-    return satisfied_features
+    return satisfied_features, or_disjunctions
+
+
+def gatherSatisfiedExtensionRequiredFeatures(
+    vk: VulkanObject, 
+    ext_name: str, 
+    api_version: VK_VERSION, 
+    enabled_exts: set[str], 
+    enabled_features: set[tuple[str, str]]
+) -> tuple[dict[str, dict[str, bool]], list[dict]]:
+    satisfied_features: dict[str, dict[str, bool]] = {}
+    or_disjunctions: list[dict] = []
+
+    if ext_name not in vk.extensions:
+        return satisfied_features, or_disjunctions
+
+    ext_obj = vk.extensions[ext_name]
+    for req in getattr(ext_obj, 'featureRequirement', []):
+        if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
+            fields = [f.strip() for f in req.field.split(',')] if req.field else []
+            if len(fields) > 1:
+                if is_any_feature_enabled(vk, req.struct, fields, enabled_features):
+                    continue
+                else:
+                    or_disjunctions.append({
+                        "struct": req.struct,
+                        "fields": fields,
+                        "ext": ext_name,
+                        "depends": req.depends
+                    })
+                    continue
+            for field_name in fields:
+                satisfied_features.setdefault(req.struct, {})[field_name] = True
+
+    return satisfied_features, or_disjunctions
 
 def parse_property_value(prop_name: str, val_str: str) -> Any:
     if val_str is None:
@@ -988,36 +995,3 @@ def gatherSatisfiedCoreRequiredPropertiesForVersion(
                 struct_dict[req.name] = parsed_val
 
     return satisfied_properties
-
-def gatherSatisfiedExtensionRequiredFeatures(
-    vk: VulkanObject, 
-    ext_name: str, 
-    api_version: VK_VERSION, 
-    enabled_exts: set[str], 
-    enabled_features: set[tuple[str, str]]
-) -> dict[str, dict[str, bool]]:
-    satisfied_features: dict[str, dict[str, bool]] = {}
-
-    if ext_name not in vk.extensions:
-        return satisfied_features
-
-    ext_obj = vk.extensions[ext_name]
-    for req in getattr(ext_obj, 'featureRequirement', []):
-        if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
-            fields = [f.strip() for f in req.field.split(',')] if req.field else []
-            if len(fields) > 1:
-                if is_any_feature_enabled(vk, req.struct, fields, enabled_features):
-                    continue
-                else:
-                    msg = (
-                        f"WARNING: Extension '{ext_name}' requires one of the OR-features in "
-                        f"'{req.struct}' ({req.field}), but none are enabled in context. "
-                        f"Skipping automatic feature pull. One feature option must be explicitly enabled in the profile."
-                    )
-                    logging.warning(msg)
-                    print(msg)
-                    continue
-            for field_name in fields:
-                satisfied_features.setdefault(req.struct, {})[field_name] = True
-
-    return satisfied_features

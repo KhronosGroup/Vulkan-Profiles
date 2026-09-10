@@ -79,14 +79,14 @@ class TestVulkanObjectUtils(unittest.TestCase):
         vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
 
         # On Vulkan 1.0, core Vulkan 1.1+ features must strictly NOT be pulled
-        core_features_v10 = gatherSatisfiedCoreRequiredFeaturesForVersion(
+        core_features_v10, _ = gatherSatisfiedCoreRequiredFeaturesForVersion(
             vk, VK_VERSION.V1_1, VK_VERSION.V1_0, enabled_exts=set(), enabled_features=set()
         )
         self.assertNotIn("VkPhysicalDeviceVulkan11Features", core_features_v10)
         self.assertNotIn("VkPhysicalDeviceVulkan12Features", core_features_v10)
 
         # On Vulkan 1.2, evaluating core 1.2 features for a Vulkan 1.2 profile
-        core_features_v12 = gatherSatisfiedCoreRequiredFeaturesForVersion(
+        core_features_v12, _ = gatherSatisfiedCoreRequiredFeaturesForVersion(
             vk, VK_VERSION.V1_2, VK_VERSION.V1_2, enabled_exts=set(), enabled_features=set()
         )
         if "VkPhysicalDeviceVulkan12Features" in core_features_v12:
@@ -96,7 +96,7 @@ class TestVulkanObjectUtils(unittest.TestCase):
         vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
 
         # Evaluating VK_KHR_variable_pointers should gather its required features
-        ext_features = gatherSatisfiedExtensionRequiredFeatures(
+        ext_features, _ = gatherSatisfiedExtensionRequiredFeatures(
             vk, "VK_KHR_variable_pointers", VK_VERSION.V1_0, 
             enabled_exts={"VK_KHR_variable_pointers"}, enabled_features=set()
         )
@@ -555,7 +555,7 @@ class TestVulkanObjectUtils(unittest.TestCase):
         vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
 
         # Case 1: Core 1.2 feature evaluation on Vulkan 1.1 API returns empty dict
-        features_v11_no_ext = gatherSatisfiedCoreRequiredFeaturesForVersion(
+        features_v11_no_ext, _ = gatherSatisfiedCoreRequiredFeaturesForVersion(
             vk, VK_VERSION.V1_2, VK_VERSION.V1_1, enabled_exts=set(), enabled_features=set()
         )
         v12_features_v11 = features_v11_no_ext.get("VkPhysicalDeviceVulkan12Features", {})
@@ -563,7 +563,7 @@ class TestVulkanObjectUtils(unittest.TestCase):
 
         # Case 2: Core 1.2 feature evaluation on Vulkan 1.2 API with extension enabled gathers samplerMirrorClampToEdge
         exts_with_clamp = {"VK_KHR_sampler_mirror_clamp_to_edge"}
-        features_v12_ext = gatherSatisfiedCoreRequiredFeaturesForVersion(
+        features_v12_ext, _ = gatherSatisfiedCoreRequiredFeaturesForVersion(
             vk, VK_VERSION.V1_2, VK_VERSION.V1_2, enabled_exts=exts_with_clamp, enabled_features=set()
         )
         v12_features_ext = features_v12_ext.get("VkPhysicalDeviceVulkan12Features", {})
@@ -571,7 +571,7 @@ class TestVulkanObjectUtils(unittest.TestCase):
         self.assertTrue(v12_features_ext["samplerMirrorClampToEdge"])
 
         # Case 3: Core 1.2 feature evaluation on Vulkan 1.2 API without extension enabled strictly omits samplerMirrorClampToEdge
-        features_v12 = gatherSatisfiedCoreRequiredFeaturesForVersion(
+        features_v12, _ = gatherSatisfiedCoreRequiredFeaturesForVersion(
             vk, VK_VERSION.V1_2, VK_VERSION.V1_2, enabled_exts=set(), enabled_features=set()
         )
         v12_features_v12 = features_v12.get("VkPhysicalDeviceVulkan12Features", {})
@@ -581,7 +581,7 @@ class TestVulkanObjectUtils(unittest.TestCase):
         vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
 
         # Case 1: Neither atomic Int64 feature is enabled -> shaderInt64 is NOT gathered
-        features_none = gatherSatisfiedCoreRequiredFeaturesForVersion(
+        features_none, _ = gatherSatisfiedCoreRequiredFeaturesForVersion(
             vk, VK_VERSION.V1_2, VK_VERSION.V1_2, enabled_exts=set(), enabled_features=set()
         )
         base_features_none = features_none.get("VkPhysicalDeviceFeatures", {})
@@ -589,7 +589,7 @@ class TestVulkanObjectUtils(unittest.TestCase):
 
         # Case 2: Enable shaderBufferInt64Atomics -> shaderInt64 IS gathered
         input_buffer_atomic = {("VkPhysicalDeviceShaderAtomicInt64Features", "shaderBufferInt64Atomics")}
-        features_buffer = gatherSatisfiedCoreRequiredFeaturesForVersion(
+        features_buffer, _ = gatherSatisfiedCoreRequiredFeaturesForVersion(
             vk, VK_VERSION.V1_2, VK_VERSION.V1_2, enabled_exts=set(), enabled_features=input_buffer_atomic
         )
         base_features_buffer = features_buffer.get("VkPhysicalDeviceFeatures", {})
@@ -598,7 +598,7 @@ class TestVulkanObjectUtils(unittest.TestCase):
 
         # Case 3: Enable shaderSharedInt64Atomics -> shaderInt64 IS gathered
         input_shared_atomic = {("VkPhysicalDeviceShaderAtomicInt64Features", "shaderSharedInt64Atomics")}
-        features_shared = gatherSatisfiedCoreRequiredFeaturesForVersion(
+        features_shared, _ = gatherSatisfiedCoreRequiredFeaturesForVersion(
             vk, VK_VERSION.V1_2, VK_VERSION.V1_2, enabled_exts=set(), enabled_features=input_shared_atomic
         )
         base_features_shared = features_shared.get("VkPhysicalDeviceFeatures", {})
@@ -616,4 +616,3 @@ if __name__ == '__main__':
     TestVulkanObjectUtils.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
-    

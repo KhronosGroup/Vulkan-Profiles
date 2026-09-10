@@ -457,7 +457,7 @@ def pull_extension_dependencies_capabilities_block(
                         enabled_features.add((s_name, m_name))
 
     for ext_name in filtered_deps.keys():
-        ext_satisfied = gatherSatisfiedExtensionRequiredFeatures(
+        ext_satisfied, _ = gatherSatisfiedExtensionRequiredFeatures(
             vk, ext_name, version, profile_enabled_exts, enabled_features
         )
         if ext_satisfied:
@@ -552,6 +552,60 @@ def pull_extension_dependencies_profiles_files(vk: VulkanObject, ignore_extensio
 # Required Capabilities Evaluation & Transition Blocks
 # -----------------------------------------------------------------------------
 
+def process_or_disjunction(
+    vk: VulkanObject,
+    profile_obj: dict,
+    capabilities_dict: dict,
+    block_name: str,
+    disjunction: dict
+):
+    """
+    Processes an OR feature disjunction by:
+    1. Extracting the extension (if applicable) from the source capability block.
+    2. Creating self-contained variant capability blocks for each feature option in the disjunction.
+    3. Adding an array of OR capability block names [block_var1, block_var2, ...] into
+       profile_obj['capabilities'] immediately after block_name.
+    """
+    struct_name = disjunction["struct"]
+    fields = disjunction["fields"]
+    ext_name = disjunction.get("ext")
+
+    parent_block = capabilities_dict.get(block_name, {})
+    ext_ver_val = 1
+
+    # 1. Extract extension from parent block if it originated from an extension
+    if ext_name and "extensions" in parent_block and isinstance(parent_block["extensions"], dict):
+        if ext_name in parent_block["extensions"]:
+            ext_ver_val = parent_block["extensions"].pop(ext_name)
+            if not parent_block["extensions"]:
+                del parent_block["extensions"]
+
+    # 2. Build variant capability blocks
+    variant_block_names = []
+    for field_name in fields:
+        var_block_name = f"{block_name}_{field_name}"
+        variant_block_names.append(var_block_name)
+
+        var_block = capabilities_dict.setdefault(var_block_name, {})
+
+        if ext_name:
+            var_exts = var_block.setdefault("extensions", {})
+            var_exts[ext_name] = ext_ver_val
+
+        var_feats = var_block.setdefault("features", {})
+        var_struct = var_feats.setdefault(struct_name, {})
+        var_struct[field_name] = True
+
+    # 3. Insert variant array into profile's capabilities list right after block_name
+    profile_caps = profile_obj.setdefault("capabilities", [])
+    if variant_block_names not in profile_caps:
+        if block_name in profile_caps:
+            idx = profile_caps.index(block_name)
+            profile_caps.insert(idx + 1, variant_block_names)
+        else:
+            profile_caps.append(variant_block_names)
+
+
 def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: dict, json_file_data: dict):
     profiles_data = json_file_data.get("profiles", {})
     capabilities_dict = json_file_data.setdefault("capabilities", {})
@@ -598,7 +652,7 @@ def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: 
                     transition_properties = {}
                     for ver in VK_VERSION.versions():
                         if parent_api_version < ver <= api_version:
-                            satisfied_feat = gatherSatisfiedCoreRequiredFeaturesForVersion(
+                            satisfied_feat, core_disj = gatherSatisfiedCoreRequiredFeaturesForVersion(
                                 vk, ver, api_version, all_exts, all_enabled_features_set
                             )
                             if satisfied_feat:
@@ -676,7 +730,7 @@ def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: 
                 core_satisfied_properties = {}
                 for ver in VK_VERSION.versions():
                     if ver <= api_version:
-                        satisfied_feat = gatherSatisfiedCoreRequiredFeaturesForVersion(
+                        satisfied_feat, core_disj = gatherSatisfiedCoreRequiredFeaturesForVersion(
                             vk, ver, api_version, profile_enabled_exts, all_enabled_features_set
                         )
                         if satisfied_feat:
@@ -734,9 +788,15 @@ def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: 
                                     current_enabled_features.add((struct_name, member_name))
 
                 for ext_name in ext_list:
-                    ext_satisfied = gatherSatisfiedExtensionRequiredFeatures(
+                    ext_satisfied, ext_or_disjunctions = gatherSatisfiedExtensionRequiredFeatures(
                         vk, ext_name, api_version, profile_enabled_exts, current_enabled_features
                     )
+                    if ext_or_disjunctions:
+                        for disj in ext_or_disjunctions:
+                            process_or_disjunction(
+                                vk, profile_obj, capabilities_dict, block_name, disj
+                            )
+
                     if ext_satisfied:
                         filtered_ext_satisfied = filter_features_against_context(vk, ext_satisfied, context_features)
                         if filtered_ext_satisfied:

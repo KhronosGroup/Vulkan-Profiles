@@ -29,6 +29,7 @@
 
 ### Deprecation:
 - `gen_profiles*.py` file are all deprecated and replaced by `vkprofiles`
+- Using the Vulkan Profiles API library without declaring #define VP_USE_OBJECT is deprecated
 - Require Vulkan 1.1
 
 ## [Vulkan Profiles Tools 1.4.357](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.357.0) - July 2026
