@@ -31,7 +31,7 @@ if str(scripts_dir) not in sys.path:
 
 from vulkan_object import VulkanObject
 from source.vulkan_object_utils import initVulkanObject
-from source.main_convert import sort_profiles_files
+from source.transform_sort import sort_profiles_files
 
 
 class TestConvertSort(unittest.TestCase):

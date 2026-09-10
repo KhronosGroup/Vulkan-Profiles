@@ -31,11 +31,11 @@ if str(scripts_dir) not in sys.path:
 
 from vulkan_object import VulkanObject
 from source.vulkan_object_utils import initVulkanObject
-from source.main_convert import (
+from source.transform_pull_required_capabilities import (
     pull_extension_dependencies_profiles_files,
-    pull_required_capabilities_profiles_files,
-    sort_profiles_files
+    pull_required_capabilities_profiles_files
 )
+from source.transform_sort import sort_profiles_files
 
 
 class TestConvertPullRequiredCapabilitiesOR(unittest.TestCase):

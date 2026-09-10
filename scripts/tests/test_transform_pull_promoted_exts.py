@@ -31,12 +31,10 @@ if str(scripts_dir) not in sys.path:
 
 from vulkan_object import VulkanObject
 from source.vulkan_object_utils import initVulkanObject
-from source.main_convert import (
-    strip_promoted_extensions_profiles_files
-)
+from source.transform_pull_promoted_extensions import pull_promoted_extensions_profiles_files
 
 
-class TestConvertStripPromotedExtensions(unittest.TestCase):
+class TestConvertPullPromotedExtensions(unittest.TestCase):
     registry_path = None
 
     def setUp(self):
@@ -46,10 +44,11 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
     # Vulkan 1.0 Tests (VK_KHR_variable_pointers)
     # -------------------------------------------------------------------------
 
-    def test_strip_promoted_extensions_block_unique_vulkan10(self):
+    def test_pull_promoted_extensions_block_unique_vulkan10(self):
         """
-        Verifies that for Vulkan 1.0 profiles, extensions promoted to Vulkan 1.1+
-        (such as VK_KHR_variable_pointers) are not stripped.
+        Verifies that for Vulkan 1.0 profiles, pull_promoted_extensions_profiles_files pulls no core
+        promoted extensions (since core promotions start at Vulkan 1.1+), but still resolves dependencies
+        and required features for extensions in the primary capability block.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -86,7 +85,14 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "baseline": {
                     "extensions": {
-                        "VK_KHR_variable_pointers": 1
+                        "VK_KHR_variable_pointers": 1,
+                        "VK_KHR_get_physical_device_properties2": 1,
+                        "VK_KHR_storage_buffer_storage_class": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        }
                     }
                 }
             }
@@ -98,15 +104,15 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        strip_promoted_extensions_profiles_files(self.vk, json_files_dict)
+        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
 
-    def test_strip_promoted_extensions_block_inheritance_vulkan10(self):
+    def test_pull_promoted_extensions_block_inheritance_vulkan10(self):
         """
-        Verifies that for Vulkan 1.0 profiles with block inheritance, extensions promoted
-        to Vulkan 1.1+ (such as VK_KHR_get_physical_device_properties2 and VK_KHR_variable_pointers) are retained.
+        Verifies that for Vulkan 1.0 profiles with block inheritance, promoted extension extraction
+        only targets primary capability block_a, leaving secondary block_b untouched.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -153,7 +159,13 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
                 },
                 "block_b": {
                     "extensions": {
+                        "VK_KHR_storage_buffer_storage_class": 1,
                         "VK_KHR_variable_pointers": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        }
                     }
                 }
             }
@@ -165,14 +177,15 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        strip_promoted_extensions_profiles_files(self.vk, json_files_dict)
+        pull_promoted_extensions_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
 
-    def test_strip_promoted_extensions_profile_inheritance_vulkan10(self):
+    def test_pull_promoted_extensions_profile_inheritance_vulkan10(self):
         """
-        Verifies that for Vulkan 1.0 profiles with profile inheritance, non-promoted extensions are retained across all profiles.
+        Verifies that for Vulkan 1.0 profiles with profile inheritance, dependency pulling
+        operates independently per profile primary block.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -197,7 +210,13 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
                 },
                 "block_b": {
                     "extensions": {
+                        "VK_KHR_storage_buffer_storage_class": 1,
                         "VK_KHR_variable_pointers": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        }
                     }
                 }
             }
@@ -231,7 +250,13 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
                 },
                 "block_b": {
                     "extensions": {
-                        "VK_KHR_variable_pointers": 1
+                        "VK_KHR_variable_pointers": 1,
+                        "VK_KHR_storage_buffer_storage_class": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        }
                     }
                 }
             }
@@ -243,7 +268,7 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        strip_promoted_extensions_profiles_files(self.vk, json_files_dict)
+        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -251,10 +276,10 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
     # Vulkan 1.1 Tests (VK_KHR_variable_pointers)
     # -------------------------------------------------------------------------
 
-    def test_strip_promoted_extensions_block_unique_vulkan11(self):
+    def test_pull_promoted_extensions_block_unique_vulkan11(self):
         """
-        Verifies that for Vulkan 1.1 profiles, extensions promoted to Vulkan 1.1 core
-        (such as VK_KHR_variable_pointers) are stripped from capability blocks.
+        Verifies that all extensions promoted to Vulkan 1.1 core and their dependencies (e.g. VK_KHR_surface)
+        are automatically injected into a Vulkan 1.1 profile's primary capability block.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -289,7 +314,47 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
                 }
             },
             "capabilities": {
-                "baseline": {}
+                "baseline": {
+                    "extensions": {
+                        "VK_KHR_variable_pointers": 1,
+                        "VK_KHR_multiview": 1,
+                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_device_group": 1,
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_get_physical_device_properties2": 1,
+                        "VK_KHR_maintenance1": 1,
+                        "VK_KHR_external_memory_capabilities": 1,
+                        "VK_KHR_external_memory": 1,
+                        "VK_KHR_external_semaphore_capabilities": 1,
+                        "VK_KHR_external_semaphore": 1,
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_descriptor_update_template": 1,
+                        "VK_KHR_external_fence_capabilities": 1,
+                        "VK_KHR_external_fence": 1,
+                        "VK_KHR_maintenance2": 1,
+                        "VK_KHR_dedicated_allocation": 1,
+                        "VK_KHR_storage_buffer_storage_class": 1,
+                        "VK_KHR_relaxed_block_layout": 1,
+                        "VK_KHR_get_memory_requirements2": 1,
+                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_bind_memory2": 1,
+                        "VK_KHR_maintenance3": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
+                        },
+                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
+                            "samplerYcbcrConversion": true
+                        }
+                    }
+                }
             }
         }"""
 
@@ -299,15 +364,15 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        strip_promoted_extensions_profiles_files(self.vk, json_files_dict)
+        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
 
-    def test_strip_promoted_extensions_block_inheritance_vulkan11(self):
+    def test_pull_promoted_extensions_block_inheritance_vulkan11(self):
         """
-        Verifies that for Vulkan 1.1 profiles with block inheritance, extensions promoted
-        to Vulkan 1.1 core are stripped across all capability blocks.
+        Verifies that Vulkan 1.1 promoted extensions are injected into the primary block (block_a),
+        leaving non-primary blocks (block_b) untouched.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -347,8 +412,52 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
                 }
             },
             "capabilities": {
-                "block_a": {},
-                "block_b": {}
+                "block_a": {
+                    "extensions": {
+                        "VK_KHR_get_physical_device_properties2": 1,
+                        "VK_KHR_multiview": 1,
+                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_device_group": 1,
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_maintenance1": 1,
+                        "VK_KHR_external_memory_capabilities": 1,
+                        "VK_KHR_external_memory": 1,
+                        "VK_KHR_external_semaphore_capabilities": 1,
+                        "VK_KHR_external_semaphore": 1,
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_descriptor_update_template": 1,
+                        "VK_KHR_external_fence_capabilities": 1,
+                        "VK_KHR_external_fence": 1,
+                        "VK_KHR_maintenance2": 1,
+                        "VK_KHR_variable_pointers": 1,
+                        "VK_KHR_dedicated_allocation": 1,
+                        "VK_KHR_storage_buffer_storage_class": 1,
+                        "VK_KHR_relaxed_block_layout": 1,
+                        "VK_KHR_get_memory_requirements2": 1,
+                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_bind_memory2": 1,
+                        "VK_KHR_maintenance3": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
+                        },
+                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
+                            "samplerYcbcrConversion": true
+                        }
+                    }
+                },
+                "block_b": {
+                    "extensions": {
+                        "VK_KHR_variable_pointers": 1
+                    }
+                }
             }
         }"""
 
@@ -358,15 +467,14 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        strip_promoted_extensions_profiles_files(self.vk, json_files_dict)
+        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
 
-    def test_strip_promoted_extensions_profile_inheritance_vulkan11(self):
+    def test_pull_promoted_extensions_profile_inheritance_vulkan11(self):
         """
-        Verifies that for Vulkan 1.1 profiles with profile inheritance, extensions promoted
-        to Vulkan 1.1 core are stripped from all profile blocks.
+        Verifies that Vulkan 1.1 promoted extensions are injected into each profile's primary block across profile inheritance trees.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -418,8 +526,52 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
                 }
             },
             "capabilities": {
-                "block_a": {},
-                "block_b": {}
+                "block_a": {
+                    "extensions": {
+                        "VK_KHR_get_physical_device_properties2": 1,
+                        "VK_KHR_multiview": 1,
+                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_device_group": 1,
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_maintenance1": 1,
+                        "VK_KHR_external_memory_capabilities": 1,
+                        "VK_KHR_external_memory": 1,
+                        "VK_KHR_external_semaphore_capabilities": 1,
+                        "VK_KHR_external_semaphore": 1,
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_descriptor_update_template": 1,
+                        "VK_KHR_external_fence_capabilities": 1,
+                        "VK_KHR_external_fence": 1,
+                        "VK_KHR_maintenance2": 1,
+                        "VK_KHR_variable_pointers": 1,
+                        "VK_KHR_dedicated_allocation": 1,
+                        "VK_KHR_storage_buffer_storage_class": 1,
+                        "VK_KHR_relaxed_block_layout": 1,
+                        "VK_KHR_get_memory_requirements2": 1,
+                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_bind_memory2": 1,
+                        "VK_KHR_maintenance3": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
+                        },
+                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
+                            "samplerYcbcrConversion": true
+                        }
+                    }
+                },
+                "block_b": {
+                    "extensions": {
+                        "VK_KHR_variable_pointers": 1
+                    }
+                }
             }
         }"""
 
@@ -429,7 +581,7 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        strip_promoted_extensions_profiles_files(self.vk, json_files_dict)
+        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -437,10 +589,10 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
     # Vulkan 1.1 Advanced Tests (VK_KHR_swapchain_mutable_format)
     # -------------------------------------------------------------------------
 
-    def test_strip_promoted_extensions_block_unique_vulkan11_advanced(self):
+    def test_pull_promoted_extensions_block_unique_vulkan11_advanced(self):
         """
-        Verifies that non-promoted extensions (such as VK_KHR_swapchain_mutable_format under Vulkan 1.1)
-        are not stripped from capability blocks.
+        Verifies that when pulling promoted extensions for a Vulkan 1.1 profile containing VK_KHR_swapchain_mutable_format,
+        all 1.1 promoted extensions plus transitive dependencies (VK_KHR_swapchain, VK_KHR_surface, VK_KHR_image_format_list) are present.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -477,7 +629,47 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "baseline": {
                     "extensions": {
-                        "VK_KHR_swapchain_mutable_format": 1
+                        "VK_KHR_swapchain_mutable_format": 1,
+                        "VK_KHR_multiview": 1,
+                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_device_group": 1,
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_get_physical_device_properties2": 1,
+                        "VK_KHR_maintenance1": 1,
+                        "VK_KHR_external_memory_capabilities": 1,
+                        "VK_KHR_external_memory": 1,
+                        "VK_KHR_external_semaphore_capabilities": 1,
+                        "VK_KHR_external_semaphore": 1,
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_descriptor_update_template": 1,
+                        "VK_KHR_external_fence_capabilities": 1,
+                        "VK_KHR_external_fence": 1,
+                        "VK_KHR_maintenance2": 1,
+                        "VK_KHR_variable_pointers": 1,
+                        "VK_KHR_dedicated_allocation": 1,
+                        "VK_KHR_storage_buffer_storage_class": 1,
+                        "VK_KHR_relaxed_block_layout": 1,
+                        "VK_KHR_get_memory_requirements2": 1,
+                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_bind_memory2": 1,
+                        "VK_KHR_maintenance3": 1,
+                        "VK_KHR_surface": 1,
+                        "VK_KHR_swapchain": 1,
+                        "VK_KHR_image_format_list": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
+                        },
+                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
+                            "samplerYcbcrConversion": true
+                        }
                     }
                 }
             }
@@ -489,15 +681,15 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        strip_promoted_extensions_profiles_files(self.vk, json_files_dict)
+        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
 
-    def test_strip_promoted_extensions_block_inheritance_vulkan11_advanced(self):
+    def test_pull_promoted_extensions_block_inheritance_vulkan11_advanced(self):
         """
-        Verifies that non-promoted extensions (such as VK_KHR_swapchain and VK_KHR_swapchain_mutable_format)
-        are retained in their respective capability blocks under Vulkan 1.1.
+        Verifies that when pulling promoted extensions for a Vulkan 1.1 profile with block inheritance,
+        promoted extensions and their dependencies are populated into primary block_a, while block_b is untouched.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -539,11 +731,50 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "block_a": {
                     "extensions": {
-                        "VK_KHR_swapchain": 70
+                        "VK_KHR_surface": 1,
+                        "VK_KHR_swapchain": 1,
+                        "VK_KHR_multiview": 1,
+                        "VK_KHR_get_physical_device_properties2": 1,
+                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_device_group": 1,
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_maintenance1": 1,
+                        "VK_KHR_external_memory_capabilities": 1,
+                        "VK_KHR_external_memory": 1,
+                        "VK_KHR_external_semaphore_capabilities": 1,
+                        "VK_KHR_external_semaphore": 1,
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_descriptor_update_template": 1,
+                        "VK_KHR_external_fence_capabilities": 1,
+                        "VK_KHR_external_fence": 1,
+                        "VK_KHR_maintenance2": 1,
+                        "VK_KHR_variable_pointers": 1,
+                        "VK_KHR_dedicated_allocation": 1,
+                        "VK_KHR_storage_buffer_storage_class": 1,
+                        "VK_KHR_relaxed_block_layout": 1,
+                        "VK_KHR_get_memory_requirements2": 1,
+                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_bind_memory2": 1,
+                        "VK_KHR_maintenance3": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
+                        },
+                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
+                            "samplerYcbcrConversion": true
+                        }
                     }
                 },
                 "block_b": {
                     "extensions": {
+                        "VK_KHR_image_format_list": 1,
                         "VK_KHR_swapchain_mutable_format": 1
                     }
                 }
@@ -556,14 +787,15 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        strip_promoted_extensions_profiles_files(self.vk, json_files_dict)
+        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
 
-    def test_strip_promoted_extensions_profile_inheritance_vulkan11_advanced(self):
+def test_pull_promoted_extensions_profile_inheritance_vulkan11_advanced(self):
         """
-        Verifies that non-promoted extensions are retained across parent and child profile capability blocks.
+        Verifies that when pulling promoted extensions for Vulkan 1.1 profiles with profile inheritance,
+        each profile's primary block receives promoted extensions independently.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -617,12 +849,51 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "block_a": {
                     "extensions": {
-                        "VK_KHR_swapchain": 70
+                        "VK_KHR_surface": 1,
+                        "VK_KHR_swapchain": 1,
+                        "VK_KHR_multiview": 1,
+                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_device_group": 1,
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_get_physical_device_properties2": 1,
+                        "VK_KHR_maintenance1": 1,
+                        "VK_KHR_external_memory_capabilities": 1,
+                        "VK_KHR_external_memory": 1,
+                        "VK_KHR_external_semaphore_capabilities": 1,
+                        "VK_KHR_external_semaphore": 1,
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_descriptor_update_template": 1,
+                        "VK_KHR_external_fence_capabilities": 1,
+                        "VK_KHR_external_fence": 1,
+                        "VK_KHR_maintenance2": 1,
+                        "VK_KHR_variable_pointers": 1,
+                        "VK_KHR_dedicated_allocation": 1,
+                        "VK_KHR_storage_buffer_storage_class": 1,
+                        "VK_KHR_relaxed_block_layout": 1,
+                        "VK_KHR_get_memory_requirements2": 1,
+                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_bind_memory2": 1,
+                        "VK_KHR_maintenance3": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
+                        },
+                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                            "storageBuffer16BitAccess": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
+                            "samplerYcbcrConversion": true
+                        }
                     }
                 },
                 "block_b": {
                     "extensions": {
-                        "VK_KHR_swapchain_mutable_format": 1
+                        "VK_KHR_swapchain_mutable_format": 1,
+                        "VK_KHR_image_format_list": 1
                     }
                 }
             }
@@ -634,7 +905,7 @@ class TestConvertStripPromotedExtensions(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        strip_promoted_extensions_profiles_files(self.vk, json_files_dict)
+        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -647,7 +918,6 @@ if __name__ == '__main__':
     )
 
     args, unparsed = parser.parse_known_args()
-    TestConvertStripPromotedExtensions.registry_path = args.registry
+    TestConvertPullPromotedExtensions.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
-    

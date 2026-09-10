@@ -19,25 +19,25 @@ if str(scripts_dir) not in sys.path:
 
 from vulkan_object import VulkanObject
 from source.vulkan_object_utils import initVulkanObject
-from source.generate_profiles_merge import VulkanProfilesMergeGenerator
+from source.generate_profiles_combine import VulkanProfilesCombineGenerator
 from source.json_config import JsonConfig
 
 
-class TestMergeLimitType(unittest.TestCase):
+class TestCombineLimitType(unittest.TestCase):
     registry_path = None
 
     @classmethod
     def setUpClass(cls):
         cls.vk: VulkanObject = initVulkanObject('vulkan', cls.registry_path)
 
-    def _run_merge(self, json_text_a: str, json_text_b: str, mode: str = "intersection") -> dict:
+    def _run_combine(self, json_text_a: str, json_text_b: str, mode: str = "intersection") -> dict:
         json_a = json.loads(json_text_a)
         json_b = json.loads(json_text_b)
 
         p_config = JsonConfig.__new__(JsonConfig)
-        p_config.name = "VP_TEST_merged"
+        p_config.name = "VP_TEST_combined"
         p_config.version = 1
-        p_config.label = "Test merged profile"
+        p_config.label = "Test combined profile"
         p_config.description = "Test profile"
         p_config.stage = "STABLE"
         p_config.api_version = ["1", "2", "0"]
@@ -45,7 +45,7 @@ class TestMergeLimitType(unittest.TestCase):
         p_config.input_jsons = [json_a, json_b]
         p_config.input_profile_names = ["VP_TEST_a", "VP_TEST_b"]
         p_config.input_profile_values = [json_a["profiles"]["VP_TEST_a"], json_b["profiles"]["VP_TEST_b"]]
-        p_config.merge_mode = mode
+        p_config.combine_mode = mode
 
         profile_file = {
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
@@ -55,12 +55,12 @@ class TestMergeLimitType(unittest.TestCase):
             "history": []
         }
 
-        merger = VulkanProfilesMergeGenerator(self.vk)
-        merger.merge(p_config, profile_file, mode=mode)
+        combiner = VulkanProfilesCombineGenerator(self.vk)
+        combiner.combine(p_config, profile_file, mode=mode)
 
         return profile_file
 
-    def test_merge_limittype_max_and_bits(self):
+    def test_combine_limittype_max_and_bits(self):
         """
         Tests 'max' and 'bits' limit types (e.g. maxImageDimension2D, subPixelPrecisionBits).
         - Intersection mode selects min(A, B).
@@ -115,7 +115,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_intersection = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
@@ -127,12 +127,12 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
@@ -142,7 +142,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_union = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
@@ -154,27 +154,27 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
             "history": []
         }"""
 
-        merged_intersection = self._run_merge(input_json_a, input_json_b, mode="intersection")
+        combined_intersection = self._run_combine(input_json_a, input_json_b, mode="intersection")
         expected_intersection = json.loads(expected_json_intersection)
-        self.assertEqual(merged_intersection, expected_intersection)
+        self.assertEqual(combined_intersection, expected_intersection)
 
-        merged_union = self._run_merge(input_json_a, input_json_b, mode="union")
+        combined_union = self._run_combine(input_json_a, input_json_b, mode="union")
         expected_union = json.loads(expected_json_union)
-        self.assertEqual(merged_union, expected_union)
+        self.assertEqual(combined_union, expected_union)
 
-    def test_merge_limittype_max_array(self):
+    def test_combine_limittype_max_array(self):
         """
         Tests multi-element fixed-size array 'max' limit types (e.g. maxComputeWorkGroupCount).
         - Intersection mode calculates element-wise min: min([65535, 4096, 4096], [4096, 65535, 2048]) -> [4096, 4096, 2048].
@@ -227,7 +227,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_intersection = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
@@ -238,12 +238,12 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
@@ -253,7 +253,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_union = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
@@ -264,27 +264,27 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
             "history": []
         }"""
 
-        merged_intersection = self._run_merge(input_json_a, input_json_b, mode="intersection")
+        combined_intersection = self._run_combine(input_json_a, input_json_b, mode="intersection")
         expected_intersection = json.loads(expected_json_intersection)
-        self.assertEqual(merged_intersection, expected_intersection)
+        self.assertEqual(combined_intersection, expected_intersection)
 
-        merged_union = self._run_merge(input_json_a, input_json_b, mode="union")
+        combined_union = self._run_combine(input_json_a, input_json_b, mode="union")
         expected_union = json.loads(expected_json_union)
-        self.assertEqual(merged_union, expected_union)
+        self.assertEqual(combined_union, expected_union)
 
-    def test_merge_limittype_min_pot(self):
+    def test_combine_limittype_min_pot(self):
         """
         Tests 'min,pot' compound limit types (e.g. minUniformBufferOffsetAlignment).
         - Intersection mode calculates max(A, B) if both are power-of-two.
@@ -337,7 +337,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_intersection = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
@@ -348,12 +348,12 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
@@ -363,7 +363,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_union = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
@@ -374,27 +374,27 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
             "history": []
         }"""
 
-        merged_intersection = self._run_merge(input_json_a, input_json_b, mode="intersection")
+        combined_intersection = self._run_combine(input_json_a, input_json_b, mode="intersection")
         expected_intersection = json.loads(expected_json_intersection)
-        self.assertEqual(merged_intersection, expected_intersection)
+        self.assertEqual(combined_intersection, expected_intersection)
 
-        merged_union = self._run_merge(input_json_a, input_json_b, mode="union")
+        combined_union = self._run_combine(input_json_a, input_json_b, mode="union")
         expected_union = json.loads(expected_json_union)
-        self.assertEqual(merged_union, expected_union)
+        self.assertEqual(combined_union, expected_union)
 
-    def test_merge_limittype_min_mul(self):
+    def test_combine_limittype_min_mul(self):
         """
         Tests 'min,mul' compound limit types (e.g. bufferImageGranularity, timestampPeriod).
         - Finding a value: Integer LCM (12 vs 16 -> 48) in intersection; GCD (12 vs 16 -> 4) in union.
@@ -449,7 +449,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_intersection = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
@@ -460,12 +460,12 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
@@ -475,7 +475,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_union = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
@@ -486,27 +486,27 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
             "history": []
         }"""
 
-        merged_intersection = self._run_merge(input_json_a, input_json_b, mode="intersection")
+        combined_intersection = self._run_combine(input_json_a, input_json_b, mode="intersection")
         expected_intersection = json.loads(expected_json_intersection)
-        self.assertEqual(merged_intersection, expected_intersection)
+        self.assertEqual(combined_intersection, expected_intersection)
 
-        merged_union = self._run_merge(input_json_a, input_json_b, mode="union")
+        combined_union = self._run_combine(input_json_a, input_json_b, mode="union")
         expected_union = json.loads(expected_json_union)
-        self.assertEqual(merged_union, expected_union)
+        self.assertEqual(combined_union, expected_union)
 
-    def test_merge_limittype_min_mul_compatible_floats(self):
+    def test_combine_limittype_min_mul_compatible_floats(self):
         """
         Tests 'min,mul' float limit types when values are integer multiples.
         - Intersection mode selects 5.0 for (2.5, 5.0).
@@ -559,7 +559,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_intersection = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
@@ -570,12 +570,12 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
@@ -585,7 +585,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_union = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
@@ -596,29 +596,29 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
             "history": []
         }"""
 
-        merged_intersection = self._run_merge(input_json_a, input_json_b, mode="intersection")
+        combined_intersection = self._run_combine(input_json_a, input_json_b, mode="intersection")
         expected_intersection = json.loads(expected_json_intersection)
-        self.assertEqual(merged_intersection, expected_intersection)
+        self.assertEqual(combined_intersection, expected_intersection)
 
-        merged_union = self._run_merge(input_json_a, input_json_b, mode="union")
+        combined_union = self._run_combine(input_json_a, input_json_b, mode="union")
         expected_union = json.loads(expected_json_union)
-        self.assertEqual(merged_union, expected_union)
+        self.assertEqual(combined_union, expected_union)
 
-    def test_merge_host_image_copy_properties(self):
+    def test_combine_host_image_copy_properties(self):
         """
-        Tests merging of VkPhysicalDeviceHostImageCopyProperties (pCopySrcLayouts and pCopyDstLayouts).
+        Tests combining of VkPhysicalDeviceHostImageCopyProperties (pCopySrcLayouts and pCopyDstLayouts).
         - Intersection mode calculates list intersection of VkImageLayout enum strings.
         - Synchronizes copySrcLayoutCount and copyDstLayoutCount to match list lengths.
         """
@@ -683,7 +683,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_intersection = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceHostImageCopyProperties": {
                             "copySrcLayoutCount": 1,
@@ -700,23 +700,23 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
             "history": []
         }"""
 
-        merged_intersection = self._run_merge(input_json_a, input_json_b, mode="intersection")
+        combined_intersection = self._run_combine(input_json_a, input_json_b, mode="intersection")
         expected_intersection = json.loads(expected_json_intersection)
-        self.assertEqual(merged_intersection, expected_intersection)
+        self.assertEqual(combined_intersection, expected_intersection)
 
-    def test_merge_limittype_bitmask(self):
+    def test_combine_limittype_bitmask(self):
         """
         Tests 'bitmask' flag bit arrays (e.g. sampledImageColorSampleCounts).
         - Intersection mode takes common flags (set intersection).
@@ -777,7 +777,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_intersection = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
@@ -791,12 +791,12 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
@@ -806,7 +806,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_union = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
@@ -822,27 +822,27 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
             "history": []
         }"""
 
-        merged_intersection = self._run_merge(input_json_a, input_json_b, mode="intersection")
+        combined_intersection = self._run_combine(input_json_a, input_json_b, mode="intersection")
         expected_intersection = json.loads(expected_json_intersection)
-        self.assertEqual(merged_intersection, expected_intersection)
+        self.assertEqual(combined_intersection, expected_intersection)
 
-        merged_union = self._run_merge(input_json_a, input_json_b, mode="union")
+        combined_union = self._run_combine(input_json_a, input_json_b, mode="union")
         expected_union = json.loads(expected_json_union)
-        self.assertEqual(merged_union, expected_union)
+        self.assertEqual(combined_union, expected_union)
 
-    def test_merge_limittype_bitmask_int(self):
+    def test_combine_limittype_bitmask_int(self):
         """
         Tests integer 'bitmask' limit types (e.g. integer bitwise sample count masks).
         - Intersection mode calculates bitwise AND (1 & 3 = 1).
@@ -895,7 +895,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_intersection = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
@@ -906,12 +906,12 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
@@ -921,7 +921,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_union = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
@@ -932,27 +932,27 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
             "history": []
         }"""
 
-        merged_intersection = self._run_merge(input_json_a, input_json_b, mode="intersection")
+        combined_intersection = self._run_combine(input_json_a, input_json_b, mode="intersection")
         expected_intersection = json.loads(expected_json_intersection)
-        self.assertEqual(merged_intersection, expected_intersection)
+        self.assertEqual(combined_intersection, expected_intersection)
 
-        merged_union = self._run_merge(input_json_a, input_json_b, mode="union")
+        combined_union = self._run_combine(input_json_a, input_json_b, mode="union")
         expected_union = json.loads(expected_json_union)
-        self.assertEqual(merged_union, expected_union)
+        self.assertEqual(combined_union, expected_union)
 
-    def test_merge_limittype_range(self):
+    def test_combine_limittype_range(self):
         """
         Tests 'range' limit arrays [min, max] (e.g. pointSizeRange, lineWidthRange).
         - Intersection mode takes [max(A.min, B.min), min(A.max, B.max)].
@@ -1005,7 +1005,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_intersection = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
@@ -1016,12 +1016,12 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
@@ -1031,7 +1031,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_union = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
@@ -1042,27 +1042,27 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
             "history": []
         }"""
 
-        merged_intersection = self._run_merge(input_json_a, input_json_b, mode="intersection")
+        combined_intersection = self._run_combine(input_json_a, input_json_b, mode="intersection")
         expected_intersection = json.loads(expected_json_intersection)
-        self.assertEqual(merged_intersection, expected_intersection)
+        self.assertEqual(combined_intersection, expected_intersection)
 
-        merged_union = self._run_merge(input_json_a, input_json_b, mode="union")
+        combined_union = self._run_combine(input_json_a, input_json_b, mode="union")
         expected_union = json.loads(expected_json_union)
-        self.assertEqual(merged_union, expected_union)
+        self.assertEqual(combined_union, expected_union)
 
-    def test_merge_limittype_exact_and_noauto(self):
+    def test_combine_limittype_exact_and_noauto(self):
         """
         Tests 'exact' and 'noauto' limit types.
         - 'exact' limits (e.g. pointClippingBehavior in PointClippingProperties):
@@ -1132,7 +1132,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_intersection = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
@@ -1143,23 +1143,23 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
             "history": []
         }"""
 
-        merged_intersection = self._run_merge(input_json_a, input_json_b, mode="intersection")
+        combined_intersection = self._run_combine(input_json_a, input_json_b, mode="intersection")
         expected_intersection = json.loads(expected_json_intersection)
-        self.assertEqual(merged_intersection, expected_intersection)
+        self.assertEqual(combined_intersection, expected_intersection)
 
-    def test_merge_limittype_struct(self):
+    def test_combine_limittype_struct(self):
         """
         Tests 'struct' limit types (e.g. VkPhysicalDeviceProperties::limits and VkPhysicalDeviceProperties::sparseProperties).
         Verifies recursive sub-structure parsing and member limit evaluations.
@@ -1213,7 +1213,7 @@ class TestMergeLimitType(unittest.TestCase):
         expected_json_intersection = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
             "capabilities": {
-                "VP_TEST_merged_block": {
+                "VP_TEST_combined_block": {
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "sparseProperties": {
@@ -1225,21 +1225,21 @@ class TestMergeLimitType(unittest.TestCase):
                 }
             },
             "profiles": {
-                "VP_TEST_merged": {
+                "VP_TEST_combined": {
                     "version": 1,
                     "api-version": "1.2.0",
-                    "label": "Test merged profile",
+                    "label": "Test combined profile",
                     "description": "Test profile",
-                    "capabilities": ["VP_TEST_merged_block"]
+                    "capabilities": ["VP_TEST_combined_block"]
                 }
             },
             "contributors": {},
             "history": []
         }"""
 
-        merged_intersection = self._run_merge(input_json_a, input_json_b, mode="intersection")
+        combined_intersection = self._run_combine(input_json_a, input_json_b, mode="intersection")
         expected_intersection = json.loads(expected_json_intersection)
-        self.assertEqual(merged_intersection, expected_intersection)
+        self.assertEqual(combined_intersection, expected_intersection)
 
 
 if __name__ == '__main__':
@@ -1250,7 +1250,7 @@ if __name__ == '__main__':
     )
 
     args, unparsed = parser.parse_known_args()
-    TestMergeLimitType.registry_path = args.registry
+    TestCombineLimitType.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
     

@@ -31,7 +31,7 @@ if str(scripts_dir) not in sys.path:
 
 from vulkan_object import VulkanObject
 from source.vulkan_object_utils import initVulkanObject
-from source.main_convert import strip_duplication_profiles_files
+from source.transform_strip_duplication import strip_duplication_profiles_files
 
 
 class TestConvertStripDuplication(unittest.TestCase):

@@ -29,7 +29,7 @@ scripts_dir = Path(__file__).resolve().parent.parent
 if str(scripts_dir) not in sys.path:
     sys.path.insert(0, str(scripts_dir))
 
-from source.main_convert import consolidate_profiles_files
+from source.transform_consolidate import consolidate_profiles_files
 
 
 class TestConvertConsolidate(unittest.TestCase):
