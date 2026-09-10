@@ -36,7 +36,7 @@ from source.vulkan_object_version import (
 )
 
 
-class VulkanProfilesMergeGenerator:
+class VulkanProfilesCombineGenerator:
     def __init__(self, vk: VulkanObject):
         self.vk = vk
         self.mode = 'intersection'
@@ -89,23 +89,23 @@ class VulkanProfilesMergeGenerator:
                 count_to_array[count_member_name] = array_name
         return count_to_array
 
-    def sync_array_count_members(self, merged, struct_obj):
-        if not struct_obj or not isinstance(merged, dict):
+    def sync_array_count_members(self, combined, struct_obj):
+        if not struct_obj or not isinstance(combined, dict):
             return
         count_to_array = self.get_count_to_array_map(struct_obj)
         for count_member, array_name in count_to_array.items():
-            if array_name in merged and isinstance(merged[array_name], list):
-                merged[count_member] = len(merged[array_name])
-            elif count_member in merged or (array_name in merged and not merged[array_name]):
-                merged[count_member] = 0
+            if array_name in combined and isinstance(combined[array_name], list):
+                combined[count_member] = len(combined[array_name])
+            elif count_member in combined or (array_name in combined and not combined[array_name]):
+                combined[count_member] = 0
 
-    def merge(self, profile_config, profile_file, mode='intersection'):
+    def combine(self, profile_config, profile_file, mode='intersection'):
         self.mode = mode
         logging.info('Building a Vulkan ' + '.'.join(profile_config.api_version) + ' profile')
 
         capabilities_key = profile_config.name + "_block"
 
-        merged_caps = self.merge_capabilities(
+        combined_caps = self.combine_capabilities(
             profile_config.input_jsons,
             profile_config.input_profile_names,
             profile_config.api_version
@@ -114,19 +114,19 @@ class VulkanProfilesMergeGenerator:
         profile_dict = self.get_profile(profile_config, capabilities_key)
 
         if isinstance(profile_file, dict):
-            profile_file.setdefault("capabilities", {})[capabilities_key] = merged_caps
+            profile_file.setdefault("capabilities", {})[capabilities_key] = combined_caps
             profile_file.setdefault("profiles", {})[profile_config.name] = profile_dict
         else:
-            profile_file.add_capabilities(capabilities_key, merged_caps)
+            profile_file.add_capabilities(capabilities_key, combined_caps)
             profile_file.add_profile(profile_config.name, profile_dict)
 
-    def merge_capabilities(self, jsons, profile_names, api_version):
-        merged_extensions = dict()
-        merged_features = dict()
-        merged_properties = dict()
-        merged_formats = dict()
-        merged_qfp = list()
-        merged_video_profiles = list()
+    def combine_capabilities(self, jsons, profile_names, api_version):
+        combined_extensions = dict()
+        combined_features = dict()
+        combined_properties = dict()
+        combined_formats = dict()
+        combined_qfp = list()
+        combined_video_profiles = list()
 
         for i in range(len(jsons)):
             self.first = (i == 0)
@@ -136,74 +136,74 @@ class VulkanProfilesMergeGenerator:
                 # Prune structures/formats not present in subsequent JSONs during intersection mode
                 if self.mode == 'intersection' and not self.first:
                     if 'features' in capability:
-                        for feature in dict(merged_features):
+                        for feature in dict(combined_features):
                             if feature not in capability['features']:
-                                del merged_features[feature]
+                                del combined_features[feature]
                     else:
-                        merged_features.clear()
+                        combined_features.clear()
 
                     if 'properties' in capability:
-                        for prop in dict(merged_properties):
+                        for prop in dict(combined_properties):
                             if prop not in capability['properties']:
-                                del merged_properties[prop]
+                                del combined_properties[prop]
                     else:
-                        merged_properties.clear()
+                        combined_properties.clear()
 
                     if 'formats' in capability:
-                        for fmt_name in dict(merged_formats):
+                        for fmt_name in dict(combined_formats):
                             if fmt_name not in capability['formats']:
-                                del merged_formats[fmt_name]
+                                del combined_formats[fmt_name]
                     else:
-                        merged_formats.clear()
+                        combined_formats.clear()
 
                 # Extensions
                 if 'extensions' in capability:
                     if self.mode == 'union' or self.first:
                         for extension, spec_ver in capability['extensions'].items():
-                            merged_extensions[extension] = spec_ver
+                            combined_extensions[extension] = spec_ver
                     elif self.mode == 'intersection':
-                        for extension in list(merged_extensions):
+                        for extension in list(combined_extensions):
                             if extension not in capability['extensions']:
-                                del merged_extensions[extension]
+                                del combined_extensions[extension]
 
                 # Features
                 if 'features' in capability:
                     for feature_name, feat_members in capability['features'].items():
-                        self.add_struct(feature_name, feat_members, merged_features)
+                        self.add_struct(feature_name, feat_members, combined_features)
 
                 # Properties
                 if 'properties' in capability:
                     for property_name, prop_members in capability['properties'].items():
-                        if property_name in merged_properties:
-                            self.add_members(merged_properties[property_name], prop_members, property_name)
+                        if property_name in combined_properties:
+                            self.add_members(combined_properties[property_name], prop_members, property_name)
                         else:
                             if self.mode == 'union' or self.first:
-                                merged_properties[property_name] = dict()
-                                self.add_members(merged_properties[property_name], prop_members, property_name)
+                                combined_properties[property_name] = dict()
+                                self.add_members(combined_properties[property_name], prop_members, property_name)
 
                 # Formats
                 if 'formats' in capability:
                     for fmt_name in capability['formats']:
-                        if (fmt_name not in merged_formats) and (self.mode == 'union' or self.first):
-                            merged_formats[fmt_name] = {
+                        if (fmt_name not in combined_formats) and (self.mode == 'union' or self.first):
+                            combined_formats[fmt_name] = {
                                 'VkFormatProperties': {},
                                 'VkFormatProperties3': {},
                                 'VkFormatProperties3KHR': {}
                             }
 
-                        if fmt_name in merged_formats:
+                        if fmt_name in combined_formats:
                             for prop_struct_name in ['VkFormatProperties', 'VkFormatProperties3', 'VkFormatProperties3KHR']:
                                 for feat_cat in ['linearTilingFeatures', 'optimalTilingFeatures', 'bufferFeatures']:
-                                    self.merge_format_features(merged_formats, fmt_name, capability, prop_struct_name, feat_cat)
+                                    self.combine_format_features(combined_formats, fmt_name, capability, prop_struct_name, feat_cat)
 
                 # Queue Families
                 if 'queueFamiliesProperties' in capability:
                     if self.mode == 'intersection':
                         if self.first:
                             for qfp in capability['queueFamiliesProperties']:
-                                merged_qfp.append(qfp)
+                                combined_qfp.append(qfp)
                         else:
-                            for mqfp in list(merged_qfp):
+                            for mqfp in list(combined_qfp):
                                 found = False
                                 for qfp in capability['queueFamiliesProperties']:
                                     if mqfp['VkQueueFamilyProperties']['queueFlags'] != qfp['VkQueueFamilyProperties']['queueFlags']:
@@ -221,33 +221,33 @@ class VulkanProfilesMergeGenerator:
                                     found = True
                                     break
                                 if not found:
-                                    merged_qfp.remove(mqfp)
+                                    combined_qfp.remove(mqfp)
 
                     elif self.mode == 'union':
                         for qfp in capability['queueFamiliesProperties']:
-                            if not merged_qfp:
-                                merged_qfp.append(qfp)
+                            if not combined_qfp:
+                                combined_qfp.append(qfp)
                             else:
-                                for mqfp in merged_qfp:
+                                for mqfp in combined_qfp:
                                     if not self.compareList(mqfp['VkQueueFamilyProperties']['queueFlags'], qfp['VkQueueFamilyProperties']['queueFlags']):
-                                        merged_qfp.append(qfp)
+                                        combined_qfp.append(qfp)
                                     elif qfp['VkQueueFamilyProperties']['queueCount'] != mqfp['VkQueueFamilyProperties']['queueCount']:
-                                        merged_qfp.append(qfp)
+                                        combined_qfp.append(qfp)
                                     elif qfp['VkQueueFamilyProperties']['timestampValidBits'] != mqfp['VkQueueFamilyProperties']['timestampValidBits']:
-                                        merged_qfp.append(qfp)
+                                        combined_qfp.append(qfp)
                                     elif qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width'] != mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width']:
-                                        merged_qfp.append(qfp)
+                                        combined_qfp.append(qfp)
                                     elif qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height'] != mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height']:
-                                        merged_qfp.append(qfp)
+                                        combined_qfp.append(qfp)
                                     elif qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth'] != mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth']:
-                                        merged_qfp.append(qfp)
+                                        combined_qfp.append(qfp)
 
                 # Video Profiles
                 if 'videoProfiles' in capability:
                     if self.mode == 'intersection':
                         if self.first:
                             for video_profile in capability['videoProfiles']:
-                                merged_video_profiles.append(video_profile)
+                                combined_video_profiles.append(video_profile)
                         else:
                             def deep_compare(a, b):
                                 if isinstance(a, list):
@@ -261,38 +261,38 @@ class VulkanProfilesMergeGenerator:
                                 else:
                                     return a == b
 
-                            for merged_video_profile in list(merged_video_profiles):
-                                found = any(deep_compare(merged_video_profile, vp) for vp in capability['videoProfiles'])
+                            for combined_video_profile in list(combined_video_profiles):
+                                found = any(deep_compare(combined_video_profile, vp) for vp in capability['videoProfiles'])
                                 if not found:
-                                    merged_video_profiles.remove(merged_video_profile)
+                                    combined_video_profiles.remove(combined_video_profile)
 
                     elif self.mode == 'union':
                         for video_profile in capability['videoProfiles']:
-                            merged_video_profiles.append(video_profile)
+                            combined_video_profiles.append(video_profile)
 
         capabilities = dict()
-        if merged_extensions:
-            sorted_extensions = collections.OrderedDict(sorted(merged_extensions.items()))
+        if combined_extensions:
+            sorted_extensions = collections.OrderedDict(sorted(combined_extensions.items()))
             capabilities['extensions'] = dict(sorted_extensions)
 
-        if merged_features:
-            for feature in dict(merged_features):
-                if not merged_features[feature]:
-                    del merged_features[feature]
+        if combined_features:
+            for feature in dict(combined_features):
+                if not combined_features[feature]:
+                    del combined_features[feature]
 
-            sorted_features = collections.OrderedDict(sorted(merged_features.items()))
+            sorted_features = collections.OrderedDict(sorted(combined_features.items()))
             capabilities['features'] = dict(sorted_features)
 
-        if merged_properties:
-            for prop in dict(merged_properties):
-                if not merged_properties[prop]:
-                    del merged_properties[prop]
+        if combined_properties:
+            for prop in dict(combined_properties):
+                if not combined_properties[prop]:
+                    del combined_properties[prop]
 
-            sorted_properties = collections.OrderedDict(sorted(merged_properties.items()))
+            sorted_properties = collections.OrderedDict(sorted(combined_properties.items()))
             capabilities['properties'] = dict(sorted_properties)
 
-        if merged_formats:
-            sorted_formats = collections.OrderedDict(sorted(merged_formats.items()))
+        if combined_formats:
+            sorted_formats = collections.OrderedDict(sorted(combined_formats.items()))
             capabilities['formats'] = dict(sorted_formats)
 
             formats_to_remove = []
@@ -311,101 +311,101 @@ class VulkanProfilesMergeGenerator:
             for fmt_name in formats_to_remove:
                 del capabilities['formats'][fmt_name]
 
-        if merged_qfp:
-            capabilities['queueFamiliesProperties'] = merged_qfp
+        if combined_qfp:
+            capabilities['queueFamiliesProperties'] = combined_qfp
 
-        if merged_video_profiles:
-            capabilities['videoProfiles'] = merged_video_profiles
+        if combined_video_profiles:
+            capabilities['videoProfiles'] = combined_video_profiles
 
         return capabilities
 
     def compareList(self, l1, l2):
         return collections.Counter(l1) == collections.Counter(l2)
 
-    def merge_format_features(self, merged_formats, fmt_name, capability, prop_name, features):
+    def combine_format_features(self, combined_formats, fmt_name, capability, prop_name, features):
         if fmt_name in capability['formats'] and prop_name in capability['formats'][fmt_name]:
             if features in capability['formats'][fmt_name][prop_name]:
-                if features not in merged_formats[fmt_name][prop_name]:
+                if features not in combined_formats[fmt_name][prop_name]:
                     if self.mode == 'union' or self.first:
-                        merged_formats[fmt_name][prop_name][features] = list(capability['formats'][fmt_name][prop_name][features])
+                        combined_formats[fmt_name][prop_name][features] = list(capability['formats'][fmt_name][prop_name][features])
                 else:
                     if self.mode == 'union':
                         for feat in capability['formats'][fmt_name][prop_name][features]:
-                            if feat not in merged_formats[fmt_name][prop_name][features]:
-                                merged_formats[fmt_name][prop_name][features].append(feat)
+                            if feat not in combined_formats[fmt_name][prop_name][features]:
+                                combined_formats[fmt_name][prop_name][features].append(feat)
                     else:
-                        for feat in list(merged_formats[fmt_name][prop_name][features]):
+                        for feat in list(combined_formats[fmt_name][prop_name][features]):
                             if feat not in capability['formats'][fmt_name][prop_name][features]:
-                                merged_formats[fmt_name][prop_name][features].remove(feat)
+                                combined_formats[fmt_name][prop_name][features].remove(feat)
 
-    def add_struct(self, struct_name, struct_data, merged):
-        if struct_name in merged:
+    def add_struct(self, struct_name, struct_data, combined):
+        if struct_name in combined:
             if self.mode == 'union':
                 for member, val in struct_data.items():
-                    if member in merged[struct_name]:
-                        merged[struct_name][member] = merged[struct_name][member] or val
+                    if member in combined[struct_name]:
+                        combined[struct_name][member] = combined[struct_name][member] or val
                     else:
-                        merged[struct_name][member] = val
+                        combined[struct_name][member] = val
             elif self.mode == 'intersection':
                 if self.first:
                     for member, val in struct_data.items():
-                        merged[struct_name][member] = val
-                for member in list(merged[struct_name]):
+                        combined[struct_name][member] = val
+                for member in list(combined[struct_name]):
                     if member not in struct_data:
-                        del merged[struct_name][member]
-                    elif struct_data[member] != merged[struct_name][member]:
-                        del merged[struct_name][member]
+                        del combined[struct_name][member]
+                    elif struct_data[member] != combined[struct_name][member]:
+                        del combined[struct_name][member]
         else:
             if self.mode == 'union' or self.first:
-                merged[struct_name] = dict(struct_data)
+                combined[struct_name] = dict(struct_data)
 
-    def add_members(self, merged, entry, property_name=None):
+    def add_members(self, combined, entry, property_name=None):
         struct_obj = getStructByName(self.vk.structs, property_name) if property_name else None
         count_to_array = self.get_count_to_array_map(struct_obj)
 
         if property_name and struct_obj:
-            for member in list(merged):
+            for member in list(combined):
                 if property_name == 'VkPhysicalDeviceProperties' and member in ('limits', 'sparseProperties'):
                     continue
                 mem_obj = getMemberByName(struct_obj, member)
                 if mem_obj:
                     tokens = [t.strip() for t in mem_obj.limitType.split(',')] if mem_obj.limitType else []
-                    is_ptr_array = self.is_pointer_array_member(mem_obj, merged[member])
+                    is_ptr_array = self.is_pointer_array_member(mem_obj, combined[member])
                     is_count = member in count_to_array
                     if 'noauto' in tokens and not is_ptr_array and not is_count:
-                        del merged[member]
+                        del combined[member]
 
         if self.mode == 'intersection' and not self.first:
-            for member in list(merged):
+            for member in list(combined):
                 if property_name == 'VkPhysicalDeviceProperties' and member in ('limits', 'sparseProperties'):
                     continue
                 if member not in entry:
-                    del merged[member]
+                    del combined[member]
 
         for member, val in entry.items():
             if property_name == 'VkPhysicalDeviceProperties' and member == 'limits':
-                if 'limits' not in merged:
+                if 'limits' not in combined:
                     if self.mode == 'union' or self.first:
-                        merged['limits'] = dict()
+                        combined['limits'] = dict()
                     else:
                         continue
                 limits_struct_obj = self.vk.structs.get('VkPhysicalDeviceLimits')
-                self.add_members_nested(merged['limits'], val, limits_struct_obj, 'VkPhysicalDeviceLimits')
+                self.add_members_nested(combined['limits'], val, limits_struct_obj, 'VkPhysicalDeviceLimits')
                 continue
 
             if property_name == 'VkPhysicalDeviceProperties' and member == 'sparseProperties':
-                if 'sparseProperties' not in merged:
+                if 'sparseProperties' not in combined:
                     if self.mode == 'union' or self.first:
-                        merged['sparseProperties'] = dict()
+                        combined['sparseProperties'] = dict()
                     else:
                         continue
                 sparse_struct_obj = self.vk.structs.get('VkPhysicalDeviceSparseProperties')
-                self.add_members_nested(merged['sparseProperties'], val, sparse_struct_obj, 'VkPhysicalDeviceSparseProperties')
+                self.add_members_nested(combined['sparseProperties'], val, sparse_struct_obj, 'VkPhysicalDeviceSparseProperties')
                 continue
 
             xmlmember = getMemberByName(struct_obj, member) if struct_obj else None
 
-            if member not in merged:
+            if member not in combined:
                 if xmlmember:
                     tokens = [t.strip() for t in xmlmember.limitType.split(',')] if xmlmember.limitType else []
                     is_ptr_array = self.is_pointer_array_member(xmlmember, val)
@@ -414,9 +414,9 @@ class VulkanProfilesMergeGenerator:
                         continue
                 if self.mode == 'union' or self.first:
                     if xmlmember and xmlmember.type in ('uint64_t', 'VkDeviceSize'):
-                        merged[member] = int(val)
+                        combined[member] = int(val)
                     else:
-                        merged[member] = val
+                        combined[member] = val
             else:
                 limittype = xmlmember.limitType if xmlmember else None
                 tokens = [t.strip() for t in limittype.split(',')] if limittype else []
@@ -425,42 +425,42 @@ class VulkanProfilesMergeGenerator:
                     if sub_struct_obj:
                         for smember in sub_struct_obj.members:
                             sm_name = smember.name
-                            if sm_name in merged[member]:
+                            if sm_name in combined[member]:
                                 if sm_name in val:
-                                    self.merge_members(merged[member], sm_name, val, smember, xmlmember.type)
+                                    self.combine_members(combined[member], sm_name, val, smember, xmlmember.type)
                             elif (self.mode == 'union' or self.first) and (sm_name in val):
                                 if smember.type in ('uint64_t', 'VkDeviceSize'):
-                                    merged[member][sm_name] = int(val[sm_name])
+                                    combined[member][sm_name] = int(val[sm_name])
                                 else:
-                                    merged[member][sm_name] = val[sm_name]
-                        self.sync_array_count_members(merged[member], sub_struct_obj)
+                                    combined[member][sm_name] = val[sm_name]
+                        self.sync_array_count_members(combined[member], sub_struct_obj)
                 elif xmlmember:
-                    self.merge_members(merged, member, entry, xmlmember, property_name)
+                    self.combine_members(combined, member, entry, xmlmember, property_name)
 
         if struct_obj:
-            self.sync_array_count_members(merged, struct_obj)
+            self.sync_array_count_members(combined, struct_obj)
 
-    def add_members_nested(self, merged, entry, struct_obj, struct_name):
+    def add_members_nested(self, combined, entry, struct_obj, struct_name):
         count_to_array = self.get_count_to_array_map(struct_obj)
 
         if struct_obj:
-            for member in list(merged):
+            for member in list(combined):
                 xmlmember = getMemberByName(struct_obj, member)
                 if xmlmember:
                     tokens = [t.strip() for t in xmlmember.limitType.split(',')] if xmlmember.limitType else []
-                    is_ptr_array = self.is_pointer_array_member(xmlmember, merged[member])
+                    is_ptr_array = self.is_pointer_array_member(xmlmember, combined[member])
                     is_count = member in count_to_array
                     if 'noauto' in tokens and not is_ptr_array and not is_count:
-                        del merged[member]
+                        del combined[member]
 
         if self.mode == 'intersection' and not self.first:
-            for member in list(merged):
+            for member in list(combined):
                 if member not in entry:
-                    del merged[member]
+                    del combined[member]
 
         for member, val in entry.items():
             xmlmember = getMemberByName(struct_obj, member) if struct_obj else None
-            if member not in merged:
+            if member not in combined:
                 if xmlmember:
                     tokens = [t.strip() for t in xmlmember.limitType.split(',')] if xmlmember.limitType else []
                     is_ptr_array = self.is_pointer_array_member(xmlmember, val)
@@ -469,17 +469,17 @@ class VulkanProfilesMergeGenerator:
                         continue
                 if self.mode == 'union' or self.first:
                     if xmlmember and xmlmember.type in ('uint64_t', 'VkDeviceSize'):
-                        merged[member] = int(val)
+                        combined[member] = int(val)
                     else:
-                        merged[member] = val
+                        combined[member] = val
             else:
                 if xmlmember:
-                    self.merge_members(merged, member, entry, xmlmember, struct_name)
+                    self.combine_members(combined, member, entry, xmlmember, struct_name)
 
         if struct_obj:
-            self.sync_array_count_members(merged, struct_obj)
+            self.sync_array_count_members(combined, struct_obj)
 
-    def _merge_min_pot_intersection(self, val1, val2):
+    def _combine_min_pot_intersection(self, val1, val2):
         try:
             i1 = int(val1)
             i2 = int(val2)
@@ -489,7 +489,7 @@ class VulkanProfilesMergeGenerator:
             pass
         return None
 
-    def _merge_min_mul_intersection(self, val1, val2, is_float=False):
+    def _combine_min_mul_intersection(self, val1, val2, is_float=False):
         if not is_float and isinstance(val1, int) and isinstance(val2, int) and not isinstance(val1, bool) and not isinstance(val2, bool):
             return math.lcm(val1, val2)
         try:
@@ -511,7 +511,7 @@ class VulkanProfilesMergeGenerator:
             pass
         return None
 
-    def _merge_min_pot_union(self, val1, val2):
+    def _combine_min_pot_union(self, val1, val2):
         try:
             i1 = int(val1)
             i2 = int(val2)
@@ -521,7 +521,7 @@ class VulkanProfilesMergeGenerator:
             pass
         return None
 
-    def _merge_min_mul_union(self, val1, val2, is_float=False):
+    def _combine_min_mul_union(self, val1, val2, is_float=False):
         if not is_float and isinstance(val1, int) and isinstance(val2, int) and not isinstance(val1, bool) and not isinstance(val2, bool):
             res = math.gcd(val1, val2)
             return res if res > 0 else None
@@ -539,27 +539,27 @@ class VulkanProfilesMergeGenerator:
             pass
         return None
 
-    def merge_members(self, merged, member, entry, xmlmember, property_name=None):
+    def combine_members(self, combined, member, entry, xmlmember, property_name=None):
         limittype = xmlmember.limitType if xmlmember else None
         tokens = [t.strip() for t in limittype.split(',')] if limittype else []
 
-        is_list = isinstance(merged[member], list) or (member in entry and isinstance(entry[member], list))
-        is_ptr_array = self.is_pointer_array_member(xmlmember, merged[member] if member in merged else entry.get(member))
+        is_list = isinstance(combined[member], list) or (member in entry and isinstance(entry[member], list))
+        is_ptr_array = self.is_pointer_array_member(xmlmember, combined[member] if member in combined else entry.get(member))
 
         if 'noauto' in tokens and not is_ptr_array:
-            del merged[member]
+            del combined[member]
             return
 
         if 'exact' in tokens and not is_ptr_array:
             if xmlmember and xmlmember.type in ('uint64_t', 'VkDeviceSize'):
-                if int(merged[member]) != int(entry[member]):
-                    del merged[member]
+                if int(combined[member]) != int(entry[member]):
+                    del combined[member]
             elif xmlmember and xmlmember.type == 'float':
-                if not math.isclose(float(merged[member]), float(entry[member]), abs_tol=1e-5):
-                    del merged[member]
+                if not math.isclose(float(combined[member]), float(entry[member]), abs_tol=1e-5):
+                    del combined[member]
             else:
-                if merged[member] != entry[member]:
-                    del merged[member]
+                if combined[member] != entry[member]:
+                    del combined[member]
             return
 
         is_max = 'max' in tokens or 'bits' in tokens
@@ -576,224 +576,224 @@ class VulkanProfilesMergeGenerator:
         if self.mode == 'union':
             if is_max:
                 if xmlmember.type == 'VkExtent2D':
-                    merged[member]['width'] = max(merged[member]['width'], entry[member]['width'])
-                    merged[member]['height'] = max(merged[member]['height'], entry[member]['height'])
+                    combined[member]['width'] = max(combined[member]['width'], entry[member]['width'])
+                    combined[member]['height'] = max(combined[member]['height'], entry[member]['height'])
                 elif xmlmember.type == 'VkExtent3D':
-                    merged[member]['width'] = max(merged[member]['width'], entry[member]['width'])
-                    merged[member]['height'] = max(merged[member]['height'], entry[member]['height'])
-                    merged[member]['depth'] = max(merged[member]['depth'], entry[member]['depth'])
+                    combined[member]['width'] = max(combined[member]['width'], entry[member]['width'])
+                    combined[member]['height'] = max(combined[member]['height'], entry[member]['height'])
+                    combined[member]['depth'] = max(combined[member]['depth'], entry[member]['depth'])
                 elif xmlmember.type == 'VkBool32':
-                    merged[member] = merged[member] or entry[member]
-                elif isinstance(merged[member], list) and isinstance(entry[member], list):
-                    length = min(len(merged[member]), len(entry[member]))
+                    combined[member] = combined[member] or entry[member]
+                elif isinstance(combined[member], list) and isinstance(entry[member], list):
+                    length = min(len(combined[member]), len(entry[member]))
                     for idx in range(length):
-                        merged[member][idx] = max(merged[member][idx], entry[member][idx])
+                        combined[member][idx] = max(combined[member][idx], entry[member][idx])
                 else:
-                    merged[member] = max(merged[member], entry[member])
+                    combined[member] = max(combined[member], entry[member])
             elif is_min:
                 if xmlmember.type == 'VkExtent2D':
                     if is_pot:
-                        w = self._merge_min_pot_union(merged[member]['width'], entry[member]['width'])
-                        h = self._merge_min_pot_union(merged[member]['height'], entry[member]['height'])
+                        w = self._combine_min_pot_union(combined[member]['width'], entry[member]['width'])
+                        h = self._combine_min_pot_union(combined[member]['height'], entry[member]['height'])
                         if w is not None and h is not None:
-                            merged[member]['width'], merged[member]['height'] = w, h
+                            combined[member]['width'], combined[member]['height'] = w, h
                         else:
-                            del merged[member]
+                            del combined[member]
                     elif is_mul:
-                        w = self._merge_min_mul_union(merged[member]['width'], entry[member]['width'])
-                        h = self._merge_min_mul_union(merged[member]['height'], entry[member]['height'])
+                        w = self._combine_min_mul_union(combined[member]['width'], entry[member]['width'])
+                        h = self._combine_min_mul_union(combined[member]['height'], entry[member]['height'])
                         if w is not None and h is not None:
-                            merged[member]['width'], merged[member]['height'] = w, h
+                            combined[member]['width'], combined[member]['height'] = w, h
                         else:
-                            del merged[member]
+                            del combined[member]
                     else:
-                        merged[member]['width'] = min(merged[member]['width'], entry[member]['width'])
-                        merged[member]['height'] = min(merged[member]['height'], entry[member]['height'])
+                        combined[member]['width'] = min(combined[member]['width'], entry[member]['width'])
+                        combined[member]['height'] = min(combined[member]['height'], entry[member]['height'])
                 elif xmlmember.type == 'VkExtent3D':
                     if is_pot:
-                        w = self._merge_min_pot_union(merged[member]['width'], entry[member]['width'])
-                        h = self._merge_min_pot_union(merged[member]['height'], entry[member]['height'])
-                        d = self._merge_min_pot_union(merged[member]['depth'], entry[member]['depth'])
+                        w = self._combine_min_pot_union(combined[member]['width'], entry[member]['width'])
+                        h = self._combine_min_pot_union(combined[member]['height'], entry[member]['height'])
+                        d = self._combine_min_pot_union(combined[member]['depth'], entry[member]['depth'])
                         if w is not None and h is not None and d is not None:
-                            merged[member]['width'], merged[member]['height'], merged[member]['depth'] = w, h, d
+                            combined[member]['width'], combined[member]['height'], combined[member]['depth'] = w, h, d
                         else:
-                            del merged[member]
+                            del combined[member]
                     elif is_mul:
-                        w = self._merge_min_mul_union(merged[member]['width'], entry[member]['width'])
-                        h = self._merge_min_mul_union(merged[member]['height'], entry[member]['height'])
-                        d = self._merge_min_mul_union(merged[member]['depth'], entry[member]['depth'])
+                        w = self._combine_min_mul_union(combined[member]['width'], entry[member]['width'])
+                        h = self._combine_min_mul_union(combined[member]['height'], entry[member]['height'])
+                        d = self._combine_min_mul_union(combined[member]['depth'], entry[member]['depth'])
                         if w is not None and h is not None and d is not None:
-                            merged[member]['width'], merged[member]['height'], merged[member]['depth'] = w, h, d
+                            combined[member]['width'], combined[member]['height'], combined[member]['depth'] = w, h, d
                         else:
-                            del merged[member]
+                            del combined[member]
                     else:
-                        merged[member]['width'] = min(merged[member]['width'], entry[member]['width'])
-                        merged[member]['height'] = min(merged[member]['height'], entry[member]['height'])
-                        merged[member]['depth'] = min(merged[member]['depth'], entry[member]['depth'])
+                        combined[member]['width'] = min(combined[member]['width'], entry[member]['width'])
+                        combined[member]['height'] = min(combined[member]['height'], entry[member]['height'])
+                        combined[member]['depth'] = min(combined[member]['depth'], entry[member]['depth'])
                 elif xmlmember.type == 'VkBool32':
-                    merged[member] = merged[member] and entry[member]
-                elif isinstance(merged[member], list) and isinstance(entry[member], list):
+                    combined[member] = combined[member] and entry[member]
+                elif isinstance(combined[member], list) and isinstance(entry[member], list):
                     res_arr = []
                     valid = True
-                    for idx in range(min(len(merged[member]), len(entry[member]))):
+                    for idx in range(min(len(combined[member]), len(entry[member]))):
                         if is_pot:
-                            res = self._merge_min_pot_union(merged[member][idx], entry[member][idx])
+                            res = self._combine_min_pot_union(combined[member][idx], entry[member][idx])
                         elif is_mul:
-                            is_float = (xmlmember.type == 'float') or isinstance(merged[member][idx], float)
-                            res = self._merge_min_mul_union(merged[member][idx], entry[member][idx], is_float)
+                            is_float = (xmlmember.type == 'float') or isinstance(combined[member][idx], float)
+                            res = self._combine_min_mul_union(combined[member][idx], entry[member][idx], is_float)
                         else:
-                            res = min(merged[member][idx], entry[member][idx])
+                            res = min(combined[member][idx], entry[member][idx])
                         if res is None:
                             valid = False
                             break
                         res_arr.append(res)
                     if valid:
-                        merged[member] = res_arr
+                        combined[member] = res_arr
                     else:
-                        del merged[member]
+                        del combined[member]
                 else:
                     if is_pot:
-                        res = self._merge_min_pot_union(merged[member], entry[member])
+                        res = self._combine_min_pot_union(combined[member], entry[member])
                         if res is not None:
-                            merged[member] = res
+                            combined[member] = res
                         else:
-                            del merged[member]
+                            del combined[member]
                     elif is_mul:
-                        is_float = (xmlmember.type == 'float') or isinstance(merged[member], float) or isinstance(entry[member], float)
-                        res = self._merge_min_mul_union(merged[member], entry[member], is_float)
+                        is_float = (xmlmember.type == 'float') or isinstance(combined[member], float) or isinstance(entry[member], float)
+                        res = self._combine_min_mul_union(combined[member], entry[member], is_float)
                         if res is not None:
-                            merged[member] = res
+                            combined[member] = res
                         else:
-                            del merged[member]
+                            del combined[member]
                     else:
-                        merged[member] = min(merged[member], entry[member])
+                        combined[member] = min(combined[member], entry[member])
             elif is_bitmask:
-                if isinstance(merged[member], list) and isinstance(entry[member], list):
+                if isinstance(combined[member], list) and isinstance(entry[member], list):
                     for smember in entry[member]:
-                        if smember not in merged[member]:
-                            merged[member].append(smember)
-                elif not isinstance(merged[member], list) and not isinstance(entry[member], list):
-                    merged[member] = int(merged[member]) | int(entry[member])
+                        if smember not in combined[member]:
+                            combined[member].append(smember)
+                elif not isinstance(combined[member], list) and not isinstance(entry[member], list):
+                    combined[member] = int(combined[member]) | int(entry[member])
             elif is_range:
-                merged[member][0] = min(merged[member][0], entry[member][0])
-                merged[member][1] = max(merged[member][1], entry[member][1])
+                combined[member][0] = min(combined[member][0], entry[member][0])
+                combined[member][1] = max(combined[member][1], entry[member][1])
 
         elif self.mode == 'intersection':
             if is_max:
                 if xmlmember.type == 'VkExtent2D':
-                    merged[member]['width'] = min(merged[member]['width'], entry[member]['width'])
-                    merged[member]['height'] = min(merged[member]['height'], entry[member]['height'])
+                    combined[member]['width'] = min(combined[member]['width'], entry[member]['width'])
+                    combined[member]['height'] = min(combined[member]['height'], entry[member]['height'])
                 elif xmlmember.type == 'VkExtent3D':
-                    merged[member]['width'] = min(merged[member]['width'], entry[member]['width'])
-                    merged[member]['height'] = min(merged[member]['height'], entry[member]['height'])
-                    merged[member]['depth'] = min(merged[member]['depth'], entry[member]['depth'])
+                    combined[member]['width'] = min(combined[member]['width'], entry[member]['width'])
+                    combined[member]['height'] = min(combined[member]['height'], entry[member]['height'])
+                    combined[member]['depth'] = min(combined[member]['depth'], entry[member]['depth'])
                 elif xmlmember.type == 'VkBool32':
-                    merged[member] = merged[member] and entry[member]
-                elif isinstance(merged[member], list) and isinstance(entry[member], list):
-                    length = min(len(merged[member]), len(entry[member]))
+                    combined[member] = combined[member] and entry[member]
+                elif isinstance(combined[member], list) and isinstance(entry[member], list):
+                    length = min(len(combined[member]), len(entry[member]))
                     for idx in range(length):
-                        merged[member][idx] = min(merged[member][idx], entry[member][idx])
+                        combined[member][idx] = min(combined[member][idx], entry[member][idx])
                 elif xmlmember.type in ('uint64_t', 'VkDeviceSize'):
-                    merged[member] = min(int(entry[member]), int(merged[member]))
+                    combined[member] = min(int(entry[member]), int(combined[member]))
                 elif xmlmember.type == 'float':
-                    merged[member] = min(float(entry[member]), float(merged[member]))
+                    combined[member] = min(float(entry[member]), float(combined[member]))
                 else:
-                    merged[member] = min(merged[member], entry[member])
+                    combined[member] = min(combined[member], entry[member])
             elif is_min:
                 if xmlmember.type == 'VkExtent2D':
                     if is_pot:
-                        w = self._merge_min_pot_intersection(merged[member]['width'], entry[member]['width'])
-                        h = self._merge_min_pot_intersection(merged[member]['height'], entry[member]['height'])
+                        w = self._combine_min_pot_intersection(combined[member]['width'], entry[member]['width'])
+                        h = self._combine_min_pot_intersection(combined[member]['height'], entry[member]['height'])
                         if w is not None and h is not None:
-                            merged[member]['width'], merged[member]['height'] = w, h
+                            combined[member]['width'], combined[member]['height'] = w, h
                         else:
-                            del merged[member]
+                            del combined[member]
                     elif is_mul:
-                        w = self._merge_min_mul_intersection(merged[member]['width'], entry[member]['width'])
-                        h = self._merge_min_mul_intersection(merged[member]['height'], entry[member]['height'])
+                        w = self._combine_min_mul_intersection(combined[member]['width'], entry[member]['width'])
+                        h = self._combine_min_mul_intersection(combined[member]['height'], entry[member]['height'])
                         if w is not None and h is not None:
-                            merged[member]['width'], merged[member]['height'] = w, h
+                            combined[member]['width'], combined[member]['height'] = w, h
                         else:
-                            del merged[member]
+                            del combined[member]
                     else:
-                        merged[member]['width'] = max(merged[member]['width'], entry[member]['width'])
-                        merged[member]['height'] = max(merged[member]['height'], entry[member]['height'])
+                        combined[member]['width'] = max(combined[member]['width'], entry[member]['width'])
+                        combined[member]['height'] = max(combined[member]['height'], entry[member]['height'])
                 elif xmlmember.type == 'VkExtent3D':
                     if is_pot:
-                        w = self._merge_min_pot_intersection(merged[member]['width'], entry[member]['width'])
-                        h = self._merge_min_pot_intersection(merged[member]['height'], entry[member]['height'])
-                        d = self._merge_min_pot_intersection(merged[member]['depth'], entry[member]['depth'])
+                        w = self._combine_min_pot_intersection(combined[member]['width'], entry[member]['width'])
+                        h = self._combine_min_pot_intersection(combined[member]['height'], entry[member]['height'])
+                        d = self._combine_min_pot_intersection(combined[member]['depth'], entry[member]['depth'])
                         if w is not None and h is not None and d is not None:
-                            merged[member]['width'], merged[member]['height'], merged[member]['depth'] = w, h, d
+                            combined[member]['width'], combined[member]['height'], combined[member]['depth'] = w, h, d
                         else:
-                            del merged[member]
+                            del combined[member]
                     elif is_mul:
-                        w = self._merge_min_mul_intersection(merged[member]['width'], entry[member]['width'])
-                        h = self._merge_min_mul_intersection(merged[member]['height'], entry[member]['height'])
-                        d = self._merge_min_mul_intersection(merged[member]['depth'], entry[member]['depth'])
+                        w = self._combine_min_mul_intersection(combined[member]['width'], entry[member]['width'])
+                        h = self._combine_min_mul_intersection(combined[member]['height'], entry[member]['height'])
+                        d = self._combine_min_mul_intersection(combined[member]['depth'], entry[member]['depth'])
                         if w is not None and h is not None and d is not None:
-                            merged[member]['width'], merged[member]['height'], merged[member]['depth'] = w, h, d
+                            combined[member]['width'], combined[member]['height'], combined[member]['depth'] = w, h, d
                         else:
-                            del merged[member]
+                            del combined[member]
                     else:
-                        merged[member]['width'] = max(merged[member]['width'], entry[member]['width'])
-                        merged[member]['height'] = max(merged[member]['height'], entry[member]['height'])
-                        merged[member]['depth'] = max(merged[member]['depth'], entry[member]['depth'])
+                        combined[member]['width'] = max(combined[member]['width'], entry[member]['width'])
+                        combined[member]['height'] = max(combined[member]['height'], entry[member]['height'])
+                        combined[member]['depth'] = max(combined[member]['depth'], entry[member]['depth'])
                 elif xmlmember.type == 'VkBool32':
-                    merged[member] = merged[member] or entry[member]
-                elif isinstance(merged[member], list) and isinstance(entry[member], list):
+                    combined[member] = combined[member] or entry[member]
+                elif isinstance(combined[member], list) and isinstance(entry[member], list):
                     res_arr = []
                     valid = True
-                    for idx in range(min(len(merged[member]), len(entry[member]))):
+                    for idx in range(min(len(combined[member]), len(entry[member]))):
                         if is_pot:
-                            res = self._merge_min_pot_intersection(merged[member][idx], entry[member][idx])
+                            res = self._combine_min_pot_intersection(combined[member][idx], entry[member][idx])
                         elif is_mul:
-                            is_float = (xmlmember.type == 'float') or isinstance(merged[member][idx], float)
-                            res = self._merge_min_mul_intersection(merged[member][idx], entry[member][idx], is_float)
+                            is_float = (xmlmember.type == 'float') or isinstance(combined[member][idx], float)
+                            res = self._combine_min_mul_intersection(combined[member][idx], entry[member][idx], is_float)
                         else:
-                            res = max(merged[member][idx], entry[member][idx])
+                            res = max(combined[member][idx], entry[member][idx])
                         if res is None:
                             valid = False
                             break
                         res_arr.append(res)
                     if valid:
-                        merged[member] = res_arr
+                        combined[member] = res_arr
                     else:
-                        del merged[member]
+                        del combined[member]
                 else:
                     if is_pot:
-                        res = self._merge_min_pot_intersection(merged[member], entry[member])
+                        res = self._combine_min_pot_intersection(combined[member], entry[member])
                         if res is not None:
-                            merged[member] = res
+                            combined[member] = res
                         else:
-                            del merged[member]
+                            del combined[member]
                     elif is_mul:
-                        is_float = (xmlmember.type == 'float') or isinstance(merged[member], float) or isinstance(entry[member], float)
-                        res = self._merge_min_mul_intersection(merged[member], entry[member], is_float)
+                        is_float = (xmlmember.type == 'float') or isinstance(combined[member], float) or isinstance(entry[member], float)
+                        res = self._combine_min_mul_intersection(combined[member], entry[member], is_float)
                         if res is not None:
-                            merged[member] = res
+                            combined[member] = res
                         else:
-                            del merged[member]
+                            del combined[member]
                     else:
                         if xmlmember.type in ('uint64_t', 'VkDeviceSize'):
-                            merged[member] = max(int(entry[member]), int(merged[member]))
+                            combined[member] = max(int(entry[member]), int(combined[member]))
                         elif xmlmember.type == 'float':
-                            merged[member] = max(float(entry[member]), float(merged[member]))
+                            combined[member] = max(float(entry[member]), float(combined[member]))
                         else:
-                            merged[member] = max(merged[member], entry[member])
+                            combined[member] = max(combined[member], entry[member])
             elif is_bitmask:
-                if isinstance(merged[member], list) and isinstance(entry[member], list):
+                if isinstance(combined[member], list) and isinstance(entry[member], list):
                     remove_list = []
-                    for value in merged[member]:
+                    for value in combined[member]:
                         if value not in entry[member]:
                             remove_list.append(value)
                     for value in remove_list:
-                        merged[member].remove(value)
-                elif not isinstance(merged[member], list) and not isinstance(entry[member], list):
-                    merged[member] = int(merged[member]) & int(entry[member])
+                        combined[member].remove(value)
+                elif not isinstance(combined[member], list) and not isinstance(entry[member], list):
+                    combined[member] = int(combined[member]) & int(entry[member])
             elif is_range:
-                merged[member][0] = max(merged[member][0], entry[member][0])
-                merged[member][1] = min(merged[member][1], entry[member][1])
+                combined[member][0] = max(combined[member][0], entry[member][0])
+                combined[member][1] = min(combined[member][1], entry[member][1])
 
     def get_profile(self, profile_config, capabilities_key):
         profile = dict()
@@ -809,4 +809,3 @@ class VulkanProfilesMergeGenerator:
         profile['capabilities'] = list()
         profile['capabilities'].append(capabilities_key)
         return profile
-    

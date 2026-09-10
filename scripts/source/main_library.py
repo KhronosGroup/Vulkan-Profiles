@@ -25,7 +25,7 @@ import logging
 import tempfile
 import argparse
 import gen_profiles_solution
-from source.main_convert import main_convert, OutputFormatType
+from source.main_transform import main_transform, OutputFormatType
 from source.main_validate import main_validate
 
 
@@ -70,9 +70,9 @@ def main_library(args):
         input_dir = args.input
 
         temp_dir_obj = None
-        convert_mode = getattr(args, 'convert', None)
+        transform_mode = getattr(args, 'transform', None)
 
-        if convert_mode is not None:
+        if transform_mode is not None:
             intermediate_arg = getattr(args, 'intermediate', None)
             if intermediate_arg:
                 input_dir = intermediate_arg
@@ -81,15 +81,15 @@ def main_library(args):
                 temp_dir_obj = tempfile.TemporaryDirectory()
                 input_dir = temp_dir_obj.name
 
-            convert_args = argparse.Namespace(
+            transform_args = argparse.Namespace(
                 registry=args.registry,
                 input=args.input,
                 output=input_dir,
-                mode=convert_mode,
+                mode=transform_mode,
                 format=OutputFormatType.FLATTEN,
                 api=api
             )
-            main_convert(convert_args)
+            main_transform(transform_args)
 
         profiles_filenames = []
         input_filenames = getattr(args, 'input_filenames', None)

@@ -78,7 +78,7 @@ set(PROFILE_DESKTOP_MAX_2026_API_VERSION "1.4.353")
 
 # Generate profiles files
 add_custom_target(VpGenerate-ProfilesDesktopMax ALL
-    COMMAND ${VKPROFILES_EXE} merge
+    COMMAND ${VKPROFILES_EXE} combine
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_max_2024
         --output ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_desktop_max_2024.json
@@ -88,7 +88,7 @@ add_custom_target(VpGenerate-ProfilesDesktopMax ALL
         --profile-date 2023-11-01
         --profile-stage BETA
         --profile-api-version ${PROFILE_DESKTOP_MAX_2024_API_VERSION}
-    COMMAND ${VKPROFILES_EXE} merge
+    COMMAND ${VKPROFILES_EXE} combine
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_max_2026
         --output ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_desktop_max_2026.json
@@ -105,11 +105,11 @@ set_target_properties(VpGenerate-ProfilesDesktopMax PROPERTIES FOLDER "Profiles 
 add_dependencies(VpGenerate-ProfilesDesktopMax VpProfilesProcessor VpGenerate-ProfilesSchema)
 
 add_custom_target(VpGenerate-ProfilesDesktopBaseline ALL
-    COMMAND ${VKPROFILES_EXE} merge
+    COMMAND ${VKPROFILES_EXE} combine
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --config ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline_config.json
         --output ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline.json
-        --convert strip-duplication
+        --transform strip-duplication
     COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline.json ${CMAKE_CURRENT_LIST_DIR}
     VERBATIM
@@ -181,7 +181,7 @@ add_custom_target(VpGenerate-Libraries
         --output ${PROJECT_SOURCE_DIR}/library/test
         --output-src ${PROJECT_SOURCE_DIR}/library/test
         --output-filename "generated_vulkan_profiles_android"
-        --convert strip-duplication
+        --transform strip-duplication
         --mode header+source
         --include-header "generated_vulkan_profiles_android.h"
         --config release
@@ -217,7 +217,7 @@ set_target_properties(VpGenerate-Markdown PROPERTIES FOLDER "Profiles generator"
 add_dependencies(VpGenerate-Markdown VpProfilesProcessor VpGenerate-ProfilesDesktopBaseline VpGenerate-ProfilesDesktopMax)
 
 add_custom_target(VpTestIntersect ALL
-    COMMAND ${VKPROFILES_EXE} merge
+    COMMAND ${VKPROFILES_EXE} combine
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_intersect
         --output ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_intersect.json
@@ -230,7 +230,7 @@ set_target_properties(VpTestIntersect PROPERTIES FOLDER "Profiles generator/Test
 add_dependencies(VpTestIntersect VpProfilesProcessor)
 
 add_custom_target(VpTestUnion ALL
-    COMMAND ${VKPROFILES_EXE} merge
+    COMMAND ${VKPROFILES_EXE} combine
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_union
         --output ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_union.json
@@ -243,7 +243,7 @@ set_target_properties(VpTestUnion PROPERTIES FOLDER "Profiles generator/Tests")
 add_dependencies(VpTestUnion VpProfilesProcessor)
 
 add_custom_target(VpTestGeneratedName ALL
-    COMMAND ${VKPROFILES_EXE} merge
+    COMMAND ${VKPROFILES_EXE} combine
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_combine_intersect
         --output ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_generated_name.json
@@ -254,7 +254,7 @@ set_target_properties(VpTestGeneratedName PROPERTIES FOLDER "Profiles generator/
 add_dependencies(VpTestGeneratedName VpProfilesProcessor)
 
 add_custom_target(VpTestHostImageCopy ALL
-    COMMAND ${VKPROFILES_EXE} merge
+    COMMAND ${VKPROFILES_EXE} combine
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_host_image_copy
         --output ${CMAKE_CURRENT_LIST_DIR}/test/data/VP_LUNARG_test_host_image_copy.json

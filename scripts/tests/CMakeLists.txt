@@ -33,26 +33,26 @@ function(add_vulkan_python_test TARGET_NAME SCRIPT_FILENAME)
 endfunction()
 
 if(NOT APPLE) # macOS doesn't handle dynamically loading Python jsonschema'
-    add_vulkan_python_test(VpProfilesProcessor_TestVulkanProfilesUtil           test_util.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestVulkanObjectEmpty            test_init.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestVulkanVersion                test_vulkan_version.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestVulkanObjectUtils            test_vulkan_object_utils.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestVulkanObjectDepends          test_vulkan_object_expression_parsing.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestVulkanProfilesJson           test_profiles_json_utils.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestFormatFlagsConverter         test_format_flags.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestMergeLimittype               test_merge_limittype.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestConvertPullExts              test_convert_pull_caps_exts.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestConvertPullCapsCore          test_convert_pull_caps_core.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestConvertPullCapsSpec          test_convert_pull_caps_spec.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestConvertPullCapsProf          test_convert_pull_caps_prof.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestConvertPullCapsOr            test_convert_pull_caps_or.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestConvertPullPromotedExts      test_convert_pull_promoted_exts.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestConvertPullAliases           test_convert_pull_aliases.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestConvertConsolidate           test_convert_consolidate.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestConvertStripDups             test_convert_strip_duplication.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestConvertStripPromotedExts     test_convert_strip_promoted_extensions.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestConvertSort                  test_convert_sort.py)
-    add_vulkan_python_test(VpProfilesProcessor_TestValidate                     test_validate.py)
+    add_vulkan_python_test(VkProfiles_TestVulkanProfilesUtil           test_util.py)
+    add_vulkan_python_test(VkProfiles_TestVulkanObjectEmpty            test_init.py)
+    add_vulkan_python_test(VkProfiles_TestVulkanVersion                test_vulkan_version.py)
+    add_vulkan_python_test(VkProfiles_TestVulkanObjectUtils            test_vulkan_object_utils.py)
+    add_vulkan_python_test(VkProfiles_TestVulkanObjectDepends          test_vulkan_object_expression_parsing.py)
+    add_vulkan_python_test(VkProfiles_TestVulkanProfilesJson           test_profiles_json_utils.py)
+    add_vulkan_python_test(VkProfiles_TestFormatFlagsConverter         test_format_flags.py)
+    add_vulkan_python_test(VkProfiles_TestMergeLimittype               test_combine_limittype.py)
+    add_vulkan_python_test(VkProfiles_TestTransformPullExts            test_transform_pull_caps_exts.py)
+    add_vulkan_python_test(VkProfiles_TestTransformPullCapsCore        test_transform_pull_caps_core.py)
+    add_vulkan_python_test(VkProfiles_TestTransformPullCapsSpec        test_transform_pull_caps_spec.py)
+    add_vulkan_python_test(VkProfiles_TestTransformPullCapsProf        test_transform_pull_caps_prof.py)
+    add_vulkan_python_test(VkProfiles_TestTransformPullCapsOr          test_transform_pull_caps_or.py)
+    add_vulkan_python_test(VkProfiles_TestTransformPullPromotedExts    test_transform_pull_promoted_exts.py)
+    add_vulkan_python_test(VkProfiles_TestTransformPullAliases         test_transform_pull_aliases.py)
+    add_vulkan_python_test(VkProfiles_TestTransformConsolidate         test_transform_consolidate.py)
+    add_vulkan_python_test(VkProfiles_TestTransformStripDups           test_transform_strip_duplication.py)
+    add_vulkan_python_test(VkProfiles_TestTransformStripPromotedExts   test_transform_strip_promoted_exts.py)
+    add_vulkan_python_test(VkProfiles_TestTransformSort                test_transform_sort.py)
+    add_vulkan_python_test(VkProfiles_TestValidate                     test_validate.py)
 endif()
 
 # Convert Android Profiles custom target
@@ -60,10 +60,10 @@ set(REGISTRY_PATH "${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan
 set(PROFILES_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../profiles/Android")
 set(PROFILES_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/profiles")
 
-add_custom_target(convert_android ALL
+add_custom_target(transform_android_profiles ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory "${PROFILES_OUTPUT_DIR}"
     COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${REGISTRY_PATH}"
-        ${VENV_PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/../vkprofiles.py" convert
+        ${VENV_PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/../vkprofiles.py" transform
         --registry "${REGISTRY_PATH}/vk.xml"
         --input "${PROFILES_INPUT_DIR}"
         --output "${PROFILES_OUTPUT_DIR}"
@@ -76,4 +76,4 @@ add_custom_target(convert_android ALL
     COMMENT "Testing vkprofiles with Android Vulkan profiles..."
     VERBATIM
 )
-add_dependencies(convert_android VpProfilesProcessor python_venv)
+add_dependencies(transform_android_profiles VpProfilesProcessor python_venv)

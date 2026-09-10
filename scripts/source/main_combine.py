@@ -28,14 +28,14 @@ import tempfile
 from pathlib import Path
 
 from source.vulkan_object_utils import initVulkanObject
-from source.generate_profiles_merge import VulkanProfilesMergeGenerator
+from source.generate_profiles_combine import VulkanProfilesCombineGenerator
 from source.main_validate import main_validate
-from source.main_convert import main_convert
+from source.main_transform import main_transform
 from source.profiles_json_utils import save_profiles_jsons, OutputFormatType
 from source.json_config import JsonConfig
 
 
-def main_merge(args):
+def main_combine(args):
     api = getattr(args, 'api', 'vulkan') or 'vulkan'
 
     validate_val = getattr(args, 'validate', None)
@@ -51,7 +51,7 @@ def main_merge(args):
         main_validate(validate_args)
 
     if not args.registry:
-        logging.error("Merging profiles requires specifying --registry")
+        logging.error("Combining profiles requires specifying --registry")
         sys.exit(1)
 
     vk = initVulkanObject(api, args.registry)
@@ -61,10 +61,10 @@ def main_merge(args):
     input_profiles = getattr(args, 'input_profiles', None)
 
     if not config_path and not input_dir:
-        logging.error("Merging profiles requires specifying either --config or --input")
+        logging.error("Combining profiles requires specifying either --config or --input")
         sys.exit(1)
 
-    merged_json = {
+    combined_json = {
         "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
         "capabilities": {},
         "profiles": {},
@@ -81,9 +81,9 @@ def main_merge(args):
             json_data = json.load(f)
 
         if json_data.get("contributors"):
-            merged_json["contributors"] = json_data["contributors"]
+            combined_json["contributors"] = json_data["contributors"]
         if json_data.get("history"):
-            merged_json["history"] = json_data["history"]
+            combined_json["history"] = json_data["history"]
 
         for p_name, p_val in json_data.get("profiles", {}).items():
             in_dir = os.path.join(current_dir, p_val["input"])
@@ -116,8 +116,8 @@ def main_merge(args):
         profile_configs.append(p_config)
 
     for cfg in profile_configs:
-        merger = VulkanProfilesMergeGenerator(vk)
-        merger.merge(cfg, merged_json, mode)
+        combiner = VulkanProfilesCombineGenerator(vk)
+        combiner.combine(cfg, combined_json, mode)
 
     output_path = Path(args.output)
     output_dir = output_path.parent
@@ -130,22 +130,21 @@ def main_merge(args):
     elif format_type is None:
         format_type = OutputFormatType.PRETTY
 
-    convert_mode = getattr(args, 'convert', None)
+    transform_mode = getattr(args, 'transform', None)
 
-    if convert_mode:
+    if transform_mode:
         with tempfile.TemporaryDirectory() as temp_dir:
-            temp_merged_path = Path(temp_dir) / "merged.json"
-            save_profiles_jsons({temp_merged_path: merged_json}, temp_merged_path, format_type)
+            temp_combined_path = Path(temp_dir) / "combined.json"
+            save_profiles_jsons({temp_combined_path: combined_json}, temp_combined_path, format_type)
 
-            convert_args = argparse.Namespace(
+            transform_args = argparse.Namespace(
                 registry=args.registry,
-                input=str(temp_merged_path),
+                input=str(temp_combined_path),
                 output=str(output_path),
-                mode=convert_mode,
+                mode=transform_mode,
                 format=format_type,
                 api=api
             )
-            main_convert(convert_args)
+            main_transform(transform_args)
     else:
-        save_profiles_jsons({output_path: merged_json}, output_path, format_type)
-        
+        save_profiles_jsons({output_path: combined_json}, output_path, format_type)
