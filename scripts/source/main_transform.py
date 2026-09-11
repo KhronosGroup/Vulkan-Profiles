@@ -45,6 +45,9 @@ from source.transform_pull_aliases import (
 from source.transform_consolidate import (
     consolidate_profiles_files
 )
+from source.transform_strip_helper_values import (
+    strip_helper_values_profiles_files
+)
 from source.transform_strip_duplication import (
     strip_duplication_profiles_files
 )
@@ -105,6 +108,11 @@ def main_transform(args):
     if TransformBits.CONSOLIDATE in mode_enums:
         logging.debug("Consolidating profile capability blocks...")
         consolidate_profiles_files(json_files_dict)
+
+    # Strip Bitmask Helper Values
+    if TransformBits.STRIP_HELPER_VALUES in mode_enums:
+        logging.debug("Stripping bitmask helper values...")
+        strip_helper_values_profiles_files(vk, json_files_dict)
 
     # Strip Duplication
     if TransformBits.STRIP_DUPLICATION in mode_enums:
