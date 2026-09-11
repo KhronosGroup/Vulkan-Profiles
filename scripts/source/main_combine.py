@@ -25,14 +25,26 @@ import json
 import logging
 import argparse
 import tempfile
+from enum import Enum
 from pathlib import Path
 
 from source.vulkan_object_utils import initVulkanObject
 from source.generate_profiles_combine import VulkanProfilesCombineGenerator
 from source.main_validate import main_validate
 from source.main_transform import main_transform
-from source.profiles_json_utils import save_profiles_jsons, OutputFormatType
+from source.profiles_json_utils import (
+    load_profiles_jsons,
+    save_profiles_jsons,
+    strip_dict_duplication,
+    OutputFormatType
+)
 from source.json_config import JsonConfig
+
+
+class CombineMode(str, Enum):
+    INTERSECTION = 'intersection'  # Keeps capabilities supported by all input profiles.
+    UNION = 'union'                # Keeps capabilities supported by any input profile.
+    DIFFERENCE = 'difference'      # Removes common capabilities, leaving only unique profile differences.
 
 
 def main_combine(args):
@@ -64,6 +76,40 @@ def main_combine(args):
         logging.error("Combining profiles requires specifying either --config or --input")
         sys.exit(1)
 
+    raw_mode = getattr(args, 'mode', CombineMode.INTERSECTION)
+    mode = CombineMode(raw_mode)
+
+    format_type = getattr(args, 'format', OutputFormatType.PRETTY)
+    if isinstance(format_type, str):
+        format_type = OutputFormatType(format_type)
+    elif format_type is None:
+        format_type = OutputFormatType.PRETTY
+
+    output_path = Path(args.output)
+
+    # Special processing for DIFFERENCE mode across input profile files
+    if mode == CombineMode.DIFFERENCE:
+        json_files_dict = load_profiles_jsons(Path(input_dir) if input_dir else Path(config_path).parent)
+
+        generator = VulkanProfilesCombineGenerator(vk)
+        all_jsons = list(json_files_dict.values())
+        all_profile_names = []
+        for file_data in all_jsons:
+            all_profile_names.extend(list(file_data.get("profiles", {}).keys()))
+
+        common_caps = generator.combine_capabilities(all_jsons, all_profile_names, (1, 0))
+
+        diff_files_dict = {}
+        for file_key, file_data in json_files_dict.items():
+            diff_file_data = json.loads(json.dumps(file_data))
+            for cap_block in diff_file_data.get("capabilities", {}).values():
+                strip_dict_duplication(cap_block, common_caps, strip_list_elements=True)
+            diff_files_dict[file_key] = diff_file_data
+
+        save_profiles_jsons(diff_files_dict, output_path, format_type)
+        return
+
+    # Processing for UNION and INTERSECTION modes
     combined_json = {
         "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
         "capabilities": {},
@@ -72,8 +118,6 @@ def main_combine(args):
         "history": []
     }
     profile_configs = []
-
-    mode = getattr(args, 'mode', 'intersection')
 
     if config_path:
         current_dir = os.path.dirname(os.path.abspath(config_path))
@@ -87,7 +131,7 @@ def main_combine(args):
 
         for p_name, p_val in json_data.get("profiles", {}).items():
             in_dir = os.path.join(current_dir, p_val["input"])
-            p_config = JsonConfig(in_dir, [], p_val.get("api-version"), mode)
+            p_config = JsonConfig(in_dir, [], p_val.get("api-version"), mode.value)
             p_config.apply_json_value(p_name, p_val)
             profile_configs.append(p_config)
     else:
@@ -95,7 +139,7 @@ def main_combine(args):
         if input_profiles:
             input_profile_names = [p.strip() for p in input_profiles.split(',') if p.strip()]
 
-        p_config = JsonConfig(input_dir, input_profile_names, getattr(args, 'profile_api_version', None), mode)
+        p_config = JsonConfig(input_dir, input_profile_names, getattr(args, 'profile_api_version', None), mode.value)
 
         profile_name = getattr(args, 'profile_name', None) or getattr(args, 'output_profile', None)
         if profile_name:
@@ -117,18 +161,11 @@ def main_combine(args):
 
     for cfg in profile_configs:
         combiner = VulkanProfilesCombineGenerator(vk)
-        combiner.combine(cfg, combined_json, mode)
+        combiner.combine(cfg, combined_json, mode.value)
 
-    output_path = Path(args.output)
     output_dir = output_path.parent
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
-
-    format_type = getattr(args, 'format', OutputFormatType.PRETTY)
-    if isinstance(format_type, str):
-        format_type = OutputFormatType(format_type)
-    elif format_type is None:
-        format_type = OutputFormatType.PRETTY
 
     transform_mode = getattr(args, 'transform', None)
 
