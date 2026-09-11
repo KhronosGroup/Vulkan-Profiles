@@ -18,17 +18,18 @@
 - Add `vkprofiles` executable which bundles the python scripts in a standalone executable
   - Add `convert` command to pull Vulkan requirements and aliases capabilities on JSON profiles
   - Add `validate` command and add profiles analysis to check semantics
+  - Add `combine` `difference` mode, to output the differences across a set of Vulkan profiles
 
 ### Improvements:
 - Improve profiles schema to support capabilities dynamic structures
 - Optimize profiles schema to avoid duplicated values
 
 ### Bugfixes:
-- Fix `merge` missing some structures, updated desktop profiles
-
+- Fix `combine` missing some structures, updated desktop profiles
 
 ### Deprecation:
-- `gen_profiles*.py` file are all deprecated and replaced by `vkprofiles`
+- `gen_profiles_file.py` is deprecated and replaced by `vkprofiles combine` command
+- `gen_profiles_solution.py` is deprecated and replaced by `vkprofiles doc`, `vkprofiles library`, `vkprofiles validate` commands
 - Using the Vulkan Profiles API library without declaring #define VP_USE_OBJECT is deprecated
 - Require Vulkan 1.1
 

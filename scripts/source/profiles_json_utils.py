@@ -220,7 +220,7 @@ def deep_merge_dict(target: dict, source: dict):
             target[key] = copy.deepcopy(value)
 
 
-def strip_dict_duplication(target: dict, reference: dict):
+def strip_dict_duplication(target: dict, reference: dict, strip_list_elements: bool = False):
     """Recursively removes key-value pairs from target dict that match reference dict."""
     keys_to_delete = []
 
@@ -229,20 +229,25 @@ def strip_dict_duplication(target: dict, reference: dict):
             ref_value = reference[key]
 
             if isinstance(value, dict) and isinstance(ref_value, dict):
-                strip_dict_duplication(value, ref_value)
+                strip_dict_duplication(value, ref_value, strip_list_elements)
                 if not value:
                     keys_to_delete.append(key)
 
+            elif isinstance(value, list) and isinstance(ref_value, list):
+                if strip_list_elements:
+                    target[key] = [item for item in value if item not in ref_value]
+                    if not target[key]:
+                        keys_to_delete.append(key)
+                else:
+                    try:
+                        if sorted(value) == sorted(ref_value):
+                            keys_to_delete.append(key)
+                    except TypeError:
+                        if value == ref_value:
+                            keys_to_delete.append(key)
+
             elif value == ref_value:
                 keys_to_delete.append(key)
-
-            elif isinstance(value, list) and isinstance(ref_value, list):
-                try:
-                    if sorted(value) == sorted(ref_value):
-                        keys_to_delete.append(key)
-                except TypeError:
-                    if value == ref_value:
-                        keys_to_delete.append(key)
 
     for key in keys_to_delete:
         del target[key]
@@ -501,7 +506,9 @@ def save_profiles_jsons(json_files_dict, output_path, format: OutputFormatType):
         content = re.sub(r'\s+', ' ', match.group(1)).strip()
         return f"[ {content} ]" if content else "[]"
 
-    if output_path.suffix == '.json' or (len(json_files_dict) == 1 and not output_path.is_dir()):
+    is_single_file = output_path.suffix == '.json' or output_path.is_file()
+
+    if is_single_file:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         for value in json_files_dict.values():
             with open(output_path, "w", encoding="utf-8") as file:

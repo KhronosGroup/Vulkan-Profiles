@@ -28,7 +28,7 @@ from source.main_schema import main_schema
 from source.main_validate import main_validate
 from source.main_layer import main_layer
 from source.main_tests import main_tests
-from source.main_combine import main_combine
+from source.main_combine import main_combine, CombineMode
 from source.main_library import main_library
 from source.main_doc import main_doc
 from source.main_version import main_version, get_version_string
@@ -100,7 +100,7 @@ def main(argv):
     combine_parser.add_argument('--profile-api-version', action='store', help='Override the Vulkan API version of the generated profile. If the argument is not set, the value is generated.')
     combine_parser.add_argument('--profile-stage', action='store', choices=['ALPHA', 'BETA', 'STABLE'], default='STABLE', help='Override the development stage of the generated profile.')
     combine_parser.add_argument('--profile-required-profiles', action='store', help='Comma separated list of required profiles by the generated profile.')
-    combine_parser.add_argument('--mode', '-m', action='store', choices=['union', 'intersection'], default='intersection', help='Mode of profile combination.')
+    combine_parser.add_argument('--mode', '-m', action='store', choices=list(CombineMode), default=CombineMode.INTERSECTION, help='Mode of profile combination.')
     combine_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the profiles files (default: pretty).')
     combine_parser.add_argument('--transform', nargs='*', action='store', choices=list(TransformBits), default=[], help='List of transformation capabilities to apply to the combined profile output.')
     combine_parser.add_argument('--validate', nargs='*', action=ValidateAction, default=None, help='Validate profile files before combining (choices: schema, analysis).')

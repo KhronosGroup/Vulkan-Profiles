@@ -34,6 +34,7 @@ from source.vulkan_object_version import (
     is_bundle_structure,
     get_bundle_structure_core_version
 )
+from source.profiles_json_utils import collect_block_names
 
 
 class VulkanProfilesCombineGenerator:
@@ -130,7 +131,10 @@ class VulkanProfilesCombineGenerator:
 
         for i in range(len(jsons)):
             self.first = (i == 0)
-            for capability_name in jsons[i]['profiles'][profile_names[i]]['capabilities']:
+            block_names = collect_block_names(jsons[i]['profiles'][profile_names[i]].get('capabilities', []))
+            for capability_name in block_names:
+                if capability_name not in jsons[i].get('capabilities', {}):
+                    continue
                 capability = jsons[i]['capabilities'][capability_name]
 
                 # Prune structures/formats not present in subsequent JSONs during intersection mode
@@ -809,3 +813,4 @@ class VulkanProfilesCombineGenerator:
         profile['capabilities'] = list()
         profile['capabilities'].append(capabilities_key)
         return profile
+    
