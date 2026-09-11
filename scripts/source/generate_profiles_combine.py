@@ -34,7 +34,7 @@ from source.vulkan_object_version import (
     is_bundle_structure,
     get_bundle_structure_core_version
 )
-from source.profiles_json_utils import collect_block_names
+from source.profiles_json_utils import collect_block_names, deep_merge_dict
 
 
 class VulkanProfilesCombineGenerator:
@@ -131,148 +131,189 @@ class VulkanProfilesCombineGenerator:
 
         for i in range(len(jsons)):
             self.first = (i == 0)
+
+            # 1. Aggregate all capability blocks for profile i first
+            profile_cap = {
+                'extensions': {},
+                'features': {},
+                'properties': {},
+                'formats': {},
+                'queueFamiliesProperties': [],
+                'videoProfiles': []
+            }
+
             block_names = collect_block_names(jsons[i]['profiles'][profile_names[i]].get('capabilities', []))
             for capability_name in block_names:
                 if capability_name not in jsons[i].get('capabilities', {}):
                     continue
-                capability = jsons[i]['capabilities'][capability_name]
+                cap = jsons[i]['capabilities'][capability_name]
 
-                # Prune structures/formats not present in subsequent JSONs during intersection mode
-                if self.mode == 'intersection' and not self.first:
-                    if 'features' in capability:
-                        for feature in dict(combined_features):
-                            if feature not in capability['features']:
-                                del combined_features[feature]
+                if 'extensions' in cap:
+                    for extension, spec_ver in cap['extensions'].items():
+                        profile_cap['extensions'][extension] = spec_ver
+
+                if 'features' in cap:
+                    for feature_name, feat_members in cap['features'].items():
+                        if feature_name not in profile_cap['features']:
+                            profile_cap['features'][feature_name] = {}
+                        profile_cap['features'][feature_name].update(feat_members)
+
+                if 'properties' in cap:
+                    for property_name, prop_members in cap['properties'].items():
+                        if property_name not in profile_cap['properties']:
+                            profile_cap['properties'][property_name] = {}
+                        deep_merge_dict(profile_cap['properties'][property_name], prop_members)
+
+                if 'formats' in cap:
+                    for fmt_name, fmt_data in cap['formats'].items():
+                        if fmt_name not in profile_cap['formats']:
+                            profile_cap['formats'][fmt_name] = {}
+                        deep_merge_dict(profile_cap['formats'][fmt_name], fmt_data)
+
+                if 'queueFamiliesProperties' in cap:
+                    for qfp in cap['queueFamiliesProperties']:
+                        profile_cap['queueFamiliesProperties'].append(qfp)
+
+                if 'videoProfiles' in cap:
+                    for vp in cap['videoProfiles']:
+                        profile_cap['videoProfiles'].append(vp)
+
+            # 2. Perform intersection pruning against accumulated profiles
+            if self.mode == 'intersection' and not self.first:
+                if profile_cap['features']:
+                    for feature in dict(combined_features):
+                        if feature not in profile_cap['features']:
+                            del combined_features[feature]
+                else:
+                    combined_features.clear()
+
+                if profile_cap['properties']:
+                    for prop in dict(combined_properties):
+                        if prop not in profile_cap['properties']:
+                            del combined_properties[prop]
+                else:
+                    combined_properties.clear()
+
+                if profile_cap['formats']:
+                    for fmt_name in dict(combined_formats):
+                        if fmt_name not in profile_cap['formats']:
+                            del combined_formats[fmt_name]
+                else:
+                    combined_formats.clear()
+
+            # Extensions
+            if profile_cap['extensions']:
+                if self.mode == 'union' or self.first:
+                    for extension, spec_ver in profile_cap['extensions'].items():
+                        combined_extensions[extension] = spec_ver
+                elif self.mode == 'intersection':
+                    for extension in list(combined_extensions):
+                        if extension not in profile_cap['extensions']:
+                            del combined_extensions[extension]
+
+            # Features
+            if profile_cap['features']:
+                for feature_name, feat_members in profile_cap['features'].items():
+                    self.add_struct(feature_name, feat_members, combined_features)
+
+            # Properties
+            if profile_cap['properties']:
+                for property_name, prop_members in profile_cap['properties'].items():
+                    if property_name in combined_properties:
+                        self.add_members(combined_properties[property_name], prop_members, property_name)
                     else:
-                        combined_features.clear()
-
-                    if 'properties' in capability:
-                        for prop in dict(combined_properties):
-                            if prop not in capability['properties']:
-                                del combined_properties[prop]
-                    else:
-                        combined_properties.clear()
-
-                    if 'formats' in capability:
-                        for fmt_name in dict(combined_formats):
-                            if fmt_name not in capability['formats']:
-                                del combined_formats[fmt_name]
-                    else:
-                        combined_formats.clear()
-
-                # Extensions
-                if 'extensions' in capability:
-                    if self.mode == 'union' or self.first:
-                        for extension, spec_ver in capability['extensions'].items():
-                            combined_extensions[extension] = spec_ver
-                    elif self.mode == 'intersection':
-                        for extension in list(combined_extensions):
-                            if extension not in capability['extensions']:
-                                del combined_extensions[extension]
-
-                # Features
-                if 'features' in capability:
-                    for feature_name, feat_members in capability['features'].items():
-                        self.add_struct(feature_name, feat_members, combined_features)
-
-                # Properties
-                if 'properties' in capability:
-                    for property_name, prop_members in capability['properties'].items():
-                        if property_name in combined_properties:
+                        if self.mode == 'union' or self.first:
+                            combined_properties[property_name] = dict()
                             self.add_members(combined_properties[property_name], prop_members, property_name)
+
+            # Formats
+            if profile_cap['formats']:
+                for fmt_name in profile_cap['formats']:
+                    if (fmt_name not in combined_formats) and (self.mode == 'union' or self.first):
+                        combined_formats[fmt_name] = {
+                            'VkFormatProperties': {},
+                            'VkFormatProperties3': {},
+                            'VkFormatProperties3KHR': {}
+                        }
+
+                    if fmt_name in combined_formats:
+                        for prop_struct_name in ['VkFormatProperties', 'VkFormatProperties3', 'VkFormatProperties3KHR']:
+                            for feat_cat in ['linearTilingFeatures', 'optimalTilingFeatures', 'bufferFeatures']:
+                                self.combine_format_features(combined_formats, fmt_name, profile_cap, prop_struct_name, feat_cat)
+
+            # Queue Families
+            if profile_cap['queueFamiliesProperties']:
+                if self.mode == 'intersection':
+                    if self.first:
+                        for qfp in profile_cap['queueFamiliesProperties']:
+                            combined_qfp.append(qfp)
+                    else:
+                        for mqfp in list(combined_qfp):
+                            found = False
+                            for qfp in profile_cap['queueFamiliesProperties']:
+                                if mqfp['VkQueueFamilyProperties']['queueFlags'] != qfp['VkQueueFamilyProperties']['queueFlags']:
+                                    continue
+                                if mqfp['VkQueueFamilyProperties']['queueCount'] != qfp['VkQueueFamilyProperties']['queueCount']:
+                                    continue
+                                if mqfp['VkQueueFamilyProperties']['timestampValidBits'] != qfp['VkQueueFamilyProperties']['timestampValidBits']:
+                                    continue
+                                if mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width'] != qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width']:
+                                    continue
+                                if mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height'] != qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height']:
+                                    continue
+                                if mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth'] != qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth']:
+                                    continue
+                                found = True
+                                break
+                            if not found:
+                                combined_qfp.remove(mqfp)
+
+                elif self.mode == 'union':
+                    for qfp in profile_cap['queueFamiliesProperties']:
+                        if not combined_qfp:
+                            combined_qfp.append(qfp)
                         else:
-                            if self.mode == 'union' or self.first:
-                                combined_properties[property_name] = dict()
-                                self.add_members(combined_properties[property_name], prop_members, property_name)
+                            for mqfp in combined_qfp:
+                                if not self.compareList(mqfp['VkQueueFamilyProperties']['queueFlags'], qfp['VkQueueFamilyProperties']['queueFlags']):
+                                    combined_qfp.append(qfp)
+                                elif qfp['VkQueueFamilyProperties']['queueCount'] != mqfp['VkQueueFamilyProperties']['queueCount']:
+                                    combined_qfp.append(qfp)
+                                elif qfp['VkQueueFamilyProperties']['timestampValidBits'] != mqfp['VkQueueFamilyProperties']['timestampValidBits']:
+                                    combined_qfp.append(qfp)
+                                elif qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width'] != mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width']:
+                                    combined_qfp.append(qfp)
+                                elif qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height'] != mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height']:
+                                    combined_qfp.append(qfp)
+                                elif qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth'] != mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth']:
+                                    combined_qfp.append(qfp)
 
-                # Formats
-                if 'formats' in capability:
-                    for fmt_name in capability['formats']:
-                        if (fmt_name not in combined_formats) and (self.mode == 'union' or self.first):
-                            combined_formats[fmt_name] = {
-                                'VkFormatProperties': {},
-                                'VkFormatProperties3': {},
-                                'VkFormatProperties3KHR': {}
-                            }
-
-                        if fmt_name in combined_formats:
-                            for prop_struct_name in ['VkFormatProperties', 'VkFormatProperties3', 'VkFormatProperties3KHR']:
-                                for feat_cat in ['linearTilingFeatures', 'optimalTilingFeatures', 'bufferFeatures']:
-                                    self.combine_format_features(combined_formats, fmt_name, capability, prop_struct_name, feat_cat)
-
-                # Queue Families
-                if 'queueFamiliesProperties' in capability:
-                    if self.mode == 'intersection':
-                        if self.first:
-                            for qfp in capability['queueFamiliesProperties']:
-                                combined_qfp.append(qfp)
-                        else:
-                            for mqfp in list(combined_qfp):
-                                found = False
-                                for qfp in capability['queueFamiliesProperties']:
-                                    if mqfp['VkQueueFamilyProperties']['queueFlags'] != qfp['VkQueueFamilyProperties']['queueFlags']:
-                                        continue
-                                    if mqfp['VkQueueFamilyProperties']['queueCount'] != qfp['VkQueueFamilyProperties']['queueCount']:
-                                        continue
-                                    if mqfp['VkQueueFamilyProperties']['timestampValidBits'] != qfp['VkQueueFamilyProperties']['timestampValidBits']:
-                                        continue
-                                    if mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width'] != qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width']:
-                                        continue
-                                    if mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height'] != qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height']:
-                                        continue
-                                    if mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth'] != qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth']:
-                                        continue
-                                    found = True
-                                    break
-                                if not found:
-                                    combined_qfp.remove(mqfp)
-
-                    elif self.mode == 'union':
-                        for qfp in capability['queueFamiliesProperties']:
-                            if not combined_qfp:
-                                combined_qfp.append(qfp)
-                            else:
-                                for mqfp in combined_qfp:
-                                    if not self.compareList(mqfp['VkQueueFamilyProperties']['queueFlags'], qfp['VkQueueFamilyProperties']['queueFlags']):
-                                        combined_qfp.append(qfp)
-                                    elif qfp['VkQueueFamilyProperties']['queueCount'] != mqfp['VkQueueFamilyProperties']['queueCount']:
-                                        combined_qfp.append(qfp)
-                                    elif qfp['VkQueueFamilyProperties']['timestampValidBits'] != mqfp['VkQueueFamilyProperties']['timestampValidBits']:
-                                        combined_qfp.append(qfp)
-                                    elif qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width'] != mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['width']:
-                                        combined_qfp.append(qfp)
-                                    elif qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height'] != mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['height']:
-                                        combined_qfp.append(qfp)
-                                    elif qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth'] != mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth']:
-                                        combined_qfp.append(qfp)
-
-                # Video Profiles
-                if 'videoProfiles' in capability:
-                    if self.mode == 'intersection':
-                        if self.first:
-                            for video_profile in capability['videoProfiles']:
-                                combined_video_profiles.append(video_profile)
-                        else:
-                            def deep_compare(a, b):
-                                if isinstance(a, list):
-                                    if isinstance(b, list) and len(a) == len(b):
-                                        return all(deep_compare(a[i], b[i]) for i in range(len(a)))
-                                    return False
-                                elif isinstance(a, dict):
-                                    if isinstance(b, dict) and len(a.keys()) == len(b.keys()):
-                                        return all(k in b and deep_compare(a[k], b[k]) for k in a.keys())
-                                    return False
-                                else:
-                                    return a == b
-
-                            for combined_video_profile in list(combined_video_profiles):
-                                found = any(deep_compare(combined_video_profile, vp) for vp in capability['videoProfiles'])
-                                if not found:
-                                    combined_video_profiles.remove(combined_video_profile)
-
-                    elif self.mode == 'union':
-                        for video_profile in capability['videoProfiles']:
+            # Video Profiles
+            if profile_cap['videoProfiles']:
+                if self.mode == 'intersection':
+                    if self.first:
+                        for video_profile in profile_cap['videoProfiles']:
                             combined_video_profiles.append(video_profile)
+                    else:
+                        def deep_compare(a, b):
+                            if isinstance(a, list):
+                                if isinstance(b, list) and len(a) == len(b):
+                                    return all(deep_compare(a[idx], b[idx]) for idx in range(len(a)))
+                                return False
+                            elif isinstance(a, dict):
+                                if isinstance(b, dict) and len(a.keys()) == len(b.keys()):
+                                    return all(k in b and deep_compare(a[k], b[k]) for k in a.keys())
+                                return False
+                            else:
+                                return a == b
+
+                        for combined_video_profile in list(combined_video_profiles):
+                            found = any(deep_compare(combined_video_profile, vp) for vp in profile_cap['videoProfiles'])
+                            if not found:
+                                combined_video_profiles.remove(combined_video_profile)
+
+                elif self.mode == 'union':
+                    for video_profile in profile_cap['videoProfiles']:
+                        combined_video_profiles.append(video_profile)
 
         capabilities = dict()
         if combined_extensions:
@@ -309,8 +350,8 @@ class VulkanProfilesCombineGenerator:
                     if prop_name in capabilities['formats'][fmt_name]:
                         if not capabilities['formats'][fmt_name][prop_name]:
                             del capabilities['formats'][fmt_name][prop_name]
-            if not capabilities['formats'][fmt_name]:
-                formats_to_remove.append(fmt_name)
+                if not capabilities['formats'][fmt_name]:
+                    formats_to_remove.append(fmt_name)
 
             for fmt_name in formats_to_remove:
                 del capabilities['formats'][fmt_name]
