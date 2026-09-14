@@ -21,6 +21,7 @@ import sys
 import logging
 import collections
 import math
+from enum import Enum
 
 from source.vulkan_object_utils import (
     VulkanObject,
@@ -36,10 +37,19 @@ from source.vulkan_object_version import (
 )
 
 
+class CombineMode(str, Enum):
+    UNION = 'union'
+    INTERSECTION = 'intersection'
+    DIFFERENCE = 'difference'
+
+    def __str__(self):
+        return str(self.value)
+
+
 class VulkanProfilesCombineGenerator:
     def __init__(self, vk: VulkanObject):
         self.vk = vk
-        self.mode = 'intersection'
+        self.mode = CombineMode.INTERSECTION
         self.first = True
 
     def is_enum_type(self, type_name: str) -> bool:
@@ -99,7 +109,7 @@ class VulkanProfilesCombineGenerator:
             elif count_member in combined or (array_name in combined and not combined[array_name]):
                 combined[count_member] = 0
 
-    def combine(self, profile_config, profile_file, mode='intersection'):
+    def combine(self, profile_config, profile_file, mode=CombineMode.INTERSECTION):
         self.mode = mode
         logging.info('Building a Vulkan ' + '.'.join(profile_config.api_version) + ' profile')
 
@@ -134,7 +144,7 @@ class VulkanProfilesCombineGenerator:
                 capability = jsons[i]['capabilities'][capability_name]
 
                 # Prune structures/formats not present in subsequent JSONs during intersection mode
-                if self.mode == 'intersection' and not self.first:
+                if self.mode == CombineMode.INTERSECTION and not self.first:
                     if 'features' in capability:
                         for feature in dict(combined_features):
                             if feature not in capability['features']:
@@ -158,12 +168,16 @@ class VulkanProfilesCombineGenerator:
 
                 # Extensions
                 if 'extensions' in capability:
-                    if self.mode == 'union' or self.first:
+                    if self.mode == CombineMode.UNION or self.first:
                         for extension, spec_ver in capability['extensions'].items():
                             combined_extensions[extension] = spec_ver
-                    elif self.mode == 'intersection':
+                    elif self.mode == CombineMode.INTERSECTION:
                         for extension in list(combined_extensions):
                             if extension not in capability['extensions']:
+                                del combined_extensions[extension]
+                    elif self.mode == CombineMode.DIFFERENCE:
+                        for extension in list(combined_extensions):
+                            if extension in capability['extensions']:
                                 del combined_extensions[extension]
 
                 # Features
@@ -177,14 +191,14 @@ class VulkanProfilesCombineGenerator:
                         if property_name in combined_properties:
                             self.add_members(combined_properties[property_name], prop_members, property_name)
                         else:
-                            if self.mode == 'union' or self.first:
+                            if self.mode == CombineMode.UNION or self.first:
                                 combined_properties[property_name] = dict()
                                 self.add_members(combined_properties[property_name], prop_members, property_name)
 
                 # Formats
                 if 'formats' in capability:
                     for fmt_name in capability['formats']:
-                        if (fmt_name not in combined_formats) and (self.mode == 'union' or self.first):
+                        if (fmt_name not in combined_formats) and (self.mode == CombineMode.UNION or self.first):
                             combined_formats[fmt_name] = {
                                 'VkFormatProperties': {},
                                 'VkFormatProperties3': {},
@@ -198,7 +212,7 @@ class VulkanProfilesCombineGenerator:
 
                 # Queue Families
                 if 'queueFamiliesProperties' in capability:
-                    if self.mode == 'intersection':
+                    if self.mode == CombineMode.INTERSECTION:
                         if self.first:
                             for qfp in capability['queueFamiliesProperties']:
                                 combined_qfp.append(qfp)
@@ -223,7 +237,7 @@ class VulkanProfilesCombineGenerator:
                                 if not found:
                                     combined_qfp.remove(mqfp)
 
-                    elif self.mode == 'union':
+                    elif self.mode == CombineMode.UNION:
                         for qfp in capability['queueFamiliesProperties']:
                             if not combined_qfp:
                                 combined_qfp.append(qfp)
@@ -242,9 +256,21 @@ class VulkanProfilesCombineGenerator:
                                     elif qfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth'] != mqfp['VkQueueFamilyProperties']['minImageTransferGranularity']['depth']:
                                         combined_qfp.append(qfp)
 
+                    elif self.mode == CombineMode.DIFFERENCE:
+                        if self.first:
+                            for qfp in capability['queueFamiliesProperties']:
+                                combined_qfp.append(qfp)
+                        else:
+                            for mqfp in list(combined_qfp):
+                                for qfp in capability['queueFamiliesProperties']:
+                                    if (mqfp['VkQueueFamilyProperties']['queueFlags'] == qfp['VkQueueFamilyProperties']['queueFlags'] and
+                                        mqfp['VkQueueFamilyProperties']['queueCount'] == qfp['VkQueueFamilyProperties']['queueCount']):
+                                        combined_qfp.remove(mqfp)
+                                        break
+
                 # Video Profiles
                 if 'videoProfiles' in capability:
-                    if self.mode == 'intersection':
+                    if self.mode == CombineMode.INTERSECTION:
                         if self.first:
                             for video_profile in capability['videoProfiles']:
                                 combined_video_profiles.append(video_profile)
@@ -266,9 +292,19 @@ class VulkanProfilesCombineGenerator:
                                 if not found:
                                     combined_video_profiles.remove(combined_video_profile)
 
-                    elif self.mode == 'union':
+                    elif self.mode == CombineMode.UNION:
                         for video_profile in capability['videoProfiles']:
                             combined_video_profiles.append(video_profile)
+
+                    elif self.mode == CombineMode.DIFFERENCE:
+                        if self.first:
+                            for video_profile in capability['videoProfiles']:
+                                combined_video_profiles.append(video_profile)
+                        else:
+                            for combined_video_profile in list(combined_video_profiles):
+                                found = any(deep_compare(combined_video_profile, vp) for vp in capability['videoProfiles'])
+                                if found:
+                                    combined_video_profiles.remove(combined_video_profile)
 
         capabilities = dict()
         if combined_extensions:
@@ -326,27 +362,31 @@ class VulkanProfilesCombineGenerator:
         if fmt_name in capability['formats'] and prop_name in capability['formats'][fmt_name]:
             if features in capability['formats'][fmt_name][prop_name]:
                 if features not in combined_formats[fmt_name][prop_name]:
-                    if self.mode == 'union' or self.first:
+                    if self.mode == CombineMode.UNION or self.first:
                         combined_formats[fmt_name][prop_name][features] = list(capability['formats'][fmt_name][prop_name][features])
                 else:
-                    if self.mode == 'union':
+                    if self.mode == CombineMode.UNION:
                         for feat in capability['formats'][fmt_name][prop_name][features]:
                             if feat not in combined_formats[fmt_name][prop_name][features]:
                                 combined_formats[fmt_name][prop_name][features].append(feat)
-                    else:
+                    elif self.mode == CombineMode.INTERSECTION:
                         for feat in list(combined_formats[fmt_name][prop_name][features]):
                             if feat not in capability['formats'][fmt_name][prop_name][features]:
+                                combined_formats[fmt_name][prop_name][features].remove(feat)
+                    elif self.mode == CombineMode.DIFFERENCE:
+                        for feat in list(combined_formats[fmt_name][prop_name][features]):
+                            if feat in capability['formats'][fmt_name][prop_name][features]:
                                 combined_formats[fmt_name][prop_name][features].remove(feat)
 
     def add_struct(self, struct_name, struct_data, combined):
         if struct_name in combined:
-            if self.mode == 'union':
+            if self.mode == CombineMode.UNION:
                 for member, val in struct_data.items():
                     if member in combined[struct_name]:
                         combined[struct_name][member] = combined[struct_name][member] or val
                     else:
                         combined[struct_name][member] = val
-            elif self.mode == 'intersection':
+            elif self.mode == CombineMode.INTERSECTION:
                 if self.first:
                     for member, val in struct_data.items():
                         combined[struct_name][member] = val
@@ -355,8 +395,12 @@ class VulkanProfilesCombineGenerator:
                         del combined[struct_name][member]
                     elif struct_data[member] != combined[struct_name][member]:
                         del combined[struct_name][member]
+            elif self.mode == CombineMode.DIFFERENCE:
+                for member in list(combined[struct_name]):
+                    if member in struct_data and combined[struct_name][member] == struct_data[member]:
+                        del combined[struct_name][member]
         else:
-            if self.mode == 'union' or self.first:
+            if self.mode == CombineMode.UNION or self.first:
                 combined[struct_name] = dict(struct_data)
 
     def add_members(self, combined, entry, property_name=None):
@@ -375,17 +419,23 @@ class VulkanProfilesCombineGenerator:
                     if 'noauto' in tokens and not is_ptr_array and not is_count:
                         del combined[member]
 
-        if self.mode == 'intersection' and not self.first:
+        if self.mode == CombineMode.INTERSECTION and not self.first:
             for member in list(combined):
                 if property_name == 'VkPhysicalDeviceProperties' and member in ('limits', 'sparseProperties'):
                     continue
                 if member not in entry:
                     del combined[member]
+        elif self.mode == CombineMode.DIFFERENCE and not self.first:
+            for member in list(combined):
+                if property_name == 'VkPhysicalDeviceProperties' and member in ('limits', 'sparseProperties'):
+                    continue
+                if member in entry and combined[member] == entry[member]:
+                    del combined[member]
 
         for member, val in entry.items():
             if property_name == 'VkPhysicalDeviceProperties' and member == 'limits':
                 if 'limits' not in combined:
-                    if self.mode == 'union' or self.first:
+                    if self.mode == CombineMode.UNION or self.first:
                         combined['limits'] = dict()
                     else:
                         continue
@@ -395,7 +445,7 @@ class VulkanProfilesCombineGenerator:
 
             if property_name == 'VkPhysicalDeviceProperties' and member == 'sparseProperties':
                 if 'sparseProperties' not in combined:
-                    if self.mode == 'union' or self.first:
+                    if self.mode == CombineMode.UNION or self.first:
                         combined['sparseProperties'] = dict()
                     else:
                         continue
@@ -412,7 +462,7 @@ class VulkanProfilesCombineGenerator:
                     is_count = member in count_to_array
                     if 'noauto' in tokens and not is_ptr_array and not is_count:
                         continue
-                if self.mode == 'union' or self.first:
+                if self.mode == CombineMode.UNION or self.first:
                     if xmlmember and xmlmember.type in ('uint64_t', 'VkDeviceSize'):
                         combined[member] = int(val)
                     else:
@@ -428,7 +478,7 @@ class VulkanProfilesCombineGenerator:
                             if sm_name in combined[member]:
                                 if sm_name in val:
                                     self.combine_members(combined[member], sm_name, val, smember, xmlmember.type)
-                            elif (self.mode == 'union' or self.first) and (sm_name in val):
+                            elif (self.mode == CombineMode.UNION or self.first) and (sm_name in val):
                                 if smember.type in ('uint64_t', 'VkDeviceSize'):
                                     combined[member][sm_name] = int(val[sm_name])
                                 else:
@@ -453,9 +503,13 @@ class VulkanProfilesCombineGenerator:
                     if 'noauto' in tokens and not is_ptr_array and not is_count:
                         del combined[member]
 
-        if self.mode == 'intersection' and not self.first:
+        if self.mode == CombineMode.INTERSECTION and not self.first:
             for member in list(combined):
                 if member not in entry:
+                    del combined[member]
+        elif self.mode == CombineMode.DIFFERENCE and not self.first:
+            for member in list(combined):
+                if member in entry and combined[member] == entry[member]:
                     del combined[member]
 
         for member, val in entry.items():
@@ -467,7 +521,7 @@ class VulkanProfilesCombineGenerator:
                     is_count = member in count_to_array
                     if 'noauto' in tokens and not is_ptr_array and not is_count:
                         continue
-                if self.mode == 'union' or self.first:
+                if self.mode == CombineMode.UNION or self.first:
                     if xmlmember and xmlmember.type in ('uint64_t', 'VkDeviceSize'):
                         combined[member] = int(val)
                     else:
@@ -573,7 +627,7 @@ class VulkanProfilesCombineGenerator:
             (xmlmember and self.is_enum_type(xmlmember.type))
         )
 
-        if self.mode == 'union':
+        if self.mode == CombineMode.UNION:
             if is_max:
                 if xmlmember.type == 'VkExtent2D':
                     combined[member]['width'] = max(combined[member]['width'], entry[member]['width'])
@@ -678,7 +732,7 @@ class VulkanProfilesCombineGenerator:
                 combined[member][0] = min(combined[member][0], entry[member][0])
                 combined[member][1] = max(combined[member][1], entry[member][1])
 
-        elif self.mode == 'intersection':
+        elif self.mode == CombineMode.INTERSECTION:
             if is_max:
                 if xmlmember.type == 'VkExtent2D':
                     combined[member]['width'] = min(combined[member]['width'], entry[member]['width'])
@@ -795,6 +849,15 @@ class VulkanProfilesCombineGenerator:
                 combined[member][0] = max(combined[member][0], entry[member][0])
                 combined[member][1] = min(combined[member][1], entry[member][1])
 
+        elif self.mode == CombineMode.DIFFERENCE:
+            if is_bitmask:
+                if isinstance(combined[member], list) and isinstance(entry[member], list):
+                    for value in entry[member]:
+                        if value in combined[member]:
+                            combined[member].remove(value)
+                elif not isinstance(combined[member], list) and not isinstance(entry[member], list):
+                    combined[member] = int(combined[member]) & ~int(entry[member])
+
     def get_profile(self, profile_config, capabilities_key):
         profile = dict()
         profile['version'] = profile_config.version
@@ -809,3 +872,4 @@ class VulkanProfilesCombineGenerator:
         profile['capabilities'] = list()
         profile['capabilities'].append(capabilities_key)
         return profile
+    

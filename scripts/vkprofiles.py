@@ -25,20 +25,20 @@ import sys
 
 from source.main_transform import main_transform, TransformBits, OutputFormatType
 from source.main_schema import main_schema
-from source.main_validate import main_validate
+from source.main_validate import main_validate, ValidateMode
 from source.main_layer import main_layer
 from source.main_tests import main_tests
-from source.main_combine import main_combine
-from source.main_library import main_library
+from source.main_combine import main_combine, CombineMode
+from source.main_library import main_library, LibraryMode
 from source.main_doc import main_doc
 from source.main_version import main_version, get_version_string
 
 
 class ValidateAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
-        valid_modes = ['schema', 'analysis']
+        valid_modes = [m.value for m in ValidateMode]
         if values is None or len(values) == 0:
-            setattr(namespace, self.dest, valid_modes)
+            setattr(namespace, self.dest, list(ValidateMode))
         else:
             res = []
             for v in values:
@@ -46,9 +46,11 @@ class ValidateAction(argparse.Action):
                     item = item.strip()
                     if item:
                         if item not in valid_modes:
-                            parser.error(f"argument {option_string}: invalid choice: '{item}' (choose from 'schema', 'analysis')")
-                        if item not in res:
-                            res.append(item)
+                            choices_str = ", ".join(f"'{m.value}'" for m in ValidateMode)
+                            parser.error(f"argument {option_string}: invalid choice: '{item}' (choose from {choices_str})")
+                        mode_enum = ValidateMode(item)
+                        if mode_enum not in res:
+                            res.append(mode_enum)
             setattr(namespace, self.dest, res)
 
 
@@ -68,7 +70,7 @@ def main(argv):
     validate_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
     validate_parser.add_argument('--schema', '-s', action='store', help='Use a profile schema (profiles-*.json). By default, generate a profile schema vk.xml.')
     validate_parser.add_argument('--input', '-i', action='store', required=True, help='Path to the input profiles files.')
-    validate_parser.add_argument('--mode', '-m', nargs='*', action=ValidateAction, default=['schema', 'analysis'], help="Validation mode(s) to execute (default: schema analysis).")
+    validate_parser.add_argument('--mode', '-m', nargs='*', action=ValidateAction, default=[ValidateMode.SCHEMA, ValidateMode.ANALYSIS], help="Validation mode(s) to execute (default: schema analysis).")
 
     schema_parser = subparsers.add_parser('schema', help='Generate a profile json schema file.')
     schema_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
@@ -100,7 +102,7 @@ def main(argv):
     combine_parser.add_argument('--profile-api-version', action='store', help='Override the Vulkan API version of the generated profile. If the argument is not set, the value is generated.')
     combine_parser.add_argument('--profile-stage', action='store', choices=['ALPHA', 'BETA', 'STABLE'], default='STABLE', help='Override the development stage of the generated profile.')
     combine_parser.add_argument('--profile-required-profiles', action='store', help='Comma separated list of required profiles by the generated profile.')
-    combine_parser.add_argument('--mode', '-m', action='store', choices=['union', 'intersection'], default='intersection', help='Mode of profile combination.')
+    combine_parser.add_argument('--mode', '-m', action='store', type=CombineMode, choices=list(CombineMode), default=CombineMode.INTERSECTION, help='Mode of profile combination.')
     combine_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the profiles files (default: pretty).')
     combine_parser.add_argument('--transform', nargs='*', action='store', choices=list(TransformBits), default=[], help='List of transformation capabilities to apply to the combined profile output.')
     combine_parser.add_argument('--validate', nargs='*', action=ValidateAction, default=None, help='Validate profile files before combining (choices: schema, analysis).')
@@ -113,7 +115,7 @@ def main(argv):
     library_parser.add_argument('--output', '-o', '--output-inc', action='store', help='Output include directory for profile library.')
     library_parser.add_argument('--output-src', action='store', help='Output source directory for profile library.')
     library_parser.add_argument('--output-filename', action='store', default='vulkan_profiles', help='Output filename for profile library, default "vulkan_profiles".')
-    library_parser.add_argument('--mode', nargs='*', action='store', choices=['header-only', 'header+source'], default=['header-only', 'header+source'], help='Library output generation mode.')
+    library_parser.add_argument('--mode', nargs='*', action='store', type=LibraryMode, choices=list(LibraryMode), default=[LibraryMode.HEADER_ONLY, LibraryMode.HEADER_SOURCE], help='Library output generation mode.')
     library_parser.add_argument('--validate', nargs='*', action=ValidateAction, default=None, help='Validate generated JSON profile schema and JSON profiles (choices: schema, analysis).')
     library_parser.add_argument('--transform', nargs='*', action='store', choices=list(TransformBits), default=[], help='List of transformation capabilities to apply before generating the library.')
     library_parser.add_argument('--intermediate', action='store', help='Directory path for intermediate transformed profiles (used when --transform is provided).')

@@ -21,6 +21,7 @@
 
 import logging
 import sys
+from enum import Enum
 from pathlib import Path
 
 from source.vulkan_object_version import VK_VERSION, is_bundle_structure
@@ -42,6 +43,14 @@ from source.profiles_json_utils import (
     collect_profile_capabilities,
 )
 from source.generate_profiles_schema import VulkanProfilesSchemaGenerator2
+
+
+class ValidateMode(str, Enum):
+    SCHEMA = 'schema'
+    ANALYSIS = 'analysis'
+
+    def __str__(self):
+        return str(self.value)
 
 
 class VulkanProfilesDataValidation:
@@ -133,13 +142,13 @@ def main_validate(args):
     input_path = Path(args.input)
     schema_path = Path(args.schema) if getattr(args, 'schema', None) else None
 
-    modes = getattr(args, 'mode', ['schema', 'analysis'])
+    modes = getattr(args, 'mode', [ValidateMode.SCHEMA, ValidateMode.ANALYSIS])
     if isinstance(modes, str):
-        modes = [modes]
+        modes = [ValidateMode(modes)]
 
     vk = initVulkanObject(getattr(args, 'api', 'vulkan') or 'vulkan', getattr(args, 'registry', None))
 
-    if 'schema' in modes:
+    if ValidateMode.SCHEMA in modes:
         if schema_path is None:
             schema_gen = VulkanProfilesSchemaGenerator2(vk)
             schema_data = schema_gen.schema
@@ -154,7 +163,7 @@ def main_validate(args):
                 count = validate_profiles_jsons(input_path, schema_path)
                 logging.info(f"Validated {count} file(s) against schema {schema_path}.")
 
-    if 'analysis' in modes:
+    if ValidateMode.ANALYSIS in modes:
         json_files_dict = load_profiles_jsons(input_path)
         validator = VulkanProfilesDataValidation(vk)
         issues = validator.validate_data(json_files_dict)

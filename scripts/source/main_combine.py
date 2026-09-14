@@ -28,7 +28,7 @@ import tempfile
 from pathlib import Path
 
 from source.vulkan_object_utils import initVulkanObject
-from source.generate_profiles_combine import VulkanProfilesCombineGenerator
+from source.generate_profiles_combine import VulkanProfilesCombineGenerator, CombineMode
 from source.main_validate import main_validate
 from source.main_transform import main_transform
 from source.profiles_json_utils import save_profiles_jsons, OutputFormatType
@@ -73,7 +73,7 @@ def main_combine(args):
     }
     profile_configs = []
 
-    mode = getattr(args, 'mode', 'intersection')
+    mode = getattr(args, 'mode', CombineMode.INTERSECTION)
 
     if config_path:
         current_dir = os.path.dirname(os.path.abspath(config_path))
@@ -148,3 +148,4 @@ def main_combine(args):
             main_transform(transform_args)
     else:
         save_profiles_jsons({output_path: combined_json}, output_path, format_type)
+        

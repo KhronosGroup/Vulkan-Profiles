@@ -24,9 +24,18 @@ import sys
 import logging
 import tempfile
 import argparse
+from enum import Enum
 import gen_profiles_solution
 from source.main_transform import main_transform, OutputFormatType
 from source.main_validate import main_validate
+
+
+class LibraryMode(str, Enum):
+    HEADER_ONLY = 'header-only'
+    HEADER_SOURCE = 'header+source'
+
+    def __str__(self):
+        return str(self.value)
 
 
 def main_library(args):
@@ -53,11 +62,11 @@ def main_library(args):
     out_inc = getattr(args, 'output_inc', None) or getattr(args, 'output', None)
     out_src = getattr(args, 'output_src', None)
 
-    mode = getattr(args, 'mode', ['header+source'])
-    if isinstance(mode, str):
-        mode = [mode]
+    mode = getattr(args, 'mode', [LibraryMode.HEADER_ONLY, LibraryMode.HEADER_SOURCE])
+    if isinstance(mode, (str, LibraryMode)):
+        mode = [LibraryMode(mode)]
 
-    if 'header-only' in mode:
+    if LibraryMode.HEADER_ONLY in mode:
         out_src = None
     elif not out_src:
         out_src = out_inc
