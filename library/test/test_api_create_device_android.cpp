@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2021-2023 Valve Corporation
- * Copyright (c) 2021-2023 LunarG, Inc.
+ * Copyright (c) 2021-2026 Valve Corporation
+ * Copyright (c) 2021-2026 LunarG, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -191,7 +191,7 @@ void android_main(struct android_app *app) {
 
     while (1) {
         int events;
-        struct android_poll_source *source;
+        struct android_poll_source *source = nullptr;
         while (ALooper_pollOnce(active ? 0 : -1, NULL, &events, (void **)&source) >= 0) {
             if (source) {
                 source->process(app, source);

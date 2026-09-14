@@ -204,10 +204,13 @@ void android_main(struct android_app *app) {
     while (1) {
         int events;
         struct android_poll_source *source;
-        while (ALooper_pollAll(active ? 0 : -1, nullptr, &events, (void **)&source) >= 0) {
-            if (source) {
-                source->process(app, source);
+        int ident = 0;
+        while ((ident = ALooper_pollOnce(active ? 0 : -1, nullptr, &events, (void **)&source)) >= 0) {
+            if (source != nullptr) {
+                source->process(android_app, source);
             }
+            // Set active = true so subsequent loop iterations do not block (-1) if multiple events are pending
+            active = true;
         }
 
         if (initialized && active) {
