@@ -25,12 +25,12 @@ file(GLOB PROFILES_FILES ${CMAKE_CURRENT_LIST_DIR})
 source_group("Python Files" FILES ${PROFILES_SCRIPT})
 
 set(PROFILES_FILES_FOR_INSTALL
-    Khronos/VP_KHR_roadmap.json
-    LunarG/VP_LUNARG_minimum_requirements.json
-    LunarG/VP_LUNARG_desktop_baseline.json
-    Android/VP_ANDROID_vulkan_profile_2021.json
-    Android/VP_ANDROID_vulkan_profile_2022.json
-    Android/VP_ANDROID_vulkan_profile_2025.json
+    VP_LUNARG_minimum_requirements.json
+    VP_LUNARG_desktop_baseline.json
+    VP_ANDROID_vulkan_profile_2021.json
+    VP_ANDROID_vulkan_profile_2022.json
+    VP_ANDROID_vulkan_profile_2025.json
+    VP_KHR_roadmap.json
 )
 
 set(PROFILES_FILES_FOR_API_LIBRARY
@@ -56,7 +56,7 @@ else()
     set(VKPROFILES_EXE "${PROJECT_SOURCE_DIR}/scripts/vkprofiles")
 endif()
 
-add_custom_target(VpGenerate-ProfilesSchema
+add_custom_target(VpGenerate-ProfilesSchema ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/schema
     COMMAND ${VKPROFILES_EXE}
         schema
@@ -109,7 +109,7 @@ add_custom_target(VpGenerate-ProfilesDesktopBaseline ALL
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --config ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline_config.json
         --output ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline.json
-        --transform strip-duplication
+        --transform pull-aliases strip-helper-values
     COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline.json ${CMAKE_CURRENT_LIST_DIR}
     VERBATIM
@@ -118,7 +118,19 @@ add_custom_target(VpGenerate-ProfilesDesktopBaseline ALL
 set_target_properties(VpGenerate-ProfilesDesktopBaseline PROPERTIES FOLDER "Profiles generator")
 add_dependencies(VpGenerate-ProfilesDesktopBaseline VpProfilesProcessor VpGenerate-ProfilesSchema)
 
-add_custom_target(VpGenerate-Libraries
+add_custom_target(VpGenerate-ProfilesAndroid ALL
+    COMMAND ${VKPROFILES_EXE} transform
+        --mode pull-aliases strip-helper-values
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_LIST_DIR}/Android
+        --output ${CMAKE_CURRENT_LIST_DIR}
+    VERBATIM
+    SOURCES ${PROFILES_FILES}
+    DEPENDS ${PROFILES_FILES} python_venv)
+set_target_properties(VpGenerate-ProfilesAndroid PROPERTIES FOLDER "Profiles generator")
+add_dependencies(VpGenerate-ProfilesAndroid VpProfilesProcessor VpGenerate-ProfilesSchema)
+
+add_custom_target(VpGenerate-Libraries ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/library/include/vulkan
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/library/include/vulkan/debug
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/library/source
@@ -142,6 +154,7 @@ add_custom_target(VpGenerate-Libraries
         --output-src ${PROJECT_SOURCE_DIR}/library/source
         --output-filename "vulkan_profiles"
         --mode header+source
+        --transform strip-duplication strip-helper-values
         --config release
     COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
@@ -152,6 +165,27 @@ add_custom_target(VpGenerate-Libraries
         --output-src ${PROJECT_SOURCE_DIR}/library/source/debug
         --output-filename "vulkan_profiles"
         --mode header+source
+        --transform strip-duplication strip-helper-values
+        --config debug
+    COMMAND ${VKPROFILES_EXE} library
+        --api ${API_TYPE}
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_LIST_DIR}
+        --input-filenames ${PROFILES_FILES_FOR_ANDROID_DOC}
+        --output ${PROJECT_SOURCE_DIR}/library/include/vulkan
+        --output-filename "android_vulkan_profiles"
+        --mode header-only
+        --transform strip-duplication
+        --config release
+    COMMAND ${VKPROFILES_EXE} library
+        --api ${API_TYPE}
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_LIST_DIR}
+        --input-filenames ${PROFILES_FILES_FOR_ANDROID_DOC}
+        --output ${PROJECT_SOURCE_DIR}/library/include/vulkan
+        --output-filename "android_vulkan_profiles_debug"
+        --mode header-only
+        --transform strip-duplication
         --config debug
     COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
@@ -160,8 +194,9 @@ add_custom_target(VpGenerate-Libraries
         --input-filenames ${PROFILES_FILES_FOR_API_LIBRARY_TEST}
         --output ${PROJECT_SOURCE_DIR}/library/test
         --output-filename "generated_vulkan_profiles"
-        --include-header "generated_vulkan_profiles.h"
         --mode header+source
+        --include-header "generated_vulkan_profiles.h"
+        --transform strip-duplication
         --config release
     COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
@@ -172,6 +207,7 @@ add_custom_target(VpGenerate-Libraries
         --output-filename "generated_vulkan_profiles_debug"
         --mode header+source
         --include-header "generated_vulkan_profiles_debug.h"
+        --transform strip-duplication
         --config debug
     COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
@@ -181,17 +217,17 @@ add_custom_target(VpGenerate-Libraries
         --output ${PROJECT_SOURCE_DIR}/library/test
         --output-src ${PROJECT_SOURCE_DIR}/library/test
         --output-filename "generated_vulkan_profiles_android"
-        --transform strip-duplication
         --mode header+source
+        --transform strip-duplication
         --include-header "generated_vulkan_profiles_android.h"
         --config release
     VERBATIM
     SOURCES ${PROFILES_FILES}
     DEPENDS ${PROFILES_FILES} python_venv)
 set_target_properties(VpGenerate-Libraries PROPERTIES FOLDER "Profiles generator")
-add_dependencies(VpGenerate-Libraries VpProfilesProcessor VpGenerate-ProfilesDesktopBaseline VpGenerate-ProfilesDesktopMax)
+add_dependencies(VpGenerate-Libraries VpProfilesProcessor VpGenerate-ProfilesAndroid VpGenerate-ProfilesDesktopBaseline VpGenerate-ProfilesDesktopMax)
 
-add_custom_target(VpGenerate-Markdown
+add_custom_target(VpGenerate-Markdown ALL
     COMMAND ${VKPROFILES_EXE} doc
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
@@ -207,7 +243,7 @@ add_custom_target(VpGenerate-Markdown
     COMMAND ${VKPROFILES_EXE} doc
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-        --input ${CMAKE_CURRENT_LIST_DIR}/Android
+        --input ${CMAKE_CURRENT_LIST_DIR}
         --input-filenames ${PROFILES_FILES_FOR_ANDROID_DOC}
         --output ${PROJECT_SOURCE_DIR}/PROFILES_ANDROID.md
     VERBATIM

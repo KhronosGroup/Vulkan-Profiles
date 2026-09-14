@@ -171,7 +171,14 @@ def main_combine(args):
 
     if transform_mode:
         with tempfile.TemporaryDirectory() as temp_dir:
-            temp_combined_path = Path(temp_dir) / "combined.json"
+            if output_path.suffix == '.json':
+                temp_filename = output_path.name
+            elif profile_configs and getattr(profile_configs[0], 'name', None):
+                temp_filename = f"{profile_configs[0].name}.json"
+            else:
+                temp_filename = "combined.json"
+
+            temp_combined_path = Path(temp_dir) / temp_filename
             save_profiles_jsons({temp_combined_path: combined_json}, temp_combined_path, format_type)
 
             transform_args = argparse.Namespace(
@@ -185,3 +192,4 @@ def main_combine(args):
             main_transform(transform_args)
     else:
         save_profiles_jsons({output_path: combined_json}, output_path, format_type)
+        
