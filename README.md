@@ -9,14 +9,11 @@
 [3]: https://i.creativecommons.org/l/by-nd/4.0/88x31.png "Creative Commons License"
 [4]: https://creativecommons.org/licenses/by-nd/4.0/
 
-# Vulkan Profiles Toolset
+# Vulkan Profiles Tools
 
-The *Vulkan Profiles Toolset* is a collection of tools delivered with the [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/) for Vulkan application developers to leverage *Vulkan Profiles* while developing a Vulkan application.
+The *Vulkan Profiles Tools* is a collection of tools delivered with the [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/) for Vulkan application developers to leverage *Vulkan Profiles* while developing a Vulkan application.
 
 * **[Vulkan Profiles Tools Overview](./OVERVIEW.md)**: Discover the components and how they work together.
-* **[vkprofiles commande lines reference](./profiles/README.md)**: Command-line guide and options reference for the `vkprofiles` tool (`validate`, `schema`, `convert`, `merge`, `library`, `doc`).
-* **[Vulkan Profiles Tools Whitepaper](./doc/Vulkan-Profiles-Tools-Whitepaper.pdf)**: Detailed whitepaper about the Vulkan Profiles Tools.
-* **[Vulkan Profiles Documentation](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_definitions.html)**: *Tables to compare profiles capabilities*.
 * **[Change Log](./CHANGELOG.md)**: The history of *Vulkan Profiles Toolset* releases.
 * **[Contributing](./CONTRIBUTING.md)**: How to contribute to the *Vulkan Profiles* repository.
 * **[Bug reports](https://github.com/KhronosGroup/Vulkan-Profiles)**: Open a GitHub issue when you encounter a bug.
