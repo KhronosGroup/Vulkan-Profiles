@@ -1,6 +1,6 @@
-# Vulkan Profiles Toolset Overview
+# Vulkan Profiles Tools Overview
 
-The *Vulkan Profiles Toolset* is a collection of components for Vulkan application developers to build **portable** Vulkan applications using *Vulkan Profiles*.
+The *Vulkan Profiles Tools* is a collection of components for Vulkan application developers to build **portable** Vulkan applications using *Vulkan Profiles*.
 
 *Vulkan Profiles* have multiple use cases, including:
 
@@ -12,33 +12,37 @@ The *Vulkan Profiles Toolset* is a collection of components for Vulkan applicati
 
 Conceptually, *Vulkan Profiles* can be understood as the explicit expression and formalization of Vulkan requirements and provides clear communication of these requirements within the *Vulkan Community*.
 
-*The Vulkan Profiles Toolset* delivered in the ***[Vulkan SDK](https://www.lunarg.com/vulkan-sdk/)***.
+* The Vulkan Profiles tools require Vulkan 1.1.
 
-## Vulkan Profiles Toolset Components
+*The Vulkan Profiles Tools* delivered in the ***[Vulkan SDK](https://www.lunarg.com/vulkan-sdk/)***.
 
-The *Vulkan Profiles Toolset* includes the following components:
+## Vulkan Profiles Tools Components
+
+The *Vulkan Profiles Tools* includes the following components:
+
+* ***[The `vkprofiles` command line tool](./scripts/README.md)***
+* A command-line tool to process Vulkan profiles files and generate code and documentation:
+  * Validates Vulkan profiles files and analysis the sementics of profiles file data.
+  * Supports profiles combining via `union`, `intersection` and `difference` of Vulkan capabilities.
+  * Supports transformation of Vulkan profiles file to help developers to produce exhaustive Vulkan capabilities set and process the data to be more relavant for Vulkan Profiles layer users and generating Vulkan Profiles API libraries.
 
 * ***[The Vulkan Profiles JSON Schema](https://github.com/KhronosGroup/Khronos-Schemas/tree/main/vulkan)***
 * A data format to exchange Vulkan capabilities: extensions, features, properties, formats and queue properties.
 * Each revision of Vulkan API is represented by a schema that supersedes older versions of Vulkan API.
 * The schema covers Vulkan capabilities and all extensions.
 
-* ***[The `vkprofiles` command line tool](./scripts/README.md)***
-* A command-line utility to validate, convert, merge, generate schema files, generate C/C++ API libraries, and generate Markdown documentation.
-* Supports profile merging via `union` and `intersection` of Vulkan capabilities, as well as automatic capability conversion from `vk.xml`.
-
 * ***[The Vulkan Profiles API library](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_api_library.html)***
 * A header-only C++ library to use *Vulkan Profiles* in Vulkan applications.
 * The library allows checking Profiles support on a device and creating a `VkDevice` instance with the profile features and extensions enabled.
-* The library requires a Vulkan 1.1 driver.
 
 * ***[The Vulkan Profiles Layer](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_layer.html)***
 * A layer used during application development to ensure adherence to the requirements of a chosen *Vulkan Profile*.
 * [It simulates but doesn't emulate](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_layer.html%23technical-details) Vulkan capabilities. Hence, it is used with the [Validation layer](https://github.com/KhronosGroup/Vulkan-ValidationLayers) to clamp available capabilities on the Vulkan developer system.
-* The layer requires a Vulkan 1.1 driver.
 
 * ***[The Vulkan Profiles Comparison Table](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_definitions.html)***
-* Human-readable format of *Vulkan Profiles* in a table to enable comparison.
+* Human-readable formats, HTML and markdown of *Vulkan Profiles* in a table to enable comparison.
+
+* **[Vulkan Profiles Tools Whitepaper](./doc/Vulkan-Profiles-Tools-Whitepaper.pdf)**: Detailed whitepaper about the Vulkan Profiles Tools.
 
 ## Vulkan Profiles Files
 
@@ -81,8 +85,8 @@ The Vulkan Profiles files shipping within the *Vulkan SDK* are located at `$(VUL
 
 Considering the complexity of the Vulkan ecosystem, there isn't a single *Vulkan Profile* that can fit all needs. As a result, on top of the predefined *Vulkan Profiles*, the *Vulkan Profiles Toolset* solution is designed around the idea of code generation.
 
-The *Vulkan Profiles Toolset* is generated against [`vk.xml`](https://github.com/KhronosGroup/Vulkan-Headers/blob/main/registry/vk.xml)(the canonical representation of the Vulkan specification) and *[Vulkan Profiles](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main/profiles)*.
-This design guarantees that any Vulkan developer can regenerate the entire *Vulkan Profiles Toolset* solution with any new [Vulkan Header](https://github.com/KhronosGroup/Vulkan-Headers) update or any set of *Vulkan Profiles*.
+The *Vulkan Profiles Tools* is generated against [`vk.xml`](https://github.com/KhronosGroup/Vulkan-Headers/blob/main/registry/vk.xml)(the canonical representation of the Vulkan specification) and *[Vulkan Profiles](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main/profiles)*.
+This design guarantees that any Vulkan developer can regenerate the entire *Vulkan Profiles Tools* solution with any new [Vulkan Header](https://github.com/KhronosGroup/Vulkan-Headers) update or any set of *Vulkan Profiles*.
 
 The following diagram shows the Vulkan Profiles Toolset generation pipeline with every produced components:
 
@@ -176,12 +180,13 @@ Each entry in `profiles` includes a reference name and a dictionary containing t
 
 ## Vulkan Profiles File Processing (`vkprofiles`)
 
-The *Vulkan Profiles Toolset* includes the `vkprofiles` CLI tool to convert, merge, validate, and process profile files.
+The *Vulkan Profiles Tools* include the `vkprofiles` command line tool to transform, combine and validate profile files. This tool aims at helping Vulkan developers to create their own Vulkan profiles to reflect their Vulkan applications requirements and the Vulkan platforms they want to support.
 
-For merging profile files, it supports both:
+For combinng profile files, it supports:
 
-* Intersection of Vulkan Capabilities
-* Union of Vulkan Capabilities
+* Union of Vulkan Capabilities: To accumulate Vulkan capabilities from multiple profiles
+* Intersection of Vulkan Capabilities: To find the common set of Vulkan capabilities of multiple profiles
+* Difference of Vulkan Capabilities: To identify the specific capabilities some profiles contains but some other don't.
 
 [GPUInfo.org](https://vulkan.gpuinfo.org/) allows downloading `device` profiles in the form of JSON files. We can use these files to create *platform* profiles by calculating their intersection.
 
@@ -190,11 +195,11 @@ This is the approach used to create the `VP_LUNARG_desktop_baseline` profiles in
 Example:
 
 ```bash
-vkprofiles merge --registry vk.xml --config profiles/LunarG/VP_LUNARG_desktop_baseline_config.json --output profiles/LunarG/VP_LUNARG_desktop_baseline.json
+vkprofiles combine --registry vk.xml --mode intersection --config profiles/LunarG/VP_LUNARG_desktop_baseline_config.json --output profiles/LunarG/VP_LUNARG_desktop_baseline.json
 
 ```
 
-For detailed usage documentation on all available `vkprofiles` subcommands (`convert`, `validate`, `schema`, `merge`, `library`, `doc`), see the **[`vkprofiles` CLI Reference](./profiles/README.md)**.
+For detailed usage documentation on all available `vkprofiles` subcommands (`validate`, `transform`, `combine`, `schema`, `library`, `doc`), see the **[`vkprofiles` command line reference](./scripts/README.md)**.
 
 ## Vulkan Profiles JSON Validation
 

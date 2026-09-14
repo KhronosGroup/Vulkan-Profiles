@@ -87,8 +87,8 @@ vkprofiles transform --registry vk.xml --input path/to/input_dir --output path/t
 * `--registry`, `-r`: Path to `vk.xml`.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
 * `--format`: Output formatting style (`flatten` or `pretty`). Default: `pretty`.
-* `--mode`: Space-separated list of transformation capabilities to apply. Default: all flags.
-* `--validate`: Validate profile files before transformation (choices: `schema`, `analysis`). Default: `schema analysis`.
+* `--mode`: Space-separated list of transformation capabilities to apply. Default: no extra transforms unless specified.
+* `--validate`: Validate profile files before transformation (choices: `schema`, `analysis`). Optional; no validation is performed unless requested.
 
 #### Transformation Mode Flags (`--mode`)
 
@@ -101,6 +101,7 @@ Conversion flags are processed in a deterministic internal pipeline order regard
 | `ignore-extension-versions` | Sets all required extension versions to 1, overriding specific extension spec versions. |
 | `pull-aliases` | Resolves and populates all equivalent capability aliases across core structures and extensions. |
 | `consolidate` | Combines all mandatory capability blocks into a single consolidated requirements block per profile. |
+| `strip-helper-values` | Removes internal helper bitmask values from capability blocks such as composite/all-flags/none constants. |
 | `strip-duplication` | Removes redundant duplicate features, properties, and extension requirements across inheritance trees and within blocks. |
 | `strip-promoted-extensions` | Removes extensions that are already promoted to the profile's target core Vulkan version. |
 | `sort` | Sorts capability blocks, structures, and extension lists into canonical Vulkan order. |
@@ -120,7 +121,7 @@ vkprofiles transform \
 
 ### 4. `combine`
 
-Combines multiple profile JSON files into a single output profile JSON file via `intersection` or `union`.
+Combines multiple profile JSON files into a single output profile JSON file using one of the supported combination modes: `intersection`, `union`, or `difference`.
 
 ```bash
 vkprofiles combine --registry vk.xml --input path/to/profiles --output path/to/combined.json [options]
@@ -130,10 +131,10 @@ vkprofiles combine --registry vk.xml --input path/to/profiles --output path/to/c
 * `--output`, `-o`: *(Required)* Output JSON file path.
 * `--input`, `-i`: Directory path containing profiles to combine.
 * `--config`, `-c`: Path to JSON combine config file.
-* `--mode`, `-m`: Combination mode (`intersection` or `union`). Default: `intersection`.
+* `--mode`, `-m`: Combination mode (`intersection`, `union`, or `difference`). Default: `intersection`.
 * `--format`: Output formatting style (`flatten` or `pretty`). Default: `pretty`.
-* `--transform`: Apply transformation capabilities to the combined profile output (choices: `pull-required-capabilities`, `pull-promoted-extensions`, `ignore-extension-versions`, `pull-aliases`, `strip-duplication`, `consolidate`, `strip-promoted-extensions`, `sort`).
-* `--validate`: Validate profile files before combining (choices: `schema`, `analysis`). Default: `schema analysis`.
+* `--transform`: List of transformation capabilities to apply to the combined profile output (choices: `pull-required-capabilities`, `pull-promoted-extensions`, `ignore-extension-versions`, `pull-aliases`, `consolidate`, `strip-helper-values`, `strip-duplication`, `strip-promoted-extensions`, `sort`).
+* `--validate`: Validate profile files before combining (choices: `schema`, `analysis`). Optional; pass the values you want to run.
 * `--profile-name`: Override output profile name.
 * `--profile-version`: Set profile version number. Default: `1`.
 * `--profile-label`: Set profile label string.
@@ -205,10 +206,10 @@ vkprofiles library --registry vk.xml --input path/to/profiles --output path/to/i
 * `--output`, `-o`, `--output-inc`: Target header output directory.
 * `--output-src`: Target source output directory. If omitted in `header+source` mode, defaults to `--output`.
 * `--output-filename`: Base filename for generated files. Default: `vulkan_profiles`.
-* `--mode`: Library generation mode (`header-only`, `header+source`). Default: `header-only` and `header+source`.
-* `--transform`: Apply profiles data transformation prior to generation (choices: `pull-required-capabilities`, `pull-promoted-extensions`, `ignore-extension-versions`, `pull-aliases`, `strip-duplication`, `consolidate`, `strip-promoted-extensions`, `sort`).
+* `--mode`: Library generation mode list (`header-only`, `header+source`). Default: both modes are generated.
+* `--transform`: List of profiles transformations to apply before generation (choices: `pull-required-capabilities`, `pull-promoted-extensions`, `ignore-extension-versions`, `pull-aliases`, `consolidate`, `strip-helper-values`, `strip-duplication`, `strip-promoted-extensions`, `sort`).
 * `--intermediate`: Directory path for intermediate transformed JSON files (used when `--transform` is provided).
-* `--validate`: Validate profiles (choices: `schema`, `analysis`) during generation. Default: `schema analysis`.
+* `--validate`: Validate profiles (choices: `schema`, `analysis`) during generation. Optional; pass the values you want to run.
 * `--debug`, `-d`: Generate debug variant of library code.
 * `--config`, `-c`: Build configuration (`release` or `debug`).
 
