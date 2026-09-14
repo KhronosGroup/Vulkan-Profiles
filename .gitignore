@@ -50,6 +50,14 @@ profiles/LunarG/VP_LUNARG_desktop_baseline_vulkan_object.json
 profiles/LunarG/VP_LUNARG_desktop_baseline_vulkan_registry.json
 profiles/Android/VP_ANDROID_18_requirements.json
 profiles/Android/VP_ANDROID_19_requirements.json
+profiles/VP_ANDROID_15_requirements.json
+profiles/VP_ANDROID_16_requirements.json
+profiles/VP_ANDROID_17_requirements.json
+profiles/VP_ANDROID_18_requirements.json
+profiles/VP_ANDROID_19_requirements.json
+profiles/VP_ANDROID_vulkan_profile_2021.json
+profiles/VP_ANDROID_vulkan_profile_2022.json
+profiles/VP_ANDROID_vulkan_profile_2025.json
 PROFILES.md
 PROFILES_ALL.md
 PROFILES_ANDROID.md
@@ -59,6 +67,8 @@ library/include/
 library/source/
 library/include/vulkan/vulkan_profiles.h
 library/include/vulkan/vulkan_profiles.hpp
+library/include/vulkan/android_vulkan_profiles.hpp
+library/include/vulkan/android_vulkan_profiles_debug.hpp
 library/include/vulkan/debug/vulkan_profiles.h
 library/include/vulkan/debug/vulkan_profiles.hpp
 library/source/vulkan_profiles.cpp

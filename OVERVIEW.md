@@ -54,7 +54,7 @@ The Khronos Roadmap profiles expose advanced features initially found in higher-
 * [VP_KHR_roadmap_2024](https://github.com/KhronosGroup/Vulkan-Headers/blob/main/registry/profiles/VP_KHR_roadmap.json) (Vulkan 1.3)
 * [VP_KHR_roadmap_2022](https://github.com/KhronosGroup/Vulkan-Headers/blob/main/registry/profiles/VP_KHR_roadmap.json) (Vulkan 1.3)
 
-The Android Vulkan Profiles are collection of functionality that is broadly supported on Android:
+The Android Vulkan Profiles are collection of functionality that is broadly supported on Android designed from Vulkan application developers to target a large amount of devices:
 
 * [VP_ANDROID_vulkan_profile_2025](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/Android/VP_ANDROID_vulkan_profile_2025.json) (Vulkan 1.1)
 * [VP_ANDROID_vulkan_profile_2022](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/Android/VP_ANDROID_vulkan_profile_2022.json) (Vulkan 1.1)
@@ -63,7 +63,7 @@ The Android Vulkan Profiles are collection of functionality that is broadly supp
 The VP_ANDROID_baseline_2022 profile has been deprecated by Android, rebranded into the VP_ANDROID_vulkan_profile_2022 profile.
 The VP_ANDROID_baseline_2021 profile has been deprecated by Android, rebranded into the VP_ANDROID_vulkan_profile_2021 profile.
 
-The Vulkan Requirement for Android profiles Collection of functionality that is mandated for chipsets that launch (or renew Google Requirements Freeze) on Android:
+The Vulkan Requirement for Android profiles collection of functionality that is mandated for chipsets that launch (or renew Google Requirements Freeze) on Android:
 
 * [VP_ANDROID_17_requirements](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/Android/VP_ANDROID_17_requirements.json) (Vulkan 1.4)
 * [VP_ANDROID_16_requirements](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/Android/VP_ANDROID_16_requirements.json) (Vulkan 1.3)
