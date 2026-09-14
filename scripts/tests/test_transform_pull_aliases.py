@@ -432,6 +432,64 @@ class TestConvertPullAliases(unittest.TestCase):
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
+    def test_pull_line_rasterization_khr_not_included_when_khr_extension_not_enabled(self):
+        """
+        Verifies that when VK_EXT_line_rasterization is enabled in a Vulkan 1.3 profile,
+        alias expansion populates VkPhysicalDeviceLineRasterizationFeaturesEXT,
+        but does NOT populate VkPhysicalDeviceLineRasterizationFeaturesKHR because 
+        VK_KHR_line_rasterization is not declared in the profile's extensions.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-273.json#",
+            "profiles": {
+                "VP_ANDROID_15_requirements": {
+                    "version": 2,
+                    "api-version": "1.3.273",
+                    "capabilities": ["swBresenhamLines"]
+                }
+            },
+            "capabilities": {
+                "swBresenhamLines": {
+                    "extensions": {
+                        "VK_EXT_line_rasterization": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceLineRasterizationFeaturesEXT": {
+                            "bresenhamLines": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-273.json#",
+            "profiles": {
+                "VP_ANDROID_15_requirements": {
+                    "version": 2,
+                    "api-version": "1.3.273",
+                    "capabilities": ["swBresenhamLines"]
+                }
+            },
+            "capabilities": {
+                "swBresenhamLines": {
+                    "extensions": {
+                        "VK_EXT_line_rasterization": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceLineRasterizationFeaturesEXT": {
+                            "bresenhamLines": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_aliases_profiles_files(self.vk, False, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

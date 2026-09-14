@@ -233,7 +233,7 @@ class TestConvertPullRequiredCapabilitiesCore(unittest.TestCase):
                                 "framebufferNoAttachmentsSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "maxColorAttachments": 4,
                                 "sampledImageColorSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
-                                "sampledImageIntegerSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "sampledImageIntegerSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
                                 "sampledImageDepthSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "sampledImageStencilSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "storageImageSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
@@ -388,7 +388,7 @@ class TestConvertPullRequiredCapabilitiesCore(unittest.TestCase):
                                 "framebufferNoAttachmentsSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "maxColorAttachments": 4,
                                 "sampledImageColorSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
-                                "sampledImageIntegerSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "sampledImageIntegerSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
                                 "sampledImageDepthSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "sampledImageStencilSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "storageImageSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
@@ -565,7 +565,7 @@ class TestConvertPullRequiredCapabilitiesCore(unittest.TestCase):
                                 "framebufferNoAttachmentsSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "maxColorAttachments": 4,
                                 "sampledImageColorSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
-                                "sampledImageIntegerSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "sampledImageIntegerSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
                                 "sampledImageDepthSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "sampledImageStencilSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "storageImageSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
@@ -804,7 +804,7 @@ class TestConvertPullRequiredCapabilitiesCore(unittest.TestCase):
                                 "framebufferNoAttachmentsSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "maxColorAttachments": 4,
                                 "sampledImageColorSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
-                                "sampledImageIntegerSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "sampledImageIntegerSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
                                 "sampledImageDepthSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "sampledImageStencilSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "storageImageSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
@@ -1126,7 +1126,7 @@ class TestConvertPullRequiredCapabilitiesCore(unittest.TestCase):
                                 "framebufferNoAttachmentsSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "maxColorAttachments": 8,
                                 "sampledImageColorSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
-                                "sampledImageIntegerSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "sampledImageIntegerSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
                                 "sampledImageDepthSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "sampledImageStencilSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "storageImageSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
@@ -1441,8 +1441,7 @@ class TestConvertPullRequiredCapabilitiesCore(unittest.TestCase):
                                     "VK_SAMPLE_COUNT_4_BIT"
                                 ],
                                 "sampledImageIntegerSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
+                                    "VK_SAMPLE_COUNT_1_BIT"
                                 ],
                                 "sampledImageDepthSampleCounts": [
                                     "VK_SAMPLE_COUNT_1_BIT",
@@ -1731,7 +1730,7 @@ class TestConvertPullRequiredCapabilitiesCore(unittest.TestCase):
                                 "framebufferNoAttachmentsSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "maxColorAttachments": 4,
                                 "sampledImageColorSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
-                                "sampledImageIntegerSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "sampledImageIntegerSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
                                 "sampledImageDepthSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "sampledImageStencilSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "storageImageSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
