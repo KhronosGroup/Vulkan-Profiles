@@ -124,7 +124,7 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceLimits', 'framebufferNoAttachmentsSampleCounts', 'VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxColorAttachments', '4', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'sampledImageColorSampleCounts', 'VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT', None),
-        PropertyRequirement('VkPhysicalDeviceLimits', 'sampledImageIntegerSampleCounts', 'VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'sampledImageIntegerSampleCounts', 'VK_SAMPLE_COUNT_1_BIT', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'sampledImageDepthSampleCounts', 'VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'sampledImageStencilSampleCounts', 'VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'storageImageSampleCounts', 'VK_SAMPLE_COUNT_1_BIT', None),

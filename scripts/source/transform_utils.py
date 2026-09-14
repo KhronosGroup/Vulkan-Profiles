@@ -237,42 +237,59 @@ def get_parent_property_value(parent_props_dict: dict, struct_name: str, prop_na
 def isStructExtensionEnabled(vk: VulkanObject, struct_name: str, version: VK_VERSION, enabled_exts: set[str]) -> bool:
     """
     Returns True if struct_name is enabled for the given version and enabled extensions.
-    - Core structures (no extension suffix) are enabled if core version >= struct core version.
-    - Extension structures (with KHR/EXT/vendor suffix) require the defining extension to be in enabled_exts.
+    - Extension structures (ending with KHR/EXT/vendor tag or belonging to an extension)
+      REQUIRE that at least one defining extension is present in enabled_exts.
+    - Core structures (no extension suffix) are enabled if core version <= version, or if
+      any defining extension is in enabled_exts.
     """
-    is_ext_struct = is_extension_struct_name(vk, struct_name)
+    # 1. Collect defining extension requirements for struct_name
+    req_exts = set()
 
-    if not is_ext_struct:
-        core_ver = getStructCoreVersion(vk, struct_name)
-        if core_ver != VK_VERSION.NONE and version != VK_VERSION.NONE and version >= core_ver:
-            return True
+    if hasattr(vk, 'aliasTypeRequirements') and struct_name in vk.aliasTypeRequirements:
+        req_exts.update(vk.aliasTypeRequirements[struct_name].keys())
 
-    req_keys = set()
     struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
     if struct_obj:
         if hasattr(struct_obj, 'definingRequirements') and struct_obj.definingRequirements:
-            req_keys.update(struct_obj.definingRequirements.keys())
+            req_exts.update(struct_obj.definingRequirements.keys())
         elif hasattr(struct_obj, 'extensions') and struct_obj.extensions:
-            req_keys.update(struct_obj.extensions)
+            req_exts.update(struct_obj.extensions)
 
-    if hasattr(vk, 'aliasTypeRequirements') and struct_name in vk.aliasTypeRequirements:
-        req_keys.update(vk.aliasTypeRequirements[struct_name].keys())
+    is_ext_struct = is_extension_struct_name(vk, struct_name) or (
+        struct_obj and hasattr(struct_obj, 'name') and is_extension_struct_name(vk, struct_obj.name)
+    )
 
-    if struct_obj and hasattr(struct_obj, 'aliases'):
-        for alias in struct_obj.aliases:
-            if hasattr(vk, 'aliasTypeRequirements') and alias in vk.aliasTypeRequirements:
-                req_keys.update(vk.aliasTypeRequirements[alias].keys())
+    # 2. Extension structures MUST have their defining extension in enabled_exts
+    if is_ext_struct:
+        if not req_exts:
+            return False
+        for req in req_exts:
+            if req in enabled_exts:
+                return True
+        return False
 
-    if not req_keys:
-        return not is_ext_struct
+    # 3. Core structures (non-extension)
+    core_ver = getStructCoreVersion(vk, struct_name)
+    if core_ver != VK_VERSION.NONE and version != VK_VERSION.NONE and version >= core_ver:
+        return True
 
-    for req in req_keys:
+    # If core_ver is None or version < core_ver, check if any defining requirement is enabled or promoted
+    if not req_exts:
+        return True
+
+    for req in req_exts:
         if req in enabled_exts:
             return True
 
-        if not is_ext_struct and (req.startswith("VK_VERSION_") or req.startswith("VK_API_VERSION_")):
+        if req.startswith("VK_VERSION_") or req.startswith("VK_API_VERSION_"):
             ver = VK_VERSION.from_string(req)
             if ver != VK_VERSION.NONE and version != VK_VERSION.NONE and version >= ver:
+                return True
+
+        ext_obj = vk.extensions.get(req)
+        if ext_obj and getattr(ext_obj, 'promotedTo', None):
+            promoted_ver = VK_VERSION.from_string(ext_obj.promotedTo)
+            if promoted_ver != VK_VERSION.NONE and version != VK_VERSION.NONE and version >= promoted_ver:
                 return True
 
     return False
