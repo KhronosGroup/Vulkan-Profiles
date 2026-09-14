@@ -44,23 +44,31 @@ def get_bitmask_helper_values(vk: VulkanObject) -> set[str]:
     return helpers
 
 
-def _strip_helpers_from_dict(data: dict, helpers: set[str]):
+def _strip_helpers_from_dict(data, helpers: set[str]):
     """Recursively strips identified helper enum strings from lists or dictionaries."""
-    if not isinstance(data, dict):
-        return
+    if isinstance(data, dict):
+        keys_to_delete = []
+        for key, val in list(data.items()):
+            if isinstance(val, (dict, list)):
+                _strip_helpers_from_dict(val, helpers)
+            elif isinstance(val, str) and val in helpers:
+                keys_to_delete.append(key)
 
-    keys_to_delete = []
-    for key, val in list(data.items()):
-        if isinstance(val, dict):
-            _strip_helpers_from_dict(val, helpers)
-        elif isinstance(val, list):
-            filtered = [item for item in val if item not in helpers]
-            data[key] = filtered
-        elif isinstance(val, str) and val in helpers:
-            keys_to_delete.append(key)
+        for k in keys_to_delete:
+            del data[k]
 
-    for k in keys_to_delete:
-        del data[k]
+    elif isinstance(data, list):
+        filtered = []
+        for item in data:
+            if isinstance(item, (dict, list)):
+                _strip_helpers_from_dict(item, helpers)
+                filtered.append(item)
+            elif isinstance(item, str):
+                if item not in helpers:
+                    filtered.append(item)
+            else:
+                filtered.append(item)
+        data[:] = filtered
 
 
 def strip_helper_values_profiles_files(vk: VulkanObject, json_files_dict: dict):
@@ -74,4 +82,3 @@ def strip_helper_values_profiles_files(vk: VulkanObject, json_files_dict: dict):
             _strip_helpers_from_dict(file_data, helpers)
         elif hasattr(file_data, 'dict'):
             _strip_helpers_from_dict(file_data.dict, helpers)
-            
