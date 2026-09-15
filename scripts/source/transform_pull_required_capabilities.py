@@ -29,6 +29,7 @@ from source.vulkan_object_utils import (
     gatherSatisfiedCoreRequiredFeaturesForVersion,
     gatherSatisfiedCoreRequiredPropertiesForVersion,
     gatherSatisfiedExtensionRequiredFeatures,
+    gatherSatisfiedExtensionRequiredProperties,
     StructCapabilityAlias
 )
 from source.profiles_json_utils import (
@@ -54,13 +55,15 @@ def pull_extension_dependencies_capabilities_block(
     ignore_extension_versions: bool, 
     json_profiles_capabilities_block: dict,
     context_extensions: set[str] = None,
-    context_features: set[tuple[str, str]] = None
+    context_features: set[tuple[str, str]] = None,
+    context_properties: dict[str, Any] = None
 ):
     if "extensions" not in json_profiles_capabilities_block:
         return
 
-    context_extensions = context_extensions or set()
-    context_features = context_features or set()
+    context_extensions = context_extensions if context_extensions is not None else set()
+    context_features = context_features if context_features is not None else set()
+    context_properties = context_properties if context_properties is not None else {}
 
     curr_exts = dict(json_profiles_capabilities_block["extensions"])
     while True:
@@ -134,6 +137,17 @@ def pull_extension_dependencies_capabilities_block(
                 features_dict = json_profiles_capabilities_block.setdefault("features", {})
                 deep_merge_dict(features_dict, filtered_ext_satisfied)
 
+        ext_satisfied_props = gatherSatisfiedExtensionRequiredProperties(
+            vk, ext_name, version, profile_enabled_exts, enabled_features
+        )
+        if ext_satisfied_props:
+            filtered_ext_satisfied_props = filter_properties_against_context(
+                vk, ext_satisfied_props, context_properties
+            )
+            if filtered_ext_satisfied_props:
+                properties_dict = json_profiles_capabilities_block.setdefault("properties", {})
+                deep_merge_dict(properties_dict, filtered_ext_satisfied_props)
+
 
 def pull_extension_dependencies_profiles_file(
     vk: VulkanObject, 
@@ -149,6 +163,7 @@ def pull_extension_dependencies_profiles_file(
 
         context_extensions = set()
         context_features = set()
+        context_properties = {}
         parent_profiles = profile_obj.get("profiles", [])
         if json_files_dict and parent_profiles:
             parent_caps = collect_required_profiles_capabilities_recursive(json_files_dict, parent_profiles)
@@ -159,13 +174,15 @@ def pull_extension_dependencies_profiles_file(
                     for m_name, val in members.items():
                         if val:
                             context_features.add((s_name, m_name))
+            if "properties" in parent_caps and isinstance(parent_caps["properties"], dict):
+                deep_merge_dict(context_properties, parent_caps["properties"])
 
         block_names = collect_block_names(profile_obj.get("capabilities", []))
         for block_name in block_names:
             if block_name in json_profiles_capabilities:
                 block = json_profiles_capabilities[block_name]
                 pull_extension_dependencies_capabilities_block(
-                    vk, api_version, ignore_extension_versions, block, context_extensions, context_features
+                    vk, api_version, ignore_extension_versions, block, context_extensions, context_features, context_properties
                 )
                 if "extensions" in block and isinstance(block["extensions"], dict):
                     context_extensions.update(block["extensions"].keys())
@@ -175,6 +192,8 @@ def pull_extension_dependencies_profiles_file(
                             for m_name, val in members.items():
                                 if val:
                                     context_features.add((s_name, m_name))
+                if "properties" in block and isinstance(block["properties"], dict):
+                    deep_merge_dict(context_properties, block["properties"])
 
 
 def pull_extension_dependencies_profiles_files(vk: VulkanObject, ignore_extension_versions: bool, json_files_dict: dict):
@@ -429,6 +448,15 @@ def pull_required_capabilities_profiles_file(vk: VulkanObject, json_files_dict: 
                         if filtered_ext_satisfied:
                             block_features = block.setdefault("features", {})
                             deep_merge_dict(block_features, filtered_ext_satisfied)
+
+                    ext_satisfied_props = gatherSatisfiedExtensionRequiredProperties(
+                        vk, ext_name, api_version, profile_enabled_exts, current_enabled_features
+                    )
+                    if ext_satisfied_props:
+                        filtered_ext_satisfied_props = filter_properties_against_context(vk, ext_satisfied_props, context_properties)
+                        if filtered_ext_satisfied_props:
+                            block_properties = block.setdefault("properties", {})
+                            deep_merge_dict(block_properties, filtered_ext_satisfied_props)
 
                 update_context_from_capabilities(block, context_features, context_properties, context_extensions)
 

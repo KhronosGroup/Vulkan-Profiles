@@ -479,6 +479,9 @@ class TestConvertPullRequiredCapabilitiesOR(unittest.TestCase):
                                 "residencyStandard3DBlockShape": false,
                                 "residencyNonResidentStrict": false
                             }
+                        },
+                        "VkPhysicalDeviceLineRasterizationPropertiesKHR": {
+                            "lineSubPixelPrecisionBits": 4
                         }
                     }
                 }
@@ -680,6 +683,9 @@ class TestConvertPullRequiredCapabilitiesOR(unittest.TestCase):
                                 "residencyStandard3DBlockShape": false,
                                 "residencyNonResidentStrict": false
                             }
+                        },
+                        "VkPhysicalDeviceLineRasterizationPropertiesEXT": {
+                            "lineSubPixelPrecisionBits": 4
                         }
                     }
                 },
@@ -937,6 +943,19 @@ class TestConvertPullRequiredCapabilitiesOR(unittest.TestCase):
                                 "residencyStandard3DBlockShape": false,
                                 "residencyNonResidentStrict": false
                             }
+                        },
+                        "VkPhysicalDeviceTransformFeedbackPropertiesEXT": {
+                            "maxTransformFeedbackAttributesPerStream": 512,
+                            "maxTransformFeedbackAttributesPerVertex": 64,
+                            "maxTransformFeedbackBufferSize": 1073741824,                            
+                            "maxTransformFeedbackBuffers": 4,
+                            "maxTransformFeedbackBuffersPerSubpass": 4,
+                            "maxTransformFeedbackStreamStride": 2048,
+                            "maxTransformFeedbackStreams": 4,
+                            "transformFeedbackDraw": true,
+                            "transformFeedbackQueries": true,
+                            "transformFeedbackRasterizationStreamSelect": true,
+                            "transformFeedbackStreamsLinesTriangles": true
                         }
                     }
                 },
@@ -969,4 +988,3 @@ if __name__ == '__main__':
     TestConvertPullRequiredCapabilitiesOR.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
-    

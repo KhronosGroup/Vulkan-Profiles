@@ -186,7 +186,7 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
                                 "maxDrawIndexedIndexValue": 16777216,
                                 "maxDrawIndirectCount": 1,
                                 "maxSamplerLodBias": 2,
-                                "maxSamplerAnisotropy": 1,
+                                "maxSamplerAnisotropy": 1.0,
                                 "maxViewports": 1,
                                 "maxViewportDimensions": [
                                     4096,
@@ -428,7 +428,7 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
                                 "maxDrawIndexedIndexValue": 16777216,
                                 "maxDrawIndirectCount": 1,
                                 "maxSamplerLodBias": 2,
-                                "maxSamplerAnisotropy": 1,
+                                "maxSamplerAnisotropy": 1.0,
                                 "maxViewports": 1,
                                 "maxViewportDimensions": [
                                     4096,
