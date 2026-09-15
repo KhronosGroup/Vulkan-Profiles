@@ -41,14 +41,14 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
         self.vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
 
     # -------------------------------------------------------------------------
-    # Vulkan 1.0 Tests (VK_KHR_variable_pointers)
+    # Vulkan 1.0 Tests (VK_KHR_variable_pointers, VK_KHR_multiview)
     # -------------------------------------------------------------------------
 
     def test_pull_promoted_extensions_block_unique_vulkan10(self):
         """
         Verifies that for Vulkan 1.0 profiles, pull_promoted_extensions_profiles_files pulls no core
-        promoted extensions (since core promotions start at Vulkan 1.1+), but still resolves dependencies
-        and required features for extensions in the primary capability block.
+        promoted extensions (since core promotions start at Vulkan 1.1+), but still resolves dependencies,
+        required features, and required properties for extensions in the primary capability block.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -62,7 +62,8 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "baseline": {
                     "extensions": {
-                        "VK_KHR_variable_pointers": 1
+                        "VK_KHR_variable_pointers": 1,
+                        "VK_KHR_multiview": 1
                     }
                 }
             }
@@ -86,12 +87,22 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                 "baseline": {
                     "extensions": {
                         "VK_KHR_variable_pointers": 1,
+                        "VK_KHR_multiview": 1,
                         "VK_KHR_get_physical_device_properties2": 1,
                         "VK_KHR_storage_buffer_storage_class": 1
                     },
                     "features": {
                         "VkPhysicalDeviceVariablePointerFeaturesKHR": {
                             "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                            "maxMultiviewInstanceIndex": 134217727,
+                            "maxMultiviewViewCount": 6
                         }
                     }
                 }
@@ -279,7 +290,7 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
     def test_pull_promoted_extensions_block_unique_vulkan11(self):
         """
         Verifies that all extensions promoted to Vulkan 1.1 core and their dependencies (e.g. VK_KHR_surface)
-        are automatically injected into a Vulkan 1.1 profile's primary capability block.
+        are automatically injected into a Vulkan 1.1 profile's primary capability block along with required features and properties.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -352,6 +363,16 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                         },
                         "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
                             "samplerYcbcrConversion": true
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                            "maxMultiviewInstanceIndex": 134217727,
+                            "maxMultiviewViewCount": 6
+                        },
+                        "VkPhysicalDeviceMaintenance3PropertiesKHR": {
+                            "maxMemoryAllocationSize": 1073741824,
+                            "maxPerSetDescriptors": 1024
                         }
                     }
                 }
@@ -450,6 +471,16 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                         },
                         "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
                             "samplerYcbcrConversion": true
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                            "maxMultiviewViewCount": 6,
+                            "maxMultiviewInstanceIndex": 134217727
+                        },
+                        "VkPhysicalDeviceMaintenance3PropertiesKHR": {
+                            "maxPerSetDescriptors": 1024,
+                            "maxMemoryAllocationSize": 1073741824
                         }
                     }
                 },
@@ -565,6 +596,16 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                         "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
                             "samplerYcbcrConversion": true
                         }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                            "maxMultiviewInstanceIndex": 134217727,
+                            "maxMultiviewViewCount": 6
+                        },
+                        "VkPhysicalDeviceMaintenance3PropertiesKHR": {
+                            "maxMemoryAllocationSize": 1073741824,
+                            "maxPerSetDescriptors": 1024
+                        }
                     }
                 },
                 "block_b": {
@@ -670,6 +711,16 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                         "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
                             "samplerYcbcrConversion": true
                         }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                            "maxMultiviewInstanceIndex": 134217727,
+                            "maxMultiviewViewCount": 6
+                        },
+                        "VkPhysicalDeviceMaintenance3PropertiesKHR": {
+                            "maxMemoryAllocationSize": 1073741824,
+                            "maxPerSetDescriptors": 1024
+                        }
                     }
                 }
             }
@@ -770,6 +821,16 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                         "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
                             "samplerYcbcrConversion": true
                         }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                            "maxMultiviewInstanceIndex": 134217727,
+                            "maxMultiviewViewCount": 6
+                        },
+                        "VkPhysicalDeviceMaintenance3PropertiesKHR": {
+                            "maxMemoryAllocationSize": 1073741824,
+                            "maxPerSetDescriptors": 1024
+                        }
                     }
                 },
                 "block_b": {
@@ -792,7 +853,7 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
 
-def test_pull_promoted_extensions_profile_inheritance_vulkan11_advanced(self):
+    def test_pull_promoted_extensions_profile_inheritance_vulkan11_advanced(self):
         """
         Verifies that when pulling promoted extensions for Vulkan 1.1 profiles with profile inheritance,
         each profile's primary block receives promoted extensions independently.
@@ -888,6 +949,16 @@ def test_pull_promoted_extensions_profile_inheritance_vulkan11_advanced(self):
                         "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
                             "samplerYcbcrConversion": true
                         }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                            "maxMultiviewInstanceIndex": 134217727,
+                            "maxMultiviewViewCount": 6
+                        },
+                        "VkPhysicalDeviceMaintenance3PropertiesKHR": {
+                            "maxMemoryAllocationSize": 1073741824,
+                            "maxPerSetDescriptors": 1024
+                        }
                     }
                 },
                 "block_b": {
@@ -921,3 +992,4 @@ if __name__ == '__main__':
     TestConvertPullPromotedExtensions.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
+    

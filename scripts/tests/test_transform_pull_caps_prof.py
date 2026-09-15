@@ -183,9 +183,9 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
                                 "subPixelPrecisionBits": 4,
                                 "subTexelPrecisionBits": 4,
                                 "mipmapPrecisionBits": 4,
-                                "maxDrawIndexedIndexValue": 16777216,
+                                "maxDrawIndexedIndexValue": 4294967295,
                                 "maxDrawIndirectCount": 1,
-                                "maxSamplerLodBias": 2,
+                                "maxSamplerLodBias": 2.0,
                                 "maxSamplerAnisotropy": 1.0,
                                 "maxViewports": 1,
                                 "maxViewportDimensions": [
@@ -193,8 +193,8 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
                                     4096
                                 ],
                                 "viewportBoundsRange": [
-                                    -8192,
-                                    8192
+                                    -8192.0,
+                                    8192.0
                                 ],
                                 "viewportSubPixelBits": 0,
                                 "minMemoryMapAlignment": 64,
@@ -427,7 +427,7 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
                                 "mipmapPrecisionBits": 4,
                                 "maxDrawIndexedIndexValue": 16777216,
                                 "maxDrawIndirectCount": 1,
-                                "maxSamplerLodBias": 2,
+                                "maxSamplerLodBias": 2.0,
                                 "maxSamplerAnisotropy": 1.0,
                                 "maxViewports": 1,
                                 "maxViewportDimensions": [
@@ -435,8 +435,8 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
                                     4096
                                 ],
                                 "viewportBoundsRange": [
-                                    -8192,
-                                    8192
+                                    -8192.0,
+                                    8192.0
                                 ],
                                 "viewportSubPixelBits": 0,
                                 "minMemoryMapAlignment": 64,
