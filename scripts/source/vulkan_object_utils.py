@@ -686,17 +686,25 @@ def findExtensionVersion(vk: VulkanObject, extension_name: str) -> int:
         return vk.extensions[extension_name].specVersionValue
     else:
         return 0
-    
-def gatherDependentExtensions(vk: VulkanObject, version: VK_VERSION, ignore_extension_versions: bool, extensions: dict[str, int]) -> dict[str, int]:
+
+
+def gatherDependentExtensions(
+    vk: VulkanObject, 
+    version: VK_VERSION, 
+    ignore_extension_versions: bool, 
+    extensions: dict[str, int],
+    profile_name: str = ""
+) -> dict[str, int]:
     result = {}
     
     for extension in extensions:
         if extension not in vk.extensions:
-            logging.error(f'{extension} is not part of vk.xml, discarding')
+            profile_ctx = f"Profile '{profile_name}': " if profile_name else ""
+            logging.error(f'{profile_ctx}{extension} is not part of vk.xml, discarding')
             continue
         
         extension_data = vk.extensions[extension]
-        depend_extensions = collectExtensions(version, extension_data.depends)
+        depend_extensions = collectExtensions(version, extension_data.depends, extension, profile_name)
     
         for depend_extension in depend_extensions:
             if depend_extension not in result:
@@ -712,6 +720,7 @@ def gatherDependentExtensions(vk: VulkanObject, version: VK_VERSION, ignore_exte
                 result[extension] = extension_data.specVersionValue
     
     return result
+
 
 def gatherDynamicStructs(vk: VulkanObject):
     discovered = set()

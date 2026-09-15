@@ -56,7 +56,8 @@ def pull_extension_dependencies_capabilities_block(
     json_profiles_capabilities_block: dict,
     context_extensions: set[str] = None,
     context_features: set[tuple[str, str]] = None,
-    context_properties: dict[str, Any] = None
+    context_properties: dict[str, Any] = None,
+    profile_name: str = ""
 ):
     if "extensions" not in json_profiles_capabilities_block:
         return
@@ -68,7 +69,7 @@ def pull_extension_dependencies_capabilities_block(
     curr_exts = dict(json_profiles_capabilities_block["extensions"])
     while True:
         raw_deps = gatherDependentExtensions(
-            vk, version, ignore_extension_versions, curr_exts
+            vk, version, ignore_extension_versions, curr_exts, profile_name
         )
         if len(raw_deps) == len(curr_exts):
             break
@@ -182,7 +183,7 @@ def pull_extension_dependencies_profiles_file(
             if block_name in json_profiles_capabilities:
                 block = json_profiles_capabilities[block_name]
                 pull_extension_dependencies_capabilities_block(
-                    vk, api_version, ignore_extension_versions, block, context_extensions, context_features, context_properties
+                    vk, api_version, ignore_extension_versions, block, context_extensions, context_features, context_properties, profile_key
                 )
                 if "extensions" in block and isinstance(block["extensions"], dict):
                     context_extensions.update(block["extensions"].keys())

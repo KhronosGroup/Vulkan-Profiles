@@ -78,7 +78,7 @@ def pull_promoted_extensions_profiles_file(
             if block_name in capabilities_dict:
                 block = capabilities_dict[block_name]
                 pull_extension_dependencies_capabilities_block(
-                    vk, api_version, ignore_extension_versions, block, context_extensions, context_features
+                    vk, api_version, ignore_extension_versions, block, context_extensions, context_features, profile_name=key
                 )
                 if "extensions" in block and isinstance(block["extensions"], dict):
                     context_extensions.update(block["extensions"].keys())

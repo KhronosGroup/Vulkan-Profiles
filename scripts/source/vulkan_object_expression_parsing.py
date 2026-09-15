@@ -19,6 +19,7 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
+import logging
 import re
 from typing import Callable
 from source.vulkan_object_version import VK_VERSION
@@ -65,102 +66,45 @@ class ExpressionTree:
         return Node(value=self._consume())
 
 
-# def collectExtensions(current_version: VK_VERSION, expression_str: str) -> list:
-#     """
-#     Parses the expression tree and returns the mandatory extension strings 
-#     required given the system's current string-backed Vulkan version enum.
-#     """
-    
-#     # GUARD CLAUSE: Handle None, empty strings, or whitespace-only strings gracefully
-#     if not expression_str or not expression_str.strip():
-#         return []
-    
-#     tree = ExpressionTree(expression_str)
-
-#     def _evaluate(node):
-#         if not node:
-#             return False
-
-#         # Base case: Leaf Nodes
-#         if node.is_leaf():
-#             try:
-#                 # Try to map the string token directly to the VK_VERSION Enum Value
-#                 token_ver = VK_VERSION(node.value)
-#                 # Compare their hierarchical position in the ordered list
-#                 return VERSION_ORDER.index(current_version) >= VERSION_ORDER.index(token_ver)
-#             except ValueError:
-#                 # If it's not a valid version string, treat it as an extension requirement
-#                 return [node.value]
-
-#         left_res = _evaluate(node.left)
-#         right_res = _evaluate(node.right)
-
-#         # Logical AND (+) handling
-#         if node.value == '+':
-#             if left_res is False or right_res is False:
-#                 return False
-#             if left_res is True: return right_res
-#             if right_res is True: return left_res
-#             return left_res + right_res
-
-#         # Logical OR (,) handling
-#         elif node.value == ',':
-#             if left_res is True or right_res is True:
-#                 return True
-#             if left_res is False: return right_res
-#             if right_res is False: return left_res
-#             return left_res
-
-#         return False
-
-#     result = _evaluate(tree.root)
-#     return [] if isinstance(result, bool) else result
-
-def collectExtensions(current_version: VK_VERSION, expression_str: str) -> list:
+def collectExtensions(current_version: VK_VERSION, expression_str: str, extension_name: str, profile_name: str) -> list:
     """
     Parses the expression tree and returns the mandatory extension strings 
     required given the system's current string-backed Vulkan version enum.
     """
-    # GUARD CLAUSE: Handle None, empty strings, or whitespace-only strings gracefully
     if not expression_str or not expression_str.strip():
         return []
     
     VERSION_ORDER = list(VK_VERSION)
     
     tree = ExpressionTree(expression_str)
-    errors = []  # To track version mismatches during evaluation
+    errors = []
 
     def _evaluate(node):
         if not node:
             return False
 
-        # Base case: Leaf Nodes
         if node.is_leaf():
             try:
-                # Try to map the string token directly to the VK_VERSION Enum Value
                 token_ver = VK_VERSION(node.value)
                 
-                # FEATURE 2: If current_version is NONE, bypass the version check entirely
                 if current_version == VK_VERSION.NONE:
                     return True
                 
-                # Compare their hierarchical position in the ordered list
                 if VERSION_ORDER.index(current_version) < VERSION_ORDER.index(token_ver):
-                    # FEATURE 1: Record the error message in case the evaluation fails
+                    by_ext = f"by extension '{extension_name}'" if extension_name else "by an extension"
+                    prefix = f"Profile '{profile_name}'" if profile_name else "Invalid Profiles File"
                     errors.append(
-                        f"WARNING: Invalid Profiles File, the required Vulkan version '{current_version.value}' by the profile is older than the requied Vulkan version '{token_ver.value}' by an extension"
+                        f"{prefix}, the required Vulkan version '{current_version.value}' by the profile is older than the required Vulkan version '{token_ver.value}' {by_ext}"
                     )
                     return False
                 return True
                 
             except ValueError:
-                # If it's not a valid version string, treat it as an extension requirement
                 return [node.value]
 
         left_res = _evaluate(node.left)
         right_res = _evaluate(node.right)
 
-        # Logical AND (+) handling
         if node.value == '+':
             if left_res is False or right_res is False:
                 return False
@@ -168,7 +112,6 @@ def collectExtensions(current_version: VK_VERSION, expression_str: str) -> list:
             if right_res is True: return left_res
             return left_res + right_res
 
-        # Logical OR (,) handling
         elif node.value == ',':
             if left_res is True or right_res is True:
                 return True
@@ -180,11 +123,9 @@ def collectExtensions(current_version: VK_VERSION, expression_str: str) -> list:
 
     result = _evaluate(tree.root)
     
-    # If evaluation yields False, it means the version requirements completely failed.
-    # Print the logged errors without crashing.
     if result is False and errors:
         for err in errors:
-            print(err)
+            logging.warning(err)
 
     return [] if isinstance(result, bool) else result
 
@@ -201,48 +142,43 @@ def evalExpression(expression: str, is_symbol_enabled: Callable[[str], bool]) ->
     if not expression or not expression.strip():
         return True
 
-    # Tokenize by operators: '(', ')', '+', ',' and symbols
     raw_tokens = re.split(r'([(),+])', expression)
     tokens = [t.strip() for t in raw_tokens if t and t.strip()]
 
     pos = 0
 
     def parse_expr() -> bool:
-        """Parses OR (',') terms."""
         nonlocal pos
         result = parse_term()
         while pos < len(tokens) and tokens[pos] == ',':
-            pos += 1  # consume ','
+            pos += 1
             rhs = parse_term()
             result = result or rhs
         return result
 
     def parse_term() -> bool:
-        """Parses AND ('+') factors."""
         nonlocal pos
         result = parse_factor()
         while pos < len(tokens) and tokens[pos] == '+':
-            pos += 1  # consume '+'
+            pos += 1
             rhs = parse_factor()
             result = result and rhs
         return result
 
     def parse_factor() -> bool:
-        """Parses grouped sub-expressions or individual symbols."""
         nonlocal pos
         if pos >= len(tokens):
             return False
 
         token = tokens[pos]
         if token == '(':
-            pos += 1  # consume '('
+            pos += 1
             res = parse_expr()
             if pos < len(tokens) and tokens[pos] == ')':
-                pos += 1  # consume ')'
+                pos += 1
             return res
         else:
-            pos += 1  # consume symbol
+            pos += 1
             return is_symbol_enabled(token)
 
     return parse_expr()
-
