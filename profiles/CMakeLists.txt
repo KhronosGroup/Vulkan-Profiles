@@ -88,6 +88,7 @@ add_custom_target(VpGenerate-ProfilesDesktopMax ALL
         --profile-date 2023-11-01
         --profile-stage BETA
         --profile-api-version ${PROFILE_DESKTOP_MAX_2024_API_VERSION}
+        --format flatten
     COMMAND ${VKPROFILES_EXE} combine
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_max_2026
@@ -98,6 +99,7 @@ add_custom_target(VpGenerate-ProfilesDesktopMax ALL
         --profile-date 2026-06-22
         --profile-stage BETA
         --profile-api-version ${PROFILE_DESKTOP_MAX_2026_API_VERSION}
+        --format flatten
     VERBATIM
     SOURCES ${PROFILES_FILES}
     DEPENDS ${PROFILES_FILES} python_venv)
@@ -110,6 +112,7 @@ add_custom_target(VpGenerate-ProfilesDesktopBaseline ALL
         --config ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline_config.json
         --output ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline.json
         --transform pull-aliases strip-helper-values
+        --format flatten
     COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline.json ${CMAKE_CURRENT_LIST_DIR}
     VERBATIM
@@ -124,6 +127,7 @@ add_custom_target(VpGenerate-ProfilesAndroid ALL
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/Android
         --output ${CMAKE_CURRENT_LIST_DIR}
+        --format flatten
     VERBATIM
     SOURCES ${PROFILES_FILES}
     DEPENDS ${PROFILES_FILES} python_venv)
