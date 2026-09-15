@@ -673,7 +673,7 @@ def gatherDependentExtensions(vk: VulkanObject, version: VK_VERSION, ignore_exte
     
     for extension in extensions:
         if extension not in vk.extensions:
-            logging.error(f'{extension} is part of vk.xml, discarding')
+            logging.error(f'{extension} is not part of vk.xml, discarding')
             continue
         
         extension_data = vk.extensions[extension]
