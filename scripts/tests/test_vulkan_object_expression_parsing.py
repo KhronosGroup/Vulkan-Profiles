@@ -36,65 +36,65 @@ class TestExpressionTrees(unittest.TestCase):
     registry_path = None
 
     def testCollectExtensions2(self):
-        O = collectExtensions(VK_VERSION.V1_1, "")
+        O = collectExtensions(VK_VERSION.V1_1, "", "test_ext", "test_profile")
         self.assertEqual(len(O), 0)
         
-        P = collectExtensions(VK_VERSION.V1_1, None)
+        P = collectExtensions(VK_VERSION.V1_1, None, "test_ext", "test_profile")
         self.assertEqual(len(P), 0)
         
-        A = collectExtensions(VK_VERSION.V1_1, "(VK_VERSION_1_1+VK_KHR_synchronization2),VK_VERSION_1_3")
+        A = collectExtensions(VK_VERSION.V1_1, "(VK_VERSION_1_1+VK_KHR_synchronization2),VK_VERSION_1_3", "test_ext", "test_profile")
         self.assertEqual(A[0], "VK_KHR_synchronization2")
         
-        B = collectExtensions(VK_VERSION.V1_3, "(VK_VERSION_1_1+VK_KHR_synchronization2),VK_VERSION_1_3")
+        B = collectExtensions(VK_VERSION.V1_3, "(VK_VERSION_1_1+VK_KHR_synchronization2),VK_VERSION_1_3", "test_ext", "test_profile")
         self.assertEqual(len(B), 0)
         
-        C = collectExtensions(VK_VERSION.V1_0, "(VK_VERSION_1_1+VK_KHR_synchronization2),VK_VERSION_1_3")
+        C = collectExtensions(VK_VERSION.V1_0, "(VK_VERSION_1_1+VK_KHR_synchronization2),VK_VERSION_1_3", "test_ext", "test_profile")
         self.assertEqual(len(C), 0)
 
-        D = collectExtensions(VK_VERSION.V1_0, "VK_KHR_swapchain+VK_KHR_display")
+        D = collectExtensions(VK_VERSION.V1_0, "VK_KHR_swapchain+VK_KHR_display", "test_ext", "test_profile")
         self.assertEqual(len(D), 2)
         self.assertEqual(D[0], "VK_KHR_swapchain")
         self.assertEqual(D[1], "VK_KHR_display")
 
-        E = collectExtensions(VK_VERSION.V1_2, "VK_KHR_swapchain+VK_KHR_display")
+        E = collectExtensions(VK_VERSION.V1_2, "VK_KHR_swapchain+VK_KHR_display", "test_ext", "test_profile")
         self.assertEqual(len(E), 2)
         self.assertEqual(E[0], "VK_KHR_swapchain")
         self.assertEqual(E[1], "VK_KHR_display")
         
-        F = collectExtensions(VK_VERSION.V1_2, "VK_KHR_video_queue+(VK_KHR_synchronization2,VK_VERSION_1_3)")
+        F = collectExtensions(VK_VERSION.V1_2, "VK_KHR_video_queue+(VK_KHR_synchronization2,VK_VERSION_1_3)", "test_ext", "test_profile")
         self.assertEqual(len(F), 2)
         self.assertEqual(F[0], "VK_KHR_video_queue")
         self.assertEqual(F[1], "VK_KHR_synchronization2")
 
-        G = collectExtensions(VK_VERSION.V1_3, "VK_KHR_video_queue+(VK_KHR_synchronization2,VK_VERSION_1_3)")
+        G = collectExtensions(VK_VERSION.V1_3, "VK_KHR_video_queue+(VK_KHR_synchronization2,VK_VERSION_1_3)", "test_ext", "test_profile")
         self.assertEqual(len(G), 1)
         self.assertEqual(G[0], "VK_KHR_video_queue")
     
-        H = collectExtensions(VK_VERSION.V1_3, "VK_KHR_video_queue")
+        H = collectExtensions(VK_VERSION.V1_3, "VK_KHR_video_queue", "test_ext", "test_profile")
         self.assertEqual(len(H), 1)
         self.assertEqual(H[0], "VK_KHR_video_queue")
         
-        I = collectExtensions(VK_VERSION.V1_0, "((VK_KHR_get_physical_device_properties2,VK_VERSION_1_1)+VK_KHR_depth_stencil_resolve),VK_VERSION_1_2")
+        I = collectExtensions(VK_VERSION.V1_0, "((VK_KHR_get_physical_device_properties2,VK_VERSION_1_1)+VK_KHR_depth_stencil_resolve),VK_VERSION_1_2", "test_ext", "test_profile")
         self.assertEqual(len(I), 2)
         self.assertEqual(I[0], "VK_KHR_get_physical_device_properties2")
         self.assertEqual(I[1], "VK_KHR_depth_stencil_resolve")
         
-        J = collectExtensions(VK_VERSION.V1_1, "VK_VERSION_1_1+VK_KHR_shader_float_controls")
+        J = collectExtensions(VK_VERSION.V1_1, "VK_VERSION_1_1+VK_KHR_shader_float_controls", "test_ext", "test_profile")
         self.assertEqual(len(J), 1)
         self.assertEqual(J[0], "VK_KHR_shader_float_controls")
         
-        K = collectExtensions(VK_VERSION.NONE, "VK_VERSION_1_1+VK_KHR_shader_float_controls")
+        K = collectExtensions(VK_VERSION.NONE, "VK_VERSION_1_1+VK_KHR_shader_float_controls", "test_ext", "test_profile")
         self.assertEqual(len(K), 1)
         self.assertEqual(K[0], "VK_KHR_shader_float_controls")
 
-        L = collectExtensions(VK_VERSION.V1_0, "VK_VERSION_1_1+VK_KHR_shader_float_controls")
+        L = collectExtensions(VK_VERSION.V1_0, "VK_VERSION_1_1+VK_KHR_shader_float_controls", "test_ext", "test_profile")
         self.assertEqual(len(L), 0)
         
-        M = collectExtensions(VK_VERSION.V1_3, "VK_KHR_swapchain+(VK_KHR_maintenance2,VK_VERSION_1_1)+(VK_KHR_image_format_list,VK_VERSION_1_2)")
+        M = collectExtensions(VK_VERSION.V1_3, "VK_KHR_swapchain+(VK_KHR_maintenance2,VK_VERSION_1_1)+(VK_KHR_image_format_list,VK_VERSION_1_2)", "test_ext", "test_profile")
         self.assertEqual(len(M), 1)
         self.assertEqual(M[0], "VK_KHR_swapchain")
      
-        R = collectExtensions(VK_VERSION.V1_0, "VK_KHR_swapchain+(VK_KHR_maintenance2,VK_VERSION_1_1)+(VK_KHR_image_format_list,VK_VERSION_1_2)")
+        R = collectExtensions(VK_VERSION.V1_0, "VK_KHR_swapchain+(VK_KHR_maintenance2,VK_VERSION_1_1)+(VK_KHR_image_format_list,VK_VERSION_1_2)", "test_ext", "test_profile")
         self.assertEqual(len(R), 3)
         self.assertEqual(R[0], "VK_KHR_swapchain")   
         self.assertEqual(R[1], "VK_KHR_maintenance2")   
@@ -125,13 +125,12 @@ class TestEvalExpression(unittest.TestCase):
         self.assertFalse(evalExpression("VK_VERSION_1_3,VK_KHR_dynamic_rendering", is_enabled))
 
     def testPrecedenceAndGrouping(self):
-        # "A + (B , C)"
         enabled = {"A", "C"}
         is_enabled = lambda s: s in enabled
 
         self.assertTrue(evalExpression("A+(B,C)", is_enabled))
         self.assertFalse(evalExpression("A+B,D", is_enabled))
-        
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -143,6 +142,4 @@ if __name__ == '__main__':
     TestExpressionTrees.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
-
-    unittest.main()
-
+    

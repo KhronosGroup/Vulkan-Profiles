@@ -31,6 +31,7 @@ from source.vulkan_object_utils import (
     getStructCoreVersion,
     is_extension_struct_name
 )
+from source.profiles_json_utils import collect_block_names
 from source.transform_utils import (
     CategoryPriority,
     CoreStructTier,
@@ -71,14 +72,14 @@ def get_ext_priority_key(ext_name: str) -> tuple:
         return (ExtensionPriority.VENDOR, ext_name)
 
 
-def sort_extensions(vk: VulkanObject, exts: dict | list) -> dict | list:
+def sort_extensions(vk: VulkanObject, exts: dict | list, profile_name: str = "") -> dict | list:
     is_dict = isinstance(exts, dict)
     ext_names = list(exts.keys()) if is_dict else list(exts)
     ext_set = set(ext_names)
 
     prereqs = {e: set() for e in ext_names}
     for e in ext_names:
-        deps = gatherDependentExtensions(vk, VK_VERSION.V1_0, True, {e: 1})
+        deps = gatherDependentExtensions(vk, VK_VERSION.NONE, True, {e: 1}, profile_name)
         for dep in deps:
             if dep != e and dep in ext_set:
                 prereqs[e].add(dep)
@@ -110,12 +111,12 @@ def sort_extensions(vk: VulkanObject, exts: dict | list) -> dict | list:
         return sorted_exts
 
 
-def sort_capabilities_block(vk: VulkanObject, json_block: dict):
+def sort_capabilities_block(vk: VulkanObject, json_block: dict, profile_name: str):
     if not isinstance(json_block, dict):
         return
 
     if "extensions" in json_block:
-        json_block["extensions"] = sort_extensions(vk, json_block["extensions"])
+        json_block["extensions"] = sort_extensions(vk, json_block["extensions"], profile_name)
 
     for category in ("features", "properties"):
         if category in json_block and isinstance(json_block[category], dict):
@@ -177,9 +178,17 @@ def sort_capabilities_block(vk: VulkanObject, json_block: dict):
 
 
 def sort_profiles_file(vk: VulkanObject, json_file_data: dict):
+    profiles_data = json_file_data.get("profiles", {})
     capabilities_dict = json_file_data.get("capabilities", {})
+
+    for profile_name, profile_obj in profiles_data.items():
+        block_names = collect_block_names(profile_obj.get("capabilities", []))
+        for block_name in block_names:
+            if block_name in capabilities_dict:
+                sort_capabilities_block(vk, capabilities_dict[block_name], profile_name)
+
     for block_name, block in capabilities_dict.items():
-        sort_capabilities_block(vk, block)
+        sort_capabilities_block(vk, block, "")
 
 
 def sort_profiles_files(vk: VulkanObject, json_files_dict: dict):
@@ -193,3 +202,4 @@ def sort_profiles_files(vk: VulkanObject, json_files_dict: dict):
     for file_key, json_file_data in json_files_dict.items():
         if isinstance(json_file_data, dict):
             sort_profiles_file(vk, json_file_data)
+            
