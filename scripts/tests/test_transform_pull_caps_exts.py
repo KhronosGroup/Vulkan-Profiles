@@ -748,6 +748,11 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
                         "VkPhysicalDeviceTimelineSemaphoreFeaturesKHR": {
                             "timelineSemaphore": true
                         }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceTimelineSemaphorePropertiesKHR": {
+                            "maxTimelineSemaphoreValueDifference": 2147483647
+                        }
                     }
                 }
             }
@@ -819,6 +824,11 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
                     "features": {
                         "VkPhysicalDeviceTimelineSemaphoreFeaturesKHR": {
                             "timelineSemaphore": true
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceTimelineSemaphorePropertiesKHR": {
+                            "maxTimelineSemaphoreValueDifference": 2147483647
                         }
                     }
                 }
@@ -903,6 +913,11 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
                     "features": {
                         "VkPhysicalDeviceTimelineSemaphoreFeaturesKHR": {
                             "timelineSemaphore": true
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceTimelineSemaphorePropertiesKHR": {
+                            "maxTimelineSemaphoreValueDifference": 2147483647
                         }
                     }
                 }
@@ -1521,6 +1536,188 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
         pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
+
+    # -------------------------------------------------------------------------
+    # Extension Property Requirements Tests (vulkan_object_data.py)
+    # -------------------------------------------------------------------------
+
+    def test_pull_extension_dependencies_properties_multiview(self):
+        """
+        Verifies that pulling extension dependencies for VK_KHR_multiview populates
+        both feature requirements (multiview=true) and property requirements
+        (VkPhysicalDeviceMultiviewPropertiesKHR) from vulkan_object_data.py.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "extensions": {
+                        "VK_KHR_multiview": 1
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "extensions": {
+                        "VK_KHR_get_physical_device_properties2": 2,
+                        "VK_KHR_multiview": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                            "maxMultiviewInstanceIndex": 134217727,
+                            "maxMultiviewViewCount": 6
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+    def test_pull_extension_dependencies_properties_push_descriptor(self):
+        """
+        Verifies that pulling extension dependencies for VK_KHR_push_descriptor populates
+        VkPhysicalDevicePushDescriptorPropertiesKHR property requirements from vulkan_object_data.py.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "extensions": {
+                        "VK_KHR_push_descriptor": 1
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "extensions": {
+                        "VK_KHR_push_descriptor": 2,
+                        "VK_KHR_get_physical_device_properties2": 2
+                    },
+                    "properties": {
+                        "VkPhysicalDevicePushDescriptorPropertiesKHR": {
+                            "maxPushDescriptors": 32
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+    def test_pull_extension_dependencies_properties_transform_feedback(self):
+        """
+        Verifies that pulling extension dependencies for VK_EXT_transform_feedback populates
+        VkPhysicalDeviceTransformFeedbackPropertiesEXT property requirements from vulkan_object_data.py.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "extensions": {
+                        "VK_EXT_transform_feedback": 1
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "extensions": {
+                        "VK_EXT_transform_feedback": 1,
+                        "VK_KHR_get_physical_device_properties2": 2
+                    },
+                    "features": {
+                        "VkPhysicalDeviceTransformFeedbackFeaturesEXT": {
+                            "transformFeedback": true
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceTransformFeedbackPropertiesEXT": {
+                            "maxTransformFeedbackAttributesPerStream": 512,
+                            "maxTransformFeedbackAttributesPerVertex": 64,
+                            "maxTransformFeedbackBuffers": 4,
+                            "maxTransformFeedbackBuffersPerSubpass": 4,
+                            "maxTransformFeedbackBufferSize": 1073741824,
+                            "maxTransformFeedbackStreams": 4,
+                            "maxTransformFeedbackStreamStride": 2048,
+                            "transformFeedbackDraw": true,
+                            "transformFeedbackQueries": true,
+                            "transformFeedbackRasterizationStreamSelect": true,
+                            "transformFeedbackStreamsLinesTriangles": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
 
 if __name__ == '__main__':

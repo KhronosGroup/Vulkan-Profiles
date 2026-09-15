@@ -31,19 +31,96 @@ if str(scripts_dir) not in sys.path:
 
 from vulkan_object import VulkanObject
 from source.vulkan_object_utils import initVulkanObject
-from source.transform_pull_depends import pull_depends_profiles_files
+from source.transform_pull_required_capabilities import (
+    pull_required_capabilities_profiles_files,
+    pull_extension_dependencies_profiles_files
+)
+from source.transform_sort import sort_profiles_files
 
 
-class TestConvertPullDepends(unittest.TestCase):
+class TestConvertPullCapsDepends(unittest.TestCase):
     registry_path = None
 
     def setUp(self):
         self.vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
 
+    def assertProfileDataEqual(self, gen_data: dict, exp_data: dict):
+        self.assertEqual(
+            list(gen_data.keys()),
+            list(exp_data.keys()),
+            f"Top-level keys mismatch: {list(gen_data.keys())} vs {list(exp_data.keys())}"
+        )
+
+        if "profiles" in exp_data:
+            self.assertEqual(
+                list(gen_data.get("profiles", {}).keys()),
+                list(exp_data["profiles"].keys()),
+                "Profile name list mismatch"
+            )
+            for prof_name, exp_prof in exp_data["profiles"].items():
+                gen_prof = gen_data["profiles"].get(prof_name, {})
+                self.assertEqual(
+                    gen_prof.get("capabilities"),
+                    exp_prof.get("capabilities"),
+                    f"Capabilities block reference list mismatch in profile '{prof_name}'"
+                )
+
+        if "capabilities" in exp_data:
+            self.assertEqual(
+                list(gen_data.get("capabilities", {}).keys()),
+                list(exp_data["capabilities"].keys()),
+                "Capability block name list mismatch"
+            )
+
+            for cap_name, exp_block in exp_data["capabilities"].items():
+                gen_block = gen_data["capabilities"].get(cap_name, {})
+
+                self.assertEqual(
+                    list(gen_block.keys()),
+                    list(exp_block.keys()),
+                    f"Section mismatch in capability block '{cap_name}'"
+                )
+
+                for section in ("features", "properties"):
+                    if section in exp_block:
+                        exp_section = exp_block[section]
+                        gen_section = gen_block.get(section, {})
+
+                        self.assertEqual(
+                            list(gen_section.keys()),
+                            list(exp_section.keys()),
+                            f"Structure name list mismatch in capability block '{cap_name}', section '{section}'"
+                        )
+
+                        for struct_name, exp_struct in exp_section.items():
+                            gen_struct = gen_section.get(struct_name, {})
+                            if isinstance(exp_struct, dict):
+                                self.assertEqual(
+                                    list(gen_struct.keys()),
+                                    list(exp_struct.keys()),
+                                    f"Member key list mismatch in '{cap_name}.{section}.{struct_name}'"
+                                )
+                                for member_name, exp_val in exp_struct.items():
+                                    gen_val = gen_struct.get(member_name)
+                                    self.assertEqual(
+                                        gen_val,
+                                        exp_val,
+                                        f"Value mismatch in '{cap_name}.{section}.{struct_name}.{member_name}'"
+                                    )
+                            else:
+                                self.assertEqual(
+                                    gen_struct,
+                                    exp_struct,
+                                    f"Value mismatch in '{cap_name}.{section}.{struct_name}'"
+                                )
+
+        self.assertEqual(gen_data, exp_data)
+
     def test_pull_depends_large_points_adds_point_size_range(self):
         """
         Verifies that pulling required dependent capabilities for a profile with
-        largePoints=true populates the required pointSizeRange property limit.
+        largePoints=true populates the required pointSizeRange property limit
+        alongside Vulkan 1.1 core capabilities.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -78,14 +155,136 @@ class TestConvertPullDepends(unittest.TestCase):
                 "baseline": {
                     "features": {
                         "VkPhysicalDeviceFeatures": {
+                            "robustBufferAccess": true,
                             "largePoints": true
+                        },
+                        "VkPhysicalDeviceMultiviewFeatures": {
+                            "multiview": true
                         }
                     },
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
-                                "pointSizeRange": [ 1.0, 511.0 ]
+                                "maxImageDimension1D": 4096,
+                                "maxImageDimension2D": 4096,
+                                "maxImageDimension3D": 256,
+                                "maxImageDimensionCube": 4096,
+                                "maxImageArrayLayers": 256,
+                                "maxTexelBufferElements": 65536,
+                                "maxUniformBufferRange": 16384,
+                                "maxStorageBufferRange": 134217728,
+                                "maxPushConstantsSize": 128,
+                                "maxMemoryAllocationCount": 4096,
+                                "maxSamplerAllocationCount": 4000,
+                                "bufferImageGranularity": 131072,
+                                "sparseAddressSpaceSize": 0,
+                                "maxBoundDescriptorSets": 4,
+                                "maxPerStageDescriptorSamplers": 16,
+                                "maxPerStageDescriptorUniformBuffers": 12,
+                                "maxPerStageDescriptorStorageBuffers": 4,
+                                "maxPerStageDescriptorSampledImages": 16,
+                                "maxPerStageDescriptorStorageImages": 4,
+                                "maxPerStageDescriptorInputAttachments": 4,
+                                "maxPerStageResources": 128,
+                                "maxDescriptorSetSamplers": 96,
+                                "maxDescriptorSetUniformBuffers": 72,
+                                "maxDescriptorSetUniformBuffersDynamic": 8,
+                                "maxDescriptorSetStorageBuffers": 24,
+                                "maxDescriptorSetStorageBuffersDynamic": 4,
+                                "maxDescriptorSetSampledImages": 96,
+                                "maxDescriptorSetStorageImages": 24,
+                                "maxDescriptorSetInputAttachments": 4,
+                                "maxVertexInputAttributes": 16,
+                                "maxVertexInputBindings": 16,
+                                "maxVertexInputAttributeOffset": 2047,
+                                "maxVertexInputBindingStride": 2048,
+                                "maxVertexOutputComponents": 64,
+                                "maxTessellationGenerationLevel": 0,
+                                "maxTessellationPatchSize": 0,
+                                "maxTessellationControlPerVertexInputComponents": 0,
+                                "maxTessellationControlPerVertexOutputComponents": 0,
+                                "maxTessellationControlPerPatchOutputComponents": 0,
+                                "maxTessellationControlTotalOutputComponents": 0,
+                                "maxTessellationEvaluationInputComponents": 0,
+                                "maxTessellationEvaluationOutputComponents": 0,
+                                "maxGeometryShaderInvocations": 0,
+                                "maxGeometryInputComponents": 0,
+                                "maxGeometryOutputComponents": 0,
+                                "maxGeometryOutputVertices": 0,
+                                "maxGeometryTotalOutputComponents": 0,
+                                "maxFragmentInputComponents": 64,
+                                "maxFragmentOutputAttachments": 4,
+                                "maxFragmentDualSrcAttachments": 0,
+                                "maxFragmentCombinedOutputResources": 4,
+                                "maxComputeSharedMemorySize": 16384,
+                                "maxComputeWorkGroupCount": [65535, 65535, 65535],
+                                "maxComputeWorkGroupInvocations": 128,
+                                "maxComputeWorkGroupSize": [128, 128, 64],
+                                "subPixelPrecisionBits": 4,
+                                "subTexelPrecisionBits": 4,
+                                "mipmapPrecisionBits": 4,
+                                "maxDrawIndexedIndexValue": 16777216,
+                                "maxDrawIndirectCount": 1,
+                                "maxSamplerLodBias": 2,
+                                "maxSamplerAnisotropy": 1,
+                                "maxViewports": 1,
+                                "maxViewportDimensions": [4096, 4096],
+                                "viewportBoundsRange": [-8192, 8192],
+                                "viewportSubPixelBits": 0,
+                                "minMemoryMapAlignment": 64,
+                                "minTexelBufferOffsetAlignment": 256,
+                                "minUniformBufferOffsetAlignment": 256,
+                                "minStorageBufferOffsetAlignment": 256,
+                                "minTexelOffset": -8,
+                                "maxTexelOffset": 7,
+                                "minTexelGatherOffset": -8,
+                                "maxTexelGatherOffset": 7,
+                                "minInterpolationOffset": 0.0,
+                                "maxInterpolationOffset": 0.0,
+                                "subPixelInterpolationOffsetBits": 0,
+                                "maxFramebufferWidth": 4096,
+                                "maxFramebufferHeight": 4096,
+                                "maxFramebufferLayers": 256,
+                                "framebufferColorSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "framebufferDepthSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "framebufferStencilSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "framebufferNoAttachmentsSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "maxColorAttachments": 4,
+                                "sampledImageColorSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "sampledImageIntegerSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
+                                "sampledImageDepthSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "sampledImageStencilSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "storageImageSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
+                                "maxSampleMaskWords": 1,
+                                "maxClipDistances": 0,
+                                "maxCullDistances": 0,
+                                "maxCombinedClipAndCullDistances": 0,
+                                "discreteQueuePriorities": 2,
+                                "pointSizeRange": [1.0, 64.0],
+                                "lineWidthRange": [1.0, 1.0],
+                                "pointSizeGranularity": 1.0,
+                                "lineWidthGranularity": 1.0,
+                                "nonCoherentAtomSize": 256
+                            },
+                            "sparseProperties": {
+                                "residencyStandard2DBlockShape": false,
+                                "residencyStandard2DMultisampleBlockShape": false,
+                                "residencyStandard3DBlockShape": false,
+                                "residencyNonResidentStrict": false
                             }
+                        },
+                        "VkPhysicalDeviceMaintenance3Properties": {
+                            "maxMemoryAllocationSize": 1073741824,
+                            "maxPerSetDescriptors": 1024
+                        },
+                        "VkPhysicalDeviceMultiviewProperties": {
+                            "maxMultiviewInstanceIndex": 134217727,
+                            "maxMultiviewViewCount": 6
+                        },
+                        "VkPhysicalDeviceSubgroupProperties": {
+                            "subgroupSize": 1,
+                            "supportedOperations": ["VK_SUBGROUP_FEATURE_BASIC_BIT"],
+                            "supportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT"]
                         }
                     }
                 }
@@ -93,9 +292,80 @@ class TestConvertPullDepends(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_depends_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, True, json_files_dict)
+        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
+        sort_profiles_files(self.vk, json_files_dict)
 
-        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+        self.assertProfileDataEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+    def test_pull_depends_extension_properties_sampler_filter_minmax(self):
+        """
+        Verifies that enabling VK_EXT_sampler_filter_minmax populates
+        VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT property limits.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "extensions": {
+                        "VK_EXT_sampler_filter_minmax": 1
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_extension_dependencies_profiles_files(self.vk, True, json_files_dict)
+        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
+
+        baseline_props = json_files_dict["test_profile.json"]["capabilities"]["baseline"]["properties"]
+        self.assertIn("VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT", baseline_props)
+        minmax_props = baseline_props["VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT"]
+        self.assertTrue(minmax_props.get("filterMinmaxSingleComponentFormats"))
+        self.assertTrue(minmax_props.get("filterMinmaxImageComponentMapping"))
+
+    def test_pull_depends_vulkan12_sampler_filter_minmax_properties(self):
+        """
+        Verifies that enabling samplerFilterMinmax feature in Vulkan 1.2 populates
+        filterMinmaxSingleComponentFormats and filterMinmaxImageComponentMapping
+        in VkPhysicalDeviceVulkan12Properties.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-131.json#",
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.2.131",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "features": {
+                        "VkPhysicalDeviceVulkan12Features": {
+                            "samplerFilterMinmax": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_extension_dependencies_profiles_files(self.vk, True, json_files_dict)
+        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
+
+        baseline_props = json_files_dict["test_profile.json"]["capabilities"]["baseline"]["properties"]
+        self.assertIn("VkPhysicalDeviceVulkan12Properties", baseline_props)
+        v12_props = baseline_props["VkPhysicalDeviceVulkan12Properties"]
+        self.assertTrue(v12_props.get("filterMinmaxSingleComponentFormats"))
+        self.assertTrue(v12_props.get("filterMinmaxImageComponentMapping"))
 
 
 if __name__ == '__main__':
@@ -106,7 +376,7 @@ if __name__ == '__main__':
     )
 
     args, unparsed = parser.parse_known_args()
-    TestConvertPullDepends.registry_path = args.registry
+    TestConvertPullCapsDepends.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
     

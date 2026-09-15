@@ -38,7 +38,11 @@ from reg import Registry
 from base_generator import BaseGenerator, BaseGeneratorOptions, SetOutputDirectory, SetOutputFileName, SetTargetApiName, SetMergedApiNames
 from source.vulkan_object_version import VK_VERSION, get_bundle_structure_core_version, is_bundle_structure
 from source.vulkan_object_expression_parsing import collectExtensions, evalExpression
-from source.vulkan_object_data import DEFAULT_CORE_PROPERTY_REQUIREMENTS, PropertyRequirement
+from source.vulkan_object_data import (
+    DEFAULT_CORE_PROPERTY_REQUIREMENTS, 
+    DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS,
+    PropertyRequirement
+)
 
 __all__ = [
     'getVulkanObject',
@@ -78,7 +82,8 @@ def _bakeDefaultVersionsIfMissing(vk: VulkanObject):
 
 
 def _bakeDefaultPropertiesIfMissing(vk: VulkanObject):
-    """Ensures all core version default property requirements are baked into vk.versions."""
+    """Ensures core and extension default property requirements are baked into vk objects."""
+    # 1. Bake Core Version Property Requirements
     for ver_name, default_props in DEFAULT_CORE_PROPERTY_REQUIREMENTS.items():
         ver_obj = vk.versions.get(ver_name)
         if ver_obj is None:
@@ -109,6 +114,20 @@ def _bakeDefaultPropertiesIfMissing(vk: VulkanObject):
         for dp in default_props:
             if (dp.struct, dp.name) not in existing_req_names:
                 ver_obj.propertyRequirement.append(dp)
+
+    # 2. Bake Extension Property Requirements
+    if hasattr(vk, 'extensions'):
+        for ext_name, default_props in DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS.items():
+            ext_obj = vk.extensions.get(ext_name)
+            if ext_obj is not None:
+                if not hasattr(ext_obj, 'propertyRequirement') or ext_obj.propertyRequirement is None:
+                    ext_obj.propertyRequirement = []
+                existing_req_names = {
+                    (req.struct, req.name) for req in ext_obj.propertyRequirement
+                }
+                for dp in default_props:
+                    if (dp.struct, dp.name) not in existing_req_names:
+                        ext_obj.propertyRequirement.append(dp)
 
 
 @functools.lru_cache(maxsize=1)
@@ -970,6 +989,7 @@ def gatherSatisfiedCoreRequiredPropertiesForVersion(
     enabled_exts: set[str], 
     enabled_features: set[tuple[str, str]]
 ) -> dict[str, Any]:
+    from source.profiles_json_utils import merge_capability_value
     satisfied_properties: dict[str, Any] = {}
 
     if exact_ver == VK_VERSION.NONE or api_version == VK_VERSION.NONE or exact_ver > api_version:
@@ -985,13 +1005,48 @@ def gatherSatisfiedCoreRequiredPropertiesForVersion(
             if req.struct == 'VkPhysicalDeviceLimits':
                 vk_props = satisfied_properties.setdefault('VkPhysicalDeviceProperties', {})
                 limits = vk_props.setdefault('limits', {})
-                limits[req.name] = parsed_val
+                if req.name in limits:
+                    limits[req.name] = merge_capability_value(req.name, limits[req.name], parsed_val)
+                else:
+                    limits[req.name] = parsed_val
             elif req.struct == 'VkPhysicalDeviceSparseProperties':
                 vk_props = satisfied_properties.setdefault('VkPhysicalDeviceProperties', {})
                 sparse = vk_props.setdefault('sparseProperties', {})
-                sparse[req.name] = parsed_val
+                if req.name in sparse:
+                    sparse[req.name] = merge_capability_value(req.name, sparse[req.name], parsed_val)
+                else:
+                    sparse[req.name] = parsed_val
             else:
                 struct_dict = satisfied_properties.setdefault(req.struct, {})
+                if req.name in struct_dict:
+                    struct_dict[req.name] = merge_capability_value(req.name, struct_dict[req.name], parsed_val)
+                else:
+                    struct_dict[req.name] = parsed_val
+
+    return satisfied_properties
+
+
+def gatherSatisfiedExtensionRequiredProperties(
+    vk: VulkanObject, 
+    ext_name: str, 
+    api_version: VK_VERSION, 
+    enabled_exts: set[str], 
+    enabled_features: set[tuple[str, str]]
+) -> dict[str, Any]:
+    from source.profiles_json_utils import merge_capability_value
+    satisfied_properties: dict[str, Any] = {}
+
+    if ext_name not in vk.extensions:
+        return satisfied_properties
+
+    ext_obj = vk.extensions[ext_name]
+    for req in getattr(ext_obj, 'propertyRequirement', []) or []:
+        if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
+            parsed_val = parse_property_value(req.name, req.value)
+            struct_dict = satisfied_properties.setdefault(req.struct, {})
+            if req.name in struct_dict:
+                struct_dict[req.name] = merge_capability_value(req.name, struct_dict[req.name], parsed_val)
+            else:
                 struct_dict[req.name] = parsed_val
 
     return satisfied_properties
