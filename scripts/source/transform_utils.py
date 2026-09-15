@@ -25,7 +25,9 @@ from typing import Any
 from source.vulkan_object_version import (
     is_bundle_structure, 
     get_active_feature_bundles,
-    get_active_property_bundles
+    get_active_property_bundles,
+    get_feature_bundle_structures,
+    get_property_bundle_structures
 )
 from source.vulkan_object_utils import (
     VulkanObject, 
@@ -80,23 +82,6 @@ class ExtensionPriority(IntEnum):
 class MemberSortFallback(IntEnum):
     """Fallback index position for structure members not found in C struct definitions."""
     UNKNOWN_MEMBER_INDEX = 9999  # Members missing from the vk.xml struct definition are sorted to the end of the dictionary.
-
-
-BUNDLE_FEATURE_ORDER = [
-    'VkPhysicalDeviceFeatures',
-    'VkPhysicalDeviceVulkan11Features',
-    'VkPhysicalDeviceVulkan12Features',
-    'VkPhysicalDeviceVulkan13Features',
-    'VkPhysicalDeviceVulkan14Features'
-]
-
-BUNDLE_PROPERTY_ORDER = [
-    'VkPhysicalDeviceProperties',
-    'VkPhysicalDeviceVulkan11Properties',
-    'VkPhysicalDeviceVulkan12Properties',
-    'VkPhysicalDeviceVulkan13Properties',
-    'VkPhysicalDeviceVulkan14Properties'
-]
 
 
 def _restore_member_orders(target_dict: dict[str, dict], original_orders: dict[str, list[str]]):
@@ -160,9 +145,10 @@ def canonicalize_capabilities_for_version(
             for member_name, val in members.items():
                 new_features.setdefault(struct_name, {})[member_name] = val
 
-    # Order bundle feature structures strictly by Vulkan version (1.0 -> 1.4)
+    # Order bundle feature structures strictly by Vulkan version (1.0 -> max version)
     ordered_new_features = {}
-    for b_name in BUNDLE_FEATURE_ORDER:
+    feature_bundle_order = ["VkPhysicalDeviceFeatures"] + get_feature_bundle_structures(api_version, vk)
+    for b_name in feature_bundle_order:
         if b_name in new_features:
             ordered_new_features[b_name] = new_features[b_name]
     for s_name, members in new_features.items():
@@ -190,9 +176,10 @@ def canonicalize_capabilities_for_version(
         if not is_covered:
             new_properties[struct_name] = prop_data
 
-    # Order bundle property structures strictly by Vulkan version (1.0 -> 1.4)
+    # Order bundle property structures strictly by Vulkan version (1.0 -> max version)
     ordered_new_properties = {}
-    for b_name in BUNDLE_PROPERTY_ORDER:
+    property_bundle_order = ["VkPhysicalDeviceProperties"] + get_property_bundle_structures(api_version, vk)
+    for b_name in property_bundle_order:
         if b_name in new_properties:
             ordered_new_properties[b_name] = new_properties[b_name]
     for s_name, prop_data in new_properties.items():
@@ -242,13 +229,13 @@ def isStructExtensionEnabled(vk: VulkanObject, struct_name: str, version: VK_VER
     - Core structures (no extension suffix) are enabled if core version <= version, or if
       any defining extension is in enabled_exts.
     """
-    # 1. Collect defining extension requirements for struct_name
+    # 1. Collect defining extension requirements for struct_name specifically
     req_exts = set()
 
     if hasattr(vk, 'aliasTypeRequirements') and struct_name in vk.aliasTypeRequirements:
         req_exts.update(vk.aliasTypeRequirements[struct_name].keys())
 
-    struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
+    struct_obj = vk.structs.get(struct_name)
     if struct_obj:
         if hasattr(struct_obj, 'definingRequirements') and struct_obj.definingRequirements:
             req_exts.update(struct_obj.definingRequirements.keys())

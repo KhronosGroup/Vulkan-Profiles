@@ -491,6 +491,75 @@ class TestConvertPullAliases(unittest.TestCase):
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
 
+    def test_pull_aliases_unenabled_vendor_extension_features_not_included(self):
+        """
+        Verifies that expanding feature aliases in a profile with enabled KHR/EXT 
+        extensions (VK_KHR_compute_shader_derivatives, VK_EXT_mutable_descriptor_type) 
+        does NOT populate vendor extension feature structure aliases 
+        (VkPhysicalDeviceComputeShaderDerivativesFeaturesNV, VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE)
+        when those vendor extensions are not declared.
+        """
+
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-335.json#",
+            "profiles": {
+                "VP_ANDROID_18_requirements": {
+                    "version": 3,
+                    "api-version": "1.4.335",
+                    "capabilities": ["MUST"]
+                }
+            },
+            "capabilities": {
+                "MUST": {
+                    "extensions": {
+                        "VK_KHR_compute_shader_derivatives": 1,
+                        "VK_EXT_mutable_descriptor_type": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceComputeShaderDerivativesFeaturesKHR": {
+                            "computeDerivativeGroupLinear": true
+                        },
+                        "VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT": {
+                            "mutableDescriptorType": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-335.json#",
+            "profiles": {
+                "VP_ANDROID_18_requirements": {
+                    "version": 3,
+                    "api-version": "1.4.335",
+                    "capabilities": ["MUST"]
+                }
+            },
+            "capabilities": {
+                "MUST": {
+                    "extensions": {
+                        "VK_KHR_compute_shader_derivatives": 1,
+                        "VK_EXT_mutable_descriptor_type": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceComputeShaderDerivativesFeaturesKHR": {
+                            "computeDerivativeGroupLinear": true
+                        },
+                        "VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT": {
+                            "mutableDescriptorType": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_aliases_profiles_files(self.vk, False, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
