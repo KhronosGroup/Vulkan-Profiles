@@ -159,6 +159,22 @@ def sort_capabilities_block(vk: VulkanObject, json_block: dict):
                 sorted_formats[fmt_name] = fmt_structs
         json_block["formats"] = sorted_formats
 
+    # Re-order capability block dictionary keys to ensure canonical order:
+    # "extensions", "features", "properties", followed by any remaining elements.
+    preferred_order = ["extensions", "features", "properties"]
+    ordered_block = {}
+
+    for key in preferred_order:
+        if key in json_block:
+            ordered_block[key] = json_block[key]
+
+    for key, val in json_block.items():
+        if key not in ordered_block:
+            ordered_block[key] = val
+
+    json_block.clear()
+    json_block.update(ordered_block)
+
 
 def sort_profiles_file(vk: VulkanObject, json_file_data: dict):
     capabilities_dict = json_file_data.get("capabilities", {})
@@ -177,4 +193,3 @@ def sort_profiles_files(vk: VulkanObject, json_files_dict: dict):
     for file_key, json_file_data in json_files_dict.items():
         if isinstance(json_file_data, dict):
             sort_profiles_file(vk, json_file_data)
-            

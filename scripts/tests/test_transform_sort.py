@@ -338,6 +338,81 @@ class TestConvertSort(unittest.TestCase):
         self.assertEqual(gen_fmt_structs, exp_fmt_structs)
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
+    def test_sort_capability_block_elements_order(self):
+        """
+        Verifies that top-level JSON elements inside capability blocks are re-ordered
+        in canonical sequence: ["extensions", "features", "properties"], followed by any remaining elements.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-304.json#",
+            "profiles": {
+                "VP_TEST_sort_block_keys": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["caps_misordered"]
+                }
+            },
+            "capabilities": {
+                "caps_misordered": {
+                    "properties": {
+                        "VkPhysicalDeviceProperties": {
+                            "limits": {
+                                "maxImageDimension2D": 4096
+                            }
+                        }
+                    },
+                    "features": {
+                        "VkPhysicalDeviceFeatures": {
+                            "robustBufferAccess": true
+                        }
+                    },
+                    "extensions": {
+                        "VK_KHR_surface": 1
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-304.json#",
+            "profiles": {
+                "VP_TEST_sort_block_keys": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["caps_misordered"]
+                }
+            },
+            "capabilities": {
+                "caps_misordered": {
+                    "extensions": {
+                        "VK_KHR_surface": 1
+                    },
+                    "features": {
+                        "VkPhysicalDeviceFeatures": {
+                            "robustBufferAccess": true
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceProperties": {
+                            "limits": {
+                                "maxImageDimension2D": 4096
+                            }
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        sort_profiles_files(self.vk, json_files_dict)
+
+        gen_block_keys = list(json_files_dict["test_profile.json"]["capabilities"]["caps_misordered"].keys())
+        exp_block_keys = list(json.loads(expected_json_text)["capabilities"]["caps_misordered"].keys())
+
+        self.assertEqual(gen_block_keys, ["extensions", "features", "properties"])
+        self.assertEqual(gen_block_keys, exp_block_keys)
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
