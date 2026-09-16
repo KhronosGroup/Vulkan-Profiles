@@ -498,11 +498,11 @@ def load_profiles_json(input_file: Path | str) -> dict | None:
                 if isinstance(schema_url, str) and schema_url.startswith("https://schema.khronos.org/vulkan/profiles-0."):
                     logging.info(f"Loading: {input_file}")
                     return json_file_data
-            return json_file_data
+        return None
     except Exception as e:
         logging.error(f"Failed to load profile file '{input_file}': {e}")
         return None
-
+    
 
 def load_profiles_jsons(input_dir: str | Path) -> dict[Path, dict]:
     """Loads profile JSON file(s) from a file path or directory recursively."""
