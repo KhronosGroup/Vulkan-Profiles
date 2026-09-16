@@ -369,7 +369,7 @@ def collect_profile_capabilities(json_files_dict: dict, json_file_data: dict, pr
     return combined_caps
 
 
-def validate_profiles_json_data(json_data, schema_data) -> bool:
+def _validate_profiles_json_data(json_data, schema_data) -> bool:
     try:
         import jsonschema
         jsonschema.validate(json_data, schema_data)
@@ -387,6 +387,11 @@ def validate_profiles_json_data(json_data, schema_data) -> bool:
         return False
 
 
+def validate_profiles_json_data(json_data: dict, schema_data: dict) -> bool:
+    """Validates a single profile JSON object against a schema dictionary."""
+    return _validate_profiles_json_data(json_data, schema_data)
+
+
 def validate_profiles_json(json_data_path: Path, json_schema_path: Path) -> bool:
     schema_data = load_schema_json(json_schema_path)
     if schema_data is None:
@@ -400,7 +405,7 @@ def validate_profiles_json(json_data_path: Path, json_schema_path: Path) -> bool
 
     logging.info(f"Validating profile file: {json_data_path} with {json_schema_path}")
 
-    return validate_profiles_json_data(json_data, schema_data)
+    return _validate_profiles_json_data(json_data, schema_data)
 
 
 def validate_profiles_jsons_data(json_data_dir: Path, json_schema_data) -> int:
@@ -420,7 +425,7 @@ def validate_profiles_jsons_data(json_data_dir: Path, json_schema_data) -> int:
             logging.debug(f"Invalid profile file: {profiles_files_paths[i]}")
             continue
 
-        if validate_profiles_json_data(json_data, json_schema_data):
+        if _validate_profiles_json_data(json_data, json_schema_data):
             result += 1
 
     return result
@@ -449,7 +454,7 @@ def load_schema_json(input_file: Path | str) -> dict | None:
                     if isinstance(id_url, str) and id_url.startswith("https://schema.khronos.org/vulkan/profiles-0."):
                         logging.info(f"Loading schema: {input_file}")
                         return schema_file_data
-            return schema_file_data
+            return None
     except Exception as e:
         logging.error(f"Failed to load schema file '{input_file}': {e}")
         return None
@@ -470,9 +475,9 @@ def load_schema_jsons(input_dir: str | Path) -> dict[Path, dict]:
         else:
             logging.warning(f"Skipping '{input_dir.name}': filename does not start with 'profiles-'")
     elif input_dir.is_dir():
-        for item in input_dir.iterdir():
-            if item.is_file() and item.name.startswith('profiles-') and item.name.endswith('.json'):
-                schema_files_paths.append(item)
+        for pos_json in os.listdir(input_dir):
+            if pos_json.startswith('profiles-') and pos_json.endswith('.json'):
+                schema_files_paths.append(input_dir / pos_json)
     else:
         logging.error(f"Input path '{input_dir}' does not exist")
         sys.exit(1)
@@ -493,7 +498,7 @@ def load_profiles_json(input_file: Path | str) -> dict | None:
     try:
         with open(input_file, "r", encoding="utf-8") as file:
             json_file_data = json.load(file)
-            if isinstance(json_file_data, dict) and "$schema" in json_file_data:
+            if isinstance(json_file_data, dict) and "$schema" in json_file_data and "profiles" in json_file_data:
                 schema_url = json_file_data["$schema"]
                 if isinstance(schema_url, str) and schema_url.startswith("https://schema.khronos.org/vulkan/profiles-0."):
                     logging.info(f"Loading: {input_file}")
@@ -502,10 +507,10 @@ def load_profiles_json(input_file: Path | str) -> dict | None:
     except Exception as e:
         logging.error(f"Failed to load profile file '{input_file}': {e}")
         return None
-    
+
 
 def load_profiles_jsons(input_dir: str | Path) -> dict[Path, dict]:
-    """Loads profile JSON file(s) from a file path or directory recursively."""
+    """Loads profile JSON file(s) from a file path or directory."""
     if isinstance(input_dir, str):
         input_dir = Path(input_dir)
     if input_dir is None:
@@ -516,10 +521,9 @@ def load_profiles_jsons(input_dir: str | Path) -> dict[Path, dict]:
     if input_dir.is_file():
         profiles_files_paths.append(input_dir)
     elif input_dir.is_dir():
-        for root, _, files in os.walk(input_dir):
-            for file in files:
-                if file.endswith('.json'):
-                    profiles_files_paths.append(Path(root) / file)
+        for pos_json in os.listdir(input_dir):
+            if pos_json.endswith('.json'):
+                profiles_files_paths.append(input_dir / pos_json)
     else:
         logging.error(f"Input path '{input_dir}' does not exist")
         sys.exit(1)
@@ -527,7 +531,7 @@ def load_profiles_jsons(input_dir: str | Path) -> dict[Path, dict]:
     json_files_dict = {}
     for path in profiles_files_paths:
         json_file_data = load_profiles_json(path)
-        if json_file_data and isinstance(json_file_data, dict) and "profiles" in json_file_data:
+        if json_file_data:
             json_files_dict[path] = json_file_data
 
     return json_files_dict
