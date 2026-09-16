@@ -532,3 +532,43 @@ def save_profiles_jsons(json_files_dict, output_path, format: OutputFormatType):
                 else:
                     json.dump(value, file, indent=4)
                     
+                    
+def load_schema_json(file_path: Path) -> dict | None:
+    """Loads a single JSON schema file."""
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        logging.error(f"Failed to load schema file '{file_path}': {e}")
+        return None
+
+
+def load_schema_jsons(input_dir: str | Path) -> dict[Path, dict]:
+    """Loads schema JSON file(s) starting with 'profiles-' from a file path or directory."""
+    if isinstance(input_dir, str):
+        input_dir = Path(input_dir)
+    if input_dir is None:
+        logging.error('No input directory or file set, use --input')
+        sys.exit(1)
+
+    schema_files_paths = []
+    if input_dir.is_file():
+        if input_dir.name.startswith('profiles-') and input_dir.name.endswith('.json'):
+            schema_files_paths.append(input_dir)
+        else:
+            logging.warning(f"Skipping '{input_dir.name}': filename does not start with 'profiles-'")
+    elif input_dir.is_dir():
+        for item in input_dir.iterdir():
+            if item.is_file() and item.name.startswith('profiles-') and item.name.endswith('.json'):
+                schema_files_paths.append(item)
+    else:
+        logging.error(f"Input path '{input_dir}' does not exist")
+        sys.exit(1)
+
+    json_files_dict = {}
+    for path in schema_files_paths:
+        schema_data = load_schema_json(path)
+        if schema_data:
+            json_files_dict[path] = schema_data
+
+    return json_files_dict
