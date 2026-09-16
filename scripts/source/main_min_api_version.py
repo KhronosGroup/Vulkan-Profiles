@@ -28,7 +28,6 @@ import urllib.request
 from enum import Enum
 from pathlib import Path
 
-from source.main_extract import extract_profile, ExtractMode
 from source.profiles_json_utils import (
     load_profiles_jsons,
     save_profiles_jsons,
@@ -42,7 +41,7 @@ SCHEMA_GITHUB_API_URL = "https://api.github.com/repos/KhronosGroup/Khronos-Schem
 
 class MinApiVersionMode(str, Enum):
     SHOW = 'display'        # Displays the profiles "api-version" and schema URI read from input JSON.
-    PROCESS = 'evaluate'  # Evaluates schemas to determine min Vulkan Header version and updates JSON if output path is supplied.
+    PROCESS = 'evaluate'   # Evaluates schemas to determine min Vulkan Header version and updates JSON if output path is supplied.
 
 
 def parse_schema_filename(filename: str) -> tuple[tuple[int, ...], int] | None:
@@ -80,7 +79,6 @@ def load_available_schemas(schemas_dir: str | Path = None) -> list[tuple[int, Pa
     download_dir.mkdir(parents=True, exist_ok=True)
     manifest_file = download_dir / "manifest.json"
 
-    # Load local manifest tracking cached file SHAs
     local_manifest = {}
     if manifest_file.exists():
         try:
@@ -89,7 +87,6 @@ def load_available_schemas(schemas_dir: str | Path = None) -> list[tuple[int, Pa
         except Exception:
             local_manifest = {}
 
-    # Query GitHub contents API to check remote file SHAs
     remote_manifest = {}
     try:
         req = urllib.request.Request(SCHEMA_GITHUB_API_URL, headers={"User-Agent": "vkprofiles"})
@@ -105,7 +102,6 @@ def load_available_schemas(schemas_dir: str | Path = None) -> list[tuple[int, Pa
     except Exception as e:
         logging.debug(f"Could not query remote GitHub repository: {e}")
 
-    # Identify missing or updated files
     if remote_manifest:
         files_to_download = []
         for fname, info in remote_manifest.items():
@@ -132,7 +128,6 @@ def load_available_schemas(schemas_dir: str | Path = None) -> list[tuple[int, Pa
             except Exception as e:
                 logging.debug(f"Failed to update manifest.json: {e}")
 
-    # Search local candidate directories for schema files
     candidate_dirs = []
     if schemas_dir:
         candidate_dirs.append(Path(schemas_dir))
@@ -202,7 +197,7 @@ def main_min_api_version(args):
     input_path = Path(args.input)
     mode = getattr(args, 'mode', MinApiVersionMode.SHOW) or MinApiVersionMode.SHOW
     output_path = Path(args.output) if getattr(args, 'output', None) else None
-    schemas_dir = getattr(args, 'schemas_dir', None)
+    schemas_dir = getattr(args, 'schemas', None)
     format_type = getattr(args, 'format', OutputFormatType.PRETTY)
 
     target_profile_names = None
@@ -242,11 +237,7 @@ def main_min_api_version(args):
                 if target_profile_names and pname not in target_profile_names:
                     continue
 
-                extracted_data = extract_profile(json_files_dict, pname, mode=ExtractMode.PULL)
-                if not extracted_data:
-                    continue
-
-                min_header_ver, min_schema = find_min_schema_for_profile(extracted_data, schemas, profile_name=pname)
+                min_header_ver, min_schema = find_min_schema_for_profile(file_data, schemas, profile_name=pname)
                 profile_min_headers[pname] = min_header_ver
                 api_ver_str = get_schema_api_version(min_schema)
 
@@ -267,3 +258,4 @@ def main_min_api_version(args):
         if output_path:
             save_profiles_jsons(updated_files_dict, output_path, format_type)
             logging.info(f"Updated profiles file(s) saved to {output_path}")
+            
