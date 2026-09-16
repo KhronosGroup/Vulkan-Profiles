@@ -19,183 +19,185 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
+import json
 import logging
-import argparse
-import sys
+import os
+import re
+import tempfile
+import urllib.request
+from pathlib import Path
 
-from source.main_transform import main_transform, TransformBits, OutputFormatType
-from source.main_schema import main_schema
-from source.main_validate import main_validate
-from source.main_layer import main_layer
-from source.main_tests import main_tests
-from source.main_combine import main_combine, CombineMode
-from source.main_library import main_library
-from source.main_doc import main_doc
-from source.main_extract import main_extract, ExtractMode
-from source.main_min_api_version import main_min_api_version
-from source.main_version import main_version, get_version_string
+from source.main_extract import extract_profile, ExtractMode
+from source.profiles_json_utils import (
+    load_profiles_jsons,
+    save_profiles_jsons,
+    _validate_profiles_json_data,
+    OutputFormatType
+)
+
+SCHEMA_GITHUB_RAW_URL = "https://raw.githubusercontent.com/KhronosGroup/Khronos-Schemas/main/vulkan/"
+SCHEMA_GITHUB_API_URL = "https://api.github.com/repos/KhronosGroup/Khronos-Schemas/contents/vulkan"
 
 
-class ValidateAction(argparse.Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-        valid_modes = ['schema', 'analysis']
-        if values is None or len(values) == 0:
-            setattr(namespace, self.dest, valid_modes)
+def load_available_schemas(schemas_dir: str | Path = None) -> list[tuple[int, Path | str, dict]]:
+    """
+    Finds and loads profile schemas (profiles-*.json), extracting header version numbers.
+    Returns list of tuples: (header_version, schema_path_or_url, schema_data) sorted by header_version descending.
+    """
+    schemas = []
+
+    candidate_dirs = []
+    if schemas_dir:
+        candidate_dirs.append(Path(schemas_dir))
+    candidate_dirs.extend([
+        Path("external/Khronos-Schemas/vulkan"),
+        Path("Khronos-Schemas/vulkan"),
+        Path("schemas")
+    ])
+
+    for s_dir in candidate_dirs:
+        if s_dir.exists() and s_dir.is_dir():
+            for file_path in s_dir.glob("profiles-*.json"):
+                match = re.search(r"profiles-.*-(\d+)\.json$", file_path.name)
+                if match:
+                    header_ver = int(match.group(1))
+                    try:
+                        with open(file_path, "r", encoding="utf-8") as f:
+                            schema_data = json.load(f)
+                            schemas.append((header_ver, file_path, schema_data))
+                    except Exception as e:
+                        logging.debug(f"Failed to load schema {file_path}: {e}")
+
+            if schemas:
+                break
+
+    if not schemas:
+        download_dir = Path(schemas_dir) if schemas_dir else (Path(tempfile.gettempdir()) / "vkprofiles_schemas")
+        download_dir.mkdir(parents=True, exist_ok=True)
+
+        logging.info(f"Downloading Khronos Vulkan profile schemas to '{download_dir.resolve()}'...")
+        try:
+            req = urllib.request.Request(SCHEMA_GITHUB_API_URL, headers={"User-Agent": "vkprofiles"})
+            with urllib.request.urlopen(req) as resp:
+                contents = json.loads(resp.read().decode("utf-8"))
+
+            for item in contents:
+                filename = item.get("name", "")
+                if filename.startswith("profiles-") and filename.endswith(".json"):
+                    match = re.search(r"profiles-.*-(\d+)\.json$", filename)
+                    if match:
+                        header_ver = int(match.group(1))
+                        download_url = item.get("download_url") or (SCHEMA_GITHUB_RAW_URL + filename)
+                        local_file_path = download_dir / filename
+                        try:
+                            with urllib.request.urlopen(download_url) as s_resp:
+                                schema_bytes = s_resp.read()
+                                schema_data = json.loads(schema_bytes.decode("utf-8"))
+                                with open(local_file_path, "wb") as f_out:
+                                    f_out.write(schema_bytes)
+                                schemas.append((header_ver, local_file_path, schema_data))
+                        except Exception as e:
+                            logging.debug(f"Failed downloading schema {filename}: {e}")
+        except Exception as e:
+            logging.warning(f"Could not fetch schemas from GitHub: {e}")
+
+    schemas.sort(key=lambda x: x[0], reverse=True)
+    return schemas
+
+
+def find_min_schema_for_profile(profile_file_data: dict, schemas: list[tuple[int, Path | str, dict]], profile_name: str = "") -> tuple[int | None, dict | None]:
+    """
+    Validates a profile against schemas from newest to oldest.
+    The first schema validation that fails indicates that the previous validated schema is the min-vulkan-api version.
+    """
+    last_passing_header_ver = None
+    last_passing_schema = None
+
+    for header_ver, schema_identifier, schema_data in schemas:
+        schema_file_name = Path(str(schema_identifier)).name if schema_identifier else f"profiles-0.8.2-{header_ver}.json"
+        prof_str = f" for profile '{profile_name}'" if profile_name else ""
+        print(f"Checking schema '{schema_file_name}'{prof_str}...")
+
+        is_valid = _validate_profiles_json_data(profile_file_data, schema_data)
+        if is_valid:
+            last_passing_header_ver = header_ver
+            last_passing_schema = schema_data
         else:
-            res = []
-            for v in values:
-                for item in v.split(','):
-                    item = item.strip()
-                    if item:
-                        if item not in valid_modes:
-                            parser.error(f"argument {option_string}: invalid choice: '{item}' (choose from 'schema', 'analysis')")
-                        if item not in res:
-                            res.append(item)
-            setattr(namespace, self.dest, res)
+            if last_passing_header_ver is not None:
+                break
+
+    if last_passing_header_ver is None and schemas:
+        last_passing_header_ver = schemas[-1][0]
+        last_passing_schema = schemas[-1][2]
+
+    return last_passing_header_ver, last_passing_schema
 
 
-def main(argv):
-    parser = argparse.ArgumentParser(description='Transform Vulkan profile JSON file')
-    
-    parser.add_argument('--version', '-v', action='version', version=get_version_string())
+def main_min_api_version(args):
+    input_path = Path(args.input)
+    mode = getattr(args, 'mode', 'print') or 'print'
+    output_path = Path(args.output) if getattr(args, 'output', None) else None
+    schemas_dir = getattr(args, 'schemas_dir', None)
+    format_type = getattr(args, 'format', OutputFormatType.PRETTY)
 
-    log_group = parser.add_mutually_exclusive_group()
-    log_group.add_argument('--verbose', action='store_true', help='Enable verbose output including debug messages.')
-    log_group.add_argument('--quiet', action='store_true', help='Suppress warning and informational messages.')
+    target_profile_names = None
+    if getattr(args, 'profile_names', None):
+        target_profile_names = {p.strip() for p in args.profile_names.split(',') if p.strip()}
 
-    subparsers = parser.add_subparsers(dest='command', required=True)
+    json_files_dict = load_profiles_jsons(input_path)
+    if not json_files_dict:
+        logging.error(f"No profile files loaded from {input_path}")
+        return
 
-    validate_parser = subparsers.add_parser('validate', help='Validate a profile file against a profile schema or perform static analysis.')
-    validate_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
-    validate_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
-    validate_parser.add_argument('--schema', '-s', action='store', help='Use a profile schema (profiles-*.json). By default, generate a profile schema vk.xml.')
-    validate_parser.add_argument('--input', '-i', action='store', required=True, help='Path to the input profiles files.')
-    validate_parser.add_argument('--mode', '-m', nargs='*', action=ValidateAction, default=['schema', 'analysis'], help="Validation mode(s) to execute (default: schema analysis).")
+    if mode == 'print':
+        for file_key, file_data in json_files_dict.items():
+            schema_url = file_data.get("$schema", "")
+            schema_filename = schema_url.split('/')[-1].rstrip('#') if schema_url else "unknown"
+            profiles = file_data.get("profiles", {})
+            for pname, p_obj in profiles.items():
+                if target_profile_names and pname not in target_profile_names:
+                    continue
+                api_ver = p_obj.get("api-version", "unknown")
+                print(f"Profile '{pname}': api-version = {api_ver}, schema = {schema_filename}")
 
-    schema_parser = subparsers.add_parser('schema', help='Generate a profile json schema file.')
-    schema_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
-    schema_parser.add_argument('--output', '-o', action='store', required=True, help='Path to the output profile schema file.')
-    schema_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
+    elif mode in ('detect', 'search', 'update'):
+        schemas = load_available_schemas(schemas_dir)
+        if not schemas:
+            logging.error("No valid Vulkan profile schemas available for validation detection.")
+            return
 
-    transform_parser = subparsers.add_parser('transform', help='Transform an implicit profile to an explicit profile by pulling Vulkan capabilities dependencies from vk.xml.')
-    transform_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
-    transform_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
-    transform_parser.add_argument('--input', '-i', action='store', required=True, help='Path to the input profiles files.')
-    transform_parser.add_argument('--output', '-o', action='store', required=True, help='Path to the output profiles files.')
-    transform_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the profiles files (default: pretty).')
-    transform_parser.add_argument('--mode', '-m', nargs='*', action='store', choices=list(TransformBits), default=[], help='List of transformation capabilities')
-    transform_parser.add_argument('--validate', nargs='*', action=ValidateAction, default=None, help='Validate profile files before transformation (choices: schema, analysis).')
+        updated_files_dict = {}
 
-    combine_parser = subparsers.add_parser('combine', help='Generate combined Vulkan profile JSON files.')
-    combine_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
-    combine_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
-    combine_parser.add_argument('--config', '-c', action='store', help='Use specified a JSON combine config file path instead of using individual arguments.')
-    combine_parser.add_argument('--input', '-i', action='store', help='Path to directory with profiles.')
-    combine_parser.add_argument('--input-profiles', action='store', help='Comma separated list of profiles.')
-    combine_parser.add_argument('--output', '-o', action='store', required=True, help='Path to output profile.')
-    combine_parser.add_argument('--output-profile', action='store', help='Profile name of the output profile. Deprecated, replaced by `--profile-name`.')
-    combine_parser.add_argument('--profile-name', action='store', help='Profile name of the output profile. If the argument is not set, the value is generated.')
-    combine_parser.add_argument('--profile-version', action='store', help='Override the Profile version of the generated profile. If the argument is not set, the value is 1.')
-    combine_parser.add_argument('--profile-label', action='store', help='Override the Label of the generated profile. If the argument is not set, the value is generated.')
-    combine_parser.add_argument('--profile-desc', action='store', help='Override the Description of the generated profile. If the argument is not set, the value is generated.')
-    combine_parser.add_argument('--profile-date', action='store', help='Override the release date of the generated profile. If the argument is not set, the value is generated.')
-    combine_parser.add_argument('--profile-api-version', action='store', help='Override the Vulkan API version of the generated profile. If the argument is not set, the value is generated.')
-    combine_parser.add_argument('--profile-stage', action='store', choices=['ALPHA', 'BETA', 'STABLE'], default='STABLE', help='Override the development stage of the generated profile.')
-    combine_parser.add_argument('--profile-required-profiles', action='store', help='Comma separated list of required profiles by the generated profile.')
-    combine_parser.add_argument('--mode', '-m', action='store', choices=list(CombineMode), default=CombineMode.INTERSECTION, help='Mode of profile combination.')
-    combine_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the profiles files (default: pretty).')
-    combine_parser.add_argument('--transform', nargs='*', action='store', choices=list(TransformBits), default=[], help='List of transformation capabilities to apply to the combined profile output.')
-    combine_parser.add_argument('--validate', nargs='*', action=ValidateAction, default=None, help='Validate profile files before combining (choices: schema, analysis).')
+        for file_key, file_data in json_files_dict.items():
+            profiles = file_data.get("profiles", {})
+            profile_min_headers = {}
 
-    extract_parser = subparsers.add_parser('extract', help='Extract a profile from a profile JSON file into a single profile JSON file.')
-    extract_parser.add_argument('--input', '-i', action='store', required=True, help='Path to input profiles file.')
-    extract_parser.add_argument('--output', '-o', action='store', required=True, help='Path to output profile JSON file.')
-    extract_parser.add_argument('--profile-name', '-p', action='store', required=True, help='Specific profile name to extract.')
-    extract_parser.add_argument('--mode', '-m', type=ExtractMode, choices=list(ExtractMode), default=ExtractMode.REFERENCE, help='Extraction mode: "reference-required-profiles" keeps parent profile references external, "pull-required-profiles" includes required parent profiles and blocks.')
-    extract_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the output file.')
+            for pname in profiles.keys():
+                if target_profile_names and pname not in target_profile_names:
+                    continue
 
-    min_api_parser = subparsers.add_parser('min-api-version', help='Print, detect or update the Vulkan API version of profile(s).')
-    min_api_parser.add_argument('--input', '-i', action='store', required=True, help='Path to input profiles file or directory.')
-    min_api_parser.add_argument('--output', '-o', action='store', help='Path to output profiles file or directory (required for update mode).')
-    min_api_parser.add_argument('--profile-names', action='store', help='Comma separated list of profile names to process.')
-    min_api_parser.add_argument('--schemas-dir', '-s', action='store', help='Path to directory containing Vulkan profile schemas (profiles-*.json).')
-    min_api_parser.add_argument('--mode', '-m', choices=['print', 'detect', 'search', 'update'], default='print', help='Operation mode: print (read api-version/schema), detect/search (find min api-version schema), update (update schema/api-version in JSON). Default: print.')
-    min_api_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for output JSON files.')
+                extracted_data = extract_profile(json_files_dict, pname, mode=ExtractMode.PULL)
+                if not extracted_data:
+                    continue
 
-    library_parser = subparsers.add_parser('library', help='Generate the Vulkan profiles C/C++ API library headers and source files.')
-    library_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
-    library_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
-    library_parser.add_argument('--input', '-i', action='store', required=True, help='Path to directory with profiles.')
-    library_parser.add_argument('--input-filenames', action='store', help='Comma separated list of profile filenames.')
-    library_parser.add_argument('--output', '-o', '--output-inc', action='store', help='Output include directory for profile library.')
-    library_parser.add_argument('--output-src', action='store', help='Output source directory for profile library.')
-    library_parser.add_argument('--output-filename', action='store', default='vulkan_profiles', help='Output filename for profile library, default "vulkan_profiles".')
-    library_parser.add_argument('--mode', nargs='*', action='store', choices=['header-only', 'header+source'], default=['header-only', 'header+source'], help='Library output generation mode.')
-    library_parser.add_argument('--validate', nargs='*', action=ValidateAction, default=None, help='Validate generated JSON profile schema and JSON profiles (choices: schema, analysis).')
-    library_parser.add_argument('--transform', nargs='*', action='store', choices=list(TransformBits), default=[], help='List of transformation capabilities to apply before generating the library.')
-    library_parser.add_argument('--intermediate', action='store', help='Directory path for intermediate transformed profiles (used when --transform is provided).')
-    library_parser.add_argument('--debug', '-d', action='store_true', help='Also generate library variant with debug messages.')
-    library_parser.add_argument('--config', '-c', action='store', default='release', choices=['release', 'debug'], help='Select build configuration.')
-    library_parser.add_argument('--include-header', action='store', help='Override the header file include directive in generated C++ source files.')
+                min_header_ver, _ = find_min_schema_for_profile(extracted_data, schemas, profile_name=pname)
+                profile_min_headers[pname] = min_header_ver
 
-    doc_parser = subparsers.add_parser('doc', help='Generate markdown documentation for Vulkan profiles.')
-    doc_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
-    doc_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
-    doc_parser.add_argument('--input', '-i', action='store', required=True, help='Path to directory with profiles.')
-    doc_parser.add_argument('--input-filenames', action='store', help='Comma separated list of profile filenames.')
-    doc_parser.add_argument('--output', '-o', action='store', required=True, help='Output markdown file for profiles documentation.')
-    doc_parser.add_argument('--validate', nargs='*', action=ValidateAction, default=None, help='Validate profile files before generating documentation (choices: schema, analysis).')
+                print(f"Profile '{pname}': min required schema header version = {min_header_ver}")
 
-    layer_parser = subparsers.add_parser('layer', help='Generate the Vulkan profiles layer source file.')
-    layer_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
-    layer_parser.add_argument('--registry', '-r', action='store', help='Use specified registry file instead of vk.xml.')
-    layer_parser.add_argument('--output', '-o', '--out-layer', action='store', help='Output the layer source file.')
+            if profile_min_headers:
+                max_header_ver = max([h for h in profile_min_headers.values() if h is not None] or [0])
+                print(f"File '{file_key}': overall file schema header version = {max_header_ver}")
 
-    tests_parser = subparsers.add_parser('tests', help='Generate test profile and test C++ source file.')
-    tests_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
-    tests_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
-    tests_parser.add_argument('--output-profile', action='store', required=True, help='Output profile test file.')
-    tests_parser.add_argument('--output-cpp', action='store', help='Output C++ tests file.')
+                if mode == 'update':
+                    new_file_data = json.loads(json.dumps(file_data))
+                    new_file_data["$schema"] = f"https://schema.khronos.org/vulkan/profiles-0.8.2-{max_header_ver}.json#"
+                    updated_files_dict[file_key] = new_file_data
 
-    subparsers.add_parser('version', help='Print vkprofiles version.')
-
-    args = parser.parse_args(argv)
-
-    if args.quiet:
-        log_level = logging.ERROR
-    elif args.verbose:
-        log_level = logging.DEBUG
-    else:
-        log_level = logging.WARNING
-
-    logging.basicConfig(level=log_level, format='%(levelname)s: %(message)s', force=True)
-
-    if args.command == 'transform':
-        main_transform(args)
-    elif args.command == 'extract':
-        main_extract(args)
-    elif args.command == 'min-api-version':
-        main_min_api_version(args)
-    elif args.command == 'validate':
-        main_validate(args)
-    elif args.command == 'schema':
-        main_schema(args)
-    elif args.command == 'combine':
-        main_combine(args)
-    elif args.command == 'library':
-        main_library(args)
-    elif args.command == 'doc':
-        main_doc(args)
-    elif args.command == 'layer':
-        main_layer(args)
-    elif args.command == 'tests':
-        main_tests(args)
-    elif args.command == 'version':
-        main_version(args)
-    else:
-        parser.print_help()
-
-
-if __name__ == '__main__':
-    sys.exit(main(sys.argv[1:]))
-    
+        if mode == 'update':
+            if not output_path:
+                logging.error("--output path is required when mode is 'update'")
+                return
+            save_profiles_jsons(updated_files_dict, output_path, format_type)
+            logging.info(f"Updated profiles file(s) saved to {output_path}")
+            
