@@ -29,6 +29,11 @@ from enum import Enum
 from typing import Any
 
 
+class OutputFormatType(str, Enum):
+    PRETTY = 'pretty'
+    FLATTEN = 'flatten'
+
+
 def is_min_limit_property(prop_name: str) -> bool:
     """Returns True if smaller property value is a stricter requirement (min-type limit)."""
     if prop_name.startswith("min"):
@@ -364,7 +369,7 @@ def collect_profile_capabilities(json_files_dict: dict, json_file_data: dict, pr
     return combined_caps
 
 
-def _validate_profiles_json_data(json_data, schema_data) -> bool:
+def validate_profiles_json_data(json_data, schema_data) -> bool:
     try:
         import jsonschema
         jsonschema.validate(json_data, schema_data)
@@ -378,7 +383,7 @@ def _validate_profiles_json_data(json_data, schema_data) -> bool:
         logging.error(f"The provided schema itself is invalid: {e.message}")
         return False
     except ModuleNotFoundError:
-        logging.warning("`jsonschema` module is not installed, schema validation skip")
+        logging.warning("`jsonschema` module is not installed, schema validation skipped")
         return False
 
 
@@ -395,7 +400,7 @@ def validate_profiles_json(json_data_path: Path, json_schema_path: Path) -> bool
 
     logging.info(f"Validating profile file: {json_data_path} with {json_schema_path}")
 
-    return _validate_profiles_json_data(json_data, schema_data)
+    return validate_profiles_json_data(json_data, schema_data)
 
 
 def validate_profiles_jsons_data(json_data_dir: Path, json_schema_data) -> int:
@@ -407,17 +412,17 @@ def validate_profiles_jsons_data(json_data_dir: Path, json_schema_data) -> int:
             if pos_json.endswith('.json'):
                 full_path = json_data_dir / pos_json
                 profiles_files_paths.append(full_path)
-            
+
     result = 0
     for i in range(len(profiles_files_paths)):
         json_data = load_profiles_json(profiles_files_paths[i])
         if json_data is None:
             logging.debug(f"Invalid profile file: {profiles_files_paths[i]}")
             continue
-        
-        if _validate_profiles_json_data(json_data, json_schema_data):
+
+        if validate_profiles_json_data(json_data, json_schema_data):
             result += 1
-            
+
     return result
 
 
@@ -426,120 +431,27 @@ def validate_profiles_jsons(json_data_dir: Path, json_schema_path: Path) -> int:
     if schema_data is None:
         logging.error(f"Invalid profile file: {json_schema_path}")
         return 0
-            
+
     return validate_profiles_jsons_data(json_data_dir, schema_data)
 
 
-def load_schema_json(input_file):
-    with open(input_file, "r", encoding="utf-8") as file:
-        schema_file_data = json.load(file)
-
-        if isinstance(schema_file_data, dict) and "$schema" in schema_file_data:
-            schema_url = schema_file_data["$schema"]
-            id_url = schema_file_data["$id"]
-
-            if isinstance(schema_url, str) and schema_url.startswith("http://json-schema.org/draft-07/schema#"):
-                if isinstance(id_url, str) and id_url.startswith("https://schema.khronos.org/vulkan/profiles-0."):
-                    logging.debug(f"Loading schema: {input_file}")
-                    return schema_file_data
-
-
-def load_profiles_json(input_file):
-    with open(input_file, "r", encoding="utf-8") as file:
-        json_file_data = json.load(file)
-
-        if isinstance(json_file_data, dict) and "$schema" in json_file_data:
-            schema_url = json_file_data["$schema"]
-
-            if isinstance(schema_url, str) and schema_url.startswith("https://schema.khronos.org/vulkan/profiles-0."):
-                logging.debug(f"Loading: {input_file}")
-                return json_file_data
-
-
-def load_profiles_jsons(input_dir):
-    if isinstance(input_dir, str):
-        input_dir = Path(input_dir)
-    if input_dir is None:
-        logging.error('No input directory or file set, use --input')
-        sys.exit(1)
-    if not isinstance(input_dir, Path):
-        logging.error('`input_dir` is not a Path type')
-        sys.exit(1)
-
-    profiles_files_paths = []
-    if input_dir.is_file():
-        profiles_files_paths.append(input_dir)
-    elif input_dir.is_dir():
-        for pos_json in os.listdir(input_dir):
-            if pos_json.endswith('.json'):
-                full_path = input_dir / pos_json
-                profiles_files_paths.append(full_path)
-    else:
-        logging.error(f"Input path '{input_dir}' does not exist")
-        sys.exit(1)
-
-    json_files_dict = {}
-    for i in range(len(profiles_files_paths)):
-        json_file_data = load_profiles_json(profiles_files_paths[i])
-        if json_file_data:
-            json_files_dict[profiles_files_paths[i]] = json_file_data
-
-    return json_files_dict
-
-
-class OutputFormatType(str, Enum):
-    PRETTY = 'pretty'
-    FLATTEN = 'flatten'
-
-
-def save_profiles_jsons(json_files_dict, output_path, format: OutputFormatType):
-    if isinstance(output_path, str):
-        output_path = Path(output_path)
-    if output_path is None:
-        logging.error('No output path set, use --output')
-        sys.exit(1)
-    if not isinstance(output_path, Path):
-        logging.error('`output_path` is not a Path type')
-        sys.exit(1)
-
-    def flatten_array(match):
-        content = re.sub(r'\s+', ' ', match.group(1)).strip()
-        return f"[ {content} ]" if content else "[]"
-
-    is_single_file = output_path.suffix == '.json' or output_path.is_file()
-
-    if is_single_file:
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        for value in json_files_dict.values():
-            with open(output_path, "w", encoding="utf-8") as file:
-                if format == OutputFormatType.FLATTEN:
-                    pretty_json = json.dumps(value, indent=4)
-                    flat_json = re.sub(r'\[([^\[\]{}]*?)\]', flatten_array, pretty_json)
-                    file.write(flat_json)
-                else:
-                    json.dump(value, file, indent=4)
-            break
-    else:
-        output_path.mkdir(parents=True, exist_ok=True)
-        for key, value in json_files_dict.items():
-            file_name = key.name if isinstance(key, Path) else Path(key).name
-            out_file = output_path / file_name
-            with open(out_file, "w", encoding="utf-8") as file:
-                if format == OutputFormatType.FLATTEN:
-                    pretty_json = json.dumps(value, indent=4)
-                    flat_json = re.sub(r'\[([^\[\]{}]*?)\]', flatten_array, pretty_json)
-                    file.write(flat_json)
-                else:
-                    json.dump(value, file, indent=4)
-                    
-                    
-def load_schema_json(file_path: Path) -> dict | None:
+def load_schema_json(input_file: Path | str) -> dict | None:
     """Loads a single JSON schema file."""
+    if isinstance(input_file, str):
+        input_file = Path(input_file)
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            return json.load(f)
+        with open(input_file, "r", encoding="utf-8") as file:
+            schema_file_data = json.load(file)
+            if isinstance(schema_file_data, dict) and "$schema" in schema_file_data:
+                schema_url = schema_file_data["$schema"]
+                id_url = schema_file_data.get("$id", "")
+                if isinstance(schema_url, str) and schema_url.startswith("http://json-schema.org/draft-07/schema#"):
+                    if isinstance(id_url, str) and id_url.startswith("https://schema.khronos.org/vulkan/profiles-0."):
+                        logging.info(f"Loading schema: {input_file}")
+                        return schema_file_data
+            return schema_file_data
     except Exception as e:
-        logging.error(f"Failed to load schema file '{file_path}': {e}")
+        logging.error(f"Failed to load schema file '{input_file}': {e}")
         return None
 
 
@@ -572,3 +484,94 @@ def load_schema_jsons(input_dir: str | Path) -> dict[Path, dict]:
             json_files_dict[path] = schema_data
 
     return json_files_dict
+
+
+def load_profiles_json(input_file: Path | str) -> dict | None:
+    """Loads a single profile JSON file."""
+    if isinstance(input_file, str):
+        input_file = Path(input_file)
+    try:
+        with open(input_file, "r", encoding="utf-8") as file:
+            json_file_data = json.load(file)
+            if isinstance(json_file_data, dict) and "$schema" in json_file_data:
+                schema_url = json_file_data["$schema"]
+                if isinstance(schema_url, str) and schema_url.startswith("https://schema.khronos.org/vulkan/profiles-0."):
+                    logging.info(f"Loading: {input_file}")
+                    return json_file_data
+            return json_file_data
+    except Exception as e:
+        logging.error(f"Failed to load profile file '{input_file}': {e}")
+        return None
+
+
+def load_profiles_jsons(input_dir: str | Path) -> dict[Path, dict]:
+    """Loads profile JSON file(s) from a file path or directory recursively."""
+    if isinstance(input_dir, str):
+        input_dir = Path(input_dir)
+    if input_dir is None:
+        logging.error('No input directory or file set, use --input')
+        sys.exit(1)
+
+    profiles_files_paths = []
+    if input_dir.is_file():
+        profiles_files_paths.append(input_dir)
+    elif input_dir.is_dir():
+        for root, _, files in os.walk(input_dir):
+            for file in files:
+                if file.endswith('.json'):
+                    profiles_files_paths.append(Path(root) / file)
+    else:
+        logging.error(f"Input path '{input_dir}' does not exist")
+        sys.exit(1)
+
+    json_files_dict = {}
+    for path in profiles_files_paths:
+        json_file_data = load_profiles_json(path)
+        if json_file_data and isinstance(json_file_data, dict) and "profiles" in json_file_data:
+            json_files_dict[path] = json_file_data
+
+    return json_files_dict
+
+
+def save_profiles_jsons(json_files_dict: dict, output_path: Path | str, format: OutputFormatType = OutputFormatType.PRETTY):
+    """Saves profile or schema JSON objects back to disk."""
+    if isinstance(output_path, str):
+        output_path = Path(output_path)
+    if output_path is None:
+        logging.error('No output path set, use --output')
+        sys.exit(1)
+
+    def flatten_array(match):
+        content = re.sub(r'\s+', ' ', match.group(1)).strip()
+        return f"[ {content} ]" if content else "[]"
+
+    is_single_file = output_path.suffix == '.json' or output_path.is_file()
+
+    if is_single_file:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        for value in json_files_dict.values():
+            with open(output_path, "w", encoding="utf-8") as file:
+                if format == OutputFormatType.FLATTEN:
+                    pretty_json = json.dumps(value, indent=4)
+                    flat_json = re.sub(r'\[([^\[\]{}]*?)\]', flatten_array, pretty_json)
+                    file.write(flat_json)
+                    file.write("\n")
+                else:
+                    json.dump(value, file, indent=4)
+                    file.write("\n")
+            break
+    else:
+        output_path.mkdir(parents=True, exist_ok=True)
+        for key, value in json_files_dict.items():
+            file_name = key.name if isinstance(key, Path) else Path(key).name
+            out_file = output_path / file_name
+            with open(out_file, "w", encoding="utf-8") as file:
+                if format == OutputFormatType.FLATTEN:
+                    pretty_json = json.dumps(value, indent=4)
+                    flat_json = re.sub(r'\[([^\[\]{}]*?)\]', flatten_array, pretty_json)
+                    file.write(flat_json)
+                    file.write("\n")
+                else:
+                    json.dump(value, file, indent=4)
+                    file.write("\n")
+                    

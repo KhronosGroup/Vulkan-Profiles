@@ -32,7 +32,7 @@ from source.main_combine import main_combine, CombineMode
 from source.main_library import main_library
 from source.main_doc import main_doc
 from source.main_extract import main_extract, ExtractMode
-from source.main_min_api_version import main_min_api_version
+from source.main_min_api_version import main_min_api_version, MinApiVersionMode
 from source.main_version import main_version, get_version_string
 
 
@@ -117,12 +117,12 @@ def main(argv):
     extract_parser.add_argument('--mode', '-m', type=ExtractMode, choices=list(ExtractMode), default=ExtractMode.REFERENCE, help='Extraction mode: "reference-required-profiles" keeps parent profile references external, "pull-required-profiles" includes required parent profiles and blocks.')
     extract_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the output file.')
 
-    min_api_parser = subparsers.add_parser('min-api-version', help='Print, detect or update the Vulkan API version of profile(s).')
+    min_api_parser = subparsers.add_parser('min-api-version', help='Display or process the minimum Vulkan API version of profile(s).')
     min_api_parser.add_argument('--input', '-i', action='store', required=True, help='Path to input profiles file or directory.')
-    min_api_parser.add_argument('--output', '-o', action='store', help='Path to output profiles file or directory (required for update mode).')
+    min_api_parser.add_argument('--output', '-o', action='store', help='Path to output profiles file or directory.')
     min_api_parser.add_argument('--profile-names', action='store', help='Comma separated list of profile names to process.')
-    min_api_parser.add_argument('--schemas-dir', '-s', action='store', help='Path to directory containing Vulkan profile schemas (profiles-*.json).')
-    min_api_parser.add_argument('--mode', '-m', choices=['print', 'detect', 'search', 'update'], default='print', help='Operation mode: print (read api-version/schema), detect/search (find min api-version schema), update (update schema/api-version in JSON). Default: print.')
+    min_api_parser.add_argument('--schemas', '-s', action='store', help='Path to directory containing Vulkan profile schemas (profiles-*.json).')
+    min_api_parser.add_argument('--mode', '-m', type=MinApiVersionMode, choices=list(MinApiVersionMode), default=MinApiVersionMode.SHOW, help='Operation mode: "show" (display api-version/schema read from input), "process" (evaluate schemas to determine min Vulkan header version and update JSONs if output path is provided). Default: show.')
     min_api_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for output JSON files.')
 
     library_parser = subparsers.add_parser('library', help='Generate the Vulkan profiles C/C++ API library headers and source files.')
@@ -201,4 +201,3 @@ def main(argv):
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))
-    
