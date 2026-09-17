@@ -19,8 +19,7 @@ if str(scripts_dir) not in sys.path:
 
 from vulkan_object import VulkanObject
 from source.vulkan_object_utils import initVulkanObject
-from source.generate_profiles_combine import VulkanProfilesCombineGenerator
-from source.json_config import JsonConfig
+from source.generate_profiles_combine import VulkanProfilesCombineGenerator, CombineConfig
 
 
 class TestCombineLimitType(unittest.TestCase):
@@ -34,7 +33,7 @@ class TestCombineLimitType(unittest.TestCase):
         json_a = json.loads(json_text_a)
         json_b = json.loads(json_text_b)
 
-        p_config = JsonConfig.__new__(JsonConfig)
+        p_config = CombineConfig.__new__(CombineConfig)
         p_config.name = "VP_TEST_combined"
         p_config.version = 1
         p_config.label = "Test combined profile"

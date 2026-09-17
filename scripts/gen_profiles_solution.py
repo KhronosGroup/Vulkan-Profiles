@@ -5594,13 +5594,13 @@ class VulkanProfilesDatabase():
         results = []
         self.recurseRequiredProfiles(self.json_files, results, profile_key)
         if len(results) > 1:
-            logging.info('Required profiles by the {0} profile:'.format(profile_key))
+            logging.debug('Required profiles by the {0} profile:'.format(profile_key))
             for result in results:
                 if result != profile_key:
-                    logging.info('- {0}'.format(result))
+                    logging.debug('- {0}'.format(result))
 
         else:
-            logging.info('Required profiles by the {0} profile: None'.format(profile_key))
+            logging.debug('Required profiles by the {0} profile: None'.format(profile_key))
         return results
 
     def gatherProfileCapabilities(self, json_profile_key, json_profile_value, json_capabilities_value):
@@ -5610,16 +5610,16 @@ class VulkanProfilesDatabase():
             # When we have multiple possible capabilities blocks, we load them all but effectively the API library can't effectively implement this behavior.
             if type(cap_key).__name__ == 'list':
                 for cap_key_case in cap_key:
-                    logging.info('- {0}::{1}'.format(json_profile_key, cap_key_case))
+                    logging.debug('- {0}::{1}'.format(json_profile_key, cap_key_case))
                     capabilities_list.append(json_capabilities_value[cap_key_case])
             elif cap_key in json_capabilities_value:
                 capabilities_list.append(json_capabilities_value[cap_key])
-                logging.info('- {0}::{1}'.format(json_profile_key, cap_key))
+                logging.debug('- {0}::{1}'.format(json_profile_key, cap_key))
 
         return capabilities_list
 
     def collectProfileCapabilities(self, profile_requirements):
-        logging.info('Required capabilities blocks by the {0} profile:'.format(profile_requirements[0]))
+        logging.debug('Required capabilities blocks by the {0} profile:'.format(profile_requirements[0]))
         
         capabilities_list = []
         for required_profile in profile_requirements:
@@ -5678,7 +5678,7 @@ class VulkanProfilesFiles():
 
     def parseProfiles(self, registry, json_profiles, json_caps):
         for json_profile_key, json_profile_value in json_profiles.items():
-            logging.info("Registering profile '{0}'".format(json_profile_key))
+            logging.debug("Registering profile '{0}'".format(json_profile_key))
             if json_profile_key not in self.profiles:
                 self.profiles[json_profile_key] = VulkanProfile(registry, self.json_profiles_database, json_profile_key, json_profile_value, json_caps)
 

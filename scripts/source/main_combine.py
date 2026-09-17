@@ -29,7 +29,7 @@ from enum import Enum
 from pathlib import Path
 
 from source.vulkan_object_utils import initVulkanObject
-from source.generate_profiles_combine import VulkanProfilesCombineGenerator
+from source.generate_profiles_combine import VulkanProfilesCombineGenerator, CombineConfig
 from source.main_validate import main_validate
 from source.main_transform import main_transform
 from source.profiles_json_utils import (
@@ -38,7 +38,6 @@ from source.profiles_json_utils import (
     strip_dict_duplication,
     OutputFormatType
 )
-from source.json_config import JsonConfig
 
 
 class CombineMode(str, Enum):
@@ -66,15 +65,13 @@ def main_combine(args):
         logging.error("Combining profiles requires specifying --registry")
         sys.exit(1)
 
-    vk = initVulkanObject(api, args.registry)
-
-    config_path = getattr(args, 'config', None)
     input_dir = getattr(args, 'input', None)
-    input_profiles = getattr(args, 'input_profiles', None)
-
-    if not config_path and not input_dir:
-        logging.error("Combining profiles requires specifying either --config or --input")
+    if not input_dir:
+        logging.error("Combining profiles requires specifying --input")
         sys.exit(1)
+
+    vk = initVulkanObject(api, args.registry)
+    input_profiles = getattr(args, 'input_profiles', None)
 
     raw_mode = getattr(args, 'mode', CombineMode.INTERSECTION)
     mode = CombineMode(raw_mode)
@@ -89,7 +86,7 @@ def main_combine(args):
 
     # Special processing for DIFFERENCE mode across input profile files
     if mode == CombineMode.DIFFERENCE:
-        json_files_dict = load_profiles_jsons(Path(input_dir) if input_dir else Path(config_path).parent)
+        json_files_dict = load_profiles_jsons(Path(input_dir))
 
         generator = VulkanProfilesCombineGenerator(vk)
         all_jsons = list(json_files_dict.values())
@@ -117,51 +114,31 @@ def main_combine(args):
         "contributors": {},
         "history": []
     }
-    profile_configs = []
 
-    if config_path:
-        current_dir = os.path.dirname(os.path.abspath(config_path))
-        with open(config_path, 'r', encoding='utf-8') as f:
-            json_data = json.load(f)
+    input_profile_names = []
+    if input_profiles:
+        input_profile_names = [p.strip() for p in input_profiles.split(',') if p.strip()]
 
-        if json_data.get("contributors"):
-            combined_json["contributors"] = json_data["contributors"]
-        if json_data.get("history"):
-            combined_json["history"] = json_data["history"]
+    p_config = CombineConfig(input_dir, input_profile_names, getattr(args, 'profile_api_version', None), mode.value)
 
-        for p_name, p_val in json_data.get("profiles", {}).items():
-            in_dir = os.path.join(current_dir, p_val["input"])
-            p_config = JsonConfig(in_dir, [], p_val.get("api-version"), mode.value)
-            p_config.apply_json_value(p_name, p_val)
-            profile_configs.append(p_config)
-    else:
-        input_profile_names = []
-        if input_profiles:
-            input_profile_names = [p.strip() for p in input_profiles.split(',') if p.strip()]
+    profile_name = getattr(args, 'profile_name', None) or getattr(args, 'output_profile', None)
+    if profile_name:
+        p_config.name = profile_name
+    if getattr(args, 'profile_version', None) is not None:
+        p_config.version = int(args.profile_version)
+    if getattr(args, 'profile_label', None):
+        p_config.label = args.profile_label
+    if getattr(args, 'profile_desc', None):
+        p_config.description = args.profile_desc
+    if getattr(args, 'profile_stage', None):
+        p_config.stage = args.profile_stage
+    if getattr(args, 'profile_date', None):
+        p_config.date = args.profile_date
+    if getattr(args, 'profile_required_profiles', None):
+        p_config.required_profiles = [p.strip() for p in args.profile_required_profiles.split(',') if p.strip()]
 
-        p_config = JsonConfig(input_dir, input_profile_names, getattr(args, 'profile_api_version', None), mode.value)
-
-        profile_name = getattr(args, 'profile_name', None) or getattr(args, 'output_profile', None)
-        if profile_name:
-            p_config.name = profile_name
-        if getattr(args, 'profile_version', None) is not None:
-            p_config.version = int(args.profile_version)
-        if getattr(args, 'profile_label', None):
-            p_config.label = args.profile_label
-        if getattr(args, 'profile_desc', None):
-            p_config.description = args.profile_desc
-        if getattr(args, 'profile_stage', None):
-            p_config.stage = args.profile_stage
-        if getattr(args, 'profile_date', None):
-            p_config.date = args.profile_date
-        if getattr(args, 'profile_required_profiles', None):
-            p_config.required_profiles = [p.strip() for p in args.profile_required_profiles.split(',') if p.strip()]
-
-        profile_configs.append(p_config)
-
-    for cfg in profile_configs:
-        combiner = VulkanProfilesCombineGenerator(vk)
-        combiner.combine(cfg, combined_json, mode.value)
+    combiner = VulkanProfilesCombineGenerator(vk)
+    combiner.combine(p_config, combined_json, mode.value)
 
     output_dir = output_path.parent
     if output_dir:
@@ -171,13 +148,7 @@ def main_combine(args):
 
     if transform_mode:
         with tempfile.TemporaryDirectory() as temp_dir:
-            if output_path.suffix == '.json':
-                temp_filename = output_path.name
-            elif profile_configs and getattr(profile_configs[0], 'name', None):
-                temp_filename = f"{profile_configs[0].name}.json"
-            else:
-                temp_filename = "combined.json"
-
+            temp_filename = output_path.name if output_path.suffix == '.json' else "combined.json"
             temp_combined_path = Path(temp_dir) / temp_filename
             save_profiles_jsons({temp_combined_path: combined_json}, temp_combined_path, format_type)
 

@@ -12,14 +12,250 @@ Global options:
 
 * `--help`, `-h`: Print help message and exit (available at top-level and for all subcommands).
 * `--version`, `-v`: Print `vkprofiles` version.
-* `--verbose`: Enable verbose debug logging.
-* `--quiet`: Suppress warning and informational messages.
+* `--quiet`: Suppress warning and informational messages (ERROR level only).
+* `--verbose`: Enable verbose output using the INFO level.
+* `--log`: Filter output by message type: `none`, `all`, `info`, `warning`, `error`, or `critical`. It is mutually exclusive with `--quiet` and `--verbose`.
+
+The parser registers commands in this order: `graph`, `validate`, `schema`, `transform`, `combine`, `extract`, `min-api-version`, `library`, `doc`, `layer`, `tests`, `version`.
 
 ---
 
 ## Subcommands
 
-### 1. `validate`
+### 1. `graph`
+
+Executes a dependency-driven pipeline graph of `vkprofiles` commands from a JSON file. This is useful for automating profile generation, validation, document generation, and library generation in one workflow.
+
+```bash
+vkprofiles graph --registry vk.xml --input path/to/graph.json
+```
+
+* `--input`, `-i`: *(Required)* Path to the graph execution JSON configuration file.
+* `--registry`, `-r`: *(Required for execution)* Shared Vulkan registry file (`vk.xml`) applied to every step in the graph.
+
+#### Graph JSON Schema
+
+The actual schema is defined in [scripts/source/graph_schema.py](scripts/source/graph_schema.py). It enforces the following structure:
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://schema.khronos.org/vulkan/profiles-graph-0.8.2.json#",
+  "title": "Vulkan Profiles Graph Execution Schema",
+  "type": "object",
+  "required": ["nodes"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "variables": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "number", "boolean"]
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/graph_node" }
+    }
+  },
+  "definitions": {
+    "graph_node": {
+      "type": "object",
+      "required": ["id", "command", "args"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "description": { "type": "string" },
+        "command": {
+          "type": "string",
+          "enum": [
+            "validate",
+            "schema",
+            "transform",
+            "combine",
+            "extract",
+            "min-api-version",
+            "graph",
+            "library",
+            "doc",
+            "layer",
+            "tests"
+          ]
+        },
+        "depends_on": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "args": { "type": "object" }
+      }
+    }
+  }
+}
+```
+
+#### Graph Schema Element Description
+
+| Element | Required | Description |
+| --- | --- | --- |
+| `$schema` | No | Optional schema identifier for the graph file itself. |
+| `variables` | No | Global variable map with string, number, or boolean values. These are resolved with `${var_name}` and `$node_id.attribute` substitution. |
+| `nodes` | Yes | Required array with at least one execution node. |
+| `nodes[].id` | Yes | Unique node identifier. |
+| `nodes[].description` | No | Human-readable description for logging/output. |
+| `nodes[].command` | Yes | Command name to execute. Valid values are `validate`, `schema`, `transform`, `combine`, `extract`, `min-api-version`, `graph`, `library`, `doc`, `layer`, and `tests`. |
+| `nodes[].depends_on` | No | Array of upstream node ids that must complete before this node runs. |
+| `nodes[].args` | Yes | Object of CLI arguments for the underlying command. Keys follow the CLI flag names, using underscores instead of hyphens. |
+| `definitions.contributor` | No (helper schema) | Helper object for contributor metadata with `company`, `email`, `github`, and `contact` fields. |
+| `definitions.history_entry` | No (helper schema) | Helper object for profile history entries with `revision`, `date`, `author`, and `comment` fields. |
+
+The graph executor also supports variable substitution in strings, lists, and nested objects. For example, `"output": "${profile_root}/VP_LUNARG_desktop_baseline.json"` resolves using the global `variables` map, and `$node_id.output` can be used to pass the output from a previous step into a later node.
+
+#### Example: Generate the Desktop Baseline profile, validate it, build a library, and produce documentation
+
+Create a graph file such as `profiles/desktop_baseline_pipeline.json`:
+
+```json
+{
+  "$schema": "https://schema.khronos.org/vulkan/profiles-graph-0.8.2.json#",
+  "nodes": [
+    {
+      "id": "generate_schema",
+      "description": "Generate the Vulkan Profiles schema",
+      "command": "schema",
+      "args": {
+        "output": "schema/profiles-0.8-latest.json",
+        "api": "vulkan"
+      }
+    },
+    {
+      "id": "desktop_baseline",
+      "description": "Generate VP_LUNARG_desktop_baseline profile",
+      "depends_on": ["generate_schema"],
+      "command": "combine",
+      "args": {
+        "output": "profiles/LunarG/VP_LUNARG_desktop_baseline.json",
+        "format": "flatten",
+        "transform": ["pull-aliases", "strip-helper-values"],
+        "contributors": {
+          "Christophe Riccio": {
+            "company": "LunarG",
+            "email": "christophe@lunarg.com",
+            "contact": true
+          }
+        },
+        "history": [
+          {
+            "revision": 4,
+            "date": "2026-09-16",
+            "author": "Christophe Riccio",
+            "comment": "Updated Desktop Baseline profiles with missing structures"
+          }
+        ],
+        "profiles": {
+          "VP_LUNARG_desktop_baseline_2022": {
+            "version": 3,
+            "input": "profiles/LunarG/VP_LUNARG_desktop_baseline_2022",
+            "label": "LunarG Vulkan Desktop Baseline 2022 profile",
+            "description": "Desktop baseline profile for 2022-era systems.",
+            "date": "2026-09-16",
+            "stage": "STABLE",
+            "api-version": "1.1.139",
+            "required-profiles": ""
+          },
+          "VP_LUNARG_desktop_baseline_2023": {
+            "version": 3,
+            "input": "profiles/LunarG/VP_LUNARG_desktop_baseline_2023",
+            "label": "LunarG Vulkan Desktop Baseline 2023 profile",
+            "description": "Desktop baseline profile for 2023-era systems.",
+            "date": "2026-09-16",
+            "stage": "STABLE",
+            "api-version": "1.2.148",
+            "required-profiles": ""
+          },
+          "VP_LUNARG_desktop_baseline_2024": {
+            "version": 2,
+            "input": "profiles/LunarG/VP_LUNARG_desktop_baseline_2024",
+            "label": "LunarG Vulkan Desktop Baseline 2024 profile",
+            "description": "Desktop baseline profile for 2024-era systems.",
+            "date": "2026-09-16",
+            "stage": "STABLE",
+            "api-version": "1.2.204",
+            "required-profiles": ""
+          },
+          "VP_LUNARG_desktop_baseline_2026": {
+            "version": 2,
+            "input": "profiles/LunarG/VP_LUNARG_desktop_baseline_2026",
+            "label": "LunarG Vulkan Desktop Baseline 2026 profile",
+            "description": "Desktop baseline profile for 2026-era systems.",
+            "date": "2026-09-16",
+            "stage": "STABLE",
+            "api-version": "1.4.303",
+            "required-profiles": ""
+          }
+        }
+      }
+    },
+    {
+      "id": "validate_profiles",
+      "description": "Validate the generated profile",
+      "depends_on": ["desktop_baseline"],
+      "command": "validate",
+      "args": {
+        "input": "profiles/LunarG",
+        "mode": ["schema", "analysis"]
+      }
+    },
+    {
+      "id": "library_profiles",
+      "description": "Generate the Vulkan API library for the baseline profiles",
+      "depends_on": ["validate_profiles"],
+      "command": "library",
+      "args": {
+        "input": "profiles",
+        "input_filenames": "VP_KHR_roadmap.json,VP_LUNARG_desktop_baseline.json",
+        "output": "library/include/vulkan",
+        "output_src": "library/source",
+        "output_filename": "vulkan_profiles",
+        "mode": ["header+source"],
+        "transform": ["strip-duplication", "strip-helper-values"],
+        "config": "release"
+      }
+    },
+    {
+      "id": "doc_profiles",
+      "description": "Generate markdown documentation for the baselines",
+      "depends_on": ["validate_profiles"],
+      "command": "doc",
+      "args": {
+        "input": "profiles",
+        "input_filenames": "VP_KHR_roadmap.json,VP_LUNARG_desktop_baseline.json",
+        "output": "PROFILES_ALL.md"
+      }
+    }
+  ]
+}
+```
+
+Run it with:
+
+```bash
+vkprofiles graph \
+    --registry external/Debug/64/Vulkan-Headers/registry/vk.xml \
+    --input profiles/desktop_baseline_pipeline.json
+```
+
+This graph will:
+
+1. Generate the schema file at `schema/profiles-0.8-latest.json`.
+2. Build the `VP_LUNARG_desktop_baseline.json` file from the Desktop Baseline subprofiles.
+3. Validate the generated baseline profile against the schema and `vk.xml` analysis rules.
+4. Generate the Vulkan API C/C++ library for the selected profiles.
+5. Generate the Markdown profile documentation in `PROFILES_ALL.md`.
+
+---
+
+### 2. `validate`
 
 Validates one or more profile JSON files against the Vulkan Profiles JSON schema and performs static analysis against `vk.xml`.
 
@@ -55,7 +291,7 @@ vkprofiles validate \
 
 ---
 
-### 2. `schema`
+### 3. `schema`
 
 Generates a Vulkan Profiles JSON schema file from `vk.xml`, or upgrades existing profile JSON files to schema 0.8.2.
 
@@ -93,7 +329,7 @@ vkprofiles schema \
 
 ---
 
-### 3. `transform`
+### 4. `transform`
 
 Transforms implicit profile JSON files to explicit profile JSON files by pulling Vulkan capabilities, extension dependencies, and feature aliases directly from `vk.xml`.
 
@@ -138,7 +374,7 @@ vkprofiles transform \
 
 ---
 
-### 4. `combine`
+### 5. `combine`
 
 Combines multiple profile JSON files into a single output profile JSON file using one of the supported combination modes: `intersection`, `union`, or `difference`.
 
@@ -205,7 +441,7 @@ vkprofiles combine \
 
 ---
 
-### 5. `extract`
+### 6. `extract`
 
 Extracts a single named profile from a larger profile JSON file or directory into a standalone output profile JSON file.
 
@@ -231,7 +467,7 @@ vkprofiles extract \
 
 ---
 
-### 6. `min-api-version`
+### 7. `min-api-version`
 
 Displays the profile `api-version` and schema URI from input JSON, or evaluates the minimum compatible Vulkan profile schema version and updates profile JSON files as needed.
 
@@ -274,7 +510,7 @@ vkprofiles min-api-version \
 
 ---
 
-### 7. `library`
+### 8. `library`
 
 Generates C/C++ Vulkan Profiles API library headers (`vulkan_profiles.h`, `vulkan_profiles.hpp`) and source files (`vulkan_profiles.cpp`).
 
@@ -332,7 +568,7 @@ vkprofiles library \
 
 ---
 
-### 8. `doc`
+### 9. `doc`
 
 Generates Markdown documentation from profile JSON files.
 
@@ -361,7 +597,7 @@ vkprofiles doc \
 
 ---
 
-### 9. `version`
+### 10. `version`
 
 Prints the `vkprofiles` version string based on the Vulkan Headers version used when building the tool.
 
