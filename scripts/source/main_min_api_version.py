@@ -32,7 +32,17 @@ from source.profiles_json_utils import (
     load_profiles_jsons,
     save_profiles_jsons,
     validate_profiles_json_data,
+    get_profile_and_file_data,
+    collect_profile_capabilities,
     OutputFormatType
+)
+from source.vulkan_object_version import VK_VERSION
+from source.vulkan_object_expression_parsing import evalExpression
+from source.vulkan_object_utils import (
+    initVulkanObject,
+    getStructCoreVersion,
+    getStructDefiningExtensions,
+    VulkanObject
 )
 
 SCHEMA_GITHUB_RAW_URL = "https://raw.githubusercontent.com/KhronosGroup/Khronos-Schemas/main/vulkan/"
@@ -41,7 +51,7 @@ SCHEMA_GITHUB_API_URL = "https://api.github.com/repos/KhronosGroup/Khronos-Schem
 
 class MinApiVersionMode(str, Enum):
     SHOW = 'display'        # Displays the profiles "api-version" and schema URI read from input JSON.
-    PROCESS = 'evaluate'   # Evaluates schemas to determine min Vulkan Header version and updates JSON if output path is supplied.
+    EVALUATE = 'evaluate'   # Evaluates schemas and vk.xml to determine min Vulkan version and updates JSON if output path is supplied.
 
 
 def parse_schema_filename(filename: str) -> tuple[tuple[int, ...], int] | None:
@@ -68,14 +78,151 @@ def get_schema_api_version(schema_data: dict) -> str | None:
     return None
 
 
+def get_extension_min_core_version(vk: VulkanObject, ext_name: str, visited: set = None) -> VK_VERSION:
+    """Evaluates the 'depends' attribute of an extension to determine its minimum required Vulkan core version."""
+    if visited is None:
+        visited = set()
+    if ext_name in visited:
+        return VK_VERSION.V1_0
+    visited.add(ext_name)
+
+    if not vk or not hasattr(vk, 'extensions') or ext_name not in vk.extensions:
+        return VK_VERSION.V1_0
+
+    ext_obj = vk.extensions[ext_name]
+    depends_expr = getattr(ext_obj, 'depends', None)
+    if not depends_expr or not depends_expr.strip():
+        return VK_VERSION.V1_0
+
+    for candidate_ver in VK_VERSION.versions():
+        def is_symbol_enabled(symbol: str) -> bool:
+            symbol = symbol.strip()
+            if symbol.startswith("VK_VERSION_") or symbol.startswith("VK_API_VERSION_"):
+                sym_ver = VK_VERSION.from_string(symbol)
+                if sym_ver != VK_VERSION.NONE:
+                    return candidate_ver >= sym_ver
+            if hasattr(vk, 'extensions') and symbol in vk.extensions:
+                req_ver = get_extension_min_core_version(vk, symbol, visited.copy())
+                return candidate_ver >= req_ver
+            return True
+
+        if evalExpression(depends_expr, is_symbol_enabled):
+            return candidate_ver
+
+    return VK_VERSION.versions()[-1] if VK_VERSION.versions() else VK_VERSION.V1_4
+
+
+def get_struct_min_core_version(vk: VulkanObject, struct_name: str) -> VK_VERSION:
+    """Determines the minimum Vulkan core version required for a structure."""
+    core_ver = getStructCoreVersion(vk, struct_name)
+    if core_ver != VK_VERSION.NONE:
+        return core_ver
+
+    if not vk:
+        return VK_VERSION.V1_0
+
+    def_exts = getStructDefiningExtensions(vk, struct_name)
+    if def_exts:
+        min_vers = [get_extension_min_core_version(vk, ext) for ext in def_exts]
+        return min(min_vers) if min_vers else VK_VERSION.V1_0
+
+    return VK_VERSION.V1_0
+
+
+def collect_profile_elements(file_data_dict: dict, file_data: dict, profile_name: str) -> tuple[set[str], set[str]]:
+    """Scans capability sets for structure names (Vk*) and extension names (VK_*)."""
+    struct_names = set()
+    ext_names = set()
+
+    p_obj, file_data_found = get_profile_and_file_data(file_data_dict, profile_name)
+    if not p_obj:
+        p_obj = file_data.get("profiles", {}).get(profile_name, {})
+        file_data_found = file_data
+
+    merged_caps = collect_profile_capabilities(file_data_dict, file_data_found, p_obj) if p_obj and file_data_found else file_data.get("capabilities", {})
+
+    def scan_dict(d):
+        if not isinstance(d, dict):
+            return
+        for k, v in d.items():
+            if isinstance(k, str):
+                if k.startswith("VK_"):
+                    ext_names.add(k)
+                elif k.startswith("Vk"):
+                    struct_names.add(k)
+            if isinstance(v, dict):
+                scan_dict(v)
+            elif isinstance(v, list):
+                for item in v:
+                    if isinstance(item, dict):
+                        scan_dict(item)
+
+    scan_dict(merged_caps)
+    return struct_names, ext_names
+
+
+def calculate_profile_min_core_version(vk: VulkanObject, file_data_dict: dict, file_data: dict, profile_name: str) -> VK_VERSION:
+    """Returns the newest Vulkan core version required across all structures and extensions used by a profile."""
+    struct_names, ext_names = collect_profile_elements(file_data_dict, file_data, profile_name)
+
+    max_ver = VK_VERSION.V1_0
+
+    for s_name in struct_names:
+        s_ver = get_struct_min_core_version(vk, s_name)
+        if s_ver > max_ver:
+            max_ver = s_ver
+
+    if vk:
+        for e_name in ext_names:
+            e_ver = get_extension_min_core_version(vk, e_name)
+            if e_ver > max_ver:
+                max_ver = e_ver
+
+    return max_ver
+
+
 def load_available_schemas(schemas_dir: str | Path = None) -> list[tuple[int, Path | str, dict]]:
-    """
-    Finds and loads profile schemas (profiles-*.json).
-    Only selects the highest schema revision per Vulkan header version.
-    Returns list of tuples: (header_version, schema_path_or_url, schema_data) sorted by header_version descending.
-    """
-    default_cache_dir = Path(tempfile.gettempdir()) / "vkprofiles_schemas"
-    download_dir = Path(schemas_dir) if schemas_dir else default_cache_dir
+    """Loads local or cached profile schema files."""
+    candidate_dirs = []
+    if schemas_dir:
+        candidate_dirs.append(Path(schemas_dir))
+    else:
+        candidate_dirs.extend([
+            Path("schema"),
+            Path("schemas"),
+            Path("external/Khronos-Schemas/vulkan"),
+            Path("Khronos-Schemas/vulkan"),
+            Path(tempfile.gettempdir()) / "vkprofiles_schemas"
+        ])
+
+    best_schemas_by_header: dict[int, tuple[tuple[int, ...], Path, dict]] = {}
+
+    for s_dir in candidate_dirs:
+        if s_dir.exists() and s_dir.is_dir():
+            for file_path in s_dir.glob("profiles-*.json"):
+                parsed = parse_schema_filename(file_path.name)
+                if not parsed:
+                    continue
+
+                schema_ver_tuple, header_ver = parsed
+
+                if header_ver not in best_schemas_by_header or schema_ver_tuple > best_schemas_by_header[header_ver][0]:
+                    try:
+                        with open(file_path, "r", encoding="utf-8") as f:
+                            schema_data = json.load(f)
+                            best_schemas_by_header[header_ver] = (schema_ver_tuple, file_path, schema_data)
+                    except Exception as e:
+                        logging.debug(f"Failed to load schema {file_path}: {e}")
+
+            if best_schemas_by_header:
+                break
+
+    if best_schemas_by_header:
+        schemas = [(header_ver, info[1], info[2]) for header_ver, info in best_schemas_by_header.items()]
+        schemas.sort(key=lambda x: x[0], reverse=True)
+        return schemas
+
+    download_dir = Path(tempfile.gettempdir()) / "vkprofiles_schemas"
     download_dir.mkdir(parents=True, exist_ok=True)
     manifest_file = download_dir / "manifest.json"
 
@@ -128,37 +275,18 @@ def load_available_schemas(schemas_dir: str | Path = None) -> list[tuple[int, Pa
             except Exception as e:
                 logging.debug(f"Failed to update manifest.json: {e}")
 
-    candidate_dirs = []
-    if schemas_dir:
-        candidate_dirs.append(Path(schemas_dir))
-    candidate_dirs.extend([
-        default_cache_dir,
-        Path("external/Khronos-Schemas/vulkan"),
-        Path("Khronos-Schemas/vulkan"),
-        Path("schemas")
-    ])
-
-    best_schemas_by_header: dict[int, tuple[tuple[int, ...], Path, dict]] = {}
-
-    for s_dir in candidate_dirs:
-        if s_dir.exists() and s_dir.is_dir():
-            for file_path in s_dir.glob("profiles-*.json"):
-                parsed = parse_schema_filename(file_path.name)
-                if not parsed:
-                    continue
-
-                schema_ver_tuple, header_ver = parsed
-
-                if header_ver not in best_schemas_by_header or schema_ver_tuple > best_schemas_by_header[header_ver][0]:
-                    try:
-                        with open(file_path, "r", encoding="utf-8") as f:
-                            schema_data = json.load(f)
-                            best_schemas_by_header[header_ver] = (schema_ver_tuple, file_path, schema_data)
-                    except Exception as e:
-                        logging.debug(f"Failed to load schema {file_path}: {e}")
-
-            if best_schemas_by_header:
-                break
+    for file_path in download_dir.glob("profiles-*.json"):
+        parsed = parse_schema_filename(file_path.name)
+        if not parsed:
+            continue
+        schema_ver_tuple, header_ver = parsed
+        if header_ver not in best_schemas_by_header or schema_ver_tuple > best_schemas_by_header[header_ver][0]:
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    schema_data = json.load(f)
+                    best_schemas_by_header[header_ver] = (schema_ver_tuple, file_path, schema_data)
+            except Exception as e:
+                logging.debug(f"Failed to load schema {file_path}: {e}")
 
     schemas = [(header_ver, info[1], info[2]) for header_ver, info in best_schemas_by_header.items()]
     schemas.sort(key=lambda x: x[0], reverse=True)
@@ -166,17 +294,14 @@ def load_available_schemas(schemas_dir: str | Path = None) -> list[tuple[int, Pa
 
 
 def find_min_schema_for_profile(profile_file_data: dict, schemas: list[tuple[int, Path | str, dict]], profile_name: str = "") -> tuple[int | None, dict | None]:
-    """
-    Validates a profile against schemas from newest to oldest.
-    The first schema validation that fails indicates that the previous validated schema is the min-vulkan-api version.
-    """
+    """Validates a profile against schemas from newest to oldest to identify the oldest passing schema header version."""
     last_passing_header_ver = None
     last_passing_schema = None
 
     for header_ver, schema_identifier, schema_data in schemas:
         schema_file_name = Path(str(schema_identifier)).name if schema_identifier else f"profiles-0.8.2-{header_ver}.json"
         prof_str = f" for profile '{profile_name}'" if profile_name else ""
-        print(f"Checking schema '{schema_file_name}'{prof_str}...")
+        logging.info(f"Checking schema '{schema_file_name}'{prof_str}...")
 
         is_valid = validate_profiles_json_data(profile_file_data, schema_data)
         if is_valid:
@@ -193,11 +318,72 @@ def find_min_schema_for_profile(profile_file_data: dict, schemas: list[tuple[int
     return last_passing_header_ver, last_passing_schema
 
 
+def evaluate_min_api_version(vk_object=None, json_data: dict = None, profile_names: list[str] = None, mode: MinApiVersionMode = MinApiVersionMode.SHOW, schemas_dir: str | Path = None, registry_path: str = None) -> dict[str, str]:
+    """Evaluates or displays the minimum required Vulkan API version for specified profile(s)."""
+    if json_data is None:
+        return {}
+
+    if isinstance(json_data, dict) and "profiles" in json_data:
+        json_files_dict = {"input.json": json_data}
+    elif isinstance(json_data, dict):
+        json_files_dict = json_data
+    else:
+        return {}
+
+    if mode in (MinApiVersionMode.EVALUATE, 'evaluate') and vk_object is None:
+        try:
+            vk_object = initVulkanObject('vulkan', registry_path)
+        except Exception as e:
+            logging.debug(f"Could not initialize VulkanObject: {e}")
+            vk_object = None
+
+    target_profiles = set(profile_names) if profile_names else None
+    results = {}
+
+    if mode in (MinApiVersionMode.SHOW, 'display'):
+        for file_key, file_data in json_files_dict.items():
+            profiles = file_data.get("profiles", {})
+            for pname, p_obj in profiles.items():
+                if target_profiles and pname not in target_profiles:
+                    continue
+                results[pname] = p_obj.get("api-version", "unknown")
+
+    elif mode in (MinApiVersionMode.EVALUATE, 'evaluate'):
+        schemas = load_available_schemas(schemas_dir)
+        if not schemas:
+            logging.error("No valid Vulkan profile schemas available for validation detection.")
+            return {}
+
+        from source.main_extract import extract_profile, ExtractMode
+
+        for file_key, file_data in json_files_dict.items():
+            profiles = file_data.get("profiles", {})
+            for pname in profiles.keys():
+                if target_profiles and pname not in target_profiles:
+                    continue
+
+                extracted_data = extract_profile(json_files_dict, pname, mode=ExtractMode.PULL)
+                if not extracted_data:
+                    extracted_data = file_data
+
+                min_header_ver, min_schema = find_min_schema_for_profile(extracted_data, schemas, profile_name=pname)
+
+                min_core_ver = calculate_profile_min_core_version(vk_object, json_files_dict, extracted_data, pname)
+
+                if min_header_ver:
+                    results[pname] = f"{min_core_ver.major}.{min_core_ver.minor}.{min_header_ver}"
+                else:
+                    results[pname] = f"{min_core_ver.major}.{min_core_ver.minor}.0"
+
+    return results
+
+
 def main_min_api_version(args):
     input_path = Path(args.input)
     mode = getattr(args, 'mode', MinApiVersionMode.SHOW) or MinApiVersionMode.SHOW
     output_path = Path(args.output) if getattr(args, 'output', None) else None
     schemas_dir = getattr(args, 'schemas', None)
+    registry_path = getattr(args, 'registry', None)
     format_type = getattr(args, 'format', OutputFormatType.PRETTY)
 
     target_profile_names = None
@@ -218,14 +404,21 @@ def main_min_api_version(args):
                 if target_profile_names and pname not in target_profile_names:
                     continue
                 api_ver = p_obj.get("api-version", "unknown")
-                print(f"Profile '{pname}': api-version = {api_ver}, schema = {schema_filename}")
+                logging.info(f"Profile '{pname}': api-version = {api_ver}, schema = {schema_filename}")
 
-    elif mode == MinApiVersionMode.PROCESS:
+    elif mode == MinApiVersionMode.EVALUATE:
         schemas = load_available_schemas(schemas_dir)
         if not schemas:
             logging.error("No valid Vulkan profile schemas available for validation detection.")
             return
 
+        vk_object = None
+        try:
+            vk_object = initVulkanObject('vulkan', registry_path)
+        except Exception as e:
+            logging.debug(f"Could not initialize VulkanObject ({e}); core minor version will be deduced from bundle structure names.")
+
+        from source.main_extract import extract_profile, ExtractMode
         updated_files_dict = {}
 
         for file_key, file_data in json_files_dict.items():
@@ -237,20 +430,24 @@ def main_min_api_version(args):
                 if target_profile_names and pname not in target_profile_names:
                     continue
 
+                extracted_data = extract_profile(json_files_dict, pname, mode=ExtractMode.PULL)
+                if not extracted_data:
+                    extracted_data = file_data
+
                 min_header_ver, min_schema = find_min_schema_for_profile(file_data, schemas, profile_name=pname)
                 profile_min_headers[pname] = min_header_ver
-                api_ver_str = get_schema_api_version(min_schema)
 
-                if api_ver_str:
-                    print(f"Profile '{pname}': min required schema header version = {min_header_ver} (api-version = {api_ver_str})")
-                    if pname in new_file_data.get("profiles", {}):
-                        new_file_data["profiles"][pname]["api-version"] = api_ver_str
-                else:
-                    print(f"Profile '{pname}': min required schema header version = {min_header_ver}")
+                min_core_ver = calculate_profile_min_core_version(vk_object, json_files_dict, extracted_data, pname)
+
+                eval_api_ver_str = f"{min_core_ver.major}.{min_core_ver.minor}.{min_header_ver}"
+
+                logging.info(f"Profile '{pname}': min required schema header version = {min_header_ver} (api-version = {eval_api_ver_str})")
+                if pname in new_file_data.get("profiles", {}):
+                    new_file_data["profiles"][pname]["api-version"] = eval_api_ver_str
 
             if profile_min_headers:
                 max_header_ver = max([h for h in profile_min_headers.values() if h is not None] or [0])
-                print(f"File '{file_key}': overall file schema header version = {max_header_ver}")
+                logging.info(f"File '{file_key}': overall file schema header version = {max_header_ver}")
 
                 new_file_data["$schema"] = f"https://schema.khronos.org/vulkan/profiles-0.8.2-{max_header_ver}.json#"
                 updated_files_dict[file_key] = new_file_data
