@@ -1,5 +1,5 @@
 # ~~~
-# Copyright (c) 2021-2024 Valve Corporation
+# Copyright (c) 2021-2026 Valve Corporation
 # Copyright (c) 2021-2026 LunarG, Inc.
 # Copyright (c) 2024 RasterGrid Kft.
 #
@@ -92,7 +92,7 @@ function(LayerTestAndroid NAME)
                 vktestframework.cpp)
 
     add_test(NAME ${ANDROID_APK_NAME} COMMAND profiles_${NAME})
-    add_dependencies(${ANDROID_APK_NAME} ProfilesLayer VpGenerate-Libraries)
+    add_dependencies(${ANDROID_APK_NAME} ProfilesLayer VpGenerate-Profiles)
 
     if (NOT ANDROID_SDK_HOME)
         set(ANDROID_SDK_HOME $ENV{ANDROID_SDK_HOME})

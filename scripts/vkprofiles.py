@@ -33,6 +33,7 @@ from source.main_library import main_library
 from source.main_doc import main_doc
 from source.main_extract import main_extract, ExtractMode
 from source.main_min_api_version import main_min_api_version, MinApiVersionMode
+from source.main_graph import main_graph
 from source.main_version import main_version, get_version_string
 
 
@@ -54,12 +55,34 @@ class ValidateAction(argparse.Action):
             setattr(namespace, self.dest, res)
 
 
+class LogTypeAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        valid_types = ['none', 'all', 'info', 'warning', 'error', 'critical']
+        res = []
+        if values:
+            for v in values:
+                for item in v.split(','):
+                    item = item.strip().lower()
+                    if item:
+                        if item not in valid_types:
+                            parser.error(f"argument {option_string}: invalid choice: '{item}' (choose from {', '.join(valid_types)})")
+                        if item not in res:
+                            res.append(item)
+
+        if 'none' in res and len(res) > 1:
+            parser.error(f"argument {option_string}: 'none' cannot be combined with other log types")
+        if 'all' in res and len(res) > 1:
+            parser.error(f"argument {option_string}: 'all' cannot be combined with other log types")
+
+        setattr(namespace, self.dest, res)
+
+
 def main(argv):
-    # Shared parent parser for logging arguments across root and subparsers
     log_parser = argparse.ArgumentParser(add_help=False)
     log_group = log_parser.add_mutually_exclusive_group()
-    log_group.add_argument('--verbose', action='store_true', help='Enable verbose output including debug messages.')
-    log_group.add_argument('--quiet', action='store_true', help='Suppress warning and informational messages.')
+    log_group.add_argument('--quiet', action='store_true', help='Suppress warning and informational messages (ERROR level only).')
+    log_group.add_argument('--verbose', action='store_true', help='Enable verbose output (INFO, WARNING, and ERROR levels).')
+    log_group.add_argument('--log', nargs='*', action=LogTypeAction, default=None, help='Filter output by specific message types (choices: none, all, info, warning, error, critical). Cannot be combined with --quiet or --verbose.')
 
     parser = argparse.ArgumentParser(
         description='Transform Vulkan profile JSON file',
@@ -70,6 +93,12 @@ def main(argv):
 
     subparsers = parser.add_subparsers(dest='command', required=True)
 
+    # 1. Pipeline Orchestrator (Graph)
+    graph_parser = subparsers.add_parser('graph', parents=[log_parser], help='Execute a pipeline graph of vkprofiles operations from a JSON configuration file.')
+    graph_parser.add_argument('--input', '-i', action='store', required=True, help='Path to graph execution JSON configuration file.')
+    graph_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified Vulkan registry file (vk.xml) across all graph steps.')
+
+    # 2. Atomic Pipeline Operations
     validate_parser = subparsers.add_parser('validate', parents=[log_parser], help='Validate a profile file against a profile schema or perform static analysis.')
     validate_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     validate_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
@@ -97,8 +126,7 @@ def main(argv):
     combine_parser = subparsers.add_parser('combine', parents=[log_parser], help='Generate combined Vulkan profile JSON files.')
     combine_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     combine_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
-    combine_parser.add_argument('--config', '-c', action='store', help='Use specified a JSON combine config file path instead of using individual arguments.')
-    combine_parser.add_argument('--input', '-i', action='store', help='Path to directory with profiles.')
+    combine_parser.add_argument('--input', '-i', action='store', required=True, help='Path to directory with profiles.')
     combine_parser.add_argument('--input-profiles', action='store', help='Comma separated list of profiles.')
     combine_parser.add_argument('--output', '-o', action='store', required=True, help='Path to output profile.')
     combine_parser.add_argument('--output-profile', action='store', help='Profile name of the output profile. Deprecated, replaced by `--profile-name`.')
@@ -172,13 +200,28 @@ def main(argv):
     if args.quiet:
         log_level = logging.ERROR
     elif args.verbose:
-        log_level = logging.DEBUG
+        log_level = logging.INFO
+    elif args.log is not None:
+        if 'none' in args.log:
+            log_level = logging.CRITICAL + 100
+        elif 'all' in args.log:
+            log_level = logging.INFO
+        else:
+            level_map = {
+                'info': logging.INFO,
+                'warning': logging.WARNING,
+                'error': logging.ERROR,
+                'critical': logging.CRITICAL
+            }
+            log_level = min([level_map[t] for t in args.log if t in level_map], default=logging.WARNING)
     else:
         log_level = logging.WARNING
 
     logging.basicConfig(level=log_level, format='%(levelname)s: %(message)s', force=True)
 
-    if args.command == 'transform':
+    if args.command == 'graph':
+        main_graph(args, main_dispatcher=main)
+    elif args.command == 'transform':
         main_transform(args)
     elif args.command == 'extract':
         main_extract(args)

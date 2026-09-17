@@ -40,5 +40,58 @@ target_link_libraries(${TEST_NAME} PRIVATE GTest::gtest GTest::gtest_main jsoncp
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME} --gtest_catch_exceptions=0)
 set_target_properties(${TEST_NAME} PROPERTIES FOLDER "Profiles schema")
 set_tests_properties(${TEST_NAME} PROPERTIES ENVIRONMENT "PYTHONPATH=${REGISTRY_PATH}")
-add_dependencies(${TEST_NAME} VpGenerate-ProfilesDesktopMax VpGenerate-ProfilesDesktopBaseline)
+add_dependencies(${TEST_NAME} VpGenerate-Profiles)
 
+if(WIN32)
+    set(VKPROFILES_EXE "${PROJECT_SOURCE_DIR}/scripts/vkprofiles.exe")
+else()
+    set(VKPROFILES_EXE "${PROJECT_SOURCE_DIR}/scripts/vkprofiles")
+endif()
+
+add_custom_target(VpTestIntersect ALL
+    COMMAND ${VKPROFILES_EXE} combine
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_test_combine_intersect
+        --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_test_combine_intersect.json
+        --profile-name VP_LUNARG_test_combine_intersect
+        --mode intersection
+    VERBATIM
+    SOURCES ${FILES_UNIT_TEST}
+    DEPENDS ${FILES_UNIT_TEST} python_venv)
+set_target_properties(VpTestIntersect PROPERTIES FOLDER "Profiles generator/Tests")
+add_dependencies(VpTestIntersect VpProfilesProcessor)
+
+add_custom_target(VpTestUnion ALL
+    COMMAND ${VKPROFILES_EXE} combine
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_test_combine_union
+        --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_test_combine_union.json
+        --profile-name VP_LUNARG_test_combine_union
+        --mode union
+    VERBATIM
+    SOURCES ${FILES_UNIT_TEST}
+    DEPENDS ${FILES_UNIT_TEST} python_venv)
+set_target_properties(VpTestUnion PROPERTIES FOLDER "Profiles generator/Tests")
+add_dependencies(VpTestUnion VpProfilesProcessor)
+
+add_custom_target(VpTestGeneratedName ALL
+    COMMAND ${VKPROFILES_EXE} combine
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_test_combine_intersect
+        --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_test_generated_name.json
+    VERBATIM
+    SOURCES ${FILES_UNIT_TEST}
+    DEPENDS ${FILES_UNIT_TEST} python_venv)
+set_target_properties(VpTestGeneratedName PROPERTIES FOLDER "Profiles generator/Tests")
+add_dependencies(VpTestGeneratedName VpProfilesProcessor)
+
+add_custom_target(VpTestHostImageCopy ALL
+    COMMAND ${VKPROFILES_EXE} combine
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_test_host_image_copy
+        --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_test_host_image_copy.json
+    VERBATIM
+    SOURCES ${FILES_UNIT_TEST}
+    DEPENDS ${FILES_UNIT_TEST} python_venv)
+set_target_properties(VpTestHostImageCopy PROPERTIES FOLDER "Profiles generator/Tests")
+add_dependencies(VpTestHostImageCopy VpProfilesProcessor)
