@@ -47,15 +47,16 @@ from source.profiles_json_utils import (
 
 
 class TransformBits(str, Enum):
-    PULL_REQUIRED_CAPABILITIES = 'pull-required-capabilities'  # Evaluates extension dependencies and pulls satisfied core/extension feature and property requirements into capability blocks.
-    PULL_PROMOTED_EXTENSIONS = 'pull-promoted-extensions'      # Requires all extensions promoted to core up to the profile's target Vulkan version.
-    IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions'    # Sets all required extension versions to 1, overriding specific extension spec versions.
-    PULL_ALIASES = 'pull-aliases'                              # Resolves and populates all equivalent capability aliases across core structures and extensions.
-    CONSOLIDATE = 'consolidate'                                # Merges all mandatory capability blocks into a single consolidated requirements block per profile.
-    STRIP_HELPER_VALUES = 'strip-helper-values'                # Removes non-bitpos bitmask helper values (composites, all-flags, and zero/none constants) from capability blocks.
-    STRIP_DUPLICATION = 'strip-duplication'                    # Removes redundant duplicate features, properties, and extension requirements across inheritance trees and within blocks.
-    STRIP_PROMOTED_EXTENSIONS = 'strip-promoted-extensions'    # Removes extensions that are already promoted to the profile's target core Vulkan version.
-    SORT = 'sort'                                              # Sorts capability blocks, structures, and extension lists into canonical Vulkan order.
+    PULL_REQUIRED_CAPABILITIES = 'pull-required-capabilities'       # Evaluates extension dependencies and pulls satisfied core/extension feature and property requirements into capability blocks.
+    PULL_PROMOTED_EXTENSIONS = 'pull-promoted-extensions'           # Requires all extensions promoted to core up to the profile's target Vulkan version.
+    IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions'         # Sets all required extension versions to 1, overriding specific extension spec versions.
+    OVERRIDE_CORE_CAPABILITIES = 'override-with-core-capabilities'  # Allows pull-required-capabilities to override profile capability values that are below Vulkan core spec requirements.
+    PULL_ALIASES = 'pull-aliases'                                   # Resolves and populates all equivalent capability aliases across core structures and extensions.
+    CONSOLIDATE = 'consolidate'                                     # Merges all mandatory capability blocks into a single consolidated requirements block per profile.
+    STRIP_HELPER_VALUES = 'strip-helper-values'                     # Removes non-bitpos bitmask helper values (composites, all-flags, and zero/none constants) from capability blocks.
+    STRIP_DUPLICATION = 'strip-duplication'                         # Removes redundant duplicate features, properties, and extension requirements across inheritance trees and within blocks.
+    STRIP_PROMOTED_EXTENSIONS = 'strip-promoted-extensions'         # Removes extensions that are already promoted to the profile's target core Vulkan version.
+    SORT = 'sort'                                                   # Sorts capability blocks, structures, and extension lists into canonical Vulkan order.
 
 
 class CategoryPriority(IntEnum):
@@ -229,7 +230,6 @@ def isStructExtensionEnabled(vk: VulkanObject, struct_name: str, version: VK_VER
     - Core structures (no extension suffix) are enabled if core version <= version, or if
       any defining extension is in enabled_exts.
     """
-    # 1. Collect defining extension requirements for struct_name specifically
     req_exts = set()
 
     if hasattr(vk, 'aliasTypeRequirements') and struct_name in vk.aliasTypeRequirements:
@@ -246,7 +246,6 @@ def isStructExtensionEnabled(vk: VulkanObject, struct_name: str, version: VK_VER
         struct_obj and hasattr(struct_obj, 'name') and is_extension_struct_name(vk, struct_obj.name)
     )
 
-    # 2. Extension structures MUST have their defining extension in enabled_exts
     if is_ext_struct:
         if not req_exts:
             return False
@@ -255,12 +254,10 @@ def isStructExtensionEnabled(vk: VulkanObject, struct_name: str, version: VK_VER
                 return True
         return False
 
-    # 3. Core structures (non-extension)
     core_ver = getStructCoreVersion(vk, struct_name)
     if core_ver != VK_VERSION.NONE and version != VK_VERSION.NONE and version >= core_ver:
         return True
 
-    # If core_ver is None or version < core_ver, check if any defining requirement is enabled or promoted
     if not req_exts:
         return True
 
@@ -285,9 +282,10 @@ def isStructExtensionEnabled(vk: VulkanObject, struct_name: str, version: VK_VER
 def filter_features_against_context(
     vk: VulkanObject,
     features_dict: dict[str, dict[str, bool]],
-    context_features: set[tuple[str, str]]
+    context_features: set[tuple[str, str]],
+    override_core_capabilities: bool = False
 ) -> dict[str, dict[str, bool]]:
-    """Filters candidate feature requirements against accumulated context features (including structural aliases)."""
+    """Filters candidate feature requirements against accumulated context features."""
     filtered_features = {}
     for s_name, members in features_dict.items():
         if not isinstance(members, dict):
@@ -307,7 +305,7 @@ def filter_features_against_context(
                         is_in_context = True
                         break
 
-            if not is_in_context:
+            if not is_in_context or override_core_capabilities:
                 new_members[m_name] = val
 
         if new_members:
@@ -318,7 +316,8 @@ def filter_features_against_context(
 def filter_properties_against_context(
     vk: VulkanObject,
     properties_dict: dict[str, Any],
-    context_properties: dict[str, Any]
+    context_properties: dict[str, Any],
+    override_core_capabilities: bool = False
 ) -> dict[str, Any]:
     """Filters candidate property requirements against accumulated context properties."""
     filtered_properties = {}
@@ -336,7 +335,9 @@ def filter_properties_against_context(
                     found_in_ctx, ctx_val = get_parent_property_value(
                         context_properties, s_name, prop_name, vk
                     )
-                    if not found_in_ctx or not is_property_satisfied(ctx_val, prop_val, prop_name):
+                    if not found_in_ctx:
+                        new_sub_dict[prop_name] = prop_val
+                    elif override_core_capabilities and not is_property_satisfied(ctx_val, prop_val, prop_name):
                         new_sub_dict[prop_name] = prop_val
                 if new_sub_dict:
                     new_s_data[sub_group_name] = new_sub_dict
@@ -348,7 +349,9 @@ def filter_properties_against_context(
                 found_in_ctx, ctx_val = get_parent_property_value(
                     context_properties, s_name, prop_name, vk
                 )
-                if not found_in_ctx or not is_property_satisfied(ctx_val, prop_val, prop_name):
+                if not found_in_ctx:
+                    new_p_data[prop_name] = prop_val
+                elif override_core_capabilities and not is_property_satisfied(ctx_val, prop_val, prop_name):
                     new_p_data[prop_name] = prop_val
             if new_p_data:
                 filtered_properties[s_name] = new_p_data
@@ -374,4 +377,3 @@ def update_context_from_capabilities(
 
     if "properties" in caps_dict and isinstance(caps_dict["properties"], dict):
         deep_merge_dict(context_properties, caps_dict["properties"])
-        
