@@ -22,6 +22,7 @@
 import logging
 import argparse
 import sys
+import time
 
 from source.main_transform import main_transform, TransformBits, OutputFormatType
 from source.main_schema import main_schema
@@ -151,14 +152,14 @@ def main(argv):
     extract_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the output file.')
 
     min_api_parser = subparsers.add_parser('min-api-version', parents=[log_parser], help='Display or process the minimum Vulkan API version of profile(s).')
-    min_api_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified Vulkan registry file (vk.xml).')
+    min_api_parser.add_argument('--registry', '-r', action='store', help='Use specified Vulkan registry file (vk.xml).')
     min_api_parser.add_argument('--input', '-i', action='store', required=True, help='Path to input profiles file or directory.')
     min_api_parser.add_argument('--output', '-o', action='store', help='Path to output profiles file or directory.')
     min_api_parser.add_argument('--profile-names', action='store', help='Comma separated list of profile names to process.')
     min_api_parser.add_argument('--schemas', '-s', action='store', help='Path to directory containing Vulkan profile schemas (profiles-*.json).')
     min_api_parser.add_argument('--mode', '-m', type=MinApiVersionMode, choices=list(MinApiVersionMode), default=MinApiVersionMode.SHOW, help='Operation mode: "display" (display api-version/schema read from input), "evaluate" (evaluate schemas to determine min Vulkan header version and update JSONs if output path is provided). Default: display.')
     min_api_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for output JSON files.')
-    
+
     library_parser = subparsers.add_parser('library', parents=[log_parser], help='Generate the Vulkan profiles C/C++ API library headers and source files.')
     library_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     library_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
@@ -220,6 +221,8 @@ def main(argv):
 
     logging.basicConfig(level=log_level, format='%(levelname)s: %(message)s', force=True)
 
+    start_time = time.perf_counter()
+
     if args.command == 'graph':
         main_graph(args, main_dispatcher=main)
     elif args.command == 'transform':
@@ -246,6 +249,10 @@ def main(argv):
         main_version(args)
     else:
         parser.print_help()
+        return
+
+    elapsed_time = time.perf_counter() - start_time
+    logging.info(f"Command '{args.command}' executed in {elapsed_time:.3f}s")
 
 
 if __name__ == '__main__':

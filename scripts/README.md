@@ -597,22 +597,6 @@ vkprofiles doc \
 
 ---
 
-### 10. `version`
-
-Prints the `vkprofiles` version string based on the Vulkan Headers version used when building the tool.
-
-```bash
-vkprofiles version
-```
-
-**Example:**
-
-```bash
-vkprofiles version
-```
-
----
-
 ## Tool Developer Subcommands
 
 > [!NOTE]
@@ -663,4 +647,20 @@ vkprofiles tests \
     --registry vk.xml \
     --output-profile profiles/test/data/VP_LUNARG_test_api_generated.json \
     --output-cpp layer/tests/tests_generated.cpp
+```
+
+---
+
+### 12. `version`
+
+Prints the `vkprofiles` version string based on the Vulkan Headers version used when building the tool.
+
+```bash
+vkprofiles version
+```
+
+**Example:**
+
+```bash
+vkprofiles version
 ```
