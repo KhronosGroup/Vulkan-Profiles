@@ -432,6 +432,120 @@ class TestMinApiVersion(unittest.TestCase):
 
         self.assertEqual(evaluated_versions.get("VP_TEST_ext_or_dep_eval"), "1.0.106")
 
+    def test_evaluate_min_api_version_extract_pull_integration(self):
+        """
+        Verifies that evaluate_min_api_version internally invokes extract_profile in PULL mode,
+        evaluating both parent and child profiles correctly across inherited capabilities:
+        - VP_TEST_extract_parent uses Vulkan 1.2 features ('1.2.251').
+        - VP_TEST_extract_child inherits VP_TEST_extract_parent and adds Vulkan 1.3 features ('1.3.251').
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-latest.json#",
+            "profiles": {
+                "VP_TEST_extract_parent": {
+                    "label": "Parent Profile with 1.2 Features",
+                    "description": "Parent profile containing Vulkan 1.2 features",
+                    "version": 1,
+                    "api-version": "1.0.0",
+                    "capabilities": ["parent_v12_block"]
+                },
+                "VP_TEST_extract_child": {
+                    "label": "Child Profile Inheriting Parent and Adding 1.3 Features",
+                    "description": "Child profile inheriting from parent and adding Vulkan 1.3 features",
+                    "version": 1,
+                    "api-version": "1.0.0",
+                    "profiles": ["VP_TEST_extract_parent"],
+                    "capabilities": ["child_v13_block"]
+                }
+            },
+            "capabilities": {
+                "parent_v12_block": {
+                    "features": {
+                        "VkPhysicalDeviceVulkan12Features": {
+                            "timelineSemaphore": true
+                        }
+                    }
+                },
+                "child_v13_block": {
+                    "features": {
+                        "VkPhysicalDeviceVulkan13Features": {
+                            "dynamicRendering": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_data = json.loads(original_json_text)
+        evaluated_versions = evaluate_min_api_version(
+            self.vk,
+            json_data,
+            profile_names=["VP_TEST_extract_parent", "VP_TEST_extract_child"],
+            mode=MinApiVersionMode.EVALUATE,
+            schemas_dir=self.schemas_dir
+        )
+
+        self.assertEqual(evaluated_versions.get("VP_TEST_extract_parent"), "1.2.251")
+        self.assertEqual(evaluated_versions.get("VP_TEST_extract_child"), "1.3.251")
+
+    def test_evaluate_min_api_version_extract_pull_parent_v13_child_v12(self):
+        """
+        Verifies that when a child profile uses Vulkan 1.2 features but inherits from a parent profile
+        that uses Vulkan 1.3 features, extracting in PULL mode results in Vulkan 1.3 minimum API version
+        for the child as well:
+        - VP_TEST_extract_parent_v13 uses Vulkan 1.3 features ('1.3.251').
+        - VP_TEST_extract_child_v12 inherits VP_TEST_extract_parent_v13 and adds Vulkan 1.2 features,
+          evaluating to ('1.3.251').
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-latest.json#",
+            "profiles": {
+                "VP_TEST_extract_parent_v13": {
+                    "label": "Parent Profile with 1.3 Features",
+                    "description": "Parent profile containing Vulkan 1.3 features",
+                    "version": 1,
+                    "api-version": "1.0.0",
+                    "capabilities": ["parent_v13_block"]
+                },
+                "VP_TEST_extract_child_v12": {
+                    "label": "Child Profile Inheriting Parent and Adding 1.2 Features",
+                    "description": "Child profile inheriting from parent with 1.3 features and adding 1.2 features",
+                    "version": 1,
+                    "api-version": "1.0.0",
+                    "profiles": ["VP_TEST_extract_parent_v13"],
+                    "capabilities": ["child_v12_block"]
+                }
+            },
+            "capabilities": {
+                "parent_v13_block": {
+                    "features": {
+                        "VkPhysicalDeviceVulkan13Features": {
+                            "dynamicRendering": true
+                        }
+                    }
+                },
+                "child_v12_block": {
+                    "features": {
+                        "VkPhysicalDeviceVulkan12Features": {
+                            "timelineSemaphore": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_data = json.loads(original_json_text)
+        evaluated_versions = evaluate_min_api_version(
+            self.vk,
+            json_data,
+            profile_names=["VP_TEST_extract_parent_v13", "VP_TEST_extract_child_v12"],
+            mode=MinApiVersionMode.EVALUATE,
+            schemas_dir=self.schemas_dir
+        )
+
+        self.assertEqual(evaluated_versions.get("VP_TEST_extract_parent_v13"), "1.3.251")
+        self.assertEqual(evaluated_versions.get("VP_TEST_extract_child_v12"), "1.3.251")
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -444,4 +558,3 @@ if __name__ == '__main__':
     TestMinApiVersion.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
-    

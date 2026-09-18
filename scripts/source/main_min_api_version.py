@@ -420,6 +420,8 @@ def main_min_api_version(args):
 
         from source.main_extract import extract_profile, ExtractMode
         updated_files_dict = {}
+        summary_profiles = {}
+        summary_files = {}
 
         for file_key, file_data in json_files_dict.items():
             profiles = file_data.get("profiles", {})
@@ -434,7 +436,7 @@ def main_min_api_version(args):
                 if not extracted_data:
                     extracted_data = file_data
 
-                min_header_ver, min_schema = find_min_schema_for_profile(file_data, schemas, profile_name=pname)
+                min_header_ver, min_schema = find_min_schema_for_profile(extracted_data, schemas, profile_name=pname)
                 profile_min_headers[pname] = min_header_ver
 
                 min_core_ver = calculate_profile_min_core_version(vk_object, json_files_dict, extracted_data, pname)
@@ -445,14 +447,24 @@ def main_min_api_version(args):
                 if pname in new_file_data.get("profiles", {}):
                     new_file_data["profiles"][pname]["api-version"] = eval_api_ver_str
 
+                summary_profiles[pname] = eval_api_ver_str
+
             if profile_min_headers:
                 max_header_ver = max([h for h in profile_min_headers.values() if h is not None] or [0])
                 logging.info(f"File '{file_key}': overall file schema header version = {max_header_ver}")
 
                 new_file_data["$schema"] = f"https://schema.khronos.org/vulkan/profiles-0.8.2-{max_header_ver}.json#"
                 updated_files_dict[file_key] = new_file_data
+                summary_files[file_key] = max_header_ver
 
         if output_path:
             save_profiles_jsons(updated_files_dict, output_path, format_type)
             logging.info(f"Updated profiles file(s) saved to {output_path}")
-            
+
+        if summary_profiles or summary_files:
+            logging.info("--- Minimum API Version Evaluation Summary ---")
+            for pname, api_ver in summary_profiles.items():
+                logging.info(f"Profile '{pname}': evaluated api-version = {api_ver}")
+            for file_key, schema_ver in summary_files.items():
+                logging.info(f"File '{file_key}': evaluated schema header version = {schema_ver}")
+                
