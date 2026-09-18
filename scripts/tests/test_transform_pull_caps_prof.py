@@ -42,9 +42,9 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
 
     def test_pull_required_capabilities_already_present_vulkan10(self):
         """
-        Verifies that pulling core requirements onto an existing profile preserves profile capability requirements
-        higher than Vulkan core requirements (e.g. maxImageDimension2D = 8192, framebufferColorSampleCounts with 8_BIT)
-        while enforcing core baseline minimums (maxImageDimension1D = 4096, 1_BIT sample counts).
+        Verifies that pulling core requirements with override_core_capabilities=True onto an existing profile
+        preserves profile capability requirements higher than Vulkan core requirements (e.g. maxImageDimension2D = 8192,
+        framebufferColorSampleCounts with 8_BIT) while enforcing core baseline minimums (maxImageDimension1D = 4096, 1_BIT sample counts).
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -276,40 +276,10 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
             }
         }"""
 
-        try:
-            original_data = json.loads(original_json_text)
-            expected_data = json.loads(expected_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(self.vk, json_files_dict, override_core_capabilities=True)
 
-        json_files_dict = {"test_profile.json": original_data}
-        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
-
-        gen_data = json_files_dict["test_profile.json"]
-        exp_data = json.loads(expected_json_text)
-
-        # Subsection assertions for granular diagnostics
-        self.assertEqual(
-            list(gen_data["capabilities"].keys()),
-            list(exp_data["capabilities"].keys()),
-            "Mismatch in capability block names or order"
-        )
-        for block_name, exp_block in exp_data["capabilities"].items():
-            gen_block = gen_data["capabilities"].get(block_name, {})
-            for section in ("features", "properties", "formats"):
-                if section in exp_block:
-                    self.assertIn(
-                        section, 
-                        gen_block, 
-                        f"Section '{section}' missing in generated capability block '{block_name}'"
-                    )
-                    self.assertEqual(
-                        list(gen_block[section].keys()),
-                        list(exp_block[section].keys()),
-                        f"Mismatch in structure keys/order for block '{block_name}' section '{section}'"
-                    )
-
-        self.assertEqual(gen_data, exp_data)
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
     def test_pull_required_capabilities_not_ext_vulkan10(self):
         """
@@ -517,40 +487,10 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
             }
         }"""
 
-        try:
-            original_data = json.loads(original_json_text)
-            expected_data = json.loads(expected_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(self.vk, json_files_dict, override_core_capabilities=True)
 
-        json_files_dict = {"test_profile.json": original_data}
-        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
-
-        gen_data = json_files_dict["test_profile.json"]
-        exp_data = json.loads(expected_json_text)
-
-        # Subsection assertions for granular diagnostics
-        self.assertEqual(
-            list(gen_data["capabilities"].keys()),
-            list(exp_data["capabilities"].keys()),
-            "Mismatch in capability block names or order"
-        )
-        for block_name, exp_block in exp_data["capabilities"].items():
-            gen_block = gen_data["capabilities"].get(block_name, {})
-            for section in ("features", "properties", "formats"):
-                if section in exp_block:
-                    self.assertIn(
-                        section, 
-                        gen_block, 
-                        f"Section '{section}' missing in generated capability block '{block_name}'"
-                    )
-                    self.assertEqual(
-                        list(gen_block[section].keys()),
-                        list(exp_block[section].keys()),
-                        f"Mismatch in structure keys/order for block '{block_name}' section '{section}'"
-                    )
-
-        self.assertEqual(gen_data, exp_data)
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
 
 if __name__ == '__main__':

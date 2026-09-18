@@ -19,115 +19,89 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
-import argparse
 import logging
 from pathlib import Path
 
-from source.main_validate import main_validate
-from source.vulkan_object_utils import initVulkanObject
+from source.vulkan_object_utils import initVulkanObject, VulkanObject
 from source.profiles_json_utils import (
-    load_profiles_jsons, 
-    save_profiles_jsons, 
+    load_profiles_jsons,
+    save_profiles_jsons,
     OutputFormatType
 )
-
 from source.transform_utils import TransformBits
 from source.transform_pull_required_capabilities import (
     pull_extension_dependencies_profiles_files,
     pull_required_capabilities_profiles_files
 )
-from source.transform_pull_promoted_extensions import (
-    pull_promoted_extensions_profiles_files
-)
-from source.transform_pull_aliases import (
-    pull_aliases_profiles_files
-)
-from source.transform_consolidate import (
-    consolidate_profiles_files
-)
-from source.transform_strip_helper_values import (
-    strip_helper_values_profiles_files
-)
-from source.transform_strip_duplication import (
-    strip_duplication_profiles_files
-)
-from source.transform_strip_promoted_extensions import (
-    strip_promoted_extensions_profiles_files
-)
-from source.transform_sort import (
-    sort_profiles_files
-)
+from source.transform_pull_promoted_extensions import pull_promoted_extensions_profiles_files
+from source.transform_pull_aliases import pull_aliases_profiles_files
+from source.transform_consolidate import consolidate_profiles_files
+from source.transform_strip_helper_values import strip_helper_values_profiles_files
+from source.transform_strip_duplication import strip_duplication_profiles_files
+from source.transform_strip_promoted_extensions import strip_promoted_extensions_profiles_files
+from source.transform_sort import sort_profiles_files
+from source.main_validate import main_validate
+
+
+def transform_profiles_files(
+    vk: VulkanObject,
+    json_files_dict: dict,
+    transform_modes: list[TransformBits]
+):
+    if not transform_modes:
+        return
+
+    ignore_ext_versions = TransformBits.IGNORE_EXTENSION_VERSIONS in transform_modes
+    override_core_caps = TransformBits.OVERRIDE_CORE_CAPABILITIES in transform_modes
+
+    if TransformBits.PULL_REQUIRED_CAPABILITIES in transform_modes:
+        pull_extension_dependencies_profiles_files(
+            vk, ignore_ext_versions, json_files_dict, override_core_capabilities=override_core_caps
+        )
+        pull_required_capabilities_profiles_files(
+            vk, json_files_dict, override_core_capabilities=override_core_caps
+        )
+
+    if TransformBits.PULL_PROMOTED_EXTENSIONS in transform_modes:
+        pull_promoted_extensions_profiles_files(vk, ignore_ext_versions, json_files_dict)
+
+    if TransformBits.PULL_ALIASES in transform_modes:
+        pull_aliases_profiles_files(vk, json_files_dict)
+
+    if TransformBits.CONSOLIDATE in transform_modes:
+        consolidate_profiles_files(vk, json_files_dict)
+
+    if TransformBits.STRIP_HELPER_VALUES in transform_modes:
+        strip_helper_values_profiles_files(vk, json_files_dict)
+
+    if TransformBits.STRIP_DUPLICATION in transform_modes:
+        strip_duplication_profiles_files(vk, json_files_dict)
+
+    if TransformBits.STRIP_PROMOTED_EXTENSIONS in transform_modes:
+        strip_promoted_extensions_profiles_files(vk, json_files_dict)
+
+    if TransformBits.SORT in transform_modes:
+        sort_profiles_files(vk, json_files_dict)
 
 
 def main_transform(args):
-    validate_val = getattr(args, 'validate', None)
-    if validate_val:
-        validate_modes = validate_val if isinstance(validate_val, list) else ['schema', 'analysis']
+    input_path = Path(args.input)
+    output_path = Path(args.output)
+    registry_path = getattr(args, 'registry', None)
+    format_type = getattr(args, 'format', OutputFormatType.PRETTY) or OutputFormatType.PRETTY
+    transform_modes = getattr(args, 'mode', []) or []
 
-        validate_args = argparse.Namespace(
-            registry=getattr(args, 'registry', None),
-            input=args.input,
-            schema=getattr(args, 'schema', None),
-            api=getattr(args, 'api', 'vulkan') or 'vulkan',
-            mode=validate_modes
-        )
-        main_validate(validate_args)
+    if getattr(args, 'validate', None) is not None:
+        main_validate(args)
 
-    vk = initVulkanObject('vulkan', args.registry or None)
+    json_files_dict = load_profiles_jsons(input_path)
+    if not json_files_dict:
+        logging.error(f"No profiles JSON files loaded from '{input_path}'")
+        return
 
-    for version in vk.versions.values():
-        logging.debug(version.name)
-    
-    json_files_dict = load_profiles_jsons(Path(args.input))
+    vk = initVulkanObject(getattr(args, 'api', 'vulkan'), registry_path)
 
-    raw_modes = getattr(args, 'mode', None) or []
-    mode_enums = [TransformBits(m) for m in raw_modes]
-    
-    require_promoted_extensions = TransformBits.PULL_PROMOTED_EXTENSIONS in mode_enums
-    ignore_extension_versions = TransformBits.IGNORE_EXTENSION_VERSIONS in mode_enums
+    transform_profiles_files(vk, json_files_dict, transform_modes)
 
-    # Pull Required Capabilities (Dependencies + Core/Extension Requirements)
-    if TransformBits.PULL_REQUIRED_CAPABILITIES in mode_enums:
-        logging.debug("Pulling extension dependencies...")
-        pull_extension_dependencies_profiles_files(vk, ignore_extension_versions, json_files_dict)
-
-        logging.debug("Evaluating and pulling required capabilities...")
-        pull_required_capabilities_profiles_files(vk, json_files_dict)
-
-    # Pull Promoted Extensions
-    if TransformBits.PULL_PROMOTED_EXTENSIONS in mode_enums:
-        logging.debug("Pulling promoted extensions for core versions...")
-        pull_promoted_extensions_profiles_files(vk, ignore_extension_versions, json_files_dict)
-
-    # Pull Capability Aliases
-    if TransformBits.PULL_ALIASES in mode_enums:
-        logging.debug("Pulling capability aliases...")
-        pull_aliases_profiles_files(vk, require_promoted_extensions, json_files_dict)
-
-    # Consolidate
-    if TransformBits.CONSOLIDATE in mode_enums:
-        logging.debug("Consolidating profile capability blocks...")
-        consolidate_profiles_files(json_files_dict)
-
-    # Strip Bitmask Helper Values
-    if TransformBits.STRIP_HELPER_VALUES in mode_enums:
-        logging.debug("Stripping bitmask helper values...")
-        strip_helper_values_profiles_files(vk, json_files_dict)
-
-    # Strip Duplication
-    if TransformBits.STRIP_DUPLICATION in mode_enums:
-        logging.debug("Stripping capabilities duplication...")
-        strip_duplication_profiles_files(vk, json_files_dict)
-
-    # Strip Promoted Extensions
-    if TransformBits.STRIP_PROMOTED_EXTENSIONS in mode_enums:
-        logging.debug("Stripping extensions promoted to profile core version...")
-        strip_promoted_extensions_profiles_files(vk, json_files_dict)
-
-    # Sort
-    if TransformBits.SORT in mode_enums:
-        logging.debug("Sorting capability blocks and extensions...")
-        sort_profiles_files(vk, json_files_dict)
-
-    save_profiles_jsons(json_files_dict, Path(args.output), OutputFormatType(args.format))
-    
+    save_profiles_jsons(json_files_dict, output_path, format_type)
+    logging.info(f"Transformed profile files saved to {output_path}")

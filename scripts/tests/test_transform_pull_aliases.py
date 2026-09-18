@@ -96,7 +96,7 @@ class TestConvertPullAliases(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_aliases_profiles_files(self.vk, False, json_files_dict)
+        pull_aliases_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
@@ -167,7 +167,7 @@ class TestConvertPullAliases(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_aliases_profiles_files(self.vk, False, json_files_dict)
+        pull_aliases_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
@@ -230,7 +230,7 @@ class TestConvertPullAliases(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_aliases_profiles_files(self.vk, False, json_files_dict)
+        pull_aliases_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
@@ -352,7 +352,7 @@ class TestConvertPullAliases(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_aliases_profiles_files(self.vk, False, json_files_dict)
+        pull_aliases_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
@@ -428,7 +428,7 @@ class TestConvertPullAliases(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_aliases_profiles_files(self.vk, False, json_files_dict)
+        pull_aliases_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
@@ -486,10 +486,9 @@ class TestConvertPullAliases(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_aliases_profiles_files(self.vk, False, json_files_dict)
+        pull_aliases_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
-
 
     def test_pull_aliases_unenabled_vendor_extension_features_not_included(self):
         """
@@ -555,10 +554,9 @@ class TestConvertPullAliases(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_aliases_profiles_files(self.vk, False, json_files_dict)
+        pull_aliases_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
-
 
     def test_pull_aliases_does_not_pull_dependent_limits_large_points(self):
         """
@@ -606,7 +604,7 @@ class TestConvertPullAliases(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_aliases_profiles_files(self.vk, False, json_files_dict)
+        pull_aliases_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 

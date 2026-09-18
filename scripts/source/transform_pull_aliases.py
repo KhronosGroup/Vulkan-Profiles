@@ -136,7 +136,7 @@ def pull_aliases_capabilities_block(
     return json_profiles_capabilities_block
 
 
-def pull_aliases_profiles_file(vk: VulkanObject, require_promoted_extensions: bool, json_files_dict, json_file_data):
+def pull_aliases_profiles_file(vk: VulkanObject, json_files_dict: dict, json_file_data: dict):
     profiles_data = json_file_data["profiles"]
     json_profiles_capabilities = json_file_data["capabilities"]
 
@@ -158,15 +158,14 @@ def pull_aliases_profiles_file(vk: VulkanObject, require_promoted_extensions: bo
                 )
 
 
-def pull_aliases_profiles_files(vk: VulkanObject, require_promoted_extensions: bool, json_files_dict: dict):
+def pull_aliases_profiles_files(vk: VulkanObject, json_files_dict: dict):
     if not isinstance(json_files_dict, dict):
         return
 
     if "profiles" in json_files_dict or "capabilities" in json_files_dict:
-        pull_aliases_profiles_file(vk, require_promoted_extensions, json_files_dict, json_files_dict)
+        pull_aliases_profiles_file(vk, json_files_dict, json_files_dict)
         return
 
     sorted_file_keys = get_topologically_sorted_file_keys(json_files_dict)
     for file_key in sorted_file_keys:
-        pull_aliases_profiles_file(vk, require_promoted_extensions, json_files_dict, json_files_dict[file_key])
-        
+        pull_aliases_profiles_file(vk, json_files_dict, json_files_dict[file_key])

@@ -240,16 +240,11 @@ class TestConvertPullRequiredCapabilitiesSpec(unittest.TestCase):
             }
         }"""
 
-        try:
-            original_data = json.loads(original_json_text)
-            expected_data = json.loads(expected_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(self.vk, json_files_dict, override_core_capabilities=True)
 
-        json_files_dict = {"test_profile.json": original_data}
-        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
-
-        self.assertEqual(json_files_dict["test_profile.json"], expected_data)
+        exp_data = json.loads(expected_json_text)
+        self.assertEqual(json_files_dict["test_profile.json"], exp_data)
 
     def test_pull_required_capabilities_empty_vulkan11(self):
         """
@@ -467,16 +462,11 @@ class TestConvertPullRequiredCapabilitiesSpec(unittest.TestCase):
             }
         }"""
 
-        try:
-            original_data = json.loads(original_json_text)
-            expected_data = json.loads(expected_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(self.vk, json_files_dict, override_core_capabilities=True)
 
-        json_files_dict = {"test_profile.json": original_data}
-        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
-
-        self.assertEqual(json_files_dict["test_profile.json"], expected_data)
+        exp_data = json.loads(expected_json_text)
+        self.assertEqual(json_files_dict["test_profile.json"], exp_data)
 
     def test_pull_required_capabilities_empty_vulkan12(self):
         """
@@ -749,16 +739,11 @@ class TestConvertPullRequiredCapabilitiesSpec(unittest.TestCase):
             }
         }"""
 
-        try:
-            original_data = json.loads(original_json_text)
-            expected_data = json.loads(expected_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(self.vk, json_files_dict, override_core_capabilities=True)
 
-        json_files_dict = {"test_profile.json": original_data}
-        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
-
-        self.assertEqual(json_files_dict["test_profile.json"], expected_data)
+        exp_data = json.loads(expected_json_text)
+        self.assertEqual(json_files_dict["test_profile.json"], exp_data)
 
     def test_pull_required_capabilities_empty_vulkan13(self):
         """
@@ -1089,16 +1074,11 @@ class TestConvertPullRequiredCapabilitiesSpec(unittest.TestCase):
             }
         }"""
 
-        try:
-            original_data = json.loads(original_json_text)
-            expected_data = json.loads(expected_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(self.vk, json_files_dict, override_core_capabilities=True)
 
-        json_files_dict = {"test_profile.json": original_data}
-        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
-
-        self.assertEqual(json_files_dict["test_profile.json"], expected_data)
+        exp_data = json.loads(expected_json_text)
+        self.assertEqual(json_files_dict["test_profile.json"], exp_data)
 
     def test_pull_required_capabilities_empty_vulkan14(self):
         """
@@ -1139,56 +1119,56 @@ class TestConvertPullRequiredCapabilitiesSpec(unittest.TestCase):
                             "drawIndirectFirstInstance": true,
                             "depthClamp": true,
                             "depthBiasClamp": true,
+                            "largePoints": true,
                             "samplerAnisotropy": true,
                             "fragmentStoresAndAtomics": true,
+                            "shaderImageGatherExtended": true,
                             "shaderStorageImageExtendedFormats": true,
                             "shaderUniformBufferArrayDynamicIndexing": true,
                             "shaderSampledImageArrayDynamicIndexing": true,
                             "shaderStorageBufferArrayDynamicIndexing": true,
                             "shaderStorageImageArrayDynamicIndexing": true,
-                            "shaderImageGatherExtended": true,
-                            "shaderInt16": true,
-                            "largePoints": true
+                            "shaderInt16": true
                         },
                         "VkPhysicalDeviceVulkan11Features": {
-                            "multiview": true,
-                            "samplerYcbcrConversion": true,
                             "storageBuffer16BitAccess": true,
+                            "multiview": true,
+                            "variablePointersStorageBuffer": true,
                             "variablePointers": true,
-                            "variablePointersStorageBuffer": true
+                            "samplerYcbcrConversion": true
                         },
                         "VkPhysicalDeviceVulkan12Features": {
-                            "subgroupBroadcastDynamicId": true,
+                            "samplerMirrorClampToEdge": true,
+                            "storageBuffer8BitAccess": true,
+                            "shaderInt8": true,
+                            "shaderUniformTexelBufferArrayDynamicIndexing": true,
+                            "shaderStorageTexelBufferArrayDynamicIndexing": true,
+                            "scalarBlockLayout": true,
                             "imagelessFramebuffer": true,
                             "uniformBufferStandardLayout": true,
                             "shaderSubgroupExtendedTypes": true,
                             "separateDepthStencilLayouts": true,
                             "hostQueryReset": true,
                             "timelineSemaphore": true,
+                            "bufferDeviceAddress": true,
                             "vulkanMemoryModel": true,
                             "vulkanMemoryModelDeviceScope": true,
-                            "bufferDeviceAddress": true,
-                            "samplerMirrorClampToEdge": true,
-                            "scalarBlockLayout": true,                            
-                            "shaderUniformTexelBufferArrayDynamicIndexing": true,
-                            "shaderStorageTexelBufferArrayDynamicIndexing": true,
-                            "shaderInt8": true,                            
-                            "storageBuffer8BitAccess": true
+                            "subgroupBroadcastDynamicId": true
                         },
                         "VkPhysicalDeviceVulkan13Features": {
-                            "shaderTerminateInvocation": true,
-                            "shaderDemoteToHelperInvocation": true,
-                            "privateData": true,
-                            "pipelineCreationCacheControl": true,                                           
-                            "synchronization2": true,
-                            "shaderZeroInitializeWorkgroupMemory": true,
                             "robustImageAccess": true,
+                            "inlineUniformBlock": true,
+                            "pipelineCreationCacheControl": true,
+                            "privateData": true,
+                            "shaderDemoteToHelperInvocation": true,
+                            "shaderTerminateInvocation": true,
                             "subgroupSizeControl": true,
                             "computeFullSubgroups": true,
+                            "synchronization2": true,
+                            "shaderZeroInitializeWorkgroupMemory": true,
                             "dynamicRendering": true,
                             "shaderIntegerDotProduct": true,
-                            "maintenance4": true,
-                            "inlineUniformBlock": true
+                            "maintenance4": true
                         },
                         "VkPhysicalDeviceVulkan14Features": {
                             "globalPriorityQuery": true,
@@ -1199,11 +1179,11 @@ class TestConvertPullRequiredCapabilitiesSpec(unittest.TestCase):
                             "bresenhamLines": true,
                             "vertexAttributeInstanceRateDivisor": true,
                             "indexTypeUint8": true,
-                            "maintenance5": true,
-                            "pushDescriptor": true,
                             "dynamicRenderingLocalRead": true,
+                            "maintenance5": true,
                             "maintenance6": true,
-                            "pipelineRobustness": true
+                            "pipelineRobustness": true,
+                            "pushDescriptor": true
                         }
                     },
                     "properties": {
@@ -1261,17 +1241,9 @@ class TestConvertPullRequiredCapabilitiesSpec(unittest.TestCase):
                                 "maxFragmentDualSrcAttachments": 0,
                                 "maxFragmentCombinedOutputResources": 16,
                                 "maxComputeSharedMemorySize": 16384,
-                                "maxComputeWorkGroupCount": [
-                                    65535,
-                                    65535,
-                                    65535
-                                ],
+                                "maxComputeWorkGroupCount": [65535, 65535, 65535],
                                 "maxComputeWorkGroupInvocations": 256,
-                                "maxComputeWorkGroupSize": [
-                                    256,
-                                    256,
-                                    64
-                                ],
+                                "maxComputeWorkGroupSize": [256, 256, 64],
                                 "subPixelPrecisionBits": 4,
                                 "subTexelPrecisionBits": 8,
                                 "mipmapPrecisionBits": 6,
@@ -1280,14 +1252,8 @@ class TestConvertPullRequiredCapabilitiesSpec(unittest.TestCase):
                                 "maxSamplerLodBias": 14,
                                 "maxSamplerAnisotropy": 1,
                                 "maxViewports": 1,
-                                "maxViewportDimensions": [
-                                    7680,
-                                    7680
-                                ],
-                                "viewportBoundsRange": [
-                                    -15360,
-                                    15359
-                                ],
+                                "maxViewportDimensions": [7680, 7680],
+                                "viewportBoundsRange": [-15360, 15359],
                                 "viewportSubPixelBits": 0,
                                 "minMemoryMapAlignment": 64,
                                 "minTexelBufferOffsetAlignment": 256,
@@ -1303,54 +1269,23 @@ class TestConvertPullRequiredCapabilitiesSpec(unittest.TestCase):
                                 "maxFramebufferWidth": 7680,
                                 "maxFramebufferHeight": 7680,
                                 "maxFramebufferLayers": 256,
-                                "framebufferColorSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "framebufferDepthSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "framebufferStencilSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "framebufferNoAttachmentsSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
+                                "framebufferColorSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "framebufferDepthSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "framebufferStencilSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "framebufferNoAttachmentsSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "maxColorAttachments": 8,
-                                "sampledImageColorSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "sampledImageIntegerSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT"
-                                ],
-                                "sampledImageDepthSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "sampledImageStencilSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "storageImageSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT"
-                                ],
+                                "sampledImageColorSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "sampledImageIntegerSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
+                                "sampledImageDepthSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "sampledImageStencilSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
+                                "storageImageSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
                                 "maxSampleMaskWords": 1,
                                 "maxClipDistances": 0,
                                 "maxCullDistances": 0,
                                 "maxCombinedClipAndCullDistances": 0,
                                 "discreteQueuePriorities": 2,
-                                "pointSizeRange": [
-                                    1.0,
-                                    256.0
-                                ],
-                                "lineWidthRange": [
-                                    1.0,
-                                    1.0
-                                ],
+                                "pointSizeRange": [1.0, 256.0],
+                                "lineWidthRange": [1.0, 1.0],
                                 "pointSizeGranularity": 0.125,
                                 "lineWidthGranularity": 0.5,
                                 "nonCoherentAtomSize": 256,
@@ -1366,10 +1301,7 @@ class TestConvertPullRequiredCapabilitiesSpec(unittest.TestCase):
                         },
                         "VkPhysicalDeviceVulkan11Properties": {
                             "subgroupSize": 1,
-                            "subgroupSupportedStages": [
-                                "VK_SHADER_STAGE_COMPUTE_BIT",
-                                "VK_SHADER_STAGE_FRAGMENT_BIT"
-                            ],
+                            "subgroupSupportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_FRAGMENT_BIT"],
                             "subgroupSupportedOperations": [
                                 "VK_SUBGROUP_FEATURE_BASIC_BIT",
                                 "VK_SUBGROUP_FEATURE_ROTATE_BIT",
@@ -1426,9 +1358,7 @@ class TestConvertPullRequiredCapabilitiesSpec(unittest.TestCase):
                             "filterMinmaxSingleComponentFormats": false,
                             "filterMinmaxImageComponentMapping": false,
                             "maxTimelineSemaphoreValueDifference": 2147483647,
-                            "framebufferIntegerColorSampleCounts": [
-                                "VK_SAMPLE_COUNT_1_BIT"
-                            ]
+                            "framebufferIntegerColorSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"]
                         },
                         "VkPhysicalDeviceVulkan13Properties": {
                             "maxComputeWorkgroupSubgroups": 0,
@@ -1479,16 +1409,11 @@ class TestConvertPullRequiredCapabilitiesSpec(unittest.TestCase):
             }
         }"""
 
-        try:
-            original_data = json.loads(original_json_text)
-            expected_data = json.loads(expected_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(self.vk, json_files_dict, override_core_capabilities=True)
 
-        json_files_dict = {"test_profile.json": original_data}
-        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
-
-        self.assertEqual(json_files_dict["test_profile.json"], expected_data)
+        exp_data = json.loads(expected_json_text)
+        self.assertEqual(json_files_dict["test_profile.json"], exp_data)
 
 
     def test_pull_required_capabilities_profile_inheritance_vulkan10_to_vulkan11(self):
@@ -1731,16 +1656,11 @@ class TestConvertPullRequiredCapabilitiesSpec(unittest.TestCase):
             }
         }"""
 
-        try:
-            original_data = json.loads(original_json_text)
-            expected_data = json.loads(expected_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(self.vk, json_files_dict, override_core_capabilities=True)
 
-        json_files_dict = {"test_profile.json": original_data}
-        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
-
-        self.assertEqual(json_files_dict["test_profile.json"], expected_data)
+        exp_data = json.loads(expected_json_text)
+        self.assertEqual(json_files_dict["test_profile.json"], exp_data)
 
 
     def test_pull_required_capabilities_profile_inheritance_vulkan11_to_vulkan12(self):
@@ -2043,16 +1963,11 @@ class TestConvertPullRequiredCapabilitiesSpec(unittest.TestCase):
             }
         }"""
 
-        try:
-            original_data = json.loads(original_json_text)
-            expected_data = json.loads(expected_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(self.vk, json_files_dict, override_core_capabilities=True)
 
-        json_files_dict = {"test_profile.json": original_data}
-        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
-
-        self.assertEqual(json_files_dict["test_profile.json"], expected_data)
+        exp_data = json.loads(expected_json_text)
+        self.assertEqual(json_files_dict["test_profile.json"], exp_data)
 
 
     def test_pull_required_capabilities_profile_inheritance_vulkan11_to_vulkan14(self):
@@ -2521,7 +2436,7 @@ class TestConvertPullRequiredCapabilitiesSpec(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
+        pull_required_capabilities_profiles_files(self.vk, json_files_dict, override_core_capabilities=True)
         sort_profiles_files(self.vk, json_files_dict)
 
         gen_data = json_files_dict["test_profile.json"]
@@ -2541,7 +2456,6 @@ class TestConvertPullRequiredCapabilitiesSpec(unittest.TestCase):
         )
 
         self.assertEqual(gen_data, exp_data)
-
 
     def test_pull_required_capabilities_profile_multiple_inheritance(self):
         """
@@ -3089,7 +3003,7 @@ class TestConvertPullRequiredCapabilitiesSpec(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
+        pull_required_capabilities_profiles_files(self.vk, json_files_dict, override_core_capabilities=True)
         sort_profiles_files(self.vk, json_files_dict)
 
         gen_data = json_files_dict["test_profile.json"]
