@@ -24,7 +24,8 @@ import argparse
 import sys
 import time
 
-from source.main_transform import main_transform, TransformBits, OutputFormatType
+from source.transform_utils import PullBits, StripBits
+from source.main_transform import main_transform, OutputFormatType
 from source.main_schema import main_schema
 from source.main_validate import main_validate
 from source.main_layer import main_layer
@@ -78,6 +79,38 @@ class LogTypeAction(argparse.Action):
         setattr(namespace, self.dest, res)
 
 
+def add_transform_arguments(parser: argparse.ArgumentParser) -> None:
+    """Adds standard transform options (--pull, --consolidate, --strip, --sort) to a subcommand parser."""
+    parser.add_argument(
+        '--pull',
+        nargs='*',
+        type=PullBits,
+        choices=list(PullBits),
+        default=[],
+        metavar='OPTION',
+        help='Pull capability options to apply (choices: ' + ', '.join([e.value for e in PullBits]) + ').'
+    )
+    parser.add_argument(
+        '--consolidate',
+        action='store_true',
+        help='Consolidate capabilities.'
+    )
+    parser.add_argument(
+        '--strip',
+        nargs='*',
+        type=StripBits,
+        choices=list(StripBits),
+        default=[],
+        metavar='OPTION',
+        help='Strip options to apply (choices: ' + ', '.join([e.value for e in StripBits]) + ').'
+    )
+    parser.add_argument(
+        '--sort',
+        action='store_true',
+        help='Sort profile capabilities.'
+    )
+
+
 def main(argv):
     log_parser = argparse.ArgumentParser(add_help=False)
     log_group = log_parser.add_mutually_exclusive_group()
@@ -121,7 +154,7 @@ def main(argv):
     transform_parser.add_argument('--input', '-i', action='store', required=True, help='Path to the input profiles files.')
     transform_parser.add_argument('--output', '-o', action='store', required=True, help='Path to the output profiles files.')
     transform_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the profiles files (default: pretty).')
-    transform_parser.add_argument('--mode', '-m', nargs='*', action='store', choices=list(TransformBits), default=[], help='List of transformation capabilities')
+    add_transform_arguments(transform_parser)
     transform_parser.add_argument('--validate', nargs='*', action=ValidateAction, default=None, help='Validate profile files before transformation (choices: schema, analysis).')
 
     combine_parser = subparsers.add_parser('combine', parents=[log_parser], help='Generate combined Vulkan profile JSON files.')
@@ -141,7 +174,7 @@ def main(argv):
     combine_parser.add_argument('--profile-required-profiles', action='store', help='Comma separated list of required profiles by the generated profile.')
     combine_parser.add_argument('--mode', '-m', action='store', choices=list(CombineMode), default=CombineMode.INTERSECTION, help='Mode of profile combination.')
     combine_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the profiles files (default: pretty).')
-    combine_parser.add_argument('--transform', nargs='*', action='store', choices=list(TransformBits), default=[], help='List of transformation capabilities to apply to the combined profile output.')
+    add_transform_arguments(combine_parser)
     combine_parser.add_argument('--validate', nargs='*', action=ValidateAction, default=None, help='Validate profile files before combining (choices: schema, analysis).')
 
     extract_parser = subparsers.add_parser('extract', parents=[log_parser], help='Extract a profile from a profile JSON file into a single profile JSON file.')
@@ -170,8 +203,8 @@ def main(argv):
     library_parser.add_argument('--output-filename', action='store', default='vulkan_profiles', help='Output filename for profile library, default "vulkan_profiles".')
     library_parser.add_argument('--mode', nargs='*', action='store', choices=['header-only', 'header+source'], default=['header-only', 'header+source'], help='Library output generation mode.')
     library_parser.add_argument('--validate', nargs='*', action=ValidateAction, default=None, help='Validate generated JSON profile schema and JSON profiles (choices: schema, analysis).')
-    library_parser.add_argument('--transform', nargs='*', action='store', choices=list(TransformBits), default=[], help='List of transformation capabilities to apply before generating the library.')
-    library_parser.add_argument('--intermediate', action='store', help='Directory path for intermediate transformed profiles (used when --transform is provided).')
+    add_transform_arguments(library_parser)
+    library_parser.add_argument('--intermediate', action='store', help='Directory path for intermediate transformed profiles (used when transformation options are provided).')
     library_parser.add_argument('--debug', '-d', action='store_true', help='Also generate library variant with debug messages.')
     library_parser.add_argument('--config', '-c', action='store', default='release', choices=['release', 'debug'], help='Select build configuration.')
     library_parser.add_argument('--include-header', action='store', help='Override the header file include directive in generated C++ source files.')
@@ -257,3 +290,4 @@ def main(argv):
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))
+    

@@ -24,14 +24,13 @@ import sys
 import json
 import logging
 import argparse
-import tempfile
 from enum import Enum
 from pathlib import Path
 
 from source.vulkan_object_utils import initVulkanObject
 from source.generate_profiles_combine import VulkanProfilesCombineGenerator, CombineConfig
 from source.main_validate import main_validate
-from source.main_transform import main_transform
+from source.main_transform import transform_profiles_files
 from source.profiles_json_utils import (
     load_profiles_jsons,
     save_profiles_jsons,
@@ -61,7 +60,7 @@ def main_combine(args):
         )
         main_validate(validate_args)
 
-    if not args.registry:
+    if not getattr(args, 'registry', None):
         logging.error("Combining profiles requires specifying --registry")
         sys.exit(1)
 
@@ -84,6 +83,11 @@ def main_combine(args):
 
     output_path = Path(args.output)
 
+    pull_modes = getattr(args, 'pull', []) or []
+    consolidate = getattr(args, 'consolidate', False)
+    strip_modes = getattr(args, 'strip', []) or []
+    sort = getattr(args, 'sort', False)
+
     # Special processing for DIFFERENCE mode across input profile files
     if mode == CombineMode.DIFFERENCE:
         json_files_dict = load_profiles_jsons(Path(input_dir))
@@ -102,6 +106,16 @@ def main_combine(args):
             for cap_block in diff_file_data.get("capabilities", {}).values():
                 strip_dict_duplication(cap_block, common_caps, strip_list_elements=True)
             diff_files_dict[file_key] = diff_file_data
+
+        if pull_modes or consolidate or strip_modes or sort:
+            transform_profiles_files(
+                vk,
+                diff_files_dict,
+                pull_modes=pull_modes,
+                consolidate=consolidate,
+                strip_modes=strip_modes,
+                sort=sort
+            )
 
         save_profiles_jsons(diff_files_dict, output_path, format_type)
         return
@@ -144,23 +158,16 @@ def main_combine(args):
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
 
-    transform_mode = getattr(args, 'transform', None)
+    output_dict = {output_path: combined_json}
 
-    if transform_mode:
-        with tempfile.TemporaryDirectory() as temp_dir:
-            temp_filename = output_path.name if output_path.suffix == '.json' else "combined.json"
-            temp_combined_path = Path(temp_dir) / temp_filename
-            save_profiles_jsons({temp_combined_path: combined_json}, temp_combined_path, format_type)
+    if pull_modes or consolidate or strip_modes or sort:
+        transform_profiles_files(
+            vk,
+            output_dict,
+            pull_modes=pull_modes,
+            consolidate=consolidate,
+            strip_modes=strip_modes,
+            sort=sort
+        )
 
-            transform_args = argparse.Namespace(
-                registry=args.registry,
-                input=str(temp_combined_path),
-                output=str(output_path),
-                mode=transform_mode,
-                format=format_type,
-                api=api
-            )
-            main_transform(transform_args)
-    else:
-        save_profiles_jsons({output_path: combined_json}, output_path, format_type)
-        
+    save_profiles_jsons(output_dict, output_path, format_type)

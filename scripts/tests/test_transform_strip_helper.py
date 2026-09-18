@@ -32,7 +32,7 @@ if str(scripts_dir) not in sys.path:
     sys.path.insert(0, str(scripts_dir))
 
 from source.main_transform import main_transform
-from source.transform_utils import TransformBits
+from source.transform_utils import StripBits
 
 
 REGISTRY_PATH = None
@@ -87,7 +87,7 @@ class TestTransformStripHelperValues(unittest.TestCase):
             json.dump(profile_data, f, indent=4)
 
     def test_strip_helper_values(self):
-        """Tests that STRIP_HELPER_VALUES removes composite and non-bitpos zero/all constants."""
+        """Tests that StripBits.HELPER_VALUES removes composite and non-bitpos zero/all constants."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
             input_dir = temp_path / "input"
@@ -100,7 +100,10 @@ class TestTransformStripHelperValues(unittest.TestCase):
                 registry=REGISTRY_PATH,
                 input=str(input_dir),
                 output=str(output_dir),
-                mode=[TransformBits.STRIP_HELPER_VALUES],
+                pull=[],
+                consolidate=False,
+                strip=[StripBits.HELPER_VALUES],
+                sort=False,
                 api="vulkan",
                 format="pretty",
                 validate=None
