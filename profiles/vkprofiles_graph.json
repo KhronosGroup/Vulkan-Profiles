@@ -51,7 +51,6 @@
             "command": "combine",
             "args": {
                 "output": "profiles/LunarG/VP_LUNARG_desktop_baseline.json",
-                "transform": ["pull-aliases", "strip-helper-values"],
                 "format": "flatten",
                 "contributors": {
                     "Christophe Riccio": {
@@ -138,7 +137,8 @@
             "args": {
                 "input": "profiles/Android",
                 "output": "profiles",
-                "mode": ["pull-aliases", "strip-helper-values"],
+                "pull": ["aliases"],
+                "strip": ["helper-values"],
                 "format": "flatten"
             }
         },
@@ -163,8 +163,9 @@
                 "output": "library/include/vulkan",
                 "output_src": "library/source",
                 "output_filename": "vulkan_profiles",
+                "intermediate": "library/include/vulkan/intermediate",
                 "mode": ["header+source"],
-                "transform": ["strip-duplication", "strip-helper-values"],
+                "strip": true,
                 "config": "release"
             }
         },
@@ -180,7 +181,7 @@
                 "output_src": "library/source/debug",
                 "output_filename": "vulkan_profiles",
                 "mode": ["header+source"],
-                "transform": ["strip-duplication", "strip-helper-values"],
+                "strip": true,
                 "config": "debug"
             }
         },
@@ -195,7 +196,7 @@
                 "output": "library/include/vulkan",
                 "output_filename": "android_vulkan_profiles",
                 "mode": ["header-only"],
-                "transform": ["strip-duplication"],
+                "strip": true,
                 "config": "release"
             }
         },
@@ -210,7 +211,7 @@
                 "output": "library/include/vulkan",
                 "output_filename": "android_vulkan_profiles_debug",
                 "mode": ["header-only"],
-                "transform": ["strip-duplication"],
+                "strip": true,
                 "config": "debug"
             }
         },
@@ -226,7 +227,7 @@
                 "output_filename": "generated_vulkan_profiles",
                 "mode": ["header+source"],
                 "include_header": "generated_vulkan_profiles.h",
-                "transform": ["strip-duplication"],
+                "strip": true,
                 "config": "release"
             }
         },
@@ -242,7 +243,7 @@
                 "output_filename": "generated_vulkan_profiles_debug",
                 "mode": ["header+source"],
                 "include_header": "generated_vulkan_profiles_debug.h",
-                "transform": ["strip-duplication"],
+                "strip": true,
                 "config": "debug"
             }
         },
@@ -258,7 +259,7 @@
                 "output_src": "library/test",
                 "output_filename": "generated_vulkan_profiles_android",
                 "mode": ["header+source"],
-                "transform": ["strip-duplication"],
+                "strip": true,
                 "include_header": "generated_vulkan_profiles_android.h",
                 "config": "release"
             }
