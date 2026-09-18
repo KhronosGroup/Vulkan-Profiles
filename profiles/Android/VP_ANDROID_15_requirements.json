@@ -77,21 +77,21 @@
                     }
                 },
                 "VkPhysicalDeviceVulkan11Properties": {
-                    "subgroupSupportedOperations": ["VK_SUBGROUP_FEATURE_BASIC_BIT", "VK_SUBGROUP_FEATURE_VOTE_BIT", "VK_SUBGROUP_FEATURE_ARITHMETIC_BIT", "VK_SUBGROUP_FEATURE_BALLOT_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT"]
+                    "subgroupSupportedOperations": [ "VK_SUBGROUP_FEATURE_BASIC_BIT", "VK_SUBGROUP_FEATURE_VOTE_BIT", "VK_SUBGROUP_FEATURE_ARITHMETIC_BIT", "VK_SUBGROUP_FEATURE_BALLOT_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_BIT", "VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT" ]
                 }
             },
             "formats": {
                 "VK_FORMAT_A4B4G4R4_UNORM_PACK16_EXT": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": ["VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"],
-                        "optimalTilingFeatures": ["VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"],
+                        "linearTilingFeatures": [ "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT" ],
+                        "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT" ],
                         "bufferFeatures": []
                     }
                 },
                 "VK_FORMAT_A4R4G4B4_UNORM_PACK16_EXT": {
                     "VkFormatProperties": {
-                        "linearTilingFeatures": ["VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"],
-                        "optimalTilingFeatures": ["VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT"],
+                        "linearTilingFeatures": [ "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT" ],
+                        "optimalTilingFeatures": [ "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT", "VK_FORMAT_FEATURE_BLIT_DST_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT", "VK_FORMAT_FEATURE_TRANSFER_DST_BIT" ],
                         "bufferFeatures": []
                     }
                 }
@@ -167,11 +167,11 @@
                     "comment": "Renamed/rebranded from 'VP_ANDROID_15_minimums' (a.k.a. Vulkan Profile for Android 15 or VPA15) to 'VP_ANDROID_15_requirements' (a.k.a. Vulkan Requirements for Android 15 or VRA15)"
                 }
             ],
-            "profiles": ["VP_ANDROID_vulkan_profile_2022"],
+            "profiles": [ "VP_ANDROID_vulkan_profile_2022" ],
             "capabilities": [
                 "MUST",
-                ["primitivesGeneratedQuery", "pipelineStatisticsQuery"],
-                ["swBresenhamLines", "hwBresenhamLines"]
+                [ "primitivesGeneratedQuery", "pipelineStatisticsQuery" ],
+                [ "swBresenhamLines", "hwBresenhamLines" ]
             ]
         }
     }
