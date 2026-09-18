@@ -46,17 +46,18 @@ from source.profiles_json_utils import (
 )
 
 
-class TransformBits(str, Enum):
-    PULL_REQUIRED_CAPABILITIES = 'pull-required-capabilities'       # Evaluates extension dependencies and pulls satisfied core/extension feature and property requirements into capability blocks.
-    PULL_PROMOTED_EXTENSIONS = 'pull-promoted-extensions'           # Requires all extensions promoted to core up to the profile's target Vulkan version.
-    IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions'         # Sets all required extension versions to 1, overriding specific extension spec versions.
-    OVERRIDE_CORE_CAPABILITIES = 'override-with-core-capabilities'  # Allows pull-required-capabilities to override profile capability values that are below Vulkan core spec requirements.
-    PULL_ALIASES = 'pull-aliases'                                   # Resolves and populates all equivalent capability aliases across core structures and extensions.
-    CONSOLIDATE = 'consolidate'                                     # Merges all mandatory capability blocks into a single consolidated requirements block per profile.
-    STRIP_HELPER_VALUES = 'strip-helper-values'                     # Removes non-bitpos bitmask helper values (composites, all-flags, and zero/none constants) from capability blocks.
-    STRIP_DUPLICATION = 'strip-duplication'                         # Removes redundant duplicate features, properties, and extension requirements across inheritance trees and within blocks.
-    STRIP_PROMOTED_EXTENSIONS = 'strip-promoted-extensions'         # Removes extensions that are already promoted to the profile's target core Vulkan version.
-    SORT = 'sort'                                                   # Sorts capability blocks, structures, and extension lists into canonical Vulkan order.
+class PullBits(str, Enum):
+    REQUIRED_CAPABILITIES = 'required-capabilities'  # Evaluates extension dependencies and pulls satisfied core/extension feature and property requirements into capability blocks.
+    PROMOTED_EXTENSIONS = 'promoted-extensions'      # Requires all extensions promoted to core up to the profile's target Vulkan version.
+    IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions'    # Sets all required extension versions to 1, overriding specific extension spec versions.
+    OVERRIDE_CORE_CAPABILITIES = 'override-with-core-capabilities'  # Allows required-capabilities pulling to override profile capability values that are below Vulkan core spec requirements.
+    ALIASES = 'aliases'                              # Resolves and populates all equivalent capability aliases across core structures and extensions.
+
+
+class StripBits(str, Enum):
+    HELPER_VALUES = 'helper-values'                # Removes non-bitpos bitmask helper values (composites, all-flags, and zero/none constants) from capability blocks.
+    DUPLICATION = 'duplication'                    # Removes redundant duplicate features, properties, and extension requirements across inheritance trees and within blocks.
+    PROMOTED_EXTENSIONS = 'promoted-extensions'    # Removes extensions that are already promoted to the profile's target core Vulkan version.
 
 
 class CategoryPriority(IntEnum):

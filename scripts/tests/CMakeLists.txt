@@ -74,10 +74,10 @@ add_custom_target(transform_android_profiles ALL
         --registry "${REGISTRY_PATH}/vk.xml"
         --input "${PROFILES_INPUT_DIR}"
         --output "${PROFILES_OUTPUT_DIR}"
-        --mode pull-required-capabilities
+        --pull required-capabilities
                ignore-extension-versions
-               pull-aliases
-               strip-duplication
+               aliases
+        --strip duplication
         --format flatten
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     COMMENT "Testing vkprofiles with Android Vulkan profiles..."
