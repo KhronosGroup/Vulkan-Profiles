@@ -5638,7 +5638,7 @@ class VulkanProfilesDatabase():
 
 
 class VulkanProfilesFiles():
-    def __init__(self, registry, profiles_dir, profiles_files, validate, schema=None):
+    def __init__(self, registry, profiles_dir, input_profiles=None, validate=False, schema=None):
         self.profiles = dict()
         self.json_profiles_database = VulkanProfilesDatabase()
 
@@ -5653,17 +5653,16 @@ class VulkanProfilesFiles():
             filenames = os.listdir(dirAbsPath)
 
         for filename in filenames:
-            skip_file = False
-            if profiles_files:
-                if filename not in profiles_files:
-                    skip_file = True
-            if skip_file:
-                continue
             fileAbsPath = os.path.join(dirAbsPath, filename)
             if os.path.isfile(fileAbsPath) and os.path.splitext(filename)[-1] == '.json':
-                logging.info("Loading profile file: '{0}'".format(filename))
-                with open(fileAbsPath, 'r') as f:
-                    json_root = json.load(f)
+                try:
+                    with open(fileAbsPath, 'r', encoding='utf-8') as f:
+                        json_root = json.load(f)
+                except Exception:
+                    continue
+
+                if isinstance(json_root, dict) and 'profiles' in json_root and 'capabilities' in json_root:
+                    logging.info("Loading profile file: '{0}'".format(filename))
                     if validate:
                         try:
                             import jsonschema
@@ -5674,10 +5673,12 @@ class VulkanProfilesFiles():
                     self.json_profiles_database.json_files.append(json_root)
 
         for json_file_data in self.json_profiles_database.json_files:
-            self.parseProfiles(registry, json_file_data['profiles'], json_file_data['capabilities'])
+            self.parseProfiles(registry, json_file_data['profiles'], json_file_data['capabilities'], input_profiles)
 
-    def parseProfiles(self, registry, json_profiles, json_caps):
+    def parseProfiles(self, registry, json_profiles, json_caps, input_profiles=None):
         for json_profile_key, json_profile_value in json_profiles.items():
+            if input_profiles and json_profile_key not in input_profiles:
+                continue
             logging.debug("Registering profile '{0}'".format(json_profile_key))
             if json_profile_key not in self.profiles:
                 self.profiles[json_profile_key] = VulkanProfile(registry, self.json_profiles_database, json_profile_key, json_profile_value, json_caps)
@@ -6778,6 +6779,13 @@ class VulkanProfilesDocGenerator():
         for profile in sorted_profiles:
             if (not profile.multiple_variants):
                 self.profiles.append(profile)
+
+        if not self.profiles:
+            logging.error("No valid non-variant profiles were found to generate documentation.")
+            self.maxRequiredCoreVersion = VulkanVersionNumber("1.0.0", self.registry.api)
+            self.coreInstanceExtensions = []
+            self.coreDeviceExtensions = []
+            return
 
         # Determine maximum core version required across all profiles
         self.maxRequiredCoreVersion = max(profile.apiVersionNumber for profile in self.profiles)

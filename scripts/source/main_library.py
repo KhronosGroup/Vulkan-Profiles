@@ -48,21 +48,39 @@ def main_library(args):
     if getattr(args, 'validate', None) is not None:
         main_validate(args)
 
-    input_filenames = None
-    if getattr(args, 'input_filenames', None):
-        input_filenames = [f.strip() for f in args.input_filenames.split(',') if f.strip()]
+    input_profiles = None
+    if getattr(args, 'input_profiles', None):
+        input_profiles = [p.strip() for p in args.input_profiles.split(',') if p.strip()]
 
     json_files_dict = load_profiles_jsons(input_path)
-    if input_filenames and json_files_dict:
-        json_files_dict = {
-            path_key: data
-            for path_key, data in json_files_dict.items()
-            if Path(path_key).name in input_filenames
+
+    if input_profiles and json_files_dict:
+        all_available_profiles = {
+            p_name
+            for data in json_files_dict.values()
+            if isinstance(data, dict) and 'profiles' in data and isinstance(data['profiles'], dict)
+            for p_name in data['profiles'].keys()
         }
+        missing_profiles = [p for p in input_profiles if p not in all_available_profiles]
+        if missing_profiles:
+            logging.error(f"Profile(s) specified in '--input-profiles' not found in database: {', '.join(missing_profiles)}")
+            sys.exit(1)
+
+        filtered_dict = {}
+        for path_key, data in json_files_dict.items():
+            if isinstance(data, dict) and 'profiles' in data and isinstance(data['profiles'], dict):
+                matching_profiles = {
+                    p_name: p_val for p_name, p_val in data['profiles'].items() if p_name in input_profiles
+                }
+                if matching_profiles:
+                    new_data = dict(data)
+                    new_data['profiles'] = matching_profiles
+                    filtered_dict[path_key] = new_data
+        json_files_dict = filtered_dict
 
     if not json_files_dict:
         logging.error(f"No profile JSON files loaded from '{input_path}'")
-        return
+        sys.exit(1)
 
     vk = initVulkanObject(api, registry_path)
 
