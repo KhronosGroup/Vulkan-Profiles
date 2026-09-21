@@ -179,7 +179,7 @@ def main(argv):
     extract_parser = subparsers.add_parser('extract', parents=[log_parser], help='Extract a profile from a profile JSON file into a single profile JSON file.')
     extract_parser.add_argument('--input', '-i', action='store', required=True, help='Path to input profiles file.')
     extract_parser.add_argument('--output', '-o', action='store', required=True, help='Path to output profile JSON file.')
-    extract_parser.add_argument('--profile-name', '-p', action='store', required=True, help='Specific profile name to extract.')
+    extract_parser.add_argument('--profile-name', action='store', required=True, help='Specific profile name to extract.')
     extract_parser.add_argument('--mode', '-m', type=ExtractMode, choices=list(ExtractMode), default=ExtractMode.REFERENCE, help='Extraction mode: "reference-required-profiles" keeps parent profile references external, "pull-required-profiles" includes required parent profiles and blocks.')
     extract_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the output file.')
 
@@ -188,7 +188,7 @@ def main(argv):
     min_api_parser.add_argument('--input', '-i', action='store', required=True, help='Path to input profiles file or directory.')
     min_api_parser.add_argument('--input-profiles', action='store', help='Comma separated list of profile names to process.')
     min_api_parser.add_argument('--output', '-o', action='store', help='Path to output profiles file or directory.')
-    min_api_parser.add_argument('--schemas', '-s', action='store', help='Path to directory containing Vulkan profile schemas (profiles-*.json).')
+    min_api_parser.add_argument('--schemas', action='store', help='Path to directory containing Vulkan profile schemas (profiles-*.json).')
     min_api_parser.add_argument('--mode', '-m', type=MinApiVersionMode, choices=list(MinApiVersionMode), default=MinApiVersionMode.SHOW, help='Operation mode: "display" (display api-version/schema read from input), "evaluate" (evaluate schemas to determine min Vulkan header version and update JSONs if output path is provided). Default: display.')
     min_api_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for output JSON files.')
 

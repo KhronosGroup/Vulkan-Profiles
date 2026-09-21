@@ -22,9 +22,9 @@
 
 #include "test.hpp"
 #ifndef VULKAN_PROFILES_HEADER_ONLY
-#include "generated_vulkan_profiles_debug.hpp"
+#include "generated_vulkan_requirements_debug.hpp"
 #else
-#include "generated_vulkan_profiles_debug.h"
+#include "generated_vulkan_requirements_debug.h"
 #endif
 
 #include <cstdio>
@@ -385,7 +385,7 @@ TEST(api_create_device_profile, with_extensions_flag) {
 #endif//VKU_FORCE_EXTRA_TESTS
 
 TEST(api_create_device_profile, overrite_with_unsupported_extensions) {
-    const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
+    const VpProfileProperties profile = {VP_LUNARG_MINIMUM_REQUIREMENTS_1_3_NAME, VP_LUNARG_MINIMUM_REQUIREMENTS_1_3_SPEC_VERSION};
 
     static const char* extensions[] = {"VK_LUNARG_doesnot_exist", "VK_GTRUC_automagic_rendering",
                                        "VK_GTRUC_portability_everywhere"};
@@ -412,7 +412,7 @@ TEST(api_create_device_profile, overrite_with_unsupported_extensions) {
 }
 
 TEST(api_get_profile_support, unsupported_name) {
-    VpProfileProperties profile{"Bouuahhhh", VP_KHR_ROADMAP_2022_SPEC_VERSION};
+    VpProfileProperties profile{"Bouuahhhh", VP_LUNARG_MINIMUM_REQUIREMENTS_1_3_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
     vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
@@ -420,7 +420,7 @@ TEST(api_get_profile_support, unsupported_name) {
 }
 
 TEST(api_get_profile_support, unsupported_version) {
-    VpProfileProperties profile{VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION + 1};
+    VpProfileProperties profile{VP_LUNARG_MINIMUM_REQUIREMENTS_1_3_NAME, VP_LUNARG_MINIMUM_REQUIREMENTS_1_3_SPEC_VERSION + 1};
 
     VkBool32 supported = VK_FALSE;
     vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);

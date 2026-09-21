@@ -401,7 +401,6 @@ vkprofiles combine --registry vk.xml --input path/to/profiles --output path/to/c
 * `--strip [OPTIONS ...]`: Strip options: `helper-values`, `duplication`, or `promoted-extensions`.
 * `--sort`: Sort profile capabilities.
 * `--validate [MODES ...]`: Validate profile files before combining (`schema`, `analysis`). If specified without modes, both validation modes are used.
-* `--output-profile`: Deprecated alias for `--profile-name`.
 * `--profile-name`: Override output profile name.
 * `--profile-version`: Set profile version number. Default: `1`.
 * `--profile-label`: Set profile label string.
@@ -488,7 +487,7 @@ vkprofiles min-api-version --input path/to/profiles [options]
 
 * `--input`, `-i`: *(Required)* Path to input profiles file or directory.
 * `--output`, `-o`: Path to output profiles file or directory when updating JSONs in `evaluate` mode.
-* `--profile-names`: Comma-separated list of profile names to process.
+* `--input-profiles`: Comma-separated list of profile names to process.
 * `--schemas`, `-s`: Path to a directory containing Vulkan profile schemas (`profiles-*.json`).
 * `--mode`, `-m`: Operation mode: `display` or `evaluate`. Default: `display`.
 * `--format`: Output formatting style (`flatten` or `pretty`). Default: `pretty`.
@@ -505,7 +504,7 @@ vkprofiles min-api-version --input path/to/profiles [options]
 ```bash
 vkprofiles min-api-version \
     --input profiles/LunarG \
-    --profile-names VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2026 \
+    --input-profiles VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2026 \
     --mode display
 ```
 
@@ -530,7 +529,7 @@ Generates C/C++ Vulkan Profiles API library headers (`vulkan_profiles.h`, `vulka
 > When calling `vkCreateDevice`, the Vulkan specification prohibits passing duplicate or aliased feature structures simultaneously in the `VkDeviceCreateInfo` `pNext` chain. Specifically, two different structures enabling or configuring the same underlying Vulkan feature cannot both be present in `pNext`, even if their member boolean values match.
 >
 > **Resolution:**
-> To ensure the generated library creates valid `VkDevice` instances, input profile JSON files should not contain unexpanded or redundant feature structures. Use `--pull aliases --strip duplication` before generating the library when appropriate.
+> To ensure the generated library creates valid `VkDevice` instances, input profile JSON files should not contain unexpanded or redundant feature structures. Use `--pull aliases --strip` before generating the library when appropriate.
 
 ```bash
 vkprofiles library --registry vk.xml --input path/to/profiles --output path/to/include [options]
@@ -545,7 +544,7 @@ vkprofiles library --registry vk.xml --input path/to/profiles --output path/to/i
 * `--mode [MODES ...]`: Library generation modes (`header-only`, `header+source`). Default: both modes are generated.
 * `--pull [OPTIONS ...]`: Pull capability options: `required-capabilities`, `promoted-extensions`, `ignore-extension-versions`, `ignore-unsupported`, `override-with-core-capabilities`, or `aliases`.
 * `--consolidate`: Consolidate capabilities.
-* `--strip [OPTIONS ...]`: Strip options: `helper-values`, `duplication`, or `promoted-extensions`.
+* `--strip`: Strip redundant capability structures before generating the library to keep `VkDevice` creation valid.
 * `--sort`: Sort profile capabilities.
 * `--intermediate`: Directory path for intermediate transformed JSON files (used when transformation options are provided).
 * `--validate [MODES ...]`: Validate profiles during generation (`schema`, `analysis`). If specified without modes, both validation modes are used.
@@ -566,7 +565,7 @@ vkprofiles library \
     --output-filename vulkan_profiles \
     --mode header+source \
     --pull aliases \
-    --strip duplication \
+    --strip \
     --config release
 ```
 

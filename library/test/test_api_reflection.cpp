@@ -20,9 +20,9 @@
 
 #include "test.hpp"
 #ifndef VULKAN_PROFILES_HEADER_ONLY
-#include <vulkan/vulkan_profiles.hpp>
+#include "generated_vulkan_profiles_roadmap.hpp"
 #else
-#include <vulkan/vulkan_profiles.h>
+#include "generated_vulkan_profiles_roadmap.h"
 #endif
 
 TEST(api_get_profiles_beta, full) {
