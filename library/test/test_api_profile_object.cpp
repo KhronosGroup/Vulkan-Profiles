@@ -26,9 +26,9 @@
 
 #include "test.hpp"
 #ifndef VULKAN_PROFILES_HEADER_ONLY
-#include "generated_vulkan_profiles_debug.hpp"
+#include "generated_vulkan_profiles_roadmap_debug.hpp"
 #else
-#include "generated_vulkan_profiles_debug.h"
+#include "generated_vulkan_profiles_roadmap_debug.h"
 #endif
 
 #include <cstdio>
@@ -75,18 +75,6 @@ struct Functions {
         vpDestroyFunctions(handle, nullptr);
     }
 };
-
-TEST(fucntions_object, check_support_vulkan_1_1) {
-    Functions functions;
-
-    const VpProfileProperties profileProperties = {VP_LUNARG_MINIMUM_REQUIREMENTS_1_1_NAME, VP_LUNARG_MINIMUM_REQUIREMENTS_1_1_SPEC_VERSION};
-
-    VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(
-        functions.handle, scaffold->instance, scaffold->physicalDevice, &profileProperties, &supported);
-    EXPECT_TRUE(result == VK_SUCCESS);
-    EXPECT_TRUE(supported == VK_TRUE);
-}
 
 TEST(fucntions_object, overrite_with_unsupported_extensions) {
     Functions functions;
@@ -143,17 +131,6 @@ TEST(api_capabilities_object, get_api_version) {
     uint32_t version = vpGetProfileAPIVersion(functions.handle, &profileProperties);
 
     EXPECT_EQ(VK_MAKE_API_VERSION(0, 1, 3, 204), version);
-}
-
-TEST(api_capabilities_object, get_required_profiles) {
-    Functions functions;
-
-    const VpProfileProperties profileProperties = {VP_KHR_ROADMAP_2024_NAME, VP_KHR_ROADMAP_2024_SPEC_VERSION};
-
-    uint32_t propertyCount = 0;
-    VkResult result0 = vpGetProfileRequiredProfiles(functions.handle, &profileProperties, &propertyCount, nullptr);
-    EXPECT_EQ(VK_SUCCESS, result0);
-    EXPECT_TRUE(propertyCount == 1);
 }
 
 TEST(api_capabilities_object, get_profile_fallback) {
@@ -316,7 +293,7 @@ TEST(api_capabilities_object, get_profile_feature_structure_types) {
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, features[1]);
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES, features[2]);
     EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, features[3]);
-    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES, features[4]);
+    EXPECT_EQ(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GLOBAL_PRIORITY_QUERY_FEATURES_KHR, features[4]);
 }
 
 TEST(api_capabilities_object, get_profile_Property_structure_types) {

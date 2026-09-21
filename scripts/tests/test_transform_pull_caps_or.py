@@ -949,17 +949,16 @@ class TestConvertPullRequiredCapabilitiesOR(unittest.TestCase):
                             }
                         },
                         "VkPhysicalDeviceTransformFeedbackPropertiesEXT": {
-                            "maxTransformFeedbackAttributesPerStream": 512,
-                            "maxTransformFeedbackAttributesPerVertex": 64,
-                            "maxTransformFeedbackBufferSize": 1073741824,                            
+                            "maxTransformFeedbackBufferDataSize": 512,
+                            "maxTransformFeedbackBufferDataStride": 512,
+                            "maxTransformFeedbackBufferSize": 1073741824,
                             "maxTransformFeedbackBuffers": 4,
-                            "maxTransformFeedbackBuffersPerSubpass": 4,
-                            "maxTransformFeedbackStreamStride": 2048,
+                            "maxTransformFeedbackStreamDataSize": 512,
                             "maxTransformFeedbackStreams": 4,
-                            "transformFeedbackDraw": true,
-                            "transformFeedbackQueries": true,
-                            "transformFeedbackRasterizationStreamSelect": true,
-                            "transformFeedbackStreamsLinesTriangles": true
+                            "transformFeedbackDraw": false,
+                            "transformFeedbackQueries": false,
+                            "transformFeedbackRasterizationStreamSelect": false,
+                            "transformFeedbackStreamsLinesTriangles": false
                         }
                     }
                 },

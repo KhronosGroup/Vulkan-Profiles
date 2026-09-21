@@ -25,12 +25,12 @@ file(GLOB PROFILES_FILES ${CMAKE_CURRENT_LIST_DIR})
 source_group("Python Files" FILES ${PROFILES_SCRIPT})
 
 set(PROFILES_FILES_FOR_INSTALL
-    VP_LUNARG_minimum_requirements.json
-    VP_LUNARG_desktop_baseline.json
-    VP_ANDROID_vulkan_profile_2021.json
-    VP_ANDROID_vulkan_profile_2022.json
-    VP_ANDROID_vulkan_profile_2025.json
-    VP_KHR_roadmap.json
+    ${CMAKE_CURRENT_LIST_DIR}/build/VP_LUNARG_minimum_requirements.json
+    ${CMAKE_CURRENT_LIST_DIR}/build/VP_LUNARG_desktop_baseline.json
+    ${CMAKE_CURRENT_LIST_DIR}/build/VP_ANDROID_vulkan_profile_2021.json
+    ${CMAKE_CURRENT_LIST_DIR}/build/VP_ANDROID_vulkan_profile_2022.json
+    ${CMAKE_CURRENT_LIST_DIR}/build/VP_ANDROID_vulkan_profile_2025.json
+    ${CMAKE_CURRENT_LIST_DIR}/build/VP_KHR_roadmap.json
 )
 
 if(WIN32)
@@ -42,20 +42,21 @@ endif()
 # Single custom target executing full generation graph
 add_custom_target(VpGenerate-Profiles ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/schema
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_LIST_DIR}/build
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/library/include/vulkan/debug
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/library/source/debug
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/profiles/VP_KHR_roadmap.json
-        ${CMAKE_CURRENT_LIST_DIR}/VP_KHR_roadmap.json
+        ${CMAKE_CURRENT_LIST_DIR}/build/VP_KHR_roadmap.json
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_minimum_requirements.json
-        ${CMAKE_CURRENT_LIST_DIR}/VP_LUNARG_minimum_requirements.json
+        ${CMAKE_CURRENT_LIST_DIR}/build/VP_LUNARG_minimum_requirements.json
     COMMAND ${VKPROFILES_EXE} graph
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/vkprofiles_graph.json
         --verbose
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${CMAKE_CURRENT_LIST_DIR}/VP_LUNARG_desktop_baseline.json
+        ${CMAKE_CURRENT_LIST_DIR}/build/VP_LUNARG_desktop_baseline.json
         ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline.json
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     VERBATIM

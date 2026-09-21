@@ -50,7 +50,7 @@
             "depends_on": [ "generate_schema" ],
             "command": "combine",
             "args": {
-                "output": "profiles/VP_LUNARG_desktop_baseline.json",
+                "output": "profiles/build/VP_LUNARG_desktop_baseline.json",
                 "format": "flatten",
                 "contributors": {
                     "Christophe Riccio": {
@@ -136,7 +136,7 @@
             "command": "transform",
             "args": {
                 "input": "profiles/Android",
-                "output": "profiles",
+                "output": "profiles/build",
                 "pull": [ "required-capabilities", "aliases" ],
                 "strip": [ "helper-values" ],
                 "format": "flatten"
@@ -148,8 +148,59 @@
             "depends_on": [ "desktop_baseline", "transform_android" ],
             "command": "validate",
             "args": {
-                "input": "profiles",
+                "input": "profiles/build",
                 "mode": [ "schema" ]
+            }
+        },
+        {
+            "id": "library_test_roadmap",
+            "description": "Generate Android test library headers/source",
+            "depends_on": [ "validate_profiles" ],
+            "command": "library",
+            "args": {
+                "input": "profiles/build",
+                "input_profiles": "VP_KHR_roadmap_2022,VP_KHR_roadmap_2024,VP_KHR_roadmap_2026",
+                "output": "library/test",
+                "output_src": "library/test",
+                "output_filename": "generated_vulkan_profiles_roadmap",
+                "mode": [ "header+source" ],
+                "strip": true,
+                "include_header": "generated_vulkan_profiles_roadmap.h",
+                "config": "release"
+            }
+        },
+        {
+            "id": "library_test_roadmap_debug",
+            "description": "Generate Android test library headers/source",
+            "depends_on": [ "validate_profiles" ],
+            "command": "library",
+            "args": {
+                "input": "profiles/build",
+                "input_profiles": "VP_KHR_roadmap_2022,VP_KHR_roadmap_2024,VP_KHR_roadmap_2026",
+                "output": "library/test",
+                "output_src": "library/test",
+                "output_filename": "generated_vulkan_profiles_roadmap_debug",
+                "mode": [ "header+source" ],
+                "strip": false,
+                "include_header": "generated_vulkan_profiles_roadmap_debug.h",
+                "config": "debug"
+            }
+        },
+        {
+            "id": "library_minimum_requirements",
+            "description": "Generate Vulkan Profiles C++ library (Debug)",
+            "depends_on": [ "validate_profiles" ],
+            "command": "library",
+            "args": {
+                "input": "profiles/build",
+                "input_profiles": "VP_LUNARG_minimum_requirements_1_0,VP_LUNARG_minimum_requirements_1_1,VP_LUNARG_minimum_requirements_1_2,VP_LUNARG_minimum_requirements_1_3,VP_LUNARG_minimum_requirements_1_4",
+                "output": "library/test",
+                "output_src": "library/test",
+                "output_filename": "generated_vulkan_requirements_debug",
+                "mode": [ "header+source" ],
+                "strip": true,
+                "include_header": "generated_vulkan_requirements_debug.h",
+                "config": "debug"
             }
         },
         {
@@ -158,7 +209,7 @@
             "depends_on": [ "validate_profiles" ],
             "command": "library",
             "args": {
-                "input": "profiles",
+                "input": "profiles/build",
                 "input_profiles": "VP_KHR_roadmap_2022,VP_KHR_roadmap_2024,VP_KHR_roadmap_2026,VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2023,VP_LUNARG_desktop_baseline_2024,VP_LUNARG_desktop_baseline_2026",
                 "output": "library/include/vulkan",
                 "output_src": "library/source",
@@ -175,7 +226,7 @@
             "depends_on": [ "validate_profiles" ],
             "command": "library",
             "args": {
-                "input": "profiles",
+                "input": "profiles/build",
                 "input_profiles": "VP_KHR_roadmap_2022,VP_KHR_roadmap_2024,VP_KHR_roadmap_2026,VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2023,VP_LUNARG_desktop_baseline_2024,VP_LUNARG_desktop_baseline_2026",
                 "output": "library/include/vulkan/debug",
                 "output_src": "library/source/debug",
@@ -191,7 +242,7 @@
             "depends_on": [ "validate_profiles" ],
             "command": "library",
             "args": {
-                "input": "profiles",
+                "input": "profiles/build",
                 "input_profiles": "VP_ANDROID_vulkan_profile_2021,VP_ANDROID_vulkan_profile_2022,VP_ANDROID_vulkan_profile_2025",
                 "output": "library/include/vulkan",
                 "output_filename": "android_vulkan_profiles",
@@ -206,7 +257,7 @@
             "depends_on": [ "validate_profiles" ],
             "command": "library",
             "args": {
-                "input": "profiles",
+                "input": "profiles/build",
                 "input_profiles": "VP_ANDROID_vulkan_profile_2021,VP_ANDROID_vulkan_profile_2022,VP_ANDROID_vulkan_profile_2025",
                 "output": "library/include/vulkan",
                 "output_filename": "android_vulkan_profiles_debug",
@@ -222,7 +273,7 @@
             "command": "library",
             "args": {
                 "input": "profiles",
-                "input_profiles": "VP_LUNARG_minimum_requirements_1_0,VP_LUNARG_minimum_requirements_1_1,VP_LUNARG_minimum_requirements_1_2,VP_LUNARG_minimum_requirements_1_3,VP_LUNARG_minimum_requirements_1_4,VP_KHR_roadmap_2022,VP_KHR_roadmap_2024,VP_KHR_roadmap_2026,VP_ANDROID_baseline_2021,VP_ANDROID_baseline_2022,VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2023,VP_LUNARG_desktop_baseline_2024,VP_LUNARG_desktop_baseline_2026",
+                "input_profiles": "VP_KHR_roadmap_2022,VP_ANDROID_baseline_2021,VP_ANDROID_baseline_2022",
                 "output": "library/test",
                 "output_filename": "generated_vulkan_profiles",
                 "mode": [ "header+source" ],
@@ -238,7 +289,7 @@
             "command": "library",
             "args": {
                 "input": "profiles",
-                "input_profiles": "VP_LUNARG_minimum_requirements_1_0,VP_LUNARG_minimum_requirements_1_1,VP_LUNARG_minimum_requirements_1_2,VP_LUNARG_minimum_requirements_1_3,VP_LUNARG_minimum_requirements_1_4,VP_KHR_roadmap_2022,VP_KHR_roadmap_2024,VP_KHR_roadmap_2026,VP_ANDROID_baseline_2021,VP_ANDROID_baseline_2022,VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2023,VP_LUNARG_desktop_baseline_2024,VP_LUNARG_desktop_baseline_2026",
+                "input_profiles": "VP_KHR_roadmap_2022,VP_ANDROID_baseline_2021,VP_ANDROID_baseline_2022",
                 "output": "library/test",
                 "output_filename": "generated_vulkan_profiles_debug",
                 "mode": [ "header+source" ],
@@ -270,20 +321,20 @@
             "depends_on": [ "validate_profiles" ],
             "command": "doc",
             "args": {
-                "input": "profiles",
-                "input_profiles": "VP_LUNARG_minimum_requirements_1_0,VP_LUNARG_minimum_requirements_1_1,VP_LUNARG_minimum_requirements_1_2,VP_LUNARG_minimum_requirements_1_3,VP_LUNARG_minimum_requirements_1_4,VP_KHR_roadmap_2022,VP_KHR_roadmap_2024,VP_KHR_roadmap_2026",
+                "input": "profiles/build",
+                "input_profiles": "VP_KHR_roadmap_2022,VP_KHR_roadmap_2024,VP_KHR_roadmap_2026",
                 "output": "PROFILES.md"
             }
         },
         {
-            "id": "doc_desktop",
-            "description": "Generate PROFILES_DESKTOP.md documentation",
+            "id": "doc_all",
+            "description": "Generate PROFILES_ALL.md documentation",
             "depends_on": [ "desktop_baseline" ],
             "command": "doc",
             "args": {
-                "input": "profiles",
-                "input_profiles": "VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2023,VP_LUNARG_desktop_baseline_2024,VP_LUNARG_desktop_baseline_2026",
-                "output": "PROFILES_DESKTOP.md"
+                "input": "profiles/build",
+                "input_profiles": "VP_KHR_roadmap_2022,VP_KHR_roadmap_2024,VP_KHR_roadmap_2026,VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2023,VP_LUNARG_desktop_baseline_2024,VP_LUNARG_desktop_baseline_2026",
+                "output": "PROFILES_ALL.md"
             }
         },
         {
@@ -292,7 +343,7 @@
             "depends_on": [ "transform_android" ],
             "command": "doc",
             "args": {
-                "input": "profiles",
+                "input": "profiles/build",
                 "input_profiles": "VP_ANDROID_vulkan_profile_2021,VP_ANDROID_vulkan_profile_2022,VP_ANDROID_vulkan_profile_2025",
                 "output": "PROFILES_ANDROID.md"
             }
