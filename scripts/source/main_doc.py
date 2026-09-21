@@ -43,17 +43,23 @@ def main_doc(args):
     api = getattr(args, 'api', 'vulkan') or 'vulkan'
     registry = gen_profiles_solution.VulkanRegistry(args.registry, api)
 
-    profiles_filenames = []
-    input_filenames = getattr(args, 'input_filenames', None)
-    if input_filenames:
-        profiles_filenames = input_filenames.split(',')
+    input_profiles = None
+    raw_profiles = getattr(args, 'input_profiles', None)
+    if raw_profiles:
+        input_profiles = [p.strip() for p in raw_profiles.split(',') if p.strip()]
 
     validate = getattr(args, 'validate', False)
     schema = None
 
     input_profiles_files = gen_profiles_solution.VulkanProfilesFiles(
-        registry, args.input, profiles_filenames, validate, schema
+        registry, args.input, input_profiles, validate, schema
     )
+
+    if input_profiles:
+        missing_profiles = [p for p in input_profiles if p not in input_profiles_files.profiles]
+        if missing_profiles:
+            logging.error(f"Profile(s) specified in '--input-profiles' not found in database: {', '.join(missing_profiles)}")
+            sys.exit(1)
 
     generator = gen_profiles_solution.VulkanProfilesDocGenerator(registry, input_profiles_files)
     generator.generate(args.output)

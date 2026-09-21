@@ -55,8 +55,8 @@ add_custom_target(VpGenerate-Profiles ALL
         --input ${CMAKE_CURRENT_LIST_DIR}/vkprofiles_graph.json
         --verbose
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline.json
         ${CMAKE_CURRENT_LIST_DIR}/VP_LUNARG_desktop_baseline.json
+        ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_desktop_baseline.json
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     VERBATIM
     SOURCES ${PROFILES_FILES}
