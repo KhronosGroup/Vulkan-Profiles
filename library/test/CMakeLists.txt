@@ -55,7 +55,25 @@ set_source_files_properties(
     PROPERTIES GENERATED TRUE
 )
 
+set(vulkan_profiles_source_roadmap ${CMAKE_CURRENT_LIST_DIR}/generated_vulkan_profiles_roadmap$<$<CONFIG:Debug>:_debug>.cpp)
+set_source_files_properties(
+    ${CMAKE_CURRENT_LIST_DIR}/generated_vulkan_profiles_roadmap.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/generated_vulkan_profiles_roadmap_debug.cpp
+    PROPERTIES GENERATED TRUE
+)
+
+set(vulkan_profiles_source_requirements ${CMAKE_CURRENT_LIST_DIR}/generated_vulkan_requirements_debug.cpp)
+set_source_files_properties(
+    ${CMAKE_CURRENT_LIST_DIR}/generated_vulkan_requirements_debug.cpp
+    PROPERTIES GENERATED TRUE
+)
+
 function(add_unit_test NAME)
+    set(SRC_VAR ${vulkan_profiles_source})
+    if(ARGC GREATER 1)
+        set(SRC_VAR ${ARGV1})
+    endif()
+
     set(TEST_FILE ./${NAME}.cpp)
     set(TEST_NAME_HO VpLibrary_${NAME}_header_only)
     set(TEST_NAME_WS VpLibrary_${NAME}_with_source)
@@ -71,7 +89,7 @@ function(add_unit_test NAME)
     add_test(NAME ${TEST_NAME_HO} COMMAND ${TEST_NAME_HO} --gtest_catch_exceptions=0)
     set_target_properties(${TEST_NAME_HO} PROPERTIES FOLDER "Profiles API library")
 
-    add_executable(${TEST_NAME_WS} ${TEST_FILE} ${vulkan_profiles_source})
+    add_executable(${TEST_NAME_WS} ${TEST_FILE} ${SRC_VAR})
     if(MSVC)
         target_compile_options(${TEST_NAME_WS} PRIVATE /bigobj)
     endif()
@@ -85,6 +103,11 @@ function(add_unit_test NAME)
 endfunction(add_unit_test)
 
 function(add_unit_test_object NAME)
+    set(SRC_VAR ${vulkan_profiles_source})
+    if(ARGC GREATER 1)
+        set(SRC_VAR ${ARGV1})
+    endif()
+
     set(TEST_FILE ./${NAME}.cpp)
     set(TEST_NAME_HO VpLibrary_${NAME}_header_only)
     set(TEST_NAME_WS VpLibrary_${NAME}_with_source)
@@ -101,7 +124,7 @@ function(add_unit_test_object NAME)
     add_test(NAME ${TEST_NAME_HO} COMMAND ${TEST_NAME_HO} --gtest_catch_exceptions=0)
     set_target_properties(${TEST_NAME_HO} PROPERTIES FOLDER "Profiles API library")
 
-    add_executable(${TEST_NAME_WS} ${TEST_FILE} ${vulkan_profiles_source})
+    add_executable(${TEST_NAME_WS} ${TEST_FILE} ${SRC_VAR})
     if(MSVC)
         target_compile_options(${TEST_NAME_WS} PRIVATE /bigobj)
     endif()
@@ -115,10 +138,10 @@ function(add_unit_test_object NAME)
     set_target_properties(${TEST_NAME_WS} PROPERTIES FOLDER "Profiles API library")
 endfunction(add_unit_test_object)
 
-add_unit_test(test_api_reflection)
+add_unit_test(test_api_reflection ${vulkan_profiles_source_roadmap})
 if(NOT APPLE)
-    add_unit_test_object(test_api_profile_object)
-    add_unit_test(test_api_create_device)
+    add_unit_test_object(test_api_profile_object ${vulkan_profiles_source_roadmap})
+    add_unit_test(test_api_create_device ${vulkan_profiles_source_requirements})
 endif()
 
 function (create_android_package NAME)

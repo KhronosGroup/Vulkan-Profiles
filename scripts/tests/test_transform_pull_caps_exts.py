@@ -1697,17 +1697,16 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
                     },
                     "properties": {
                         "VkPhysicalDeviceTransformFeedbackPropertiesEXT": {
-                            "maxTransformFeedbackAttributesPerStream": 512,
-                            "maxTransformFeedbackAttributesPerVertex": 64,
-                            "maxTransformFeedbackBuffers": 4,
-                            "maxTransformFeedbackBuffersPerSubpass": 4,
+                            "maxTransformFeedbackBufferDataSize": 512,
+                            "maxTransformFeedbackBufferDataStride": 512,
                             "maxTransformFeedbackBufferSize": 1073741824,
+                            "maxTransformFeedbackBuffers": 4,
+                            "maxTransformFeedbackStreamDataSize": 512,
                             "maxTransformFeedbackStreams": 4,
-                            "maxTransformFeedbackStreamStride": 2048,
-                            "transformFeedbackDraw": true,
-                            "transformFeedbackQueries": true,
-                            "transformFeedbackRasterizationStreamSelect": true,
-                            "transformFeedbackStreamsLinesTriangles": true
+                            "transformFeedbackDraw": false,
+                            "transformFeedbackQueries": false,
+                            "transformFeedbackRasterizationStreamSelect": false,
+                            "transformFeedbackStreamsLinesTriangles": false
                         }
                     }
                 }
@@ -1731,4 +1730,3 @@ if __name__ == '__main__':
     TestConvertPullExtensionsDependencies.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
-    

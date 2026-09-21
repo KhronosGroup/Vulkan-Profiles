@@ -250,7 +250,7 @@ TEST(test_validate_unit, VP_LUNARG_desktop_max_2026) {
 TEST(test_validate_sdk, VP_LUNARG_minimum_requirements) {
     JsonValidator validator;
 
-    const std::string path = std::string(PROFILE_FILES_PATH) + "VP_LUNARG_minimum_requirements.json";
+    const std::string path = std::string(PROFILE_FILES_PATH) + "LunarG/VP_LUNARG_minimum_requirements.json";
     const Json::Value json_document2 = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(json_document2));
 }
@@ -258,7 +258,7 @@ TEST(test_validate_sdk, VP_LUNARG_minimum_requirements) {
 TEST(test_validate_sdk, VP_LUNARG_desktop_baseline) {
     JsonValidator validator;
 
-    const std::string path = std::string(PROFILE_FILES_PATH) + "VP_LUNARG_desktop_baseline.json";
+    const std::string path = std::string(PROFILE_FILES_PATH) + "LunarG/VP_LUNARG_desktop_baseline.json";
     const Json::Value json_document2 = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(json_document2));
 }
@@ -266,7 +266,7 @@ TEST(test_validate_sdk, VP_LUNARG_desktop_baseline) {
 TEST(test_validate_sdk, VP_KHR_roadmap) {
     JsonValidator validator;
 
-    const std::string path = std::string(PROFILE_FILES_PATH) + "VP_KHR_roadmap.json";
+    const std::string path = std::string(PROFILE_FILES_PATH) + "Khronos/VP_KHR_roadmap.json";
     const Json::Value json_document3 = ParseJsonFile(path.c_str());
     EXPECT_TRUE(validator.Check(json_document3));
 }
