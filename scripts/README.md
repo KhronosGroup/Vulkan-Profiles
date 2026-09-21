@@ -18,9 +18,9 @@ Global options:
 * `--verbose`: Enable INFO, WARNING, and ERROR output.
 * `--log [TYPES ...]`: Filter output by message type: `none`, `all`, `info`, `warning`, `error`, or `critical`. Values may be comma-separated or space-separated. `none` and `all` cannot be combined with other types, and this option is mutually exclusive with `--quiet` and `--verbose`.
 
-The top-level CLI registers commands in this order: `graph`, `validate`, `schema`, `transform`, `combine`, `extract`, `min-api-version`, `library`, `doc`, `layer`, `tests`, and `version`.
+The parser registers commands in the following order in [scripts/vkprofiles.py](vkprofiles.py): `graph`, `validate`, `schema`, `transform`, `combine`, `extract`, `min-api-version`, `summary`, `library`, `doc`, `layer`, `tests`, and `version`.
 
-Within a graph file, `nodes[].command` is limited to the pipeline operations supported by the executor (`schema`, `transform`, `combine`, `validate`, `library`, `doc`, `extract`, `min-api-version`, `layer`, and `tests`). Top-level `graph` and `version` are CLI entry points, not valid node commands.
+Within a graph file, `nodes[].command` is limited to the pipeline operations supported by the executor (`schema`, `transform`, `combine`, `validate`, `library`, `doc`, `extract`, `min-api-version`, `summary`, `layer`, and `tests`). Top-level `graph` and `version` are CLI entry points, not valid node commands.
 
 ---
 
@@ -78,6 +78,7 @@ The graph schema is defined in [scripts/source/graph_schema.py](source/graph_sch
               "doc",
               "extract",
               "min-api-version",
+              "summary",
               "layer",
               "tests"
             ]
@@ -101,7 +102,7 @@ The graph schema is defined in [scripts/source/graph_schema.py](source/graph_sch
 | `nodes` | Yes | Required array with at least one execution node. |
 | `nodes[].id` | Yes | Unique node identifier. |
 | `nodes[].description` | No | Human-readable description for logging/output. |
-| `nodes[].command` | Yes | Pipeline operation to execute. Valid values are `validate`, `schema`, `transform`, `combine`, `extract`, `min-api-version`, `library`, `doc`, `layer`, and `tests`. |
+| `nodes[].command` | Yes | Pipeline operation to execute. Valid values are `validate`, `schema`, `transform`, `combine`, `extract`, `min-api-version`, `summary`, `library`, `doc`, `layer`, and `tests`. |
 | `nodes[].depends_on` | No | Array of upstream node ids that must complete before this node runs. |
 | `nodes[].args` | Yes | Object of CLI arguments for the underlying command. Keys follow the CLI flag names, using underscores instead of hyphens. |
 
@@ -348,7 +349,6 @@ vkprofiles transform --registry vk.xml --input path/to/input_dir --output path/t
 * `--consolidate`: Consolidate capabilities.
 * `--strip [OPTIONS ...]`: Strip options: `helper-values`, `duplication`, or `promoted-extensions`.
 * `--sort`: Sort profile capabilities.
-* `--validate [MODES ...]`: Validate profile files before transformation (`schema`, `analysis`). If specified without modes, both validation modes are used.
 
 #### Transformation Options
 
@@ -377,8 +377,7 @@ vkprofiles transform \
     --output profiles/generated \
     --pull required-capabilities aliases \
     --strip duplication promoted-extensions \
-    --consolidate \
-    --validate
+    --consolidate
 ```
 
 ---
@@ -391,17 +390,13 @@ Combines multiple profile JSON files into a single output profile JSON file usin
 vkprofiles combine --registry vk.xml --input path/to/profiles --output path/to/combined.json [options]
 ```
 
+* `--api`: Target API variant (`vulkan`). Default: `vulkan`.
 * `--registry`, `-r`: *(Required)* Path to `vk.xml`.
+* `--input`, `-i`: *(Required)* Directory containing profiles to combine.
+* `--input-profiles`: Comma-separated list of profile names to combine.
 * `--output`, `-o`: *(Required)* Output JSON file path.
-* `--input`, `-i`: Directory path containing profiles to combine.
-* `--input-profiles`: Comma-separated list of profiles to combine.
 * `--mode`, `-m`: Combination mode (`intersection`, `union`, or `difference`). Default: `intersection`.
 * `--format`: Output formatting style (`flatten` or `pretty`). Default: `pretty`.
-* `--pull [OPTIONS ...]`: Pull capability options: `required-capabilities`, `promoted-extensions`, `ignore-extension-versions`, `ignore-unsupported`, `override-with-core-capabilities`, or `aliases`.
-* `--consolidate`: Consolidate capabilities.
-* `--strip [OPTIONS ...]`: Strip options: `helper-values`, `duplication`, or `promoted-extensions`.
-* `--sort`: Sort profile capabilities.
-* `--validate [MODES ...]`: Validate profile files before combining (`schema`, `analysis`). If specified without modes, both validation modes are used.
 * `--profile-name`: Override output profile name.
 * `--profile-version`: Set profile version number. Default: `1`.
 * `--profile-label`: Set profile label string.
@@ -410,31 +405,6 @@ vkprofiles combine --registry vk.xml --input path/to/profiles --output path/to/c
 * `--profile-api-version`: Set target Vulkan API version (e.g., `1.3.280`).
 * `--profile-stage`: Set development stage (`ALPHA`, `BETA`, `STABLE`). Default: `STABLE`.
 * `--profile-required-profiles`: Comma-separated list of required profiles by the generated profile.
-
-#### Combining Multiple Profiles into a Single Output File (`--config`)
-
-When passing a JSON configuration file via `--config`, the `combine` command can process multiple profile definitions at once and pack them into a single output JSON file. The configuration file specifies a `profiles` object mapping target profile names (for example `VP_LUNARG_desktop_baseline_2022`, `VP_LUNARG_desktop_baseline_2023`, `VP_LUNARG_desktop_baseline_2024`, `VP_LUNARG_desktop_baseline_2026`) to their respective source input directories, label, description, API version, and required profiles. Root-level metadata such as `contributors` and `history` are also embedded into the final combined file.
-
-#### Target Vulkan API Version Selection (`--profile-api-version`)
-
-When specifying `--profile-api-version` (or setting `api-version` within a `--config` JSON file), developers must specify a Vulkan API version that exposes all Vulkan capabilities defined by the profile data. Selecting a target API version lower than what is required by any included core structure or feature will result in an invalid profile definition.
-
-To assist developers in determining and verifying the correct API version:
-
-* `vkprofiles validate` with `--mode analysis` checks the profile data against `vk.xml` and explicitly reports any capabilities or core structures that are not supported by the designated Vulkan major/minor version.
-* Published Vulkan Profiles Schemas in the Khronos-Schemas repository can be used to validate against a specific Vulkan Header version.
-
-**Example (Creating a combined baseline profile with configuration and transformation):**
-
-```bash
-vkprofiles combine \
-    --registry vk.xml \
-    --config profiles/LunarG/VP_LUNARG_desktop_baseline_config.json \
-    --output profiles/LunarG/VP_LUNARG_desktop_baseline.json \
-    --pull aliases \
-    --strip duplication \
-    --validate
-```
 
 **Example (Combining a directory into a single profile):**
 
@@ -461,12 +431,10 @@ vkprofiles extract --input path/to/input.json --input-profiles PROFILE_NAME[,PRO
 ```
 
 * `--input`, `-i`: *(Required)* Path to input profile JSON file or directory.
-* `--output`, `-o`: *(Required)* Path to output profile JSON file.
 * `--input-profiles`: *(Required)* Comma-separated list of profile names to extract.
+* `--output`, `-o`: *(Required)* Path to output profile JSON file.
 * `--mode`, `-m`: Extraction mode: `reference-required-profiles` or `pull-required-profiles`. Default: `reference-required-profiles`.
 * `--format`: Output formatting style (`flatten` or `pretty`). Default: `pretty`.
-* `--contributors`: Optional JSON string or object of profile contributors to add to the extracted output.
-* `--history`: Optional JSON string or list of profile revision history records to add to the extracted output.
 
 **Example:**
 
@@ -489,8 +457,8 @@ vkprofiles min-api-version --input path/to/profiles [options]
 ```
 
 * `--input`, `-i`: *(Required)* Path to input profiles file or directory.
-* `--output`, `-o`: Path to output profiles file or directory when updating JSONs in `evaluate` mode.
 * `--input-profiles`: Comma-separated list of profile names to process.
+* `--output`, `-o`: Path to output profiles file or directory when updating JSONs in `evaluate` mode.
 * `--schemas`, `-s`: Path to a directory containing Vulkan profile schemas (`profiles-*.json`).
 * `--mode`, `-m`: Operation mode: `display` or `evaluate`. Default: `display`.
 * `--format`: Output formatting style (`flatten` or `pretty`). Default: `pretty`.
@@ -532,25 +500,22 @@ Generates C/C++ Vulkan Profiles API library headers (`vulkan_profiles.h`, `vulka
 > When calling `vkCreateDevice`, the Vulkan specification prohibits passing duplicate or aliased feature structures simultaneously in the `VkDeviceCreateInfo` `pNext` chain. Specifically, two different structures enabling or configuring the same underlying Vulkan feature cannot both be present in `pNext`, even if their member boolean values match.
 >
 > **Resolution:**
-> To ensure the generated library creates valid `VkDevice` instances, input profile JSON files should not contain unexpanded or redundant feature structures. Use `--pull aliases --strip` before generating the library when appropriate.
+> To ensure the generated library creates valid `VkDevice` instances, use `--strip` when generating the library to remove redundant capability structures.
 
 ```bash
 vkprofiles library --registry vk.xml --input path/to/profiles --output path/to/include [options]
 ```
 
+* `--api`: Target API variant (`vulkan`). Default: `vulkan`.
 * `--registry`, `-r`: *(Required)* Path to `vk.xml`.
 * `--input`, `-i`: *(Required)* Directory containing input profile JSON files.
-* `--input-filenames`: Comma-separated list of profile filenames.
+* `--input-profiles`: Comma-separated list of profile names to process.
 * `--output`, `-o`, `--output-inc`: Target header output directory.
 * `--output-src`: Target source output directory. If omitted in `header+source` mode, defaults to `--output`.
 * `--output-filename`: Base filename for generated files. Default: `vulkan_profiles`.
 * `--mode [MODES ...]`: Library generation modes (`header-only`, `header+source`). Default: both modes are generated.
-* `--pull [OPTIONS ...]`: Pull capability options: `required-capabilities`, `promoted-extensions`, `ignore-extension-versions`, `ignore-unsupported`, `override-with-core-capabilities`, or `aliases`.
-* `--consolidate`: Consolidate capabilities.
 * `--strip`: Strip redundant capability structures before generating the library to keep `VkDevice` creation valid.
-* `--sort`: Sort profile capabilities.
-* `--intermediate`: Directory path for intermediate transformed JSON files (used when transformation options are provided).
-* `--validate [MODES ...]`: Validate profiles during generation (`schema`, `analysis`). If specified without modes, both validation modes are used.
+* `--intermediate`: Directory path for intermediate transformed JSON files (used when `--strip` is provided).
 * `--debug`, `-d`: Generate debug variant of library code.
 * `--config`, `-c`: Build configuration (`release` or `debug`). Default: `release`.
 * `--include-header`: Override the header file include directive in generated C++ source files.
@@ -562,12 +527,11 @@ vkprofiles library \
     --api vulkan \
     --registry vk.xml \
     --input profiles \
-    --input-filenames "VP_KHR_roadmap.json,VP_LUNARG_minimum_requirements.json,VP_LUNARG_desktop_baseline.json" \
+  --input-profiles "VP_KHR_roadmap_2022,VP_KHR_roadmap_2024,VP_KHR_roadmap_2026,VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2023,VP_LUNARG_desktop_baseline_2024,VP_LUNARG_desktop_baseline_2026" \
     --output library/include/vulkan \
     --output-src library/source \
     --output-filename vulkan_profiles \
     --mode header+source \
-    --pull aliases \
     --strip \
     --config release
 ```
@@ -595,9 +559,8 @@ vkprofiles doc --registry vk.xml --input path/to/profiles --output PROFILES.md [
 
 * `--registry`, `-r`: *(Required)* Path to `vk.xml`.
 * `--input`, `-i`: *(Required)* Directory containing profile JSON files.
-* `--output`, `-o`: *(Required)* Output Markdown file path.
 * `--input-filenames`: Comma-separated list of profile filenames.
-* `--validate [MODES ...]`: Validate profile JSON files before generating documentation (`schema`, `analysis`). If specified without modes, both validation modes are used. By default, no validation is requested.
+* `--output`, `-o`: *(Required)* Output Markdown file path.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
 
 **Example:**
@@ -608,8 +571,44 @@ vkprofiles doc \
     --registry vk.xml \
     --input profiles \
     --input-filenames "VP_KHR_roadmap.json,VP_LUNARG_minimum_requirements.json" \
-    --output PROFILES.md \
-    --validate
+    --output PROFILES.md
+```
+
+---
+
+### 10. `summary`
+
+Generates a summary of profile definitions from one or more profile JSON files or directories, displaying metadata and capability counts.
+
+```bash
+vkprofiles summary --input path/to/profiles [options]
+```
+
+* `--input`, `-i`: *(Required)* Path to input profile JSON file or directory.
+* `--input-profiles`: Comma-separated list of profile names to summarize.
+* `--format`: Output formatting style (`flatten` or `pretty`). Default: `pretty`.
+
+**Example:**
+
+```bash
+vkprofiles summary \
+    --input profiles/LunarG
+```
+
+---
+
+### 11. `version`
+
+Prints the `vkprofiles` version string based on the Vulkan Headers version used when building the tool.
+
+```bash
+vkprofiles version
+```
+
+**Example:**
+
+```bash
+vkprofiles version
 ```
 
 ---
@@ -620,7 +619,7 @@ vkprofiles doc \
 > **Internal Tool Developer Commands**
 > The `layer` and `tests` subcommands are designed exclusively for developers maintaining the Vulkan Profiles repository to generate layer and test code.
 
-### 10. `layer` *(Internal)*
+### 12. `layer` *(Internal)*
 
 Generates `profiles_generated.cpp` for the Vulkan Profiles layer (`VkLayer_khronos_profiles`).
 
@@ -629,7 +628,7 @@ vkprofiles layer --registry vk.xml --output layer/profiles_generated.cpp
 ```
 
 * `--registry`, `-r`: Path to `vk.xml`.
-* `--output`, `-o`, `--out-layer`: Output path for the generated layer source file.
+* `--output`, `-o`: Output path for the generated layer source file.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
 
 **Example:**
@@ -643,7 +642,7 @@ vkprofiles layer \
 
 ---
 
-### 11. `tests` *(Internal)*
+### 13. `tests` *(Internal)*
 
 Generates synthetic test profile JSON (`VP_LUNARG_test_api_generated.json`) and a C++ test suite (`tests_generated.cpp`).
 
@@ -664,20 +663,4 @@ vkprofiles tests \
     --registry vk.xml \
     --output-profile profiles/test/data/VP_LUNARG_test_api_generated.json \
     --output-cpp layer/tests/tests_generated.cpp
-```
-
----
-
-### 12. `version`
-
-Prints the `vkprofiles` version string based on the Vulkan Headers version used when building the tool.
-
-```bash
-vkprofiles version
-```
-
-**Example:**
-
-```bash
-vkprofiles version
 ```
