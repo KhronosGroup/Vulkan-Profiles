@@ -30,6 +30,14 @@ else()
     list(APPEND test_libraries Vulkan::Loader)
 endif()
 
+add_custom_target(VpGenerate-Test-Profiles
+    COMMAND ${VKPROFILES_EXE} graph
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_LIST_DIR}/vkprofiles_test_graph.json
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    VERBATIM
+    DEPENDS VpGenerate-Profiles python_venv)
+
 add_custom_target(VpLibrary_test_generated_library
     COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
@@ -37,7 +45,6 @@ add_custom_target(VpLibrary_test_generated_library
         --input ${PROJECT_SOURCE_DIR}/library/test/profiles
         --output ${PROJECT_SOURCE_DIR}/library/test
         --output-filename "test_vulkan_profiles"
-        --validate schema
     VERBATIM
     SOURCES ${CMAKE_CURRENT_LIST_DIR}/profiles
     DEPENDS ${CMAKE_CURRENT_LIST_DIR}/profiles
@@ -46,6 +53,7 @@ add_custom_target(VpLibrary_test_generated_library
             python_venv)
 set_target_properties(VpLibrary_test_generated_library PROPERTIES FOLDER "Profiles API library")
 add_dependencies(VpLibrary_test_generated_library VpGenerate-Profiles)
+add_dependencies(VpLibrary_test_generated_library VpGenerate-Test-Profiles)
 
 # Use generated profile source files from the current CMake directory based on build configuration
 set(vulkan_profiles_source ${CMAKE_CURRENT_LIST_DIR}/generated_vulkan_profiles$<$<CONFIG:Debug>:_debug>.cpp)

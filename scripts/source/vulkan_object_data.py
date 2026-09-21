@@ -414,8 +414,8 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceRobustness2PropertiesEXT', 'robustUniformBufferAccessSizeAlignment', '1', None),
     ],
     'VK_EXT_provoking_vertex': [
-        PropertyRequirement('VkPhysicalDeviceProvokingVertexPropertiesEXT', 'provokingVertexModePerPipeline', 'true', None),
-        PropertyRequirement('VkPhysicalDeviceProvokingVertexPropertiesEXT', 'transformFeedbackPreservesProvokingVertex', 'true', 'VK_EXT_transform_feedback'),
+        PropertyRequirement('VkPhysicalDeviceProvokingVertexPropertiesEXT', 'provokingVertexModePerPipeline', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceProvokingVertexPropertiesEXT', 'transformFeedbackPreservesTriangleFanProvokingVertex', 'false', None),
     ],
     'VK_EXT_blend_operation_advanced': [
         PropertyRequirement('VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT', 'advancedBlendMaxColorAttachments', '1', None),

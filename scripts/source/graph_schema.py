@@ -46,7 +46,7 @@ GRAPH_JSON_SCHEMA = {
                     },
                     "command": {
                         "type": "string",
-                        "enum": ["schema", "transform", "combine", "validate", "library", "doc", "extract", "min-api-version", "layer", "tests"]
+                        "enum": ["schema", "transform", "combine", "validate", "library", "doc", "extract", "min-api-version", "summary", "layer", "tests"]
                     },
                     "args": { "type": "object" }
                 },
