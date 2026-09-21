@@ -39,7 +39,7 @@ vkprofiles graph --registry vk.xml --input path/to/graph.json
 
 #### Graph JSON Schema
 
-The graph schema is defined in [scripts/source/graph_schema.py](source/graph_schema.py). It enforces the following structure:
+The graph schema is defined in [scripts/source/graph_schema.py](source/graph_schema.py). It enforces the following structure. Graph nodes are not a custom DSL: each `args` object is converted directly into argv for the underlying command. Lists become repeated arguments, booleans become bare flags, and nested objects remain structured data when the target subcommand accepts them.
 
 ```json
 {
@@ -104,6 +104,8 @@ The graph schema is defined in [scripts/source/graph_schema.py](source/graph_sch
 | `nodes[].command` | Yes | Pipeline operation to execute. Valid values are `validate`, `schema`, `transform`, `combine`, `extract`, `min-api-version`, `library`, `doc`, `layer`, and `tests`. |
 | `nodes[].depends_on` | No | Array of upstream node ids that must complete before this node runs. |
 | `nodes[].args` | Yes | Object of CLI arguments for the underlying command. Keys follow the CLI flag names, using underscores instead of hyphens. |
+
+Graph node arguments are not a custom DSL: they are translated directly into argv for the underlying subcommand. The executor in [scripts/source/main_graph.py](source/main_graph.py) converts each key/value pair into CLI flags, with lists expanded into repeated arguments, boolean `true` mapped to a bare flag, and `false`/`null` omitted. For example, `"pull": ["aliases", "required-capabilities"]` becomes `--pull aliases required-capabilities`, while `"strip": true` becomes `--strip`.
 
 The graph executor supports variable substitution in strings, lists, and nested objects. For example, `"output": "${profile_root}/VP_LUNARG_desktop_baseline.json"` resolves using the global `variables` map, and `$node_id.output` can be used to pass the output from a previous step into a later node.
 
@@ -393,7 +395,6 @@ vkprofiles combine --registry vk.xml --input path/to/profiles --output path/to/c
 * `--output`, `-o`: *(Required)* Output JSON file path.
 * `--input`, `-i`: Directory path containing profiles to combine.
 * `--input-profiles`: Comma-separated list of profiles to combine.
-* `--config`, `-c`: Path to JSON combine config file.
 * `--mode`, `-m`: Combination mode (`intersection`, `union`, or `difference`). Default: `intersection`.
 * `--format`: Output formatting style (`flatten` or `pretty`). Default: `pretty`.
 * `--pull [OPTIONS ...]`: Pull capability options: `required-capabilities`, `promoted-extensions`, `ignore-extension-versions`, `ignore-unsupported`, `override-with-core-capabilities`, or `aliases`.
@@ -453,25 +454,27 @@ vkprofiles combine \
 
 ### 6. `extract`
 
-Extracts a single named profile from a larger profile JSON file or directory into a standalone output profile JSON file.
+Extracts one or more named profiles from a larger profile JSON file or directory into a standalone output profile JSON file.
 
 ```bash
-vkprofiles extract --input path/to/input.json --output path/to/output.json --profile-name PROFILE_NAME [options]
+vkprofiles extract --input path/to/input.json --input-profiles PROFILE_NAME[,PROFILE_2] --output path/to/output.json [options]
 ```
 
 * `--input`, `-i`: *(Required)* Path to input profile JSON file or directory.
 * `--output`, `-o`: *(Required)* Path to output profile JSON file.
-* `--profile-name`, `-p`: *(Required)* Specific profile name to extract.
+* `--input-profiles`: *(Required)* Comma-separated list of profile names to extract.
 * `--mode`, `-m`: Extraction mode: `reference-required-profiles` or `pull-required-profiles`. Default: `reference-required-profiles`.
 * `--format`: Output formatting style (`flatten` or `pretty`). Default: `pretty`.
+* `--contributors`: Optional JSON string or object of profile contributors to add to the extracted output.
+* `--history`: Optional JSON string or list of profile revision history records to add to the extracted output.
 
 **Example:**
 
 ```bash
 vkprofiles extract \
     --input profiles/LunarG \
-    --output profiles/extracted/VP_LUNARG_desktop_baseline.json \
-    --profile-name VP_LUNARG_desktop_baseline \
+    --input-profiles VP_LUNARG_desktop_baseline,VP_LUNARG_desktop_max_2026 \
+    --output profiles/extracted/VP_LUNARG_desktop_selected.json \
     --mode reference-required-profiles
 ```
 
