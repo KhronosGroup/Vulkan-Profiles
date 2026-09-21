@@ -78,7 +78,7 @@ class TestConvertPullCapsDepends(unittest.TestCase):
                 self.assertEqual(
                     list(gen_block.keys()),
                     list(exp_block.keys()),
-                    f"Section mismatch in capability block '{cap_name}'"
+                    f"Section mismatch in capability block '{cap_name}' section"
                 )
 
                 for section in ("features", "properties"):
@@ -368,6 +368,54 @@ class TestConvertPullCapsDepends(unittest.TestCase):
         self.assertTrue(v12_props.get("filterMinmaxSingleComponentFormats"))
         self.assertTrue(v12_props.get("filterMinmaxImageComponentMapping"))
 
+    def test_pull_depends_ignore_unsupported_skips_unsupported_defaults(self):
+        """
+        Verifies that passing ignore_unsupported=True during capability pulling
+        skips pulling default baseline limit values for unsupported feature-dependent
+        properties (e.g., sparseAddressSpaceSize, maxTessellationGenerationLevel)
+        while preserving systematically supported limits and limits for supported features.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.0.0",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "features": {
+                        "VkPhysicalDeviceFeatures": {
+                            "largePoints": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_extension_dependencies_profiles_files(self.vk, True, json_files_dict, ignore_unsupported=True)
+        pull_required_capabilities_profiles_files(self.vk, json_files_dict, ignore_unsupported=True)
+
+        baseline_props = json_files_dict["test_profile.json"]["capabilities"]["baseline"].get("properties", {})
+        limits = baseline_props.get("VkPhysicalDeviceProperties", {}).get("limits", {})
+
+        # 1. Systematically supported property without feature dependency MUST be present
+        self.assertIn("maxVertexInputBindingStride", limits)
+        self.assertEqual(limits["maxVertexInputBindingStride"], 2048)
+
+        # 2. Supported feature-dependent property (largePoints=True) MUST be present with supported limit value
+        self.assertIn("pointSizeRange", limits)
+        self.assertEqual(limits["pointSizeRange"], [1.0, 64.0])
+
+        # 3. Default limits for unsupported features MUST be omitted when ignore_unsupported=True
+        self.assertNotIn("sparseAddressSpaceSize", limits)
+        self.assertNotIn("maxTessellationGenerationLevel", limits)
+        self.assertNotIn("maxGeometryShaderInvocations", limits)
+        self.assertNotIn("maxSamplerAnisotropy", limits)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -380,4 +428,3 @@ if __name__ == '__main__':
     TestConvertPullCapsDepends.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
-    
