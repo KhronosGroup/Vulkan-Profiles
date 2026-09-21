@@ -268,6 +268,7 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
                                 "residencyStandard2DBlockShape": false,
                                 "residencyStandard2DMultisampleBlockShape": false,
                                 "residencyStandard3DBlockShape": false,
+                                "residencyAlignedMipSize": true,
                                 "residencyNonResidentStrict": false
                             }
                         }
@@ -479,6 +480,7 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
                                 "residencyStandard2DBlockShape": false,
                                 "residencyStandard2DMultisampleBlockShape": false,
                                 "residencyStandard3DBlockShape": false,
+                                "residencyAlignedMipSize": true,
                                 "residencyNonResidentStrict": false
                             }
                         }

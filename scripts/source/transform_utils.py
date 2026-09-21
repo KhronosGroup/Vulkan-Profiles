@@ -50,9 +50,10 @@ class PullBits(str, Enum):
     REQUIRED_CAPABILITIES = 'required-capabilities'  # Evaluates extension dependencies and pulls satisfied core/extension feature and property requirements into capability blocks.
     PROMOTED_EXTENSIONS = 'promoted-extensions'      # Requires all extensions promoted to core up to the profile's target Vulkan version.
     IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions'    # Sets all required extension versions to 1, overriding specific extension spec versions.
+    IGNORE_UNSUPPORTED = 'ignore-unsupported'        # Skips pulling default values for feature-dependent properties when feature is unsupported.
     OVERRIDE_CORE_CAPABILITIES = 'override-with-core-capabilities'  # Allows required-capabilities pulling to override profile capability values that are below Vulkan core spec requirements.
     ALIASES = 'aliases'                              # Resolves and populates all equivalent capability aliases across core structures and extensions.
-
+    
 
 class StripBits(str, Enum):
     HELPER_VALUES = 'helper-values'                # Removes non-bitpos bitmask helper values (composites, all-flags, and zero/none constants) from capability blocks.

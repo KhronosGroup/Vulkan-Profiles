@@ -58,7 +58,8 @@ def pull_extension_dependencies_capabilities_block(
     context_features: set[tuple[str, str]] = None,
     context_properties: dict[str, Any] = None,
     profile_name: str = "",
-    override_core_capabilities: bool = False
+    override_core_capabilities: bool = False,
+    ignore_unsupported: bool = False
 ):
     if "extensions" not in json_profiles_capabilities_block:
         return
@@ -118,7 +119,7 @@ def pull_extension_dependencies_capabilities_block(
                 deep_merge_dict(features_dict, filtered_ext_satisfied)
 
         ext_satisfied_props = gatherSatisfiedExtensionRequiredProperties(
-            vk, ext_name, version, profile_enabled_exts, enabled_features
+            vk, ext_name, version, profile_enabled_exts, enabled_features, ignore_unsupported=ignore_unsupported
         )
         if ext_satisfied_props:
             filtered_ext_satisfied_props = filter_properties_against_context(
@@ -134,7 +135,8 @@ def pull_extension_dependencies_profiles_file(
     ignore_extension_versions: bool, 
     json_file_data: dict, 
     json_files_dict: dict = None,
-    override_core_capabilities: bool = False
+    override_core_capabilities: bool = False,
+    ignore_unsupported: bool = False
 ):
     profiles_data = json_file_data.get("profiles", {})
     json_profiles_capabilities = json_file_data.get("capabilities", {})
@@ -163,7 +165,7 @@ def pull_extension_dependencies_profiles_file(
             if block_name in json_profiles_capabilities:
                 block = json_profiles_capabilities[block_name]
                 pull_extension_dependencies_capabilities_block(
-                    vk, api_version, ignore_extension_versions, block, context_extensions, context_features, context_properties, profile_key, override_core_capabilities
+                    vk, api_version, ignore_extension_versions, block, context_extensions, context_features, context_properties, profile_key, override_core_capabilities, ignore_unsupported=ignore_unsupported
                 )
                 if "extensions" in block and isinstance(block["extensions"], dict):
                     context_extensions.update(block["extensions"].keys())
@@ -181,14 +183,15 @@ def pull_extension_dependencies_profiles_files(
     vk: VulkanObject, 
     ignore_extension_versions: bool, 
     json_files_dict: dict,
-    override_core_capabilities: bool = False
+    override_core_capabilities: bool = False,
+    ignore_unsupported: bool = False
 ):
     if not isinstance(json_files_dict, dict):
         return
 
     if "profiles" in json_files_dict or "capabilities" in json_files_dict:
         pull_extension_dependencies_profiles_file(
-            vk, ignore_extension_versions, json_files_dict, None, override_core_capabilities
+            vk, ignore_extension_versions, json_files_dict, None, override_core_capabilities, ignore_unsupported=ignore_unsupported
         )
         return
 
@@ -197,7 +200,7 @@ def pull_extension_dependencies_profiles_files(
         json_file_data = json_files_dict[file_key]
         if isinstance(json_file_data, dict):
             pull_extension_dependencies_profiles_file(
-                vk, ignore_extension_versions, json_file_data, json_files_dict, override_core_capabilities
+                vk, ignore_extension_versions, json_file_data, json_files_dict, override_core_capabilities, ignore_unsupported=ignore_unsupported
             )
 
 
@@ -249,7 +252,8 @@ def pull_required_capabilities_profiles_file(
     vk: VulkanObject, 
     json_files_dict: dict, 
     json_file_data: dict,
-    override_core_capabilities: bool = False
+    override_core_capabilities: bool = False,
+    ignore_unsupported: bool = False
 ):
     profiles_data = json_file_data.get("profiles", {})
     capabilities_dict = json_file_data.setdefault("capabilities", {})
@@ -316,7 +320,7 @@ def pull_required_capabilities_profiles_file(
                                 deep_merge_dict(transition_features, satisfied_feat)
 
                             satisfied_prop = gatherSatisfiedCoreRequiredPropertiesForVersion(
-                                vk, ver, api_version, all_exts, all_enabled_features_set
+                                vk, ver, api_version, all_exts, all_enabled_features_set, ignore_unsupported=ignore_unsupported
                             )
                             if satisfied_prop:
                                 deep_merge_dict(transition_properties, satisfied_prop)
@@ -397,7 +401,7 @@ def pull_required_capabilities_profiles_file(
                             deep_merge_dict(core_satisfied_features, satisfied_feat)
 
                         satisfied_prop = gatherSatisfiedCoreRequiredPropertiesForVersion(
-                            vk, ver, api_version, profile_enabled_exts, all_enabled_features_set
+                            vk, ver, api_version, profile_enabled_exts, all_enabled_features_set, ignore_unsupported=ignore_unsupported
                         )
                         if satisfied_prop:
                             deep_merge_dict(core_satisfied_properties, satisfied_prop)
@@ -469,7 +473,7 @@ def pull_required_capabilities_profiles_file(
                             deep_merge_dict(block_features, filtered_ext_satisfied)
 
                     ext_satisfied_props = gatherSatisfiedExtensionRequiredProperties(
-                        vk, ext_name, api_version, profile_enabled_exts, current_enabled_features
+                        vk, ext_name, api_version, profile_enabled_exts, current_enabled_features, ignore_unsupported=ignore_unsupported
                     )
                     if ext_satisfied_props:
                         filtered_ext_satisfied_props = filter_properties_against_context(
@@ -485,10 +489,11 @@ def pull_required_capabilities_profiles_file(
 def pull_required_capabilities_profiles_files(
     vk: VulkanObject, 
     json_files_dict: dict,
-    override_core_capabilities: bool = False
+    override_core_capabilities: bool = False,
+    ignore_unsupported: bool = False
 ):
     sorted_file_keys = get_topologically_sorted_file_keys(json_files_dict)
     for file_key in sorted_file_keys:
         pull_required_capabilities_profiles_file(
-            vk, json_files_dict, json_files_dict[file_key], override_core_capabilities
+            vk, json_files_dict, json_files_dict[file_key], override_core_capabilities, ignore_unsupported=ignore_unsupported
         )

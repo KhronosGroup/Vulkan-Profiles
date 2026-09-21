@@ -55,14 +55,15 @@ def transform_profiles_files(
     strip_modes = strip_modes or []
 
     ignore_ext_versions = PullBits.IGNORE_EXTENSION_VERSIONS in pull_modes
+    ignore_unsupported = PullBits.IGNORE_UNSUPPORTED in pull_modes
     override_core_caps = PullBits.OVERRIDE_CORE_CAPABILITIES in pull_modes
 
     if PullBits.REQUIRED_CAPABILITIES in pull_modes:
         pull_extension_dependencies_profiles_files(
-            vk, ignore_ext_versions, json_files_dict, override_core_capabilities=override_core_caps
+            vk, ignore_ext_versions, json_files_dict, override_core_capabilities=override_core_caps, ignore_unsupported=ignore_unsupported
         )
         pull_required_capabilities_profiles_files(
-            vk, json_files_dict, override_core_capabilities=override_core_caps
+            vk, json_files_dict, override_core_capabilities=override_core_caps, ignore_unsupported=ignore_unsupported
         )
 
     if PullBits.PROMOTED_EXTENSIONS in pull_modes:
