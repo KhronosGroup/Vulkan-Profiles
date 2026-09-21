@@ -176,12 +176,14 @@ def main(argv):
     combine_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the profiles files (default: pretty).')
     combine_parser.add_argument('--validate', nargs='*', action=ValidateAction, default=None, help='Validate profile files before combining (choices: schema, analysis).')
 
-    extract_parser = subparsers.add_parser('extract', parents=[log_parser], help='Extract a profile from a profile JSON file into a single profile JSON file.')
-    extract_parser.add_argument('--input', '-i', action='store', required=True, help='Path to input profiles file.')
+    extract_parser = subparsers.add_parser('extract', parents=[log_parser], help='Extract profile(s) from profile JSON file(s) into a single profile JSON file.')
+    extract_parser.add_argument('--input', '-i', action='store', required=True, help='Path to input profiles file or directory.')
     extract_parser.add_argument('--output', '-o', action='store', required=True, help='Path to output profile JSON file.')
-    extract_parser.add_argument('--profile-name', action='store', required=True, help='Specific profile name to extract.')
+    extract_parser.add_argument('--input-profiles', action='store', required=True, help='Comma separated list of profile names to extract.')
     extract_parser.add_argument('--mode', '-m', type=ExtractMode, choices=list(ExtractMode), default=ExtractMode.REFERENCE, help='Extraction mode: "reference-required-profiles" keeps parent profile references external, "pull-required-profiles" includes required parent profiles and blocks.')
     extract_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the output file.')
+    extract_parser.add_argument('--contributors', action='store', help='JSON string or dict of profile contributors.')
+    extract_parser.add_argument('--history', action='store', help='JSON string or list of profile revision history.')
 
     min_api_parser = subparsers.add_parser('min-api-version', parents=[log_parser], help='Display or process the minimum Vulkan API version of profile(s).')
     min_api_parser.add_argument('--registry', '-r', action='store', help='Use specified Vulkan registry file (vk.xml).')

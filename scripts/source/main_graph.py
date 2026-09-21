@@ -60,7 +60,7 @@ def resolve_variables(value, node_outputs: dict, global_vars: dict):
 def build_argv_from_args(command: str, args_dict: dict) -> list[str]:
     """Converts a dictionary of arguments into CLI argv list for argparse sub-command execution."""
     argv = [command]
-    ignored_keys = {"profiles", "contributors", "history"}
+    ignored_keys = {"profiles"}
     for key, val in args_dict.items():
         if val is None or val is False or key in ignored_keys:
             continue
@@ -69,6 +69,8 @@ def build_argv_from_args(command: str, args_dict: dict) -> list[str]:
 
         if val is True:
             argv.append(flag)
+        elif key in ("contributors", "history") and isinstance(val, (dict, list)):
+            argv.extend([flag, json.dumps(val)])
         elif isinstance(val, list):
             argv.append(flag)
             for item in val:
