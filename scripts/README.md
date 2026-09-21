@@ -342,7 +342,7 @@ vkprofiles transform --registry vk.xml --input path/to/input_dir --output path/t
 * `--registry`, `-r`: Path to `vk.xml`.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
 * `--format`: Output formatting style (`flatten` or `pretty`). Default: `pretty`.
-* `--pull [OPTIONS ...]`: Pull capability options: `required-capabilities`, `promoted-extensions`, `ignore-extension-versions`, `override-with-core-capabilities`, or `aliases`.
+* `--pull [OPTIONS ...]`: Pull capability options: `required-capabilities`, `promoted-extensions`, `ignore-extension-versions`, `ignore-unsupported`, `override-with-core-capabilities`, or `aliases`.
 * `--consolidate`: Consolidate capabilities.
 * `--strip [OPTIONS ...]`: Strip options: `helper-values`, `duplication`, or `promoted-extensions`.
 * `--sort`: Sort profile capabilities.
@@ -357,6 +357,7 @@ Conversion flags are processed in a deterministic internal pipeline order regard
 | `--pull required-capabilities` | Evaluates extension dependencies and pulls satisfied core/extension feature and property requirements into capability blocks. |
 | `--pull promoted-extensions` | Requires all extensions promoted to core up to the profile's target Vulkan version. |
 | `--pull ignore-extension-versions` | Sets all required extension versions to 1, overriding specific extension spec versions. |
+| `--pull ignore-unsupported` | Skips pulling default values for feature-dependent properties when the corresponding feature is unsupported. |
 | `--pull override-with-core-capabilities` | Allows required-capabilities pulling to override profile capability values below Vulkan core requirements. |
 | `--pull aliases` | Resolves and populates equivalent capability aliases across core structures and extensions. |
 | `--consolidate` | Combines capability blocks into a consolidated requirements block per profile. |
@@ -395,7 +396,7 @@ vkprofiles combine --registry vk.xml --input path/to/profiles --output path/to/c
 * `--config`, `-c`: Path to JSON combine config file.
 * `--mode`, `-m`: Combination mode (`intersection`, `union`, or `difference`). Default: `intersection`.
 * `--format`: Output formatting style (`flatten` or `pretty`). Default: `pretty`.
-* `--pull [OPTIONS ...]`: Pull capability options: `required-capabilities`, `promoted-extensions`, `ignore-extension-versions`, `override-with-core-capabilities`, or `aliases`.
+* `--pull [OPTIONS ...]`: Pull capability options: `required-capabilities`, `promoted-extensions`, `ignore-extension-versions`, `ignore-unsupported`, `override-with-core-capabilities`, or `aliases`.
 * `--consolidate`: Consolidate capabilities.
 * `--strip [OPTIONS ...]`: Strip options: `helper-values`, `duplication`, or `promoted-extensions`.
 * `--sort`: Sort profile capabilities.
@@ -542,7 +543,7 @@ vkprofiles library --registry vk.xml --input path/to/profiles --output path/to/i
 * `--output-src`: Target source output directory. If omitted in `header+source` mode, defaults to `--output`.
 * `--output-filename`: Base filename for generated files. Default: `vulkan_profiles`.
 * `--mode [MODES ...]`: Library generation modes (`header-only`, `header+source`). Default: both modes are generated.
-* `--pull [OPTIONS ...]`: Pull capability options: `required-capabilities`, `promoted-extensions`, `ignore-extension-versions`, `override-with-core-capabilities`, or `aliases`.
+* `--pull [OPTIONS ...]`: Pull capability options: `required-capabilities`, `promoted-extensions`, `ignore-extension-versions`, `ignore-unsupported`, `override-with-core-capabilities`, or `aliases`.
 * `--consolidate`: Consolidate capabilities.
 * `--strip [OPTIONS ...]`: Strip options: `helper-values`, `duplication`, or `promoted-extensions`.
 * `--sort`: Sort profile capabilities.

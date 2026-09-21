@@ -996,7 +996,8 @@ def gatherSatisfiedCoreRequiredPropertiesForVersion(
     exact_ver: VK_VERSION,
     api_version: VK_VERSION, 
     enabled_exts: set[str], 
-    enabled_features: set[tuple[str, str]]
+    enabled_features: set[tuple[str, str]],
+    ignore_unsupported: bool = False
 ) -> dict[str, Any]:
     from source.profiles_json_utils import merge_capability_value
     satisfied_properties: dict[str, Any] = {}
@@ -1009,6 +1010,9 @@ def gatherSatisfiedCoreRequiredPropertiesForVersion(
         return satisfied_properties
 
     for req in getattr(ver_obj, 'propertyRequirement', []) or []:
+        if ignore_unsupported and req.depends and req.depends.startswith('!'):
+            continue
+
         if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
             parsed_val = parse_property_value(req.name, req.value)
             if req.struct == 'VkPhysicalDeviceLimits':
@@ -1040,7 +1044,8 @@ def gatherSatisfiedExtensionRequiredProperties(
     ext_name: str, 
     api_version: VK_VERSION, 
     enabled_exts: set[str], 
-    enabled_features: set[tuple[str, str]]
+    enabled_features: set[tuple[str, str]],
+    ignore_unsupported: bool = False
 ) -> dict[str, Any]:
     from source.profiles_json_utils import merge_capability_value
     satisfied_properties: dict[str, Any] = {}
@@ -1050,6 +1055,9 @@ def gatherSatisfiedExtensionRequiredProperties(
 
     ext_obj = vk.extensions[ext_name]
     for req in getattr(ext_obj, 'propertyRequirement', []) or []:
+        if ignore_unsupported and req.depends and req.depends.startswith('!'):
+            continue
+
         if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
             parsed_val = parse_property_value(req.name, req.value)
             struct_dict = satisfied_properties.setdefault(req.struct, {})
