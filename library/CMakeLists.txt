@@ -19,7 +19,6 @@ add_library(Vulkan::Profiles ALIAS VulkanProfiles)
 install(
     FILES
         ${CMAKE_SOURCE_DIR}/library/include/vulkan/debug/vulkan_profiles.hpp
-        ${CMAKE_SOURCE_DIR}/library/include/vulkan/android_vulkan_profiles.hpp
     DESTINATION
         ${CMAKE_INSTALL_INCLUDEDIR}/vulkan/
 )

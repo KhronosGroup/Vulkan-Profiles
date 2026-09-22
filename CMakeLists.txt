@@ -202,7 +202,7 @@ add_dependencies(VpProfilesProcessor python_venv)
 if(WIN32)
     set(VKPROFILES_INSTALL_DIR "Bin")
 else()
-    set(VKPROFILES_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/vulkan/bin")
+    set(VKPROFILES_INSTALL_DIR "${CMAKE_INSTALL_BINDIR}")
 endif()
 
 install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/scripts/vkprofiles${CMAKE_EXECUTABLE_SUFFIX}"
