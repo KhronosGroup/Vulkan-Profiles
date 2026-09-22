@@ -82,6 +82,32 @@ def main_library(args):
         logging.error(f"No profile JSON files loaded from '{input_path}'")
         sys.exit(1)
 
+    # Validate that all required parent profile dependencies are present in the filtered dataset
+    active_profile_names = {
+        p_name
+        for data in json_files_dict.values()
+        if isinstance(data, dict) and 'profiles' in data and isinstance(data['profiles'], dict)
+        for p_name in data['profiles'].keys()
+    }
+
+    missing_parents = {}
+    for data in json_files_dict.values():
+        if isinstance(data, dict) and 'profiles' in data and isinstance(data['profiles'], dict):
+            for p_name, p_val in data['profiles'].items():
+                if isinstance(p_val, dict):
+                    req_parents = p_val.get('profiles', [])
+                    for parent in req_parents:
+                        if parent not in active_profile_names:
+                            missing_parents.setdefault(p_name, []).append(parent)
+
+    if missing_parents:
+        for p_name, parents in missing_parents.items():
+            logging.error(
+                f"Profile '{p_name}' requires parent profile(s) '{', '.join(parents)}', "
+                f"which were omitted from '--input-profiles'."
+            )
+        sys.exit(1)
+
     vk = initVulkanObject(api, registry_path)
 
     if strip:

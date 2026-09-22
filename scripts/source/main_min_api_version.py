@@ -23,6 +23,7 @@ import json
 import logging
 import os
 import re
+import sys
 import tempfile
 import urllib.request
 from enum import Enum
@@ -295,10 +296,13 @@ def load_available_schemas(schemas_dir: str | Path = None) -> list[tuple[int, Pa
 
 def find_min_schema_for_profile(profile_file_data: dict, schemas: list[tuple[int, Path | str, dict]], profile_name: str = "") -> tuple[int | None, dict | None]:
     """Validates a profile against schemas from newest to oldest to identify the oldest passing schema header version."""
+    if not schemas:
+        return None, None
+
     last_passing_header_ver = None
     last_passing_schema = None
 
-    for header_ver, schema_identifier, schema_data in schemas:
+    for idx, (header_ver, schema_identifier, schema_data) in enumerate(schemas):
         schema_file_name = Path(str(schema_identifier)).name if schema_identifier else f"profiles-0.8.2-{header_ver}.json"
         prof_str = f" for profile '{profile_name}'" if profile_name else ""
         logging.info(f"Checking schema '{schema_file_name}'{prof_str}...")
@@ -308,12 +312,11 @@ def find_min_schema_for_profile(profile_file_data: dict, schemas: list[tuple[int
             last_passing_header_ver = header_ver
             last_passing_schema = schema_data
         else:
+            if idx == 0:
+                logging.error(f"Profile '{profile_name}' failed schema validation against the newest schema '{schema_file_name}'.")
+                return None, None
             if last_passing_header_ver is not None:
                 break
-
-    if last_passing_header_ver is None and schemas:
-        last_passing_header_ver = schemas[-1][0]
-        last_passing_schema = schemas[-1][2]
 
     return last_passing_header_ver, last_passing_schema
 
@@ -367,13 +370,12 @@ def evaluate_min_api_version(vk_object=None, json_data: dict = None, profile_nam
                     extracted_data = file_data
 
                 min_header_ver, min_schema = find_min_schema_for_profile(extracted_data, schemas, profile_name=pname)
+                if min_header_ver is None:
+                    logging.error(f"Schema validation failed for profile '{pname}'.")
+                    return {}
 
                 min_core_ver = calculate_profile_min_core_version(vk_object, json_files_dict, extracted_data, pname)
-
-                if min_header_ver:
-                    results[pname] = f"{min_core_ver.major}.{min_core_ver.minor}.{min_header_ver}"
-                else:
-                    results[pname] = f"{min_core_ver.major}.{min_core_ver.minor}.0"
+                results[pname] = f"{min_core_ver.major}.{min_core_ver.minor}.{min_header_ver}"
 
     return results
 
@@ -393,7 +395,7 @@ def main_min_api_version(args):
     json_files_dict = load_profiles_jsons(input_path)
     if not json_files_dict:
         logging.error(f"No profile files loaded from {input_path}")
-        return
+        sys.exit(1)
 
     if mode == MinApiVersionMode.SHOW:
         for file_key, file_data in json_files_dict.items():
@@ -410,7 +412,7 @@ def main_min_api_version(args):
         schemas = load_available_schemas(schemas_dir)
         if not schemas:
             logging.error("No valid Vulkan profile schemas available for validation detection.")
-            return
+            sys.exit(1)
 
         vk_object = None
         try:
@@ -437,6 +439,10 @@ def main_min_api_version(args):
                     extracted_data = file_data
 
                 min_header_ver, min_schema = find_min_schema_for_profile(extracted_data, schemas, profile_name=pname)
+                if min_header_ver is None:
+                    logging.error(f"Schema validation failed for profile '{pname}'. Aborting min-api-version evaluation.")
+                    sys.exit(1)
+
                 profile_min_headers[pname] = min_header_ver
 
                 min_core_ver = calculate_profile_min_core_version(vk_object, json_files_dict, extracted_data, pname)
@@ -467,4 +473,3 @@ def main_min_api_version(args):
                 logging.info(f"Profile '{pname}': evaluated api-version = {api_ver}")
             for file_key, schema_ver in summary_files.items():
                 logging.info(f"File '{file_key}': evaluated schema header version = {schema_ver}")
-                

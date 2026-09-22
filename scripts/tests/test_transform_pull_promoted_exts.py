@@ -31,7 +31,9 @@ if str(scripts_dir) not in sys.path:
 
 from vulkan_object import VulkanObject
 from source.vulkan_object_utils import initVulkanObject
+from source.transform_utils import PullBits
 from source.transform_pull_promoted_extensions import pull_promoted_extensions_profiles_files
+from source.transform_sort import sort_profiles_files
 
 
 class TestConvertPullPromotedExtensions(unittest.TestCase):
@@ -40,6 +42,85 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
     def setUp(self):
         self.vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
 
+    def assertProfileDataEqual(self, gen_data: dict, exp_data: dict):
+        self.assertEqual(
+            list(gen_data.keys()),
+            list(exp_data.keys()),
+            f"Top-level keys mismatch: {list(gen_data.keys())} vs {list(exp_data.keys())}"
+        )
+
+        if "profiles" in exp_data:
+            self.assertEqual(
+                list(gen_data.get("profiles", {}).keys()),
+                list(exp_data["profiles"].keys()),
+                "Profile name list mismatch"
+            )
+            for prof_name, exp_prof in exp_data["profiles"].items():
+                gen_prof = gen_data["profiles"].get(prof_name, {})
+                self.assertEqual(
+                    gen_prof.get("capabilities"),
+                    exp_prof.get("capabilities"),
+                    f"Capabilities block reference list mismatch in profile '{prof_name}'"
+                )
+
+        if "capabilities" in exp_data:
+            self.assertEqual(
+                list(gen_data.get("capabilities", {}).keys()),
+                list(exp_data["capabilities"].keys()),
+                "Capability block name list mismatch"
+            )
+
+            for cap_name, exp_block in exp_data["capabilities"].items():
+                gen_block = gen_data["capabilities"].get(cap_name, {})
+
+                self.assertEqual(
+                    list(gen_block.keys()),
+                    list(exp_block.keys()),
+                    f"Section mismatch in capability block '{cap_name}'"
+                )
+
+                for section in ("extensions", "features", "properties"):
+                    if section in exp_block:
+                        exp_section = exp_block[section]
+                        gen_section = gen_block.get(section, {})
+
+                        if section == "extensions":
+                            self.assertEqual(
+                                gen_section,
+                                exp_section,
+                                f"Extension mismatch in capability block '{cap_name}'"
+                            )
+                        else:
+                            self.assertEqual(
+                                list(gen_section.keys()),
+                                list(exp_section.keys()),
+                                f"Structure name list mismatch in capability block '{cap_name}', section '{section}'"
+                            )
+
+                            for struct_name, exp_struct in exp_section.items():
+                                gen_struct = gen_section.get(struct_name, {})
+                                if isinstance(exp_struct, dict):
+                                    self.assertEqual(
+                                        list(gen_struct.keys()),
+                                        list(exp_struct.keys()),
+                                        f"Member key list mismatch in '{cap_name}.{section}.{struct_name}'"
+                                    )
+                                    for member_name, exp_val in exp_struct.items():
+                                        gen_val = gen_struct.get(member_name)
+                                        self.assertEqual(
+                                            gen_val,
+                                            exp_val,
+                                            f"Value mismatch in '{cap_name}.{section}.{struct_name}.{member_name}'"
+                                        )
+                                else:
+                                    self.assertEqual(
+                                        gen_struct,
+                                        exp_struct,
+                                        f"Value mismatch in '{cap_name}.{section}.{struct_name}'"
+                                    )
+
+        self.assertEqual(gen_data, exp_data)
+
     # -------------------------------------------------------------------------
     # Vulkan 1.0 Tests (VK_KHR_variable_pointers, VK_KHR_multiview)
     # -------------------------------------------------------------------------
@@ -47,8 +128,8 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
     def test_pull_promoted_extensions_block_unique_vulkan10(self):
         """
         Verifies that for Vulkan 1.0 profiles, pull_promoted_extensions_profiles_files pulls no core
-        promoted extensions (since core promotions start at Vulkan 1.1+), but still resolves dependencies,
-        required features, and required properties for extensions in the primary capability block.
+        promoted extensions (since core promotions start at Vulkan 1.1+), but still resolves dependencies
+        and required features/properties for extensions explicitly enabled in the primary capability block.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -69,11 +150,6 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             }
         }"""
 
-        try:
-            original_data = json.loads(original_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
-
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
             "profiles": {
@@ -86,17 +162,17 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "baseline": {
                     "extensions": {
-                        "VK_KHR_variable_pointers": 1,
-                        "VK_KHR_multiview": 1,
                         "VK_KHR_get_physical_device_properties2": 1,
-                        "VK_KHR_storage_buffer_storage_class": 1
+                        "VK_KHR_multiview": 1,
+                        "VK_KHR_storage_buffer_storage_class": 1,
+                        "VK_KHR_variable_pointers": 1
                     },
                     "features": {
-                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
-                            "variablePointersStorageBuffer": true
-                        },
                         "VkPhysicalDeviceMultiviewFeaturesKHR": {
                             "multiview": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
                         }
                     },
                     "properties": {
@@ -109,15 +185,21 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             }
         }"""
 
-        try:
-            expected_data = json.loads(expected_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_promoted_extensions_profiles_files(
+            self.vk, 
+            [PullBits.PROMOTED_EXTENSIONS, PullBits.IGNORE_EXTENSION_VERSIONS, PullBits.IGNORE_UNSUPPORTED], 
+            json_files_dict
+        )
+        sort_profiles_files(self.vk, json_files_dict)
 
-        json_files_dict = {"test_profile.json": original_data}
-        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
+        res_baseline = json_files_dict["test_profile.json"]["capabilities"]["baseline"]
+        
+        # Verify feature and property structures were pulled for enabled extension
+        self.assertIn("VkPhysicalDeviceMultiviewFeaturesKHR", res_baseline.get("features", {}))
+        self.assertIn("VkPhysicalDeviceMultiviewPropertiesKHR", res_baseline.get("properties", {}))
 
-        self.assertEqual(json_files_dict["test_profile.json"], expected_data)
+        self.assertProfileDataEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
 
     def test_pull_promoted_extensions_block_inheritance_vulkan10(self):
@@ -148,11 +230,6 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             }
         }"""
 
-        try:
-            original_data = json.loads(original_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
-
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
             "profiles": {
@@ -182,15 +259,15 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             }
         }"""
 
-        try:
-            expected_data = json.loads(expected_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_promoted_extensions_profiles_files(
+            self.vk, 
+            [PullBits.PROMOTED_EXTENSIONS, PullBits.IGNORE_UNSUPPORTED], 
+            json_files_dict
+        )
+        sort_profiles_files(self.vk, json_files_dict)
 
-        json_files_dict = {"test_profile.json": original_data}
-        pull_promoted_extensions_profiles_files(self.vk, False, json_files_dict)
-
-        self.assertEqual(json_files_dict["test_profile.json"], expected_data)
+        self.assertProfileDataEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
 
     def test_pull_promoted_extensions_profile_inheritance_vulkan10(self):
@@ -233,11 +310,6 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             }
         }"""
 
-        try:
-            original_data = json.loads(original_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
-
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
             "profiles": {
@@ -261,8 +333,8 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                 },
                 "block_b": {
                     "extensions": {
-                        "VK_KHR_variable_pointers": 1,
-                        "VK_KHR_storage_buffer_storage_class": 1
+                        "VK_KHR_storage_buffer_storage_class": 1,
+                        "VK_KHR_variable_pointers": 1
                     },
                     "features": {
                         "VkPhysicalDeviceVariablePointerFeaturesKHR": {
@@ -273,15 +345,15 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             }
         }"""
 
-        try:
-            expected_data = json.loads(expected_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_promoted_extensions_profiles_files(
+            self.vk, 
+            [PullBits.PROMOTED_EXTENSIONS, PullBits.IGNORE_EXTENSION_VERSIONS, PullBits.IGNORE_UNSUPPORTED], 
+            json_files_dict
+        )
+        sort_profiles_files(self.vk, json_files_dict)
 
-        json_files_dict = {"test_profile.json": original_data}
-        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
-
-        self.assertEqual(json_files_dict["test_profile.json"], expected_data)
+        self.assertProfileDataEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
     # -------------------------------------------------------------------------
     # Vulkan 1.1 Tests (VK_KHR_variable_pointers)
@@ -289,8 +361,9 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
 
     def test_pull_promoted_extensions_block_unique_vulkan11(self):
         """
-        Verifies that all extensions promoted to Vulkan 1.1 core and their dependencies (e.g. VK_KHR_surface)
-        are automatically injected into a Vulkan 1.1 profile's primary capability block along with required features and properties.
+        Verifies that all extensions promoted to Vulkan 1.1 core (e.g. VK_KHR_multiview, VK_KHR_maintenance3)
+        are automatically injected into a Vulkan 1.1 profile's primary capability block along with ALL their
+        required features and properties structures.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -310,11 +383,6 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             }
         }"""
 
-        try:
-            original_data = json.loads(original_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
-
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
             "profiles": {
@@ -327,67 +395,81 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "baseline": {
                     "extensions": {
-                        "VK_KHR_variable_pointers": 1,
-                        "VK_KHR_multiview": 1,
-                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_bind_memory2": 1,
+                        "VK_KHR_dedicated_allocation": 1,
+                        "VK_KHR_descriptor_update_template": 1,
                         "VK_KHR_device_group": 1,
-                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_external_fence": 1,
+                        "VK_KHR_external_fence_capabilities": 1,
+                        "VK_KHR_external_memory": 1,
+                        "VK_KHR_external_memory_capabilities": 1,
+                        "VK_KHR_external_semaphore": 1,
+                        "VK_KHR_external_semaphore_capabilities": 1,
+                        "VK_KHR_get_memory_requirements2": 1,
                         "VK_KHR_get_physical_device_properties2": 1,
                         "VK_KHR_maintenance1": 1,
-                        "VK_KHR_external_memory_capabilities": 1,
-                        "VK_KHR_external_memory": 1,
-                        "VK_KHR_external_semaphore_capabilities": 1,
-                        "VK_KHR_external_semaphore": 1,
-                        "VK_KHR_16bit_storage": 1,
-                        "VK_KHR_descriptor_update_template": 1,
-                        "VK_KHR_external_fence_capabilities": 1,
-                        "VK_KHR_external_fence": 1,
                         "VK_KHR_maintenance2": 1,
-                        "VK_KHR_dedicated_allocation": 1,
-                        "VK_KHR_storage_buffer_storage_class": 1,
+                        "VK_KHR_maintenance3": 1,
+                        "VK_KHR_multiview": 1,
                         "VK_KHR_relaxed_block_layout": 1,
-                        "VK_KHR_get_memory_requirements2": 1,
                         "VK_KHR_sampler_ycbcr_conversion": 1,
-                        "VK_KHR_bind_memory2": 1,
-                        "VK_KHR_maintenance3": 1
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_storage_buffer_storage_class": 1,
+                        "VK_KHR_variable_pointers": 1
                     },
                     "features": {
-                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
-                            "multiview": true
-                        },
                         "VkPhysicalDevice16BitStorageFeaturesKHR": {
                             "storageBuffer16BitAccess": true
                         },
-                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
-                            "variablePointersStorageBuffer": true
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
                         },
                         "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
                             "samplerYcbcrConversion": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
                         }
                     },
                     "properties": {
-                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
-                            "maxMultiviewInstanceIndex": 134217727,
-                            "maxMultiviewViewCount": 6
-                        },
                         "VkPhysicalDeviceMaintenance3PropertiesKHR": {
                             "maxMemoryAllocationSize": 1073741824,
                             "maxPerSetDescriptors": 1024
+                        },
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                            "maxMultiviewInstanceIndex": 134217727,
+                            "maxMultiviewViewCount": 6
                         }
                     }
                 }
             }
         }"""
 
-        try:
-            expected_data = json.loads(expected_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_promoted_extensions_profiles_files(
+            self.vk, 
+            [PullBits.PROMOTED_EXTENSIONS, PullBits.IGNORE_EXTENSION_VERSIONS, PullBits.IGNORE_UNSUPPORTED], 
+            json_files_dict
+        )
+        sort_profiles_files(self.vk, json_files_dict)
 
-        json_files_dict = {"test_profile.json": original_data}
-        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
+        res_baseline = json_files_dict["test_profile.json"]["capabilities"]["baseline"]
 
-        self.assertEqual(json_files_dict["test_profile.json"], expected_data)
+        # Specifically verify features structures from promoted extensions
+        features_dict = res_baseline.get("features", {})
+        self.assertIn("VkPhysicalDevice16BitStorageFeaturesKHR", features_dict)
+        self.assertIn("VkPhysicalDeviceMultiviewFeaturesKHR", features_dict)
+        self.assertIn("VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR", features_dict)
+        self.assertIn("VkPhysicalDeviceVariablePointerFeaturesKHR", features_dict)
+
+        # Specifically verify properties structures from promoted extensions
+        properties_dict = res_baseline.get("properties", {})
+        self.assertIn("VkPhysicalDeviceMaintenance3PropertiesKHR", properties_dict)
+        self.assertIn("VkPhysicalDeviceMultiviewPropertiesKHR", properties_dict)
+
+        self.assertProfileDataEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
 
     def test_pull_promoted_extensions_block_inheritance_vulkan11(self):
@@ -418,11 +500,6 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             }
         }"""
 
-        try:
-            original_data = json.loads(original_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
-
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
             "profiles": {
@@ -435,52 +512,52 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "block_a": {
                     "extensions": {
-                        "VK_KHR_get_physical_device_properties2": 1,
-                        "VK_KHR_multiview": 1,
-                        "VK_KHR_device_group_creation": 1,
-                        "VK_KHR_device_group": 1,
-                        "VK_KHR_shader_draw_parameters": 1,
-                        "VK_KHR_maintenance1": 1,
-                        "VK_KHR_external_memory_capabilities": 1,
-                        "VK_KHR_external_memory": 1,
-                        "VK_KHR_external_semaphore_capabilities": 1,
-                        "VK_KHR_external_semaphore": 1,
                         "VK_KHR_16bit_storage": 1,
-                        "VK_KHR_descriptor_update_template": 1,
-                        "VK_KHR_external_fence_capabilities": 1,
-                        "VK_KHR_external_fence": 1,
-                        "VK_KHR_maintenance2": 1,
-                        "VK_KHR_variable_pointers": 1,
-                        "VK_KHR_dedicated_allocation": 1,
-                        "VK_KHR_storage_buffer_storage_class": 1,
-                        "VK_KHR_relaxed_block_layout": 1,
-                        "VK_KHR_get_memory_requirements2": 1,
-                        "VK_KHR_sampler_ycbcr_conversion": 1,
                         "VK_KHR_bind_memory2": 1,
-                        "VK_KHR_maintenance3": 1
+                        "VK_KHR_dedicated_allocation": 1,
+                        "VK_KHR_descriptor_update_template": 1,
+                        "VK_KHR_device_group": 1,
+                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_external_fence": 1,
+                        "VK_KHR_external_fence_capabilities": 1,
+                        "VK_KHR_external_memory": 1,
+                        "VK_KHR_external_memory_capabilities": 1,
+                        "VK_KHR_external_semaphore": 1,
+                        "VK_KHR_external_semaphore_capabilities": 1,
+                        "VK_KHR_get_memory_requirements2": 1,
+                        "VK_KHR_get_physical_device_properties2": 1,
+                        "VK_KHR_maintenance1": 1,
+                        "VK_KHR_maintenance2": 1,
+                        "VK_KHR_maintenance3": 1,
+                        "VK_KHR_multiview": 1,
+                        "VK_KHR_relaxed_block_layout": 1,
+                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_storage_buffer_storage_class": 1,
+                        "VK_KHR_variable_pointers": 1
                     },
                     "features": {
-                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
-                            "multiview": true
-                        },
                         "VkPhysicalDevice16BitStorageFeaturesKHR": {
                             "storageBuffer16BitAccess": true
                         },
-                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
-                            "variablePointersStorageBuffer": true
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
                         },
                         "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
                             "samplerYcbcrConversion": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
                         }
                     },
                     "properties": {
-                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
-                            "maxMultiviewViewCount": 6,
-                            "maxMultiviewInstanceIndex": 134217727
-                        },
                         "VkPhysicalDeviceMaintenance3PropertiesKHR": {
-                            "maxPerSetDescriptors": 1024,
-                            "maxMemoryAllocationSize": 1073741824
+                            "maxMemoryAllocationSize": 1073741824,
+                            "maxPerSetDescriptors": 1024
+                        },
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                            "maxMultiviewInstanceIndex": 134217727,
+                            "maxMultiviewViewCount": 6
                         }
                     }
                 },
@@ -492,15 +569,15 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             }
         }"""
 
-        try:
-            expected_data = json.loads(expected_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_promoted_extensions_profiles_files(
+            self.vk, 
+            [PullBits.PROMOTED_EXTENSIONS, PullBits.IGNORE_EXTENSION_VERSIONS, PullBits.IGNORE_UNSUPPORTED], 
+            json_files_dict
+        )
+        sort_profiles_files(self.vk, json_files_dict)
 
-        json_files_dict = {"test_profile.json": original_data}
-        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
-
-        self.assertEqual(json_files_dict["test_profile.json"], expected_data)
+        self.assertProfileDataEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
 
     def test_pull_promoted_extensions_profile_inheritance_vulkan11(self):
@@ -536,11 +613,6 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             }
         }"""
 
-        try:
-            original_data = json.loads(original_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
-
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
             "profiles": {
@@ -559,52 +631,52 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "block_a": {
                     "extensions": {
-                        "VK_KHR_get_physical_device_properties2": 1,
-                        "VK_KHR_multiview": 1,
-                        "VK_KHR_device_group_creation": 1,
-                        "VK_KHR_device_group": 1,
-                        "VK_KHR_shader_draw_parameters": 1,
-                        "VK_KHR_maintenance1": 1,
-                        "VK_KHR_external_memory_capabilities": 1,
-                        "VK_KHR_external_memory": 1,
-                        "VK_KHR_external_semaphore_capabilities": 1,
-                        "VK_KHR_external_semaphore": 1,
                         "VK_KHR_16bit_storage": 1,
-                        "VK_KHR_descriptor_update_template": 1,
-                        "VK_KHR_external_fence_capabilities": 1,
-                        "VK_KHR_external_fence": 1,
-                        "VK_KHR_maintenance2": 1,
-                        "VK_KHR_variable_pointers": 1,
-                        "VK_KHR_dedicated_allocation": 1,
-                        "VK_KHR_storage_buffer_storage_class": 1,
-                        "VK_KHR_relaxed_block_layout": 1,
-                        "VK_KHR_get_memory_requirements2": 1,
-                        "VK_KHR_sampler_ycbcr_conversion": 1,
                         "VK_KHR_bind_memory2": 1,
-                        "VK_KHR_maintenance3": 1
+                        "VK_KHR_dedicated_allocation": 1,
+                        "VK_KHR_descriptor_update_template": 1,
+                        "VK_KHR_device_group": 1,
+                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_external_fence": 1,
+                        "VK_KHR_external_fence_capabilities": 1,
+                        "VK_KHR_external_memory": 1,
+                        "VK_KHR_external_memory_capabilities": 1,
+                        "VK_KHR_external_semaphore": 1,
+                        "VK_KHR_external_semaphore_capabilities": 1,
+                        "VK_KHR_get_memory_requirements2": 1,
+                        "VK_KHR_get_physical_device_properties2": 1,
+                        "VK_KHR_maintenance1": 1,
+                        "VK_KHR_maintenance2": 1,
+                        "VK_KHR_maintenance3": 1,
+                        "VK_KHR_multiview": 1,
+                        "VK_KHR_relaxed_block_layout": 1,
+                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_storage_buffer_storage_class": 1,
+                        "VK_KHR_variable_pointers": 1
                     },
                     "features": {
-                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
-                            "multiview": true
-                        },
                         "VkPhysicalDevice16BitStorageFeaturesKHR": {
                             "storageBuffer16BitAccess": true
                         },
-                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
-                            "variablePointersStorageBuffer": true
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
                         },
                         "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
                             "samplerYcbcrConversion": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
                         }
                     },
                     "properties": {
-                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
-                            "maxMultiviewInstanceIndex": 134217727,
-                            "maxMultiviewViewCount": 6
-                        },
                         "VkPhysicalDeviceMaintenance3PropertiesKHR": {
                             "maxMemoryAllocationSize": 1073741824,
                             "maxPerSetDescriptors": 1024
+                        },
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                            "maxMultiviewInstanceIndex": 134217727,
+                            "maxMultiviewViewCount": 6
                         }
                     }
                 },
@@ -616,15 +688,15 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             }
         }"""
 
-        try:
-            expected_data = json.loads(expected_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_promoted_extensions_profiles_files(
+            self.vk, 
+            [PullBits.PROMOTED_EXTENSIONS, PullBits.IGNORE_EXTENSION_VERSIONS, PullBits.IGNORE_UNSUPPORTED], 
+            json_files_dict
+        )
+        sort_profiles_files(self.vk, json_files_dict)
 
-        json_files_dict = {"test_profile.json": original_data}
-        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
-
-        self.assertEqual(json_files_dict["test_profile.json"], expected_data)
+        self.assertProfileDataEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
     # -------------------------------------------------------------------------
     # Vulkan 1.1 Advanced Tests (VK_KHR_swapchain_mutable_format)
@@ -653,11 +725,6 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             }
         }"""
 
-        try:
-            original_data = json.loads(original_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
-
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
             "profiles": {
@@ -670,71 +737,71 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "baseline": {
                     "extensions": {
-                        "VK_KHR_swapchain_mutable_format": 1,
-                        "VK_KHR_multiview": 1,
-                        "VK_KHR_device_group_creation": 1,
-                        "VK_KHR_device_group": 1,
-                        "VK_KHR_shader_draw_parameters": 1,
-                        "VK_KHR_get_physical_device_properties2": 1,
-                        "VK_KHR_maintenance1": 1,
-                        "VK_KHR_external_memory_capabilities": 1,
-                        "VK_KHR_external_memory": 1,
-                        "VK_KHR_external_semaphore_capabilities": 1,
-                        "VK_KHR_external_semaphore": 1,
                         "VK_KHR_16bit_storage": 1,
-                        "VK_KHR_descriptor_update_template": 1,
-                        "VK_KHR_external_fence_capabilities": 1,
-                        "VK_KHR_external_fence": 1,
-                        "VK_KHR_maintenance2": 1,
-                        "VK_KHR_variable_pointers": 1,
-                        "VK_KHR_dedicated_allocation": 1,
-                        "VK_KHR_storage_buffer_storage_class": 1,
-                        "VK_KHR_relaxed_block_layout": 1,
-                        "VK_KHR_get_memory_requirements2": 1,
-                        "VK_KHR_sampler_ycbcr_conversion": 1,
                         "VK_KHR_bind_memory2": 1,
+                        "VK_KHR_dedicated_allocation": 1,
+                        "VK_KHR_descriptor_update_template": 1,
+                        "VK_KHR_device_group": 1,
+                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_external_fence": 1,
+                        "VK_KHR_external_fence_capabilities": 1,
+                        "VK_KHR_external_memory": 1,
+                        "VK_KHR_external_memory_capabilities": 1,
+                        "VK_KHR_external_semaphore": 1,
+                        "VK_KHR_external_semaphore_capabilities": 1,
+                        "VK_KHR_get_memory_requirements2": 1,
+                        "VK_KHR_get_physical_device_properties2": 1,
+                        "VK_KHR_image_format_list": 1,
+                        "VK_KHR_maintenance1": 1,
+                        "VK_KHR_maintenance2": 1,
                         "VK_KHR_maintenance3": 1,
+                        "VK_KHR_multiview": 1,
+                        "VK_KHR_relaxed_block_layout": 1,
+                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_storage_buffer_storage_class": 1,
                         "VK_KHR_surface": 1,
                         "VK_KHR_swapchain": 1,
-                        "VK_KHR_image_format_list": 1
+                        "VK_KHR_swapchain_mutable_format": 1,
+                        "VK_KHR_variable_pointers": 1
                     },
                     "features": {
-                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
-                            "multiview": true
-                        },
                         "VkPhysicalDevice16BitStorageFeaturesKHR": {
                             "storageBuffer16BitAccess": true
                         },
-                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
-                            "variablePointersStorageBuffer": true
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
                         },
                         "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
                             "samplerYcbcrConversion": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
                         }
                     },
                     "properties": {
-                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
-                            "maxMultiviewInstanceIndex": 134217727,
-                            "maxMultiviewViewCount": 6
-                        },
                         "VkPhysicalDeviceMaintenance3PropertiesKHR": {
                             "maxMemoryAllocationSize": 1073741824,
                             "maxPerSetDescriptors": 1024
+                        },
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                            "maxMultiviewInstanceIndex": 134217727,
+                            "maxMultiviewViewCount": 6
                         }
                     }
                 }
             }
         }"""
 
-        try:
-            expected_data = json.loads(expected_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_promoted_extensions_profiles_files(
+            self.vk, 
+            [PullBits.PROMOTED_EXTENSIONS, PullBits.IGNORE_EXTENSION_VERSIONS, PullBits.IGNORE_UNSUPPORTED], 
+            json_files_dict
+        )
+        sort_profiles_files(self.vk, json_files_dict)
 
-        json_files_dict = {"test_profile.json": original_data}
-        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
-
-        self.assertEqual(json_files_dict["test_profile.json"], expected_data)
+        self.assertProfileDataEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
 
     def test_pull_promoted_extensions_block_inheritance_vulkan11_advanced(self):
@@ -765,11 +832,6 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             }
         }"""
 
-        try:
-            original_data = json.loads(original_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
-
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
             "profiles": {
@@ -782,54 +844,54 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "block_a": {
                     "extensions": {
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_bind_memory2": 1,
+                        "VK_KHR_dedicated_allocation": 1,
+                        "VK_KHR_descriptor_update_template": 1,
+                        "VK_KHR_device_group": 1,
+                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_external_fence": 1,
+                        "VK_KHR_external_fence_capabilities": 1,
+                        "VK_KHR_external_memory": 1,
+                        "VK_KHR_external_memory_capabilities": 1,
+                        "VK_KHR_external_semaphore": 1,
+                        "VK_KHR_external_semaphore_capabilities": 1,
+                        "VK_KHR_get_memory_requirements2": 1,
+                        "VK_KHR_get_physical_device_properties2": 1,
+                        "VK_KHR_maintenance1": 1,
+                        "VK_KHR_maintenance2": 1,
+                        "VK_KHR_maintenance3": 1,
+                        "VK_KHR_multiview": 1,
+                        "VK_KHR_relaxed_block_layout": 1,
+                        "VK_KHR_sampler_ycbcr_conversion": 1,
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_storage_buffer_storage_class": 1,
                         "VK_KHR_surface": 1,
                         "VK_KHR_swapchain": 1,
-                        "VK_KHR_multiview": 1,
-                        "VK_KHR_get_physical_device_properties2": 1,
-                        "VK_KHR_device_group_creation": 1,
-                        "VK_KHR_device_group": 1,
-                        "VK_KHR_shader_draw_parameters": 1,
-                        "VK_KHR_maintenance1": 1,
-                        "VK_KHR_external_memory_capabilities": 1,
-                        "VK_KHR_external_memory": 1,
-                        "VK_KHR_external_semaphore_capabilities": 1,
-                        "VK_KHR_external_semaphore": 1,
-                        "VK_KHR_16bit_storage": 1,
-                        "VK_KHR_descriptor_update_template": 1,
-                        "VK_KHR_external_fence_capabilities": 1,
-                        "VK_KHR_external_fence": 1,
-                        "VK_KHR_maintenance2": 1,
-                        "VK_KHR_variable_pointers": 1,
-                        "VK_KHR_dedicated_allocation": 1,
-                        "VK_KHR_storage_buffer_storage_class": 1,
-                        "VK_KHR_relaxed_block_layout": 1,
-                        "VK_KHR_get_memory_requirements2": 1,
-                        "VK_KHR_sampler_ycbcr_conversion": 1,
-                        "VK_KHR_bind_memory2": 1,
-                        "VK_KHR_maintenance3": 1
+                        "VK_KHR_variable_pointers": 1
                     },
                     "features": {
-                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
-                            "multiview": true
-                        },
                         "VkPhysicalDevice16BitStorageFeaturesKHR": {
                             "storageBuffer16BitAccess": true
                         },
-                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
-                            "variablePointersStorageBuffer": true
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
                         },
                         "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
                             "samplerYcbcrConversion": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
                         }
                     },
                     "properties": {
-                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
-                            "maxMultiviewInstanceIndex": 134217727,
-                            "maxMultiviewViewCount": 6
-                        },
                         "VkPhysicalDeviceMaintenance3PropertiesKHR": {
                             "maxMemoryAllocationSize": 1073741824,
                             "maxPerSetDescriptors": 1024
+                        },
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                            "maxMultiviewInstanceIndex": 134217727,
+                            "maxMultiviewViewCount": 6
                         }
                     }
                 },
@@ -842,15 +904,15 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             }
         }"""
 
-        try:
-            expected_data = json.loads(expected_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_promoted_extensions_profiles_files(
+            self.vk, 
+            [PullBits.PROMOTED_EXTENSIONS, PullBits.IGNORE_EXTENSION_VERSIONS, PullBits.IGNORE_UNSUPPORTED], 
+            json_files_dict
+        )
+        sort_profiles_files(self.vk, json_files_dict)
 
-        json_files_dict = {"test_profile.json": original_data}
-        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
-
-        self.assertEqual(json_files_dict["test_profile.json"], expected_data)
+        self.assertProfileDataEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
 
     def test_pull_promoted_extensions_profile_inheritance_vulkan11_advanced(self):
@@ -887,11 +949,6 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             }
         }"""
 
-        try:
-            original_data = json.loads(original_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
-
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
             "profiles": {
@@ -910,75 +967,75 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
             "capabilities": {
                 "block_a": {
                     "extensions": {
-                        "VK_KHR_surface": 1,
-                        "VK_KHR_swapchain": 1,
-                        "VK_KHR_multiview": 1,
-                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_16bit_storage": 1,
+                        "VK_KHR_bind_memory2": 1,
+                        "VK_KHR_dedicated_allocation": 1,
+                        "VK_KHR_descriptor_update_template": 1,
                         "VK_KHR_device_group": 1,
-                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_device_group_creation": 1,
+                        "VK_KHR_external_fence": 1,
+                        "VK_KHR_external_fence_capabilities": 1,
+                        "VK_KHR_external_memory": 1,
+                        "VK_KHR_external_memory_capabilities": 1,
+                        "VK_KHR_external_semaphore": 1,
+                        "VK_KHR_external_semaphore_capabilities": 1,
+                        "VK_KHR_get_memory_requirements2": 1,
                         "VK_KHR_get_physical_device_properties2": 1,
                         "VK_KHR_maintenance1": 1,
-                        "VK_KHR_external_memory_capabilities": 1,
-                        "VK_KHR_external_memory": 1,
-                        "VK_KHR_external_semaphore_capabilities": 1,
-                        "VK_KHR_external_semaphore": 1,
-                        "VK_KHR_16bit_storage": 1,
-                        "VK_KHR_descriptor_update_template": 1,
-                        "VK_KHR_external_fence_capabilities": 1,
-                        "VK_KHR_external_fence": 1,
                         "VK_KHR_maintenance2": 1,
-                        "VK_KHR_variable_pointers": 1,
-                        "VK_KHR_dedicated_allocation": 1,
-                        "VK_KHR_storage_buffer_storage_class": 1,
+                        "VK_KHR_maintenance3": 1,
+                        "VK_KHR_multiview": 1,
                         "VK_KHR_relaxed_block_layout": 1,
-                        "VK_KHR_get_memory_requirements2": 1,
                         "VK_KHR_sampler_ycbcr_conversion": 1,
-                        "VK_KHR_bind_memory2": 1,
-                        "VK_KHR_maintenance3": 1
+                        "VK_KHR_shader_draw_parameters": 1,
+                        "VK_KHR_storage_buffer_storage_class": 1,
+                        "VK_KHR_surface": 1,
+                        "VK_KHR_swapchain": 1,
+                        "VK_KHR_variable_pointers": 1
                     },
                     "features": {
-                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
-                            "multiview": true
-                        },
                         "VkPhysicalDevice16BitStorageFeaturesKHR": {
                             "storageBuffer16BitAccess": true
                         },
-                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
-                            "variablePointersStorageBuffer": true
+                        "VkPhysicalDeviceMultiviewFeaturesKHR": {
+                            "multiview": true
                         },
                         "VkPhysicalDeviceSamplerYcbcrConversionFeaturesKHR": {
                             "samplerYcbcrConversion": true
+                        },
+                        "VkPhysicalDeviceVariablePointerFeaturesKHR": {
+                            "variablePointersStorageBuffer": true
                         }
                     },
                     "properties": {
-                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
-                            "maxMultiviewInstanceIndex": 134217727,
-                            "maxMultiviewViewCount": 6
-                        },
                         "VkPhysicalDeviceMaintenance3PropertiesKHR": {
                             "maxMemoryAllocationSize": 1073741824,
                             "maxPerSetDescriptors": 1024
+                        },
+                        "VkPhysicalDeviceMultiviewPropertiesKHR": {
+                            "maxMultiviewInstanceIndex": 134217727,
+                            "maxMultiviewViewCount": 6
                         }
                     }
                 },
                 "block_b": {
                     "extensions": {
-                        "VK_KHR_swapchain_mutable_format": 1,
-                        "VK_KHR_image_format_list": 1
+                        "VK_KHR_image_format_list": 1,
+                        "VK_KHR_swapchain_mutable_format": 1
                     }
                 }
             }
         }"""
 
-        try:
-            expected_data = json.loads(expected_json_text)
-        except json.JSONDecodeError as e:
-            print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_promoted_extensions_profiles_files(
+            self.vk, 
+            [PullBits.PROMOTED_EXTENSIONS, PullBits.IGNORE_EXTENSION_VERSIONS, PullBits.IGNORE_UNSUPPORTED], 
+            json_files_dict
+        )
+        sort_profiles_files(self.vk, json_files_dict)
 
-        json_files_dict = {"test_profile.json": original_data}
-        pull_promoted_extensions_profiles_files(self.vk, True, json_files_dict)
-
-        self.assertEqual(json_files_dict["test_profile.json"], expected_data)
+        self.assertProfileDataEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
 
 if __name__ == '__main__':
@@ -992,4 +1049,3 @@ if __name__ == '__main__':
     TestConvertPullPromotedExtensions.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
-    

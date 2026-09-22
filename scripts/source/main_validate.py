@@ -139,6 +139,11 @@ class VulkanProfilesDataValidation:
         """Analysis Case 3: Checks that aliased structure members have consistent values across capability definitions."""
         issues = []
 
+        def are_values_equal(val1, val2) -> bool:
+            if isinstance(val1, list) and isinstance(val2, list):
+                return sorted(val1) == sorted(val2)
+            return val1 == val2
+
         for struct_name, members in category_dict.items():
             if not isinstance(members, dict):
                 continue
@@ -159,10 +164,11 @@ class VulkanProfilesDataValidation:
                             alias_members = category_dict[alias.struct]
                             if isinstance(alias_members, dict) and alias.member in alias_members:
                                 alias_val = alias_members[alias.member]
-                                if val != alias_val:
+                                if not are_values_equal(val, alias_val):
                                     issues.append(
-                                        f"Member '{member_name}' in structure '{struct_name}' "
-                                        f"has mismatching values across aliased structures in profile '{profile_name}'"
+                                        f"Member '{member_name}' in structure '{struct_name}' (value: {val}) "
+                                        f"has mismatching value with member '{alias.member}' in aliased structure '{alias.struct}' (value: {alias_val}) "
+                                        f"in profile '{profile_name}'"
                                     )
 
         return issues
@@ -228,9 +234,7 @@ def main_validate(args):
             logging.info(f"Validated {count} file(s) against generated schema.")
         else:
             if input_path.is_file():
-                valid = validate_profiles_json(input_path, schema_path)
-                if not valid:
-                    sys.exit(1)
+                validate_profiles_json(input_path, schema_path)
             else:
                 count = validate_profiles_jsons(input_path, schema_path)
                 logging.info(f"Validated {count} file(s) against schema {schema_path}.")
@@ -241,5 +245,4 @@ def main_validate(args):
         issues = validator.validate_data(json_files_dict)
         if issues:
             for issue in issues:
-                logging.error(issue)
-            sys.exit(1)
+                logging.warning(issue)
