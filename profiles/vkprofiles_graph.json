@@ -103,7 +103,21 @@
             "args": {
                 "input": "profiles/Android",
                 "output": "profiles/build",
-                "pull": [ "required-capabilities", "aliases" ],
+                "pull": [ "required-capabilities", "ignore-unsupported", "aliases" ],
+                "strip": [ "helper-values" ],
+                "format": "flatten"
+            }
+        },
+        {
+            "id": "transform_desktop",
+            "description": "Transform Desktop profiles",
+            "depends_on": [ "desktop_baseline" ],
+            "command": "transform",
+            "args": {
+                "input": "profiles/build",
+                "input-profiles": "VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2023,VP_LUNARG_desktop_baseline_2024,VP_LUNARG_desktop_baseline_2026",
+                "output": "profiles/build",
+                "pull": [ "required-capabilities", "ignore-unsupported", "aliases" ],
                 "strip": [ "helper-values" ],
                 "format": "flatten"
             }
@@ -111,11 +125,11 @@
         {
             "id": "validate_profiles",
             "description": "Validate generated profiles against JSON Schema",
-            "depends_on": [ "desktop_baseline", "transform_android" ],
+            "depends_on": [ "transform_desktop", "transform_android" ],
             "command": "validate",
             "args": {
                 "input": "profiles/build",
-                "mode": [ "schema" ]
+                "mode": [ "schema", "analysis" ]
             }
         },
         {
@@ -188,6 +202,21 @@
                 "input_profiles": "VP_ANDROID_vulkan_profile_2021,VP_ANDROID_vulkan_profile_2022,VP_ANDROID_vulkan_profile_2025",
                 "output": "library/include/vulkan",
                 "output_filename": "android_vulkan_profiles_debug",
+                "mode": [ "header-only" ],
+                "strip": true,
+                "config": "debug"
+            }
+        },
+        {
+            "id": "library_android_requirements_debug",
+            "description": "Generate Android Requirements header (Debug)",
+            "depends_on": [ "validate_profiles" ],
+            "command": "library",
+            "args": {
+                "input": "profiles/build",
+                "input_profiles": "VP_ANDROID_15_requirements,VP_ANDROID_16_requirements,VP_ANDROID_17_requirements,VP_ANDROID_vulkan_profile_2021,VP_ANDROID_vulkan_profile_2022,VP_ANDROID_vulkan_profile_2025",
+                "output": "library/include/vulkan",
+                "output_filename": "android_vulkan_requirements_debug",
                 "mode": [ "header-only" ],
                 "strip": true,
                 "config": "debug"

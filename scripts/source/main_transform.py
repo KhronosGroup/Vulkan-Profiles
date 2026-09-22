@@ -54,19 +54,12 @@ def transform_profiles_files(
     pull_modes = pull_modes or []
     strip_modes = strip_modes or []
 
-    ignore_ext_versions = PullBits.IGNORE_EXTENSION_VERSIONS in pull_modes
-    ignore_unsupported = PullBits.IGNORE_UNSUPPORTED in pull_modes
-    override_core_caps = PullBits.OVERRIDE_CORE_CAPABILITIES in pull_modes
-
     if PullBits.REQUIRED_CAPABILITIES in pull_modes:
-        pull_extension_dependencies_profiles_files(
-            vk, ignore_ext_versions, json_files_dict, override_core_capabilities=override_core_caps, ignore_unsupported=ignore_unsupported
-        )
-        pull_required_capabilities_profiles_files(
-            vk, json_files_dict, override_core_capabilities=override_core_caps, ignore_unsupported=ignore_unsupported
-        )
+        pull_extension_dependencies_profiles_files(vk, pull_modes, json_files_dict)
+        pull_required_capabilities_profiles_files(vk, pull_modes, json_files_dict)
 
     if PullBits.PROMOTED_EXTENSIONS in pull_modes:
+        ignore_ext_versions = PullBits.IGNORE_EXTENSION_VERSIONS in pull_modes
         pull_promoted_extensions_profiles_files(vk, ignore_ext_versions, json_files_dict)
 
     if PullBits.ALIASES in pull_modes:
@@ -107,9 +100,11 @@ def main_transform(args):
         logging.error(f"No profiles JSON files loaded from '{input_path}'")
         return
 
+    # Validate requested input profiles before transforming
     input_profiles = getattr(args, 'input_profiles', None)
+    target_profiles = None
     if input_profiles:
-        target_profiles = [p.strip() for p in input_profiles.split(',') if p.strip()]
+        target_profiles = set(p.strip() for p in input_profiles.split(',') if p.strip())
         all_available_profiles = {
             p_name
             for data in json_files_dict.values()
@@ -119,7 +114,22 @@ def main_transform(args):
         missing_profiles = [p for p in target_profiles if p not in all_available_profiles]
         if missing_profiles:
             logging.error(f"Profile(s) specified in '--input-profiles' not found in database: {', '.join(missing_profiles)}")
+            return
 
+    vk = initVulkanObject(getattr(args, 'api', 'vulkan'), registry_path)
+
+    # Execute transformations with all profiles available in memory for dependency resolution
+    transform_profiles_files(
+        vk,
+        json_files_dict,
+        pull_modes=pull_modes,
+        consolidate=consolidate,
+        strip_modes=strip_modes,
+        sort=sort
+    )
+
+    # Filter output profiles after transformation pipeline completes
+    if target_profiles:
         filtered_dict = {}
         for path_key, data in json_files_dict.items():
             if isinstance(data, dict) and 'profiles' in data and isinstance(data['profiles'], dict):
@@ -136,17 +146,5 @@ def main_transform(args):
         logging.error(f"No profiles matching '--input-profiles' were found in '{input_path}'")
         return
 
-    vk = initVulkanObject(getattr(args, 'api', 'vulkan'), registry_path)
-
-    transform_profiles_files(
-        vk,
-        json_files_dict,
-        pull_modes=pull_modes,
-        consolidate=consolidate,
-        strip_modes=strip_modes,
-        sort=sort
-    )
-
     save_profiles_jsons(json_files_dict, output_path, format_type)
     logging.info(f"Transformed profile files saved to {output_path}")
-    

@@ -375,7 +375,7 @@ def _validate_profiles_json_data(json_data, schema_data) -> bool:
         jsonschema.validate(json_data, schema_data)
         return True
     except jsonschema.exceptions.ValidationError as e:
-        logging.info(f"Message: {e.message}")
+        logging.info(f"Validation Message: {e.message}")
         logging.info(f"Location in JSON: {' -> '.join([str(p) for p in e.path])}")
         logging.info(f"Invalid value/context: {e.instance}")
         return False

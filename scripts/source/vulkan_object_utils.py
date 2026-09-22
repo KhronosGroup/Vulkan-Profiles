@@ -46,7 +46,8 @@ from source.vulkan_object_data import (
 
 __all__ = [
     'getVulkanObject',
-    'VulkanObject'
+    'VulkanObject',
+    'get_member_unsupported_default'
 ]
 
 
@@ -848,7 +849,20 @@ def evaluateFeatureDepends(
 
         if "::" in token:
             parts = token.split("::")
-            return (parts[0], parts[1]) in enabled_features
+            struct_name, member_name = parts[0].strip(), parts[1].strip()
+
+            # Direct check
+            if (struct_name, member_name) in enabled_features:
+                return True
+
+            # Capability alias resolution
+            query_id = StructCapabilityAlias(struct_name, member_name)
+            aliases = gatherCapabilityAliases(vk, query_id)
+            for alias in aliases:
+                if isinstance(alias, StructCapabilityAlias):
+                    if (alias.struct, alias.member) in enabled_features:
+                        return True
+            return False
 
         if token.startswith("VK_VERSION_") or token.startswith("VK_API_VERSION_") or (token and token[0].isdigit()):
             ver = VK_VERSION.from_string(token)
@@ -948,8 +962,76 @@ def gatherSatisfiedExtensionRequiredFeatures(
 
     return satisfied_features, or_disjunctions
 
-def parse_property_value(prop_name: str, val_str: str) -> Any:
-    if val_str is None:
+
+def is_member_list_or_bitmask(vk: VulkanObject, struct_name: str, member_name: str) -> bool:
+    """Dynamically queries VulkanObject to determine if struct_name::member_name is an array, pointer, or bitmask type."""
+    if not vk or not hasattr(vk, 'structs'):
+        return False
+
+    struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
+    if not struct_obj or not hasattr(struct_obj, 'members'):
+        return False
+
+    member_obj = getMemberByName(struct_obj, member_name)
+    if not member_obj:
+        return False
+
+    # Check if member is a pointer, variable-length array, or fixed-size array
+    if member_obj.pointer or member_obj.length or member_obj.fixedSizeArray:
+        return True
+
+    # Check if member is a bitmask or flags enum type
+    if member_obj.limitType == 'bitmask':
+        return True
+
+    if hasattr(vk, 'bitmasks') and member_obj.type in vk.bitmasks:
+        return True
+
+    if hasattr(vk, 'flags') and member_obj.type in vk.flags:
+        return True
+
+    return False
+
+
+def get_member_unsupported_default(vk: VulkanObject, struct_name: str, member_name: str) -> Any:
+    """
+    Queries VulkanObject to determine the default fallback value for an unsupported
+    or unlisted member based on vk.xml metadata (limitType, member type, pointers/arrays).
+    """
+    # 1. Feature structure members systematically default to False
+    if struct_name.endswith("Features"):
+        return False
+
+    struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
+    if not struct_obj:
+        return False
+
+    member_obj = getMemberByName(struct_obj, member_name)
+    if not member_obj:
+        return False
+
+    is_bool = member_obj.type in ('VkBool32', 'bool')
+    limit_type = getattr(member_obj, 'limitType', None)
+
+    # 2. Boolean members (VkBool32 / bool)
+    if is_bool:
+        if limit_type == 'min':
+            return True
+        # Handles 'max', 'bitmask', 'bits', or unspecified limittype for bools
+        return False
+
+    # 3. Non-boolean members (Lists, Bitmasks, Numeric limits)
+    if is_member_list_or_bitmask(vk, struct_name, member_name):
+        return []
+
+    if limit_type in ('max', 'min'):
+        return 0
+
+    return 0
+
+
+def parse_property_value(vk: VulkanObject, struct_name: str, prop_name: str, val_str: str) -> Any:
+    if val_str is None or val_str == '???':
         return None
     val_str = val_str.strip()
     if val_str == 'true' or val_str == 'VK_TRUE':
@@ -957,12 +1039,13 @@ def parse_property_value(prop_name: str, val_str: str) -> Any:
     if val_str == 'false' or val_str == 'VK_FALSE':
         return False
 
-    if val_str == '0' and prop_name in (
-        'supportedDepthResolveModes', 
-        'supportedStencilResolveModes', 
-        'requiredSubgroupSizeStages'
-    ):
-        return []
+    # Dynamically check if '0' or '' refers to an empty array/bitmask or a scalar zero
+    if val_str == '0' or val_str == '':
+        if is_member_list_or_bitmask(vk, struct_name, prop_name):
+            return []
+        if val_str == '':
+            return ''
+        return 0
 
     if '|' in val_str or val_str.startswith('VK_'):
         flags = [f.strip() for f in val_str.split('|') if f.strip()]
@@ -1010,11 +1093,18 @@ def gatherSatisfiedCoreRequiredPropertiesForVersion(
         return satisfied_properties
 
     for req in getattr(ver_obj, 'propertyRequirement', []) or []:
+        # Skip requirements with None or '???' values (Implementation-dependent / driver-specified)
+        if req.value is None or req.value == '???':
+            continue
+
         if ignore_unsupported and req.depends and req.depends.startswith('!'):
             continue
 
         if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
-            parsed_val = parse_property_value(req.name, req.value)
+            parsed_val = parse_property_value(vk, req.struct, req.name, req.value)
+            if parsed_val is None:
+                continue
+
             if req.struct == 'VkPhysicalDeviceLimits':
                 vk_props = satisfied_properties.setdefault('VkPhysicalDeviceProperties', {})
                 limits = vk_props.setdefault('limits', {})
@@ -1055,11 +1145,18 @@ def gatherSatisfiedExtensionRequiredProperties(
 
     ext_obj = vk.extensions[ext_name]
     for req in getattr(ext_obj, 'propertyRequirement', []) or []:
+        # Skip requirements with None or '???' values (Implementation-dependent / driver-specified)
+        if req.value is None or req.value == '???':
+            continue
+
         if ignore_unsupported and req.depends and req.depends.startswith('!'):
             continue
 
         if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
-            parsed_val = parse_property_value(req.name, req.value)
+            parsed_val = parse_property_value(vk, req.struct, req.name, req.value)
+            if parsed_val is None:
+                continue
+
             struct_dict = satisfied_properties.setdefault(req.struct, {})
             if req.name in struct_dict:
                 struct_dict[req.name] = merge_capability_value(req.name, struct_dict[req.name], parsed_val)

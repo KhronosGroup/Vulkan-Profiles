@@ -139,7 +139,7 @@ class TestValidate(unittest.TestCase):
         json_files_dict = {"test_profile.json": json.loads(json_text)}
         issues = self.validator.validate_data(json_files_dict)
 
-        self.assertTrue(any("has mismatching values across aliased structures" in issue for issue in issues))
+        self.assertTrue(any("has mismatching value" in issue and "aliased structure" in issue for issue in issues))
 
 
 if __name__ == '__main__':
@@ -153,4 +153,3 @@ if __name__ == '__main__':
     TestValidate.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
-    

@@ -27,7 +27,8 @@ from source.vulkan_object_version import (
     get_active_feature_bundles,
     get_active_property_bundles,
     get_feature_bundle_structures,
-    get_property_bundle_structures
+    get_property_bundle_structures,
+    get_bundle_structure_core_version
 )
 from source.vulkan_object_utils import (
     VulkanObject, 
@@ -42,7 +43,8 @@ from source.vulkan_object_utils import (
 )
 from source.profiles_json_utils import (
     deep_merge_dict,
-    is_property_satisfied
+    is_property_satisfied,
+    merge_capability_value
 )
 
 
@@ -137,11 +139,26 @@ def canonicalize_capabilities_for_version(
         is_covered = False
         if active_feature_bundles and not is_bundle_structure(struct_name):
             for bundle in active_feature_bundles:
+                bundle_intro_ver = get_bundle_structure_core_version(bundle)
+                if bundle_intro_ver != VK_VERSION.NONE and api_version < bundle_intro_ver:
+                    continue
+
                 if is_struct_covered_by_bundle(vk, bundle, struct_name):
                     is_covered = True
                     for member_name, val in members.items():
-                        if val and member_name not in new_features.setdefault(bundle, {}):
-                            new_features[bundle][member_name] = True
+                        if val:
+                            target_member = member_name
+                            bundle_obj = vk.structs.get(bundle) or getStructByName(vk.structs, bundle)
+                            bundle_member_names = {m.name for m in getattr(bundle_obj, 'members', [])} if bundle_obj else set()
+                            
+                            if member_name not in bundle_member_names:
+                                aliases = gatherCapabilityAliases(vk, StructCapabilityAlias(struct_name, member_name))
+                                for alias in aliases:
+                                    if isinstance(alias, StructCapabilityAlias) and alias.struct == bundle:
+                                        target_member = alias.member
+                                        break
+                            
+                            new_features.setdefault(bundle, {})[target_member] = True
                     break
 
         if not is_covered:
@@ -169,11 +186,35 @@ def canonicalize_capabilities_for_version(
 
     for struct_name in sorted_property_structs:
         prop_data = properties_dict[struct_name]
+        if not isinstance(prop_data, dict):
+            continue
+
         is_covered = False
         if active_property_bundles and not is_bundle_structure(struct_name):
             for bundle in active_property_bundles:
+                bundle_intro_ver = get_bundle_structure_core_version(bundle)
+                if bundle_intro_ver != VK_VERSION.NONE and api_version < bundle_intro_ver:
+                    continue
+
                 if is_property_struct_covered_by_bundle(vk, bundle, struct_name):
                     is_covered = True
+                    bundle_obj = vk.structs.get(bundle) or getStructByName(vk.structs, bundle)
+                    bundle_member_names = {m.name for m in getattr(bundle_obj, 'members', [])} if bundle_obj else set()
+
+                    for prop_name, prop_val in prop_data.items():
+                        target_prop_name = prop_name
+                        if prop_name not in bundle_member_names:
+                            aliases = gatherCapabilityAliases(vk, StructCapabilityAlias(struct_name, prop_name))
+                            for alias in aliases:
+                                if isinstance(alias, StructCapabilityAlias) and alias.struct == bundle:
+                                    target_prop_name = alias.member
+                                    break
+                        
+                        bundle_props = new_properties.setdefault(bundle, {})
+                        if target_prop_name in bundle_props:
+                            bundle_props[target_prop_name] = merge_capability_value(target_prop_name, bundle_props[target_prop_name], prop_val)
+                        else:
+                            bundle_props[target_prop_name] = prop_val
                     break
 
         if not is_covered:
@@ -225,13 +266,6 @@ def get_parent_property_value(parent_props_dict: dict, struct_name: str, prop_na
 
 
 def isStructExtensionEnabled(vk: VulkanObject, struct_name: str, version: VK_VERSION, enabled_exts: set[str]) -> bool:
-    """
-    Returns True if struct_name is enabled for the given version and enabled extensions.
-    - Extension structures (ending with KHR/EXT/vendor tag or belonging to an extension)
-      REQUIRE that at least one defining extension is present in enabled_exts.
-    - Core structures (no extension suffix) are enabled if core version <= version, or if
-      any defining extension is in enabled_exts.
-    """
     req_exts = set()
 
     if hasattr(vk, 'aliasTypeRequirements') and struct_name in vk.aliasTypeRequirements:

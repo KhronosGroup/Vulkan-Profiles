@@ -412,9 +412,9 @@ class TestMinApiVersion(unittest.TestCase):
                         "VK_KHR_get_physical_device_properties2": 1,
                         "VK_KHR_shader_float_controls": 1
                     },
-                    "features": {
+                    "properties": {
                         "VkPhysicalDeviceFloatControlsPropertiesKHR": {
-                            "separateDenormSettings": true
+                            "shaderSignedZeroInfNanPreserveFloat32": true
                         }
                     }
                 }

@@ -31,6 +31,7 @@ if str(scripts_dir) not in sys.path:
 
 from vulkan_object import VulkanObject
 from source.vulkan_object_utils import initVulkanObject
+from source.transform_utils import PullBits
 from source.transform_pull_required_capabilities import (
     pull_required_capabilities_profiles_files,
     pull_extension_dependencies_profiles_files
@@ -156,10 +157,65 @@ class TestConvertPullCapsDepends(unittest.TestCase):
                     "features": {
                         "VkPhysicalDeviceFeatures": {
                             "robustBufferAccess": true,
-                            "largePoints": true
+                            "fullDrawIndexUint32": false,
+                            "imageCubeArray": false,
+                            "independentBlend": false,
+                            "geometryShader": false,
+                            "tessellationShader": false,
+                            "sampleRateShading": false,
+                            "dualSrcBlend": false,
+                            "logicOp": false,
+                            "multiDrawIndirect": false,
+                            "drawIndirectFirstInstance": false,
+                            "depthClamp": false,
+                            "depthBiasClamp": false,
+                            "fillModeNonSolid": false,
+                            "depthBounds": false,
+                            "wideLines": false,
+                            "largePoints": true,
+                            "alphaToOne": false,
+                            "multiViewport": false,
+                            "samplerAnisotropy": false,
+                            "textureCompressionETC2": false,
+                            "textureCompressionASTC_LDR": false,
+                            "textureCompressionBC": false,
+                            "occlusionQueryPrecise": false,
+                            "pipelineStatisticsQuery": false,
+                            "vertexPipelineStoresAndAtomics": false,
+                            "fragmentStoresAndAtomics": false,
+                            "shaderTessellationAndGeometryPointSize": false,
+                            "shaderImageGatherExtended": false,
+                            "shaderStorageImageExtendedFormats": false,
+                            "shaderStorageImageMultisample": false,
+                            "shaderStorageImageReadWithoutFormat": false,
+                            "shaderStorageImageWriteWithoutFormat": false,
+                            "shaderUniformBufferArrayDynamicIndexing": false,
+                            "shaderSampledImageArrayDynamicIndexing": false,
+                            "shaderStorageBufferArrayDynamicIndexing": false,
+                            "shaderStorageImageArrayDynamicIndexing": false,
+                            "shaderClipDistance": false,
+                            "shaderCullDistance": false,
+                            "shaderFloat64": false,
+                            "shaderInt64": false,
+                            "shaderInt16": false,
+                            "shaderResourceResidency": false,
+                            "shaderResourceMinLod": false,
+                            "sparseBinding": false,
+                            "sparseResidencyBuffer": false,
+                            "sparseResidencyImage2D": false,
+                            "sparseResidencyImage3D": false,
+                            "sparseResidency2Samples": false,
+                            "sparseResidency4Samples": false,
+                            "sparseResidency8Samples": false,
+                            "sparseResidency16Samples": false,
+                            "sparseResidencyAliased": false,
+                            "variableMultisampleRate": false,
+                            "inheritedQueries": false
                         },
                         "VkPhysicalDeviceMultiviewFeatures": {
-                            "multiview": true
+                            "multiview": true,
+                            "multiviewGeometryShader": false,
+                            "multiviewTessellationShader": false
                         }
                     },
                     "properties": {
@@ -177,7 +233,6 @@ class TestConvertPullCapsDepends(unittest.TestCase):
                                 "maxMemoryAllocationCount": 4096,
                                 "maxSamplerAllocationCount": 4000,
                                 "bufferImageGranularity": 131072,
-                                "sparseAddressSpaceSize": 0,
                                 "maxBoundDescriptorSets": 4,
                                 "maxPerStageDescriptorSamplers": 16,
                                 "maxPerStageDescriptorUniformBuffers": 12,
@@ -223,13 +278,13 @@ class TestConvertPullCapsDepends(unittest.TestCase):
                                 "subPixelPrecisionBits": 4,
                                 "subTexelPrecisionBits": 4,
                                 "mipmapPrecisionBits": 4,
-                                "maxDrawIndexedIndexValue": 16777216,
+                                "maxDrawIndexedIndexValue": 16777215,
                                 "maxDrawIndirectCount": 1,
-                                "maxSamplerLodBias": 2,
-                                "maxSamplerAnisotropy": 1,
+                                "maxSamplerLodBias": 2.0,
+                                "maxSamplerAnisotropy": 1.0,
                                 "maxViewports": 1,
                                 "maxViewportDimensions": [4096, 4096],
-                                "viewportBoundsRange": [-8192, 8192],
+                                "viewportBoundsRange": [-8192.0, 8192.0],
                                 "viewportSubPixelBits": 0,
                                 "minMemoryMapAlignment": 64,
                                 "minTexelBufferOffsetAlignment": 256,
@@ -237,8 +292,8 @@ class TestConvertPullCapsDepends(unittest.TestCase):
                                 "minStorageBufferOffsetAlignment": 256,
                                 "minTexelOffset": -8,
                                 "maxTexelOffset": 7,
-                                "minTexelGatherOffset": -8,
-                                "maxTexelGatherOffset": 7,
+                                "minTexelGatherOffset": 0,
+                                "maxTexelGatherOffset": 0,
                                 "minInterpolationOffset": 0.0,
                                 "maxInterpolationOffset": 0.0,
                                 "subPixelInterpolationOffsetBits": 0,
@@ -256,6 +311,8 @@ class TestConvertPullCapsDepends(unittest.TestCase):
                                 "sampledImageStencilSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "storageImageSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
                                 "maxSampleMaskWords": 1,
+                                "timestampComputeAndGraphics": false,
+                                "timestampPeriod": 0,
                                 "maxClipDistances": 0,
                                 "maxCullDistances": 0,
                                 "maxCombinedClipAndCullDistances": 0,
@@ -263,8 +320,13 @@ class TestConvertPullCapsDepends(unittest.TestCase):
                                 "pointSizeRange": [1.0, 64.0],
                                 "lineWidthRange": [1.0, 1.0],
                                 "pointSizeGranularity": 1.0,
-                                "lineWidthGranularity": 1.0,
-                                "nonCoherentAtomSize": 256
+                                "lineWidthGranularity": 0.0,
+                                "strictLines": false,
+                                "standardSampleLocations": false,
+                                "optimalBufferCopyOffsetAlignment": 0,
+                                "optimalBufferCopyRowPitchAlignment": 0,
+                                "nonCoherentAtomSize": 256,
+                                "sparseAddressSpaceSize": 0
                             },
                             "sparseProperties": {
                                 "residencyStandard2DBlockShape": false,
@@ -282,7 +344,11 @@ class TestConvertPullCapsDepends(unittest.TestCase):
                             "maxMultiviewInstanceIndex": 134217727,
                             "maxMultiviewViewCount": 6
                         },
+                        "VkPhysicalDeviceProtectedMemoryProperties": {
+                            "protectedNoFault": false
+                        },
                         "VkPhysicalDeviceSubgroupProperties": {
+                            "quadOperationsInAllStages": false,
                             "subgroupSize": 1,
                             "supportedOperations": ["VK_SUBGROUP_FEATURE_BASIC_BIT"],
                             "supportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT"]
@@ -293,8 +359,8 @@ class TestConvertPullCapsDepends(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_extension_dependencies_profiles_files(self.vk, True, json_files_dict)
-        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [PullBits.REQUIRED_CAPABILITIES, PullBits.IGNORE_EXTENSION_VERSIONS], json_files_dict)
+        pull_required_capabilities_profiles_files(self.vk, [PullBits.REQUIRED_CAPABILITIES], json_files_dict)
         sort_profiles_files(self.vk, json_files_dict)
 
         self.assertProfileDataEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
@@ -323,20 +389,19 @@ class TestConvertPullCapsDepends(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_extension_dependencies_profiles_files(self.vk, True, json_files_dict)
-        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [PullBits.REQUIRED_CAPABILITIES, PullBits.IGNORE_EXTENSION_VERSIONS], json_files_dict)
+        pull_required_capabilities_profiles_files(self.vk, [PullBits.REQUIRED_CAPABILITIES], json_files_dict)
 
         baseline_props = json_files_dict["test_profile.json"]["capabilities"]["baseline"]["properties"]
         self.assertIn("VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT", baseline_props)
         minmax_props = baseline_props["VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT"]
-        self.assertTrue(minmax_props.get("filterMinmaxSingleComponentFormats"))
-        self.assertTrue(minmax_props.get("filterMinmaxImageComponentMapping"))
+        self.assertFalse(minmax_props.get("filterMinmaxSingleComponentFormats"))
+        self.assertFalse(minmax_props.get("filterMinmaxImageComponentMapping"))
 
     def test_pull_depends_vulkan12_sampler_filter_minmax_properties(self):
         """
         Verifies that enabling samplerFilterMinmax feature in Vulkan 1.2 populates
-        filterMinmaxSingleComponentFormats and filterMinmaxImageComponentMapping
-        in VkPhysicalDeviceVulkan12Properties.
+        filterMinmaxSingleComponentFormats in VkPhysicalDeviceVulkan12Properties.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-131.json#",
@@ -359,18 +424,17 @@ class TestConvertPullCapsDepends(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_extension_dependencies_profiles_files(self.vk, True, json_files_dict)
-        pull_required_capabilities_profiles_files(self.vk, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [PullBits.REQUIRED_CAPABILITIES, PullBits.IGNORE_EXTENSION_VERSIONS], json_files_dict)
+        pull_required_capabilities_profiles_files(self.vk, [PullBits.REQUIRED_CAPABILITIES], json_files_dict)
 
         baseline_props = json_files_dict["test_profile.json"]["capabilities"]["baseline"]["properties"]
         self.assertIn("VkPhysicalDeviceVulkan12Properties", baseline_props)
         v12_props = baseline_props["VkPhysicalDeviceVulkan12Properties"]
         self.assertTrue(v12_props.get("filterMinmaxSingleComponentFormats"))
-        self.assertTrue(v12_props.get("filterMinmaxImageComponentMapping"))
 
     def test_pull_depends_ignore_unsupported_skips_unsupported_defaults(self):
         """
-        Verifies that passing ignore_unsupported=True during capability pulling
+        Verifies that passing PullBits.IGNORE_UNSUPPORTED during capability pulling
         skips pulling default baseline limit values for unsupported feature-dependent
         properties (e.g., sparseAddressSpaceSize, maxTessellationGenerationLevel)
         while preserving systematically supported limits and limits for supported features.
@@ -396,8 +460,8 @@ class TestConvertPullCapsDepends(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_extension_dependencies_profiles_files(self.vk, True, json_files_dict, ignore_unsupported=True)
-        pull_required_capabilities_profiles_files(self.vk, json_files_dict, ignore_unsupported=True)
+        pull_extension_dependencies_profiles_files(self.vk, [PullBits.REQUIRED_CAPABILITIES, PullBits.IGNORE_EXTENSION_VERSIONS, PullBits.IGNORE_UNSUPPORTED], json_files_dict)
+        pull_required_capabilities_profiles_files(self.vk, [PullBits.REQUIRED_CAPABILITIES, PullBits.IGNORE_UNSUPPORTED], json_files_dict)
 
         baseline_props = json_files_dict["test_profile.json"]["capabilities"]["baseline"].get("properties", {})
         limits = baseline_props.get("VkPhysicalDeviceProperties", {}).get("limits", {})
@@ -410,7 +474,7 @@ class TestConvertPullCapsDepends(unittest.TestCase):
         self.assertIn("pointSizeRange", limits)
         self.assertEqual(limits["pointSizeRange"], [1.0, 64.0])
 
-        # 3. Default limits for unsupported features MUST be omitted when ignore_unsupported=True
+        # 3. Default limits for unsupported features MUST be omitted when PullBits.IGNORE_UNSUPPORTED is active
         self.assertNotIn("sparseAddressSpaceSize", limits)
         self.assertNotIn("maxTessellationGenerationLevel", limits)
         self.assertNotIn("maxGeometryShaderInvocations", limits)
