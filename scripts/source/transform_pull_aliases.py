@@ -19,6 +19,8 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
+import copy
+
 from source.vulkan_object_utils import (
     VulkanObject, 
     VK_VERSION, 
@@ -31,7 +33,8 @@ from source.profiles_json_utils import (
     collect_profile_capabilities,
     get_topologically_sorted_file_keys,
     collect_required_profiles_capabilities_recursive,
-    deep_merge_dict
+    deep_merge_dict,
+    merge_capability_value
 )
 from source.format_flag_converter import FormatFeatureFlagConverter 
 from source.transform_utils import (
@@ -89,7 +92,12 @@ def pull_aliases_capabilities_block(
                         if is_dict:
                             if target_struct not in new_category_block:
                                 new_category_block[target_struct] = {}
-                            new_category_block[target_struct][target_member] = val
+                            if target_member in new_category_block[target_struct]:
+                                new_category_block[target_struct][target_member] = merge_capability_value(
+                                    target_member, new_category_block[target_struct][target_member], val
+                                )
+                            else:
+                                new_category_block[target_struct][target_member] = copy.deepcopy(val)
                         else:
                             if target_struct not in new_category_block:
                                 new_category_block[target_struct] = []

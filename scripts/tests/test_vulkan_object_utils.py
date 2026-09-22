@@ -44,7 +44,10 @@ from source.vulkan_object_utils import (
     gatherPromotedExtensionsForExactVersion,
     gatherRequiredFeaturesForVersion,
     getExtensionPromotedTo,
-    getStructDefiningExtensions
+    getStructDefiningExtensions,
+    is_member_list_or_bitmask,
+    parse_property_value,
+    get_member_unsupported_default
 )
 
 
@@ -604,6 +607,57 @@ class TestVulkanObjectUtils(unittest.TestCase):
         base_features_shared = features_shared.get("VkPhysicalDeviceFeatures", {})
         self.assertIn("shaderInt64", base_features_shared)
         self.assertTrue(base_features_shared["shaderInt64"])
+
+    def testParsePropertyValueDynamicArrayAndBitmaskResolution(self):
+        vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
+
+        # 1. Verify dynamic identification of pointer/array members in VulkanObject
+        self.assertTrue(is_member_list_or_bitmask(vk, "VkPhysicalDeviceHostImageCopyProperties", "pCopySrcLayouts"))
+        self.assertTrue(is_member_list_or_bitmask(vk, "VkPhysicalDeviceVulkan14Properties", "pCopyDstLayouts"))
+
+        # 2. Verify dynamic identification of bitmask/flags members in VulkanObject
+        self.assertTrue(is_member_list_or_bitmask(vk, "VkPhysicalDeviceVulkan12Properties", "supportedDepthResolveModes"))
+        self.assertTrue(is_member_list_or_bitmask(vk, "VkPhysicalDeviceVulkan11Properties", "subgroupSupportedStages"))
+
+        # 3. Verify scalar numeric limits return False for is_member_list_or_bitmask
+        self.assertFalse(is_member_list_or_bitmask(vk, "VkPhysicalDeviceLimits", "maxImageDimension1D"))
+        self.assertFalse(is_member_list_or_bitmask(vk, "VkPhysicalDeviceLimits", "discreteQueuePriorities"))
+
+        # 4. Verify parse_property_value converts '0' or '' to [] for array/bitmask members dynamically
+        self.assertEqual(parse_property_value(vk, "VkPhysicalDeviceVulkan14Properties", "pCopySrcLayouts", "0"), [])
+        self.assertEqual(parse_property_value(vk, "VkPhysicalDeviceHostImageCopyProperties", "pCopyDstLayouts", ""), [])
+        self.assertEqual(parse_property_value(vk, "VkPhysicalDeviceVulkan12Properties", "supportedDepthResolveModes", "0"), [])
+
+        # 5. Verify parse_property_value converts '0' to scalar 0 for scalar numeric properties
+        self.assertEqual(parse_property_value(vk, "VkPhysicalDeviceLimits", "discreteQueuePriorities", "0"), 0)
+        self.assertEqual(parse_property_value(vk, "VkPhysicalDeviceLimits", "maxImageDimension1D", "4096"), 4096)
+
+        # 6. Verify None or '???' values return None (implementation-dependent)
+        self.assertIsNone(parse_property_value(vk, "VkPhysicalDeviceVulkan14Properties", "pCopySrcLayouts", None))
+        self.assertIsNone(parse_property_value(vk, "VkPhysicalDeviceVulkan14Properties", "pCopySrcLayouts", "???"))
+
+    def testGetMemberUnsupportedDefault(self):
+        vk: VulkanObject = initVulkanObject('vulkan', self.registry_path)
+
+        # 1. Feature structure members systematically default to False
+        self.assertFalse(get_member_unsupported_default(vk, "VkPhysicalDeviceFeatures", "geometryShader"))
+        self.assertFalse(get_member_unsupported_default(vk, "VkPhysicalDeviceVulkan11Features", "multiview"))
+        self.assertFalse(get_member_unsupported_default(vk, "VkPhysicalDeviceVulkan12Features", "timelineSemaphore"))
+
+        # 2. Sparse/Property boolean members with limittype="min" default to True
+        self.assertTrue(get_member_unsupported_default(vk, "VkPhysicalDeviceSparseProperties", "residencyAlignedMipSize"))
+
+        # 3. Sparse/Property boolean members with limittype="max" or unlisted default to False
+        self.assertFalse(get_member_unsupported_default(vk, "VkPhysicalDeviceSparseProperties", "residencyStandard2DBlockShape"))
+        self.assertFalse(get_member_unsupported_default(vk, "VkPhysicalDeviceSparseProperties", "residencyNonResidentStrict"))
+
+        # 4. Array, pointer, and bitmask/flags property members default to []
+        self.assertEqual(get_member_unsupported_default(vk, "VkPhysicalDeviceHostImageCopyProperties", "pCopySrcLayouts"), [])
+        self.assertEqual(get_member_unsupported_default(vk, "VkPhysicalDeviceVulkan12Properties", "supportedDepthResolveModes"), [])
+
+        # 5. Scalar numeric limits default to 0
+        self.assertEqual(get_member_unsupported_default(vk, "VkPhysicalDeviceLimits", "maxImageDimension1D"), 0)
+        self.assertEqual(get_member_unsupported_default(vk, "VkPhysicalDeviceLimits", "discreteQueuePriorities"), 0)
 
 
 if __name__ == '__main__':

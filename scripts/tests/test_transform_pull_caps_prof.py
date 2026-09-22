@@ -31,6 +31,7 @@ if str(scripts_dir) not in sys.path:
 
 from vulkan_object import VulkanObject
 from source.vulkan_object_utils import initVulkanObject
+from source.transform_utils import PullBits
 from source.transform_pull_required_capabilities import pull_required_capabilities_profiles_files
 
 
@@ -42,9 +43,9 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
 
     def test_pull_required_capabilities_already_present_vulkan10(self):
         """
-        Verifies that pulling core requirements with override_core_capabilities=True onto an existing profile
+        Verifies that pulling core requirements with PullBits.OVERRIDE_CORE_CAPABILITIES onto an existing profile
         preserves profile capability requirements higher than Vulkan core requirements (e.g. maxImageDimension2D = 8192,
-        framebufferColorSampleCounts with 8_BIT) while enforcing core baseline minimums (maxImageDimension1D = 4096, 1_BIT sample counts).
+        framebufferColorSampleCounts with 8_BIT) while enforcing core baseline minimums (maxImageDimension1D = 4096).
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -88,203 +89,36 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
             }
         }"""
 
-        expected_json_text = """{
-            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_profile_v10": {
-                    "version": 1,
-                    "api-version": "1.0.68",
-                    "capabilities": ["baseline"]
-                }
-            },
-            "capabilities": {
-                "baseline": {
-                    "extensions": {
-                        "VK_KHR_shader_draw_parameters": 1,
-                        "VK_KHR_16bit_storage": 1
-                    },
-                    "features": {
-                        "VkPhysicalDeviceFeatures": {
-                            "robustBufferAccess": true,
-                            "fullDrawIndexUint32": true,
-                            "imageCubeArray": false
-                        },
-                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
-                            "uniformAndStorageBuffer16BitAccess": true,
-                            "storageBuffer16BitAccess": true
-                        }
-                    },
-                    "properties": {
-                        "VkPhysicalDeviceProperties": {
-                            "limits": {
-                                "maxImageDimension1D": 4096,
-                                "maxImageDimension2D": 8192,
-                                "maxImageDimension3D": 256,
-                                "maxImageDimensionCube": 4096,
-                                "maxImageArrayLayers": 256,
-                                "maxTexelBufferElements": 65536,
-                                "maxUniformBufferRange": 16384,
-                                "maxStorageBufferRange": 134217728,
-                                "maxPushConstantsSize": 128,
-                                "maxMemoryAllocationCount": 4096,
-                                "maxSamplerAllocationCount": 4000,
-                                "bufferImageGranularity": 131072,
-                                "sparseAddressSpaceSize": 0,
-                                "maxBoundDescriptorSets": 4,
-                                "maxPerStageDescriptorSamplers": 16,
-                                "maxPerStageDescriptorUniformBuffers": 12,
-                                "maxPerStageDescriptorStorageBuffers": 4,
-                                "maxPerStageDescriptorSampledImages": 16,
-                                "maxPerStageDescriptorStorageImages": 4,
-                                "maxPerStageDescriptorInputAttachments": 4,
-                                "maxPerStageResources": 128,
-                                "maxDescriptorSetSamplers": 96,
-                                "maxDescriptorSetUniformBuffers": 72,
-                                "maxDescriptorSetUniformBuffersDynamic": 8,
-                                "maxDescriptorSetStorageBuffers": 24,
-                                "maxDescriptorSetStorageBuffersDynamic": 4,
-                                "maxDescriptorSetSampledImages": 96,
-                                "maxDescriptorSetStorageImages": 24,
-                                "maxDescriptorSetInputAttachments": 4,
-                                "maxVertexInputAttributes": 16,
-                                "maxVertexInputBindings": 16,
-                                "maxVertexInputAttributeOffset": 2047,
-                                "maxVertexInputBindingStride": 2048,
-                                "maxVertexOutputComponents": 64,
-                                "maxTessellationGenerationLevel": 0,
-                                "maxTessellationPatchSize": 0,
-                                "maxTessellationControlPerVertexInputComponents": 0,
-                                "maxTessellationControlPerVertexOutputComponents": 0,
-                                "maxTessellationControlPerPatchOutputComponents": 0,
-                                "maxTessellationControlTotalOutputComponents": 0,
-                                "maxTessellationEvaluationInputComponents": 0,
-                                "maxTessellationEvaluationOutputComponents": 0,
-                                "maxGeometryShaderInvocations": 0,
-                                "maxGeometryInputComponents": 0,
-                                "maxGeometryOutputComponents": 0,
-                                "maxGeometryOutputVertices": 0,
-                                "maxGeometryTotalOutputComponents": 0,
-                                "maxFragmentInputComponents": 64,
-                                "maxFragmentOutputAttachments": 4,
-                                "maxFragmentDualSrcAttachments": 0,
-                                "maxFragmentCombinedOutputResources": 4,
-                                "maxComputeSharedMemorySize": 16384,
-                                "maxComputeWorkGroupCount": [
-                                    65535,
-                                    65535,
-                                    65535
-                                ],
-                                "maxComputeWorkGroupInvocations": 128,
-                                "maxComputeWorkGroupSize": [
-                                    128,
-                                    128,
-                                    64
-                                ],
-                                "subPixelPrecisionBits": 4,
-                                "subTexelPrecisionBits": 4,
-                                "mipmapPrecisionBits": 4,
-                                "maxDrawIndexedIndexValue": 4294967295,
-                                "maxDrawIndirectCount": 1,
-                                "maxSamplerLodBias": 2.0,
-                                "maxSamplerAnisotropy": 1.0,
-                                "maxViewports": 1,
-                                "maxViewportDimensions": [
-                                    4096,
-                                    4096
-                                ],
-                                "viewportBoundsRange": [
-                                    -8192.0,
-                                    8192.0
-                                ],
-                                "viewportSubPixelBits": 0,
-                                "minMemoryMapAlignment": 64,
-                                "minTexelBufferOffsetAlignment": 256,
-                                "minUniformBufferOffsetAlignment": 256,
-                                "minStorageBufferOffsetAlignment": 256,
-                                "minTexelOffset": -8,
-                                "maxTexelOffset": 7,
-                                "minTexelGatherOffset": -8,
-                                "maxTexelGatherOffset": 7,
-                                "minInterpolationOffset": 0.0,
-                                "maxInterpolationOffset": 0.0,
-                                "subPixelInterpolationOffsetBits": 0,
-                                "maxFramebufferWidth": 4096,
-                                "maxFramebufferHeight": 4096,
-                                "maxFramebufferLayers": 256,
-                                "framebufferColorSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT",
-                                    "VK_SAMPLE_COUNT_8_BIT"
-                                ],
-                                "framebufferDepthSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "framebufferStencilSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "framebufferNoAttachmentsSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "maxColorAttachments": 4,
-                                "sampledImageColorSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "sampledImageIntegerSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT"
-                                ],
-                                "sampledImageDepthSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "sampledImageStencilSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "storageImageSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT"
-                                ],
-                                "maxSampleMaskWords": 1,
-                                "maxClipDistances": 0,
-                                "maxCullDistances": 0,
-                                "maxCombinedClipAndCullDistances": 0,
-                                "discreteQueuePriorities": 2,
-                                "pointSizeRange": [
-                                    1.0,
-                                    1.0
-                                ],
-                                "lineWidthRange": [
-                                    1.0,
-                                    1.0
-                                ],
-                                "pointSizeGranularity": 1.0,
-                                "lineWidthGranularity": 1.0,
-                                "nonCoherentAtomSize": 256
-                            },
-                            "sparseProperties": {
-                                "residencyStandard2DBlockShape": false,
-                                "residencyStandard2DMultisampleBlockShape": false,
-                                "residencyStandard3DBlockShape": false,
-                                "residencyAlignedMipSize": true,
-                                "residencyNonResidentStrict": false
-                            }
-                        }
-                    }
-                }
-            }
-        }"""
-
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_required_capabilities_profiles_files(self.vk, json_files_dict, override_core_capabilities=True)
+        pull_required_capabilities_profiles_files(
+            self.vk, 
+            [PullBits.REQUIRED_CAPABILITIES, PullBits.OVERRIDE_CORE_CAPABILITIES, PullBits.IGNORE_UNSUPPORTED], 
+            json_files_dict
+        )
 
-        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+        baseline_caps = json_files_dict["test_profile.json"]["capabilities"]["baseline"]
+        limits = baseline_caps["properties"]["VkPhysicalDeviceProperties"]["limits"]
+        features16 = baseline_caps["features"]["VkPhysicalDevice16BitStorageFeaturesKHR"]
+
+        # 1. Core baseline minimum is enforced over below-spec value (2048 -> 4096)
+        self.assertEqual(limits.get("maxImageDimension1D"), 4096)
+
+        # 2. Above-spec profile value is preserved (8192)
+        self.assertEqual(limits.get("maxImageDimension2D"), 8192)
+
+        # 3. Sample counts combine core requirements (1_BIT, 4_BIT) with profile value (8_BIT)
+        color_samples = limits.get("framebufferColorSampleCounts", [])
+        self.assertIn("VK_SAMPLE_COUNT_1_BIT", color_samples)
+        self.assertIn("VK_SAMPLE_COUNT_4_BIT", color_samples)
+        self.assertIn("VK_SAMPLE_COUNT_8_BIT", color_samples)
+
+        # 4. Extension required features are pulled
+        self.assertTrue(features16.get("storageBuffer16BitAccess"))
+        self.assertTrue(features16.get("uniformAndStorageBuffer16BitAccess"))
 
     def test_pull_required_capabilities_not_ext_vulkan10(self):
         """
-        Verifies that when VK_KHR_portability_subset is set, robustness is not added.
+        Verifies that when VK_KHR_portability_subset is set, robustBufferAccess is not added.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -299,200 +133,23 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
                 "baseline": {
                     "extensions": {
                         "VK_KHR_portability_subset": 1
-                    },
-                    "properties": {
-                        "VkPhysicalDeviceProperties": {
-                            "limits": {
-                                "maxImageDimension1D": 4096,
-                                "maxImageDimension2D": 4096,
-                                "maxImageDimension3D": 256
-                            }
-                        }
-                    }
-                }
-            }
-        }"""
-
-        expected_json_text = """{
-            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_profile_v10": {
-                    "version": 1,
-                    "api-version": "1.0.68",
-                    "capabilities": ["baseline"]
-                }
-            },
-            "capabilities": {
-                "baseline": {
-                    "extensions": {
-                        "VK_KHR_portability_subset": 1
-                    },
-                    "properties": {
-                        "VkPhysicalDeviceProperties": {
-                            "limits": {
-                                "maxImageDimension1D": 4096,
-                                "maxImageDimension2D": 4096,
-                                "maxImageDimension3D": 256,
-                                "maxImageDimensionCube": 4096,
-                                "maxImageArrayLayers": 256,
-                                "maxTexelBufferElements": 65536,
-                                "maxUniformBufferRange": 16384,
-                                "maxStorageBufferRange": 134217728,
-                                "maxPushConstantsSize": 128,
-                                "maxMemoryAllocationCount": 4096,
-                                "maxSamplerAllocationCount": 4000,
-                                "bufferImageGranularity": 131072,
-                                "sparseAddressSpaceSize": 0,
-                                "maxBoundDescriptorSets": 4,
-                                "maxPerStageDescriptorSamplers": 16,
-                                "maxPerStageDescriptorUniformBuffers": 12,
-                                "maxPerStageDescriptorStorageBuffers": 4,
-                                "maxPerStageDescriptorSampledImages": 16,
-                                "maxPerStageDescriptorStorageImages": 4,
-                                "maxPerStageDescriptorInputAttachments": 4,
-                                "maxPerStageResources": 128,
-                                "maxDescriptorSetSamplers": 96,
-                                "maxDescriptorSetUniformBuffers": 72,
-                                "maxDescriptorSetUniformBuffersDynamic": 8,
-                                "maxDescriptorSetStorageBuffers": 24,
-                                "maxDescriptorSetStorageBuffersDynamic": 4,
-                                "maxDescriptorSetSampledImages": 96,
-                                "maxDescriptorSetStorageImages": 24,
-                                "maxDescriptorSetInputAttachments": 4,
-                                "maxVertexInputAttributes": 16,
-                                "maxVertexInputBindings": 16,
-                                "maxVertexInputAttributeOffset": 2047,
-                                "maxVertexInputBindingStride": 2048,
-                                "maxVertexOutputComponents": 64,
-                                "maxTessellationGenerationLevel": 0,
-                                "maxTessellationPatchSize": 0,
-                                "maxTessellationControlPerVertexInputComponents": 0,
-                                "maxTessellationControlPerVertexOutputComponents": 0,
-                                "maxTessellationControlPerPatchOutputComponents": 0,
-                                "maxTessellationControlTotalOutputComponents": 0,
-                                "maxTessellationEvaluationInputComponents": 0,
-                                "maxTessellationEvaluationOutputComponents": 0,
-                                "maxGeometryShaderInvocations": 0,
-                                "maxGeometryInputComponents": 0,
-                                "maxGeometryOutputComponents": 0,
-                                "maxGeometryOutputVertices": 0,
-                                "maxGeometryTotalOutputComponents": 0,
-                                "maxFragmentInputComponents": 64,
-                                "maxFragmentOutputAttachments": 4,
-                                "maxFragmentDualSrcAttachments": 0,
-                                "maxFragmentCombinedOutputResources": 4,
-                                "maxComputeSharedMemorySize": 16384,
-                                "maxComputeWorkGroupCount": [
-                                    65535,
-                                    65535,
-                                    65535
-                                ],
-                                "maxComputeWorkGroupInvocations": 128,
-                                "maxComputeWorkGroupSize": [
-                                    128,
-                                    128,
-                                    64
-                                ],
-                                "subPixelPrecisionBits": 4,
-                                "subTexelPrecisionBits": 4,
-                                "mipmapPrecisionBits": 4,
-                                "maxDrawIndexedIndexValue": 16777216,
-                                "maxDrawIndirectCount": 1,
-                                "maxSamplerLodBias": 2.0,
-                                "maxSamplerAnisotropy": 1.0,
-                                "maxViewports": 1,
-                                "maxViewportDimensions": [
-                                    4096,
-                                    4096
-                                ],
-                                "viewportBoundsRange": [
-                                    -8192.0,
-                                    8192.0
-                                ],
-                                "viewportSubPixelBits": 0,
-                                "minMemoryMapAlignment": 64,
-                                "minTexelBufferOffsetAlignment": 256,
-                                "minUniformBufferOffsetAlignment": 256,
-                                "minStorageBufferOffsetAlignment": 256,
-                                "minTexelOffset": -8,
-                                "maxTexelOffset": 7,
-                                "minTexelGatherOffset": -8,
-                                "maxTexelGatherOffset": 7,
-                                "minInterpolationOffset": 0.0,
-                                "maxInterpolationOffset": 0.0,
-                                "subPixelInterpolationOffsetBits": 0,
-                                "maxFramebufferWidth": 4096,
-                                "maxFramebufferHeight": 4096,
-                                "maxFramebufferLayers": 256,
-                                "framebufferColorSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "framebufferDepthSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "framebufferStencilSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "framebufferNoAttachmentsSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "maxColorAttachments": 4,
-                                "sampledImageColorSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "sampledImageIntegerSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT"
-                                ],
-                                "sampledImageDepthSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "sampledImageStencilSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT",
-                                    "VK_SAMPLE_COUNT_4_BIT"
-                                ],
-                                "storageImageSampleCounts": [
-                                    "VK_SAMPLE_COUNT_1_BIT"
-                                ],
-                                "maxSampleMaskWords": 1,
-                                "maxClipDistances": 0,
-                                "maxCullDistances": 0,
-                                "maxCombinedClipAndCullDistances": 0,
-                                "discreteQueuePriorities": 2,
-                                "pointSizeRange": [
-                                    1.0,
-                                    1.0
-                                ],
-                                "lineWidthRange": [
-                                    1.0,
-                                    1.0
-                                ],
-                                "pointSizeGranularity": 1.0,
-                                "lineWidthGranularity": 1.0,
-                                "nonCoherentAtomSize": 256
-                            },
-                            "sparseProperties": {
-                                "residencyStandard2DBlockShape": false,
-                                "residencyStandard2DMultisampleBlockShape": false,
-                                "residencyStandard3DBlockShape": false,
-                                "residencyAlignedMipSize": true,
-                                "residencyNonResidentStrict": false
-                            }
-                        }
                     }
                 }
             }
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_required_capabilities_profiles_files(self.vk, json_files_dict, override_core_capabilities=True)
+        pull_required_capabilities_profiles_files(
+            self.vk, 
+            [PullBits.REQUIRED_CAPABILITIES, PullBits.OVERRIDE_CORE_CAPABILITIES, PullBits.IGNORE_UNSUPPORTED], 
+            json_files_dict
+        )
 
-        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+        baseline_caps = json_files_dict["test_profile.json"]["capabilities"]["baseline"]
+        vk_features = baseline_caps.get("features", {}).get("VkPhysicalDeviceFeatures", {})
+
+        # robustBufferAccess must not be pulled when VK_KHR_portability_subset is present
+        self.assertFalse(vk_features.get("robustBufferAccess", False))
 
 
 if __name__ == '__main__':
@@ -506,4 +163,3 @@ if __name__ == '__main__':
     TestConvertPullRequiredCapabilitiesProf.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
-    

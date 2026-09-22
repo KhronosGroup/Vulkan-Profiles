@@ -608,6 +608,63 @@ class TestConvertPullAliases(unittest.TestCase):
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
+    def test_pull_aliases_merges_subgroup_properties_across_aliased_structs(self):
+        """
+        Verifies that expanding property aliases across VkPhysicalDeviceSubgroupProperties and
+        VkPhysicalDeviceVulkan11Properties merges array values (supportedStages/subgroupSupportedStages)
+        rather than overwriting them with partial values.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-303.json#",
+            "profiles": {
+                "VP_TEST_profile_subgroup": {
+                    "version": 1,
+                    "api-version": "1.2.0",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "properties": {
+                        "VkPhysicalDeviceSubgroupProperties": {
+                            "supportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_FRAGMENT_BIT"]
+                        },
+                        "VkPhysicalDeviceVulkan11Properties": {
+                            "subgroupSupportedStages": ["VK_SHADER_STAGE_FRAGMENT_BIT"]
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-303.json#",
+            "profiles": {
+                "VP_TEST_profile_subgroup": {
+                    "version": 1,
+                    "api-version": "1.2.0",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "properties": {
+                        "VkPhysicalDeviceSubgroupProperties": {
+                            "supportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_FRAGMENT_BIT"]
+                        },
+                        "VkPhysicalDeviceVulkan11Properties": {
+                            "subgroupSupportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_FRAGMENT_BIT"]
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_aliases_profiles_files(self.vk, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -620,4 +677,3 @@ if __name__ == '__main__':
     TestConvertPullAliases.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
-    

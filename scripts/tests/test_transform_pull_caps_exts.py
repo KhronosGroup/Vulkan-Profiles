@@ -102,7 +102,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -175,7 +175,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -260,7 +260,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -325,7 +325,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -397,7 +397,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -481,7 +481,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -544,7 +544,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -613,7 +613,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -694,7 +694,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -764,7 +764,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -841,7 +841,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -930,7 +930,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -1001,7 +1001,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -1078,7 +1078,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -1167,7 +1167,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -1241,7 +1241,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -1320,7 +1320,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -1412,10 +1412,9 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
-
 
     # -------------------------------------------------------------------------
     # Multi-Level Inheritance Tests (Vulkan 1.1 -> Vulkan 1.2 -> Vulkan 1.4)
@@ -1533,7 +1532,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             print(f"JSON syntax is incorrect: {e.msg} at line {e.lineno}, column {e.colno}")
 
         json_files_dict = {"test_profile.json": original_data}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], expected_data)
 
@@ -1577,8 +1576,8 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
             "capabilities": {
                 "baseline": {
                     "extensions": {
-                        "VK_KHR_get_physical_device_properties2": 2,
-                        "VK_KHR_multiview": 1
+                        "VK_KHR_multiview": 1,
+                        "VK_KHR_get_physical_device_properties2": 2
                     },
                     "features": {
                         "VkPhysicalDeviceMultiviewFeaturesKHR": {
@@ -1596,7 +1595,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
@@ -1648,7 +1647,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
@@ -1697,16 +1696,16 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
                     },
                     "properties": {
                         "VkPhysicalDeviceTransformFeedbackPropertiesEXT": {
+                            "maxTransformFeedbackStreams": 1,
+                            "maxTransformFeedbackBuffers": 1,
+                            "maxTransformFeedbackBufferSize": 134217728,
+                            "maxTransformFeedbackStreamDataSize": 512,
                             "maxTransformFeedbackBufferDataSize": 512,
                             "maxTransformFeedbackBufferDataStride": 512,
-                            "maxTransformFeedbackBufferSize": 1073741824,
-                            "maxTransformFeedbackBuffers": 4,
-                            "maxTransformFeedbackStreamDataSize": 512,
-                            "maxTransformFeedbackStreams": 4,
-                            "transformFeedbackDraw": false,
                             "transformFeedbackQueries": false,
+                            "transformFeedbackStreamsLinesTriangles": false,
                             "transformFeedbackRasterizationStreamSelect": false,
-                            "transformFeedbackStreamsLinesTriangles": false
+                            "transformFeedbackDraw": false
                         }
                     }
                 }
@@ -1714,7 +1713,7 @@ class TestConvertPullExtensionsDependencies(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        pull_extension_dependencies_profiles_files(self.vk, False, json_files_dict)
+        pull_extension_dependencies_profiles_files(self.vk, [], json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
