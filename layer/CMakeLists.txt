@@ -202,9 +202,9 @@ configure_file("${INPUT_FILE}" "${INTERMEDIATE_FILE}" @ONLY)
 # Copy the configured manifest JSON to the build directory and validate it against layers_settings_schema.json
 add_custom_command(TARGET ProfilesLayer POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${INTERMEDIATE_FILE}" "$<TARGET_FILE_DIR:ProfilesLayer>/${OUTPUT_FILE_FINAL_NAME}"
-    COMMAND ${Python3_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/validate_manifest.py"
+    COMMAND ${Python3_EXECUTABLE} "${VULKAN_UTILITY_LIBRARIES_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/validate_json_schema.py"
             "$<TARGET_FILE_DIR:ProfilesLayer>/${OUTPUT_FILE_FINAL_NAME}"
-            "${CMAKE_CURRENT_SOURCE_DIR}/layers_settings_schema.json"
+            "${VULKAN_UTILITY_LIBRARIES_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/layers_settings_schema.json"
             "${CMAKE_BINARY_DIR}"
     COMMENT "Validating ${OUTPUT_FILE_FINAL_NAME} against layers_settings_schema.json"
     VERBATIM
