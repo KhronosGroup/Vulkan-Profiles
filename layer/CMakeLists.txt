@@ -21,15 +21,17 @@
 # based on the target API variant (e.g. Vulkan SC)
 set(LAYER_NAME "VkLayer_khronos_profiles")
 
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
 if(BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
-execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp)
-execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp)
+execute_process(COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp")
+execute_process(COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp")
 
-set_source_files_properties(${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp PROPERTIES GENERATED true)
-set_source_files_properties(${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp PROPERTIES GENERATED true)
+set_source_files_properties("${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp" PROPERTIES GENERATED true)
+set_source_files_properties("${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp" PROPERTIES GENERATED true)
 
 if(WIN32)
     set(VKPROFILES_EXE "${PROJECT_SOURCE_DIR}/scripts/vkprofiles.exe")
@@ -218,11 +220,17 @@ endif()
 
 set(JSON_API_VERSION ${VulkanHeaders_VERSION})
 
-configure_file(${INPUT_FILE} ${INTERMEDIATE_FILE} @ONLY)
+configure_file("${INPUT_FILE}" "${INTERMEDIATE_FILE}" @ONLY)
 
-# To support both multi/single configuration generators just copy the json to the correct directory
+# Copy the configured manifest JSON to the build directory and validate it against layers_settings_schema.json
 add_custom_command(TARGET ProfilesLayer POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${INTERMEDIATE_FILE} $<TARGET_FILE_DIR:ProfilesLayer>/${OUTPUT_FILE_FINAL_NAME}
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${INTERMEDIATE_FILE}" "$<TARGET_FILE_DIR:ProfilesLayer>/${OUTPUT_FILE_FINAL_NAME}"
+    COMMAND ${Python3_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/validate_manifest.py"
+            "$<TARGET_FILE_DIR:ProfilesLayer>/${OUTPUT_FILE_FINAL_NAME}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/layers_settings_schema.json"
+            "${CMAKE_BINARY_DIR}"
+    COMMENT "Validating ${OUTPUT_FILE_FINAL_NAME} against layers_settings_schema.json"
+    VERBATIM
 )
 
 # For UNIX-based systems, `library_path` should not contain a relative path (indicated by "./") before installing to system directories
@@ -238,16 +246,22 @@ if (UNIX)
         set(JSON_LIBRARY_PATH "lib${LAYER_NAME}.so")
     endif()
 
-    configure_file(${INPUT_FILE} ${UNIX_INTERMEDIATE_FILE} @ONLY)
+    configure_file("${INPUT_FILE}" "${UNIX_INTERMEDIATE_FILE}" @ONLY)
 
-    install(FILES ${UNIX_INTERMEDIATE_FILE} DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${API_TYPE}/explicit_layer.d RENAME ${OUTPUT_FILE_FINAL_NAME})
+    if (API_TYPE)
+        set(EXPLICIT_LAYER_DEST_DIR "${CMAKE_INSTALL_DATAROOTDIR}/${API_TYPE}/explicit_layer.d")
+    else()
+        set(EXPLICIT_LAYER_DEST_DIR "${CMAKE_INSTALL_DATAROOTDIR}/vulkan/explicit_layer.d")
+    endif()
+
+    install(FILES "${UNIX_INTERMEDIATE_FILE}" DESTINATION "${EXPLICIT_LAYER_DEST_DIR}" RENAME "${OUTPUT_FILE_FINAL_NAME}")
 endif()
 
 if (WIN32)
-    install(FILES ${INTERMEDIATE_FILE} DESTINATION ${LAYER_INSTALL_DIR} RENAME ${OUTPUT_FILE_FINAL_NAME})
+    install(FILES "${INTERMEDIATE_FILE}" DESTINATION "${LAYER_INSTALL_DIR}" RENAME "${OUTPUT_FILE_FINAL_NAME}")
 endif()
 if (MSVC)
-    install(FILES $<TARGET_PDB_FILE:ProfilesLayer> DESTINATION ${LAYER_INSTALL_DIR})
+    install(FILES $<TARGET_PDB_FILE:ProfilesLayer> DESTINATION "${LAYER_INSTALL_DIR}")
 endif()
 
-install(TARGETS ProfilesLayer DESTINATION ${LAYER_INSTALL_DIR})
+install(TARGETS ProfilesLayer DESTINATION "${LAYER_INSTALL_DIR}")
