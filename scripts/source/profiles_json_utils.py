@@ -369,10 +369,37 @@ def collect_profile_capabilities(json_files_dict: dict, json_file_data: dict, pr
     return combined_caps
 
 
+# id(schema_data) -> (schema_data, validator). Keeping a reference to schema_data keeps its id() from being reused.
+_schema_validators_cache = {}
+
+
+def _get_schema_validator(schema_data, check_schema: bool = True):
+    """Returns a validator for schema_data, checking the schema itself only the first time it is used.
+
+    jsonschema.validate() re-checks the schema against its meta-schema on every call, which costs more than validating
+    a profile file and adds up when the same schema validates many files.
+    """
+    import jsonschema
+
+    cached = _schema_validators_cache.get(id(schema_data))
+    if cached is not None and cached[0] is schema_data:
+        return cached[1]
+
+    cls = jsonschema.validators.validator_for(schema_data)
+    if check_schema:
+        cls.check_schema(schema_data)
+    validator = cls(schema_data)
+    _schema_validators_cache[id(schema_data)] = (schema_data, validator)
+    return validator
+
+
 def _validate_profiles_json_data(json_data, schema_data) -> bool:
     try:
         import jsonschema
-        jsonschema.validate(json_data, schema_data)
+        # Same as jsonschema.validate(), minus the repeated schema check
+        error = jsonschema.exceptions.best_match(_get_schema_validator(schema_data).iter_errors(json_data))
+        if error is not None:
+            raise error
         return True
     except jsonschema.exceptions.ValidationError as e:
         logging.info(f"Validation Message: {e.message}")
@@ -390,6 +417,19 @@ def _validate_profiles_json_data(json_data, schema_data) -> bool:
 def validate_profiles_json_data(json_data: dict, schema_data: dict) -> bool:
     """Validates a single profile JSON object against a schema dictionary."""
     return _validate_profiles_json_data(json_data, schema_data)
+
+
+def is_profiles_json_data_valid(json_data: dict, schema_data: dict) -> bool:
+    """Fast pass/fail check of a profile JSON object against a trusted (e.g. published) schema dictionary.
+
+    Unlike validate_profiles_json_data(), this neither checks the schema against its meta-schema nor collects every
+    error to report the most relevant one: it stops at the first error and logs nothing.
+    """
+    try:
+        return _get_schema_validator(schema_data, check_schema=False).is_valid(json_data)
+    except ModuleNotFoundError:
+        logging.warning("`jsonschema` module is not installed, schema validation skipped")
+        return False
 
 
 def validate_profiles_json(json_data_path: Path, json_schema_path: Path) -> bool:

@@ -3680,6 +3680,19 @@ class VulkanRegistry():
 
     def parseEnums(self, xml):
         self.enums = dict()
+
+        # Group extending enum values by the enum they extend in a single pass. Querying the features and
+        # extensions with an XPath per enum type scans the whole registry hundreds of times.
+        def groupByExtends(enumValues):
+            grouped = dict()
+            for value in enumValues:
+                extends = value.get('extends')
+                if extends is not None:
+                    grouped.setdefault(extends, []).append(value)
+            return grouped
+        featureValuesByExtends = groupByExtends(self.findAllFeatures(xml, "./require/enum"))
+        extensionValuesByExtends = groupByExtends(self.findAllExtensions(xml, "./require/enum"))
+
         # Find enum definitions
         for enum in xml.findall("./types/type[@category='enum']"):
             name = enum.get('name')
@@ -3699,10 +3712,10 @@ class VulkanRegistry():
                         enumDef.values.append(value.get('name'))
 
             # Then find extension values
-            for value in self.findAllFeatures(xml, "./require/enum[@extends='" + enumDef.name + "']"):
+            for value in featureValuesByExtends.get(enumDef.name, []):
                 if value.get('alias') is None:
                     enumDef.values.append(value.get('name'))
-            for value in self.findAllExtensions(xml, "./require/enum[@extends='" + enumDef.name + "']"):
+            for value in extensionValuesByExtends.get(enumDef.name, []):
                 if value.get('alias') is None:
                     enumDef.values.append(value.get('name'))
 

@@ -33,6 +33,7 @@ from source.profiles_json_utils import (
     load_profiles_jsons,
     save_profiles_jsons,
     validate_profiles_json_data,
+    is_profiles_json_data_valid,
     get_profile_and_file_data,
     collect_profile_capabilities,
     OutputFormatType
@@ -295,30 +296,42 @@ def load_available_schemas(schemas_dir: str | Path = None) -> list[tuple[int, Pa
 
 
 def find_min_schema_for_profile(profile_file_data: dict, schemas: list[tuple[int, Path | str, dict]], profile_name: str = "") -> tuple[int | None, dict | None]:
-    """Validates a profile against schemas from newest to oldest to identify the oldest passing schema header version."""
+    """Identifies the oldest schema header version a profile passes validation against.
+
+    `schemas` is sorted newest to oldest. Each schema only adds to the previous one, so the passing schemas form
+    a contiguous run starting at the newest; binary search for the end of that run instead of validating against
+    every schema (each validation is expensive and there are hundreds of header versions).
+    """
     if not schemas:
         return None, None
 
-    last_passing_header_ver = None
-    last_passing_schema = None
+    prof_str = f" for profile '{profile_name}'" if profile_name else ""
 
-    for idx, (header_ver, schema_identifier, schema_data) in enumerate(schemas):
+    def passes(idx: int) -> bool:
+        header_ver, schema_identifier, schema_data = schemas[idx]
         schema_file_name = Path(str(schema_identifier)).name if schema_identifier else f"profiles-0.8.2-{header_ver}.json"
-        prof_str = f" for profile '{profile_name}'" if profile_name else ""
         logging.info(f"Checking schema '{schema_file_name}'{prof_str}...")
-
-        is_valid = validate_profiles_json_data(profile_file_data, schema_data)
-        if is_valid:
-            last_passing_header_ver = header_ver
-            last_passing_schema = schema_data
-        else:
-            if idx == 0:
+        # Failing is expected while searching, so only pay for detailed error reporting on the newest schema
+        if idx == 0:
+            is_valid = validate_profiles_json_data(profile_file_data, schema_data)
+            if not is_valid:
                 logging.error(f"Profile '{profile_name}' failed schema validation against the newest schema '{schema_file_name}'.")
-                return None, None
-            if last_passing_header_ver is not None:
-                break
+            return is_valid
+        return is_profiles_json_data_valid(profile_file_data, schema_data)
 
-    return last_passing_header_ver, last_passing_schema
+    if not passes(0):
+        return None, None
+
+    # Invariant: schemas[lo] passes, schemas[hi] fails (hi == len(schemas) means every schema passes)
+    lo, hi = 0, len(schemas)
+    while hi - lo > 1:
+        mid = (lo + hi) // 2
+        if passes(mid):
+            lo = mid
+        else:
+            hi = mid
+
+    return schemas[lo][0], schemas[lo][2]
 
 
 def evaluate_min_api_version(vk_object=None, json_data: dict = None, profile_names: list[str] = None, mode: MinApiVersionMode = MinApiVersionMode.SHOW, schemas_dir: str | Path = None, registry_path: str = None) -> dict[str, str]:

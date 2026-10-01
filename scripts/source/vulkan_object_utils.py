@@ -238,18 +238,26 @@ def is_extension_struct_name(vk: VulkanObject, struct_name: str) -> bool:
     """Returns True if struct_name has a vendor or extension suffix (e.g. KHR, EXT, NV, AMD)."""
     if struct_name.endswith("KHR") or struct_name.endswith("EXT"):
         return True
-    if hasattr(vk, 'extensions'):
-        for ext_name in vk.extensions.keys():
+    if not hasattr(vk, '_extension_tags_cache'):
+        tags = set()
+        for ext_name in getattr(vk, 'extensions', {}).keys():
             parts = ext_name.split('_')
-            if len(parts) >= 2:
-                tag = parts[1]
-                if tag and struct_name.endswith(tag):
-                    return True
-    return False
+            if len(parts) >= 2 and parts[1]:
+                tags.add(parts[1])
+        vk._extension_tags_cache = tuple(tags)
+    return struct_name.endswith(vk._extension_tags_cache)
 
 
 def getStructCoreVersion(vk: VulkanObject, struct_name: str) -> VK_VERSION:
     """Returns the VK_VERSION where a structure was introduced into core Vulkan."""
+    if not hasattr(vk, '_struct_core_version_cache'):
+        vk._struct_core_version_cache = {}
+    if struct_name not in vk._struct_core_version_cache:
+        vk._struct_core_version_cache[struct_name] = _getStructCoreVersionUncached(vk, struct_name)
+    return vk._struct_core_version_cache[struct_name]
+
+
+def _getStructCoreVersionUncached(vk: VulkanObject, struct_name: str) -> VK_VERSION:
     bundle_ver = get_bundle_structure_core_version(struct_name)
     if bundle_ver != VK_VERSION.NONE:
         return bundle_ver
@@ -516,6 +524,45 @@ def _get_alias_key(alias_id: CapabilityAlias):
     return str(alias_id)
 
 
+def _getCapabilityAliasIndex(vk: VulkanObject):
+    """Builds (once per VulkanObject) the lookup tables used by gatherCapabilityAliases.
+
+    Returns a tuple of:
+    - a function mapping a struct name or struct alias to its canonical struct name
+    - canonical (struct, member) key -> [(struct_name, struct_obj, member, cap_alias)] in registry order
+    - extension name -> canonical key of the first member carrying that ExtensionCapabilityAlias
+    """
+    if hasattr(vk, '_capability_alias_index'):
+        return vk._capability_alias_index
+
+    # Same resolution as getStructByName(), without the linear scan per lookup
+    struct_alias_to_name = {}
+    for struct_obj in vk.structs.values():
+        for alias_struct in struct_obj.aliases:
+            struct_alias_to_name.setdefault(alias_struct, struct_obj.name)
+
+    def canonical_struct_name(name):
+        if name in vk.structs:
+            return vk.structs[name].name
+        return struct_alias_to_name.get(name, name)
+
+    members_by_key = {}
+    ext_to_key = {}
+    for struct_name, struct_obj in vk.structs.items():
+        for member in struct_obj.members:
+            cap_alias = getattr(member, 'capabilityAlias', None)
+            if isinstance(cap_alias, StructCapabilityAlias):
+                current_key = (canonical_struct_name(cap_alias.struct), cap_alias.member)
+            else:
+                current_key = (struct_name, member.name)
+                if isinstance(cap_alias, ExtensionCapabilityAlias):
+                    ext_to_key.setdefault(cap_alias.name, current_key)
+            members_by_key.setdefault(current_key, []).append((struct_name, struct_obj, member, cap_alias))
+
+    vk._capability_alias_index = (canonical_struct_name, members_by_key, ext_to_key)
+    return vk._capability_alias_index
+
+
 def gatherCapabilityAliases(vk: VulkanObject, alias_id: CapabilityAlias) -> list[CapabilityAlias]:
     alias_key = _get_alias_key(alias_id)
     if not hasattr(vk, '_capability_aliases_cache'):
@@ -523,60 +570,42 @@ def gatherCapabilityAliases(vk: VulkanObject, alias_id: CapabilityAlias) -> list
     if alias_key in vk._capability_aliases_cache:
         return vk._capability_aliases_cache[alias_key]
 
+    canonical_struct_name, members_by_key, ext_to_key = _getCapabilityAliasIndex(vk)
     canonical_key = None
 
     if isinstance(alias_id, StructCapabilityAlias):
-        struct_obj = getStructByName(vk.structs, alias_id.struct)
-        canonical_struct = struct_obj.name if struct_obj else alias_id.struct
+        canonical_struct = canonical_struct_name(alias_id.struct)
         canonical_key = (canonical_struct, alias_id.member)
-        
+
         if canonical_struct in vk.structs:
             for member in vk.structs[canonical_struct].members:
                 if member.name == alias_id.member:
                     cap_alias = getattr(member, 'capabilityAlias', None)
                     if isinstance(cap_alias, StructCapabilityAlias):
-                        target_struct_obj = getStructByName(vk.structs, cap_alias.struct)
-                        canonical_key = (target_struct_obj.name if target_struct_obj else cap_alias.struct, cap_alias.member)
+                        canonical_key = (canonical_struct_name(cap_alias.struct), cap_alias.member)
                     break
-    
+
     elif isinstance(alias_id, ExtensionCapabilityAlias):
-        for struct_name, struct_obj in vk.structs.items():
-            for member in struct_obj.members:
-                cap_alias = getattr(member, 'capabilityAlias', None)
-                if isinstance(cap_alias, ExtensionCapabilityAlias) and cap_alias.name == alias_id.name:
-                    canonical_key = (struct_name, member.name)
-                    break
-            if canonical_key:
-                break
-        
+        canonical_key = ext_to_key.get(alias_id.name)
         if not canonical_key:
             vk._capability_aliases_cache[alias_key] = []
             return []
 
     aliases = []
-    for struct_name, struct_obj in vk.structs.items():
-        for member in struct_obj.members:
-            cap_alias = getattr(member, 'capabilityAlias', None)
-            if isinstance(cap_alias, StructCapabilityAlias):
-                target_struct_obj = getStructByName(vk.structs, cap_alias.struct)
-                current_key = (target_struct_obj.name if target_struct_obj else cap_alias.struct, cap_alias.member)
-            else:
-                current_key = (struct_name, member.name)
+    for struct_name, struct_obj, member, cap_alias in members_by_key.get(canonical_key, []):
+        item = StructCapabilityAlias(struct_name, member.name)
+        if item not in aliases:
+            aliases.append(item)
 
-            if current_key == canonical_key:
-                item = StructCapabilityAlias(struct_name, member.name)
-                if item not in aliases:
-                    aliases.append(item)
+        for alias_struct in struct_obj.aliases:
+            alias_item = StructCapabilityAlias(alias_struct, member.name)
+            if alias_item not in aliases:
+                aliases.append(alias_item)
 
-                for alias_struct in struct_obj.aliases:
-                    alias_item = StructCapabilityAlias(alias_struct, member.name)
-                    if alias_item not in aliases:
-                        aliases.append(alias_item)
-
-                if isinstance(cap_alias, ExtensionCapabilityAlias) and cap_alias.name in vk.extensions:
-                    ext_item = ExtensionCapabilityAlias(cap_alias.name)
-                    if ext_item not in aliases:
-                        aliases.append(ext_item)
+        if isinstance(cap_alias, ExtensionCapabilityAlias) and cap_alias.name in vk.extensions:
+            ext_item = ExtensionCapabilityAlias(cap_alias.name)
+            if ext_item not in aliases:
+                aliases.append(ext_item)
 
     result = [item for item in aliases if item != alias_id]
     vk._capability_aliases_cache[alias_key] = result
