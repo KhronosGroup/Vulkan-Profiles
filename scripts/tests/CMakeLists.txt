@@ -71,7 +71,7 @@ set(REGISTRY_PATH "${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan
 set(PROFILES_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../profiles/Android")
 set(PROFILES_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/profiles")
 
-add_custom_target(transform_android_profiles ALL
+add_custom_target(VpGenerate-Profiles-Android ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory "${PROFILES_OUTPUT_DIR}"
     COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${REGISTRY_PATH}"
         ${VENV_PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/../vkprofiles.py" transform
@@ -87,4 +87,5 @@ add_custom_target(transform_android_profiles ALL
     COMMENT "Testing vkprofiles with Android Vulkan profiles..."
     VERBATIM
 )
-add_dependencies(transform_android_profiles VpProfilesProcessor python_venv)
+set_target_properties(VpGenerate-Profiles-Android PROPERTIES FOLDER "Profiles generator")
+add_dependencies(VpGenerate-Profiles-Android VpProfilesProcessor python_venv)

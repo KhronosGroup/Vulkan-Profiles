@@ -204,6 +204,7 @@
                 "output_filename": "android_vulkan_profiles_debug",
                 "mode": [ "header-only" ],
                 "strip": true,
+                "intermediate": "build/intermediate",
                 "config": "debug"
             }
         },
