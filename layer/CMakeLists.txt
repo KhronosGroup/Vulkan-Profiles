@@ -23,15 +23,7 @@ set(LAYER_NAME "VkLayer_khronos_profiles")
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
-if(BUILD_TESTS)
-    add_subdirectory(tests)
-endif()
-
-execute_process(COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp")
-execute_process(COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp")
-
 set_source_files_properties("${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp" PROPERTIES GENERATED true)
-set_source_files_properties("${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp" PROPERTIES GENERATED true)
 
 if(WIN32)
     set(VKPROFILES_EXE "${PROJECT_SOURCE_DIR}/scripts/vkprofiles.exe")
@@ -186,20 +178,6 @@ add_custom_target(VpLayer_generate ALL
 set_target_properties(VpLayer_generate PROPERTIES FOLDER "Profiles layer")
 add_dependencies(ProfilesLayer VpLayer_generate)
 
-add_custom_target(VpLayer_generate_tests ALL
-    COMMAND ${VKPROFILES_EXE} tests
-        --api ${API_TYPE}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-        --output-profile ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_api_generated.json
-        --output-cpp ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp
-    VERBATIM
-    DEPENDS ProfilesLayer
-            VpLayer_generate
-            VpProfilesProcessor
-            python_venv
-)
-set_target_properties(VpLayer_generate_tests PROPERTIES FOLDER "Profiles layer")
-
 set(INPUT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${LAYER_NAME}.json.in")
 set(INTERMEDIATE_FILE "${CMAKE_CURRENT_BINARY_DIR}/json/profile.json")
 set(OUTPUT_FILE_FINAL_NAME "${LAYER_NAME}.json")
@@ -232,6 +210,10 @@ add_custom_command(TARGET ProfilesLayer POST_BUILD
     COMMENT "Validating ${OUTPUT_FILE_FINAL_NAME} against layers_settings_schema.json"
     VERBATIM
 )
+
+if(BUILD_TESTS)
+    add_subdirectory(tests)
+endif()
 
 # For UNIX-based systems, `library_path` should not contain a relative path (indicated by "./") before installing to system directories
 # This json isn't used for regular local development, it's used for installation

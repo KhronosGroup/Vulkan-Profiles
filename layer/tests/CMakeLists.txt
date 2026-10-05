@@ -19,7 +19,21 @@
 # - Christophe Riccio <christophe@lunarg.com>
 # ~~~
 
-execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_SOURCE_DIR}/layer/profiles.cpp)
+set_source_files_properties("${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp" PROPERTIES GENERATED true)
+
+add_custom_target(VpLayer_generate_tests ALL
+    COMMAND ${VKPROFILES_EXE} tests
+        --api ${API_TYPE}
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --output-profile ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_api_generated.json
+        --output-cpp ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp
+    VERBATIM
+    DEPENDS ProfilesLayer
+            VpLayer_generate
+            VpProfilesProcessor
+            python_venv
+)
+set_target_properties(VpLayer_generate_tests PROPERTIES FOLDER "Profiles layer")
 
 if (ANDROID)
     set(LAYER_TEST_FILES
@@ -63,7 +77,7 @@ function(LayerTest NAME)
                    profiles_test_helper.cpp
                    layer_tests_main.cpp
                    vktestframework.cpp)
-    add_dependencies(${TEST_NAME} ProfilesLayer ${TEST_JSON_FILES})
+    add_dependencies(${TEST_NAME} ProfilesLayer VpTestIntersect VpTestUnion VpTestGeneratedName VpTestHostImageCopy VpLayer_generate_tests ${TEST_JSON_FILES})
     target_link_libraries(${TEST_NAME} Vulkan::CompilerConfiguration Vulkan::CompilerConfigurationExtra Vulkan::Headers Vulkan::Loader GTest::gtest GTest::gtest_main Vulkan::LayerSettings)
     target_compile_definitions(${TEST_NAME} PUBLIC JSON_TEST_FILES_PATH="${CMAKE_SOURCE_DIR}/profiles/test/data/")
     target_compile_definitions(${TEST_NAME} PUBLIC JSON_PROFILES_PATH="${CMAKE_SOURCE_DIR}/profiles/")
@@ -160,13 +174,6 @@ if (NOT ANDROID)
     foreach(test_item ${LAYER_TEST_FILES})
         LayerTest(${test_item})
     endforeach()
-
-    if (NOT APPLE)
-        add_dependencies(VkLayer_tests_combine_intersection VpTestIntersect)
-        add_dependencies(VkLayer_tests_combine_union VpTestUnion)
-        add_dependencies(VkLayer_tests_generated VpLayer_generate_tests)
-        add_dependencies(VkLayer_tests_generated VpTestHostImageCopy)
-    endif()
 else()
     LayerTestAndroid("VulkanProfilesLayerTests")
 endif()
