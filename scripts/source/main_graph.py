@@ -191,6 +191,7 @@ def main_graph(args, main_dispatcher=None):
         node = node_map[node_id]
         cmd = node.get("command")
         description = node.get("description", "")
+        ignore = node.get("ignore", False)
         raw_args = node.get("args", {})
         resolved_args = resolve_variables(raw_args, node_outputs, global_vars)
 
@@ -204,20 +205,23 @@ def main_graph(args, main_dispatcher=None):
         out_info = f" -> '{out_dest}'" if out_dest else ""
         desc_info = f" ({description})" if description else ""
 
-        logging.info(f"[{step_idx}/{total_steps}] Step '{node_id}': '{cmd}'{desc_info}{out_info}")
-        step_start_time = time.time()
+        if ignore:
+            logging.info(f"[{step_idx}/{total_steps}] Step '{node_id}': '{cmd}'{desc_info} [SKIPPED]")
+        else:
+            logging.info(f"[{step_idx}/{total_steps}] Step '{node_id}': '{cmd}'{desc_info}{out_info}")
+            step_start_time = time.time()
 
-        if cmd == "combine" and "profiles" in resolved_args:
-            execute_batch_combine_node(node_id, resolved_args, graph_file)
-        elif main_dispatcher:
-            sub_argv = build_argv_from_args(cmd, resolved_args)
-            exit_code = main_dispatcher(sub_argv)
-            if exit_code and exit_code != 0:
-                logging.error(f"[{step_idx}/{total_steps}] Step '{node_id}' failed with exit code {exit_code}")
-                sys.exit(exit_code)
+            if cmd == "combine" and "profiles" in resolved_args:
+                execute_batch_combine_node(node_id, resolved_args, graph_file)
+            elif main_dispatcher:
+                sub_argv = build_argv_from_args(cmd, resolved_args)
+                exit_code = main_dispatcher(sub_argv)
+                if exit_code and exit_code != 0:
+                    logging.error(f"[{step_idx}/{total_steps}] Step '{node_id}' failed with exit code {exit_code}")
+                    sys.exit(exit_code)
 
-        elapsed = time.time() - step_start_time
-        logging.info(f"[{step_idx}/{total_steps}] Completed '{node_id}' in {elapsed:.2f}s")
+            elapsed = time.time() - step_start_time
+            logging.info(f"[{step_idx}/{total_steps}] Completed '{node_id}' in {elapsed:.2f}s")
 
         node_outputs[node_id] = {
             "output": out_dest,

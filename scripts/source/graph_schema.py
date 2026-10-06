@@ -40,6 +40,7 @@ GRAPH_JSON_SCHEMA = {
                 "properties": {
                     "id": { "type": "string" },
                     "description": { "type": "string" },
+                    "ignore": { "type": "boolean" },
                     "depends_on": {
                         "type": "array",
                         "items": { "type": "string" }
