@@ -11,7 +11,12 @@
 
 # Release Notes
 
-## [Vulkan Profiles Tools 1.4.362](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - September 2026
+## [Vulkan Profiles Tools 1.4.363](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - December 2026
+
+### Improvements:
+- Add `validate` analysis check to report unratified extensions in profiles files
+
+## [Vulkan Profiles Tools 1.4.363](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.363.0) - September 2026
 
 ### Features:
 - Implement `VK_NO_PROTOTYPES` support #734
