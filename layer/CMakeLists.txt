@@ -86,9 +86,9 @@ add_custom_target(VpLayer_generate ALL
     VERBATIM
     DEPENDS ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
             ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/video.xml
-            VpProfilesProcessor
-            python_venv)
+            )
 set_target_properties(VpLayer_generate PROPERTIES FOLDER "Profiles layer")
+add_dependencies(VpLayer_generate VpProfilesProcessor)
 
 # ProfilesLayer build target
 

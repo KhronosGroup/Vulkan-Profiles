@@ -28,11 +28,7 @@ add_custom_target(VpLayer_generate_tests ALL
         --output-profile ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_api_generated.json
         --output-cpp ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp
     VERBATIM
-    DEPENDS ProfilesLayer
-            VpLayer_generate
-            VpProfilesProcessor
-            python_venv
-)
+    DEPENDS ProfilesLayer)
 set_target_properties(VpLayer_generate_tests PROPERTIES FOLDER "Profiles layer")
 
 if (ANDROID)
@@ -106,7 +102,7 @@ function(LayerTestAndroid NAME)
                 vktestframework.cpp)
 
     add_test(NAME ${ANDROID_APK_NAME} COMMAND profiles_${NAME})
-    add_dependencies(${ANDROID_APK_NAME} ProfilesLayer VpGenerate-Profiles)
+    add_dependencies(${ANDROID_APK_NAME} VpLayer_generate_tests VpGenerate-Profiles)
 
     if (NOT ANDROID_SDK_HOME)
         set(ANDROID_SDK_HOME $ENV{ANDROID_SDK_HOME})

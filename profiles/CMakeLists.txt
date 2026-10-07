@@ -70,10 +70,10 @@ add_custom_target(VpGenerate-Profiles ALL
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     VERBATIM
     SOURCES ${PROFILES_FILES}
-    DEPENDS ${PROFILES_FILES} python_venv)
+    DEPENDS ${PROFILES_FILES})
 
 set_target_properties(VpGenerate-Profiles PROPERTIES FOLDER "Profiles generator")
-add_dependencies(VpGenerate-Profiles VpProfilesProcessor python_venv)
+add_dependencies(VpGenerate-Profiles VpProfilesProcessor)
 
 set(json_install_dir "${CMAKE_INSTALL_DATADIR}/vulkan/config/VK_LAYER_KHRONOS_profiles")
 if (WIN32)
