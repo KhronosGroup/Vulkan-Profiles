@@ -173,6 +173,24 @@ class VulkanProfilesDataValidation:
 
         return issues
 
+    def validate_ratified_extensions(
+        self,
+        profile_name: str,
+        enabled_exts: set[str]
+    ) -> list[str]:
+        """Analysis Case 4: Checks that all extensions enabled in the profile are ratified for Vulkan."""
+        issues = []
+
+        for ext_name in sorted(enabled_exts):
+            if ext_name in self.vk.extensions:
+                ext_obj = self.vk.extensions[ext_name]
+                if not ext_obj.ratified:
+                    issues.append(
+                        f"Extension '{ext_name}' in profile '{profile_name}' is not ratified for Vulkan"
+                    )
+
+        return issues
+
     def validate_data(self, json_files_dict: dict) -> list[str]:
         """Executes all data analysis validation cases across loaded profile files."""
         issues = []
@@ -190,6 +208,13 @@ class VulkanProfilesDataValidation:
                 issues.extend(
                     self.validate_required_profile_api_versions(
                         json_files_dict, profile_name, profile_obj
+                    )
+                )
+
+                # Analysis Case 4: Extension Ratification Checks
+                issues.extend(
+                    self.validate_ratified_extensions(
+                        profile_name, enabled_exts
                     )
                 )
 
