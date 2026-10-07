@@ -206,15 +206,15 @@ else()
     set(VKPROFILES_INSTALL_DIR "${CMAKE_INSTALL_BINDIR}")
 endif()
 
-install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/scripts/vkprofiles${CMAKE_EXECUTABLE_SUFFIX}"
-    DESTINATION "${VKPROFILES_INSTALL_DIR}"
-)
-
 # The profiles directory regenerates the Profiles source and headers.
 option(BUILD_PROFILES_LIBRARY "Build Profiles API Library" ON)
 if (BUILD_PROFILES_LIBRARY)
     add_subdirectory(profiles)
     add_subdirectory(library)
+
+    install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/scripts/vkprofiles${CMAKE_EXECUTABLE_SUFFIX}"
+        DESTINATION "${VKPROFILES_INSTALL_DIR}"
+    )
 endif()
 
 option(BUILD_PROFILES_LAYER "Build Profiles Layer" ON)

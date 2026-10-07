@@ -78,16 +78,18 @@ add_definitions(-DVK_ENABLE_BETA_EXTENSIONS)
 source_group("JSON Manifest" FILES ${LAYER_NAME}.json.in)
 source_group("Export Files" FILES ${LAYER_NAME}.def ${LAYER_NAME}.map)
 
+# Run the generator script directly with the system Python: it only needs the standard library
+# and the registry scripts, so the layer doesn't need the venv or the PyInstaller executable.
+set(VULKAN_REGISTRY_PATH "${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry")
 add_custom_target(VpLayer_generate ALL
-    COMMAND ${VKPROFILES_EXE} layer
+    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${VULKAN_REGISTRY_PATH}"
+        ${Python3_EXECUTABLE} ${PROFILES_SCRIPT} layer
         --api ${API_TYPE}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --registry ${VULKAN_REGISTRY_PATH}/vk.xml
         --output ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp
     VERBATIM
-    DEPENDS ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-            ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/video.xml
-            VpProfilesProcessor
-            python_venv)
+    DEPENDS ${VULKAN_REGISTRY_PATH}/vk.xml
+            ${VULKAN_REGISTRY_PATH}/video.xml)
 set_target_properties(VpLayer_generate PROPERTIES FOLDER "Profiles layer")
 
 # ProfilesLayer build target
