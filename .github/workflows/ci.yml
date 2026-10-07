@@ -64,7 +64,7 @@ jobs:
         with:
           key: ${{ runner.os }}-${{ matrix.config }}
       - name: Configure/Generate
-        run: cmake -S. -B build -D BUILD_TESTS=OFF -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}}
+        run: cmake -S. -B build -D BUILD_TESTS=OFF -D SKIP_PYTHON_AUTO_INSTALL=ON -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}}
       - name: Build
         run: cmake --build build --config ${{matrix.config}}
       - name: Install
@@ -102,6 +102,7 @@ jobs:
           -D BUILD_WERROR=ON \
           -D CMAKE_BUILD_TYPE=Debug \
           -D UPDATE_DEPS=ON \
+          -D SKIP_PYTHON_AUTO_INSTALL=ON \
           -D BUILD_TESTS=OFF
       - name: Build
         run: cmake --build build
@@ -130,7 +131,7 @@ jobs:
         with:
           arch: ${{ matrix.arch }}
       - name: Configure/Generate
-        run: cmake -S. -B build -D BUILD_TESTS=OFF -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}}
+        run: cmake -S. -B build -D BUILD_TESTS=OFF -D SKIP_PYTHON_AUTO_INSTALL=ON -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}}
       - name: Build
         run: cmake --build build --config ${{matrix.config}}
       - name: Install

@@ -47,33 +47,41 @@ set(PROFILES_SCRIPT ${PROJECT_SOURCE_DIR}/scripts/vkprofiles.py)
 # We need Python 3.10 or better to use pyinstaller 6.
 find_package(Python3 3.10 REQUIRED COMPONENTS Interpreter)
 
-# Some Python-based build operations (e.g. turning a Python script into a standalone
-# executable) require custom Python modules. Here we'll create a custom
-# Python virtual environment with the modules we need.
-set(VENV_DIR "${CMAKE_CURRENT_BINARY_DIR}/python-venv")
-if(WIN32)
-    set(VENV_PYTHON_EXECUTABLE "${VENV_DIR}/Scripts/python.exe")
+option(SKIP_PYTHON_AUTO_INSTALL "Skip Python Modules installation" OFF)
+
+if (NOT SKIP_PYTHON_AUTO_INSTALL)
+    # Some Python-based build operations (e.g. turning a Python script into a standalone
+    # executable) require custom Python modules. Here we'll create a custom
+    # Python virtual environment with the modules we need.
+    set(VENV_DIR "${CMAKE_CURRENT_BINARY_DIR}/python-venv")
+    if(WIN32)
+        set(VENV_PYTHON_EXECUTABLE "${VENV_DIR}/Scripts/python.exe")
+    else()
+        set(VENV_PYTHON_EXECUTABLE "${VENV_DIR}/bin/python3")
+    endif()
+
+    # VENV_STAMP is used as a dependency for any target using the venv, to ensure
+    # that if the venv's dependencies are changed, the venv will be updated.
+    set(VENV_STAMP "${VENV_DIR}/venv.stamp")
+
+    add_custom_command(
+        OUTPUT "${VENV_STAMP}"
+        COMMAND ${Python3_EXECUTABLE} -m venv "${VENV_DIR}"
+        COMMAND "${VENV_PYTHON_EXECUTABLE}" -m pip install --no-cache-dir -r "${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt"
+        COMMAND ${CMAKE_COMMAND} -E touch "${VENV_STAMP}"
+        DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt"
+        COMMENT "Creating Python virtual environment and installing dependencies..."
+        VERBATIM
+    )
+
+    # This target works in subdirectories as a dependency.
+    add_custom_target(python_venv DEPENDS "${VENV_STAMP}")
+    set_target_properties(python_venv PROPERTIES FOLDER "Profiles generator")
+
+    set(PYTHON_EXECUTABLE "${VENV_PYTHON_EXECUTABLE}")
 else()
-    set(VENV_PYTHON_EXECUTABLE "${VENV_DIR}/bin/python3")
+    set(PYTHON_EXECUTABLE "${Python3_EXECUTABLE}")
 endif()
-
-# VENV_STAMP is used as a dependency for any target using the venv, to ensure
-# that if the venv's dependencies are changed, the venv will be updated.
-set(VENV_STAMP "${VENV_DIR}/venv.stamp")
-
-add_custom_command(
-    OUTPUT "${VENV_STAMP}"
-    COMMAND ${Python3_EXECUTABLE} -m venv "${VENV_DIR}"
-    COMMAND "${VENV_PYTHON_EXECUTABLE}" -m pip install --no-cache-dir -r "${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt"
-    COMMAND ${CMAKE_COMMAND} -E touch "${VENV_STAMP}"
-    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt"
-    COMMENT "Creating Python virtual environment and installing dependencies..."
-    VERBATIM
-)
-
-# This target works in subdirectories as a dependency.
-add_custom_target(python_venv DEPENDS "${VENV_STAMP}")
-set_target_properties(python_venv PROPERTIES FOLDER "Profiles generator")
 
 # ==============================================================================
 
@@ -144,11 +152,11 @@ function(add_pyinstaller_target TARGET_NAME)
         list(APPEND PYINSTALLER_PATH_FLAGS "--paths" "${p}")
     endforeach()
 
-    # Generate the executable via PyInstaller using the VENV python executable
+    # Generate the executable via PyInstaller using the configured Python executable
     add_custom_command(
         OUTPUT "${FINAL_EXECUTABLE}"
-        COMMAND "${VENV_PYTHON_EXECUTABLE}" -m PyInstaller --onefile --clean ${PYINSTALLER_PATH_FLAGS} --name "${ARG_OUTPUT_NAME}" --distpath "${ARG_OUTPUT_DIR}" "${ARG_SCRIPT}"
-        DEPENDS ${ARG_DEPENDS} python_venv
+        COMMAND "${PYTHON_EXECUTABLE}" -m PyInstaller --onefile --clean ${PYINSTALLER_PATH_FLAGS} --name "${ARG_OUTPUT_NAME}" --distpath "${ARG_OUTPUT_DIR}" "${ARG_SCRIPT}"
+        DEPENDS ${ARG_DEPENDS}
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
         COMMENT "Packaging ${TARGET_NAME} into a standalone executable..."
         VERBATIM
@@ -198,7 +206,9 @@ add_pyinstaller_target(VpProfilesProcessor
     DEPENDS ${PYTHON_DEPENDENCIES}
     FOLDER "Profiles generator"
 )
-add_dependencies(VpProfilesProcessor python_venv)
+if (NOT SKIP_PYTHON_AUTO_INSTALL)
+    add_dependencies(VpProfilesProcessor python_venv)
+endif()
 
 if(WIN32)
     set(VKPROFILES_INSTALL_DIR "Bin")

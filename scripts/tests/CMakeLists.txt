@@ -88,4 +88,4 @@ add_custom_target(VpGenerate-Profiles-Android ALL
     VERBATIM
 )
 set_target_properties(VpGenerate-Profiles-Android PROPERTIES FOLDER "Profiles generator")
-add_dependencies(VpGenerate-Profiles-Android VpProfilesProcessor python_venv)
+add_dependencies(VpGenerate-Profiles-Android VpProfilesProcessor)
