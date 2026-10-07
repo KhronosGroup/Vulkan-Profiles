@@ -134,7 +134,7 @@
         },
         {
             "id": "min_api_version_desktop",
-            "ignore": false,
+            "ignore": true,
             "description": "Evaluate and assign minimum API and schema versions for Desktop Baseline profiles",
             "depends_on": [ "validate_profiles" ],
             "command": "min-api-version",
