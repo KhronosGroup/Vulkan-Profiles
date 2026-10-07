@@ -78,6 +78,18 @@ add_definitions(-DVK_ENABLE_BETA_EXTENSIONS)
 source_group("JSON Manifest" FILES ${LAYER_NAME}.json.in)
 source_group("Export Files" FILES ${LAYER_NAME}.def ${LAYER_NAME}.map)
 
+add_custom_target(VpLayer_generate ALL
+    COMMAND ${VKPROFILES_EXE} layer
+        --api ${API_TYPE}
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --output ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp
+    VERBATIM
+    DEPENDS ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+            ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/video.xml
+            VpProfilesProcessor
+            python_venv)
+set_target_properties(VpLayer_generate PROPERTIES FOLDER "Profiles layer")
+
 # ProfilesLayer build target
 
 if(IOS)
@@ -91,7 +103,7 @@ elseif(ENABLE_SO_VERSIONING)
 else()
     add_library(ProfilesLayer MODULE)
 endif()
-
+add_dependencies(ProfilesLayer VpLayer_generate)
 set_target_properties(ProfilesLayer PROPERTIES FOLDER "Profiles layer")
 set_target_properties(ProfilesLayer PROPERTIES OUTPUT_NAME ${LAYER_NAME})
 
@@ -164,19 +176,6 @@ if(ANDROID)
     # Android needs -llog for __android_print_log()
     target_link_Libraries(ProfilesLayer PRIVATE log)
 endif()
-
-add_custom_target(VpLayer_generate ALL
-    COMMAND ${VKPROFILES_EXE} layer
-        --api ${API_TYPE}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-        --output ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp
-    VERBATIM
-    DEPENDS ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-            ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/video.xml
-            VpProfilesProcessor
-            python_venv)
-set_target_properties(VpLayer_generate PROPERTIES FOLDER "Profiles layer")
-add_dependencies(ProfilesLayer VpLayer_generate)
 
 set(INPUT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${LAYER_NAME}.json.in")
 set(INTERMEDIATE_FILE "${CMAKE_CURRENT_BINARY_DIR}/json/profile.json")

@@ -73,6 +73,7 @@ add_custom_command(
 
 # This target works in subdirectories as a dependency.
 add_custom_target(python_venv DEPENDS "${VENV_STAMP}")
+set_target_properties(python_venv PROPERTIES FOLDER "Profiles generator")
 
 # ==============================================================================
 
@@ -210,6 +211,13 @@ install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/scripts/vkprofiles${CMAKE_EXECUTAB
 )
 
 # The profiles directory regenerates the Profiles source and headers.
-add_subdirectory(profiles)
-add_subdirectory(library)
-add_subdirectory(layer)
+option(BUILD_PROFILES_LIBRARY "Build Profiles API Library" ON)
+if (BUILD_PROFILES_LIBRARY)
+    add_subdirectory(profiles)
+    add_subdirectory(library)
+endif()
+
+option(BUILD_PROFILES_LAYER "Build Profiles Layer" ON)
+if (BUILD_PROFILES_LAYER)
+    add_subdirectory(layer)
+endif()
