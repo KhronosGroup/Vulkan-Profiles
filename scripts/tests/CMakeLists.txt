@@ -16,13 +16,22 @@
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
+# Use PYTHON_EXECUTABLE set by root CMakeLists.txt, or fallback to Python3_EXECUTABLE
+if(NOT PYTHON_EXECUTABLE)
+    if(VENV_PYTHON_EXECUTABLE AND NOT SKIP_PYTHON_AUTO_INSTALL)
+        set(PYTHON_EXECUTABLE "${VENV_PYTHON_EXECUTABLE}")
+    else()
+        set(PYTHON_EXECUTABLE "${Python3_EXECUTABLE}")
+    endif()
+endif()
+
 function(add_vulkan_python_test TARGET_NAME SCRIPT_FILENAME)
     set(REGISTRY_PATH "${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry")
     set(FULL_SCRIPT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT_FILENAME}")
 
     # Register the script as a CTest test case
     add_test(NAME ${TARGET_NAME}
-        COMMAND ${VENV_PYTHON_EXECUTABLE} "${FULL_SCRIPT_PATH}" --registry "${REGISTRY_PATH}/vk.xml"
+        COMMAND ${PYTHON_EXECUTABLE} "${FULL_SCRIPT_PATH}" --registry "${REGISTRY_PATH}/vk.xml"
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     )
 
@@ -32,7 +41,7 @@ function(add_vulkan_python_test TARGET_NAME SCRIPT_FILENAME)
     )
 endfunction()
 
-if(NOT APPLE) # macOS doesn't handle dynamically loading Python jsonschema'
+if(NOT APPLE) # macOS does not handle dynamically loading Python jsonschema
     add_vulkan_python_test(VkProfiles_TestVulkanProfilesUtil           test_util.py)
     add_vulkan_python_test(VkProfiles_TestVulkanObjectEmpty            test_init.py)
     add_vulkan_python_test(VkProfiles_TestVulkanVersion                test_vulkan_version.py)
@@ -60,6 +69,7 @@ if(NOT APPLE) # macOS doesn't handle dynamically loading Python jsonschema'
     add_vulkan_python_test(VkProfiles_TestTransformStripHelper         test_transform_strip_helper.py)
     add_vulkan_python_test(VkProfiles_TestTransformStripDups           test_transform_strip_duplication.py)
     add_vulkan_python_test(VkProfiles_TestTransformStripPromotedExts   test_transform_strip_promoted_exts.py)
+    add_vulkan_python_test(VkProfiles_TestTransformStripUnratified     test_transform_strip_unratified.py)
     add_vulkan_python_test(VkProfiles_TestTransformSort                test_transform_sort.py)
     add_vulkan_python_test(VkProfiles_TestExtract                      test_extract.py)
     add_vulkan_python_test(VkProfiles_TestMinApiVersion                test_min_api_version.py)
@@ -74,7 +84,7 @@ set(PROFILES_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/profiles")
 add_custom_target(VpGenerate-Profiles-Android ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory "${PROFILES_OUTPUT_DIR}"
     COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${REGISTRY_PATH}"
-        ${VENV_PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/../vkprofiles.py" transform
+        ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/../vkprofiles.py" transform
         --registry "${REGISTRY_PATH}/vk.xml"
         --input "${PROFILES_INPUT_DIR}"
         --output "${PROFILES_OUTPUT_DIR}"

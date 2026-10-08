@@ -61,6 +61,7 @@ class StripBits(str, Enum):
     HELPER_VALUES = 'helper-values'                # Removes non-bitpos bitmask helper values (composites, all-flags, and zero/none constants) from capability blocks.
     DUPLICATION = 'duplication'                    # Removes redundant duplicate features, properties, and extension requirements across inheritance trees and within blocks.
     PROMOTED_EXTENSIONS = 'promoted-extensions'    # Removes extensions that are already promoted to the profile's target core Vulkan version.
+    UNRATIFIED = 'unratified'                      # Removes extensions and extension structures that are not ratified for Vulkan.
 
 
 class CategoryPriority(IntEnum):
