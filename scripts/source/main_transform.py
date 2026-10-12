@@ -63,7 +63,7 @@ def transform_profiles_files(
         pull_promoted_extensions_profiles_files(vk, pull_modes, json_files_dict)
 
     if PullBits.ALIASES in pull_modes:
-        pull_aliases_profiles_files(vk, json_files_dict)
+        pull_aliases_profiles_files(vk, pull_modes, json_files_dict)
 
     if consolidate:
         consolidate_profiles_files(vk, json_files_dict)

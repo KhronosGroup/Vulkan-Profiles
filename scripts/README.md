@@ -18,7 +18,7 @@ Global options:
 * `--verbose`: Enable INFO, WARNING, and ERROR output.
 * `--log [TYPES ...]`: Filter output by message type: `none`, `all`, `info`, `warning`, `error`, or `critical`. Values may be comma-separated or space-separated. `none` and `all` cannot be combined with other types, and this option is mutually exclusive with `--quiet` and `--verbose`.
 
-The parser registers commands in the following order in [scripts/vkprofiles.py](vkprofiles.py): `graph`, `validate`, `schema`, `transform`, `combine`, `extract`, `min-api-version`, `summary`, `library`, `doc`, `layer`, `tests`, and `version`.
+The parser registers commands in the following order in [scripts/vkprofiles.py](vkprofiles.py): `graph`, `validate`, `schema`, `transform`, `combine`, `extract`, `min-api-version`, `library`, `doc`, `layer`, `tests`, `summary`, and `version`.
 
 Within a graph file, `nodes[].command` is limited to the pipeline operations supported by the executor (`schema`, `transform`, `combine`, `validate`, `library`, `doc`, `extract`, `min-api-version`, `summary`, `layer`, and `tests`). Top-level `graph` and `version` are CLI entry points, not valid node commands.
 
@@ -216,7 +216,7 @@ Create a graph file such as `profiles/desktop_baseline_pipeline.json`:
       "command": "library",
       "args": {
         "input": "profiles",
-        "input_filenames": "VP_KHR_roadmap.json,VP_LUNARG_desktop_baseline.json",
+        "input_profiles": "VP_KHR_roadmap,VP_LUNARG_desktop_baseline",
         "output": "library/include/vulkan",
         "output_src": "library/source",
         "output_filename": "vulkan_profiles",
@@ -232,7 +232,7 @@ Create a graph file such as `profiles/desktop_baseline_pipeline.json`:
       "command": "doc",
       "args": {
         "input": "profiles",
-        "input_filenames": "VP_KHR_roadmap.json,VP_LUNARG_desktop_baseline.json",
+        "input_profiles": "VP_KHR_roadmap,VP_LUNARG_desktop_baseline",
         "output": "PROFILES_ALL.md"
       }
     }
@@ -559,7 +559,7 @@ vkprofiles doc --registry vk.xml --input path/to/profiles --output PROFILES.md [
 
 * `--registry`, `-r`: *(Required)* Path to `vk.xml`.
 * `--input`, `-i`: *(Required)* Directory containing profile JSON files.
-* `--input-filenames`: Comma-separated list of profile filenames.
+* `--input-profiles`: Comma-separated list of profile names to document.
 * `--output`, `-o`: *(Required)* Output Markdown file path.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
 
@@ -570,7 +570,7 @@ vkprofiles doc \
     --api vulkan \
     --registry vk.xml \
     --input profiles \
-    --input-filenames "VP_KHR_roadmap.json,VP_LUNARG_minimum_requirements.json" \
+    --input-profiles "VP_KHR_roadmap,VP_LUNARG_minimum_requirements" \
     --output PROFILES.md
 ```
 
