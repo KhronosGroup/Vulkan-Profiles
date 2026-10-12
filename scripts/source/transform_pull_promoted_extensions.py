@@ -30,6 +30,7 @@ from source.profiles_json_utils import (
     get_topologically_sorted_file_keys,
     collect_required_profiles_capabilities_recursive
 )
+from source.transform_utils import PullBits
 from source.transform_pull_required_capabilities import (
     pull_extension_dependencies_capabilities_block
 )
@@ -37,12 +38,13 @@ from source.transform_pull_required_capabilities import (
 
 def pull_promoted_extensions_profiles_file(
     vk: VulkanObject, 
-    ignore_extension_versions: bool, 
+    pull_bits: list[PullBits], 
     json_file_data: dict, 
     json_files_dict: dict = None
 ):
     profiles_data = json_file_data.get("profiles", {})
     capabilities_dict = json_file_data.setdefault("capabilities", {})
+    ignore_extension_versions = PullBits.IGNORE_EXTENSION_VERSIONS in pull_bits
 
     for key, profile_obj in profiles_data.items():
         api_version = VK_VERSION.from_string(profile_obj["api-version"])
@@ -78,7 +80,7 @@ def pull_promoted_extensions_profiles_file(
             if block_name in capabilities_dict:
                 block = capabilities_dict[block_name]
                 pull_extension_dependencies_capabilities_block(
-                    vk, api_version, ignore_extension_versions, block, context_extensions, context_features, profile_name=key
+                    vk, api_version, pull_bits, block, context_extensions, context_features, profile_name=key
                 )
                 if "extensions" in block and isinstance(block["extensions"], dict):
                     context_extensions.update(block["extensions"].keys())
@@ -90,15 +92,14 @@ def pull_promoted_extensions_profiles_file(
                                     context_features.add((s_name, m_name))
 
 
-def pull_promoted_extensions_profiles_files(vk: VulkanObject, ignore_extension_versions: bool, json_files_dict: dict):
+def pull_promoted_extensions_profiles_files(vk: VulkanObject, pull_bits: list[PullBits], json_files_dict: dict):
     if not isinstance(json_files_dict, dict):
         return
 
     if "profiles" in json_files_dict or "capabilities" in json_files_dict:
-        pull_promoted_extensions_profiles_file(vk, ignore_extension_versions, json_files_dict, None)
+        pull_promoted_extensions_profiles_file(vk, pull_bits, json_files_dict, None)
         return
 
     sorted_file_keys = get_topologically_sorted_file_keys(json_files_dict)
     for file_key in sorted_file_keys:
-        pull_promoted_extensions_profiles_file(vk, ignore_extension_versions, json_files_dict[file_key], json_files_dict)
-        
+        pull_promoted_extensions_profiles_file(vk, pull_bits, json_files_dict[file_key], json_files_dict)
