@@ -42,6 +42,7 @@ from source.profiles_json_utils import (
     collect_profile_capabilities,
     get_profile_and_file_data,
 )
+from source.transform_utils import AnalyseBits
 from source.generate_profiles_schema import VulkanProfilesSchemaGenerator2
 
 
@@ -191,8 +192,11 @@ class VulkanProfilesDataValidation:
 
         return issues
 
-    def validate_data(self, json_files_dict: dict) -> list[str]:
-        """Executes all data analysis validation cases across loaded profile files."""
+    def validate_data(self, json_files_dict: dict, analyse_bits: list[AnalyseBits] = None) -> list[str]:
+        """Executes selected static analysis validation cases across loaded profile files."""
+        if analyse_bits is None:
+            analyse_bits = list(AnalyseBits)
+
         issues = []
 
         for file_path, json_file_data in json_files_dict.items():
@@ -204,19 +208,21 @@ class VulkanProfilesDataValidation:
                 profile_caps = collect_profile_capabilities(json_files_dict, json_file_data, profile_obj)
                 enabled_exts = set(profile_caps.get("extensions", {}).keys())
 
-                # Analysis Case 1: Recursive Required Profile API Version Inheritance Checks
-                issues.extend(
-                    self.validate_required_profile_api_versions(
-                        json_files_dict, profile_name, profile_obj
+                # Analysis Case 1: Required Profile API Version Inheritance Checks
+                if AnalyseBits.API_VERSION in analyse_bits:
+                    issues.extend(
+                        self.validate_required_profile_api_versions(
+                            json_files_dict, profile_name, profile_obj
+                        )
                     )
-                )
 
                 # Analysis Case 4: Extension Ratification Checks
-                issues.extend(
-                    self.validate_ratified_extensions(
-                        profile_name, enabled_exts
+                if AnalyseBits.UNRATIFIED in analyse_bits:
+                    issues.extend(
+                        self.validate_ratified_extensions(
+                            profile_name, enabled_exts
+                        )
                     )
-                )
 
                 for category in ("features", "properties"):
                     category_dict = profile_caps.get(category, {})
@@ -224,19 +230,21 @@ class VulkanProfilesDataValidation:
                         continue
 
                     # Analysis Case 2: Core Structure & Extension Declaration Checks
-                    issues.extend(
-                        self.validate_core_structures_and_extensions(
-                            profile_name, api_version, category_dict, enabled_exts
+                    if AnalyseBits.EXTENSIONS in analyse_bits:
+                        issues.extend(
+                            self.validate_core_structures_and_extensions(
+                                profile_name, api_version, category_dict, enabled_exts
+                            )
                         )
-                    )
 
                     # Analysis Case 3: Aliased Capability Value Mismatch Checks
-                    checked_aliases = set()
-                    issues.extend(
-                        self.validate_aliased_capabilities(
-                            profile_name, category_dict, checked_aliases
+                    if AnalyseBits.ALIASES in analyse_bits:
+                        checked_aliases = set()
+                        issues.extend(
+                            self.validate_aliased_capabilities(
+                                profile_name, category_dict, checked_aliases
+                            )
                         )
-                    )
 
         return issues
 
@@ -244,30 +252,28 @@ class VulkanProfilesDataValidation:
 def main_validate(args):
     input_path = Path(args.input)
     schema_path = Path(args.schema) if getattr(args, 'schema', None) else None
-
-    modes = getattr(args, 'mode', ['schema', 'analysis'])
-    if isinstance(modes, str):
-        modes = [modes]
+    analyse_bits = getattr(args, 'analyse', None)
 
     vk = initVulkanObject(getattr(args, 'api', 'vulkan') or 'vulkan', getattr(args, 'registry', None))
 
-    if 'schema' in modes:
-        if schema_path is None:
-            schema_gen = VulkanProfilesSchemaGenerator2(vk)
-            schema_data = schema_gen.schema
-            count = validate_profiles_jsons_data(input_path, schema_data)
-            logging.info(f"Validated {count} file(s) against generated schema.")
+    # 1. Systematically perform JSON schema validation first
+    if schema_path is None:
+        schema_gen = VulkanProfilesSchemaGenerator2(vk)
+        schema_data = schema_gen.schema
+        count = validate_profiles_jsons_data(input_path, schema_data)
+        logging.info(f"Validated {count} file(s) against generated schema.")
+    else:
+        if input_path.is_file():
+            validate_profiles_json(input_path, schema_path)
         else:
-            if input_path.is_file():
-                validate_profiles_json(input_path, schema_path)
-            else:
-                count = validate_profiles_jsons(input_path, schema_path)
-                logging.info(f"Validated {count} file(s) against schema {schema_path}.")
+            count = validate_profiles_jsons(input_path, schema_path)
+            logging.info(f"Validated {count} file(s) against schema {schema_path}.")
 
-    if 'analysis' in modes:
+    # 2. Perform static analysis if --analyse was specified
+    if analyse_bits:
         json_files_dict = load_profiles_jsons(input_path)
         validator = VulkanProfilesDataValidation(vk)
-        issues = validator.validate_data(json_files_dict)
+        issues = validator.validate_data(json_files_dict, analyse_bits)
         if issues:
             for issue in issues:
                 logging.warning(issue)

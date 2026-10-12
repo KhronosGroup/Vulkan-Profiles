@@ -124,12 +124,12 @@
         },
         {
             "id": "validate_profiles",
-            "description": "Validate generated profiles against JSON Schema",
+            "description": "Validate generated profiles against JSON Schema and perform all static analysis checks",
             "depends_on": [ "transform_desktop", "transform_android" ],
             "command": "validate",
             "args": {
                 "input": "profiles/build",
-                "mode": [ "schema", "analysis" ]
+                "analyse": []
             }
         },
         {

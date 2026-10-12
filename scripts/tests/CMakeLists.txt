@@ -75,6 +75,7 @@ if(NOT APPLE) # macOS does not handle dynamically loading Python jsonschema
     add_vulkan_python_test(VkProfiles_TestExtract                      test_extract.py)
     add_vulkan_python_test(VkProfiles_TestMinApiVersion                test_min_api_version.py)
     add_vulkan_python_test(VkProfiles_TestValidate                     test_validate.py)
+    add_vulkan_python_test(VkProfiles_TestCommandLines                 test_command_lines.py)
 endif()
 
 # Convert Android Profiles custom target

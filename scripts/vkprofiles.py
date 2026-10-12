@@ -24,7 +24,7 @@ import argparse
 import sys
 import time
 
-from source.transform_utils import PullBits, StripBits
+from source.transform_utils import PullBits, StripBits, AnalyseBits
 from source.main_transform import main_transform, OutputFormatType
 from source.main_schema import main_schema
 from source.main_validate import main_validate
@@ -40,21 +40,23 @@ from source.main_graph import main_graph
 from source.main_version import main_version, get_version_string
 
 
-class ValidateAction(argparse.Action):
+class AnalyseAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
-        valid_modes = ['schema', 'analysis']
+        valid_bits = list(AnalyseBits)
         if values is None or len(values) == 0:
-            setattr(namespace, self.dest, valid_modes)
+            setattr(namespace, self.dest, valid_bits)
         else:
             res = []
             for v in values:
                 for item in v.split(','):
                     item = item.strip()
                     if item:
-                        if item not in valid_modes:
-                            parser.error(f"argument {option_string}: invalid choice: '{item}' (choose from 'schema', 'analysis')")
-                        if item not in res:
-                            res.append(item)
+                        try:
+                            bit = AnalyseBits(item)
+                        except ValueError:
+                            parser.error(f"argument {option_string}: invalid choice: '{item}' (choose from {', '.join([b.value for b in valid_bits])})")
+                        if bit not in res:
+                            res.append(bit)
             setattr(namespace, self.dest, res)
 
 
@@ -137,9 +139,9 @@ def main(argv):
     validate_parser = subparsers.add_parser('validate', parents=[log_parser], help='Validate a profile file against a profile schema or perform static analysis.')
     validate_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     validate_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
-    validate_parser.add_argument('--schema', '-s', action='store', help='Use a profile schema (profiles-*.json). By default, generate a profile schema vk.xml.')
+    validate_parser.add_argument('--schema', '-s', action='store', help='Use a profile schema (profiles-*.json). By default, generate a profile schema from vk.xml.')
     validate_parser.add_argument('--input', '-i', action='store', required=True, help='Path to the input profiles files.')
-    validate_parser.add_argument('--mode', '-m', nargs='*', action=ValidateAction, default=['schema', 'analysis'], help="Validation mode(s) to execute (default: schema analysis).")
+    validate_parser.add_argument('--analyse',  nargs='*', action=AnalyseAction, default=None, metavar='CHECK', help='Static analysis checks to execute (choices: ' + ', '.join([e.value for e in AnalyseBits]) + '). If specified without arguments, all checks are executed.')
 
     schema_parser = subparsers.add_parser('schema', parents=[log_parser], help='Generate a profile json schema file or upgrade profile JSON file(s) to schema 0.8.2.')
     schema_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')

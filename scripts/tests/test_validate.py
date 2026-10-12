@@ -25,13 +25,13 @@ from pathlib import Path
 import sys
 import unittest
 
-# Ensure the 'scripts' directory is in Python's import search path
 scripts_dir = Path(__file__).resolve().parent.parent
 if str(scripts_dir) not in sys.path:
     sys.path.insert(0, str(scripts_dir))
 
 from vulkan_object import VulkanObject
 from source.vulkan_object_utils import initVulkanObject
+from source.transform_utils import AnalyseBits
 from source.main_validate import VulkanProfilesDataValidation
 
 
@@ -74,7 +74,7 @@ class TestValidate(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(json_text)}
-        issues = self.validator.validate_data(json_files_dict)
+        issues = self.validator.validate_data(json_files_dict, [AnalyseBits.EXTENSIONS])
 
         self.assertTrue(any("belongs to extension 'VK_KHR_imageless_framebuffer'" in issue for issue in issues))
 
@@ -104,7 +104,7 @@ class TestValidate(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(json_text)}
-        issues = self.validator.validate_data(json_files_dict)
+        issues = self.validator.validate_data(json_files_dict, [AnalyseBits.EXTENSIONS])
 
         self.assertTrue(any("Core structure 'VkPhysicalDeviceVulkan12Features' requires Vulkan 1.2" in issue for issue in issues))
 
@@ -137,7 +137,7 @@ class TestValidate(unittest.TestCase):
         }"""
 
         json_files_dict = {"test_profile.json": json.loads(json_text)}
-        issues = self.validator.validate_data(json_files_dict)
+        issues = self.validator.validate_data(json_files_dict, [AnalyseBits.ALIASES])
 
         self.assertTrue(any("has mismatching value" in issue and "aliased structure" in issue for issue in issues))
 
