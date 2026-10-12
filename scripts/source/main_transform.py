@@ -60,8 +60,7 @@ def transform_profiles_files(
         pull_required_capabilities_profiles_files(vk, pull_modes, json_files_dict)
 
     if PullBits.PROMOTED_EXTENSIONS in pull_modes:
-        ignore_ext_versions = PullBits.IGNORE_EXTENSION_VERSIONS in pull_modes
-        pull_promoted_extensions_profiles_files(vk, ignore_ext_versions, json_files_dict)
+        pull_promoted_extensions_profiles_files(vk, pull_modes, json_files_dict)
 
     if PullBits.ALIASES in pull_modes:
         pull_aliases_profiles_files(vk, json_files_dict)
