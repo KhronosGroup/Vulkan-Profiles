@@ -154,6 +154,15 @@ GRAPH_JSON_SCHEMA = {
                 "unratified"
             ]
         },
+        "analyse_bits": {
+            "type": "string",
+            "enum": [
+                "api-version",
+                "extensions",
+                "aliases",
+                "unratified"
+            ]
+        },
         "common_args": {
             "properties": {
                 "registry": { "type": "string" },
@@ -241,9 +250,9 @@ GRAPH_JSON_SCHEMA = {
                 "registry": { "type": "string" },
                 "input": { "type": "string" },
                 "schema": { "type": "string" },
-                "mode": {
+                "analyse": {
                     "type": "array",
-                    "items": { "type": "string", "enum": ["schema", "analysis"] }
+                    "items": { "$ref": "#/definitions/analyse_bits" }
                 },
                 "api": { "type": "string", "enum": ["vulkan"] },
                 "verbose": { "type": "boolean" },

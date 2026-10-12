@@ -65,6 +65,13 @@ class StripBits(str, Enum):
     UNRATIFIED = 'unratified'                      # Removes extensions and extension structures that are not ratified for Vulkan.
 
 
+class AnalyseBits(str, Enum):
+    API_VERSION = 'api-version'  # Checks that inherited required profiles do not target newer Vulkan API versions.
+    EXTENSIONS = 'extensions'    # Checks that core structures match profile API version and extension structures belong to declared extensions.
+    ALIASES = 'aliases'          # Checks member value consistency across aliased capability structures.
+    UNRATIFIED = 'unratified'    # Checks that all enabled extensions in the profile are ratified for Vulkan.
+
+
 class CategoryPriority(IntEnum):
     """Defines structure category sorting precedence during capability block sorting (lower value = higher priority)."""
     CORE = 0    # Standard Vulkan core structures (version bundle and split core).

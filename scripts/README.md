@@ -206,7 +206,7 @@ Create a graph file such as `profiles/desktop_baseline_pipeline.json`:
       "command": "validate",
       "args": {
         "input": "profiles/LunarG",
-        "mode": ["schema", "analysis"]
+        "analyse": ["api-version", "extensions", "aliases", "unratified"]
       }
     },
     {
@@ -269,19 +269,23 @@ vkprofiles validate --input path/to/profiles [options]
 ```
 
 * `--input`, `-i`: *(Required)* Path to profile JSON file or directory to validate.
-* `--registry`, `-r`: Path to `vk.xml` (used to generate schema if `--schema` is omitted and required for `analysis` mode).
-* `--schema`, `-s`: Path to an explicit JSON schema file (`profiles-*.json`). By default, generates schema from `vk.xml`.
-* `--mode`, `-m`: Validation mode(s) to execute (`schema`, `analysis`). Default: `schema analysis`.
+* `--registry`, `-r`: Path to `vk.xml` (used to generate schema if `--schema` is omitted and required for static analysis checks).
+* `--schema`, `-s`: Path to an explicit JSON schema file (`profiles-*.json`). By default, generates a schema from `vk.xml`.
+* `--analyse [CHECK ...]`: Optional static analysis checks to execute (`api-version`, `extensions`, `aliases`, `unratified`). If specified without values, all checks run.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
 
-#### Validation Modes (`--mode`)
+#### Static Analysis Checks (`--analyse`)
 
-| Mode Value | Description |
+| Check Value | Description |
 | --- | --- |
-| `schema` | **Structural Validation:** Validates the JSON document layout and syntax against the Vulkan Profiles JSON Schema. It checks top-level key hierarchy, confirms required fields are present, verifies value data types (booleans, integers, arrays), and enforces value constraints and enumeration choices. |
-| `analysis` | **Static Semantic Analysis:** Performs deep semantic checks directly against the Vulkan Registry (`vk.xml`). It verifies that all referenced extension names, physical device feature/property structures, and format flags exist in `vk.xml`, checks that all capabilities are compatible with the target Vulkan `api-version`, and flags unrecognized struct members or unfulfilled specification dependencies. |
+| `api-version` | Verifies inherited required profiles and profile API version constraints stay compatible with Vulkan versioning rules. |
+| `extensions` | Checks extension declarations, core structure coverage, and extension-related compatibility against `vk.xml`. |
+| `aliases` | Validates member consistency across aliased capability structures. |
+| `unratified` | Flags enabled extensions or structures that are not ratified for Vulkan. |
 
-**Example (Using explicit external schema and running both modes):**
+Schema validation always runs by default. Static analysis is enabled only when `--analyse` is supplied.
+
+**Example (Using explicit external schema and running all analysis checks):**
 
 ```bash
 vkprofiles validate \
@@ -289,7 +293,7 @@ vkprofiles validate \
     --registry vk.xml \
     --schema schema/profiles-0.8-latest.json \
     --input profiles/LunarG \
-    --mode schema analysis
+    --analyse
 ```
 
 ---
