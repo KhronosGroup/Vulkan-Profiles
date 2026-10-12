@@ -25,6 +25,7 @@ from source.vulkan_object_utils import (
     VulkanObject, 
     VK_VERSION, 
     gatherDependentCapabilityAliases,
+    getStructDefiningExtensions,
     StructCapabilityAlias, 
     ExtensionCapabilityAlias
 )
@@ -38,6 +39,7 @@ from source.profiles_json_utils import (
 )
 from source.format_flag_converter import FormatFeatureFlagConverter 
 from source.transform_utils import (
+    PullBits,
     _restore_member_orders,
     isStructExtensionEnabled
 )
@@ -48,14 +50,20 @@ def pull_aliases_capabilities_block(
     version: VK_VERSION, 
     json_profiles_capabilities_block: dict, 
     inherited_caps: dict = None,
-    profile_enabled_exts: set[str] = None
+    profile_enabled_exts: set[str] = None,
+    pull_bits: list[PullBits] = None
 ) -> dict:
+    pull_bits = pull_bits or []
+    ignore_unratified = PullBits.IGNORE_UNRATIFIED in pull_bits
+
     inherited_caps = inherited_caps or {}
     ext_block = json_profiles_capabilities_block.get("extensions", {})
     block_exts = set(ext_block.keys()) if isinstance(ext_block, dict) else set(ext_block)
     inherited_exts = set(inherited_caps.get("extensions", {}).keys())
 
     enabled_exts = profile_enabled_exts if profile_enabled_exts is not None else (block_exts | inherited_exts)
+    if ignore_unratified:
+        enabled_exts = {ext for ext in enabled_exts if ext in vk.extensions and vk.extensions[ext].ratified}
 
     for category in ("features", "properties"):
         category_block = json_profiles_capabilities_block.get(category, {})
@@ -89,6 +97,11 @@ def pull_aliases_capabilities_block(
                         if not isStructExtensionEnabled(vk, target_struct, version, enabled_exts):
                             continue
 
+                        if ignore_unratified:
+                            def_exts = getStructDefiningExtensions(vk, target_struct)
+                            if def_exts and any(ext in vk.extensions and not vk.extensions[ext].ratified for ext in def_exts):
+                                continue
+
                         if is_dict:
                             if target_struct not in new_category_block:
                                 new_category_block[target_struct] = {}
@@ -105,6 +118,8 @@ def pull_aliases_capabilities_block(
                                 new_category_block[target_struct].append(target_member)
 
                     elif isinstance(alias, ExtensionCapabilityAlias):
+                        if ignore_unratified and alias.name in vk.extensions and not vk.extensions[alias.name].ratified:
+                            continue
                         if alias.name in enabled_exts and "extensions" in json_profiles_capabilities_block:
                             target_ext_block = json_profiles_capabilities_block["extensions"]
                             if isinstance(target_ext_block, dict):
@@ -144,7 +159,7 @@ def pull_aliases_capabilities_block(
     return json_profiles_capabilities_block
 
 
-def pull_aliases_profiles_file(vk: VulkanObject, json_files_dict: dict, json_file_data: dict):
+def pull_aliases_profiles_file(vk: VulkanObject, pull_bits: list[PullBits], json_files_dict: dict, json_file_data: dict):
     profiles_data = json_file_data["profiles"]
     json_profiles_capabilities = json_file_data["capabilities"]
 
@@ -162,18 +177,18 @@ def pull_aliases_profiles_file(vk: VulkanObject, json_files_dict: dict, json_fil
         for block_name in block_names:
             if block_name in json_profiles_capabilities:
                 pull_aliases_capabilities_block(
-                    vk, version, json_profiles_capabilities[block_name], inherited_caps, profile_enabled_exts
+                    vk, version, json_profiles_capabilities[block_name], inherited_caps, profile_enabled_exts, pull_bits
                 )
 
 
-def pull_aliases_profiles_files(vk: VulkanObject, json_files_dict: dict):
+def pull_aliases_profiles_files(vk: VulkanObject, pull_bits: list[PullBits], json_files_dict: dict):
     if not isinstance(json_files_dict, dict):
         return
 
     if "profiles" in json_files_dict or "capabilities" in json_files_dict:
-        pull_aliases_profiles_file(vk, json_files_dict, json_files_dict)
+        pull_aliases_profiles_file(vk, pull_bits, json_files_dict, json_files_dict)
         return
 
     sorted_file_keys = get_topologically_sorted_file_keys(json_files_dict)
     for file_key in sorted_file_keys:
-        pull_aliases_profiles_file(vk, json_files_dict, json_files_dict[file_key])
+        pull_aliases_profiles_file(vk, pull_bits, json_files_dict, json_files_dict[file_key])

@@ -45,6 +45,7 @@ def pull_promoted_extensions_profiles_file(
     profiles_data = json_file_data.get("profiles", {})
     capabilities_dict = json_file_data.setdefault("capabilities", {})
     ignore_extension_versions = PullBits.IGNORE_EXTENSION_VERSIONS in pull_bits
+    ignore_unratified = PullBits.IGNORE_UNRATIFIED in pull_bits
 
     for key, profile_obj in profiles_data.items():
         api_version = VK_VERSION.from_string(profile_obj["api-version"])
@@ -72,6 +73,8 @@ def pull_promoted_extensions_profiles_file(
             if ver != VK_VERSION.NONE and api_version != VK_VERSION.NONE and ver <= api_version:
                 promoted_exts = gatherPromotedExtensionsForExactVersion(vk, ver)
                 for ext_name, ext_ver in promoted_exts.items():
+                    if ignore_unratified and ext_name in vk.extensions and not vk.extensions[ext_name].ratified:
+                        continue
                     if ext_name not in ext_dict and ext_name not in context_extensions:
                         ext_dict[ext_name] = 1 if ignore_extension_versions else ext_ver
 
