@@ -141,6 +141,43 @@ class TestValidate(unittest.TestCase):
 
         self.assertTrue(any("has mismatching value" in issue and "aliased structure" in issue for issue in issues))
 
+    def test_subcore_capability_validation(self):
+        """
+        Verifies that static analysis with AnalyseBits.SUBCORE_CAPABILITIES detects limits
+        and features set below Vulkan core baseline minimums for the profile's api-version.
+        """
+        json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "features": {
+                        "VkPhysicalDeviceFeatures": {
+                            "robustBufferAccess": false
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceProperties": {
+                            "limits": {
+                                "maxImageDimension1D": 2048
+                            }
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(json_text)}
+        issues = self.validator.validate_data(json_files_dict, [AnalyseBits.SUBCORE_CAPABILITIES])
+
+        self.assertTrue(any("below Vulkan core requirement" in issue and "maxImageDimension1D" in issue for issue in issues))
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

@@ -160,7 +160,8 @@ GRAPH_JSON_SCHEMA = {
                 "api-version",
                 "extensions",
                 "aliases",
-                "unratified"
+                "unratified",
+                "subcore-capabilities"
             ]
         },
         "common_args": {
