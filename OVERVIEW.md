@@ -20,7 +20,7 @@ Conceptually, *Vulkan Profiles* can be understood as the explicit expression and
 
 The *Vulkan Profiles Tools* includes the following components:
 
-* ***[The `vkprofiles` command line tool](./scripts/README.md)***
+* ***[The `vkprofiles` command line tool](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/scripts/README.md)***
 * A command-line tool to process Vulkan profiles files and generate code and documentation:
   * Validates Vulkan profiles files and analysis the sementics of profiles file data.
   * Supports profiles combining via `union`, `intersection` and `difference` of Vulkan capabilities.
