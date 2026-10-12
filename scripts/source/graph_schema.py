@@ -141,7 +141,7 @@ GRAPH_JSON_SCHEMA = {
                 "aliases",
                 "ignore-extension-versions",
                 "ignore-unsupported",
-                "ignore-subcore-capabilities",
+                "ignore-subcore",
                 "ignore-unratified"
             ]
         },

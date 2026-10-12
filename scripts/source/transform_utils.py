@@ -54,7 +54,7 @@ class PullBits(str, Enum):
     ALIASES = 'aliases'                              # Resolves and populates all equivalent capability aliases across core structures and extensions.
     IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions'    # Sets all required extension versions to 1, overriding specific extension spec versions.
     IGNORE_UNSUPPORTED = 'ignore-unsupported'        # Skips pulling default values for feature-dependent properties when feature is unsupported.
-    IGNORE_SUBCORE_CAPABILITIES = 'ignore-subcore'   # Allows required-capabilities pulling to override profile capability values that are below Vulkan core spec requirements.
+    IGNORE_SUBCORE = 'ignore-subcore'                # Allows required-capabilities pulling to override profile capability values that are below Vulkan core spec requirements.
     IGNORE_UNRATIFIED = 'ignore-unratified'          # Skips pulling unratified extensions and capability aliases during pull operations.
 
 
@@ -70,7 +70,7 @@ class AnalyseBits(str, Enum):
     EXTENSIONS = 'extensions'                      # Checks that core structures match profile API version and extension structures belong to declared extensions.
     ALIASES = 'aliases'                            # Checks member value consistency across aliased capability structures.
     UNRATIFIED = 'unratified'                      # Checks that all enabled extensions in the profile are ratified for Vulkan.
-    SUBCORE_CAPABILITIES = 'subcore'               # Checks for profile capability values (features/properties) below Vulkan core specification baselines.
+    SUBCORE_CAPABILITIES = 'subcore-capabilities'  # Checks for profile capability values (features/properties) below Vulkan core specification baselines.
 
 
 class CategoryPriority(IntEnum):
@@ -328,11 +328,17 @@ def isStructExtensionEnabled(vk: VulkanObject, struct_name: str, version: VK_VER
 def filter_features_against_context(
     vk: VulkanObject,
     features_dict: dict[str, dict[str, bool]],
-    context_features: set[tuple[str, str]],
-    ignore_subcore_capabilities: bool = False
+    context_features: set[tuple[str, str]] | dict[tuple[str, str], bool],
+    ignore_subcore: bool = False
 ) -> dict[str, dict[str, bool]]:
     """Filters candidate feature requirements against accumulated context features."""
     filtered_features = {}
+
+    if isinstance(context_features, set):
+        ctx_dict = {key: True for key in context_features}
+    else:
+        ctx_dict = context_features or {}
+
     for s_name, members in features_dict.items():
         if not isinstance(members, dict):
             continue
@@ -345,13 +351,22 @@ def filter_features_against_context(
             aliases = [query_id] + gatherCapabilityAliases(vk, query_id)
 
             is_in_context = False
+            is_in_context_true = False
             for alias in aliases:
                 if isinstance(alias, StructCapabilityAlias):
-                    if (alias.struct, alias.member) in context_features:
+                    key = (alias.struct, alias.member)
+                    if key in ctx_dict:
                         is_in_context = True
-                        break
+                        if ctx_dict[key] is True:
+                            is_in_context_true = True
+                            break
 
-            if not is_in_context or ignore_subcore_capabilities:
+            if ignore_subcore:
+                should_pull = not is_in_context_true
+            else:
+                should_pull = not is_in_context
+
+            if should_pull:
                 new_members[m_name] = val
 
         if new_members:
@@ -363,7 +378,7 @@ def filter_properties_against_context(
     vk: VulkanObject,
     properties_dict: dict[str, Any],
     context_properties: dict[str, Any],
-    ignore_subcore_capabilities: bool = False
+    ignore_subcore: bool = False
 ) -> dict[str, Any]:
     """Filters candidate property requirements against accumulated context properties."""
     filtered_properties = {}
@@ -383,7 +398,7 @@ def filter_properties_against_context(
                     )
                     if not found_in_ctx:
                         new_sub_dict[prop_name] = prop_val
-                    elif ignore_subcore_capabilities and not is_property_satisfied(ctx_val, prop_val, prop_name):
+                    elif ignore_subcore and not is_property_satisfied(ctx_val, prop_val, prop_name):
                         new_sub_dict[prop_name] = prop_val
                 if new_sub_dict:
                     new_s_data[sub_group_name] = new_sub_dict
@@ -397,7 +412,7 @@ def filter_properties_against_context(
                 )
                 if not found_in_ctx:
                     new_p_data[prop_name] = prop_val
-                elif ignore_subcore_capabilities and not is_property_satisfied(ctx_val, prop_val, prop_name):
+                elif ignore_subcore and not is_property_satisfied(ctx_val, prop_val, prop_name):
                     new_p_data[prop_name] = prop_val
             if new_p_data:
                 filtered_properties[s_name] = new_p_data
@@ -406,7 +421,7 @@ def filter_properties_against_context(
 
 def update_context_from_capabilities(
     caps_dict: dict,
-    context_features: set[tuple[str, str]],
+    context_features: set[tuple[str, str]] | dict[tuple[str, str], bool],
     context_properties: dict[str, Any],
     context_extensions: set[str]
 ):
@@ -418,7 +433,9 @@ def update_context_from_capabilities(
         for s_name, members in caps_dict["features"].items():
             if isinstance(members, dict):
                 for m_name, val in members.items():
-                    if val:
+                    if isinstance(context_features, dict):
+                        context_features[(s_name, m_name)] = bool(val)
+                    elif isinstance(context_features, set) and val:
                         context_features.add((s_name, m_name))
 
     if "properties" in caps_dict and isinstance(caps_dict["properties"], dict):
