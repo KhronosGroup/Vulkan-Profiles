@@ -32,6 +32,8 @@ from source.vulkan_object_utils import (
     is_extension_struct_name,
     getExtensionPromotedTo,
     gatherCapabilityAliases,
+    gatherSatisfiedCoreRequiredFeaturesForVersion,
+    gatherSatisfiedCoreRequiredPropertiesForVersion,
     StructCapabilityAlias,
 )
 from source.profiles_json_utils import (
@@ -41,8 +43,10 @@ from source.profiles_json_utils import (
     validate_profiles_jsons_data,
     collect_profile_capabilities,
     get_profile_and_file_data,
+    deep_merge_dict,
+    is_property_satisfied,
 )
-from source.transform_utils import AnalyseBits
+from source.transform_utils import AnalyseBits, get_parent_property_value
 from source.generate_profiles_schema import VulkanProfilesSchemaGenerator2
 
 
@@ -192,6 +196,98 @@ class VulkanProfilesDataValidation:
 
         return issues
 
+    def validate_subcore_capabilities(
+        self,
+        profile_name: str,
+        api_version: VK_VERSION,
+        profile_caps: dict
+    ) -> list[str]:
+        """Analysis Case 5: Checks for profile capability values (features/properties) below Vulkan core specification baseline."""
+        issues = []
+        enabled_exts = set(profile_caps.get("extensions", {}).keys())
+
+        profile_features = profile_caps.get("features", {})
+        profile_properties = profile_caps.get("properties", {})
+
+        profile_feature_values: dict[tuple[str, str], bool] = {}
+        if isinstance(profile_features, dict):
+            for s_name, members in profile_features.items():
+                if isinstance(members, dict):
+                    for m_name, val in members.items():
+                        profile_feature_values[(s_name, m_name)] = bool(val)
+
+        core_features_req = {}
+        core_properties_req = {}
+
+        enabled_features_set = {(s, m) for (s, m), val in profile_feature_values.items() if val}
+
+        for ver in VK_VERSION.versions():
+            if ver != VK_VERSION.NONE and api_version != VK_VERSION.NONE and ver <= api_version:
+                sat_feat, _ = gatherSatisfiedCoreRequiredFeaturesForVersion(
+                    self.vk, ver, api_version, enabled_exts, enabled_features_set
+                )
+                if sat_feat:
+                    deep_merge_dict(core_features_req, sat_feat)
+
+                sat_prop = gatherSatisfiedCoreRequiredPropertiesForVersion(
+                    self.vk, ver, api_version, enabled_exts, enabled_features_set, ignore_unsupported=True
+                )
+                if sat_prop:
+                    deep_merge_dict(core_properties_req, sat_prop)
+
+        # 1. Inspect required core features
+        for struct_name, members in core_features_req.items():
+            if not isinstance(members, dict):
+                continue
+            for member_name, req_val in members.items():
+                if not req_val:
+                    continue
+                query_id = StructCapabilityAlias(struct_name, member_name)
+                aliases = [query_id] + gatherCapabilityAliases(self.vk, query_id)
+
+                val_in_profile = None
+                for alias in aliases:
+                    if isinstance(alias, StructCapabilityAlias):
+                        if (alias.struct, alias.member) in profile_feature_values:
+                            val_in_profile = profile_feature_values[(alias.struct, alias.member)]
+                            break
+
+                if val_in_profile is False:
+                    issues.append(
+                        f"Feature '{member_name}' in structure '{struct_name}' is set to false in profile '{profile_name}', "
+                        f"which is below Vulkan core requirement for API version {api_version}"
+                    )
+
+        # 2. Inspect required core properties/limits
+        for struct_name, prop_data in core_properties_req.items():
+            if not isinstance(prop_data, dict):
+                continue
+
+            if struct_name == "VkPhysicalDeviceProperties":
+                for sub_group, sub_dict in prop_data.items():
+                    if isinstance(sub_dict, dict):
+                        for prop_name, req_val in sub_dict.items():
+                            found_in_ctx, prof_val = get_parent_property_value(
+                                profile_properties, struct_name, prop_name, self.vk
+                            )
+                            if found_in_ctx and not is_property_satisfied(prof_val, req_val, prop_name):
+                                issues.append(
+                                    f"Property '{prop_name}' in structure '{struct_name}' (value: {prof_val}) in profile '{profile_name}' "
+                                    f"is below Vulkan core requirement (required: {req_val}) for API version {api_version}"
+                                )
+            else:
+                for prop_name, req_val in prop_data.items():
+                    found_in_ctx, prof_val = get_parent_property_value(
+                        profile_properties, struct_name, prop_name, self.vk
+                    )
+                    if found_in_ctx and not is_property_satisfied(prof_val, req_val, prop_name):
+                        issues.append(
+                            f"Property '{prop_name}' in structure '{struct_name}' (value: {prof_val}) in profile '{profile_name}' "
+                            f"is below Vulkan core requirement (required: {req_val}) for API version {api_version}"
+                        )
+
+        return issues
+
     def validate_data(self, json_files_dict: dict, analyse_bits: list[AnalyseBits] = None) -> list[str]:
         """Executes selected static analysis validation cases across loaded profile files."""
         if analyse_bits is None:
@@ -221,6 +317,14 @@ class VulkanProfilesDataValidation:
                     issues.extend(
                         self.validate_ratified_extensions(
                             profile_name, enabled_exts
+                        )
+                    )
+
+                # Analysis Case 5: Core Specification Minimum Capability Baseline Checks
+                if AnalyseBits.SUBCORE_CAPABILITIES in analyse_bits:
+                    issues.extend(
+                        self.validate_subcore_capabilities(
+                            profile_name, api_version, profile_caps
                         )
                     )
 

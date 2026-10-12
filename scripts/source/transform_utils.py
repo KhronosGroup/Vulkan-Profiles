@@ -54,7 +54,7 @@ class PullBits(str, Enum):
     ALIASES = 'aliases'                              # Resolves and populates all equivalent capability aliases across core structures and extensions.
     IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions'    # Sets all required extension versions to 1, overriding specific extension spec versions.
     IGNORE_UNSUPPORTED = 'ignore-unsupported'        # Skips pulling default values for feature-dependent properties when feature is unsupported.
-    IGNORE_SUBCORE_CAPABILITIES = 'ignore-subcore-capabilities'  # Allows required-capabilities pulling to override profile capability values that are below Vulkan core spec requirements.
+    IGNORE_SUBCORE_CAPABILITIES = 'ignore-subcore'   # Allows required-capabilities pulling to override profile capability values that are below Vulkan core spec requirements.
     IGNORE_UNRATIFIED = 'ignore-unratified'          # Skips pulling unratified extensions and capability aliases during pull operations.
 
 
@@ -66,10 +66,11 @@ class StripBits(str, Enum):
 
 
 class AnalyseBits(str, Enum):
-    API_VERSION = 'api-version'  # Checks that inherited required profiles do not target newer Vulkan API versions.
-    EXTENSIONS = 'extensions'    # Checks that core structures match profile API version and extension structures belong to declared extensions.
-    ALIASES = 'aliases'          # Checks member value consistency across aliased capability structures.
-    UNRATIFIED = 'unratified'    # Checks that all enabled extensions in the profile are ratified for Vulkan.
+    API_VERSION = 'api-version'                    # Checks that inherited required profiles do not target newer Vulkan API versions.
+    EXTENSIONS = 'extensions'                      # Checks that core structures match profile API version and extension structures belong to declared extensions.
+    ALIASES = 'aliases'                            # Checks member value consistency across aliased capability structures.
+    UNRATIFIED = 'unratified'                      # Checks that all enabled extensions in the profile are ratified for Vulkan.
+    SUBCORE_CAPABILITIES = 'subcore'               # Checks for profile capability values (features/properties) below Vulkan core specification baselines.
 
 
 class CategoryPriority(IntEnum):
