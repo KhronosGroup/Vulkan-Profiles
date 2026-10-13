@@ -133,7 +133,7 @@ def pull_extension_dependencies_capabilities_block(
         return
 
     ignore_extension_versions = PullBits.IGNORE_EXTENSION_VERSIONS in pull_bits
-    ignore_subcore_capabilities = PullBits.IGNORE_SUBCORE_CAPABILITIES in pull_bits
+    ignore_subcore = PullBits.IGNORE_SUBCORE in pull_bits
     ignore_unsupported = PullBits.IGNORE_UNSUPPORTED in pull_bits
     ignore_unratified = PullBits.IGNORE_UNRATIFIED in pull_bits
 
@@ -194,7 +194,7 @@ def pull_extension_dependencies_capabilities_block(
         )
         if ext_satisfied:
             filtered_ext_satisfied = filter_features_against_context(
-                vk, ext_satisfied, context_features, ignore_subcore_capabilities
+                vk, ext_satisfied, context_features, ignore_subcore
             )
             if filtered_ext_satisfied:
                 features_dict = json_profiles_capabilities_block.setdefault("features", {})
@@ -210,7 +210,7 @@ def pull_extension_dependencies_capabilities_block(
         )
         if ext_satisfied_props:
             filtered_ext_satisfied_props = filter_properties_against_context(
-                vk, ext_satisfied_props, context_properties, ignore_subcore_capabilities
+                vk, ext_satisfied_props, context_properties, ignore_subcore
             )
             if filtered_ext_satisfied_props:
                 properties_dict = json_profiles_capabilities_block.setdefault("properties", {})
@@ -361,7 +361,7 @@ def pull_required_capabilities_single_profile(
         )
 
     # 2. Process this profile with fully-transformed parent context
-    ignore_subcore_capabilities = PullBits.IGNORE_SUBCORE_CAPABILITIES in pull_bits
+    ignore_subcore = PullBits.IGNORE_SUBCORE in pull_bits
     ignore_unsupported = PullBits.IGNORE_UNSUPPORTED in pull_bits
 
     capabilities_dict = json_file_data.setdefault("capabilities", {})
@@ -434,10 +434,10 @@ def pull_required_capabilities_single_profile(
                             deep_merge_dict(transition_properties, satisfied_prop)
 
                 transition_features = filter_features_against_context(
-                    vk, transition_features, explicit_context_features, ignore_subcore_capabilities
+                    vk, transition_features, explicit_context_features, ignore_subcore
                 )
                 transition_properties = filter_properties_against_context(
-                    vk, transition_properties, explicit_context_properties, ignore_subcore_capabilities
+                    vk, transition_properties, explicit_context_properties, ignore_subcore
                 )
 
                 transition_features, transition_properties = canonicalize_capabilities_for_version(
@@ -522,10 +522,10 @@ def pull_required_capabilities_single_profile(
                         deep_merge_dict(core_satisfied_properties, satisfied_prop)
 
             core_satisfied_features = filter_features_against_context(
-                vk, core_satisfied_features, explicit_context_features, ignore_subcore_capabilities
+                vk, core_satisfied_features, explicit_context_features, ignore_subcore
             )
             core_satisfied_properties = filter_properties_against_context(
-                vk, core_satisfied_properties, explicit_context_properties, ignore_subcore_capabilities
+                vk, core_satisfied_properties, explicit_context_properties, ignore_subcore
             )
 
             core_satisfied_features, core_satisfied_properties = canonicalize_capabilities_for_version(
@@ -584,7 +584,7 @@ def pull_required_capabilities_single_profile(
 
                 if ext_satisfied:
                     filtered_ext_satisfied = filter_features_against_context(
-                        vk, ext_satisfied, explicit_context_features, ignore_subcore_capabilities
+                        vk, ext_satisfied, explicit_context_features, ignore_subcore
                     )
                     if filtered_ext_satisfied:
                         block_features = block.setdefault("features", {})
@@ -600,7 +600,7 @@ def pull_required_capabilities_single_profile(
                 )
                 if ext_satisfied_props:
                     filtered_ext_satisfied_props = filter_properties_against_context(
-                        vk, ext_satisfied_props, explicit_context_properties, ignore_subcore_capabilities
+                        vk, ext_satisfied_props, explicit_context_properties, ignore_subcore
                     )
                     if filtered_ext_satisfied_props:
                         block_properties = block.setdefault("properties", {})
@@ -611,7 +611,7 @@ def pull_required_capabilities_single_profile(
 
 def pull_required_capabilities_profiles_files(
     vk: VulkanObject, 
-    pull_bits: list[PullBits],
+    pull_bits: list[PullBits], 
     json_files_dict: dict
 ):
     """

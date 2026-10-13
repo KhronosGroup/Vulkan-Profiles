@@ -49,7 +49,7 @@ class TestConvertPullRequiredCapabilitiesOR(unittest.TestCase):
         """
         Case 1: An extension (e.g. VK_KHR_shader_float16_int8) specifies an OR feature requirement
         in vk.xml (e.g., field="shaderFloat16, shaderInt8").
-        When neither feature option is pre-enabled in context, pull-required-capabilities
+        When neither feature option is pre-enabled in context, pull requirements
         extracts the extension from the source block, creates variant blocks for each feature option,
         and adds an OR variant array [baseline_shaderFloat16, baseline_shaderInt8] into the profile.
         """

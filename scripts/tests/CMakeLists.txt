@@ -91,7 +91,7 @@ add_custom_target(VpGenerate-Profiles-Android ALL
         --registry "${REGISTRY_PATH}/vk.xml"
         --input "${PROFILES_INPUT_DIR}"
         --output "${PROFILES_OUTPUT_DIR}"
-        --pull required-capabilities
+        --pull requirements
                ignore-extension-versions
                aliases
         --strip duplication

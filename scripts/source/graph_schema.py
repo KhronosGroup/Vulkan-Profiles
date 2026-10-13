@@ -136,12 +136,12 @@ GRAPH_JSON_SCHEMA = {
         "pull_bits": {
             "type": "string",
             "enum": [
-                "required-capabilities",
-                "promoted-extensions",
+                "requirements",
+                "promoted",
                 "aliases",
                 "ignore-extension-versions",
                 "ignore-unsupported",
-                "ignore-subcore-capabilities",
+                "ignore-subcore",
                 "ignore-unratified"
             ]
         },
@@ -161,7 +161,7 @@ GRAPH_JSON_SCHEMA = {
                 "extensions",
                 "aliases",
                 "unratified",
-                "subcore-capabilities"
+                "subcore"
             ]
         },
         "common_args": {
