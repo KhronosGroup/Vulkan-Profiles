@@ -49,13 +49,13 @@ from source.profiles_json_utils import (
 
 
 class PullBits(str, Enum):
-    REQUIRED_CAPABILITIES = 'required-capabilities'  # Evaluates extension dependencies and pulls satisfied core/extension feature and property requirements into capability blocks.
-    PROMOTED_EXTENSIONS = 'promoted-extensions'      # Requires all extensions promoted to core up to the profile's target Vulkan version.
-    ALIASES = 'aliases'                              # Resolves and populates all equivalent capability aliases across core structures and extensions.
-    IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions'    # Sets all required extension versions to 1, overriding specific extension spec versions.
-    IGNORE_UNSUPPORTED = 'ignore-unsupported'        # Skips pulling default values for feature-dependent properties when feature is unsupported.
-    IGNORE_SUBCORE_CAPABILITIES = 'ignore-subcore'   # Allows required-capabilities pulling to override profile capability values that are below Vulkan core spec requirements.
-    IGNORE_UNRATIFIED = 'ignore-unratified'          # Skips pulling unratified extensions and capability aliases during pull operations.
+    REQUIRED_CAPABILITIES = 'requirements'                      # Evaluates extension dependencies and pulls satisfied core/extension feature and property requirements into capability blocks.
+    PROMOTED_EXTENSIONS = 'promoted'                            # Requires all extensions promoted to core up to the profile's target Vulkan version.
+    ALIASES = 'aliases'                                         # Resolves and populates all equivalent capability aliases across core structures and extensions.
+    IGNORE_EXTENSION_VERSIONS = 'ignore-extension-versions'     # Sets all required extension versions to 1, overriding specific extension spec versions.
+    IGNORE_UNSUPPORTED = 'ignore-unsupported'                   # Skips pulling default values for feature-dependent properties when feature is unsupported.
+    IGNORE_SUBCORE = 'ignore-subcore'                           # Allows 'requirements' pulling to override profile capability values that are below Vulkan core spec requirements.
+    IGNORE_UNRATIFIED = 'ignore-unratified'                     # Skips pulling unratified extensions and capability aliases during pull operations.
 
 
 class StripBits(str, Enum):
@@ -329,7 +329,7 @@ def filter_features_against_context(
     vk: VulkanObject,
     features_dict: dict[str, dict[str, bool]],
     context_features: set[tuple[str, str]],
-    ignore_subcore_capabilities: bool = False
+    ignore_subcore: bool = False
 ) -> dict[str, dict[str, bool]]:
     """Filters candidate feature requirements against accumulated context features."""
     filtered_features = {}
@@ -351,7 +351,7 @@ def filter_features_against_context(
                         is_in_context = True
                         break
 
-            if not is_in_context or ignore_subcore_capabilities:
+            if not is_in_context or ignore_subcore:
                 new_members[m_name] = val
 
         if new_members:
@@ -363,7 +363,7 @@ def filter_properties_against_context(
     vk: VulkanObject,
     properties_dict: dict[str, Any],
     context_properties: dict[str, Any],
-    ignore_subcore_capabilities: bool = False
+    ignore_subcore: bool = False
 ) -> dict[str, Any]:
     """Filters candidate property requirements against accumulated context properties."""
     filtered_properties = {}
@@ -383,7 +383,7 @@ def filter_properties_against_context(
                     )
                     if not found_in_ctx:
                         new_sub_dict[prop_name] = prop_val
-                    elif ignore_subcore_capabilities and not is_property_satisfied(ctx_val, prop_val, prop_name):
+                    elif ignore_subcore and not is_property_satisfied(ctx_val, prop_val, prop_name):
                         new_sub_dict[prop_name] = prop_val
                 if new_sub_dict:
                     new_s_data[sub_group_name] = new_sub_dict
@@ -397,7 +397,7 @@ def filter_properties_against_context(
                 )
                 if not found_in_ctx:
                     new_p_data[prop_name] = prop_val
-                elif ignore_subcore_capabilities and not is_property_satisfied(ctx_val, prop_val, prop_name):
+                elif ignore_subcore and not is_property_satisfied(ctx_val, prop_val, prop_name):
                     new_p_data[prop_name] = prop_val
             if new_p_data:
                 filtered_properties[s_name] = new_p_data

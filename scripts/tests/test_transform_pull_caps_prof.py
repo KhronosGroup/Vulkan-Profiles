@@ -43,7 +43,7 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
 
     def test_pull_required_capabilities_already_present_vulkan10(self):
         """
-        Verifies that pulling core requirements with PullBits.IGNORE_SUBCORE_CAPABILITIES onto an existing profile
+        Verifies that pulling core requirements with PullBits.IGNORE_SUBCORE onto an existing profile
         preserves profile capability requirements higher than Vulkan core requirements (e.g. maxImageDimension2D = 8192,
         framebufferColorSampleCounts with 8_BIT) while enforcing core baseline minimums (maxImageDimension1D = 4096).
         """
@@ -92,7 +92,7 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
         pull_required_capabilities_profiles_files(
             self.vk, 
-            [PullBits.REQUIRED_CAPABILITIES, PullBits.IGNORE_SUBCORE_CAPABILITIES, PullBits.IGNORE_UNSUPPORTED], 
+            [PullBits.REQUIRED_CAPABILITIES, PullBits.IGNORE_SUBCORE, PullBits.IGNORE_UNSUPPORTED], 
             json_files_dict
         )
 
@@ -141,7 +141,7 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
         json_files_dict = {"test_profile.json": json.loads(original_json_text)}
         pull_required_capabilities_profiles_files(
             self.vk, 
-            [PullBits.REQUIRED_CAPABILITIES, PullBits.IGNORE_SUBCORE_CAPABILITIES, PullBits.IGNORE_UNSUPPORTED], 
+            [PullBits.REQUIRED_CAPABILITIES, PullBits.IGNORE_SUBCORE, PullBits.IGNORE_UNSUPPORTED], 
             json_files_dict
         )
 
