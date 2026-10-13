@@ -151,6 +151,90 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
         # robustBufferAccess must not be pulled when VK_KHR_portability_subset is present
         self.assertFalse(vk_features.get("robustBufferAccess", False))
 
+    def test_pull_required_capabilities_explicit_false_feature_not_overridden(self):
+        """
+        Verifies that when an extension requires a feature (e.g. storageBuffer16BitAccess for VK_KHR_16bit_storage)
+        and the feature is explicitly set to false in the profile, pull_required_capabilities_profiles_files
+        does not override the false value to true when PullBits.IGNORE_SUBCORE is omitted.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_profile_explicit_false": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "extensions": {
+                        "VK_KHR_16bit_storage": 1
+                    },
+                    "features": {
+                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                            "storageBuffer16BitAccess": false
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(
+            self.vk, 
+            [PullBits.REQUIRED_CAPABILITIES], 
+            json_files_dict
+        )
+
+        baseline_caps = json_files_dict["test_profile.json"]["capabilities"]["baseline"]
+        features16 = baseline_caps.get("features", {}).get("VkPhysicalDevice16BitStorageFeaturesKHR", {})
+
+        # Verify that storageBuffer16BitAccess remains False and was not overridden
+        self.assertFalse(features16.get("storageBuffer16BitAccess", True))
+
+    def test_pull_required_capabilities_explicit_false_feature_overridden_with_ignore_subcore(self):
+        """
+        Verifies that when an extension requires a feature (e.g. storageBuffer16BitAccess for VK_KHR_16bit_storage)
+        and the feature is explicitly set to false, passing PullBits.IGNORE_SUBCORE allows
+        pull_required_capabilities_profiles_files to override the explicit false value with true.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
+            "profiles": {
+                "VP_TEST_profile_explicit_false_ignore_subcore": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "extensions": {
+                        "VK_KHR_16bit_storage": 1
+                    },
+                    "features": {
+                        "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                            "storageBuffer16BitAccess": false
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(
+            self.vk, 
+            [PullBits.REQUIRED_CAPABILITIES, PullBits.IGNORE_SUBCORE], 
+            json_files_dict
+        )
+
+        baseline_caps = json_files_dict["test_profile.json"]["capabilities"]["baseline"]
+        features16 = baseline_caps.get("features", {}).get("VkPhysicalDevice16BitStorageFeaturesKHR", {})
+
+        # Verify that storageBuffer16BitAccess was overridden to True when IGNORE_SUBCORE is set
+        self.assertTrue(features16.get("storageBuffer16BitAccess"))
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

@@ -25,19 +25,16 @@ from source.vulkan_object_utils import (
     VulkanObject, 
     VK_VERSION, 
     gatherDependentExtensions, 
-    gatherCapabilityAliases,
     gatherSatisfiedCoreRequiredFeaturesForVersion,
     gatherSatisfiedCoreRequiredPropertiesForVersion,
     gatherSatisfiedExtensionRequiredFeatures,
     gatherSatisfiedExtensionRequiredProperties,
     get_member_unsupported_default,
-    getStructByName,
-    StructCapabilityAlias
+    getStructByName
 )
 from source.profiles_json_utils import (
     collect_block_names,
     collect_profile_capabilities,
-    get_profile_and_file_data,
     get_primary_capability_block,
     get_topologically_sorted_file_keys,
     collect_required_profiles_capabilities_recursive,
@@ -125,7 +122,7 @@ def pull_extension_dependencies_capabilities_block(
     pull_bits: list[PullBits], 
     json_profiles_capabilities_block: dict,
     context_extensions: set[str] = None,
-    context_features: set[tuple[str, str]] = None,
+    context_features: dict[str, dict[str, bool]] | set[tuple[str, str]] = None,
     context_properties: dict[str, Any] = None,
     profile_name: str = ""
 ):
@@ -138,7 +135,6 @@ def pull_extension_dependencies_capabilities_block(
     ignore_unratified = PullBits.IGNORE_UNRATIFIED in pull_bits
 
     context_extensions = context_extensions if context_extensions is not None else set()
-    context_features = context_features if context_features is not None else set()
     context_properties = context_properties if context_properties is not None else {}
 
     curr_exts = dict(json_profiles_capabilities_block["extensions"])
@@ -177,14 +173,24 @@ def pull_extension_dependencies_capabilities_block(
     if ignore_unratified:
         profile_enabled_exts = {e for e in profile_enabled_exts if e in vk.extensions and vk.extensions[e].ratified}
 
+    # Normalize context_features safely regardless of whether caller passed a dict or a set
     block_features = json_profiles_capabilities_block.get("features", {})
-    enabled_features = set(context_features)
+    combined_context_features = {}
+    if isinstance(context_features, dict):
+        deep_merge_dict(combined_context_features, context_features)
+    elif isinstance(context_features, set):
+        for s_name, m_name in context_features:
+            combined_context_features.setdefault(s_name, {})[m_name] = True
+
     if isinstance(block_features, dict):
-        for s_name, members in block_features.items():
-            if isinstance(members, dict):
-                for m_name, val in members.items():
-                    if val:
-                        enabled_features.add((s_name, m_name))
+        deep_merge_dict(combined_context_features, block_features)
+
+    enabled_features = set()
+    for s_name, members in combined_context_features.items():
+        if isinstance(members, dict):
+            for m_name, val in members.items():
+                if val:
+                    enabled_features.add((s_name, m_name))
 
     for ext_name in filtered_deps.keys():
         if ignore_unratified and ext_name in vk.extensions and not vk.extensions[ext_name].ratified:
@@ -194,11 +200,12 @@ def pull_extension_dependencies_capabilities_block(
         )
         if ext_satisfied:
             filtered_ext_satisfied = filter_features_against_context(
-                vk, ext_satisfied, context_features, ignore_subcore
+                vk, ext_satisfied, combined_context_features, ignore_subcore
             )
             if filtered_ext_satisfied:
                 features_dict = json_profiles_capabilities_block.setdefault("features", {})
                 deep_merge_dict(features_dict, filtered_ext_satisfied)
+                deep_merge_dict(combined_context_features, filtered_ext_satisfied)
                 for s_name, members in filtered_ext_satisfied.items():
                     if isinstance(members, dict):
                         for m_name, val in members.items():
@@ -230,20 +237,12 @@ def pull_extension_dependencies_profiles_file(
         api_version = VK_VERSION.from_string(profile_obj.get("api-version", "1.0.0"))
 
         context_extensions = set()
-        context_features = set()
+        context_features = {}
         context_properties = {}
         parent_profiles = profile_obj.get("profiles", [])
         if json_files_dict and parent_profiles:
             parent_caps = collect_required_profiles_capabilities_recursive(json_files_dict, parent_profiles)
-            context_extensions.update(parent_caps.get("extensions", {}).keys())
-            parent_features_dict = parent_caps.get("features", {})
-            for s_name, members in parent_features_dict.items():
-                if isinstance(members, dict):
-                    for m_name, val in members.items():
-                        if val:
-                            context_features.add((s_name, m_name))
-            if "properties" in parent_caps and isinstance(parent_caps["properties"], dict):
-                deep_merge_dict(context_properties, parent_caps["properties"])
+            update_context_from_capabilities(parent_caps, context_features, context_properties, context_extensions)
 
         block_names = collect_block_names(profile_obj.get("capabilities", []))
         for block_name in block_names:
@@ -252,16 +251,7 @@ def pull_extension_dependencies_profiles_file(
                 pull_extension_dependencies_capabilities_block(
                     vk, api_version, pull_bits, block, context_extensions, context_features, context_properties, profile_key
                 )
-                if "extensions" in block and isinstance(block["extensions"], dict):
-                    context_extensions.update(block["extensions"].keys())
-                if "features" in block and isinstance(block["features"], dict):
-                    for s_name, members in block["features"].items():
-                        if isinstance(members, dict):
-                            for m_name, val in members.items():
-                                if val:
-                                    context_features.add((s_name, m_name))
-                if "properties" in block and isinstance(block["properties"], dict):
-                    deep_merge_dict(context_properties, block["properties"])
+                update_context_from_capabilities(block, context_features, context_properties, context_extensions)
 
 
 def pull_extension_dependencies_profiles_files(
@@ -368,7 +358,7 @@ def pull_required_capabilities_single_profile(
     api_version = VK_VERSION.from_string(profile_obj["api-version"])
     profile_caps_list = profile_obj.setdefault("capabilities", [])
 
-    context_features: set[tuple[str, str]] = set()
+    context_features: dict[str, dict[str, bool]] = {}
     context_properties: dict[str, Any] = {}
     context_extensions: set[str] = set()
 
@@ -377,17 +367,15 @@ def pull_required_capabilities_single_profile(
         update_context_from_capabilities(inherited_caps, context_features, context_properties, context_extensions)
 
     explicit_profile_caps = collect_profile_capabilities(json_files_dict, json_file_data, profile_obj)
-    explicit_context_properties = dict(context_properties)
+    explicit_context_properties = {}
+    deep_merge_dict(explicit_context_properties, context_properties)
     if "properties" in explicit_profile_caps and isinstance(explicit_profile_caps["properties"], dict):
         deep_merge_dict(explicit_context_properties, explicit_profile_caps["properties"])
 
-    explicit_context_features = set(context_features)
+    explicit_context_features = {}
+    deep_merge_dict(explicit_context_features, context_features)
     if "features" in explicit_profile_caps and isinstance(explicit_profile_caps["features"], dict):
-        for struct_name, members in explicit_profile_caps["features"].items():
-            if isinstance(members, dict):
-                for member_name, val in members.items():
-                    if val:
-                        explicit_context_features.add((struct_name, member_name))
+        deep_merge_dict(explicit_context_features, explicit_profile_caps["features"])
 
     if required_parent_profiles:
         for parent_pname in required_parent_profiles:
@@ -491,10 +479,9 @@ def pull_required_capabilities_single_profile(
         if primary_block is not None:
             profile_caps = collect_profile_capabilities(json_files_dict, json_file_data, profile_obj)
             profile_enabled_exts = set(profile_caps.get("extensions", {}).keys())
-            profile_features_block = profile_caps.get("features", {})
 
             all_enabled_features_set: set[tuple[str, str]] = set()
-            for struct_name, members in profile_features_block.items():
+            for struct_name, members in explicit_context_features.items():
                 if isinstance(members, dict):
                     for member_name, val in members.items():
                         if val:
@@ -564,7 +551,12 @@ def pull_required_capabilities_single_profile(
             profile_caps = collect_profile_capabilities(json_files_dict, json_file_data, profile_obj)
             profile_enabled_exts = set(profile_caps.get("extensions", {}).keys())
 
-            current_enabled_features: set[tuple[str, str]] = set(context_features)
+            current_enabled_features: set[tuple[str, str]] = set()
+            for s_name, members in context_features.items():
+                if isinstance(members, dict):
+                    for m_name, val in members.items():
+                        if val:
+                            current_enabled_features.add((s_name, m_name))
             if "features" in block and isinstance(block["features"], dict):
                 for struct_name, members in block["features"].items():
                     if isinstance(members, dict):
@@ -589,6 +581,7 @@ def pull_required_capabilities_single_profile(
                     if filtered_ext_satisfied:
                         block_features = block.setdefault("features", {})
                         deep_merge_dict(block_features, filtered_ext_satisfied)
+                        deep_merge_dict(explicit_context_features, filtered_ext_satisfied)
                         for s_name, members in filtered_ext_satisfied.items():
                             if isinstance(members, dict):
                                 for m_name, val in members.items():

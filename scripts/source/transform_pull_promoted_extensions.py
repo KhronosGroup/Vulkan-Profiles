@@ -30,7 +30,10 @@ from source.profiles_json_utils import (
     get_topologically_sorted_file_keys,
     collect_required_profiles_capabilities_recursive
 )
-from source.transform_utils import PullBits
+from source.transform_utils import (
+    PullBits,
+    update_context_from_capabilities
+)
 from source.transform_pull_required_capabilities import (
     pull_extension_dependencies_capabilities_block
 )
@@ -51,17 +54,12 @@ def pull_promoted_extensions_profiles_file(
         api_version = VK_VERSION.from_string(profile_obj["api-version"])
 
         context_extensions = set()
-        context_features = set()
+        context_features = {}
+        context_properties = {}
         parent_profiles = profile_obj.get("profiles", [])
         if json_files_dict and parent_profiles:
             parent_caps = collect_required_profiles_capabilities_recursive(json_files_dict, parent_profiles)
-            context_extensions.update(parent_caps.get("extensions", {}).keys())
-            parent_features_dict = parent_caps.get("features", {})
-            for s_name, members in parent_features_dict.items():
-                if isinstance(members, dict):
-                    for m_name, val in members.items():
-                        if val:
-                            context_features.add((s_name, m_name))
+            update_context_from_capabilities(parent_caps, context_features, context_properties, context_extensions)
 
         primary_block = get_primary_capability_block(profile_obj, capabilities_dict)
         if primary_block is None:
@@ -83,16 +81,9 @@ def pull_promoted_extensions_profiles_file(
             if block_name in capabilities_dict:
                 block = capabilities_dict[block_name]
                 pull_extension_dependencies_capabilities_block(
-                    vk, api_version, pull_bits, block, context_extensions, context_features, profile_name=key
+                    vk, api_version, pull_bits, block, context_extensions, context_features, context_properties, profile_name=key
                 )
-                if "extensions" in block and isinstance(block["extensions"], dict):
-                    context_extensions.update(block["extensions"].keys())
-                if "features" in block and isinstance(block["features"], dict):
-                    for s_name, members in block["features"].items():
-                        if isinstance(members, dict):
-                            for m_name, val in members.items():
-                                if val:
-                                    context_features.add((s_name, m_name))
+                update_context_from_capabilities(block, context_features, context_properties, context_extensions)
 
 
 def pull_promoted_extensions_profiles_files(vk: VulkanObject, pull_bits: list[PullBits], json_files_dict: dict):
