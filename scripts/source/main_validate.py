@@ -50,6 +50,16 @@ from source.transform_utils import AnalyseBits, get_parent_property_value
 from source.generate_profiles_schema import VulkanProfilesSchemaGenerator2
 
 
+class ValidationIssue(str):
+    """Represents a validation issue with an associated log severity level."""
+    level: int
+
+    def __new__(cls, message: str, level: int = logging.WARNING):
+        instance = super().__new__(cls, message)
+        instance.level = level
+        return instance
+
+
 class VulkanProfilesDataValidation:
     def __init__(self, vk: VulkanObject):
         self.vk = vk
@@ -59,7 +69,7 @@ class VulkanProfilesDataValidation:
         json_files_dict: dict,
         profile_name: str,
         profile_obj: dict
-    ) -> list[str]:
+    ) -> list[ValidationIssue]:
         """Analysis Case 1: Recursively checks that all inherited required profiles target an older or equal API version."""
         issues = []
         child_api_version = VK_VERSION.from_string(profile_obj.get("api-version", "1.0.0"))
@@ -77,8 +87,11 @@ class VulkanProfilesDataValidation:
                 req_api_version = VK_VERSION.from_string(req_profile_obj.get("api-version", "1.0.0"))
                 if child_api_version < req_api_version:
                     issues.append(
-                        f"Profile '{profile_name}' targets Vulkan {child_api_version} "
-                        f"but inherits profile '{req_pname}' which targets newer Vulkan {req_api_version}"
+                        ValidationIssue(
+                            f"Profile '{profile_name}' targets Vulkan {child_api_version} "
+                            f"but inherits profile '{req_pname}' which targets newer Vulkan {req_api_version}",
+                            level=logging.WARNING
+                        )
                     )
 
                 nested_parents = req_profile_obj.get("profiles", [])
@@ -97,7 +110,7 @@ class VulkanProfilesDataValidation:
         api_version: VK_VERSION,
         category_dict: dict,
         enabled_exts: set[str]
-    ) -> list[str]:
+    ) -> list[ValidationIssue]:
         """Analysis Case 2: Checks that required core structures and extension structures match declared profile API version and extensions."""
         issues = []
 
@@ -106,8 +119,11 @@ class VulkanProfilesDataValidation:
             if core_ver != VK_VERSION.NONE and api_version < core_ver:
                 ver_tuple = core_ver.as_tuple()
                 issues.append(
-                    f"Core structure '{struct_name}' requires Vulkan {ver_tuple[0]}.{ver_tuple[1]} "
-                    f"but profile '{profile_name}' targets Vulkan {api_version}"
+                    ValidationIssue(
+                        f"Core structure '{struct_name}' requires Vulkan {ver_tuple[0]}.{ver_tuple[1]} "
+                        f"but profile '{profile_name}' targets Vulkan {api_version}",
+                        level=logging.WARNING
+                    )
                 )
 
             if is_extension_struct_name(self.vk, struct_name):
@@ -129,8 +145,11 @@ class VulkanProfilesDataValidation:
 
                     if not declared:
                         issues.append(
-                            f"Structure '{struct_name}' in profile '{profile_name}' "
-                            f"belongs to extension '{def_exts[0]}' which is not declared in extensions"
+                            ValidationIssue(
+                                f"Structure '{struct_name}' in profile '{profile_name}' "
+                                f"belongs to extension '{def_exts[0]}' which is not declared in extensions",
+                                level=logging.WARNING
+                            )
                         )
 
         return issues
@@ -140,7 +159,7 @@ class VulkanProfilesDataValidation:
         profile_name: str,
         category_dict: dict,
         checked_aliases: set[tuple[str, str]]
-    ) -> list[str]:
+    ) -> list[ValidationIssue]:
         """Analysis Case 3: Checks that aliased structure members have consistent values across capability definitions."""
         issues = []
 
@@ -171,9 +190,12 @@ class VulkanProfilesDataValidation:
                                 alias_val = alias_members[alias.member]
                                 if not are_values_equal(val, alias_val):
                                     issues.append(
-                                        f"Member '{member_name}' in structure '{struct_name}' (value: {val}) "
-                                        f"has mismatching value with member '{alias.member}' in aliased structure '{alias.struct}' (value: {alias_val}) "
-                                        f"in profile '{profile_name}'"
+                                        ValidationIssue(
+                                            f"Member '{member_name}' in structure '{struct_name}' (value: {val}) "
+                                            f"has mismatching value with member '{alias.member}' in aliased structure '{alias.struct}' (value: {alias_val}) "
+                                            f"in profile '{profile_name}'",
+                                            level=logging.WARNING
+                                        )
                                     )
 
         return issues
@@ -182,7 +204,7 @@ class VulkanProfilesDataValidation:
         self,
         profile_name: str,
         enabled_exts: set[str]
-    ) -> list[str]:
+    ) -> list[ValidationIssue]:
         """Analysis Case 4: Checks that all extensions enabled in the profile are ratified for Vulkan."""
         issues = []
 
@@ -191,7 +213,10 @@ class VulkanProfilesDataValidation:
                 ext_obj = self.vk.extensions[ext_name]
                 if not ext_obj.ratified:
                     issues.append(
-                        f"Extension '{ext_name}' in profile '{profile_name}' is not ratified for Vulkan"
+                        ValidationIssue(
+                            f"Extension '{ext_name}' in profile '{profile_name}' is not ratified for Vulkan",
+                            level=logging.WARNING
+                        )
                     )
 
         return issues
@@ -201,7 +226,7 @@ class VulkanProfilesDataValidation:
         profile_name: str,
         api_version: VK_VERSION,
         profile_caps: dict
-    ) -> list[str]:
+    ) -> list[ValidationIssue]:
         """Analysis Case 5: Checks for profile capability values (features/properties) below Vulkan core specification baseline."""
         issues = []
         enabled_exts = set(profile_caps.get("extensions", {}).keys())
@@ -254,8 +279,11 @@ class VulkanProfilesDataValidation:
 
                 if val_in_profile is False:
                     issues.append(
-                        f"Feature '{member_name}' in structure '{struct_name}' is set to false in profile '{profile_name}', "
-                        f"which is below Vulkan core requirement for API version {api_version}"
+                        ValidationIssue(
+                            f"Feature '{member_name}' in structure '{struct_name}' is set to false in profile '{profile_name}', "
+                            f"which is below Vulkan core requirement for API version {api_version}",
+                            level=logging.INFO
+                        )
                     )
 
         # 2. Inspect required core properties/limits
@@ -272,8 +300,11 @@ class VulkanProfilesDataValidation:
                             )
                             if found_in_ctx and not is_property_satisfied(prof_val, req_val, prop_name):
                                 issues.append(
-                                    f"Property '{prop_name}' in structure '{struct_name}' (value: {prof_val}) in profile '{profile_name}' "
-                                    f"is below Vulkan core requirement (required: {req_val}) for API version {api_version}"
+                                    ValidationIssue(
+                                        f"Property '{prop_name}' in structure '{struct_name}' (value: {prof_val}) in profile '{profile_name}' "
+                                        f"is below Vulkan core requirement (required: {req_val}) for API version {api_version}",
+                                        level=logging.INFO
+                                    )
                                 )
             else:
                 for prop_name, req_val in prop_data.items():
@@ -282,18 +313,21 @@ class VulkanProfilesDataValidation:
                     )
                     if found_in_ctx and not is_property_satisfied(prof_val, req_val, prop_name):
                         issues.append(
-                            f"Property '{prop_name}' in structure '{struct_name}' (value: {prof_val}) in profile '{profile_name}' "
-                            f"is below Vulkan core requirement (required: {req_val}) for API version {api_version}"
+                            ValidationIssue(
+                                f"Property '{prop_name}' in structure '{struct_name}' (value: {prof_val}) in profile '{profile_name}' "
+                                f"is below Vulkan core requirement (required: {req_val}) for API version {api_version}",
+                                level=logging.INFO
+                            )
                         )
 
         return issues
 
-    def validate_data(self, json_files_dict: dict, analyse_bits: list[AnalyseBits] = None) -> list[str]:
+    def validate_data(self, json_files_dict: dict, analyse_bits: list[AnalyseBits] = None) -> list[ValidationIssue]:
         """Executes selected static analysis validation cases across loaded profile files."""
         if analyse_bits is None:
             analyse_bits = list(AnalyseBits)
 
-        issues = []
+        issues: list[ValidationIssue] = []
 
         for file_path, json_file_data in json_files_dict.items():
             if not isinstance(json_file_data, dict) or "profiles" not in json_file_data:
@@ -380,4 +414,8 @@ def main_validate(args):
         issues = validator.validate_data(json_files_dict, analyse_bits)
         if issues:
             for issue in issues:
-                logging.warning(issue)
+                level = getattr(issue, "level", logging.WARNING)
+                if level == logging.INFO:
+                    logging.info(issue)
+                else:
+                    logging.warning(issue)
