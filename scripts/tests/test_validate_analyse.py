@@ -21,6 +21,7 @@
 
 import argparse
 import json
+import logging
 from pathlib import Path
 import sys
 import unittest
@@ -171,7 +172,8 @@ class TestAnalyseBits(unittest.TestCase):
         """
         AnalyseBits.SUBCORE_CAPABILITIES:
         Verifies detection when a capability limit (maxImageDimension1D) is set below
-        the Vulkan core specification requirement (4096).
+        the Vulkan core specification requirement (4096), and a required core feature
+        (robustBufferAccess) is explicitly set to false, reporting both with INFO severity level.
         """
         json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -184,6 +186,11 @@ class TestAnalyseBits(unittest.TestCase):
             },
             "capabilities": {
                 "baseline": {
+                    "features": {
+                        "VkPhysicalDeviceFeatures": {
+                            "robustBufferAccess": false
+                        }
+                    },
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
@@ -198,7 +205,17 @@ class TestAnalyseBits(unittest.TestCase):
         json_files_dict = {"test_profile.json": json.loads(json_text)}
         issues = self.validator.validate_data(json_files_dict, [AnalyseBits.SUBCORE_CAPABILITIES])
 
-        self.assertTrue(any("below Vulkan core requirement" in issue and "maxImageDimension1D" in issue for issue in issues))
+        # 1. Verify property limit check below Vulkan core baseline requirement
+        prop_issue = next((issue for issue in issues if "maxImageDimension1D" in issue), None)
+        self.assertIsNotNone(prop_issue)
+        self.assertIn("below Vulkan core requirement", prop_issue)
+        self.assertEqual(getattr(prop_issue, "level", None), logging.INFO)
+
+        # 2. Verify core feature requirement explicitly set to false
+        feat_issue = next((issue for issue in issues if "robustBufferAccess" in issue), None)
+        self.assertIsNotNone(feat_issue)
+        self.assertIn("is set to false in profile", feat_issue)
+        self.assertEqual(getattr(feat_issue, "level", None), logging.INFO)
 
 
 if __name__ == '__main__':
@@ -212,4 +229,3 @@ if __name__ == '__main__':
     TestAnalyseBits.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
-    
