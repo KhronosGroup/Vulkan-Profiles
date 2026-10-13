@@ -260,7 +260,7 @@ def get_parent_property_value(parent_props_dict: dict, struct_name: str, prop_na
         a_struct = alias.struct
         a_member = alias.member
 
-        if a_struct in parent_props_dict:
+        if isinstance(parent_props_dict, dict) and a_struct in parent_props_dict:
             s_data = parent_props_dict[a_struct]
             if isinstance(s_data, dict):
                 if a_struct == "VkPhysicalDeviceProperties":
@@ -273,6 +273,34 @@ def get_parent_property_value(parent_props_dict: dict, struct_name: str, prop_na
                         return (True, s_data[a_member])
 
     return (False, None)
+
+
+def get_parent_feature_value(parent_features: dict | set, struct_name: str, feat_name: str, vk: VulkanObject) -> tuple[bool, bool]:
+    """
+    Looks up parent_features for struct_name::feat_name or any of its capability aliases.
+    Returns (True, parent_val) if found, or (False, False) if not found in parent context.
+    """
+    query_id = StructCapabilityAlias(struct_name, feat_name)
+    aliases = [query_id] + gatherCapabilityAliases(vk, query_id)
+
+    is_set = isinstance(parent_features, set)
+
+    for alias in aliases:
+        if not isinstance(alias, StructCapabilityAlias):
+            continue
+        a_struct = alias.struct
+        a_member = alias.member
+
+        if is_set:
+            if (a_struct, a_member) in parent_features:
+                return (True, True)
+        elif isinstance(parent_features, dict):
+            if a_struct in parent_features:
+                s_data = parent_features[a_struct]
+                if isinstance(s_data, dict) and a_member in s_data:
+                    return (True, bool(s_data[a_member]))
+
+    return (False, False)
 
 
 def isStructExtensionEnabled(vk: VulkanObject, struct_name: str, version: VK_VERSION, enabled_exts: set[str]) -> bool:
@@ -328,7 +356,7 @@ def isStructExtensionEnabled(vk: VulkanObject, struct_name: str, version: VK_VER
 def filter_features_against_context(
     vk: VulkanObject,
     features_dict: dict[str, dict[str, bool]],
-    context_features: set[tuple[str, str]],
+    context_features: dict[str, dict[str, bool]] | set[tuple[str, str]],
     ignore_subcore: bool = False
 ) -> dict[str, dict[str, bool]]:
     """Filters candidate feature requirements against accumulated context features."""
@@ -337,22 +365,17 @@ def filter_features_against_context(
         if not isinstance(members, dict):
             continue
         new_members = {}
-        for m_name, val in members.items():
-            if not val:
+        for feat_name, feat_val in members.items():
+            if not feat_val:
                 continue
 
-            query_id = StructCapabilityAlias(s_name, m_name)
-            aliases = [query_id] + gatherCapabilityAliases(vk, query_id)
-
-            is_in_context = False
-            for alias in aliases:
-                if isinstance(alias, StructCapabilityAlias):
-                    if (alias.struct, alias.member) in context_features:
-                        is_in_context = True
-                        break
-
-            if not is_in_context or ignore_subcore:
-                new_members[m_name] = val
+            found_in_ctx, ctx_val = get_parent_feature_value(
+                context_features, s_name, feat_name, vk
+            )
+            if not found_in_ctx:
+                new_members[feat_name] = feat_val
+            elif ignore_subcore and not ctx_val:
+                new_members[feat_name] = feat_val
 
         if new_members:
             filtered_features[s_name] = new_members
@@ -406,7 +429,7 @@ def filter_properties_against_context(
 
 def update_context_from_capabilities(
     caps_dict: dict,
-    context_features: set[tuple[str, str]],
+    context_features: dict[str, dict[str, bool]] | set[tuple[str, str]],
     context_properties: dict[str, Any],
     context_extensions: set[str]
 ):
@@ -415,11 +438,14 @@ def update_context_from_capabilities(
         context_extensions.update(caps_dict["extensions"].keys())
 
     if "features" in caps_dict and isinstance(caps_dict["features"], dict):
-        for s_name, members in caps_dict["features"].items():
-            if isinstance(members, dict):
-                for m_name, val in members.items():
-                    if val:
-                        context_features.add((s_name, m_name))
+        if isinstance(context_features, dict):
+            deep_merge_dict(context_features, caps_dict["features"])
+        elif isinstance(context_features, set):
+            for s_name, members in caps_dict["features"].items():
+                if isinstance(members, dict):
+                    for m_name, val in members.items():
+                        if val:
+                            context_features.add((s_name, m_name))
 
     if "properties" in caps_dict and isinstance(caps_dict["properties"], dict):
         deep_merge_dict(context_properties, caps_dict["properties"])
