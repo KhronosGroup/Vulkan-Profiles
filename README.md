@@ -16,6 +16,7 @@ The *Vulkan Profiles Tools* is a collection of tools delivered with the [Vulkan 
 * **[Vulkan Profiles Tools Overview](./OVERVIEW.md)**: Discover the components and how they work together.
 * **[Change Log](./CHANGELOG.md)**: The history of *Vulkan Profiles Toolset* releases.
 * **[Contributing](./CONTRIBUTING.md)**: How to contribute to the *Vulkan Profiles* repository.
+* **[Vulkan Profiles Checker for Android](./android/profiles-checker/README.md)**: A sample Android app that reports the GPU/driver details and which *Vulkan Profiles* a device supports, including the exact unmet requirements.
 * **[Bug reports](https://github.com/KhronosGroup/Vulkan-Profiles)**: Open a GitHub issue when you encounter a bug.
 
 --------------
