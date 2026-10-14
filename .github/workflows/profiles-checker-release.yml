@@ -1,0 +1,169 @@
+# Copyright 2026 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Builds the Vulkan Profiles Checker Android APK and publishes it as a GitHub
+# Release asset, so partners can download it without building from source.
+#
+# Trigger: push a tag named profiles-checker-v<version>, where <version> must
+# equal `checkerVersion` in android/profiles-checker/app/build.gradle.kts:
+#
+#   git tag -a profiles-checker-v1.0.0 -m "Vulkan Profiles Checker 1.0.0"
+#   git push origin profiles-checker-v1.0.0
+#
+# Or run it manually (workflow_dispatch) to produce the APK as a workflow
+# artifact without creating a release - useful to dry-run the pipeline.
+#
+# Optional secret PROFILES_CHECKER_DEBUG_KEYSTORE: base64 of a debug keystore
+# (`base64 -i ~/.android/debug.keystore`). When set, every release is signed
+# with the same key so devices can update in place; without it each run uses a
+# freshly generated debug key and users must uninstall before installing a newer
+# release. The app keeps no user data, so either works.
+
+name: profiles-checker-release
+
+on:
+  push:
+    tags:
+      - 'profiles-checker-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write   # needed to create the release and upload assets
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  APP_DIR: android/profiles-checker
+  JAVA_VERSION: '17'
+  NDK_VERSION: 27.0.12077973
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0   # full history so the build stamp's git commit is correct
+
+      - name: Read app version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(sed -n 's/^val checkerVersion = "\(.*\)"/\1/p' "$APP_DIR/app/build.gradle.kts")
+          [ -n "$VERSION" ] || { echo "::error::checkerVersion not found in build.gradle.kts"; exit 1; }
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "apk=vulkan-profiles-checker-$VERSION-debug.apk" >> "$GITHUB_OUTPUT"
+          echo "App version: $VERSION"
+
+      - name: Check tag matches app version
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          TAG="${GITHUB_REF#refs/tags/profiles-checker-v}"
+          if [ "$TAG" != "${{ steps.version.outputs.version }}" ]; then
+            echo "::error::Tag version '$TAG' does not match checkerVersion '${{ steps.version.outputs.version }}' in build.gradle.kts"
+            exit 1
+          fi
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-35 build-tools;35.0.0 ndk;${{ env.NDK_VERSION }} cmake;3.22.1'
+
+      - name: Restore shared debug keystore (optional)
+        # The secrets context cannot be used in `if`; pass it via env and test there.
+        env:
+          DEBUG_KEYSTORE_B64: ${{ secrets.PROFILES_CHECKER_DEBUG_KEYSTORE }}
+        shell: bash
+        run: |
+          if [ -n "$DEBUG_KEYSTORE_B64" ]; then
+            mkdir -p ~/.android
+            echo "$DEBUG_KEYSTORE_B64" | base64 -d > ~/.android/debug.keystore
+            echo "Using shared debug keystore from secret PROFILES_CHECKER_DEBUG_KEYSTORE"
+          else
+            echo "No PROFILES_CHECKER_DEBUG_KEYSTORE secret; a fresh debug keystore will be generated"
+          fi
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build universal debug APK
+        shell: bash
+        working-directory: ${{ env.APP_DIR }}
+        run: ./gradlew --no-daemon :app:assembleDebug
+
+      - name: Collect artifacts
+        id: artifacts
+        shell: bash
+        working-directory: ${{ env.APP_DIR }}/app/build/outputs/apk/debug
+        run: |
+          APK="${{ steps.version.outputs.apk }}"
+          [ -f "$APK" ] || { echo "::error::$APK not found"; ls -la; exit 1; }
+          sha256sum "$APK" > "$APK.sha256"
+          unzip -l "$APK" | grep 'lib/.*\.so' | awk '{print $4}' | sort > abis.txt
+          echo "dir=$PWD" >> "$GITHUB_OUTPUT"
+          echo "## $APK" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"; cat "$APK.sha256" abis.txt >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Write release notes
+        shell: bash
+        run: |
+          HEADERS_TAG=$(sed -n 's/^set(VULKAN_HEADERS_GIT_TAG "\(.*\)" CACHE.*/\1/p' "$APP_DIR/app/src/main/cpp/CMakeLists.txt")
+          PROFILES=$(sed -n '/^set(VP_CHECKER_PROFILES/,/CACHE/p' "$APP_DIR/app/src/main/cpp/CMakeLists.txt" | grep -o '"VP_[^"]*"' | tr -d '"' | tr ',' '\n' | sed 's/^/- `/; s/$/`/')
+          cat > release-notes.md <<EOF
+          Vulkan Profiles Checker **${{ steps.version.outputs.version }}** — universal debug APK (arm64-v8a, armeabi-v7a, x86_64, x86).
+
+          Install with \`adb install -r ${{ steps.version.outputs.apk }}\` (uninstall first if a build signed with a different debug key is present).
+
+          **Profiles compiled in**
+          $PROFILES
+
+          **Generated from**
+          - Vulkan-Profiles commit \`${GITHUB_SHA::9}\`
+          - Vulkan-Headers \`$HEADERS_TAG\` (vk.xml and roadmap profiles)
+
+          The stamp line under the app title shows the version, ABI, UTC build time and commit of the running binary; the same fields are in \`report.txt\` / logcat.
+          EOF
+          cat release-notes.md
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.version.outputs.apk }}
+          path: |
+            ${{ steps.artifacts.outputs.dir }}/${{ steps.version.outputs.apk }}
+            ${{ steps.artifacts.outputs.dir }}/${{ steps.version.outputs.apk }}.sha256
+          if-no-files-found: error
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Vulkan Profiles Checker ${{ steps.version.outputs.version }}
+          body_path: release-notes.md
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
+          files: |
+            ${{ steps.artifacts.outputs.dir }}/${{ steps.version.outputs.apk }}
+            ${{ steps.artifacts.outputs.dir }}/${{ steps.version.outputs.apk }}.sha256

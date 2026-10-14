@@ -60,6 +60,10 @@ std::string BuildTextReport(const CheckReport& report) {
     std::ostringstream out;
     out << "Vulkan Profiles Checker report\n";
     out << "==============================\n";
+    out << "App version: " << report.appVersion << "\n";
+    out << "Build time: " << report.buildTime << "\n";
+    out << "Git commit: " << report.gitCommit << "\n";
+    out << "App ABI: " << report.appAbi << "\n";
     out << "Vulkan-Headers: " << report.vulkanHeadersVersion << "\n\n";
 
     out << "System\n";
@@ -75,7 +79,7 @@ std::string BuildTextReport(const CheckReport& report) {
     if (!report.system.socManufacturer.empty() || !report.system.socModel.empty()) {
         out << "  SoC: " << report.system.socManufacturer << " " << report.system.socModel << "\n";
     }
-    AppendKeyValue(out, "ABI", report.system.abi);
+    AppendKeyValue(out, "Device ABI", report.system.abi);
     AppendKeyValue(out, "ro.hardware.vulkan", report.system.hardwareVulkan);
     AppendKeyValue(out, "ro.gfx.driver.0", report.system.gfxDriver0);
     AppendKeyValue(out, "ro.gfx.driver.1", report.system.gfxDriver1);

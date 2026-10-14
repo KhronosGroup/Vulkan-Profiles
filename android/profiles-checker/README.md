@@ -42,13 +42,37 @@ Profiles included by default (see `VP_CHECKER_PROFILES` in [CMakeLists.txt](app/
 ```sh
 cd android/profiles-checker
 ./gradlew assembleDebug
-adb install -r app/build/outputs/apk/debug/app-debug.apk
+adb install -r app/build/outputs/apk/debug/vulkan-profiles-checker-<version>-debug.apk
 ```
 
 Or open `android/profiles-checker` in Android Studio.
 
 > The app must be built from inside the Vulkan-Profiles checkout: the native build
 > locates `scripts/vkprofiles.py` and `profiles/Android/*.json` relative to itself.
+
+> Gradle 8.x requires JDK 17–22. If your default `java` is newer, run
+> `JAVA_HOME=$(/usr/libexec/java_home -v 17) ./gradlew ...` (macOS) or set
+> `org.gradle.java.home` in `gradle.properties`.
+
+The app is **debug-only by design**: the generated profiles library is the *debug*
+variant (that is what reports every unmet requirement), and a debug-signed APK can be
+side-loaded on any device. There is no `release` build type and no signing setup.
+
+### ABIs
+
+One universal APK containing `arm64-v8a`, `armeabi-v7a`, `x86_64` and `x86`. To build a
+single-ABI APK – for example to force the 32-bit library onto a 64-bit device for
+testing – pass a comma separated list; the output file gets an ABI suffix so it never
+overwrites the universal APK:
+
+```sh
+./gradlew assembleDebug -PvpCheckerAbis=armeabi-v7a
+# -> app/build/outputs/apk/debug/vulkan-profiles-checker-<version>-debug-armeabi-v7a.apk
+```
+
+> Apple-Silicon Macs can only run arm64 emulator images, and Google's arm64 images have
+> no 32-bit zygote, so `armeabi-v7a`/`x86`/`x86_64` can only be exercised on a physical
+> 32-bit-capable device or an Intel host respectively.
 
 ### Useful CMake options
 
@@ -60,6 +84,82 @@ Pass them via `android.defaultConfig.externalNativeBuild.cmake.arguments` in
 | `-DVP_CHECKER_PROFILES=...` | Comma separated list of profiles to compile in |
 | `-DVULKAN_HEADERS_GIT_TAG=v1.4.364` | Vulkan-Headers tag used for headers / `vk.xml` |
 | `-DVULKAN_PROFILES_PREBUILT_HEADER=/path/to/vulkan_profiles.hpp` | Skip Python/generation and use an existing **debug** header |
+
+## Versioning & releases
+
+### Build identity
+
+Every build stamps itself so a screenshot or a pasted log identifies the exact binary.
+The line under the title (and the header of `report.txt` / logcat) reads:
+
+```
+v1.0.0 (10000) arm64-v8a | built 2026-10-22 04:50 UTC | 4af21a7db
+```
+
+| Field | Source |
+|---|---|
+| `1.0.0` / `10000` | `checkerVersion` in `app/build.gradle.kts`; `versionCode` is derived (`MAJOR*10000 + MINOR*100 + PATCH`) so the two cannot drift |
+| `arm64-v8a` | ABI the *process* is running as (compile-time). The text report additionally shows `Device ABI` = `ro.product.cpu.abi` |
+| build time | UTC time the native library was compiled (`gen_build_info.cmake`, refreshed on every build) |
+| git commit | `git rev-parse --short HEAD` of the Vulkan-Profiles checkout; `-dirty` is appended when `android/profiles-checker`, `scripts` or `profiles` have uncommitted changes |
+| `Vulkan-Headers: v1.4.364` | `VULKAN_HEADERS_GIT_TAG` – the `vk.xml` and roadmap profiles the checks were generated from |
+
+### Publishing a build
+
+APKs are **not** committed to the repository; they are attached to **GitHub Releases**
+so partners can download a ready-made APK without building from source, and binaries
+stay out of the git history.
+
+Releases are produced by the
+[`profiles-checker-release`](../../.github/workflows/profiles-checker-release.yml)
+workflow whenever a `profiles-checker-v<version>` tag is pushed:
+
+1. **Sync** the checkout to the commit you want to ship – the profile JSON and the
+   generator scripts are baked into the APK – and make sure the tree is clean so the
+   stamp does not say `-dirty`.
+2. **Bump** `checkerVersion` in `app/build.gradle.kts` (patch for fixes, minor for new
+   profiles / Vulkan-Headers bumps, major for incompatible UI or report-format changes),
+   commit, and merge.
+3. **Tag and push** – the tag must match `checkerVersion` or the workflow fails:
+   ```sh
+   git tag -a profiles-checker-v<version> -m "Vulkan Profiles Checker <version>"
+   git push origin profiles-checker-v<version>
+   ```
+   The workflow builds the universal debug APK on a pinned JDK 17 / NDK 27 image,
+   attaches `vulkan-profiles-checker-<version>-debug.apk` and its `.sha256` to a new
+   release, and generates notes listing the profiles compiled in, the Vulkan-Headers
+   tag and the source commit.
+4. **Verify** the published APK on at least one device per GPU vendor you care about
+   (Mali, Adreno, PowerVR, …) and check the stamp line shows the expected version and
+   no `-dirty`:
+   ```sh
+   adb install -r vulkan-profiles-checker-<version>-debug.apk
+   adb logcat -s VulkanProfilesChecker | head -8
+   ```
+
+Running the workflow manually (*Actions → profiles-checker-release → Run workflow*)
+builds the APK as a downloadable workflow artifact without creating a release – a
+dry run of the pipeline.
+
+> **Debug signing and updates.** Debug APKs are signed with a debug keystore. Android
+> only allows an in-place update when the new APK is signed with the *same* key;
+> otherwise `adb install` fails with `INSTALL_FAILED_UPDATE_INCOMPATIBLE` and the user
+> must uninstall first (the app keeps no user data, so nothing is lost). To make every
+> release updatable in place, store one debug keystore as the repository secret
+> `PROFILES_CHECKER_DEBUG_KEYSTORE` (`base64 -i ~/.android/debug.keystore`); the
+> workflow uses it when present.
+
+Manual fallback without the workflow:
+
+```sh
+./gradlew clean :app:assembleDebug
+cd app/build/outputs/apk/debug
+shasum -a 256 vulkan-profiles-checker-<version>-debug.apk > vulkan-profiles-checker-<version>-debug.apk.sha256
+gh release create profiles-checker-v<version> \
+    vulkan-profiles-checker-<version>-debug.apk \
+    vulkan-profiles-checker-<version>-debug.apk.sha256 \
+    --title "Vulkan Profiles Checker <version>" --notes "<profiles compiled in, Vulkan-Headers tag, source commit>"
+```
 
 ## Reading the results
 

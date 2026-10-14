@@ -40,6 +40,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Keep in sync with scripts/known_good.json in the repository root.
 set(VULKAN_HEADERS_GIT_TAG "v1.4.364" CACHE STRING "Vulkan-Headers tag used for headers, vk.xml and the roadmap profiles")
 
+# App version. The single source of truth is app/build.gradle.kts, which passes
+# these through -D arguments; the defaults only matter for bare CMake configures.
+set(VP_CHECKER_VERSION_NAME "0.0.0" CACHE STRING "App versionName (set by Gradle)")
+set(VP_CHECKER_VERSION_CODE "0" CACHE STRING "App versionCode (set by Gradle)")
+
 # stb_truetype.h is used to rasterize the system font for the native UI.
 # Pinned to a specific commit and verified by SHA-256.
 set(STB_TRUETYPE_COMMIT "2c980bb59875b0d32144a71867fbdebb2f77cd20" CACHE STRING "nothings/stb commit providing stb_truetype.h")
@@ -187,6 +192,25 @@ endif()
 add_custom_target(generate_profiles_header DEPENDS "${GEN_HEADER}")
 
 # ------------------------------------------------------------------------------
+# Build info (version, build time, git commit) shown in the UI and the report
+# ------------------------------------------------------------------------------
+
+set(BUILD_INFO_HEADER "${GEN_INCLUDE_DIR}/vp_checker_build_info.h")
+# No OUTPUT on purpose: the target runs on every build so the timestamp is
+# refreshed; gen_build_info.cmake only rewrites the header when content changes.
+add_custom_target(generate_build_info
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN_INCLUDE_DIR}"
+    COMMAND ${CMAKE_COMMAND}
+        -DOUTPUT=${BUILD_INFO_HEADER}
+        -DVERSION_NAME=${VP_CHECKER_VERSION_NAME}
+        -DVERSION_CODE=${VP_CHECKER_VERSION_CODE}
+        -DREPO_ROOT=${VP_REPO_ROOT}
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/gen_build_info.cmake"
+    BYPRODUCTS "${BUILD_INFO_HEADER}"
+    COMMENT "Generating build info header"
+    VERBATIM)
+
+# ------------------------------------------------------------------------------
 # NativeActivity shared library
 # ------------------------------------------------------------------------------
 
@@ -209,7 +233,7 @@ add_library(profiles_checker SHARED
     ui.cpp
     "${GEN_HEADER}"
 )
-add_dependencies(profiles_checker generate_profiles_header)
+add_dependencies(profiles_checker generate_profiles_header generate_build_info)
 
 target_include_directories(profiles_checker PRIVATE
     "${GEN_INCLUDE_DIR}"
