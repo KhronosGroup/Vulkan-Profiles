@@ -155,6 +155,7 @@ void Ui::Layout(int width) {
     // Keep clear of the status bar / display cutout.
     AddSpacer(static_cast<float>(std::max(contentRect_.top, 0)) + Dp(12.0f));
     AddText("Vulkan Profiles Checker", title, kTitle, 0.0f);
+    AddText(AppBuildIdentityLine(), small, kMuted, 0.0f);
     AddSpacer(Dp(4.0f));
 
     if (!report_) {
