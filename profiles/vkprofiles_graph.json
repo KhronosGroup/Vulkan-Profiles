@@ -216,7 +216,7 @@
             "command": "library",
             "args": {
                 "input": "profiles/build",
-                "input-profiles": "VP_ANDROID_15_requirements,VP_ANDROID_16_requirements,VP_ANDROID_17_requirements,VP_ANDROID_vulkan_profile_2021,VP_ANDROID_vulkan_profile_2022,VP_ANDROID_vulkan_profile_2025",
+                "input-profiles": "VP_ANDROID_15_requirements,VP_ANDROID_16_requirements,VP_ANDROID_17_requirements,VP_ANDROID_18_requirements,VP_ANDROID_vulkan_profile_2021,VP_ANDROID_vulkan_profile_2022,VP_ANDROID_vulkan_profile_2025",
                 "output": "library/include/vulkan",
                 "output-filename": "android_vulkan_requirements_debug",
                 "mode": [ "header-only" ],
