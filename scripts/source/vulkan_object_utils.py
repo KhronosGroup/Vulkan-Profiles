@@ -38,11 +38,20 @@ from reg import Registry
 from base_generator import BaseGenerator, BaseGeneratorOptions, SetOutputDirectory, SetOutputFileName, SetTargetApiName, SetMergedApiNames
 from source.vulkan_object_version import VK_VERSION, get_bundle_structure_core_version, is_bundle_structure
 from source.vulkan_object_expression_parsing import collectExtensions, evalExpression
-from source.vulkan_object_data import (
-    DEFAULT_CORE_PROPERTY_REQUIREMENTS, 
-    DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS,
-    PropertyRequirement
-)
+try:
+    from source.vulkan_object_data import (
+        DEFAULT_CORE_PROPERTY_REQUIREMENTS, 
+        DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS,
+        PropertyRequirement,
+        VK_XML_PROPERTY_LIMIT_TYPE_WORKAROUNDS
+    )
+except ImportError:
+    from vulkan_object_data import (
+        DEFAULT_CORE_PROPERTY_REQUIREMENTS, 
+        DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS,
+        PropertyRequirement,
+        VK_XML_PROPERTY_LIMIT_TYPE_WORKAROUNDS
+    )
 
 __all__ = [
     'getVulkanObject',
@@ -131,6 +140,27 @@ def _bakeDefaultPropertiesIfMissing(vk: VulkanObject):
                         ext_obj.propertyRequirement.append(dp)
 
 
+def _applyPropertyLimitTypeWorkarounds(xml_root: ElementTree.Element | None = None, vk: VulkanObject | None = None) -> None:
+    """Applies overrides for incorrect limittypes in vk.xml and the generated VulkanObject."""
+    if xml_root is not None:
+        for type_elem in xml_root.findall(".//type[@category='struct']"):
+            struct_name = type_elem.get("name")
+            if struct_name in VK_XML_PROPERTY_LIMIT_TYPE_WORKAROUNDS:
+                overrides = VK_XML_PROPERTY_LIMIT_TYPE_WORKAROUNDS[struct_name]
+                for member in type_elem.findall("member"):
+                    name_elem = member.find("name")
+                    if name_elem is not None and name_elem.text in overrides:
+                        member.set("limittype", overrides[name_elem.text])
+
+    if vk is not None and hasattr(vk, 'structs'):
+        for struct_name, overrides in VK_XML_PROPERTY_LIMIT_TYPE_WORKAROUNDS.items():
+            struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
+            if struct_obj and hasattr(struct_obj, 'members'):
+                for member in struct_obj.members:
+                    if member.name in overrides:
+                        member.limitType = overrides[member.name]
+
+
 @functools.lru_cache(maxsize=1)
 def initVulkanObject(target_api: str = 'vulkan', alternative_xml: str = None, video: bool = False) -> VulkanObject:
     class _InternalGenerator(BaseGenerator):
@@ -177,11 +207,18 @@ def initVulkanObject(target_api: str = 'vulkan', alternative_xml: str = None, vi
         base_options = BaseGeneratorOptions(videoXmlPath=video_xml_path)
         reg = Registry(generator, base_options)
         tree = ElementTree.parse(xml_path)
+        
+        # Apply limittype workarounds on loaded XML AST
+        _applyPropertyLimitTypeWorkarounds(xml_root=tree.getroot())
+        
         reg.loadElementTree(tree)
-
         reg.apiGen()
 
         vk = generator.vk
+        
+        # Ensure VulkanObject member instances reflect the overrides
+        _applyPropertyLimitTypeWorkarounds(vk=vk)
+        
         _bakeDefaultVersionsIfMissing(vk)
         _bakeDefaultPropertiesIfMissing(vk)
 

@@ -28,12 +28,61 @@ except ImportError:
     @dataclass
     class PropertyRequirement:
         """Fallback dataclass when PropertyRequirement is absent in external vulkan_object.py."""
-        struct: str
-        name: str
-        value: (str | None) = None
-        depends: (str | None) = None
+        struct: str # The name of the struct containing the properties.
+        name: str # The name of the property within the struct.
+        value: (str | None) = None # When set to None, the property is considered implementation-dependent and not required.
+        depends: (str | None) = None # When set to None, the property is considered unconditional. Otherwise, it is conditional on the specified feature being enabled.
 
     vulkan_object.PropertyRequirement = PropertyRequirement
+
+
+# Workarounds for incorrect limittypes in vk.xml:
+# Maps struct_name -> { member_name: intended_limittype }
+VK_XML_PROPERTY_LIMIT_TYPE_WORKAROUNDS: dict[str, dict[str, str]] = {
+    # -------------------------------------------------------------------------
+    # 1. Ray Tracing (NV & KHR)
+    # -------------------------------------------------------------------------
+    'VkPhysicalDeviceRayTracingPropertiesNV': {
+        # Device must support at least this handle size (Spec: min -> vk.xml: max)
+        'shaderGroupHandleSize': 'max',
+        # Required base alignment; driver requirement must not exceed this (Spec: max -> vk.xml: min,pot)
+        'shaderGroupBaseAlignment': 'min,pot',
+    },
+    'VkPhysicalDeviceRayTracingPipelinePropertiesKHR': {
+        # Alignment constraint on shader binding tables (Spec: max -> vk.xml: min,pot)
+        'shaderGroupBaseAlignment': 'min,pot',
+        # Driver cannot demand more than 64 bytes for replay data (Spec: max -> vk.xml: min)
+        'shaderGroupHandleCaptureReplaySize': 'min',
+    },
+
+    # -------------------------------------------------------------------------
+    # 2. Descriptor Buffer Properties (VK_EXT_descriptor_buffer)
+    # -------------------------------------------------------------------------
+    'VkPhysicalDeviceDescriptorBufferPropertiesEXT': {
+        # Spec Required Limits Table: 256, Limit Type: max (driver cannot demand > 256).
+        # In vk.xml this is mislabeled 'noauto' due to missing 'min*' prefix.
+        'descriptorBufferOffsetAlignment': 'min,pot',
+
+        # Spec Required Limits Table: 64, Limit Type: max (driver cannot demand > 64 bytes).
+        # In vk.xml these are mislabeled 'noauto' because they end in 'DataSize'.
+        'bufferCaptureReplayDescriptorDataSize': 'min',
+        'imageCaptureReplayDescriptorDataSize': 'min',
+        'imageViewCaptureReplayDescriptorDataSize': 'min',
+        'samplerCaptureReplayDescriptorDataSize': 'min',
+        'accelerationStructureCaptureReplayDescriptorDataSize': 'min',
+    },
+
+    # -------------------------------------------------------------------------
+    # 3. Mesh Shader Properties (VK_EXT_mesh_shader)
+    # -------------------------------------------------------------------------
+    'VkPhysicalDeviceMeshShaderPropertiesEXT': {
+        # Allocation step granularities (Spec Required Limit: 1, Limit Type: max).
+        # In vk.xml, VkPhysicalDeviceMeshShaderPropertiesNV uses 'min,mul',
+        # but EXT was erroneously left as 'noauto'.
+        'meshOutputPerVertexGranularity': 'min,mul',
+        'meshOutputPerPrimitiveGranularity': 'min,mul',
+    },
+}
 
 
 DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
@@ -191,7 +240,7 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceMultiviewProperties', 'maxMultiviewInstanceIndex', '134217727', None),
         PropertyRequirement('VkPhysicalDeviceMaintenance3Properties', 'maxPerSetDescriptors', '1024', None),
         PropertyRequirement('VkPhysicalDeviceMaintenance3Properties', 'maxMemoryAllocationSize', '1073741824', None),
-        PropertyRequirement('VkPhysicalDeviceProtectedMemoryProperties', 'protectedNoFault', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceProtectedMemoryProperties', 'protectedNoFault', None, None),
 
         # Implementation-dependent
         PropertyRequirement('VkPhysicalDevicePointClippingProperties', 'pointClippingBehavior', None, None),
@@ -210,7 +259,7 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'maxMultiviewInstanceIndex', '134217727', None),
         PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'maxPerSetDescriptors', '1024', None),
         PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'maxMemoryAllocationSize', '1073741824', None),
-        PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'protectedNoFault', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'protectedNoFault', None, None),
 
         PropertyRequirement('VkPhysicalDeviceSamplerFilterMinmaxProperties', 'filterMinmaxImageComponentMapping', 'false', None),
         PropertyRequirement('VkPhysicalDeviceDepthStencilResolveProperties', 'supportedDepthResolveModes', 'VK_RESOLVE_MODE_SAMPLE_ZERO_BIT', None),
@@ -421,41 +470,38 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSignedZeroInfNanPreserveFloat32', 'true', None),
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'lineSubPixelPrecisionBits', '4', None),
         PropertyRequirement('VkPhysicalDeviceLineRasterizationProperties', 'lineSubPixelPrecisionBits', '4', None),
-        PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'supportsNonZeroFirstInstance', 'true', None),
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'maxPushDescriptors', '32', None),
+        PropertyRequirement('VkPhysicalDevicePushDescriptorProperties', 'maxPushDescriptors', '32', None),
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'dynamicRenderingLocalReadDepthStencilAttachments', 'false', None),
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'dynamicRenderingLocalReadMultisampledAttachments', 'false', None),
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'earlyFragmentMultisampleCoverageAfterSampleCounting', 'false', None),
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'earlyFragmentSampleMaskTestBeforeSampleCounting', 'false', None),
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'depthStencilSwizzleOneSupport', 'false', None),
-        PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'polygonModePointSize', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'polygonModePointSize', None, None),
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'nonStrictSinglePixelWideLinesUseParallelogram', 'false', None),
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'nonStrictWideLinesUseParallelogram', 'false', None),
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'blockTexelViewCompatibleMultipleLayers', 'false', None),
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'maxCombinedImageSamplerDescriptorCount', '1', None),
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'fragmentShadingRateClampCombinerInputs', 'false', None),
-        PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'maxVertexAttribDivisor', '2147483647', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'maxVertexAttribDivisor', '65535', None),
+        PropertyRequirement('VkPhysicalDeviceVertexAttributeDivisorProperties', 'maxVertexAttribDivisor', '65535', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'supportsNonZeroFirstInstance', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVertexAttributeDivisorProperties', 'supportsNonZeroFirstInstance', 'false', None),
         
-        PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'copySrcLayoutCount','0', None),
-        PropertyRequirement('VkPhysicalDeviceHostImageCopyProperties', 'copySrcLayoutCount', '0', None),
-        PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'pCopySrcLayouts', '', None),
-        PropertyRequirement('VkPhysicalDeviceHostImageCopyProperties', 'pCopySrcLayouts', '', None),
-        PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'copyDstLayoutCount', '0', None),
-        PropertyRequirement('VkPhysicalDeviceHostImageCopyProperties', 'copyDstLayoutCount', '0', None),
-        PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'pCopyDstLayouts', '', None),
-        PropertyRequirement('VkPhysicalDeviceHostImageCopyProperties', 'pCopyDstLayouts', '', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'copySrcLayoutCount', None, None),
+        PropertyRequirement('VkPhysicalDeviceHostImageCopyProperties', 'copySrcLayoutCount', None, None),
+        PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'pCopySrcLayouts', None, None),
+        PropertyRequirement('VkPhysicalDeviceHostImageCopyProperties', 'pCopySrcLayouts', None, None),
+        PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'copyDstLayoutCount', None, None),
+        PropertyRequirement('VkPhysicalDeviceHostImageCopyProperties', 'copyDstLayoutCount', None, None),
+        PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'pCopyDstLayouts', None, None),
+        PropertyRequirement('VkPhysicalDeviceHostImageCopyProperties', 'pCopyDstLayouts', None, None),
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'identicalMemoryTypeRequirements', 'false', None),
         PropertyRequirement('VkPhysicalDeviceHostImageCopyProperties', 'identicalMemoryTypeRequirements', 'false', None),
-        
         
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'optimalTilingLayoutUUID', None, None),
         PropertyRequirement('VkPhysicalDeviceHostImageCopyProperties', 'optimalTilingLayoutUUID', None, None),
 
-
-        PropertyRequirement('VkPhysicalDeviceVertexAttributeDivisorProperties', 'maxVertexAttribDivisor', '2147483647', None),
-        PropertyRequirement('VkPhysicalDeviceVertexAttributeDivisorProperties', 'supportsNonZeroFirstInstance', 'true', None),
-        PropertyRequirement('VkPhysicalDevicePushDescriptorProperties', 'maxPushDescriptors', '32', None),
-        
         # Implementation-dependent
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'defaultRobustnessStorageBuffers', None, None),
         PropertyRequirement('VkPhysicalDevicePipelineRobustnessProperties', 'defaultRobustnessStorageBuffers', None, None),
@@ -495,7 +541,7 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceMaintenance5PropertiesKHR', 'earlyFragmentMultisampleCoverageAfterSampleCounting', 'false', 'VkPhysicalDeviceMaintenance5FeaturesKHR::maintenance5'),
         PropertyRequirement('VkPhysicalDeviceMaintenance5PropertiesKHR', 'earlyFragmentSampleMaskTestBeforeSampleCounting', 'false', 'VkPhysicalDeviceMaintenance5FeaturesKHR::maintenance5'),
         PropertyRequirement('VkPhysicalDeviceMaintenance5PropertiesKHR', 'depthStencilSwizzleOneSupport', 'false', 'VkPhysicalDeviceMaintenance5FeaturesKHR::maintenance5'),
-        PropertyRequirement('VkPhysicalDeviceMaintenance5PropertiesKHR', 'polygonModePointSize', 'true', 'VkPhysicalDeviceMaintenance5Features::maintenance5'),
+        PropertyRequirement('VkPhysicalDeviceMaintenance5PropertiesKHR', 'polygonModePointSize', None, 'VkPhysicalDeviceMaintenance5Features::maintenance5'),
         PropertyRequirement('VkPhysicalDeviceMaintenance5PropertiesKHR', 'nonStrictSinglePixelWideLinesUseParallelogram', 'false', 'VkPhysicalDeviceMaintenance5FeaturesKHR::maintenance5'),
         PropertyRequirement('VkPhysicalDeviceMaintenance5PropertiesKHR', 'nonStrictWideLinesUseParallelogram', 'false', 'VkPhysicalDeviceMaintenance5FeaturesKHR::maintenance5'),
     ],
@@ -512,16 +558,11 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceMaintenance7PropertiesKHR', 'maxDescriptorSetUpdateAfterBindTotalUniformBuffersDynamic', '8', 'VkPhysicalDeviceMaintenance7FeaturesKHR::maintenance7'),
         PropertyRequirement('VkPhysicalDeviceMaintenance7PropertiesKHR', 'maxDescriptorSetUpdateAfterBindTotalStorageBuffersDynamic', '4', 'VkPhysicalDeviceMaintenance7FeaturesKHR::maintenance7'),
         PropertyRequirement('VkPhysicalDeviceMaintenance7PropertiesKHR', 'maxDescriptorSetUpdateAfterBindTotalBuffersDynamic', '12', 'VkPhysicalDeviceMaintenance7FeaturesKHR::maintenance7'),
+        PropertyRequirement('VkPhysicalDeviceMaintenance7PropertiesKHR', 'robustFragmentShadingRateAttachmentAccess', 'false', 'VkPhysicalDeviceMaintenance7FeaturesKHR::maintenance7'),
 
         # Implementation-dependent
         PropertyRequirement('VkPhysicalDeviceLayeredApiPropertiesListKHR', 'layeredApiCount', None, None),
         PropertyRequirement('VkPhysicalDeviceLayeredApiPropertiesListKHR', 'pLayeredApis', None, None),
-
-        # Unsupported
-        PropertyRequirement('VkPhysicalDeviceMaintenance7PropertiesKHR', 'robustFragmentShadingRateAttachmentAccess', 'false', 'VkPhysicalDeviceMaintenance7FeaturesKHR::maintenance7'),
-
-        # Supported
-        PropertyRequirement('VkPhysicalDeviceMaintenance7PropertiesKHR', 'robustFragmentShadingRateAttachmentAccess', 'true', '!VkPhysicalDeviceMaintenance7FeaturesKHR::maintenance7'),
     ],
     'VK_KHR_maintenance9': [
         PropertyRequirement('VkPhysicalDeviceMaintenance9PropertiesKHR', 'image2DViewOf3DSparse', 'false', 'VkPhysicalDeviceMaintenance9FeaturesKHR::maintenance9'),
@@ -530,8 +571,8 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
     ],
     'VK_KHR_maintenance10': [
         # Implementation-dependent
-        PropertyRequirement('VkPhysicalDeviceMaintenance10PropertiesKHR', 'rgba4OpaqueBlackSwizzled', 'false', 'VkPhysicalDeviceMaintenance10FeaturesKHR::maintenance10'),
-        PropertyRequirement('VkPhysicalDeviceMaintenance10PropertiesKHR', 'resolveSrgbFormatAppliesTransferFunction', 'true', 'VkPhysicalDeviceMaintenance10FeaturesKHR::maintenance10'),
+        PropertyRequirement('VkPhysicalDeviceMaintenance10PropertiesKHR', 'rgba4OpaqueBlackSwizzled', None, 'VkPhysicalDeviceMaintenance10FeaturesKHR::maintenance10'),
+        PropertyRequirement('VkPhysicalDeviceMaintenance10PropertiesKHR', 'resolveSrgbFormatAppliesTransferFunction', None, 'VkPhysicalDeviceMaintenance10FeaturesKHR::maintenance10'),
         PropertyRequirement('VkPhysicalDeviceMaintenance10PropertiesKHR', 'resolveSrgbFormatSupportsTransferFunctionControl', 'false', 'VkPhysicalDeviceMaintenance10FeaturesKHR::maintenance10'),
     ],
 
@@ -591,7 +632,7 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceVertexAttributeDivisorPropertiesKHR', 'maxVertexAttribDivisor', '2147483647', None),
     ],
     'VK_KHR_ray_tracing_pipeline': [
-        PropertyRequirement('VkPhysicalDeviceRayTracingPipelinePropertiesKHR', 'shaderGroupHandleSize', '32', None),
+        PropertyRequirement('VkPhysicalDeviceRayTracingPipelinePropertiesKHR', 'shaderGroupHandleSize', None, None),
         PropertyRequirement('VkPhysicalDeviceRayTracingPipelinePropertiesKHR', 'maxRayRecursionDepth', '1', None),
         PropertyRequirement('VkPhysicalDeviceRayTracingPipelinePropertiesKHR', 'maxShaderGroupStride', '4096', None),
         PropertyRequirement('VkPhysicalDeviceRayTracingPipelinePropertiesKHR', 'shaderGroupBaseAlignment', '64', None),
@@ -601,35 +642,36 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceRayTracingPipelinePropertiesKHR', 'maxRayHitAttributeSize', '32', None),
     ],
     'VK_KHR_acceleration_structure': [
-        PropertyRequirement('VkPhysicalDeviceAccelerationStructurePropertiesKHR', 'maxGeometryCount', '16777216', None),
-        PropertyRequirement('VkPhysicalDeviceAccelerationStructurePropertiesKHR', 'maxGeometryPrimitiveCount', '16777216', None),
-        PropertyRequirement('VkPhysicalDeviceAccelerationStructurePropertiesKHR', 'maxInstanceCount', '16777216', None),
-        PropertyRequirement('VkPhysicalDeviceAccelerationStructurePropertiesKHR', 'maxPrimitiveCount', '536870912', None),
+        PropertyRequirement('VkPhysicalDeviceAccelerationStructurePropertiesKHR', 'maxGeometryCount', '16777215', None),
+        PropertyRequirement('VkPhysicalDeviceAccelerationStructurePropertiesKHR', 'maxInstanceCount', '16777215', None),
+        PropertyRequirement('VkPhysicalDeviceAccelerationStructurePropertiesKHR', 'maxPrimitiveCount', '536870911', None),
         PropertyRequirement('VkPhysicalDeviceAccelerationStructurePropertiesKHR', 'maxPerStageDescriptorAccelerationStructures', '4', None),
         PropertyRequirement('VkPhysicalDeviceAccelerationStructurePropertiesKHR', 'maxPerStageDescriptorUpdateAfterBindAccelerationStructures', '4', None),
-        PropertyRequirement('VkPhysicalDeviceAccelerationStructurePropertiesKHR', 'maxDescriptorSetAccelerationStructures', '8', None),
+        PropertyRequirement('VkPhysicalDeviceAccelerationStructurePropertiesKHR', 'maxDescriptorSetAccelerationStructures', '16', None),
         PropertyRequirement('VkPhysicalDeviceAccelerationStructurePropertiesKHR', 'maxDescriptorSetUpdateAfterBindAccelerationStructures', '8', None),
-        PropertyRequirement('VkPhysicalDeviceAccelerationStructurePropertiesKHR', 'minAccelerationStructureScratchOffsetAlignment', '128', None),
+        PropertyRequirement('VkPhysicalDeviceAccelerationStructurePropertiesKHR', 'minAccelerationStructureScratchOffsetAlignment', '256', None),
     ],
     'VK_KHR_fragment_shading_rate': [
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'minFragmentShadingRateAttachmentTexelSize', '1, 1', None),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentShadingRateAttachmentTexelSize', '64, 64', None),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentShadingRateAttachmentTexelSizeAspectRatio', '2', None),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'primitiveFragmentShadingRateWithMultipleViewports', 'true', None),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'layeredFragmentShadingRate', 'true', None),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'layeredShadingRateAttachments', 'true', None),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateNonTrivialCombinerOps', 'true', None),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentSize', '4, 4', None),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentSizeAspectRatio', '2', None),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentShadingRateCoverageSamples', '16', None),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentShadingRateRasterizationSamples', 'VK_SAMPLE_COUNT_1_BIT', None),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithShaderDepthStencilWrites', 'false', None),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithSampleMask', 'false', None),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithShaderSampleMask', 'false', None),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithConservativeRasterization', 'false', None),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithFragmentShaderInterlock', 'false', None),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithCustomSampleLocations', 'false', None),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateStrictMultiplyCombiner', 'true', None),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'minFragmentShadingRateAttachmentTexelSize', '0, 0', '!VkPhysicalDeviceFragmentShadingRateFeaturesKHR::attachmentFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'minFragmentShadingRateAttachmentTexelSize', '32, 32', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::attachmentFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentShadingRateAttachmentTexelSize', '0, 0', '!VkPhysicalDeviceFragmentShadingRateFeaturesKHR::attachmentFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentShadingRateAttachmentTexelSize', '8, 8', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::attachmentFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentShadingRateAttachmentTexelSizeAspectRatio', '0', '!VkPhysicalDeviceFragmentShadingRateFeaturesKHR::attachmentFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentShadingRateAttachmentTexelSizeAspectRatio', '1', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::attachmentFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'primitiveFragmentShadingRateWithMultipleViewports', None, 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'layeredShadingRateAttachments', None, 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::attachmentFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateNonTrivialCombinerOps', None, 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentSize', '2, 2', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentSizeAspectRatio', '2', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentShadingRateCoverageSamples', '16', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentShadingRateRasterizationSamples', 'VK_SAMPLE_COUNT_4_BIT', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithShaderDepthStencilWrites', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithSampleMask', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithShaderSampleMask', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithConservativeRasterization', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithFragmentShaderInterlock', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithCustomSampleLocations', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateStrictMultiplyCombiner', 'true', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
     ],
     'VK_KHR_depth_stencil_resolve': [
         PropertyRequirement('VkPhysicalDeviceDepthStencilResolvePropertiesKHR', 'supportedDepthResolveModes', 'VK_RESOLVE_MODE_SAMPLE_ZERO_BIT', None),
@@ -713,8 +755,8 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceDescriptorHeapPropertiesEXT', 'imageCaptureReplayOpaqueDataSize', None, 'VkPhysicalDeviceDescriptorHeapFeaturesEXT::descriptorHeap'),
         PropertyRequirement('VkPhysicalDeviceDescriptorHeapPropertiesEXT', 'maxDescriptorHeapEmbeddedSamplers', '2032', 'VkPhysicalDeviceDescriptorHeapFeaturesEXT::descriptorHeap'),
         PropertyRequirement('VkPhysicalDeviceDescriptorHeapPropertiesEXT', 'samplerYcbcrConversionCount', '3', 'VkPhysicalDeviceDescriptorHeapFeaturesEXT::descriptorHeap'),
-        PropertyRequirement('VkPhysicalDeviceDescriptorHeapPropertiesEXT', 'sparseDescriptorHeaps', 'false', 'VkPhysicalDeviceDescriptorHeapFeaturesEXT::descriptorHeap'),
-        PropertyRequirement('VkPhysicalDeviceDescriptorHeapPropertiesEXT', 'protectedDescriptorHeaps', 'false', 'VkPhysicalDeviceDescriptorHeapFeaturesEXT::descriptorHeap'),
+        PropertyRequirement('VkPhysicalDeviceDescriptorHeapPropertiesEXT', 'sparseDescriptorHeaps', None, 'VkPhysicalDeviceDescriptorHeapFeaturesEXT::descriptorHeap'),
+        PropertyRequirement('VkPhysicalDeviceDescriptorHeapPropertiesEXT', 'protectedDescriptorHeaps', None, 'VkPhysicalDeviceDescriptorHeapFeaturesEXT::descriptorHeap'),
     ],
     'VK_EXT_device_generated_commands': [
         PropertyRequirement('VkPhysicalDeviceDeviceGeneratedCommandsPropertiesEXT', 'maxIndirectPipelineCount', '4096', 'VkPhysicalDeviceDeviceGeneratedCommandsFeaturesEXT::deviceGeneratedCommands'),
@@ -740,12 +782,10 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceFragmentDensityMapPropertiesEXT', 'fragmentDensityInvocations', None, 'VkPhysicalDeviceFragmentDensityMapFeaturesEXT::fragmentDensityMap'),
     ],
     'VK_EXT_fragment_density_map2': [
-        PropertyRequirement('VkPhysicalDeviceFragmentDensityMap2PropertiesEXT', 'maxSubsampledArrayLayers', '2', 'VkPhysicalDeviceFragmentDensityMap2FeaturesEXT::fragmentDensityMapDeferred'),
-        PropertyRequirement('VkPhysicalDeviceFragmentDensityMap2PropertiesEXT', 'maxDescriptorSetSubsampledSamplers', '1', 'VkPhysicalDeviceFragmentDensityMap2FeaturesEXT::fragmentDensityMapDeferred'),
-        PropertyRequirement('VkPhysicalDeviceFragmentDensityMap2PropertiesEXT', 'subsampledCoarseReconstructionEarlyAccess', 'false', 'VkPhysicalDeviceFragmentDensityMap2FeaturesEXT::fragmentDensityMapDeferred'),
-        
-        PropertyRequirement('VkPhysicalDeviceFragmentDensityMap2PropertiesEXT', 'subsampledLoads', 'true', '!VkPhysicalDeviceFragmentDensityMap2FeaturesEXT::fragmentDensityMapDeferred'),
-        PropertyRequirement('VkPhysicalDeviceFragmentDensityMap2PropertiesEXT', 'subsampledLoads', 'false', 'VkPhysicalDeviceFragmentDensityMap2FeaturesEXT::fragmentDensityMapDeferred'),
+        PropertyRequirement('VkPhysicalDeviceFragmentDensityMap2PropertiesEXT', 'maxSubsampledArrayLayers', '2', None),
+        PropertyRequirement('VkPhysicalDeviceFragmentDensityMap2PropertiesEXT', 'maxDescriptorSetSubsampledSamplers', '1', None),
+        PropertyRequirement('VkPhysicalDeviceFragmentDensityMap2PropertiesEXT', 'subsampledCoarseReconstructionEarlyAccess', None, None),
+        PropertyRequirement('VkPhysicalDeviceFragmentDensityMap2PropertiesEXT', 'subsampledLoads', None, None),
     ],
     'VK_EXT_fragment_density_map_offset': [
         PropertyRequirement('VkPhysicalDeviceFragmentDensityMapOffsetPropertiesEXT', 'fragmentDensityOffsetGranularity', '1024, 1024', 'VkPhysicalDeviceFragmentDensityMapOffsetFeaturesEXT::fragmentDensityMapOffset'),
@@ -870,11 +910,11 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceLineRasterizationPropertiesEXT', 'lineSubPixelPrecisionBits', '4', None),
     ],
     'VK_EXT_custom_border_color': [
-        PropertyRequirement('VkPhysicalDeviceCustomBorderColorPropertiesEXT', 'maxCustomBorderColorSamplers', '4096', None),
+        PropertyRequirement('VkPhysicalDeviceCustomBorderColorPropertiesEXT', 'maxCustomBorderColorSamplers', '32', None),
     ],
     'VK_EXT_robustness2': [
-        PropertyRequirement('VkPhysicalDeviceRobustness2PropertiesEXT', 'robustStorageBufferAccessSizeAlignment', '1', None),
-        PropertyRequirement('VkPhysicalDeviceRobustness2PropertiesEXT', 'robustUniformBufferAccessSizeAlignment', '1', None),
+        PropertyRequirement('VkPhysicalDeviceRobustness2PropertiesEXT', 'robustStorageBufferAccessSizeAlignment', '4', None),
+        PropertyRequirement('VkPhysicalDeviceRobustness2PropertiesEXT', 'robustUniformBufferAccessSizeAlignment', '256', None),
     ],
     'VK_EXT_provoking_vertex': [
         PropertyRequirement('VkPhysicalDeviceProvokingVertexPropertiesEXT', 'provokingVertexModePerPipeline', 'false', None),
@@ -882,18 +922,18 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
     ],
     'VK_EXT_blend_operation_advanced': [
         PropertyRequirement('VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT', 'advancedBlendMaxColorAttachments', '1', None),
-        PropertyRequirement('VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT', 'advancedBlendIndependentBlend', 'true', None),
-        PropertyRequirement('VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT', 'advancedBlendNonPremultipliedSrcColor', 'true', None),
-        PropertyRequirement('VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT', 'advancedBlendNonPremultipliedDstColor', 'true', None),
-        PropertyRequirement('VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT', 'advancedBlendCorrelatedOverlap', 'true', None),
-        PropertyRequirement('VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT', 'advancedBlendAllOperations', 'true', None),
+        PropertyRequirement('VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT', 'advancedBlendIndependentBlend', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT', 'advancedBlendNonPremultipliedSrcColor', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT', 'advancedBlendNonPremultipliedDstColor', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT', 'advancedBlendCorrelatedOverlap', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceBlendOperationAdvancedPropertiesEXT', 'advancedBlendAllOperations', 'false', None),
     ],
     'VK_EXT_sample_locations': [
         PropertyRequirement('VkPhysicalDeviceSampleLocationsPropertiesEXT', 'sampleLocationSampleCounts', 'VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_2_BIT | VK_SAMPLE_COUNT_4_BIT | VK_SAMPLE_COUNT_8_BIT', None),
         PropertyRequirement('VkPhysicalDeviceSampleLocationsPropertiesEXT', 'maxSampleLocationGridSize', '1, 1', None),
         PropertyRequirement('VkPhysicalDeviceSampleLocationsPropertiesEXT', 'sampleLocationCoordinateRange', '0.0, 0.9375', None),
         PropertyRequirement('VkPhysicalDeviceSampleLocationsPropertiesEXT', 'sampleLocationSubPixelBits', '4', None),
-        PropertyRequirement('VkPhysicalDeviceSampleLocationsPropertiesEXT', 'variableSampleLocations', 'true', None),
+        PropertyRequirement('VkPhysicalDeviceSampleLocationsPropertiesEXT', 'variableSampleLocations', 'false', None),
     ],
     'VK_EXT_vertex_attribute_divisor': [
         PropertyRequirement('VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT', 'maxVertexAttribDivisor', '65535', 'VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT::vertexAttributeInstanceRateDivisor'),
@@ -916,19 +956,16 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'maxMeshSharedMemorySize', '28672', None),
         PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'maxMeshPayloadAndSharedMemorySize', '28672', None),
         PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'maxMeshOutputMemorySize', '32768', None),
-        PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'maxMeshPayloadAndOutputMemorySize', '32768', None),
+        PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'maxMeshPayloadAndOutputMemorySize', '48128', None),
         PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'maxMeshOutputComponents', '128', None),
         PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'maxMeshOutputVertices', '256', None),
         PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'maxMeshOutputPrimitives', '256', None),
         PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'maxMeshOutputLayers', '8', None),
         PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'maxMeshMultiviewViewCount', '1', None),
-        PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'meshOutputPerVertexGranularity', '1', None),
-        PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'meshOutputPerPrimitiveGranularity', '1', None),
+        PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'meshOutputPerVertexGranularity', '32', None),
+        PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'meshOutputPerPrimitiveGranularity', '32', None),
         PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'maxPreferredMeshWorkGroupInvocations', '32', None),
         PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'maxPreferredTaskWorkGroupInvocations', '32', None),
-        PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'preRasterizationShadingRateFragmentSizeMesh', 'true', None),
-        PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'preferredMeshWorkGroupInvocations', '32', None),
-        PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'preferredTaskWorkGroupInvocations', '32', None),
         PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'prefersLocalInvocationVertexOutput', 'false', None),
         PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'prefersLocalInvocationPrimitiveOutput', 'false', None),
         PropertyRequirement('VkPhysicalDeviceMeshShaderPropertiesEXT', 'prefersCompactVertexOutput', 'false', None),
@@ -945,13 +982,13 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceDiscardRectanglePropertiesEXT', 'maxDiscardRectangles', '4', 'VK_EXT_discard_rectangles'),
     ],
     'VK_EXT_conservative_rasterization': [
-        PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'primitiveOverestimationSize', '0.0', None),
+        PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'primitiveOverestimationSize', None, None),
         PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'maxExtraPrimitiveOverestimationSize', '0.0', None),
         PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'extraPrimitiveOverestimationSizeGranularity', '0.0', None),
         PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'primitiveUnderestimation', 'false', None),
         PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'conservativePointAndLineRasterization', 'false', None),
-        PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'degenerateTriangleRasterized', 'false', None),
-        PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'degenerateLinesRasterized', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'degenerateTrianglesRasterized', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'degenerateLinesRasterized', None, None),
         PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'fullyCoveredFragmentShaderInputVariable', 'false', None),
         PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'conservativeRasterizationPostDepthCoverage', 'false', None),
     ],
@@ -1120,7 +1157,7 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceClusterAccelerationStructurePropertiesNV', 'maxClusterGeometryIndex', '16777215', None),
     ],
     'VK_NV_cooperative_matrix': [
-        PropertyRequirement('VkPhysicalDeviceCooperativeMatrixPropertiesNV', 'cooperativeMatrixSupportedStages', 'VK_SHADER_STAGE_COMPUTE_BIT', 'VkPhysicalDeviceCooperativeMatrixFeaturesNV::cooperativeMatrixNV'),
+        PropertyRequirement('VkPhysicalDeviceCooperativeMatrixPropertiesNV', 'cooperativeMatrixSupportedStages', 'VK_SHADER_STAGE_COMPUTE_BIT', 'VkPhysicalDeviceCooperativeMatrixFeaturesNV::cooperativeMatrix'),
     ],
     'VK_NV_cooperative_matrix2': [
         PropertyRequirement('VkPhysicalDeviceCooperativeMatrix2PropertiesNV', 'cooperativeMatrixWorkgroupScopeMaxWorkgroupSize', 'subgroupSize * 2', 'VkPhysicalDeviceCooperativeMatrix2FeaturesNV::cooperativeMatrixWorkgroupScope'),
@@ -1130,8 +1167,8 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
     'VK_NV_cooperative_vector': [
         PropertyRequirement('VkPhysicalDeviceCooperativeVectorPropertiesNV', 'cooperativeVectorSupportedStages', 'VK_SHADER_STAGE_COMPUTE_BIT', 'VkPhysicalDeviceCooperativeVectorFeaturesNV::cooperativeVector'),
         PropertyRequirement('VkPhysicalDeviceCooperativeVectorPropertiesNV', 'maxCooperativeVectorComponents', '128', 'VkPhysicalDeviceCooperativeVectorFeaturesNV::cooperativeVector'),
-        PropertyRequirement('VkPhysicalDeviceCooperativeVectorPropertiesNV', 'cooperativeVectorTrainingFloat16Accumulation', 'false', 'VkPhysicalDeviceCooperativeVectorFeaturesNV::cooperativeVector'),
-        PropertyRequirement('VkPhysicalDeviceCooperativeVectorPropertiesNV', 'cooperativeVectorTrainingFloat32Accumulation', 'false', 'VkPhysicalDeviceCooperativeVectorFeaturesNV::cooperativeVector'),
+        PropertyRequirement('VkPhysicalDeviceCooperativeVectorPropertiesNV', 'cooperativeVectorTrainingFloat16Accumulation', None, 'VkPhysicalDeviceCooperativeVectorFeaturesNV::cooperativeVector'),
+        PropertyRequirement('VkPhysicalDeviceCooperativeVectorPropertiesNV', 'cooperativeVectorTrainingFloat32Accumulation', None, 'VkPhysicalDeviceCooperativeVectorFeaturesNV::cooperativeVector'),
     ],
     'VK_NV_cuda_kernel_launch': [
         PropertyRequirement('VkPhysicalDeviceCudaKernelLaunchPropertiesNV', 'computeCapabilityMinor', None, None),
@@ -1216,7 +1253,6 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceRayTracingPropertiesNV', 'maxInstanceCount', '16777215', None),
         PropertyRequirement('VkPhysicalDeviceRayTracingPropertiesNV', 'maxTriangleCount', '536870911', None),
         PropertyRequirement('VkPhysicalDeviceRayTracingPropertiesNV', 'maxDescriptorSetAccelerationStructures', '16', None),
-
     ],
     'VK_NV_ray_tracing_invocation_reorder': [
         # Implementation-dependent
@@ -1256,7 +1292,7 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
     'VK_QCOM_tile_shading': [
         PropertyRequirement('VkPhysicalDeviceTileShadingPropertiesQCOM', 'maxApronSize', '1', 'VkPhysicalDeviceTileShadingFeaturesQCOM::tileShadingApron'),
         PropertyRequirement('VkPhysicalDeviceTileShadingPropertiesQCOM', 'preferNonCoherent', None, 'VkPhysicalDeviceTileShadingFeaturesQCOM::tileShading'),
-        PropertyRequirement('VkPhysicalDeviceTileShadingPropertiesQCOM', 'tileGranularity', '16, 16', 'VkPhysicalDeviceTileShadingFeaturesQCOM::tileShading'),
+        PropertyRequirement('VkPhysicalDeviceTileShadingPropertiesQCOM', 'tileGranularity', None, 'VkPhysicalDeviceTileShadingFeaturesQCOM::tileShading'),
         PropertyRequirement('VkPhysicalDeviceTileShadingPropertiesQCOM', 'maxTileShadingRate', '8, 8', 'VkPhysicalDeviceTileShadingFeaturesQCOM::tileShadingDispatchTile'),
     ],
     'VK_VALVE_buffer_device_address_allocation_alignment': [

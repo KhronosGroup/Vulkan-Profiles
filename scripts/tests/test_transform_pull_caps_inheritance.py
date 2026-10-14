@@ -95,7 +95,6 @@ class TestConvertPullRequiredCapabilitiesCoreInheriance(unittest.TestCase):
         self.assertTrue(trans_v11["features"]["VkPhysicalDeviceMultiviewFeatures"].get("multiview"))
         self.assertIn("VkPhysicalDeviceMaintenance3Properties", trans_v11.get("properties", {}))
         self.assertIn("VkPhysicalDeviceMultiviewProperties", trans_v11.get("properties", {}))
-        self.assertIn("VkPhysicalDeviceProtectedMemoryProperties", trans_v11.get("properties", {}))
         self.assertIn("VkPhysicalDeviceSubgroupProperties", trans_v11.get("properties", {}))
 
     def test_pull_required_capabilities_profile_inheritance_vulkan11_to_vulkan12(self):
@@ -152,7 +151,6 @@ class TestConvertPullRequiredCapabilitiesCoreInheriance(unittest.TestCase):
         self.assertIn("VkPhysicalDeviceProperties", v11_properties)
         self.assertIn("VkPhysicalDeviceMaintenance3Properties", v11_properties)
         self.assertIn("VkPhysicalDeviceMultiviewProperties", v11_properties)
-        self.assertIn("VkPhysicalDeviceProtectedMemoryProperties", v11_properties)
         self.assertIn("VkPhysicalDeviceSubgroupProperties", v11_properties)
 
         # 4. Verify transition block VP_TEST_profile_v11_to_vulkan12
@@ -230,7 +228,6 @@ class TestConvertPullRequiredCapabilitiesCoreInheriance(unittest.TestCase):
         self.assertTrue(trans_v11["features"]["VkPhysicalDeviceMultiviewFeatures"].get("multiview"))
         self.assertIn("VkPhysicalDeviceMaintenance3Properties", trans_v11.get("properties", {}))
         self.assertIn("VkPhysicalDeviceMultiviewProperties", trans_v11.get("properties", {}))
-        self.assertIn("VkPhysicalDeviceProtectedMemoryProperties", trans_v11.get("properties", {}))
         self.assertIn("VkPhysicalDeviceSubgroupProperties", trans_v11.get("properties", {}))
 
         # 4. Verify transition block VP_TEST_profile_v11_to_vulkan12

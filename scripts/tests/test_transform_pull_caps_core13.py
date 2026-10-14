@@ -234,7 +234,6 @@ class TestConvertPullRequiredCapabilitiesCore13(unittest.TestCase):
                             "subgroupQuadOperationsInAllStages": false,
                             "maxMultiviewViewCount": 6,
                             "maxMultiviewInstanceIndex": 134217727,
-                            "protectedNoFault": false,
                             "maxPerSetDescriptors": 1024,
                             "maxMemoryAllocationSize": 1073741824
                         },

@@ -286,7 +286,6 @@ class TestConvertPullRequiredCapabilitiesCore14(unittest.TestCase):
                             "subgroupQuadOperationsInAllStages": false,
                             "maxMultiviewViewCount": 6,
                             "maxMultiviewInstanceIndex": 134217727,
-                            "protectedNoFault": false,
                             "maxPerSetDescriptors": 1024,
                             "maxMemoryAllocationSize": 1073741824
                         },
@@ -362,24 +361,19 @@ class TestConvertPullRequiredCapabilitiesCore14(unittest.TestCase):
                         },
                         "VkPhysicalDeviceVulkan14Properties": {
                             "lineSubPixelPrecisionBits": 4,
-                            "maxVertexAttribDivisor": 2147483647,
-                            "supportsNonZeroFirstInstance": true,
+                            "maxVertexAttribDivisor": 65535,
+                            "supportsNonZeroFirstInstance": false,
                             "maxPushDescriptors": 32,
                             "dynamicRenderingLocalReadDepthStencilAttachments": false,
                             "dynamicRenderingLocalReadMultisampledAttachments": false,
                             "earlyFragmentMultisampleCoverageAfterSampleCounting": false,
                             "earlyFragmentSampleMaskTestBeforeSampleCounting": false,
                             "depthStencilSwizzleOneSupport": false,
-                            "polygonModePointSize": false,
                             "nonStrictSinglePixelWideLinesUseParallelogram": false,
                             "nonStrictWideLinesUseParallelogram": false,
                             "blockTexelViewCompatibleMultipleLayers": false,
                             "maxCombinedImageSamplerDescriptorCount": 1,
                             "fragmentShadingRateClampCombinerInputs": false,
-                            "copySrcLayoutCount": 0,
-                            "pCopySrcLayouts": [],
-                            "copyDstLayoutCount": 0,
-                            "pCopyDstLayouts": [],
                             "identicalMemoryTypeRequirements": false
                         }
                     }

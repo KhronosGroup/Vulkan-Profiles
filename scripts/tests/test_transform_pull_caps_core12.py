@@ -359,9 +359,6 @@ class TestConvertPullRequiredCapabilitiesCore12(unittest.TestCase):
                             "maxMultiviewInstanceIndex": 134217727,
                             "maxMultiviewViewCount": 6
                         },
-                        "VkPhysicalDeviceProtectedMemoryProperties": {
-                            "protectedNoFault": false
-                        },
                         "VkPhysicalDeviceSubgroupProperties": {
                             "quadOperationsInAllStages": false,
                             "subgroupSize": 1,
@@ -511,7 +508,6 @@ class TestConvertPullRequiredCapabilitiesCore12(unittest.TestCase):
                             "subgroupQuadOperationsInAllStages": false,
                             "maxMultiviewViewCount": 6,
                             "maxMultiviewInstanceIndex": 134217727,
-                            "protectedNoFault": false,
                             "maxPerSetDescriptors": 1024,
                             "maxMemoryAllocationSize": 1073741824
                         },

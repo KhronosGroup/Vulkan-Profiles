@@ -344,9 +344,6 @@ class TestConvertPullCapsDepends(unittest.TestCase):
                             "maxMultiviewInstanceIndex": 134217727,
                             "maxMultiviewViewCount": 6
                         },
-                        "VkPhysicalDeviceProtectedMemoryProperties": {
-                            "protectedNoFault": false
-                        },
                         "VkPhysicalDeviceSubgroupProperties": {
                             "quadOperationsInAllStages": false,
                             "subgroupSize": 1,
