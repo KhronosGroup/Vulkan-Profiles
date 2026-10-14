@@ -17,6 +17,9 @@
 - Add `validate` analysis check to report unratified extensions in profiles files
 - Add `transform --strip unratified` to remove all unratified extensions in profiles files
 
+### Profiles:
+- Add VP_ANDROID_18_requirements profile
+
 ## [Vulkan Profiles Tools 1.4.363](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.363.0) - September 2026
 
 ### Features:

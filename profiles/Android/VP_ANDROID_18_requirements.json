@@ -1,0 +1,79 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-335.json#",
+    "capabilities": {
+        "MUST": {
+            "extensions": {
+                "VK_KHR_calibrated_timestamps": 1,
+                "VK_KHR_compute_shader_derivatives": 1,
+                "VK_KHR_device_address_commands": 1,
+                "VK_KHR_device_fault": 1,
+                "VK_KHR_extended_flags": 1,
+                "VK_KHR_maintenance10": 1,
+                "VK_KHR_maintenance11": 1,
+                "VK_KHR_pipeline_executable_properties": 1,
+                "VK_EXT_depth_clip_control": 1,
+                "VK_EXT_extended_dynamic_state": 1,
+                "VK_EXT_extended_dynamic_state2": 1,
+                "VK_EXT_pipeline_creation_cache_control": 1,
+                "VK_EXT_vertex_input_dynamic_state": 1
+            },
+            "features": {
+                "VkPhysicalDeviceComputeShaderDerivativesFeaturesKHR": {
+                    "computeDerivativeGroupLinear": true
+                }
+            }
+        }
+    },
+    "profiles": {
+        "VP_ANDROID_18_requirements": {
+            "version": 4,
+            "api-version": "1.4.335",
+            "label": "Vulkan Minimum Requirements for Android 18",
+            "description": "Collection of functionality that is mandated for chipsets that launch (or renew Google Requirements Freeze) on Android 18",
+            "contributors": {
+                "Ian Elliott": {
+                    "company": "Google",
+                    "email": "ianelliott@google.com",
+                    "contact": true
+                },
+                "Paresh Goel": {
+                    "company": "Google",
+                    "email": "pareshgoel@google.com",
+                    "contact": true
+                }
+            },
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2025-07-28",
+                    "author": "Ian Elliott",
+                    "comment": "First draft"
+                },
+                {
+                    "revision": 2,
+                    "date": "2025-12-02",
+                    "author": "Ian Elliott",
+                    "comment": "Renamed/rebranded from 'VP_ANDROID_18_minimums' (a.k.a. Vulkan Profile for Android 18 or VPA18) to 'VP_ANDROID_18_requirements' (a.k.a. Vulkan Requirements for Android 18 or VRA18), and added some extensions that were delayed from VRA17 to VRA18"
+                },
+                {
+                    "revision": 3,
+                    "date": "2026-07-31",
+                    "author": "Paresh Goel",
+                    "comment": "Updated VRA18 based on hardware partner feedback."
+                },
+                {
+                    "revision": 4,
+                    "date": "2026-09-18",
+                    "author": "Paresh Goel",
+                    "comment": "Updated VRA18 based on Round 2 hardware partner feedback."
+                }
+            ],
+            "capabilities": [
+                "MUST"
+            ],
+            "profiles": [
+                "VP_ANDROID_17_requirements"
+            ]
+        }
+    }
+}

@@ -65,6 +65,7 @@ The VP_ANDROID_baseline_2021 profile has been deprecated by Android, rebranded i
 
 The Vulkan Requirement for Android profiles collection of functionality that is mandated for chipsets that launch (or renew Google Requirements Freeze) on Android:
 
+* [VP_ANDROID_18_requirements](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/Android/VP_ANDROID_18_requirements.json) (Vulkan 1.4)
 * [VP_ANDROID_17_requirements](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/Android/VP_ANDROID_17_requirements.json) (Vulkan 1.4)
 * [VP_ANDROID_16_requirements](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/Android/VP_ANDROID_16_requirements.json) (Vulkan 1.3)
 * [VP_ANDROID_15_requirements](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/Android/VP_ANDROID_15_requirements.json) (Vulkan 1.3)
