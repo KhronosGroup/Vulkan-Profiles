@@ -113,6 +113,9 @@ def populate_missing_structure_defaults(
                 if m.name in ('sType', 'pNext'):
                     continue
                 if m.name not in prop_data:
+                    # TODO: get_member_unsupported_default() returns 0 for enum members (e.g.
+                    # VkPhysicalDeviceVulkan11Properties::pointClippingBehavior), which writes an
+                    # invalid value that fails schema validation. Skip or special-case enum members.
                     prop_data[m.name] = get_member_unsupported_default(vk, struct_name, m.name)
 
 

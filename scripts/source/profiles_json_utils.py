@@ -375,6 +375,8 @@ def _validate_profiles_json_data(json_data, schema_data) -> bool:
         jsonschema.validate(json_data, schema_data)
         return True
     except jsonschema.exceptions.ValidationError as e:
+        # TODO: Schema failures are logged at INFO level, so they only show with --verbose, and
+        # 'vkprofiles validate' still exits 0 for a file that fails. Log at ERROR and fail the command.
         logging.info(f"Validation Message: {e.message}")
         logging.info(f"Location in JSON: {' -> '.join([str(p) for p in e.path])}")
         logging.info(f"Invalid value/context: {e.instance}")

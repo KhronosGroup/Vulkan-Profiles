@@ -281,6 +281,7 @@ class TestConvertPullRequiredCapabilitiesCore14(unittest.TestCase):
                             "subgroupSupportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT"],
                             "subgroupSupportedOperations": [
                                 "VK_SUBGROUP_FEATURE_BASIC_BIT",
+                                "VK_SUBGROUP_FEATURE_CLUSTERED_BIT",
                                 "VK_SUBGROUP_FEATURE_ROTATE_BIT",
                                 "VK_SUBGROUP_FEATURE_ROTATE_CLUSTERED_BIT"
                             ],

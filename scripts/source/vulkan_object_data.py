@@ -38,6 +38,7 @@ except ImportError:
 
 # Workarounds for incorrect limittypes in vk.xml:
 # Maps struct_name -> { member_name: intended_limittype }
+# TODO: Report each of these vk.xml limittype errors to Khronos and remove the entry once vk.xml is fixed.
 VK_XML_PROPERTY_LIMIT_TYPE_WORKAROUNDS: dict[str, dict[str, str]] = {
     # -------------------------------------------------------------------------
     # 1. Ray Tracing (NV & KHR)
@@ -60,10 +61,14 @@ VK_XML_PROPERTY_LIMIT_TYPE_WORKAROUNDS: dict[str, dict[str, str]] = {
     # -------------------------------------------------------------------------
     'VkPhysicalDeviceDescriptorBufferPropertiesEXT': {
         # Spec Required Limits Table: 256, Limit Type: max (driver cannot demand > 256).
+        # TODO: Clarify this wording: the spec 'max' limit type means the reported value must be <= 256,
+        # which is vk.xml 'min' (smaller is more capable).
         # In vk.xml this is mislabeled 'noauto' due to missing 'min*' prefix.
         'descriptorBufferOffsetAlignment': 'min,pot',
 
         # Spec Required Limits Table: 64, Limit Type: max (driver cannot demand > 64 bytes).
+        # TODO: Clarify this wording: the spec 'max' limit type means the reported value must be <= 64,
+        # which is vk.xml 'min' (smaller is more capable).
         # In vk.xml these are mislabeled 'noauto' because they end in 'DataSize'.
         'bufferCaptureReplayDescriptorDataSize': 'min',
         'imageCaptureReplayDescriptorDataSize': 'min',
@@ -77,6 +82,7 @@ VK_XML_PROPERTY_LIMIT_TYPE_WORKAROUNDS: dict[str, dict[str, str]] = {
     # -------------------------------------------------------------------------
     'VkPhysicalDeviceMeshShaderPropertiesEXT': {
         # Allocation step granularities (Spec Required Limit: 1, Limit Type: max).
+        # TODO: Fix this comment: the Required Limits table lists 32 (Limit Type: max), not 1.
         # In vk.xml, VkPhysicalDeviceMeshShaderPropertiesNV uses 'min,mul',
         # but EXT was erroneously left as 'noauto'.
         'meshOutputPerVertexGranularity': 'min,mul',
@@ -246,6 +252,8 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceLimits', 'viewportSubPixelBits', '0', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'minInterpolationOffset', '-0.5', 'VkPhysicalDeviceFeatures::sampleRateShading'),
         # Spec Required Limit: 0.5 - (1 ULP), where the ULP is 1 / 2^subPixelInterpolationOffsetBits.
+        # TODO: Hard-coded worst case. Ideally derived from the granularity limit (e.g. a ULP-aware
+        # limittype or attribute) rather than baked in here.
         # subPixelInterpolationOffsetBits is required to be at least 4, so the worst-case ULP is 0.0625
         # and 0.5 - 0.0625 = 0.4375 (also the example given in the Required Limits table footnote).
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxInterpolationOffset', '0.4375', 'VkPhysicalDeviceFeatures::sampleRateShading'),
@@ -254,9 +262,13 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxCullDistances', '8', 'VkPhysicalDeviceFeatures::shaderCullDistance'),
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxCombinedClipAndCullDistances', '8', 'VkPhysicalDeviceFeatures::shaderCullDistance'),
         # Spec Required Limit: (1.0, 64.0 - ULP), where the ULP is pointSizeGranularity.
+        # TODO: Hard-coded worst case. Ideally derived from the granularity limit (e.g. a ULP-aware
+        # limittype or attribute) rather than baked in here.
         # pointSizeGranularity is required to be at most 1.0, so the worst case is 64.0 - 1.0 = 63.0.
         PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeRange', '1.0, 63.0', 'VkPhysicalDeviceFeatures::largePoints'),
         # Spec Required Limit: (1.0, 8.0 - ULP), where the ULP is lineWidthGranularity.
+        # TODO: Hard-coded worst case. Ideally derived from the granularity limit (e.g. a ULP-aware
+        # limittype or attribute) rather than baked in here.
         # lineWidthGranularity is required to be at most 1.0, so the worst case is 8.0 - 1.0 = 7.0.
         PropertyRequirement('VkPhysicalDeviceLimits', 'lineWidthRange', '1.0, 7.0', 'VkPhysicalDeviceFeatures::wideLines'),
         PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeGranularity', '1.0', 'VkPhysicalDeviceFeatures::largePoints'),
@@ -572,13 +584,16 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxColorAttachments', '8', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'timestampComputeAndGraphics', 'true', None),
         # Spec Required Limit (Vulkan 1.4): (1.0, 256.0 - pointSizeGranularity).
+        # TODO: Hard-coded worst case. Ideally derived from the granularity limit (e.g. a ULP-aware
+        # limittype or attribute) rather than baked in here.
         # Vulkan 1.4 requires pointSizeGranularity to be at most 0.125, so the worst case is 256.0 - 0.125 = 255.875.
         PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeRange', '1.0, 255.875', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeGranularity', '0.125', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'lineWidthGranularity', '0.5', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'standardSampleLocations', 'true', None),
         PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'subgroupSupportedStages', 'VK_SHADER_STAGE_COMPUTE_BIT', None),
-        PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'subgroupSupportedOperations', 'VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_ROTATE_BIT | VK_SUBGROUP_FEATURE_ROTATE_CLUSTERED_BIT', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'subgroupSupportedOperations', 'VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_CLUSTERED_BIT | VK_SUBGROUP_FEATURE_ROTATE_BIT | VK_SUBGROUP_FEATURE_ROTATE_CLUSTERED_BIT', None),
+        PropertyRequirement('VkPhysicalDeviceSubgroupProperties', 'supportedOperations', 'VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_CLUSTERED_BIT | VK_SUBGROUP_FEATURE_ROTATE_BIT | VK_SUBGROUP_FEATURE_ROTATE_CLUSTERED_BIT', None),
         PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSignedZeroInfNanPreserveFloat16', 'true', None),
         PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSignedZeroInfNanPreserveFloat32', 'true', None),
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'lineSubPixelPrecisionBits', '4', None),
@@ -703,7 +718,12 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
     ],
 
     'VK_KHR_copy_memory_indirect': [
-        PropertyRequirement('VkPhysicalDeviceCopyMemoryIndirectPropertiesKHR', 'supportedQueues', 'at_least_one_of(VkQueueFlagBits)', 'VkPhysicalDeviceCopyMemoryIndirectFeaturesKHR::indirectMemoryCopy,VkPhysicalDeviceCopyMemoryIndirectFeaturesKHR::indirectMemoryToImageCopy'),
+        # TODO: The spec requires supportedQueues to "return at least one supported queue type" when
+        # indirectMemoryCopy or indirectMemoryToImageCopy is supported, without saying which one.
+        # A profile can only require specific bits, so this cannot be expressed: requiring any given
+        # bit would reject conformant devices. Left as implementation-dependent until profiles can
+        # express "at least one of" requirements.
+        PropertyRequirement('VkPhysicalDeviceCopyMemoryIndirectPropertiesKHR', 'supportedQueues', None, 'VkPhysicalDeviceCopyMemoryIndirectFeaturesKHR::indirectMemoryCopy,VkPhysicalDeviceCopyMemoryIndirectFeaturesKHR::indirectMemoryToImageCopy'),
     ],
     'VK_KHR_cooperative_matrix': [
         PropertyRequirement('VkPhysicalDeviceCooperativeMatrixPropertiesKHR', 'cooperativeMatrixSupportedStages', 'VK_SHADER_STAGE_COMPUTE_BIT', 'VkPhysicalDeviceCooperativeMatrixFeaturesKHR::cooperativeMatrix'),
@@ -758,7 +778,7 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceVertexAttributeDivisorPropertiesKHR', 'maxVertexAttribDivisor', '65535', None),
     ],
     'VK_KHR_ray_tracing_pipeline': [
-        # vk.xml limittype is 'exact', yet the Required Limits table lists 32 (Limit Type: exact)
+        # TODO: vk.xml limittype is 'exact', yet the Required Limits table lists 32 (Limit Type: exact)
         # without saying whether every implementation must report exactly 32 or only that 32 is
         # the size applications can rely on. Left as implementation-dependent until clarified.
         PropertyRequirement('VkPhysicalDeviceRayTracingPipelinePropertiesKHR', 'shaderGroupHandleSize', None, None),
@@ -790,16 +810,16 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'primitiveFragmentShadingRateWithMultipleViewports', None, 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
         PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'layeredShadingRateAttachments', None, 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::attachmentFragmentShadingRate'),
         PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateNonTrivialCombinerOps', None, 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::pipelineFragmentShadingRate'),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentSize', '2, 2', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentSizeAspectRatio', '2', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentShadingRateCoverageSamples', '16', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentShadingRateRasterizationSamples', 'VK_SAMPLE_COUNT_4_BIT', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithShaderDepthStencilWrites', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithSampleMask', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithShaderSampleMask', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithConservativeRasterization', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithFragmentShaderInterlock', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
-        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithCustomSampleLocations', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::primitiveFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentSize', '2, 2', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::pipelineFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentSizeAspectRatio', '2', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::pipelineFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentShadingRateCoverageSamples', '16', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::pipelineFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'maxFragmentShadingRateRasterizationSamples', 'VK_SAMPLE_COUNT_4_BIT', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::pipelineFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithShaderDepthStencilWrites', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::pipelineFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithSampleMask', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::pipelineFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithShaderSampleMask', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::pipelineFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithConservativeRasterization', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::pipelineFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithFragmentShaderInterlock', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::pipelineFragmentShadingRate'),
+        PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateWithCustomSampleLocations', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::pipelineFragmentShadingRate'),
         PropertyRequirement('VkPhysicalDeviceFragmentShadingRatePropertiesKHR', 'fragmentShadingRateStrictMultiplyCombiner', 'false', 'VkPhysicalDeviceFragmentShadingRateFeaturesKHR::pipelineFragmentShadingRate'),
     ],
     'VK_KHR_depth_stencil_resolve': [
@@ -1018,9 +1038,7 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceDescriptorIndexingPropertiesEXT', 'maxDescriptorSetUpdateAfterBindStorageImages', '500000', None),
         PropertyRequirement('VkPhysicalDeviceDescriptorIndexingPropertiesEXT', 'maxDescriptorSetUpdateAfterBindInputAttachments', '4', None),
 
-        PropertyRequirement('VkPhysicalDeviceDescriptorIndexingPropertiesEXT', 'robustBufferAccessUpdateAfterBind', 'false', '!VkPhysicalDeviceInlineUniformBlockFeaturesEXT::descriptorBindingInlineUniformBlockUpdateAfterBind+!VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingUniformBufferUpdateAfterBind+!VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingUniformTexelBufferUpdateAfterBind'),
-        
-        PropertyRequirement('VkPhysicalDeviceDescriptorIndexingPropertiesEXT', 'robustBufferAccessUpdateAfterBind', 'true', 'VkPhysicalDeviceInlineUniformBlockFeaturesEXT::descriptorBindingInlineUniformBlockUpdateAfterBind,VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingUniformBufferUpdateAfterBind,VkPhysicalDeviceDescriptorIndexingFeaturesEXT::descriptorBindingUniformTexelBufferUpdateAfterBind'),
+        PropertyRequirement('VkPhysicalDeviceDescriptorIndexingPropertiesEXT', 'robustBufferAccessUpdateAfterBind', 'false', None),
     ],
     'VK_EXT_inline_uniform_block': [
         PropertyRequirement('VkPhysicalDeviceInlineUniformBlockPropertiesEXT', 'maxInlineUniformBlockSize', '256', 'VkPhysicalDeviceInlineUniformBlockFeaturesEXT::inlineUniformBlock'),
@@ -1276,14 +1294,14 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceMultiviewPerViewAttributesPropertiesNVX', 'perViewPositionAllComponents', None, None),
     ],
     'VK_NV_cluster_acceleration_structure': [
-        PropertyRequirement('VkPhysicalDeviceClusterAccelerationStructurePropertiesNV', 'maxVerticesPerCluster', '256', None),
-        PropertyRequirement('VkPhysicalDeviceClusterAccelerationStructurePropertiesNV', 'maxTrianglesPerCluster', '256', None),
-        PropertyRequirement('VkPhysicalDeviceClusterAccelerationStructurePropertiesNV', 'clusterScratchByteAlignment', '256', None),
-        PropertyRequirement('VkPhysicalDeviceClusterAccelerationStructurePropertiesNV', 'clusterByteAlignment', '128', None),
-        PropertyRequirement('VkPhysicalDeviceClusterAccelerationStructurePropertiesNV', 'clusterTemplateByteAlignment', '32', None),
-        PropertyRequirement('VkPhysicalDeviceClusterAccelerationStructurePropertiesNV', 'clusterBottomLevelByteAlignment', '256', None),
-        PropertyRequirement('VkPhysicalDeviceClusterAccelerationStructurePropertiesNV', 'clusterTemplateBoundsByteAlignment', '32', None),
-        PropertyRequirement('VkPhysicalDeviceClusterAccelerationStructurePropertiesNV', 'maxClusterGeometryIndex', '16777215', None),
+        PropertyRequirement('VkPhysicalDeviceClusterAccelerationStructurePropertiesNV', 'maxVerticesPerCluster', '256', 'VkPhysicalDeviceClusterAccelerationStructureFeaturesNV::clusterAccelerationStructure'),
+        PropertyRequirement('VkPhysicalDeviceClusterAccelerationStructurePropertiesNV', 'maxTrianglesPerCluster', '256', 'VkPhysicalDeviceClusterAccelerationStructureFeaturesNV::clusterAccelerationStructure'),
+        PropertyRequirement('VkPhysicalDeviceClusterAccelerationStructurePropertiesNV', 'clusterScratchByteAlignment', '256', 'VkPhysicalDeviceClusterAccelerationStructureFeaturesNV::clusterAccelerationStructure'),
+        PropertyRequirement('VkPhysicalDeviceClusterAccelerationStructurePropertiesNV', 'clusterByteAlignment', '128', 'VkPhysicalDeviceClusterAccelerationStructureFeaturesNV::clusterAccelerationStructure'),
+        PropertyRequirement('VkPhysicalDeviceClusterAccelerationStructurePropertiesNV', 'clusterTemplateByteAlignment', '32', 'VkPhysicalDeviceClusterAccelerationStructureFeaturesNV::clusterAccelerationStructure'),
+        PropertyRequirement('VkPhysicalDeviceClusterAccelerationStructurePropertiesNV', 'clusterBottomLevelByteAlignment', '256', 'VkPhysicalDeviceClusterAccelerationStructureFeaturesNV::clusterAccelerationStructure'),
+        PropertyRequirement('VkPhysicalDeviceClusterAccelerationStructurePropertiesNV', 'clusterTemplateBoundsByteAlignment', '32', 'VkPhysicalDeviceClusterAccelerationStructureFeaturesNV::clusterAccelerationStructure'),
+        PropertyRequirement('VkPhysicalDeviceClusterAccelerationStructurePropertiesNV', 'maxClusterGeometryIndex', '16777215', 'VkPhysicalDeviceClusterAccelerationStructureFeaturesNV::clusterAccelerationStructure'),
     ],
     'VK_NV_cooperative_matrix': [
         PropertyRequirement('VkPhysicalDeviceCooperativeMatrixPropertiesNV', 'cooperativeMatrixSupportedStages', 'VK_SHADER_STAGE_COMPUTE_BIT', 'VkPhysicalDeviceCooperativeMatrixFeaturesNV::cooperativeMatrix'),
@@ -1319,9 +1337,12 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
     ],
     'VK_NV_extended_sparse_address_space': [
         # Unsupported 
-        PropertyRequirement('VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV', 'extendedSparseAddressSpaceSize', '0', '!VkPhysicalDeviceFeatures::sparseBinding+!VkPhysicalDeviceExtendedSparseAddressSpaceFeaturesNV::extendedSparseAddressSpace'),
+        PropertyRequirement('VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV', 'extendedSparseAddressSpaceSize', '0', '!VkPhysicalDeviceFeatures::sparseBinding,!VkPhysicalDeviceExtendedSparseAddressSpaceFeaturesNV::extendedSparseAddressSpace'),
         # Supported
-        PropertyRequirement('VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV', 'extendedSparseAddressSpaceSize', 'VkPhysicalDeviceLimits::sparseAddressSpaceSize', 'VkPhysicalDeviceFeatures::sparseBinding,VkPhysicalDeviceExtendedSparseAddressSpaceFeaturesNV::extendedSparseAddressSpace'),
+        # TODO: The spec requires extendedSparseAddressSpaceSize >= VkPhysicalDeviceLimits::sparseAddressSpaceSize.
+        # Interpreting a value that references another property ('VkPhysicalDeviceLimits::sparseAddressSpaceSize')
+        # remains to be implemented, so no requirement is set for now.
+        PropertyRequirement('VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV', 'extendedSparseAddressSpaceSize', None, 'VkPhysicalDeviceFeatures::sparseBinding+VkPhysicalDeviceExtendedSparseAddressSpaceFeaturesNV::extendedSparseAddressSpace'),
 
         # Implementation-dependent
         PropertyRequirement('VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV', 'extendedSparseImageUsageFlags', None, 'VkPhysicalDeviceExtendedSparseAddressSpaceFeaturesNV::extendedSparseAddressSpace'),
@@ -1409,7 +1430,7 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceImageProcessing2PropertiesQCOM', 'maxBlockMatchWindow', None, 'VkPhysicalDeviceImageProcessing2FeaturesQCOM::textureBlockMatch2'),
     ],
     'VK_QCOM_queue_perf_hint': [
-        PropertyRequirement('VkPhysicalDeviceQueuePerfHintPropertiesQCOM', 'supportedQueues', None, 'VkPhysicalDeviceQueuePerfHintFeaturesQCOM::queuePerfHint'),
+        PropertyRequirement('VkPhysicalDeviceQueuePerfHintPropertiesQCOM', 'supportedQueues', 'VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT', 'VkPhysicalDeviceQueuePerfHintFeaturesQCOM::queuePerfHint'),
     ],
     'VK_QCOM_shader_multiple_wait_queues': [
         PropertyRequirement('VkPhysicalDeviceShaderMultipleWaitQueuesPropertiesQCOM', 'maxShaderWaitQueues', '2', 'VkPhysicalDeviceShaderMultipleWaitQueuesFeaturesQCOM::shaderMultipleWaitQueues'),
