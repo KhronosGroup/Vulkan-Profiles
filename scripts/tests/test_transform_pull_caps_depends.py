@@ -284,7 +284,7 @@ class TestConvertPullCapsDepends(unittest.TestCase):
                                 "maxSamplerAnisotropy": 1.0,
                                 "maxViewports": 1,
                                 "maxViewportDimensions": [4096, 4096],
-                                "viewportBoundsRange": [-8192.0, 8192.0],
+                                "viewportBoundsRange": [-8192.0, 8191.0],
                                 "viewportSubPixelBits": 0,
                                 "minMemoryMapAlignment": 64,
                                 "minTexelBufferOffsetAlignment": 256,

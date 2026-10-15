@@ -261,6 +261,7 @@ class TestConvertPullRequiredCapabilitiesCore14(unittest.TestCase):
                                 "maxSampleMaskWords": 1,
                                 "discreteQueuePriorities": 2,
                                 "nonCoherentAtomSize": 256,
+                                "viewportSubPixelBits": 0,
                                 "timestampComputeAndGraphics": true,
                                 "pointSizeRange": [1.0, 256.0],
                                 "pointSizeGranularity": 0.125,
@@ -277,7 +278,7 @@ class TestConvertPullRequiredCapabilitiesCore14(unittest.TestCase):
                         },
                         "VkPhysicalDeviceVulkan11Properties": {
                             "subgroupSize": 1,
-                            "subgroupSupportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_FRAGMENT_BIT"],
+                            "subgroupSupportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT"],
                             "subgroupSupportedOperations": [
                                 "VK_SUBGROUP_FEATURE_BASIC_BIT",
                                 "VK_SUBGROUP_FEATURE_ROTATE_BIT",
@@ -372,7 +373,6 @@ class TestConvertPullRequiredCapabilitiesCore14(unittest.TestCase):
                             "nonStrictSinglePixelWideLinesUseParallelogram": false,
                             "nonStrictWideLinesUseParallelogram": false,
                             "blockTexelViewCompatibleMultipleLayers": false,
-                            "maxCombinedImageSamplerDescriptorCount": 1,
                             "fragmentShadingRateClampCombinerInputs": false,
                             "identicalMemoryTypeRequirements": false
                         }
