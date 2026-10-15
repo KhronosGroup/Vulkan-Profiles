@@ -320,7 +320,7 @@ class TestConvertPullCapsDepends(unittest.TestCase):
                                 "pointSizeRange": [1.0, 63.0],
                                 "lineWidthRange": [1.0, 1.0],
                                 "pointSizeGranularity": 1.0,
-                                "lineWidthGranularity": 0.0,
+                                "lineWidthGranularity": 1.0,
                                 "strictLines": false,
                                 "standardSampleLocations": false,
                                 "optimalBufferCopyOffsetAlignment": 0,

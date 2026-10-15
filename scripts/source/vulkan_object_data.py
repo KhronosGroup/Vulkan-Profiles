@@ -224,8 +224,8 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxCombinedClipAndCullDistances', '0', '!VkPhysicalDeviceFeatures::shaderCullDistance'),
         PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeRange', '1.0, 1.0', '!VkPhysicalDeviceFeatures::largePoints'),
         PropertyRequirement('VkPhysicalDeviceLimits', 'lineWidthRange', '1.0, 1.0', '!VkPhysicalDeviceFeatures::wideLines'),
-        PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeGranularity', '0.0', '!VkPhysicalDeviceFeatures::largePoints'),
-        PropertyRequirement('VkPhysicalDeviceLimits', 'lineWidthGranularity', '0.0', '!VkPhysicalDeviceFeatures::wideLines'),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeGranularity', '1.0', '!VkPhysicalDeviceFeatures::largePoints'),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'lineWidthGranularity', '1.0', '!VkPhysicalDeviceFeatures::wideLines'),
 
         # Feature-dependent limits (Table 74 / Required Limits)
         PropertyRequirement('VkPhysicalDeviceLimits', 'minTexelGatherOffset', '-8', 'VkPhysicalDeviceFeatures::shaderImageGatherExtended'),
