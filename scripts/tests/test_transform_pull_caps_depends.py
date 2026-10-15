@@ -317,7 +317,7 @@ class TestConvertPullCapsDepends(unittest.TestCase):
                                 "maxCullDistances": 0,
                                 "maxCombinedClipAndCullDistances": 0,
                                 "discreteQueuePriorities": 2,
-                                "pointSizeRange": [1.0, 64.0],
+                                "pointSizeRange": [1.0, 63.0],
                                 "lineWidthRange": [1.0, 1.0],
                                 "pointSizeGranularity": 1.0,
                                 "lineWidthGranularity": 0.0,
@@ -469,7 +469,7 @@ class TestConvertPullCapsDepends(unittest.TestCase):
 
         # 2. Supported feature-dependent property (largePoints=True) MUST be present with supported limit value
         self.assertIn("pointSizeRange", limits)
-        self.assertEqual(limits["pointSizeRange"], [1.0, 64.0])
+        self.assertEqual(limits["pointSizeRange"], [1.0, 63.0])
 
         # 3. Default limits for unsupported features MUST be omitted when PullBits.IGNORE_UNSUPPORTED is active
         self.assertNotIn("sparseAddressSpaceSize", limits)

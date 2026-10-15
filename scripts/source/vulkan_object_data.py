@@ -245,13 +245,20 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxViewports', '16', 'VkPhysicalDeviceFeatures::multiViewport'),
         PropertyRequirement('VkPhysicalDeviceLimits', 'viewportSubPixelBits', '0', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'minInterpolationOffset', '-0.5', 'VkPhysicalDeviceFeatures::sampleRateShading'),
-        PropertyRequirement('VkPhysicalDeviceLimits', 'maxInterpolationOffset', '0.5', 'VkPhysicalDeviceFeatures::sampleRateShading'),
+        # Spec Required Limit: 0.5 - (1 ULP), where the ULP is 1 / 2^subPixelInterpolationOffsetBits.
+        # subPixelInterpolationOffsetBits is required to be at least 4, so the worst-case ULP is 0.0625
+        # and 0.5 - 0.0625 = 0.4375 (also the example given in the Required Limits table footnote).
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxInterpolationOffset', '0.4375', 'VkPhysicalDeviceFeatures::sampleRateShading'),
         PropertyRequirement('VkPhysicalDeviceLimits', 'subPixelInterpolationOffsetBits', '4', 'VkPhysicalDeviceFeatures::sampleRateShading'),
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxClipDistances', '8', 'VkPhysicalDeviceFeatures::shaderClipDistance'),
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxCullDistances', '8', 'VkPhysicalDeviceFeatures::shaderCullDistance'),
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxCombinedClipAndCullDistances', '8', 'VkPhysicalDeviceFeatures::shaderCullDistance'),
-        PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeRange', '1.0, 64.0', 'VkPhysicalDeviceFeatures::largePoints'),
-        PropertyRequirement('VkPhysicalDeviceLimits', 'lineWidthRange', '1.0, 8.0', 'VkPhysicalDeviceFeatures::wideLines'),
+        # Spec Required Limit: (1.0, 64.0 - ULP), where the ULP is pointSizeGranularity.
+        # pointSizeGranularity is required to be at most 1.0, so the worst case is 64.0 - 1.0 = 63.0.
+        PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeRange', '1.0, 63.0', 'VkPhysicalDeviceFeatures::largePoints'),
+        # Spec Required Limit: (1.0, 8.0 - ULP), where the ULP is lineWidthGranularity.
+        # lineWidthGranularity is required to be at most 1.0, so the worst case is 8.0 - 1.0 = 7.0.
+        PropertyRequirement('VkPhysicalDeviceLimits', 'lineWidthRange', '1.0, 7.0', 'VkPhysicalDeviceFeatures::wideLines'),
         PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeGranularity', '1.0', 'VkPhysicalDeviceFeatures::largePoints'),
         PropertyRequirement('VkPhysicalDeviceLimits', 'lineWidthGranularity', '1.0', 'VkPhysicalDeviceFeatures::wideLines'),
         PropertyRequirement('VkPhysicalDeviceLimits', 'storageImageSampleCounts', 'VK_SAMPLE_COUNT_1_BIT | VK_SAMPLE_COUNT_4_BIT', 'VkPhysicalDeviceFeatures::shaderStorageImageMultisample'),
@@ -564,7 +571,9 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxFramebufferHeight', '7680', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxColorAttachments', '8', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'timestampComputeAndGraphics', 'true', None),
-        PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeRange', '1.0, 256.0', None),
+        # Spec Required Limit (Vulkan 1.4): (1.0, 256.0 - pointSizeGranularity).
+        # Vulkan 1.4 requires pointSizeGranularity to be at most 0.125, so the worst case is 256.0 - 0.125 = 255.875.
+        PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeRange', '1.0, 255.875', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeGranularity', '0.125', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'lineWidthGranularity', '0.5', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'standardSampleLocations', 'true', None),
@@ -749,6 +758,9 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceVertexAttributeDivisorPropertiesKHR', 'maxVertexAttribDivisor', '65535', None),
     ],
     'VK_KHR_ray_tracing_pipeline': [
+        # vk.xml limittype is 'exact', yet the Required Limits table lists 32 (Limit Type: exact)
+        # without saying whether every implementation must report exactly 32 or only that 32 is
+        # the size applications can rely on. Left as implementation-dependent until clarified.
         PropertyRequirement('VkPhysicalDeviceRayTracingPipelinePropertiesKHR', 'shaderGroupHandleSize', None, None),
         PropertyRequirement('VkPhysicalDeviceRayTracingPipelinePropertiesKHR', 'maxRayRecursionDepth', '1', None),
         PropertyRequirement('VkPhysicalDeviceRayTracingPipelinePropertiesKHR', 'maxShaderGroupStride', '4096', None),
@@ -1104,7 +1116,7 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'extraPrimitiveOverestimationSizeGranularity', '0.0', None),
         PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'primitiveUnderestimation', 'false', None),
         PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'conservativePointAndLineRasterization', 'false', None),
-        PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'degenerateTrianglesRasterized', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'degenerateTrianglesRasterized', None, None),
         PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'degenerateLinesRasterized', None, None),
         PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'fullyCoveredFragmentShaderInputVariable', 'false', None),
         PropertyRequirement('VkPhysicalDeviceConservativeRasterizationPropertiesEXT', 'conservativeRasterizationPostDepthCoverage', 'false', None),
