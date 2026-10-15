@@ -263,7 +263,7 @@ class TestConvertPullRequiredCapabilitiesCore14(unittest.TestCase):
                                 "nonCoherentAtomSize": 256,
                                 "viewportSubPixelBits": 0,
                                 "timestampComputeAndGraphics": true,
-                                "pointSizeRange": [1.0, 256.0],
+                                "pointSizeRange": [1.0, 255.875],
                                 "pointSizeGranularity": 0.125,
                                 "lineWidthGranularity": 0.5,
                                 "standardSampleLocations": true
