@@ -76,7 +76,7 @@
                         "subPixelPrecisionBits": 4,
                         "subTexelPrecisionBits": 4,
                         "mipmapPrecisionBits": 4,
-                        "maxDrawIndexedIndexValue": 16777216,
+                        "maxDrawIndexedIndexValue": 16777215,
                         "maxDrawIndirectCount": 1,
                         "maxSamplerLodBias": 2,
                         "maxSamplerAnisotropy": 1,
@@ -87,7 +87,7 @@
                         ],
                         "viewportBoundsRange": [
                             -8192,
-                            8192
+                            8191
                         ],
                         "viewportSubPixelBits": 0,
                         "minMemoryMapAlignment": 64,
@@ -96,8 +96,8 @@
                         "minStorageBufferOffsetAlignment": 256,
                         "minTexelOffset": -8,
                         "maxTexelOffset": 7,
-                        "minTexelGatherOffset": -8,
-                        "maxTexelGatherOffset": 7,
+                        "minTexelGatherOffset": 0,
+                        "maxTexelGatherOffset": 0,
                         "minInterpolationOffset": 0.0,
                         "maxInterpolationOffset": 0.0,
                         "subPixelInterpolationOffsetBits": 0,
@@ -208,12 +208,6 @@
         "vulkan12requirements": {
             "features": {
                 "VkPhysicalDeviceVulkan12Features": {
-                    "samplerMirrorClampToEdge": true,
-                    "drawIndirectCount": true,
-                    "descriptorIndexing": true,
-                    "samplerFilterMinmax": true,
-                    "shaderOutputViewportIndex": true,
-                    "shaderOutputLayer": true,
                     "uniformBufferStandardLayout": true,
                     "subgroupBroadcastDynamicId": true,
                     "imagelessFramebuffer": true,
@@ -263,8 +257,8 @@
                     "maxDescriptorSetUpdateAfterBindSampledImages": 0,
                     "maxDescriptorSetUpdateAfterBindStorageImages": 0,
                     "maxDescriptorSetUpdateAfterBindInputAttachments": 0,
-                    "supportedDepthResolveModes": [],
-                    "supportedStencilResolveModes": [],
+                    "supportedDepthResolveModes": [ "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT" ],
+                    "supportedStencilResolveModes": [ "VK_RESOLVE_MODE_SAMPLE_ZERO_BIT" ],
                     "independentResolveNone": false,
                     "independentResolve": false,
                     "filterMinmaxSingleComponentFormats": false,
@@ -285,6 +279,7 @@
                     "robustImageAccess": true,
                     "inlineUniformBlock": true,
                     "pipelineCreationCacheControl": true,
+                    "privateData": true,
                     "shaderDemoteToHelperInvocation": true,
                     "shaderTerminateInvocation": true,
                     "subgroupSizeControl": true,
@@ -417,7 +412,9 @@
                         ],
                         "subTexelPrecisionBits": 8,
                         "mipmapPrecisionBits": 6,
+                        "maxDrawIndexedIndexValue": 4294967295,
                         "maxSamplerLodBias": 14,
+                        "maxSamplerAnisotropy": 16,
                         "maxViewportDimensions": [
                             7680,
                             7680
@@ -426,13 +423,18 @@
                             -15360,
                             15359
                         ],
+                        "minTexelGatherOffset": -8,
+                        "maxTexelGatherOffset": 7,
+                        "minInterpolationOffset": -0.5,
+                        "maxInterpolationOffset": 0.4375,
+                        "subPixelInterpolationOffsetBits": 4,
                         "maxFramebufferWidth": 7680,
                         "maxFramebufferHeight": 7680,
                         "maxColorAttachments": 8,
                         "timestampComputeAndGraphics": true,
                         "pointSizeRange": [
                             1.0,
-                            256.0
+                            255.875
                         ],
                         "pointSizeGranularity": 0.125,
                         "lineWidthGranularity": 0.5,
@@ -441,11 +443,11 @@
                 },
                 "VkPhysicalDeviceVulkan11Properties": {
                     "subgroupSupportedStages": [
-                        "VK_SHADER_STAGE_COMPUTE_BIT",
-                        "VK_SHADER_STAGE_FRAGMENT_BIT"
+                        "VK_SHADER_STAGE_COMPUTE_BIT"
                     ],
                     "subgroupSupportedOperations": [
                         "VK_SUBGROUP_FEATURE_BASIC_BIT",
+                        "VK_SUBGROUP_FEATURE_CLUSTERED_BIT",
                         "VK_SUBGROUP_FEATURE_ROTATE_BIT",
                         "VK_SUBGROUP_FEATURE_ROTATE_CLUSTERED_BIT"
                     ]
@@ -455,6 +457,8 @@
                     "shaderSignedZeroInfNanPreserveFloat32": true
                 },
                 "VkPhysicalDeviceVulkan14Properties": {
+                    "lineSubPixelPrecisionBits": 4,
+                    "maxVertexAttribDivisor": 65535,
                     "maxPushDescriptors": 32
                 }
             }
@@ -469,7 +473,7 @@
     },
     "profiles": {
         "VP_LUNARG_minimum_requirements_1_0": {
-            "version": 1,
+            "version": 2,
             "api-version": "1.0.68",
             "label": "Vulkan 1.0 Minimum Requirements",
             "description": "Vulkan 1.0 Minimum Requirements.",
@@ -478,7 +482,7 @@
             ]
         },
         "VP_LUNARG_minimum_requirements_1_1": {
-            "version": 1,
+            "version": 2,
             "api-version": "1.1.108",
             "label": "Vulkan 1.1 Minimum Requirements",
             "description": "Vulkan 1.1 Minimum Requirements.",
@@ -488,7 +492,7 @@
             ]
         },
         "VP_LUNARG_minimum_requirements_1_2": {
-            "version": 1,
+            "version": 2,
             "api-version": "1.2.131",
             "label": "Vulkan 1.2 Minimum Requirements",
             "description": "Vulkan 1.2 Minimum Requirements.",
@@ -499,7 +503,7 @@
             ]
         },
         "VP_LUNARG_minimum_requirements_1_3": {
-            "version": 1,
+            "version": 2,
             "api-version": "1.3.204",
             "label": "Vulkan 1.3 Minimum Requirements",
             "description": "Vulkan 1.3 Minimum Requirements.",
@@ -511,7 +515,7 @@
             ]
         },
         "VP_LUNARG_minimum_requirements_1_4": {
-            "version": 1,
+            "version": 2,
             "api-version": "1.4.304",
             "label": "Vulkan 1.4 Minimum Requirements",
             "description": "Vulkan 1.4 Minimum Requirements.",
@@ -535,6 +539,12 @@
         }
     },
     "history": [
+        {
+            "revision": 3,
+            "date": "2026-10-16",
+            "author": "Christophe Riccio",
+            "comment": "Fix minimum requirements against the Vulkan specification: feature-dependent limits, conditional Vulkan 1.2 features, Vulkan 1.3 privateData, Vulkan 1.4 subgroup operations and limits"
+        },
         {
             "revision": 2,
             "date": "2026-03-05",
