@@ -351,3 +351,12 @@ TEST(test_validate_android, VP_ANDROID_17_requirements) {
     EXPECT_TRUE(validator.Check(json_document3));
 }
 
+TEST(test_validate_android, VP_ANDROID_18_requirements) {
+    JsonValidator validator;
+
+    const std::string path = std::string(PROFILE_FILES_PATH) + "Android/VP_ANDROID_18_requirements.json";
+    const Json::Value json_document3 = ParseJsonFile(path.c_str());
+    EXPECT_TRUE(validator.Check(json_document3));
+}
+
+
