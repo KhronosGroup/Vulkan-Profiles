@@ -4777,8 +4777,11 @@ class VulkanProfileStructs():
             for formatProps in value.formats.values():
                 formatStructs.update(formatProps)
             for name in formatStructs:
-                if name in [ 'VkFormatProperties', 'VkFormatProperties2KHR', 'VkFormatProperties3KHR' ]:
-                    # Special case, add all as VkFormatProperties2[KHR] and VkFormatProperties3KHR
+                if name in [ 'VkFormatProperties', 'VkFormatProperties2', 'VkFormatProperties2KHR', 'VkFormatProperties3', 'VkFormatProperties3KHR' ]:
+                    # Special case, add all as VkFormatProperties2[KHR] and VkFormatProperties3KHR.
+                    # The core and KHR names share the same sType, so only one of each may be
+                    # chained (VUID-VkFormatProperties2-sType-unique); some drivers (e.g. Mali)
+                    # only fill the first struct of a given sType and leave duplicates zeroed.
                     if 'VkFormatProperties2KHR' in registry.structs:
                         if registry.structs['VkFormatProperties2KHR'] not in self.format:
                             self.format.append(registry.structs['VkFormatProperties2KHR'])
@@ -5281,6 +5284,13 @@ class VulkanProfile():
             # Fill all other structures directly
             if structDef.name in caps:
                 paramList.append((structDef, '->', caps[structDef.name]))
+            elif structDef.name in ['VkFormatProperties3', 'VkFormatProperties3KHR']:
+                # Only one VkFormatProperties3[KHR] is chained (they share an sType), so make
+                # sure it is checked against capabilities written under the aliased name too.
+                for alias in ['VkFormatProperties3', 'VkFormatProperties3KHR']:
+                    if alias != structDef.name and alias in caps:
+                        paramList.append((structDef, '->', caps[alias]))
+                        break
 
             # Use variable names in the debug version of the library that can be later prettified
             if debugMessages:

@@ -157,7 +157,7 @@ class FormatFeatureFlagConverter:
 
         target_groups = [
             (FORMAT_STRUCTS_32, members_32),
-            (FORMAT_STRUCTS_64, members_64),
+            (selectFormatStructs64(version, enabled_exts), members_64),
             (FORMAT_STRUCTS_4KHR, members_4khr),
         ]
 
@@ -168,4 +168,22 @@ class FormatFeatureFlagConverter:
                     result_structs.setdefault(target_struct, {}).update(members)
 
         return result_structs
+
+
+def selectFormatStructs64(version: VK_VERSION, enabled_exts: set[str]) -> list[str]:
+    """
+    Returns the single 64-bit format properties structure to emit for the target.
+
+    VkFormatProperties3 and VkFormatProperties3KHR are aliases sharing the same sType,
+    so both must never be present at once: the generated library chains every listed
+    structure into one pNext chain, and duplicate sTypes violate
+    VUID-VkFormatProperties2-sType-unique. Some drivers (e.g. Mali) only fill the
+    first structure of a given sType and leave the duplicate zeroed, producing false
+    "unsupported" results. Prefer the core name when the API version provides it.
+    """
+    if version >= VK_VERSION.V1_3:
+        return ["VkFormatProperties3"]
+    if "VK_KHR_format_feature_flags2" in enabled_exts:
+        return ["VkFormatProperties3KHR"]
+    return []
     

@@ -192,6 +192,45 @@ class TestFormatFeatureFlagConverter(unittest.TestCase):
         self.assertIn("VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT", opt_64)
         self.assertIn("VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BIT", opt_64)
 
+    def testExpandFormatStructSingle64BitAlias(self):
+        """VkFormatProperties3 and VkFormatProperties3KHR share an sType and must never both be emitted.
+
+        The generated library chains every listed structure into one pNext chain, and a
+        duplicate sType violates VUID-VkFormatProperties2-sType-unique. Some drivers (Mali)
+        only fill the first structure of a given sType, so the duplicate would stay zeroed
+        and report a false "unsupported" result.
+        """
+        input_members = {"optimalTilingFeatures": ["VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"]}
+
+        # Vulkan >= 1.3: core name only, even if the KHR extension is also enabled
+        expanded = self.converter.expand_format_struct(
+            self.vk, "VkFormatProperties", input_members, VK_VERSION.V1_3, {"VK_KHR_format_feature_flags2"}
+        )
+        self.assertIn("VkFormatProperties3", expanded)
+        self.assertNotIn("VkFormatProperties3KHR", expanded)
+
+        # Vulkan < 1.3 with the extension: KHR name only
+        expanded = self.converter.expand_format_struct(
+            self.vk, "VkFormatProperties", input_members, VK_VERSION.V1_1, {"VK_KHR_format_feature_flags2"}
+        )
+        self.assertIn("VkFormatProperties3KHR", expanded)
+        self.assertNotIn("VkFormatProperties3", expanded)
+
+        # Vulkan < 1.3 without the extension: no 64-bit struct at all
+        expanded = self.converter.expand_format_struct(
+            self.vk, "VkFormatProperties", input_members, VK_VERSION.V1_1, set()
+        )
+        self.assertNotIn("VkFormatProperties3", expanded)
+        self.assertNotIn("VkFormatProperties3KHR", expanded)
+
+        # A KHR-named source is normalised to the core name on Vulkan >= 1.3
+        expanded = self.converter.expand_format_struct(
+            self.vk, "VkFormatProperties3KHR",
+            {"optimalTilingFeatures": ["VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"]}, VK_VERSION.V1_3, set()
+        )
+        self.assertIn("VkFormatProperties3", expanded)
+        self.assertNotIn("VkFormatProperties3KHR", expanded)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
