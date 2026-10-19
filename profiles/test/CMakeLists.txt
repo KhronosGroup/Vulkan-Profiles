@@ -95,3 +95,29 @@ add_custom_target(VpTestHostImageCopy ALL
     DEPENDS ${FILES_UNIT_TEST})
 set_target_properties(VpTestHostImageCopy PROPERTIES FOLDER "Profiles generator/Tests")
 add_dependencies(VpTestHostImageCopy VpProfilesProcessor)
+
+add_custom_target(VpTestGeneratedRequirements ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/source
+    COMMAND ${VKPROFILES_EXE} transform
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_SOURCE_DIR}/../LunarG/VP_LUNARG_minimum_requirements.json
+        --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/source
+        --pull requirements aliases ignore-extension-versions
+        --format flatten
+    COMMAND ${VKPROFILES_EXE} transform
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements
+        --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/source/VP_LUNARG_generated_requirements.json
+        --pull requirements aliases ignore-extension-versions
+        --format flatten
+    COMMAND ${VKPROFILES_EXE} combine 
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/source
+        --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/diff
+        --mode difference
+        --format flatten
+    VERBATIM
+    SOURCES ${FILES_UNIT_TEST}
+    DEPENDS ${FILES_UNIT_TEST})
+set_target_properties(VpTestGeneratedRequirements PROPERTIES FOLDER "Profiles generator/Tests")
+add_dependencies(VpTestGeneratedRequirements VpProfilesProcessor)
