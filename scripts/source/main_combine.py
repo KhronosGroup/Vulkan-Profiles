@@ -33,7 +33,8 @@ from source.main_validate import main_validate
 from source.profiles_json_utils import (
     load_profiles_jsons,
     save_profiles_jsons,
-    strip_dict_duplication,
+    collect_block_names,
+    deep_merge_dict,
     OutputFormatType
 )
 
@@ -42,6 +43,120 @@ class CombineMode(str, Enum):
     INTERSECTION = 'intersection'  # Keeps capabilities supported by all input profiles.
     UNION = 'union'                # Keeps capabilities supported by any input profile.
     DIFFERENCE = 'difference'      # Removes common capabilities, leaving only unique profile differences.
+
+
+CAPABILITY_SECTIONS = ('extensions', 'features', 'properties', 'formats')
+
+
+def effective_profile_capabilities(file_data: dict, profile_name: str) -> dict:
+    """Merges all capability blocks referenced by a profile into its effective capabilities."""
+    effective = {section: {} for section in CAPABILITY_SECTIONS}
+    capabilities = file_data.get('capabilities', {})
+    profile_obj = file_data.get('profiles', {}).get(profile_name, {})
+    for block_name in collect_block_names(profile_obj.get('capabilities', [])):
+        block = capabilities.get(block_name, {})
+        for section in CAPABILITY_SECTIONS:
+            if isinstance(block.get(section), dict):
+                deep_merge_dict(effective[section], block[section])
+    return effective
+
+
+def is_flag_list(value) -> bool:
+    """Lists of names (e.g. format feature flags, shader stages) are compared element by element; numeric
+    arrays (e.g. maxComputeWorkGroupSize) are compared as a single value."""
+    return isinstance(value, list) and all(isinstance(x, str) for x in value)
+
+
+def intersect_equal_values(a, b):
+    """Returns the parts of a and b that are identical: common keys with equal values, common list elements."""
+    if isinstance(a, dict) and isinstance(b, dict):
+        result = {}
+        for key in a.keys() & b.keys():
+            common = intersect_equal_values(a[key], b[key])
+            if common is not None:
+                result[key] = common
+        return result
+    if isinstance(a, list) and isinstance(b, list):
+        if is_flag_list(a) and is_flag_list(b):
+            return [x for x in a if x in b]
+        return a if a == b else None
+    return a if a == b else None
+
+
+def strip_common_capabilities(target: dict, commons: list):
+    """
+    Removes from target every member whose path is common in all the given common capability dicts,
+    and every list element common to all of them. Emptied dicts and lists are removed.
+    """
+    for key in list(target.keys()):
+        if not all(isinstance(c, dict) and key in c for c in commons):
+            continue
+        value = target[key]
+        sub_commons = [c[key] for c in commons]
+        if isinstance(value, dict):
+            if all(isinstance(s, dict) for s in sub_commons):
+                strip_common_capabilities(value, sub_commons)
+                if not value:
+                    del target[key]
+            elif all(s == value for s in sub_commons):
+                del target[key]
+        elif is_flag_list(value) and all(is_flag_list(s) for s in sub_commons):
+            target[key] = [x for x in value if not all(x in s for s in sub_commons)]
+            if not target[key]:
+                del target[key]
+        else:
+            # The profile effective value is the same in all compared files: this member adds no difference.
+            del target[key]
+
+
+def compute_profile_differences(json_files_dict: dict) -> dict:
+    """
+    Strips the capabilities that are common to the compared profiles, leaving only their differences.
+
+    Profiles sharing the same name across input files are compared with each other (e.g. a hand-written
+    and a generated version of the same profile). When no profile name is shared, all profiles of all
+    files are compared together. Only identical values are considered common.
+    """
+    profile_files = {}
+    for file_key, file_data in json_files_dict.items():
+        for profile_name in file_data.get('profiles', {}):
+            profile_files.setdefault(profile_name, []).append(file_key)
+
+    groups = [[(fk, name) for fk in files] for name, files in profile_files.items() if len(files) > 1]
+    if not groups:
+        groups = [[(fk, name) for name, files in profile_files.items() for fk in files]]
+
+    common_by_profile = {}
+    for group in groups:
+        if not group:
+            continue
+        effectives = [effective_profile_capabilities(json_files_dict[fk], name) for fk, name in group]
+        common = effectives[0]
+        for other in effectives[1:]:
+            common = intersect_equal_values(common, other)
+        for key in group:
+            common_by_profile[key] = common
+
+    diff_files_dict = {}
+    for file_key, file_data in json_files_dict.items():
+        diff_file_data = json.loads(json.dumps(file_data))
+        block_users = {}
+        for profile_name, profile_obj in diff_file_data.get('profiles', {}).items():
+            for block_name in collect_block_names(profile_obj.get('capabilities', [])):
+                block_users.setdefault(block_name, []).append(profile_name)
+
+        for block_name, block in diff_file_data.get('capabilities', {}).items():
+            commons = [common_by_profile.get((file_key, name)) for name in block_users.get(block_name, [])]
+            # A block shared by several profiles only loses what is common for every one of them.
+            if not commons or any(c is None for c in commons):
+                continue
+            for section in CAPABILITY_SECTIONS:
+                if isinstance(block.get(section), dict):
+                    strip_common_capabilities(block[section], [c[section] for c in commons])
+                    if not block[section]:
+                        del block[section]
+        diff_files_dict[file_key] = diff_file_data
+    return diff_files_dict
 
 
 def main_combine(args):
@@ -85,22 +200,7 @@ def main_combine(args):
     # Special processing for DIFFERENCE mode across input profile files
     if mode == CombineMode.DIFFERENCE:
         json_files_dict = load_profiles_jsons(Path(input_dir))
-
-        generator = VulkanProfilesCombineGenerator(vk)
-        all_jsons = list(json_files_dict.values())
-        all_profile_names = []
-        for file_data in all_jsons:
-            all_profile_names.extend(list(file_data.get("profiles", {}).keys()))
-
-        common_caps = generator.combine_capabilities(all_jsons, all_profile_names, (1, 0))
-
-        diff_files_dict = {}
-        for file_key, file_data in json_files_dict.items():
-            diff_file_data = json.loads(json.dumps(file_data))
-            for cap_block in diff_file_data.get("capabilities", {}).values():
-                strip_dict_duplication(cap_block, common_caps, strip_list_elements=True)
-            diff_files_dict[file_key] = diff_file_data
-
+        diff_files_dict = compute_profile_differences(json_files_dict)
         save_profiles_jsons(diff_files_dict, output_path, format_type)
         return
 

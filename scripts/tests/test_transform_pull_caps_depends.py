@@ -312,7 +312,6 @@ class TestConvertPullCapsDepends(unittest.TestCase):
                                 "storageImageSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"],
                                 "maxSampleMaskWords": 1,
                                 "timestampComputeAndGraphics": false,
-                                "timestampPeriod": 0,
                                 "maxClipDistances": 0,
                                 "maxCullDistances": 0,
                                 "maxCombinedClipAndCullDistances": 0,
@@ -323,8 +322,6 @@ class TestConvertPullCapsDepends(unittest.TestCase):
                                 "lineWidthGranularity": 1.0,
                                 "strictLines": false,
                                 "standardSampleLocations": false,
-                                "optimalBufferCopyOffsetAlignment": 0,
-                                "optimalBufferCopyRowPitchAlignment": 0,
                                 "nonCoherentAtomSize": 256,
                                 "sparseAddressSpaceSize": 0
                             },

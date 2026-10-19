@@ -84,7 +84,9 @@ def populate_missing_structure_defaults(
             if m.name in ('sType', 'pNext'):
                 continue
             if m.name not in members:
-                members[m.name] = get_member_unsupported_default(vk, struct_name, m.name)
+                default = get_member_unsupported_default(vk, struct_name, m.name)
+                if default is not None:
+                    members[m.name] = default
 
     # 2. Populate missing property structure members
     for struct_name, prop_data in properties_dict.items():
@@ -98,13 +100,17 @@ def populate_missing_structure_defaults(
             if limits_obj:
                 for m in getattr(limits_obj, 'members', []):
                     if m.name not in ('sType', 'pNext') and m.name not in limits:
-                        limits[m.name] = get_member_unsupported_default(vk, "VkPhysicalDeviceLimits", m.name)
+                        default = get_member_unsupported_default(vk, "VkPhysicalDeviceLimits", m.name)
+                        if default is not None:
+                            limits[m.name] = default
 
             sparse_obj = vk.structs.get("VkPhysicalDeviceSparseProperties") or getStructByName(vk.structs, "VkPhysicalDeviceSparseProperties")
             if sparse_obj:
                 for m in getattr(sparse_obj, 'members', []):
                     if m.name not in ('sType', 'pNext') and m.name not in sparse:
-                        sparse[m.name] = get_member_unsupported_default(vk, "VkPhysicalDeviceSparseProperties", m.name)
+                        default = get_member_unsupported_default(vk, "VkPhysicalDeviceSparseProperties", m.name)
+                        if default is not None:
+                            sparse[m.name] = default
         else:
             struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
             if not struct_obj:
@@ -113,10 +119,9 @@ def populate_missing_structure_defaults(
                 if m.name in ('sType', 'pNext'):
                     continue
                 if m.name not in prop_data:
-                    # TODO: get_member_unsupported_default() returns 0 for enum members (e.g.
-                    # VkPhysicalDeviceVulkan11Properties::pointClippingBehavior), which writes an
-                    # invalid value that fails schema validation. Skip or special-case enum members.
-                    prop_data[m.name] = get_member_unsupported_default(vk, struct_name, m.name)
+                    default = get_member_unsupported_default(vk, struct_name, m.name)
+                    if default is not None:
+                        prop_data[m.name] = default
 
 
 def pull_extension_dependencies_capabilities_block(
@@ -418,6 +423,10 @@ def pull_required_capabilities_single_profile(
                                         if val:
                                             all_enabled_features_set.add((s_name, m_name))
 
+                # Properties are gathered once all required features are known: a Vulkan 1.0 limit may
+                # depend on a feature only required by a later version (e.g. fullDrawIndexUint32 in 1.4).
+                for ver in VK_VERSION.versions():
+                    if parent_api_version < ver <= api_version:
                         satisfied_prop = gatherSatisfiedCoreRequiredPropertiesForVersion(
                             vk, ver, api_version, all_exts, all_enabled_features_set, ignore_unsupported=ignore_unsupported
                         )
@@ -479,6 +488,20 @@ def pull_required_capabilities_single_profile(
 
     else:
         primary_block = get_primary_capability_block(profile_obj, capabilities_dict)
+        primary_block_names = collect_block_names(profile_caps_list)
+        primary_block_shared = bool(primary_block_names) and sum(
+            1 for other in json_file_data.get("profiles", {}).values()
+            if primary_block_names[0] in collect_block_names(other.get("capabilities", []))
+        ) > 1
+        created_block_name = None
+        if primary_block is None or primary_block_shared:
+            # The profile defines no capability block yet (e.g. a profile only declaring an api-version),
+            # or its first block is shared with other profiles (e.g. a Vulkan 1.0 block also used by the
+            # Vulkan 1.1+ profiles): the core version requirements go to a block of this profile only.
+            created_block_name = f"{profile_name}_requirements"
+            primary_block = capabilities_dict.setdefault(created_block_name, {})
+            if created_block_name not in primary_block_names:
+                profile_caps_list.append(created_block_name)
         if primary_block is not None:
             profile_caps = collect_profile_capabilities(json_files_dict, json_file_data, profile_obj)
             profile_enabled_exts = set(profile_caps.get("extensions", {}).keys())
@@ -505,6 +528,10 @@ def pull_required_capabilities_single_profile(
                                     if val:
                                         all_enabled_features_set.add((s_name, m_name))
 
+            # Properties are gathered once all required features are known: a Vulkan 1.0 limit may
+            # depend on a feature only required by a later version (e.g. fullDrawIndexUint32 in 1.4).
+            for ver in VK_VERSION.versions():
+                if ver <= api_version:
                     satisfied_prop = gatherSatisfiedCoreRequiredPropertiesForVersion(
                         vk, ver, api_version, profile_enabled_exts, all_enabled_features_set, ignore_unsupported=ignore_unsupported
                     )
@@ -522,7 +549,9 @@ def pull_required_capabilities_single_profile(
                 vk, api_version, core_satisfied_features, core_satisfied_properties
             )
 
-            populate_missing_structure_defaults(vk, core_satisfied_features, core_satisfied_properties, ignore_unsupported)
+            # Unsupported defaults are not filled here: merging them into the primary block would
+            # override the values it already defines (e.g. a 0 alignment is "stricter" than 256).
+            # The primary block is filled below, which only adds the members it does not define.
 
             if core_satisfied_features:
                 block_features = primary_block.setdefault("features", {})
@@ -538,11 +567,16 @@ def pull_required_capabilities_single_profile(
                     primary_block.get("features", {}),
                     primary_block.get("properties", {})
                 )
-                populate_missing_structure_defaults(vk, p_feat, p_prop, ignore_unsupported)
+                # Unsupported defaults are filled per block below, only for the structures a block defines first.
                 if p_feat:
                     primary_block["features"] = p_feat
                 if p_prop:
                     primary_block["properties"] = p_prop
+
+        if created_block_name is not None and not primary_block:
+            # Nothing was pulled: do not leave an empty block behind.
+            del capabilities_dict[created_block_name]
+            profile_caps_list.remove(created_block_name)
 
     block_names = collect_block_names(profile_obj.get("capabilities", []))
     for block_name in block_names:
@@ -601,6 +635,13 @@ def pull_required_capabilities_single_profile(
                     if filtered_ext_satisfied_props:
                         block_properties = block.setdefault("properties", {})
                         deep_merge_dict(block_properties, filtered_ext_satisfied_props)
+
+            # Structures first defined by this block (not by an earlier block of the profile) get their
+            # unlisted members filled with their unsupported default values. Structures refined by a later
+            # block (e.g. a few Vulkan 1.4 limits) are left as is: filling them would override earlier values.
+            new_features = {s: m for s, m in block.get("features", {}).items() if s not in context_features}
+            new_properties = {s: m for s, m in block.get("properties", {}).items() if s not in context_properties}
+            populate_missing_structure_defaults(vk, new_features, new_properties, ignore_unsupported)
 
             update_context_from_capabilities(block, context_features, context_properties, context_extensions)
 

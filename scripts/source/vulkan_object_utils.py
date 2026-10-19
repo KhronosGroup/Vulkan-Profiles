@@ -1047,6 +1047,13 @@ def get_member_unsupported_default(vk: VulkanObject, struct_name: str, member_na
     if not member_obj:
         return False
 
+    # Scalar enumerations (e.g. pointClippingBehavior, driverID), scalar nested structures
+    # (e.g. conformanceVersion) and strings (e.g. driverName) have no meaningful unsupported
+    # value: no default. Arrays of those still default to an empty list below.
+    is_array = member_obj.pointer or member_obj.length or member_obj.fixedSizeArray
+    if member_obj.type == 'char' or (not is_array and (member_obj.type in vk.enums or member_obj.type in vk.structs)):
+        return None
+
     is_bool = member_obj.type in ('VkBool32', 'bool')
     limit_type = getattr(member_obj, 'limitType', None)
 
@@ -1061,8 +1068,10 @@ def get_member_unsupported_default(vk: VulkanObject, struct_name: str, member_na
     if is_member_list_or_bitmask(vk, struct_name, member_name):
         return []
 
-    if limit_type in ('max', 'min'):
-        return 0
+    # A "smaller is more capable" limit (e.g. minMemoryMapAlignment, limittype "min,pot") has no weakest
+    # finite value: 0 would be the strictest possible requirement, so no default.
+    if limit_type and 'min' in [t.strip() for t in limit_type.split(',')]:
+        return None
 
     return 0
 

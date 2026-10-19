@@ -1,0 +1,101 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-304.json#",
+    "capabilities": {
+        "vulkan10requirements": {},
+        "vulkan11requirements_split": {},
+        "vulkan11requirements": {},
+        "vulkan12requirements": {
+            "features": {
+                "VkPhysicalDeviceBufferDeviceAddressFeatures": {
+                    "bufferDeviceAddress": false,
+                    "bufferDeviceAddressCaptureReplay": false,
+                    "bufferDeviceAddressMultiDevice": false
+                },
+                "VkPhysicalDeviceVulkanMemoryModelFeatures": {
+                    "vulkanMemoryModel": false,
+                    "vulkanMemoryModelDeviceScope": false,
+                    "vulkanMemoryModelAvailabilityVisibilityChains": false
+                }
+            }
+        },
+        "vulkan13requirements": {},
+        "vulkan14requirements": {},
+        "vulkan14dependent": {
+            "features": {
+                "VkPhysicalDeviceVulkan14Features": {
+                    "pipelineProtectedAccess": true
+                }
+            }
+        },
+        "VP_LUNARG_minimum_requirements_1_0_requirements": {},
+        "VP_LUNARG_minimum_requirements_1_1_requirements": {},
+        "VP_LUNARG_minimum_requirements_1_2_requirements": {},
+        "VP_LUNARG_minimum_requirements_1_3_requirements": {},
+        "VP_LUNARG_minimum_requirements_1_4_requirements": {}
+    },
+    "profiles": {
+        "VP_LUNARG_minimum_requirements_1_0": {
+            "version": 2,
+            "api-version": "1.0.68",
+            "label": "Vulkan 1.0 Minimum Requirements",
+            "description": "Vulkan 1.0 Minimum Requirements.",
+            "capabilities": [ "vulkan10requirements", "VP_LUNARG_minimum_requirements_1_0_requirements" ]
+        },
+        "VP_LUNARG_minimum_requirements_1_1": {
+            "version": 2,
+            "api-version": "1.1.108",
+            "label": "Vulkan 1.1 Minimum Requirements",
+            "description": "Vulkan 1.1 Minimum Requirements.",
+            "capabilities": [ "vulkan10requirements", "vulkan11requirements_split", "VP_LUNARG_minimum_requirements_1_1_requirements" ]
+        },
+        "VP_LUNARG_minimum_requirements_1_2": {
+            "version": 2,
+            "api-version": "1.2.131",
+            "label": "Vulkan 1.2 Minimum Requirements",
+            "description": "Vulkan 1.2 Minimum Requirements.",
+            "capabilities": [ "vulkan10requirements", "vulkan11requirements", "vulkan12requirements", "VP_LUNARG_minimum_requirements_1_2_requirements" ]
+        },
+        "VP_LUNARG_minimum_requirements_1_3": {
+            "version": 2,
+            "api-version": "1.3.204",
+            "label": "Vulkan 1.3 Minimum Requirements",
+            "description": "Vulkan 1.3 Minimum Requirements.",
+            "capabilities": [ "vulkan10requirements", "vulkan11requirements", "vulkan12requirements", "vulkan13requirements", "VP_LUNARG_minimum_requirements_1_3_requirements" ]
+        },
+        "VP_LUNARG_minimum_requirements_1_4": {
+            "version": 2,
+            "api-version": "1.4.304",
+            "label": "Vulkan 1.4 Minimum Requirements",
+            "description": "Vulkan 1.4 Minimum Requirements.",
+            "capabilities": [ "vulkan10requirements", "vulkan11requirements", "vulkan12requirements", "vulkan13requirements", "vulkan14requirements", "VP_LUNARG_minimum_requirements_1_4_requirements" ],
+            "optionals": [ "vulkan14dependent" ]
+        }
+    },
+    "contributors": {
+        "Christophe Riccio": {
+            "company": "LunarG",
+            "email": "christophe@lunarg.com",
+            "contact": true
+        }
+    },
+    "history": [
+        {
+            "revision": 3,
+            "date": "2026-10-16",
+            "author": "Christophe Riccio",
+            "comment": "Fix minimum requirements against the Vulkan specification: feature-dependent limits, conditional Vulkan 1.2 features, Vulkan 1.3 privateData, Vulkan 1.4 subgroup operations and limits"
+        },
+        {
+            "revision": 2,
+            "date": "2026-03-05",
+            "author": "Christophe Riccio",
+            "comment": "Add Vulkan 1.4 Minimum Requirements profile"
+        },
+        {
+            "revision": 1,
+            "date": "2023-11-01",
+            "author": "Christophe Riccio",
+            "comment": "Initial revision"
+        }
+    ]
+}

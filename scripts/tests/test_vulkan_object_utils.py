@@ -659,6 +659,12 @@ class TestVulkanObjectUtils(unittest.TestCase):
         self.assertEqual(get_member_unsupported_default(vk, "VkPhysicalDeviceLimits", "maxImageDimension1D"), 0)
         self.assertEqual(get_member_unsupported_default(vk, "VkPhysicalDeviceLimits", "discreteQueuePriorities"), 0)
 
+        # 6. "Smaller is more capable" numeric limits and scalar enums, structures and strings have no default
+        self.assertIsNone(get_member_unsupported_default(vk, "VkPhysicalDeviceLimits", "minUniformBufferOffsetAlignment"))
+        self.assertIsNone(get_member_unsupported_default(vk, "VkPhysicalDeviceVulkan11Properties", "pointClippingBehavior"))
+        self.assertIsNone(get_member_unsupported_default(vk, "VkPhysicalDeviceDriverProperties", "conformanceVersion"))
+        self.assertIsNone(get_member_unsupported_default(vk, "VkPhysicalDeviceDriverProperties", "driverName"))
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

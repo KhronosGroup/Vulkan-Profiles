@@ -345,6 +345,87 @@ class TestCombineDifference(unittest.TestCase):
             self.assertIn("drawIndirectFirstInstance", feats_var2_a)
             self.assertIn("depthClamp", feats_var3_b)
 
+    def test_combine_difference_same_profile_names(self):
+        """
+        Tests CombineMode.DIFFERENCE when the input files define the same profiles: each profile is
+        compared with its namesake, and a block shared by several profiles only loses what is common
+        for all of them.
+        """
+        hand_written = {
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
+            "capabilities": {
+                "shared10": {
+                    "properties": {"VkPhysicalDeviceProperties": {"limits": {
+                        "maxImageDimension2D": 4096, "maxPushConstantsSize": 128,
+                        "maxComputeWorkGroupSize": [128, 128, 64]}}}
+                },
+                "only11": {
+                    "features": {"VkPhysicalDeviceMultiviewFeatures": {"multiview": True, "multiviewGeometryShader": False}},
+                    "properties": {"VkPhysicalDeviceProperties": {"limits": {"maxImageDimension2D": 8192}}}
+                }
+            },
+            "profiles": {
+                "VP_TEST_10": {"version": 1, "api-version": "1.0.0", "label": "t", "description": "t", "capabilities": ["shared10"]},
+                "VP_TEST_11": {"version": 1, "api-version": "1.1.0", "label": "t", "description": "t", "capabilities": ["shared10", "only11"]}
+            }
+        }
+        generated = {
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
+            "capabilities": {
+                "gen10": {
+                    "properties": {"VkPhysicalDeviceProperties": {"limits": {
+                        "maxImageDimension2D": 4096, "maxPushConstantsSize": 128,
+                        "maxComputeWorkGroupSize": [128, 128, 64]}}}
+                },
+                "gen11": {
+                    "features": {"VkPhysicalDeviceMultiviewFeatures": {"multiview": True, "multiviewGeometryShader": True}},
+                    "properties": {"VkPhysicalDeviceProperties": {"limits": {
+                        "maxImageDimension2D": 8192, "maxPushConstantsSize": 256,
+                        "maxComputeWorkGroupSize": [128, 128, 64]}}}
+                }
+            },
+            "profiles": {
+                "VP_TEST_10": {"version": 1, "api-version": "1.0.0", "label": "t", "description": "t", "capabilities": ["gen10"]},
+                "VP_TEST_11": {"version": 1, "api-version": "1.1.0", "label": "t", "description": "t", "capabilities": ["gen11"]}
+            }
+        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            input_dir = temp_path / "input"
+            input_dir.mkdir()
+            output_dir = temp_path / "output_diff_same"
+            with open(input_dir / "hand_written.json", "w", encoding="utf-8") as f:
+                json.dump(hand_written, f, indent=4)
+            with open(input_dir / "generated.json", "w", encoding="utf-8") as f:
+                json.dump(generated, f, indent=4)
+
+            args = argparse.Namespace(
+                registry=REGISTRY_PATH,
+                input=str(input_dir),
+                output=str(output_dir),
+                mode=CombineMode.DIFFERENCE,
+                api="vulkan",
+                format="pretty",
+                transform=None,
+                validate=None
+            )
+            main_combine(args)
+
+            with open(output_dir / "hand_written.json", "r", encoding="utf-8") as f:
+                caps_h = json.load(f)["capabilities"]
+            with open(output_dir / "generated.json", "r", encoding="utf-8") as f:
+                caps_g = json.load(f)["capabilities"]
+
+            # Features: 'multiview' is identical for VP_TEST_11 in both files and is removed, the differing member stays
+            self.assertEqual(caps_h["only11"]["features"], {"VkPhysicalDeviceMultiviewFeatures": {"multiviewGeometryShader": False}})
+            self.assertEqual(caps_g["gen11"]["features"], {"VkPhysicalDeviceMultiviewFeatures": {"multiviewGeometryShader": True}})
+
+            # Shared block: maxImageDimension2D is overridden by 'only11' and its VP_TEST_11 effective value is identical,
+            # maxComputeWorkGroupSize is compared as a whole array, maxPushConstantsSize differs for VP_TEST_11 and stays
+            self.assertEqual(caps_h["shared10"]["properties"]["VkPhysicalDeviceProperties"]["limits"], {"maxPushConstantsSize": 128})
+            self.assertEqual(caps_g["gen10"], {})  # emptied, kept because VP_TEST_10 still references it
+            self.assertEqual(caps_g["gen11"]["properties"]["VkPhysicalDeviceProperties"]["limits"], {"maxPushConstantsSize": 256})
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
