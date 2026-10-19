@@ -69,6 +69,7 @@ if(NOT APPLE) # macOS does not handle dynamically loading Python jsonschema
     add_vulkan_python_test(VkProfiles_TestTransformConsolidate         test_transform_consolidate.py)
     add_vulkan_python_test(VkProfiles_TestTransformStripHelper         test_transform_strip_helper.py)
     add_vulkan_python_test(VkProfiles_TestTransformStripDups           test_transform_strip_duplication.py)
+    add_vulkan_python_test(VkProfiles_TestTransformStripFormats        test_transform_strip_formats.py)
     add_vulkan_python_test(VkProfiles_TestTransformStripPromotedExts   test_transform_strip_promoted_exts.py)
     add_vulkan_python_test(VkProfiles_TestTransformStripUnratified     test_transform_strip_unratified.py)
     add_vulkan_python_test(VkProfiles_TestTransformSort                test_transform_sort.py)

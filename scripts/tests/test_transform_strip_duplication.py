@@ -698,290 +698,6 @@ class TestConvertStripDuplication(unittest.TestCase):
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
-    def test_strip_formats_duplication_vulkan11(self):
-        """
-        Verifies format feature list duplication stripping for a Vulkan 1.1 profile
-        using VkFormatProperties. Duplicate list entries are stripped while unique entries remain.
-        """
-        original_json_text = """{
-            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_v11_formats_profile": {
-                    "version": 1,
-                    "api-version": "1.1.0",
-                    "capabilities": [
-                        "caps1",
-                        "caps2"
-                    ]
-                }
-            },
-            "capabilities": {
-                "caps1": {
-                    "formats": {
-                        "VK_FORMAT_R8G8B8A8_UNORM": {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [
-                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"
-                                ],
-                                "optimalTilingFeatures": [
-                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
-                                    "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT"
-                                ]
-                            }
-                        }
-                    }
-                },
-                "caps2": {
-                    "formats": {
-                        "VK_FORMAT_R8G8B8A8_UNORM": {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [
-                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"
-                                ],
-                                "optimalTilingFeatures": [
-                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
-                                    "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
-                                    "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT"
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        }"""
-
-        expected_json_text = """{
-            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_v11_formats_profile": {
-                    "version": 1,
-                    "api-version": "1.1.0",
-                    "capabilities": [
-                        "caps1",
-                        "caps2"
-                    ]
-                }
-            },
-            "capabilities": {
-                "caps1": {
-                    "formats": {
-                        "VK_FORMAT_R8G8B8A8_UNORM": {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [
-                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"
-                                ],
-                                "optimalTilingFeatures": [
-                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
-                                    "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT"
-                                ]
-                            }
-                        }
-                    }
-                },
-                "caps2": {
-                    "formats": {
-                        "VK_FORMAT_R8G8B8A8_UNORM": {
-                            "VkFormatProperties": {
-                                "optimalTilingFeatures": [
-                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
-                                    "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
-                                    "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT"
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        }"""
-
-        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        strip_duplication_profiles_files(self.vk, json_files_dict)
-
-        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
-
-    def test_strip_formats_duplication_vulkan13(self):
-        """
-        Verifies format feature list duplication stripping for a Vulkan 1.3 profile
-        using VkFormatProperties3. Completely identical format definitions across capability blocks are fully stripped.
-        """
-        original_json_text = """{
-            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_v13_formats_profile": {
-                    "version": 1,
-                    "api-version": "1.3.0",
-                    "capabilities": [
-                        "caps1",
-                        "caps2"
-                    ]
-                }
-            },
-            "capabilities": {
-                "caps1": {
-                    "formats": {
-                        "VK_FORMAT_R8G8B8A8_UNORM": {
-                            "VkFormatProperties3": {
-                                "linearTilingFeatures": [
-                                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"
-                                ]
-                            }
-                        }
-                    }
-                },
-                "caps2": {
-                    "formats": {
-                        "VK_FORMAT_R8G8B8A8_UNORM": {
-                            "VkFormatProperties3": {
-                                "linearTilingFeatures": [
-                                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        }"""
-
-        expected_json_text = """{
-            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_v13_formats_profile": {
-                    "version": 1,
-                    "api-version": "1.3.0",
-                    "capabilities": [
-                        "caps1",
-                        "caps2"
-                    ]
-                }
-            },
-            "capabilities": {
-                "caps1": {
-                    "formats": {
-                        "VK_FORMAT_R8G8B8A8_UNORM": {
-                            "VkFormatProperties3": {
-                                "linearTilingFeatures": [
-                                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"
-                                ]
-                            }
-                        }
-                    }
-                },
-                "caps2": {
-                }
-            }
-        }"""
-
-        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        strip_duplication_profiles_files(self.vk, json_files_dict)
-
-        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
-
-    def test_strip_formats_duplication_mixed_properties(self):
-        """
-        Verifies format feature duplication stripping when a capability block contains
-        both VkFormatProperties and VkFormatProperties3 for the same format. Duplicate 
-        VkFormatProperties structures are stripped when fully matched in parent blocks, 
-        leaving only updated VkFormatProperties3 structures.
-        """
-        original_json_text = """{
-            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_v13_mixed_formats_profile": {
-                    "version": 1,
-                    "api-version": "1.3.0",
-                    "capabilities": [
-                        "caps1",
-                        "caps2"
-                    ]
-                }
-            },
-            "capabilities": {
-                "caps1": {
-                    "formats": {
-                        "VK_FORMAT_R8G8B8A8_UNORM": {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [
-                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"
-                                ]
-                            },
-                            "VkFormatProperties3": {
-                                "linearTilingFeatures": [
-                                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"
-                                ]
-                            }
-                        }
-                    }
-                },
-                "caps2": {
-                    "formats": {
-                        "VK_FORMAT_R8G8B8A8_UNORM": {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [
-                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"
-                                ]
-                            },
-                            "VkFormatProperties3": {
-                                "linearTilingFeatures": [
-                                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT",
-                                    "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT"
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        }"""
-
-        expected_json_text = """{
-            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_v13_mixed_formats_profile": {
-                    "version": 1,
-                    "api-version": "1.3.0",
-                    "capabilities": [
-                        "caps1",
-                        "caps2"
-                    ]
-                }
-            },
-            "capabilities": {
-                "caps1": {
-                    "formats": {
-                        "VK_FORMAT_R8G8B8A8_UNORM": {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [
-                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"
-                                ]
-                            },
-                            "VkFormatProperties3": {
-                                "linearTilingFeatures": [
-                                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"
-                                ]
-                            }
-                        }
-                    }
-                },
-                "caps2": {
-                    "formats": {
-                        "VK_FORMAT_R8G8B8A8_UNORM": {
-                            "VkFormatProperties3": {
-                                "linearTilingFeatures": [
-                                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT",
-                                    "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT"
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        }"""
-
-        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        strip_duplication_profiles_files(self.vk, json_files_dict)
-
-        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
-
-
     def test_strip_intra_block_property_alias_duplication(self):
         """
         Verifies that when a single capability block contains duplicate property aliases
@@ -1035,65 +751,6 @@ class TestConvertStripDuplication(unittest.TestCase):
         strip_duplication_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
-
-    def test_strip_intra_block_format_alias_duplication(self):
-        """
-        Verifies that when a single capability block contains duplicate format property structure
-        aliases (e.g., VkFormatProperties3 and VkFormatProperties3KHR), the extension alias structure
-        is stripped in favor of the canonical core structure.
-        """
-        original_json_text = """{
-            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
-            "profiles": {
-                "VP_LUNARG_test": {
-                    "version": 1,
-                    "api-version": "1.3.0",
-                    "capabilities": ["caps_format"]
-                }
-            },
-            "capabilities": {
-                "caps_format": {
-                    "formats": {
-                        "VK_FORMAT_R8G8B8A8_UNORM": {
-                            "VkFormatProperties3": {
-                                "linearTilingFeatures": ["VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"]
-                            },
-                            "VkFormatProperties3KHR": {
-                                "linearTilingFeatures": ["VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"]
-                            }
-                        }
-                    }
-                }
-            }
-        }"""
-
-        expected_json_text = """{
-            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
-            "profiles": {
-                "VP_LUNARG_test": {
-                    "version": 1,
-                    "api-version": "1.3.0",
-                    "capabilities": ["caps_format"]
-                }
-            },
-            "capabilities": {
-                "caps_format": {
-                    "formats": {
-                        "VK_FORMAT_R8G8B8A8_UNORM": {
-                            "VkFormatProperties3": {
-                                "linearTilingFeatures": ["VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"]
-                            }
-                        }
-                    }
-                }
-            }
-        }"""
-
-        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
-        strip_duplication_profiles_files(self.vk, json_files_dict)
-
-        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
-
 
     def test_strip_robustness2_extension_alias_duplication(self):
         """
@@ -1250,7 +907,6 @@ class TestConvertStripDuplication(unittest.TestCase):
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
-
     def test_strip_multiple_aliases_single_block_version12(self):
         """
         Verifies that when a Vulkan 1.2 capability block contains duplicate feature aliases
@@ -1325,7 +981,6 @@ class TestConvertStripDuplication(unittest.TestCase):
         strip_duplication_profiles_files(self.vk, json_files_dict)
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
-        
 
     def test_strip_multiple_aliases_inherited_profile_version12(self):
         """
@@ -1444,8 +1099,6 @@ class TestConvertStripDuplication(unittest.TestCase):
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
 
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -1457,4 +1110,3 @@ if __name__ == '__main__':
     TestConvertStripDuplication.registry_path = args.registry
 
     unittest.main(argv=[sys.argv[0]] + unparsed)
-    
