@@ -62,17 +62,9 @@
                         "maxFragmentDualSrcAttachments": 0,
                         "maxFragmentCombinedOutputResources": 4,
                         "maxComputeSharedMemorySize": 16384,
-                        "maxComputeWorkGroupCount": [
-                            65535,
-                            65535,
-                            65535
-                        ],
+                        "maxComputeWorkGroupCount": [ 65535, 65535, 65535 ],
                         "maxComputeWorkGroupInvocations": 128,
-                        "maxComputeWorkGroupSize": [
-                            128,
-                            128,
-                            64
-                        ],
+                        "maxComputeWorkGroupSize": [ 128, 128, 64 ],
                         "subPixelPrecisionBits": 4,
                         "subTexelPrecisionBits": 4,
                         "mipmapPrecisionBits": 4,
@@ -81,14 +73,8 @@
                         "maxSamplerLodBias": 2,
                         "maxSamplerAnisotropy": 1,
                         "maxViewports": 1,
-                        "maxViewportDimensions": [
-                            4096,
-                            4096
-                        ],
-                        "viewportBoundsRange": [
-                            -8192,
-                            8191
-                        ],
+                        "maxViewportDimensions": [ 4096, 4096 ],
+                        "viewportBoundsRange": [ -8192, 8191 ],
                         "viewportSubPixelBits": 0,
                         "minMemoryMapAlignment": 64,
                         "minTexelBufferOffsetAlignment": 256,
@@ -104,54 +90,23 @@
                         "maxFramebufferWidth": 4096,
                         "maxFramebufferHeight": 4096,
                         "maxFramebufferLayers": 256,
-                        "framebufferColorSampleCounts": [
-                            "VK_SAMPLE_COUNT_1_BIT",
-                            "VK_SAMPLE_COUNT_4_BIT"
-                        ],
-                        "framebufferDepthSampleCounts": [
-                            "VK_SAMPLE_COUNT_1_BIT",
-                            "VK_SAMPLE_COUNT_4_BIT"
-                        ],
-                        "framebufferStencilSampleCounts": [
-                            "VK_SAMPLE_COUNT_1_BIT",
-                            "VK_SAMPLE_COUNT_4_BIT"
-                        ],
-                        "framebufferNoAttachmentsSampleCounts": [
-                            "VK_SAMPLE_COUNT_1_BIT",
-                            "VK_SAMPLE_COUNT_4_BIT"
-                        ],
+                        "framebufferColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "framebufferDepthSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "framebufferStencilSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "framebufferNoAttachmentsSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
                         "maxColorAttachments": 4,
-                        "sampledImageColorSampleCounts": [
-                            "VK_SAMPLE_COUNT_1_BIT",
-                            "VK_SAMPLE_COUNT_4_BIT"
-                        ],
-                        "sampledImageIntegerSampleCounts": [
-                            "VK_SAMPLE_COUNT_1_BIT"
-                        ],
-                        "sampledImageDepthSampleCounts": [
-                            "VK_SAMPLE_COUNT_1_BIT",
-                            "VK_SAMPLE_COUNT_4_BIT"
-                        ],
-                        "sampledImageStencilSampleCounts": [
-                            "VK_SAMPLE_COUNT_1_BIT",
-                            "VK_SAMPLE_COUNT_4_BIT"
-                        ],
-                        "storageImageSampleCounts": [
-                            "VK_SAMPLE_COUNT_1_BIT"
-                        ],
+                        "sampledImageColorSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "sampledImageIntegerSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT" ],
+                        "sampledImageDepthSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "sampledImageStencilSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT" ],
+                        "storageImageSampleCounts": [ "VK_SAMPLE_COUNT_1_BIT" ],
                         "maxSampleMaskWords": 1,
                         "maxClipDistances": 0,
                         "maxCullDistances": 0,
                         "maxCombinedClipAndCullDistances": 0,
                         "discreteQueuePriorities": 2,
-                        "pointSizeRange": [
-                            1.0,
-                            1.0
-                        ],
-                        "lineWidthRange": [
-                            1.0,
-                            1.0
-                        ],
+                        "pointSizeRange": [ 1.0, 1.0 ],
+                        "lineWidthRange": [ 1.0, 1.0 ],
                         "pointSizeGranularity": 1.0,
                         "lineWidthGranularity": 1.0,
                         "nonCoherentAtomSize": 256
@@ -405,24 +360,14 @@
                         "maxDescriptorSetStorageImages": 144,
                         "maxFragmentCombinedOutputResources": 16,
                         "maxComputeWorkGroupInvocations": 256,
-                        "maxComputeWorkGroupSize": [
-                            256,
-                            256,
-                            64
-                        ],
+                        "maxComputeWorkGroupSize": [ 256, 256, 64 ],
                         "subTexelPrecisionBits": 8,
                         "mipmapPrecisionBits": 6,
                         "maxDrawIndexedIndexValue": 4294967295,
                         "maxSamplerLodBias": 14,
                         "maxSamplerAnisotropy": 16,
-                        "maxViewportDimensions": [
-                            7680,
-                            7680
-                        ],
-                        "viewportBoundsRange": [
-                            -15360,
-                            15359
-                        ],
+                        "maxViewportDimensions": [ 7680, 7680 ],
+                        "viewportBoundsRange": [ -15360, 15359 ],
                         "minTexelGatherOffset": -8,
                         "maxTexelGatherOffset": 7,
                         "minInterpolationOffset": -0.5,
@@ -432,26 +377,16 @@
                         "maxFramebufferHeight": 7680,
                         "maxColorAttachments": 8,
                         "timestampComputeAndGraphics": true,
-                        "pointSizeRange": [
-                            1.0,
-                            255.875
-                        ],
+                        "pointSizeRange": [ 1.0, 255.875 ],
                         "pointSizeGranularity": 0.125,
                         "lineWidthGranularity": 0.5,
                         "standardSampleLocations": true
                     }
                 },
                 "VkPhysicalDeviceVulkan11Properties": {
-                    "subgroupSupportedStages": [
-                        "VK_SHADER_STAGE_COMPUTE_BIT"
-                    ],
-                    "subgroupSupportedOperations": [
-                        "VK_SUBGROUP_FEATURE_BASIC_BIT",
-                        "VK_SUBGROUP_FEATURE_CLUSTERED_BIT",
-                        "VK_SUBGROUP_FEATURE_ROTATE_BIT",
-                        "VK_SUBGROUP_FEATURE_ROTATE_CLUSTERED_BIT"
-                    ]
-                },                
+                    "subgroupSupportedStages": [ "VK_SHADER_STAGE_COMPUTE_BIT" ],
+                    "subgroupSupportedOperations": [ "VK_SUBGROUP_FEATURE_BASIC_BIT", "VK_SUBGROUP_FEATURE_CLUSTERED_BIT", "VK_SUBGROUP_FEATURE_ROTATE_BIT", "VK_SUBGROUP_FEATURE_ROTATE_CLUSTERED_BIT" ]
+                },
                 "VkPhysicalDeviceVulkan12Properties": {
                     "shaderSignedZeroInfNanPreserveFloat16": true,
                     "shaderSignedZeroInfNanPreserveFloat32": true
@@ -477,58 +412,36 @@
             "api-version": "1.0.68",
             "label": "Vulkan 1.0 Minimum Requirements",
             "description": "Vulkan 1.0 Minimum Requirements.",
-            "capabilities": [
-                "vulkan10requirements"
-            ]
+            "capabilities": [ "vulkan10requirements" ]
         },
         "VP_LUNARG_minimum_requirements_1_1": {
             "version": 2,
             "api-version": "1.1.108",
             "label": "Vulkan 1.1 Minimum Requirements",
             "description": "Vulkan 1.1 Minimum Requirements.",
-            "capabilities": [
-                "vulkan10requirements",
-                "vulkan11requirements_split"
-            ]
+            "capabilities": [ "vulkan10requirements", "vulkan11requirements_split" ]
         },
         "VP_LUNARG_minimum_requirements_1_2": {
             "version": 2,
             "api-version": "1.2.131",
             "label": "Vulkan 1.2 Minimum Requirements",
             "description": "Vulkan 1.2 Minimum Requirements.",
-            "capabilities": [
-                "vulkan10requirements",
-                "vulkan11requirements",
-                "vulkan12requirements"
-            ]
+            "capabilities": [ "vulkan10requirements", "vulkan11requirements", "vulkan12requirements" ]
         },
         "VP_LUNARG_minimum_requirements_1_3": {
             "version": 2,
             "api-version": "1.3.204",
             "label": "Vulkan 1.3 Minimum Requirements",
             "description": "Vulkan 1.3 Minimum Requirements.",
-            "capabilities": [
-                "vulkan10requirements",
-                "vulkan11requirements",
-                "vulkan12requirements",
-                "vulkan13requirements"
-            ]
+            "capabilities": [ "vulkan10requirements", "vulkan11requirements", "vulkan12requirements", "vulkan13requirements" ]
         },
         "VP_LUNARG_minimum_requirements_1_4": {
             "version": 2,
             "api-version": "1.4.304",
             "label": "Vulkan 1.4 Minimum Requirements",
             "description": "Vulkan 1.4 Minimum Requirements.",
-            "capabilities": [
-                "vulkan10requirements",
-                "vulkan11requirements",
-                "vulkan12requirements",
-                "vulkan13requirements",
-                "vulkan14requirements"
-            ],
-            "optionals": [
-                "vulkan14dependent"
-            ]
+            "capabilities": [ "vulkan10requirements", "vulkan11requirements", "vulkan12requirements", "vulkan13requirements", "vulkan14requirements" ],
+            "optionals": [ "vulkan14dependent" ]
         }
     },
     "contributors": {
