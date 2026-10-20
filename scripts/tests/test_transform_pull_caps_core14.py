@@ -391,6 +391,43 @@ class TestConvertPullRequiredCapabilitiesCore14(unittest.TestCase):
         sort_profiles_files(self.vk, json_files_dict)
         self.assertProfileDataEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
+    def test_pull_required_capabilities_vulkan14_without_capability_block(self):
+        """
+        Pulling the Vulkan 1.4 core requirements for a profile that only declares an api-version
+        creates a capability block. Without 'ignore-unsupported', unlisted members get their
+        unsupported default, except 'exact' and 'noauto' members which are left out.
+        """
+        json_files_dict = {"test_profile.json": {
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-304.json#",
+            "profiles": {
+                "VP_TEST_profile_v14": {
+                    "version": 1,
+                    "api-version": "1.4.304"
+                }
+            }
+        }}
+        pull_required_capabilities_profiles_files(self.vk, [PullBits.REQUIRED_CAPABILITIES], json_files_dict)
+
+        data = json_files_dict["test_profile.json"]
+        self.assertEqual(data["profiles"]["VP_TEST_profile_v14"]["capabilities"], ["VP_TEST_profile_v14_requirements"])
+        properties = data["capabilities"]["VP_TEST_profile_v14_requirements"]["properties"]
+
+        # Comparable members still get their unsupported default
+        self.assertIs(properties["VkPhysicalDeviceVulkan11Properties"]["subgroupQuadOperationsInAllStages"], False)
+
+        # 'exact' members (device specific values) and 'noauto' members (not handled yet) are not filled
+        for struct_name, member_name in (
+            ("VkPhysicalDeviceVulkan11Properties", "deviceUUID"),                         # exact
+            ("VkPhysicalDeviceVulkan11Properties", "pointClippingBehavior"),              # exact
+            ("VkPhysicalDeviceVulkan12Properties", "driverID"),                           # exact
+            ("VkPhysicalDeviceVulkan12Properties", "conformanceVersion"),                 # exact
+            ("VkPhysicalDeviceVulkan14Properties", "polygonModePointSize"),               # exact
+            ("VkPhysicalDeviceVulkan14Properties", "maxCombinedImageSamplerDescriptorCount"),  # exact
+            ("VkPhysicalDeviceVulkan14Properties", "pCopySrcLayouts"),                    # noauto
+            ("VkPhysicalDeviceVulkan14Properties", "optimalTilingLayoutUUID"),            # noauto
+        ):
+            self.assertNotIn(member_name, properties.get(struct_name, {}), f"{struct_name}::{member_name}")
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

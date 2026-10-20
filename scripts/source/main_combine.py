@@ -87,10 +87,13 @@ def main_combine(args):
         json_files_dict = load_profiles_jsons(Path(input_dir))
 
         generator = VulkanProfilesCombineGenerator(vk)
-        all_jsons = list(json_files_dict.values())
+        # combine_capabilities() pairs jsons[i] with profile_names[i]: list each file once per profile it defines.
+        all_jsons = []
         all_profile_names = []
-        for file_data in all_jsons:
-            all_profile_names.extend(list(file_data.get("profiles", {}).keys()))
+        for file_data in json_files_dict.values():
+            for profile_name in file_data.get("profiles", {}).keys():
+                all_jsons.append(file_data)
+                all_profile_names.append(profile_name)
 
         common_caps = generator.combine_capabilities(all_jsons, all_profile_names, (1, 0))
 

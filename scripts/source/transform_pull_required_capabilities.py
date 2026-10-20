@@ -60,6 +60,16 @@ def find_profile_in_files_dict(json_files_dict: dict, profile_name: str) -> tupl
     return None, None
 
 
+def is_member_default_applicable(member) -> bool:
+    """
+    Returns False for members that cannot receive a default value: 'exact' members must match
+    a device specific value (e.g. deviceUUID, driverID, pointClippingBehavior) and 'noauto'
+    members are too complex for a simple resolution and are not handled yet.
+    """
+    tokens = [t.strip() for t in (getattr(member, 'limitType', None) or '').split(',')]
+    return 'exact' not in tokens and 'noauto' not in tokens
+
+
 def populate_missing_structure_defaults(
     vk: VulkanObject,
     features_dict: dict[str, dict[str, bool]],
@@ -83,7 +93,7 @@ def populate_missing_structure_defaults(
         for m in getattr(struct_obj, 'members', []):
             if m.name in ('sType', 'pNext'):
                 continue
-            if m.name not in members:
+            if m.name not in members and is_member_default_applicable(m):
                 members[m.name] = get_member_unsupported_default(vk, struct_name, m.name)
 
     # 2. Populate missing property structure members
@@ -97,13 +107,13 @@ def populate_missing_structure_defaults(
             limits_obj = vk.structs.get("VkPhysicalDeviceLimits") or getStructByName(vk.structs, "VkPhysicalDeviceLimits")
             if limits_obj:
                 for m in getattr(limits_obj, 'members', []):
-                    if m.name not in ('sType', 'pNext') and m.name not in limits:
+                    if m.name not in ('sType', 'pNext') and m.name not in limits and is_member_default_applicable(m):
                         limits[m.name] = get_member_unsupported_default(vk, "VkPhysicalDeviceLimits", m.name)
 
             sparse_obj = vk.structs.get("VkPhysicalDeviceSparseProperties") or getStructByName(vk.structs, "VkPhysicalDeviceSparseProperties")
             if sparse_obj:
                 for m in getattr(sparse_obj, 'members', []):
-                    if m.name not in ('sType', 'pNext') and m.name not in sparse:
+                    if m.name not in ('sType', 'pNext') and m.name not in sparse and is_member_default_applicable(m):
                         sparse[m.name] = get_member_unsupported_default(vk, "VkPhysicalDeviceSparseProperties", m.name)
         else:
             struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
@@ -112,10 +122,7 @@ def populate_missing_structure_defaults(
             for m in getattr(struct_obj, 'members', []):
                 if m.name in ('sType', 'pNext'):
                     continue
-                if m.name not in prop_data:
-                    # TODO: get_member_unsupported_default() returns 0 for enum members (e.g.
-                    # VkPhysicalDeviceVulkan11Properties::pointClippingBehavior), which writes an
-                    # invalid value that fails schema validation. Skip or special-case enum members.
+                if m.name not in prop_data and is_member_default_applicable(m):
                     prop_data[m.name] = get_member_unsupported_default(vk, struct_name, m.name)
 
 
@@ -479,6 +486,14 @@ def pull_required_capabilities_single_profile(
 
     else:
         primary_block = get_primary_capability_block(profile_obj, capabilities_dict)
+        created_block_name = None
+        if primary_block is None:
+            # The profile defines no capability block yet (e.g. a profile only declaring an
+            # api-version): create one to receive the core version requirements.
+            created_block_name = f"{profile_name}_requirements"
+            primary_block = capabilities_dict.setdefault(created_block_name, {})
+            if created_block_name not in collect_block_names(profile_caps_list):
+                profile_caps_list.insert(0, created_block_name)
         if primary_block is not None:
             profile_caps = collect_profile_capabilities(json_files_dict, json_file_data, profile_obj)
             profile_enabled_exts = set(profile_caps.get("extensions", {}).keys())
@@ -543,6 +558,11 @@ def pull_required_capabilities_single_profile(
                     primary_block["features"] = p_feat
                 if p_prop:
                     primary_block["properties"] = p_prop
+
+        if created_block_name is not None and not primary_block:
+            # Nothing was pulled: do not leave an empty block behind.
+            del capabilities_dict[created_block_name]
+            profile_caps_list.remove(created_block_name)
 
     block_names = collect_block_names(profile_obj.get("capabilities", []))
     for block_name in block_names:
