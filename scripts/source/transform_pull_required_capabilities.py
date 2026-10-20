@@ -537,8 +537,6 @@ def pull_required_capabilities_single_profile(
                 vk, api_version, core_satisfied_features, core_satisfied_properties
             )
 
-            populate_missing_structure_defaults(vk, core_satisfied_features, core_satisfied_properties, ignore_unsupported)
-
             if core_satisfied_features:
                 block_features = primary_block.setdefault("features", {})
                 deep_merge_dict(block_features, core_satisfied_features)
