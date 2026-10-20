@@ -873,14 +873,13 @@ TEST(mocked_api_generated_library, check_support_variants_format_reflection) {
 
     result = vpGetProfileFormatStructureTypes(mock.functions, &profile, nullptr, &structureTypeCount, nullptr);
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(structureTypeCount, 2);
+    EXPECT_EQ(structureTypeCount, 1);
 
     std::vector<VkStructureType> structureTypes(structureTypeCount);
     result = vpGetProfileFormatStructureTypes(mock.functions, &profile, nullptr, &structureTypeCount, &structureTypes[0]);
     EXPECT_EQ(result, VK_SUCCESS);
-    EXPECT_EQ(structureTypeCount, 2);
+    EXPECT_EQ(structureTypeCount, 1);
     EXPECT_EQ(structureTypes[0], VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2);
-    EXPECT_EQ(structureTypes[1], VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3);
 }
 
 TEST(mocked_api_generated_library, check_support_variants_success_2variants) {

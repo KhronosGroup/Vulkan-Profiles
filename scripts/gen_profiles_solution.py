@@ -4777,17 +4777,11 @@ class VulkanProfileStructs():
             for formatProps in value.formats.values():
                 formatStructs.update(formatProps)
             for name in formatStructs:
-                if name in [ 'VkFormatProperties', 'VkFormatProperties2KHR', 'VkFormatProperties3KHR' ]:
-                    # Special case, add all as VkFormatProperties2[KHR] and VkFormatProperties3KHR
-                    if 'VkFormatProperties2KHR' in registry.structs:
-                        if registry.structs['VkFormatProperties2KHR'] not in self.format:
-                            self.format.append(registry.structs['VkFormatProperties2KHR'])
-                    else:
-                        if registry.structs['VkFormatProperties2'] not in self.format:
-                            self.format.append(registry.structs['VkFormatProperties2'])
-                    if 'VkFormatProperties3KHR' in registry.structs:
-                        if registry.structs['VkFormatProperties3KHR'] not in self.format:
-                            self.format.append(registry.structs['VkFormatProperties3KHR'])
+                if name in [ 'VkFormatProperties', 'VkFormatProperties2', 'VkFormatProperties2KHR' ]:
+                    # Special case, VkFormatProperties data is stored in the VkFormatProperties2[KHR] base structure
+                    baseStructDef = registry.structs['VkFormatProperties2KHR'] if 'VkFormatProperties2KHR' in registry.structs else registry.structs['VkFormatProperties2']
+                    if baseStructDef not in self.format:
+                        self.format.insert(0, baseStructDef)
                 else:
                     if registry.getChainableStructDef(name, 'VkFormatProperties2') not in self.format:
                         self.format.append(registry.getChainableStructDef(name, 'VkFormatProperties2'))
@@ -4835,7 +4829,7 @@ class VulkanProfileStructs():
         for structDef in structs:
             if structDef.name in structNames:
                 duplicates.append(structDef)
-            structNames.append(structDef.aliases)
+            structNames.extend(structDef.aliases)
         # Remove duplicates
         for duplicate in duplicates:
             structs.remove(duplicate)
@@ -5278,9 +5272,10 @@ class VulkanProfile():
                 if innerCap:
                     paramList.append((self.registry.structs['VkFormatProperties'], '->formatProperties.', innerCap))
 
-            # Fill all other structures directly
-            if structDef.name in caps:
-                paramList.append((structDef, '->', caps[structDef.name]))
+            # Fill all other structures directly, including data defined using an alias name
+            for alias in structDef.aliases:
+                if alias in caps:
+                    paramList.append((structDef, '->', caps[alias]))
 
             # Use variable names in the debug version of the library that can be later prettified
             if debugMessages:
