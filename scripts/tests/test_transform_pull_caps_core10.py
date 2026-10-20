@@ -239,6 +239,64 @@ class TestConvertPullRequiredCapabilitiesCore10(unittest.TestCase):
         sort_profiles_files(self.vk, json_files_dict)
         self.assertProfileDataEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
+    def test_pull_required_capabilities_preserves_existing_min_limits(self):
+        """
+        Verifies that pulling the Vulkan 1.0 core requirements into a profile already listing
+        'min' limit type members keeps their values instead of replacing them with the
+        unsupported default value (0), while unlisted members still get their defaults.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-68.json#",
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "properties": {
+                        "VkPhysicalDeviceProperties": {
+                            "limits": {
+                                "maxImageDimension1D": 4096,
+                                "bufferImageGranularity": 131072,
+                                "minMemoryMapAlignment": 64,
+                                "minTexelBufferOffsetAlignment": 256,
+                                "minUniformBufferOffsetAlignment": 256,
+                                "minStorageBufferOffsetAlignment": 256,
+                                "pointSizeGranularity": 1.0,
+                                "lineWidthGranularity": 1.0,
+                                "nonCoherentAtomSize": 256
+                            }
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(self.vk, [PullBits.REQUIRED_CAPABILITIES], json_files_dict)
+
+        limits = json_files_dict["test_profile.json"]["capabilities"]["baseline"]["properties"]["VkPhysicalDeviceProperties"]["limits"]
+
+        # 1. Existing 'min' limit type members MUST keep their values
+        self.assertEqual(limits["bufferImageGranularity"], 131072)
+        self.assertEqual(limits["minMemoryMapAlignment"], 64)
+        self.assertEqual(limits["minTexelBufferOffsetAlignment"], 256)
+        self.assertEqual(limits["minUniformBufferOffsetAlignment"], 256)
+        self.assertEqual(limits["minStorageBufferOffsetAlignment"], 256)
+        self.assertEqual(limits["pointSizeGranularity"], 1.0)
+        self.assertEqual(limits["lineWidthGranularity"], 1.0)
+        self.assertEqual(limits["nonCoherentAtomSize"], 256)
+
+        # 2. Existing 'max' limit type member MUST keep its value
+        self.assertEqual(limits["maxImageDimension1D"], 4096)
+
+        # 3. Unlisted required member MUST be pulled
+        self.assertIn("maxImageDimension2D", limits)
+        self.assertEqual(limits["maxImageDimension2D"], 4096)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
