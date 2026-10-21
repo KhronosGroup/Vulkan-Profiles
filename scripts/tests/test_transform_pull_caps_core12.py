@@ -131,13 +131,6 @@ class TestConvertPullRequiredCapabilitiesCore12(unittest.TestCase):
 
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_profile_v10": {
-                    "version": 1,
-                    "api-version": "1.0.68",
-                    "capabilities": ["baseline"]
-                }
-            },
             "capabilities": {
                 "baseline": {
                     "features": {
@@ -227,6 +220,13 @@ class TestConvertPullRequiredCapabilitiesCore12(unittest.TestCase):
                         }
                     }
                 }
+            },
+            "profiles": {
+                "VP_TEST_profile_v10": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["baseline"]
+                }
             }
         }"""
 
@@ -256,13 +256,6 @@ class TestConvertPullRequiredCapabilitiesCore12(unittest.TestCase):
 
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_profile_v11": {
-                    "version": 1,
-                    "api-version": "1.1.108",
-                    "capabilities": ["baseline"]
-                }
-            },
             "capabilities": {
                 "baseline": {
                     "features": {
@@ -369,6 +362,13 @@ class TestConvertPullRequiredCapabilitiesCore12(unittest.TestCase):
                         }
                     }
                 }
+            },
+            "profiles": {
+                "VP_TEST_profile_v11": {
+                    "version": 1,
+                    "api-version": "1.1.108",
+                    "capabilities": ["baseline"]
+                }
             }
         }"""
 
@@ -398,13 +398,6 @@ class TestConvertPullRequiredCapabilitiesCore12(unittest.TestCase):
 
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-131.json#",
-            "profiles": {
-                "VP_TEST_profile_v12": {
-                    "version": 1,
-                    "api-version": "1.2.131",
-                    "capabilities": ["baseline"]
-                }
-            },
             "capabilities": {
                 "baseline": {
                     "features": {
@@ -546,6 +539,13 @@ class TestConvertPullRequiredCapabilitiesCore12(unittest.TestCase):
                             "framebufferIntegerColorSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"]
                         }
                     }
+                }
+            },
+            "profiles": {
+                "VP_TEST_profile_v12": {
+                    "version": 1,
+                    "api-version": "1.2.131",
+                    "capabilities": ["baseline"]
                 }
             }
         }"""

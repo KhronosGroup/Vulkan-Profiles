@@ -104,13 +104,6 @@ class TestConvertPullRequiredCapabilitiesCore13(unittest.TestCase):
 
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
-            "profiles": {
-                "VP_TEST_profile_v13": {
-                    "version": 1,
-                    "api-version": "1.3.204",
-                    "capabilities": ["baseline"]
-                }
-            },
             "capabilities": {
                 "baseline": {
                     "features": {
@@ -309,6 +302,13 @@ class TestConvertPullRequiredCapabilitiesCore13(unittest.TestCase):
                             "maxBufferSize": 1073741824
                         }
                     }
+                }
+            },
+            "profiles": {
+                "VP_TEST_profile_v13": {
+                    "version": 1,
+                    "api-version": "1.3.204",
+                    "capabilities": ["baseline"]
                 }
             }
         }"""
