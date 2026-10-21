@@ -40,6 +40,10 @@ from source.profiles_json_utils import (
     strip_dict_duplication,
     deep_merge_dict
 )
+from source.format_flag_converter import FormatFeatureFlagConverter
+
+FORMAT_PROPERTIES_32_STRUCTS = ["VkFormatProperties", "VkFormatProperties2", "VkFormatProperties2KHR"]
+FORMAT_PROPERTIES_64_STRUCTS = ["VkFormatProperties3", "VkFormatProperties3KHR"]
 
 
 def strip_intra_block_feature_duplication(vk: VulkanObject, version: VK_VERSION, json_block: dict, context_features: dict):
@@ -126,6 +130,57 @@ def strip_intra_block_property_duplication(vk: VulkanObject, version: VK_VERSION
         del json_block["properties"]
 
 
+def merge_format_properties_members(target_members: dict, source_members: dict):
+    for member_name, value in source_members.items():
+        if isinstance(value, list):
+            target_flags = target_members.setdefault(member_name, [])
+            for flag in value:
+                if flag not in target_flags:
+                    target_flags.append(flag)
+        elif member_name not in target_members:
+            target_members[member_name] = value
+
+
+def strip_format_properties_aliases(vk: VulkanObject, structs_dict: dict):
+    """
+    VkFormatProperties, VkFormatProperties2[KHR] and VkFormatProperties3[KHR] express the same
+    format capabilities. When VkFormatProperties3[KHR] is present, the 32-bit format features are
+    converted and merged into it and the other structures are removed. Otherwise
+    VkFormatProperties2[KHR] are merged into VkFormatProperties.
+    VkFormatProperties4KHR only expresses additional format features so it is left untouched.
+    """
+    present_32 = [s for s in FORMAT_PROPERTIES_32_STRUCTS if s in structs_dict]
+    present_64 = [s for s in FORMAT_PROPERTIES_64_STRUCTS if s in structs_dict]
+
+    if present_64:
+        target_name = "VkFormatProperties3" if "VkFormatProperties3" in present_64 else present_64[0]
+    elif len(present_32) > 1:
+        target_name = "VkFormatProperties"
+    else:
+        return
+
+    if not hasattr(vk, '_format_flag_converter'):
+        vk._format_flag_converter = FormatFeatureFlagConverter(vk)
+    converter = vk._format_flag_converter
+
+    target_members = structs_dict.setdefault(target_name, {})
+    for struct_name in present_64 + present_32:
+        if struct_name == target_name:
+            continue
+
+        source_members = structs_dict.pop(struct_name)
+        if struct_name in ("VkFormatProperties2", "VkFormatProperties2KHR"):
+            source_members = source_members.get("formatProperties", {})
+
+        if present_64 and struct_name in FORMAT_PROPERTIES_32_STRUCTS:
+            source_members = {
+                member_name: converter.to_flag64_list(value) if isinstance(value, list) else value
+                for member_name, value in source_members.items()
+            }
+
+        merge_format_properties_members(target_members, source_members)
+
+
 def strip_intra_block_format_duplication(vk: VulkanObject, version: VK_VERSION, json_block: dict, context_formats: dict):
     if "formats" not in json_block or not isinstance(json_block["formats"], dict):
         return
@@ -135,6 +190,8 @@ def strip_intra_block_format_duplication(vk: VulkanObject, version: VK_VERSION, 
     for fmt_name, structs_dict in list(block_formats.items()):
         if not isinstance(structs_dict, dict):
             continue
+
+        strip_format_properties_aliases(vk, structs_dict)
 
         ctx_structs = context_formats.get(fmt_name, {}) if isinstance(context_formats, dict) else {}
         all_structs = {}
