@@ -236,6 +236,213 @@ class TestConvertPullRequiredCapabilitiesCoreInheriance(unittest.TestCase):
         self.assertIn("VkPhysicalDeviceVulkan12Properties", trans_v12.get("properties", {}))
 
 
+    def test_pull_required_capabilities_inheritance_populates_profile_block_defaults(self):
+        """
+        Verifies that a profile with a required profile gets the defaults of the structures defined
+        by its own capability blocks, as when the same structures are pulled into a transition block.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-108.json#",
+            "profiles": {
+                "VP_TEST_base_profile": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["baseline"]
+                },
+                "VP_TEST_derived_profile": {
+                    "version": 1,
+                    "api-version": "1.1.108",
+                    "profiles": ["VP_TEST_base_profile"],
+                    "capabilities": ["derived"]
+                }
+            },
+            "capabilities": {
+                "baseline": {},
+                "derived": {
+                    "features": {
+                        "VkPhysicalDeviceMultiviewFeatures": {
+                            "multiview": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(self.vk, [PullBits.REQUIRED_CAPABILITIES], json_files_dict)
+
+        derived_features = json_files_dict["test_profile.json"]["capabilities"]["derived"]["features"]
+        multiview_features = derived_features["VkPhysicalDeviceMultiviewFeatures"]
+
+        # 1. The profile defined value MUST be kept
+        self.assertTrue(multiview_features["multiview"])
+
+        # 2. The unlisted members of the profile defined structure MUST get their default value
+        self.assertIn("multiviewGeometryShader", multiview_features)
+        self.assertFalse(multiview_features["multiviewGeometryShader"])
+        self.assertIn("multiviewTessellationShader", multiview_features)
+        self.assertFalse(multiview_features["multiviewTessellationShader"])
+
+    def test_pull_required_capabilities_inheritance_skips_defaults_defined_by_aliases(self):
+        """
+        Verifies that pulling Vulkan 1.4 requirements into a VkPhysicalDeviceVulkan11Features structure
+        does not populate the multiview default value when the required profile already defines it
+        through VkPhysicalDeviceMultiviewFeatures::multiview.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-304.json#",
+            "profiles": {
+                "VP_TEST_base_profile": {
+                    "version": 1,
+                    "api-version": "1.1.108",
+                    "capabilities": ["baseline"]
+                },
+                "VP_TEST_derived_profile": {
+                    "version": 1,
+                    "api-version": "1.4.304",
+                    "profiles": ["VP_TEST_base_profile"],
+                    "capabilities": ["derived"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "features": {
+                        "VkPhysicalDeviceMultiviewFeatures": {
+                            "multiview": true
+                        }
+                    }
+                },
+                "derived": {}
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(self.vk, [PullBits.REQUIRED_CAPABILITIES], json_files_dict)
+
+        capabilities = json_files_dict["test_profile.json"]["capabilities"]
+        transition_features = capabilities["VP_TEST_base_profile_to_vulkan14"]["features"]
+        vulkan11_features = transition_features["VkPhysicalDeviceVulkan11Features"]
+
+        # 1. Vulkan 1.4 required VkPhysicalDeviceVulkan11Features members MUST be pulled
+        self.assertTrue(vulkan11_features["storageBuffer16BitAccess"])
+        self.assertTrue(vulkan11_features["variablePointers"])
+
+        # 2. Unlisted members without alias in the required profile MUST get their default value
+        self.assertIn("protectedMemory", vulkan11_features)
+        self.assertFalse(vulkan11_features["protectedMemory"])
+
+        # 3. Members defined by the required profile through an alias MUST NOT get a default value
+        self.assertNotIn("multiview", vulkan11_features)
+        self.assertTrue(capabilities["baseline"]["features"]["VkPhysicalDeviceMultiviewFeatures"]["multiview"])
+
+    def test_pull_required_capabilities_inheritance_required_profile_does_not_override_requirements(self):
+        """
+        Verifies that the capabilities of a required profile targeting a lower Vulkan version don't
+        prevent pulling the requirements of the profile Vulkan version: a Vulkan 1.2 required profile
+        with bufferDeviceAddress = false and maxImageDimension1D = 4096 doesn't override the Vulkan 1.3
+        bufferDeviceAddress and the Vulkan 1.4 maxImageDimension1D requirements, while requirements
+        already satisfied by the required profile are not duplicated.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-304.json#",
+            "profiles": {
+                "VP_TEST_base_profile": {
+                    "version": 1,
+                    "api-version": "1.2.131",
+                    "capabilities": ["baseline"]
+                },
+                "VP_TEST_derived_profile": {
+                    "version": 1,
+                    "api-version": "1.4.304",
+                    "profiles": ["VP_TEST_base_profile"],
+                    "capabilities": ["derived"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "features": {
+                        "VkPhysicalDeviceVulkan12Features": {
+                            "bufferDeviceAddress": false,
+                            "timelineSemaphore": true
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceProperties": {
+                            "limits": {
+                                "maxImageDimension1D": 4096,
+                                "maxImageDimension2D": 16384
+                            }
+                        }
+                    }
+                },
+                "derived": {}
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(self.vk, [PullBits.REQUIRED_CAPABILITIES], json_files_dict)
+
+        capabilities = json_files_dict["test_profile.json"]["capabilities"]
+        transition_block = capabilities["VP_TEST_base_profile_to_vulkan14"]
+        vulkan12_features = transition_block["features"]["VkPhysicalDeviceVulkan12Features"]
+        limits = transition_block["properties"]["VkPhysicalDeviceProperties"]["limits"]
+
+        # 1. Requirements not satisfied by the required profile MUST be pulled
+        self.assertTrue(vulkan12_features["bufferDeviceAddress"])
+        self.assertEqual(limits["maxImageDimension1D"], 8192)
+
+        # 2. Requirements already satisfied by the required profile MUST NOT be duplicated
+        self.assertNotIn("timelineSemaphore", vulkan12_features)
+        self.assertNotIn("maxImageDimension2D", limits)
+
+        # 3. The required profile capabilities MUST be kept
+        self.assertFalse(capabilities["baseline"]["features"]["VkPhysicalDeviceVulkan12Features"]["bufferDeviceAddress"])
+
+    def test_pull_required_capabilities_inheritance_profile_values_override_requirements(self):
+        """
+        Verifies that, without PullBits.IGNORE_SUBCORE, the capabilities defined by the profile itself
+        still take precedence over the requirements of its Vulkan version.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_TEST_base_profile": {
+                    "version": 1,
+                    "api-version": "1.2.131",
+                    "capabilities": ["baseline"]
+                },
+                "VP_TEST_derived_profile": {
+                    "version": 1,
+                    "api-version": "1.3.204",
+                    "profiles": ["VP_TEST_base_profile"],
+                    "capabilities": ["derived"]
+                }
+            },
+            "capabilities": {
+                "baseline": {},
+                "derived": {
+                    "features": {
+                        "VkPhysicalDeviceVulkan12Features": {
+                            "bufferDeviceAddress": false
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(self.vk, [PullBits.REQUIRED_CAPABILITIES], json_files_dict)
+
+        capabilities = json_files_dict["test_profile.json"]["capabilities"]
+        transition_features = capabilities["VP_TEST_base_profile_to_vulkan13"]["features"]
+
+        # 1. The profile defined value MUST NOT be overridden by the pulled requirement
+        self.assertFalse(capabilities["derived"]["features"]["VkPhysicalDeviceVulkan12Features"]["bufferDeviceAddress"])
+        self.assertNotIn("bufferDeviceAddress", transition_features.get("VkPhysicalDeviceVulkan12Features", {}))
+
+        # 2. Other requirements MUST be pulled
+        self.assertTrue(transition_features["VkPhysicalDeviceVulkan12Features"]["vulkanMemoryModel"])
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(

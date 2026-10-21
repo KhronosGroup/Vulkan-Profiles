@@ -66,7 +66,7 @@ def transform_profiles_files(
         pull_aliases_profiles_files(vk, pull_modes, json_files_dict)
 
     if consolidate:
-        consolidate_profiles_files(vk, json_files_dict)
+        consolidate_profiles_files(json_files_dict)
 
     if StripBits.HELPER_VALUES in strip_modes:
         strip_helper_values_profiles_files(vk, json_files_dict)

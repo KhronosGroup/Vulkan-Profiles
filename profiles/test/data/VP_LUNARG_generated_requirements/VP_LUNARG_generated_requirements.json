@@ -11,25 +11,37 @@
             "version": 2,
             "api-version": "1.1.70",
             "label": "Vulkan 1.1 Minimum Requirements",
-            "description": "Vulkan 1.1 Minimum Requirements."
+            "description": "Vulkan 1.1 Minimum Requirements.",
+            "profiles": [
+                "VP_LUNARG_gen_min_requirements_1_0"
+            ]
         },
         "VP_LUNARG_gen_min_requirements_1_2": {
             "version": 2,
             "api-version": "1.2.131",
             "label": "Vulkan 1.2 Minimum Requirements",
-            "description": "Vulkan 1.2 Minimum Requirements."
+            "description": "Vulkan 1.2 Minimum Requirements.",
+            "profiles": [
+                "VP_LUNARG_gen_min_requirements_1_1"
+            ]
         },
         "VP_LUNARG_gen_min_requirements_1_3": {
             "version": 2,
             "api-version": "1.3.204",
             "label": "Vulkan 1.3 Minimum Requirements",
-            "description": "Vulkan 1.3 Minimum Requirements."
+            "description": "Vulkan 1.3 Minimum Requirements.",
+            "profiles": [
+                "VP_LUNARG_gen_min_requirements_1_2"
+            ]
         },
         "VP_LUNARG_gen_min_requirements_1_4": {
             "version": 2,
             "api-version": "1.4.304",
             "label": "Vulkan 1.4 Minimum Requirements",
-            "description": "Vulkan 1.4 Minimum Requirements."
+            "description": "Vulkan 1.4 Minimum Requirements.",
+            "profiles": [
+                "VP_LUNARG_gen_min_requirements_1_3"
+            ]
         }
     },
     "contributors": {

@@ -42,6 +42,19 @@ from source.profiles_json_utils import (
 )
 
 
+def check_single_profile_files(jsons_dict: dict):
+    """Combining compares profiles files, so each input profiles file must define a single profile."""
+    multiple_profiles_files = [
+        (file_path, list(json_data.get("profiles", {}).keys()))
+        for file_path, json_data in jsons_dict.items()
+        if len(json_data.get("profiles", {})) > 1
+    ]
+    for file_path, profile_names in multiple_profiles_files:
+        logging.error(f"Combining requires profiles files with a single profile, '{file_path}' defines {len(profile_names)} profiles: {', '.join(profile_names)}. Use 'extract' to generate a profiles file per profile.")
+    if multiple_profiles_files:
+        sys.exit(1)
+
+
 class CombineConfig:
     def __init__(self, input_dir=None, input_profile_names=None, api_version=None, merge_mode='intersection'):
         self.name = "VP_merged"
@@ -68,6 +81,7 @@ class CombineConfig:
 
     def load_inputs(self, input_dir, input_profile_names=None):
         jsons_dict = load_profiles_jsons(Path(input_dir))
+        check_single_profile_files(jsons_dict)
         target_names = [p.strip() for p in input_profile_names if p.strip()] if input_profile_names else []
 
         for file_path, json_data in jsons_dict.items():

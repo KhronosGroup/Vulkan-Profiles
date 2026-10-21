@@ -346,6 +346,59 @@ class TestCombineDifference(unittest.TestCase):
             self.assertIn("depthClamp", feats_var3_b)
 
 
+    def test_combine_difference_multiple_profiles_file(self):
+        """Tests CombineMode.DIFFERENCE exits when an input profiles file defines multiple profiles."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            input_dir = temp_path / "input"
+            input_dir.mkdir()
+
+            self.create_test_profiles(input_dir)
+
+            multiple_profiles = {
+                "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
+                "capabilities": {
+                    "cap_c": {
+                        "features": {
+                            "VkPhysicalDeviceFeatures": {
+                                "robustBufferAccess": True
+                            }
+                        }
+                    }
+                },
+                "profiles": {
+                    "VP_TEST_C": {
+                        "version": 1,
+                        "api-version": "1.0.0",
+                        "label": "Test Profile C",
+                        "description": "Test profile C",
+                        "capabilities": ["cap_c"]
+                    },
+                    "VP_TEST_D": {
+                        "version": 1,
+                        "api-version": "1.0.0",
+                        "label": "Test Profile D",
+                        "description": "Test profile D",
+                        "capabilities": ["cap_c"]
+                    }
+                }
+            }
+            with open(input_dir / "VP_TEST_C.json", "w", encoding="utf-8") as f:
+                json.dump(multiple_profiles, f, indent=4)
+
+            args = argparse.Namespace(
+                registry=REGISTRY_PATH,
+                input=str(input_dir),
+                output=str(temp_path / "output_diff"),
+                mode=CombineMode.DIFFERENCE,
+                api="vulkan",
+                format="pretty",
+                transform=None,
+                validate=None
+            )
+            with self.assertRaises(SystemExit):
+                main_combine(args)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--registry", "-r", action="store", help="Path to vk.xml")
