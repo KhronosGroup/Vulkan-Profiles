@@ -409,14 +409,14 @@
     "profiles": {
         "VP_LUNARG_minimum_requirements_1_0": {
             "version": 2,
-            "api-version": "1.0.68",
+            "api-version": "1.0.3",
             "label": "Vulkan 1.0 Minimum Requirements",
             "description": "Vulkan 1.0 Minimum Requirements.",
             "capabilities": [ "vulkan10requirements" ]
         },
         "VP_LUNARG_minimum_requirements_1_1": {
             "version": 2,
-            "api-version": "1.1.108",
+            "api-version": "1.1.70",
             "label": "Vulkan 1.1 Minimum Requirements",
             "description": "Vulkan 1.1 Minimum Requirements.",
             "capabilities": [ "vulkan10requirements", "vulkan11requirements_split" ]
