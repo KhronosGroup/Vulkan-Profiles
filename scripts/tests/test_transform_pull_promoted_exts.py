@@ -170,8 +170,8 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                     },
                     "properties": {
                         "VkPhysicalDeviceMultiviewPropertiesKHR": {
-                            "maxMultiviewInstanceIndex": 134217727,
-                            "maxMultiviewViewCount": 6
+                            "maxMultiviewViewCount": 6,
+                            "maxMultiviewInstanceIndex": 134217727
                         }
                     }
                 }
@@ -428,12 +428,12 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                     },
                     "properties": {
                         "VkPhysicalDeviceMaintenance3PropertiesKHR": {
-                            "maxMemoryAllocationSize": 1073741824,
-                            "maxPerSetDescriptors": 1024
+                            "maxPerSetDescriptors": 1024,
+                            "maxMemoryAllocationSize": 1073741824
                         },
                         "VkPhysicalDeviceMultiviewPropertiesKHR": {
-                            "maxMultiviewInstanceIndex": 134217727,
-                            "maxMultiviewViewCount": 6
+                            "maxMultiviewViewCount": 6,
+                            "maxMultiviewInstanceIndex": 134217727
                         }
                     }
                 }
@@ -545,12 +545,12 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                     },
                     "properties": {
                         "VkPhysicalDeviceMaintenance3PropertiesKHR": {
-                            "maxMemoryAllocationSize": 1073741824,
-                            "maxPerSetDescriptors": 1024
+                            "maxPerSetDescriptors": 1024,
+                            "maxMemoryAllocationSize": 1073741824
                         },
                         "VkPhysicalDeviceMultiviewPropertiesKHR": {
-                            "maxMultiviewInstanceIndex": 134217727,
-                            "maxMultiviewViewCount": 6
+                            "maxMultiviewViewCount": 6,
+                            "maxMultiviewInstanceIndex": 134217727
                         }
                     }
                 },
@@ -658,12 +658,12 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                     },
                     "properties": {
                         "VkPhysicalDeviceMaintenance3PropertiesKHR": {
-                            "maxMemoryAllocationSize": 1073741824,
-                            "maxPerSetDescriptors": 1024
+                            "maxPerSetDescriptors": 1024,
+                            "maxMemoryAllocationSize": 1073741824
                         },
                         "VkPhysicalDeviceMultiviewPropertiesKHR": {
-                            "maxMultiviewInstanceIndex": 134217727,
-                            "maxMultiviewViewCount": 6
+                            "maxMultiviewViewCount": 6,
+                            "maxMultiviewInstanceIndex": 134217727
                         }
                     }
                 },
@@ -774,12 +774,12 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                     },
                     "properties": {
                         "VkPhysicalDeviceMaintenance3PropertiesKHR": {
-                            "maxMemoryAllocationSize": 1073741824,
-                            "maxPerSetDescriptors": 1024
+                            "maxPerSetDescriptors": 1024,
+                            "maxMemoryAllocationSize": 1073741824
                         },
                         "VkPhysicalDeviceMultiviewPropertiesKHR": {
-                            "maxMultiviewInstanceIndex": 134217727,
-                            "maxMultiviewViewCount": 6
+                            "maxMultiviewViewCount": 6,
+                            "maxMultiviewInstanceIndex": 134217727
                         }
                     }
                 }
@@ -879,12 +879,12 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                     },
                     "properties": {
                         "VkPhysicalDeviceMaintenance3PropertiesKHR": {
-                            "maxMemoryAllocationSize": 1073741824,
-                            "maxPerSetDescriptors": 1024
+                            "maxPerSetDescriptors": 1024,
+                            "maxMemoryAllocationSize": 1073741824
                         },
                         "VkPhysicalDeviceMultiviewPropertiesKHR": {
-                            "maxMultiviewInstanceIndex": 134217727,
-                            "maxMultiviewViewCount": 6
+                            "maxMultiviewViewCount": 6,
+                            "maxMultiviewInstanceIndex": 134217727
                         }
                     }
                 },
@@ -996,12 +996,12 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                     },
                     "properties": {
                         "VkPhysicalDeviceMaintenance3PropertiesKHR": {
-                            "maxMemoryAllocationSize": 1073741824,
-                            "maxPerSetDescriptors": 1024
+                            "maxPerSetDescriptors": 1024,
+                            "maxMemoryAllocationSize": 1073741824
                         },
                         "VkPhysicalDeviceMultiviewPropertiesKHR": {
-                            "maxMultiviewInstanceIndex": 134217727,
-                            "maxMultiviewViewCount": 6
+                            "maxMultiviewViewCount": 6,
+                            "maxMultiviewInstanceIndex": 134217727
                         }
                     }
                 },

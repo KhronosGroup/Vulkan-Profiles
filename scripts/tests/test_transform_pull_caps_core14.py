@@ -233,6 +233,7 @@ class TestConvertPullRequiredCapabilitiesCore14(unittest.TestCase):
                                 "maxSamplerLodBias": 14.0,
                                 "maxViewportDimensions": [7680, 7680],
                                 "viewportBoundsRange": [-15360.0, 15359.0],
+                                "viewportSubPixelBits": 0,
                                 "minMemoryMapAlignment": 64,
                                 "minTexelBufferOffsetAlignment": 256,
                                 "minUniformBufferOffsetAlignment": 256,
@@ -252,14 +253,13 @@ class TestConvertPullRequiredCapabilitiesCore14(unittest.TestCase):
                                 "sampledImageDepthSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "sampledImageStencilSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "maxSampleMaskWords": 1,
-                                "discreteQueuePriorities": 2,
-                                "nonCoherentAtomSize": 256,
-                                "viewportSubPixelBits": 0,
                                 "timestampComputeAndGraphics": true,
+                                "discreteQueuePriorities": 2,
                                 "pointSizeRange": [1.0, 255.875],
                                 "pointSizeGranularity": 0.125,
                                 "lineWidthGranularity": 0.5,
-                                "standardSampleLocations": true
+                                "standardSampleLocations": true,
+                                "nonCoherentAtomSize": 256
                             },
                             "sparseProperties": {
                                 "residencyStandard2DBlockShape": false,

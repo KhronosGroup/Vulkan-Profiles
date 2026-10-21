@@ -191,6 +191,7 @@ class TestConvertPullRequiredCapabilitiesCore11(unittest.TestCase):
                                 "maxSamplerLodBias": 2.0,
                                 "maxViewportDimensions": [4096, 4096],
                                 "viewportBoundsRange": [-8192.0, 8191.0],
+                                "viewportSubPixelBits": 0,
                                 "minMemoryMapAlignment": 64,
                                 "minTexelBufferOffsetAlignment": 256,
                                 "minUniformBufferOffsetAlignment": 256,
@@ -211,8 +212,7 @@ class TestConvertPullRequiredCapabilitiesCore11(unittest.TestCase):
                                 "sampledImageStencilSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "maxSampleMaskWords": 1,
                                 "discreteQueuePriorities": 2,
-                                "nonCoherentAtomSize": 256,
-                                "viewportSubPixelBits": 0
+                                "nonCoherentAtomSize": 256
                             },
                             "sparseProperties": {
                                 "residencyStandard2DBlockShape": false,
@@ -223,18 +223,18 @@ class TestConvertPullRequiredCapabilitiesCore11(unittest.TestCase):
                             }
                         },
                         "VkPhysicalDeviceMaintenance3Properties": {
-                            "maxMemoryAllocationSize": 1073741824,
-                            "maxPerSetDescriptors": 1024
+                            "maxPerSetDescriptors": 1024,
+                            "maxMemoryAllocationSize": 1073741824
                         },
                         "VkPhysicalDeviceMultiviewProperties": {
-                            "maxMultiviewInstanceIndex": 134217727,
-                            "maxMultiviewViewCount": 6
+                            "maxMultiviewViewCount": 6,
+                            "maxMultiviewInstanceIndex": 134217727
                         },
                         "VkPhysicalDeviceSubgroupProperties": {
-                            "quadOperationsInAllStages": false,
                             "subgroupSize": 1,
+                            "supportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT"],
                             "supportedOperations": ["VK_SUBGROUP_FEATURE_BASIC_BIT"],
-                            "supportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT"]
+                            "quadOperationsInAllStages": false
                         }
                     }
                 }
