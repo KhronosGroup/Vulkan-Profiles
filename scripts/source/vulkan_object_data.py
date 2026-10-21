@@ -139,7 +139,7 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxPerStageDescriptorSampledImages', '16', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxPerStageDescriptorStorageImages', '4', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxPerStageDescriptorInputAttachments', '4', None),
-        PropertyRequirement('VkPhysicalDeviceLimits', 'maxPerStageResources', '128', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'maxPerStageResources', '44', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxDescriptorSetSamplers', '96', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxDescriptorSetUniformBuffers', '72', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxDescriptorSetUniformBuffersDynamic', '8', None),

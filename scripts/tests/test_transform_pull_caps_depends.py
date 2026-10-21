@@ -240,7 +240,7 @@ class TestConvertPullCapsDepends(unittest.TestCase):
                                 "maxPerStageDescriptorSampledImages": 16,
                                 "maxPerStageDescriptorStorageImages": 4,
                                 "maxPerStageDescriptorInputAttachments": 4,
-                                "maxPerStageResources": 128,
+                                "maxPerStageResources": 44,
                                 "maxDescriptorSetSamplers": 96,
                                 "maxDescriptorSetUniformBuffers": 72,
                                 "maxDescriptorSetUniformBuffersDynamic": 8,
