@@ -414,6 +414,45 @@ class TestConvertSort(unittest.TestCase):
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
 
+    def test_sort_root_elements_order(self):
+        """
+        Verifies that sorting re-orders the root elements of a profiles file:
+        "$schema" first, followed by the remaining elements in alphabetical order.
+        """
+        original_json_text = """{
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.0.0",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "history": [
+                {
+                    "revision": 1,
+                    "date": "2026-10-22",
+                    "author": "Test author",
+                    "comment": "Initial revision"
+                }
+            ],
+            "capabilities": {
+                "baseline": {}
+            },
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
+            "contributors": {
+                "Test author": {
+                    "company": "Test company"
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        sort_profiles_files(self.vk, json_files_dict)
+
+        sorted_json = json_files_dict["test_profile.json"]
+        self.assertEqual(list(sorted_json.keys()), ["$schema", "capabilities", "contributors", "history", "profiles"])
+        self.assertEqual(sorted_json, json.loads(original_json_text))
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(

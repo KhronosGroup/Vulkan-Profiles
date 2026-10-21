@@ -152,13 +152,6 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
 
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_profile": {
-                    "version": 1,
-                    "api-version": "1.0.68",
-                    "capabilities": ["baseline"]
-                }
-            },
             "capabilities": {
                 "baseline": {
                     "extensions": {
@@ -181,6 +174,13 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                             "maxMultiviewViewCount": 6
                         }
                     }
+                }
+            },
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["baseline"]
                 }
             }
         }"""
@@ -232,13 +232,6 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
 
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_profile": {
-                    "version": 1,
-                    "api-version": "1.0.68",
-                    "capabilities": [ "block_a", "block_b" ]
-                }
-            },
             "capabilities": {
                 "block_a": {
                     "extensions": {
@@ -255,6 +248,13 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                             "variablePointersStorageBuffer": true
                         }
                     }
+                }
+            },
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": [ "block_a", "block_b" ]
                 }
             }
         }"""
@@ -312,19 +312,6 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
 
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_profile_a": {
-                    "version": 1,
-                    "api-version": "1.0.68",
-                    "capabilities": [ "block_a" ]
-                },
-                "VP_TEST_profile_b": {
-                    "version": 1,
-                    "api-version": "1.0.68",
-                    "capabilities": [ "block_b" ],
-                    "profiles": [ "VP_TEST_profile_a" ]
-                }
-            },
             "capabilities": {
                 "block_a": {
                     "extensions": {
@@ -341,6 +328,19 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                             "variablePointersStorageBuffer": true
                         }
                     }
+                }
+            },
+            "profiles": {
+                "VP_TEST_profile_a": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": [ "block_a" ]
+                },
+                "VP_TEST_profile_b": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": [ "block_b" ],
+                    "profiles": [ "VP_TEST_profile_a" ]
                 }
             }
         }"""
@@ -385,13 +385,6 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
 
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_profile": {
-                    "version": 1,
-                    "api-version": "1.1.106",
-                    "capabilities": ["baseline"]
-                }
-            },
             "capabilities": {
                 "baseline": {
                     "extensions": {
@@ -443,6 +436,13 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                             "maxMultiviewViewCount": 6
                         }
                     }
+                }
+            },
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.1.106",
+                    "capabilities": ["baseline"]
                 }
             }
         }"""
@@ -502,13 +502,6 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
 
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_profile": {
-                    "version": 1,
-                    "api-version": "1.1.106",
-                    "capabilities": [ "block_a", "block_b" ]
-                }
-            },
             "capabilities": {
                 "block_a": {
                     "extensions": {
@@ -565,6 +558,13 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                     "extensions": {
                         "VK_KHR_variable_pointers": 1
                     }
+                }
+            },
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.1.106",
+                    "capabilities": [ "block_a", "block_b" ]
                 }
             }
         }"""
@@ -615,19 +615,6 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
 
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_profile_a": {
-                    "version": 1,
-                    "api-version": "1.1.106",
-                    "capabilities": [ "block_a" ]
-                },
-                "VP_TEST_profile_b": {
-                    "version": 1,
-                    "api-version": "1.1.106",
-                    "capabilities": [ "block_b" ],
-                    "profiles": [ "VP_TEST_profile_a" ]
-                }
-            },
             "capabilities": {
                 "block_a": {
                     "extensions": {
@@ -685,6 +672,19 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                         "VK_KHR_variable_pointers": 1
                     }
                 }
+            },
+            "profiles": {
+                "VP_TEST_profile_a": {
+                    "version": 1,
+                    "api-version": "1.1.106",
+                    "capabilities": [ "block_a" ]
+                },
+                "VP_TEST_profile_b": {
+                    "version": 1,
+                    "api-version": "1.1.106",
+                    "capabilities": [ "block_b" ],
+                    "profiles": [ "VP_TEST_profile_a" ]
+                }
             }
         }"""
 
@@ -727,13 +727,6 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
 
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_profile": {
-                    "version": 1,
-                    "api-version": "1.1.106",
-                    "capabilities": ["baseline"]
-                }
-            },
             "capabilities": {
                 "baseline": {
                     "extensions": {
@@ -790,6 +783,13 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                         }
                     }
                 }
+            },
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.1.106",
+                    "capabilities": ["baseline"]
+                }
             }
         }"""
 
@@ -834,13 +834,6 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
 
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_profile": {
-                    "version": 1,
-                    "api-version": "1.1.106",
-                    "capabilities": [ "block_a", "block_b" ]
-                }
-            },
             "capabilities": {
                 "block_a": {
                     "extensions": {
@@ -900,6 +893,13 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                         "VK_KHR_image_format_list": 1,
                         "VK_KHR_swapchain_mutable_format": 1
                     }
+                }
+            },
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.1.106",
+                    "capabilities": [ "block_a", "block_b" ]
                 }
             }
         }"""
@@ -951,19 +951,6 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
 
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
-            "profiles": {
-                "VP_TEST_profile_a": {
-                    "version": 1,
-                    "api-version": "1.1.106",
-                    "capabilities": [ "block_a" ]
-                },
-                "VP_TEST_profile_b": {
-                    "version": 1,
-                    "api-version": "1.1.106",
-                    "capabilities": [ "block_b" ],
-                    "profiles": [ "VP_TEST_profile_a" ]
-                }
-            },
             "capabilities": {
                 "block_a": {
                     "extensions": {
@@ -1023,6 +1010,19 @@ class TestConvertPullPromotedExtensions(unittest.TestCase):
                         "VK_KHR_image_format_list": 1,
                         "VK_KHR_swapchain_mutable_format": 1
                     }
+                }
+            },
+            "profiles": {
+                "VP_TEST_profile_a": {
+                    "version": 1,
+                    "api-version": "1.1.106",
+                    "capabilities": [ "block_a" ]
+                },
+                "VP_TEST_profile_b": {
+                    "version": 1,
+                    "api-version": "1.1.106",
+                    "capabilities": [ "block_b" ],
+                    "profiles": [ "VP_TEST_profile_a" ]
                 }
             }
         }"""

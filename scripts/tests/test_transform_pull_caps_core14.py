@@ -105,13 +105,6 @@ class TestConvertPullRequiredCapabilitiesCore14(unittest.TestCase):
 
         expected_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-304.json#",
-            "profiles": {
-                "VP_TEST_profile_v14": {
-                    "version": 1,
-                    "api-version": "1.4.304",
-                    "capabilities": ["baseline"]
-                }
-            },
             "capabilities": {
                 "baseline": {
                     "features": {
@@ -378,6 +371,13 @@ class TestConvertPullRequiredCapabilitiesCore14(unittest.TestCase):
                             "identicalMemoryTypeRequirements": false
                         }
                     }
+                }
+            },
+            "profiles": {
+                "VP_TEST_profile_v14": {
+                    "version": 1,
+                    "api-version": "1.4.304",
+                    "capabilities": ["baseline"]
                 }
             }
         }"""

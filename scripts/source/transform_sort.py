@@ -190,6 +190,17 @@ def sort_profiles_file(vk: VulkanObject, json_file_data: dict):
     for block_name, block in capabilities_dict.items():
         sort_capabilities_block(vk, block, "")
 
+    # Re-order root dictionary keys to ensure canonical order:
+    # "$schema" first, followed by the remaining elements in alphabetical order.
+    ordered_root = {}
+    if "$schema" in json_file_data:
+        ordered_root["$schema"] = json_file_data["$schema"]
+    for key in sorted(k for k in json_file_data.keys() if k != "$schema"):
+        ordered_root[key] = json_file_data[key]
+
+    json_file_data.clear()
+    json_file_data.update(ordered_root)
+
 
 def sort_profiles_files(vk: VulkanObject, json_files_dict: dict):
     if not isinstance(json_files_dict, dict):
