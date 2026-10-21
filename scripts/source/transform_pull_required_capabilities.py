@@ -34,6 +34,7 @@ from source.vulkan_object_utils import (
 )
 from source.profiles_json_utils import (
     collect_block_names,
+    parse_profile_capabilities,
     collect_profile_capabilities,
     get_primary_capability_block,
     get_topologically_sorted_file_keys,
@@ -45,6 +46,8 @@ from source.transform_utils import (
     canonicalize_capabilities_for_version,
     filter_features_against_context,
     filter_properties_against_context,
+    get_parent_feature_value,
+    get_parent_property_value,
     update_context_from_capabilities
 )
 
@@ -60,28 +63,70 @@ def find_profile_in_files_dict(json_files_dict: dict, profile_name: str) -> tupl
     return None, None
 
 
-def is_member_default_applicable(member) -> bool:
+def get_implementation_dependent_members(vk: VulkanObject) -> set[tuple[str, str]]:
+    """
+    Returns the (struct, member) of the property requirements defined with a None value in
+    vulkan_object_data.py, across all Vulkan versions and extensions. A None value means the
+    Vulkan specification defines no required value: the member is implementation-dependent.
+    Struct names are canonicalized so that alias structures match their requirements.
+    """
+    if not hasattr(vk, '_implementation_dependent_members'):
+        members = set()
+        for objs in (vk.versions, vk.extensions):
+            for obj in objs.values():
+                for req in getattr(obj, 'propertyRequirement', None) or []:
+                    if req.value is None:
+                        struct_obj = vk.structs.get(req.struct) or getStructByName(vk.structs, req.struct)
+                        members.add((struct_obj.name if struct_obj else req.struct, req.name))
+        vk._implementation_dependent_members = members
+    return vk._implementation_dependent_members
+
+
+def is_member_default_applicable(vk: VulkanObject, struct_obj, member) -> bool:
     """
     Returns False for members that cannot receive a default value: 'exact' members must match
-    a device specific value (e.g. deviceUUID, driverID, pointClippingBehavior) and 'noauto'
-    members are too complex for a simple resolution and are not handled yet.
+    a device specific value (e.g. deviceUUID, driverID, pointClippingBehavior), 'noauto'
+    members are too complex for a simple resolution and are not handled yet, and
+    implementation-dependent members (e.g. timestampPeriod) have no required value to default to.
     """
     tokens = [t.strip() for t in (getattr(member, 'limitType', None) or '').split(',')]
-    return 'exact' not in tokens and 'noauto' not in tokens
+    if 'exact' in tokens or 'noauto' in tokens:
+        return False
+    return (struct_obj.name, member.name) not in get_implementation_dependent_members(vk)
 
 
 def populate_missing_structure_defaults(
     vk: VulkanObject,
     features_dict: dict[str, dict[str, bool]],
     properties_dict: dict[str, Any],
-    ignore_unsupported: bool
+    ignore_unsupported: bool,
+    context_features: dict[str, dict[str, bool]] | None = None,
+    context_properties: dict[str, Any] | None = None
 ):
     """
     When ignore_unsupported=False, populates all missing/unlisted members of present
     feature and property structures with spec-accurate default fallback values.
+    A member is not populated when it is already defined, directly or through a capability
+    alias (e.g. VkPhysicalDeviceMultiviewFeatures::multiview for
+    VkPhysicalDeviceVulkan11Features::multiview), in the context capabilities or in the other
+    structures of features_dict and properties_dict.
     """
     if ignore_unsupported:
         return
+
+    # Snapshot the defined capabilities before populating so that populated defaults are not used as context
+    defined_features: dict = {}
+    deep_merge_dict(defined_features, context_features or {})
+    deep_merge_dict(defined_features, features_dict)
+    defined_properties: dict = {}
+    deep_merge_dict(defined_properties, context_properties or {})
+    deep_merge_dict(defined_properties, properties_dict)
+
+    def is_feature_defined(struct_name: str, member_name: str) -> bool:
+        return get_parent_feature_value(defined_features, struct_name, member_name, vk)[0]
+
+    def is_property_defined(struct_name: str, member_name: str) -> bool:
+        return get_parent_property_value(defined_properties, struct_name, member_name, vk)[0]
 
     # 1. Populate missing feature structure members
     for struct_name, members in features_dict.items():
@@ -91,9 +136,9 @@ def populate_missing_structure_defaults(
         if not struct_obj:
             continue
         for m in getattr(struct_obj, 'members', []):
-            if m.name in ('sType', 'pNext'):
+            if m.name in ('sType', 'pNext') or m.name in members:
                 continue
-            if m.name not in members and is_member_default_applicable(m):
+            if is_member_default_applicable(vk, struct_obj, m) and not is_feature_defined(struct_name, m.name):
                 members[m.name] = get_member_unsupported_default(vk, struct_name, m.name)
 
     # 2. Populate missing property structure members
@@ -107,22 +152,26 @@ def populate_missing_structure_defaults(
             limits_obj = vk.structs.get("VkPhysicalDeviceLimits") or getStructByName(vk.structs, "VkPhysicalDeviceLimits")
             if limits_obj:
                 for m in getattr(limits_obj, 'members', []):
-                    if m.name not in ('sType', 'pNext') and m.name not in limits and is_member_default_applicable(m):
+                    if m.name in ('sType', 'pNext') or m.name in limits:
+                        continue
+                    if is_member_default_applicable(vk, limits_obj, m) and not is_property_defined(struct_name, m.name):
                         limits[m.name] = get_member_unsupported_default(vk, "VkPhysicalDeviceLimits", m.name)
 
             sparse_obj = vk.structs.get("VkPhysicalDeviceSparseProperties") or getStructByName(vk.structs, "VkPhysicalDeviceSparseProperties")
             if sparse_obj:
                 for m in getattr(sparse_obj, 'members', []):
-                    if m.name not in ('sType', 'pNext') and m.name not in sparse and is_member_default_applicable(m):
+                    if m.name in ('sType', 'pNext') or m.name in sparse:
+                        continue
+                    if is_member_default_applicable(vk, sparse_obj, m) and not is_property_defined(struct_name, m.name):
                         sparse[m.name] = get_member_unsupported_default(vk, "VkPhysicalDeviceSparseProperties", m.name)
         else:
             struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
             if not struct_obj:
                 continue
             for m in getattr(struct_obj, 'members', []):
-                if m.name in ('sType', 'pNext'):
+                if m.name in ('sType', 'pNext') or m.name in prop_data:
                     continue
-                if m.name not in prop_data and is_member_default_applicable(m):
+                if is_member_default_applicable(vk, struct_obj, m) and not is_property_defined(struct_name, m.name):
                     prop_data[m.name] = get_member_unsupported_default(vk, struct_name, m.name)
 
 
@@ -431,18 +480,38 @@ def pull_required_capabilities_single_profile(
                         if satisfied_prop:
                             deep_merge_dict(transition_properties, satisfied_prop)
 
+                # The capabilities defined by the profile itself take precedence over the pulled requirements,
+                # unless ignore_subcore is set.
+                own_caps = {}
+                for block_name in parse_profile_capabilities(profile_caps_list):
+                    if isinstance(block_name, str) and block_name in capabilities_dict:
+                        deep_merge_dict(own_caps, capabilities_dict[block_name])
                 transition_features = filter_features_against_context(
-                    vk, transition_features, explicit_context_features, ignore_subcore
+                    vk, transition_features, own_caps.get("features", {}), ignore_subcore
                 )
                 transition_properties = filter_properties_against_context(
-                    vk, transition_properties, explicit_context_properties, ignore_subcore
+                    vk, transition_properties, own_caps.get("properties", {}), ignore_subcore
+                )
+
+                # The required profiles target a lower Vulkan version: their capabilities don't override the
+                # requirements of the profile Vulkan version, they only make redundant the requirements they
+                # already satisfy. E.g. a VkPhysicalDeviceVulkan12Features::bufferDeviceAddress = false of a
+                # Vulkan 1.2 required profile doesn't prevent pulling the Vulkan 1.3 bufferDeviceAddress requirement.
+                transition_features = filter_features_against_context(
+                    vk, transition_features, context_features, True
+                )
+                transition_properties = filter_properties_against_context(
+                    vk, transition_properties, context_properties, True
                 )
 
                 transition_features, transition_properties = canonicalize_capabilities_for_version(
                     vk, api_version, transition_features, transition_properties
                 )
 
-                populate_missing_structure_defaults(vk, transition_features, transition_properties, ignore_unsupported)
+                populate_missing_structure_defaults(
+                    vk, transition_features, transition_properties, ignore_unsupported,
+                    explicit_context_features, explicit_context_properties
+                )
 
                 if transition_features or transition_properties:
                     ver_tuple = api_version.as_tuple()
@@ -483,6 +552,24 @@ def pull_required_capabilities_single_profile(
                     profile_caps_list.insert(0, transition_block_name)
 
                     update_context_from_capabilities(trans_block, context_features, context_properties, context_extensions)
+
+        # Populate the defaults of the structures defined by the profile capability blocks, as done for the
+        # primary capability block of profiles without required profiles. Otherwise a structure gets its
+        # defaults when pulled into a transition block but not when already defined by the profile. Members
+        # defined by the required profiles or by the transition blocks are not populated.
+        own_blocks_context_features = {}
+        deep_merge_dict(own_blocks_context_features, explicit_context_features)
+        deep_merge_dict(own_blocks_context_features, context_features)
+        own_blocks_context_properties = {}
+        deep_merge_dict(own_blocks_context_properties, explicit_context_properties)
+        deep_merge_dict(own_blocks_context_properties, context_properties)
+        for block_name in parse_profile_capabilities(profile_caps_list):
+            if isinstance(block_name, str) and block_name in capabilities_dict:
+                block = capabilities_dict[block_name]
+                populate_missing_structure_defaults(
+                    vk, block.get("features", {}), block.get("properties", {}), ignore_unsupported,
+                    own_blocks_context_features, own_blocks_context_properties
+                )
 
     else:
         primary_block = get_primary_capability_block(profile_obj, capabilities_dict)
@@ -551,7 +638,9 @@ def pull_required_capabilities_single_profile(
                     primary_block.get("features", {}),
                     primary_block.get("properties", {})
                 )
-                populate_missing_structure_defaults(vk, p_feat, p_prop, ignore_unsupported)
+                populate_missing_structure_defaults(
+                    vk, p_feat, p_prop, ignore_unsupported, explicit_context_features, explicit_context_properties
+                )
                 if p_feat:
                     primary_block["features"] = p_feat
                 if p_prop:

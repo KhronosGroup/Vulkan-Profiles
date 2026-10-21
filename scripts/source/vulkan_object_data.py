@@ -193,6 +193,18 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceSparseProperties', 'residencyAlignedMipSize', 'true', None),
         PropertyRequirement('VkPhysicalDeviceSparseProperties', 'residencyNonResidentStrict', 'false', None),
 
+        # Implementation-dependent
+        # The Vulkan specification "Required Limits" table defines no supported nor unsupported value for these
+        # limits. Their limit types in the table are not minimum/maximum requirements: 'duration' for timestampPeriod
+        # and 'recommendation' for optimalBufferCopyOffsetAlignment and optimalBufferCopyRowPitchAlignment.
+        # vk.xml still gives them comparable limittype values ('min,mul' and 'min,pot') so they are neither 'exact'
+        # nor 'noauto'. Listing them with a None value marks them as implementation-dependent: no requirement is
+        # pulled for them, and they are not filled with an unsupported default value (0, which is not even a valid
+        # 'mul' or 'pot' value) when pulling requirements into a VkPhysicalDeviceLimits structure.
+        PropertyRequirement('VkPhysicalDeviceLimits', 'timestampPeriod', None, None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'optimalBufferCopyOffsetAlignment', None, None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'optimalBufferCopyRowPitchAlignment', None, None),
+
         # Unsupported
         PropertyRequirement('VkPhysicalDeviceLimits', 'sparseAddressSpaceSize', '0', '!VkPhysicalDeviceFeatures::sparseBinding'),
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxTessellationGenerationLevel', '0', '!VkPhysicalDeviceFeatures::tessellationShader'),

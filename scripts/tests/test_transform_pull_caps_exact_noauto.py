@@ -97,7 +97,8 @@ class TestConvertPullCapsExactNoauto(unittest.TestCase):
         """
         Verifies that pulling the Vulkan 1.4 core requirements does not pull 'exact' structure
         members nor 'noauto' members (limit types too complex for a simple resolution, not handled
-        yet, e.g. pCopySrcLayouts) while comparable members are still pulled.
+        yet, e.g. pCopySrcLayouts) nor implementation-dependent members (no value required by the
+        Vulkan specification, e.g. timestampPeriod) while comparable members are still pulled.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-304.json#",
@@ -152,11 +153,20 @@ class TestConvertPullCapsExactNoauto(unittest.TestCase):
         v12_props = baseline_props.get("VkPhysicalDeviceVulkan12Properties", {})
         self.assertIn("maxUpdateAfterBindDescriptorsInAllPools", v12_props)
         self.assertEqual(v12_props["maxUpdateAfterBindDescriptorsInAllPools"], 0)
+
+        # 5. Implementation-dependent members MUST NOT be pulled
+        limits = baseline_props.get("VkPhysicalDeviceProperties", {}).get("limits", {})
+        self.assertIn("nonCoherentAtomSize", limits)
+        self.assertNotIn("timestampPeriod", limits)
+        self.assertNotIn("optimalBufferCopyOffsetAlignment", limits)
+        self.assertNotIn("optimalBufferCopyRowPitchAlignment", limits)
         v13_props = baseline_props.get("VkPhysicalDeviceVulkan13Properties", {})
-        self.assertIn("minSubgroupSize", v13_props)
-        self.assertEqual(v13_props["minSubgroupSize"], 0)
-        self.assertIn("maxSubgroupSize", v13_props)
-        self.assertEqual(v13_props["maxSubgroupSize"], 0)
+        self.assertNotIn("minSubgroupSize", v13_props)
+        self.assertNotIn("maxSubgroupSize", v13_props)
+        self.assertNotIn("maxComputeWorkgroupSubgroups", v13_props)
+        self.assertNotIn("requiredSubgroupSizeStages", v13_props)
+        self.assertNotIn("storageTexelBufferOffsetAlignmentBytes", v13_props)
+        self.assertNotIn("uniformTexelBufferOffsetAlignmentBytes", v13_props)
 
     def test_pull_exact_noauto_ignore_unsupported_vulkan14(self):
         """
@@ -219,9 +229,6 @@ class TestConvertPullCapsExactNoauto(unittest.TestCase):
         self.assertNotIn("hostImageCopy", baseline_features.get("VkPhysicalDeviceVulkan14Features", {}))
         self.assertNotIn("geometryShader", baseline_features.get("VkPhysicalDeviceFeatures", {}))
         self.assertNotIn("maxUpdateAfterBindDescriptorsInAllPools", v12_props)
-        v13_props = baseline_props.get("VkPhysicalDeviceVulkan13Properties", {})
-        self.assertNotIn("minSubgroupSize", v13_props)
-        self.assertNotIn("maxSubgroupSize", v13_props)
 
 
 if __name__ == '__main__':

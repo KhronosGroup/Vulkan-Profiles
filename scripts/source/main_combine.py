@@ -28,7 +28,7 @@ from enum import Enum
 from pathlib import Path
 
 from source.vulkan_object_utils import initVulkanObject
-from source.generate_profiles_combine import VulkanProfilesCombineGenerator, CombineConfig
+from source.generate_profiles_combine import VulkanProfilesCombineGenerator, CombineConfig, check_single_profile_files
 from source.main_validate import main_validate
 from source.profiles_json_utils import (
     load_profiles_jsons,
@@ -85,6 +85,7 @@ def main_combine(args):
     # Special processing for DIFFERENCE mode across input profile files
     if mode == CombineMode.DIFFERENCE:
         json_files_dict = load_profiles_jsons(Path(input_dir))
+        check_single_profile_files(json_files_dict)
 
         generator = VulkanProfilesCombineGenerator(vk)
         # combine_capabilities() pairs jsons[i] with profile_names[i]: list each file once per profile it defines.
