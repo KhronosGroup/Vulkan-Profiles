@@ -19,10 +19,7 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
-from source.vulkan_object_version import (
-    BUNDLE_STRUCT_VERSIONS,
-    is_bundle_structure
-)
+from source.vulkan_object_version import BUNDLE_STRUCT_VERSIONS
 from source.vulkan_object_utils import (
     VulkanObject, 
     VK_VERSION, 
@@ -111,6 +108,30 @@ def sort_extensions(vk: VulkanObject, exts: dict | list, profile_name: str = "")
         return sorted_exts
 
 
+def sort_struct_members(vk: VulkanObject, struct_name: str, struct_data):
+    """
+    Returns struct_data with its members ordered following the struct definition order in vk.xml.
+    Members which are structures themselves (e.g. VkPhysicalDeviceProperties::limits) are sorted
+    recursively. Members missing from the vk.xml struct definition are sorted alphabetically at the end.
+    """
+    if not isinstance(struct_data, dict):
+        return struct_data
+
+    struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
+    members = (getattr(struct_obj, 'members', None) or []) if struct_obj else []
+    member_idx_map = {m.name: idx for idx, m in enumerate(members)}
+    member_type_map = {m.name: m.type for m in members}
+
+    sorted_members = sorted(
+        struct_data.items(),
+        key=lambda item: (member_idx_map.get(item[0], MemberSortFallback.UNKNOWN_MEMBER_INDEX), item[0])
+    )
+    return {
+        name: sort_struct_members(vk, member_type_map[name], value) if name in member_type_map and isinstance(value, dict) else value
+        for name, value in sorted_members
+    }
+
+
 def sort_capabilities_block(vk: VulkanObject, json_block: dict, profile_name: str):
     if not isinstance(json_block, dict):
         return
@@ -126,21 +147,7 @@ def sort_capabilities_block(vk: VulkanObject, json_block: dict, profile_name: st
                 key=lambda s: get_struct_sort_key(vk, s)
             )
             for s_name in sorted_struct_names:
-                struct_data = json_block[category][s_name]
-                if isinstance(struct_data, dict):
-                    if is_bundle_structure(s_name):
-                        struct_obj = vk.structs.get(s_name) or getStructByName(vk.structs, s_name)
-                        if struct_obj and hasattr(struct_obj, 'members'):
-                            member_idx_map = {m.name: idx for idx, m in enumerate(struct_obj.members)}
-                            sorted_cat[s_name] = dict(
-                                sorted(struct_data.items(), key=lambda item: member_idx_map.get(item[0], MemberSortFallback.UNKNOWN_MEMBER_INDEX))
-                            )
-                        else:
-                            sorted_cat[s_name] = struct_data
-                    else:
-                        sorted_cat[s_name] = dict(sorted(struct_data.items(), key=lambda item: item[0]))
-                else:
-                    sorted_cat[s_name] = struct_data
+                sorted_cat[s_name] = sort_struct_members(vk, s_name, json_block[category][s_name])
             json_block[category] = sorted_cat
 
     if "formats" in json_block and isinstance(json_block["formats"], dict):

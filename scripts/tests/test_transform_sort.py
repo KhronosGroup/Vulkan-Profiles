@@ -453,6 +453,76 @@ class TestConvertSort(unittest.TestCase):
         self.assertEqual(list(sorted_json.keys()), ["$schema", "capabilities", "contributors", "history", "profiles"])
         self.assertEqual(sorted_json, json.loads(original_json_text))
 
+    def test_sort_structure_members_vkxml_order(self):
+        """
+        Verifies that sorting orders the members of every feature and property structure following
+        the vk.xml structure definition order, including members which are structures themselves
+        (VkPhysicalDeviceProperties::limits and sparseProperties).
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
+            "capabilities": {
+                "baseline": {
+                    "features": {
+                        "VkPhysicalDeviceVariablePointersFeatures": {
+                            "variablePointers": true,
+                            "variablePointersStorageBuffer": true
+                        },
+                        "VkPhysicalDeviceFeatures": {
+                            "samplerAnisotropy": true,
+                            "robustBufferAccess": true
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceProperties": {
+                            "sparseProperties": {
+                                "residencyNonResidentStrict": false,
+                                "residencyStandard2DBlockShape": false
+                            },
+                            "limits": {
+                                "timestampComputeAndGraphics": true,
+                                "maxClipDistances": 8,
+                                "maxImageDimension2D": 4096,
+                                "maxImageDimension1D": 4096
+                            }
+                        },
+                        "VkPhysicalDeviceMultiviewProperties": {
+                            "maxMultiviewInstanceIndex": 134217727,
+                            "maxMultiviewViewCount": 6
+                        }
+                    }
+                }
+            },
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": ["baseline"]
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        sort_profiles_files(self.vk, json_files_dict)
+
+        block = json_files_dict["test_profile.json"]["capabilities"]["baseline"]
+        features = block["features"]
+        properties = block["properties"]
+
+        # 1. Structure members MUST follow the vk.xml order, for bundle and non-bundle structures
+        self.assertEqual(list(features["VkPhysicalDeviceFeatures"].keys()), ["robustBufferAccess", "samplerAnisotropy"])
+        self.assertEqual(list(features["VkPhysicalDeviceVariablePointersFeatures"].keys()), ["variablePointersStorageBuffer", "variablePointers"])
+        self.assertEqual(list(properties["VkPhysicalDeviceMultiviewProperties"].keys()), ["maxMultiviewViewCount", "maxMultiviewInstanceIndex"])
+
+        # 2. Structure typed members MUST be sorted recursively following the vk.xml order
+        device_properties = properties["VkPhysicalDeviceProperties"]
+        self.assertEqual(list(device_properties.keys()), ["limits", "sparseProperties"])
+        self.assertEqual(list(device_properties["limits"].keys()), ["maxImageDimension1D", "maxImageDimension2D", "timestampComputeAndGraphics", "maxClipDistances"])
+        self.assertEqual(list(device_properties["sparseProperties"].keys()), ["residencyStandard2DBlockShape", "residencyNonResidentStrict"])
+
+        # 3. Sorting MUST NOT change the values
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(original_json_text))
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(

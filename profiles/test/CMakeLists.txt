@@ -104,12 +104,14 @@ add_custom_target(VpTestGeneratedRequirements ALL
         --input ${CMAKE_CURRENT_SOURCE_DIR}/../LunarG/VP_LUNARG_minimum_requirements.json
         --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/1_transform
         --pull requirements aliases ignore-extension-versions
+        --sort
         --format flatten
     COMMAND ${VKPROFILES_EXE} transform
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements
         --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/1_transform/VP_LUNARG_generated_requirements.json
         --pull requirements aliases ignore-extension-versions
+        --sort
         --format flatten
     COMMAND ${VKPROFILES_EXE} extract
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
@@ -186,30 +188,35 @@ add_custom_target(VpTestGeneratedRequirements ALL
         --input ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/2_extract/vulkan10
         --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/3_consolidate/vulkan10
         --consolidate
+        --sort
         --format flatten
     COMMAND ${VKPROFILES_EXE} transform
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/2_extract/vulkan11
         --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/3_consolidate/vulkan11
         --consolidate
+        --sort
         --format flatten
     COMMAND ${VKPROFILES_EXE} transform
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/2_extract/vulkan12
         --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/3_consolidate/vulkan12
         --consolidate
+        --sort
         --format flatten
     COMMAND ${VKPROFILES_EXE} transform
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/2_extract/vulkan13
         --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/3_consolidate/vulkan13
         --consolidate
+        --sort
         --format flatten
     COMMAND ${VKPROFILES_EXE} transform
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/2_extract/vulkan14
         --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/3_consolidate/vulkan14
         --consolidate
+        --sort
         --format flatten
     COMMAND ${VKPROFILES_EXE} combine
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
