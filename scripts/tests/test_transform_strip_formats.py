@@ -221,9 +221,9 @@ class TestConvertStripFormat(unittest.TestCase):
     def test_strip_formats_duplication_mixed_properties(self):
         """
         Verifies format feature duplication stripping when a capability block contains
-        both VkFormatProperties and VkFormatProperties3 for the same format. Duplicate 
-        VkFormatProperties structures are stripped when fully matched in parent blocks, 
-        leaving only updated VkFormatProperties3 structures.
+        both VkFormatProperties and VkFormatProperties3 for the same format. VkFormatProperties
+        is merged into VkFormatProperties3, leaving only VkFormatProperties3 structures, and
+        VkFormatProperties3 structures fully matched in parent blocks are stripped.
         """
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
@@ -290,11 +290,6 @@ class TestConvertStripFormat(unittest.TestCase):
                 "caps1": {
                     "formats": {
                         "VK_FORMAT_R8G8B8A8_UNORM": {
-                            "VkFormatProperties": {
-                                "linearTilingFeatures": [
-                                    "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"
-                                ]
-                            },
                             "VkFormatProperties3": {
                                 "linearTilingFeatures": [
                                     "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"
@@ -381,8 +376,215 @@ class TestConvertStripFormat(unittest.TestCase):
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
+    def test_strip_format_properties_aliases_keep_format_properties3(self):
+        """
+        Verifies that when a capability block defines a format with VkFormatProperties,
+        VkFormatProperties2KHR, VkFormatProperties3 and VkFormatProperties3KHR, only VkFormatProperties3
+        is kept, with the 32-bit format features converted and merged into it.
+        VkFormatProperties4KHR is not an alias of the other structures so it is kept.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_LUNARG_test": {
+                    "version": 1,
+                    "api-version": "1.3.0",
+                    "capabilities": ["caps_format"]
+                }
+            },
+            "capabilities": {
+                "caps_format": {
+                    "extensions": {
+                        "VK_KHR_extended_flags": 1
+                    },
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties": {
+                                "linearTilingFeatures": ["VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT"],
+                                "bufferFeatures": ["VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT"]
+                            },
+                            "VkFormatProperties2KHR": {
+                                "formatProperties": {
+                                    "optimalTilingFeatures": ["VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT"]
+                                }
+                            },
+                            "VkFormatProperties3": {
+                                "linearTilingFeatures": ["VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"]
+                            },
+                            "VkFormatProperties3KHR": {
+                                "linearTilingFeatures": ["VK_FORMAT_FEATURE_2_STORAGE_READ_WITHOUT_FORMAT_BIT"]
+                            },
+                            "VkFormatProperties4KHR": {}
+                        }
+                    }
+                }
+            }
+        }"""
 
-def test_strip_formats_duplication_extended_flags(self):
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-204.json#",
+            "profiles": {
+                "VP_LUNARG_test": {
+                    "version": 1,
+                    "api-version": "1.3.0",
+                    "capabilities": ["caps_format"]
+                }
+            },
+            "capabilities": {
+                "caps_format": {
+                    "extensions": {
+                        "VK_KHR_extended_flags": 1
+                    },
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties3": {
+                                "linearTilingFeatures": [
+                                    "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT",
+                                    "VK_FORMAT_FEATURE_2_STORAGE_READ_WITHOUT_FORMAT_BIT",
+                                    "VK_FORMAT_FEATURE_2_TRANSFER_SRC_BIT"
+                                ],
+                                "bufferFeatures": ["VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT"],
+                                "optimalTilingFeatures": ["VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BIT"]
+                            },
+                            "VkFormatProperties4KHR": {}
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        strip_duplication_profiles_files(self.vk, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+    def test_strip_format_properties_aliases_keep_format_properties3khr(self):
+        """
+        Verifies that a Vulkan 1.2 profile defining a format with VkFormatProperties and
+        VkFormatProperties3KHR only keeps VkFormatProperties3KHR, with the 32-bit format
+        features converted and merged into it.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-131.json#",
+            "profiles": {
+                "VP_LUNARG_test": {
+                    "version": 1,
+                    "api-version": "1.2.131",
+                    "capabilities": ["caps_format"]
+                }
+            },
+            "capabilities": {
+                "caps_format": {
+                    "extensions": {
+                        "VK_KHR_format_feature_flags2": 1
+                    },
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties": {
+                                "optimalTilingFeatures": ["VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT"]
+                            },
+                            "VkFormatProperties3KHR": {
+                                "optimalTilingFeatures": ["VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"]
+                            }
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-131.json#",
+            "profiles": {
+                "VP_LUNARG_test": {
+                    "version": 1,
+                    "api-version": "1.2.131",
+                    "capabilities": ["caps_format"]
+                }
+            },
+            "capabilities": {
+                "caps_format": {
+                    "extensions": {
+                        "VK_KHR_format_feature_flags2": 1
+                    },
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties3KHR": {
+                                "optimalTilingFeatures": ["VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_2_BLIT_SRC_BIT"]
+                            }
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        strip_duplication_profiles_files(self.vk, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+    def test_strip_format_properties_aliases_keep_format_properties(self):
+        """
+        Verifies that a Vulkan 1.1 profile defining a format with VkFormatProperties and
+        VkFormatProperties2 only keeps VkFormatProperties, with the VkFormatProperties2
+        format features merged into it.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-108.json#",
+            "profiles": {
+                "VP_LUNARG_test": {
+                    "version": 1,
+                    "api-version": "1.1.108",
+                    "capabilities": ["caps_format"]
+                }
+            },
+            "capabilities": {
+                "caps_format": {
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties": {
+                                "optimalTilingFeatures": ["VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"]
+                            },
+                            "VkFormatProperties2": {
+                                "formatProperties": {
+                                    "optimalTilingFeatures": ["VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT"],
+                                    "bufferFeatures": ["VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT"]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }"""
+
+        expected_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-108.json#",
+            "profiles": {
+                "VP_LUNARG_test": {
+                    "version": 1,
+                    "api-version": "1.1.108",
+                    "capabilities": ["caps_format"]
+                }
+            },
+            "capabilities": {
+                "caps_format": {
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties": {
+                                "optimalTilingFeatures": ["VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT", "VK_FORMAT_FEATURE_BLIT_SRC_BIT"],
+                                "bufferFeatures": ["VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT"]
+                            }
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        strip_duplication_profiles_files(self.vk, json_files_dict)
+
+        self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
+
+    def test_strip_formats_duplication_extended_flags(self):
         """
         Verifies format feature list duplication stripping across capability blocks
         when declaring VK_KHR_extended_flags while using VkFormatProperties3 alongside
