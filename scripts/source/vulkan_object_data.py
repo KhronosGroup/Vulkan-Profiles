@@ -550,15 +550,19 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
 
         PropertyRequirement('VkPhysicalDeviceMaintenance4Properties', 'maxBufferSize', '1073741824', 'VkPhysicalDeviceMaintenance4Features::maintenance4'),
 
+        # The Vulkan specification defines no requirement for these limits, but their vk.xml limittype ('max' and
+        # 'bitmask') makes the unsupported default value (0 and no bit) a valid value: they are populated as default
+        # values, not pulled as requirements when promoting a profile to a higher Vulkan version.
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'maxComputeWorkgroupSubgroups', '0', None),
+        PropertyRequirement('VkPhysicalDeviceSubgroupSizeControlProperties', 'maxComputeWorkgroupSubgroups', '0', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'requiredSubgroupSizeStages', '0', None),
+        PropertyRequirement('VkPhysicalDeviceSubgroupSizeControlProperties', 'requiredSubgroupSizeStages', '0', None),
+
         # Implementation-dependent
         PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'minSubgroupSize', None, None),
         PropertyRequirement('VkPhysicalDeviceSubgroupSizeControlProperties', 'minSubgroupSize', None, None),
         PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'maxSubgroupSize', None, None),
         PropertyRequirement('VkPhysicalDeviceSubgroupSizeControlProperties', 'maxSubgroupSize', None, None),
-        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'maxComputeWorkgroupSubgroups', None, None),
-        PropertyRequirement('VkPhysicalDeviceSubgroupSizeControlProperties', 'maxComputeWorkgroupSubgroups', None, None),
-        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'requiredSubgroupSizeStages', None, None),
-        PropertyRequirement('VkPhysicalDeviceSubgroupSizeControlProperties', 'requiredSubgroupSizeStages', None, None),
         PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'storageTexelBufferOffsetAlignmentBytes', None, None),
         PropertyRequirement('VkPhysicalDeviceTexelBufferAlignmentProperties', 'storageTexelBufferOffsetAlignmentBytes', None, None),
         PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'storageTexelBufferOffsetSingleTexelAlignment', None, None),
@@ -1062,8 +1066,8 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
     'VK_EXT_subgroup_size_control': [
         PropertyRequirement('VkPhysicalDeviceSubgroupSizeControlPropertiesEXT', 'minSubgroupSize', '1', None),
         PropertyRequirement('VkPhysicalDeviceSubgroupSizeControlPropertiesEXT', 'maxSubgroupSize', '1', None),
-        PropertyRequirement('VkPhysicalDeviceSubgroupSizeControlPropertiesEXT', 'maxComputeWorkgroupSubgroups', None, None),
-        PropertyRequirement('VkPhysicalDeviceSubgroupSizeControlPropertiesEXT', 'requiredSubgroupSizeStages', None, None),
+        PropertyRequirement('VkPhysicalDeviceSubgroupSizeControlPropertiesEXT', 'maxComputeWorkgroupSubgroups', '0', None),
+        PropertyRequirement('VkPhysicalDeviceSubgroupSizeControlPropertiesEXT', 'requiredSubgroupSizeStages', '0', None),
     ],
     'VK_EXT_line_rasterization': [
         PropertyRequirement('VkPhysicalDeviceLineRasterizationPropertiesEXT', 'lineSubPixelPrecisionBits', '4', None),

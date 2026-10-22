@@ -25,6 +25,7 @@ from source.vulkan_object_utils import (
     VulkanObject, 
     VK_VERSION, 
     gatherDependentCapabilityAliases,
+    is_member_unsupported_default,
     getStructDefiningExtensions,
     StructCapabilityAlias, 
     ExtensionCapabilityAlias
@@ -35,6 +36,7 @@ from source.profiles_json_utils import (
     get_topologically_sorted_file_keys,
     collect_required_profiles_capabilities_recursive,
     deep_merge_dict,
+    get_profile_and_file_data,
     merge_capability_value
 )
 from source.format_flag_converter import FormatFeatureFlagConverter 
@@ -159,6 +161,80 @@ def pull_aliases_capabilities_block(
     return json_profiles_capabilities_block
 
 
+def pull_inherited_aliases_profile(
+    vk: VulkanObject,
+    json_files_dict: dict,
+    json_file_data: dict,
+    profile_name: str,
+    profile_obj: dict,
+    pull_bits: list[PullBits]
+):
+    """
+    For a profile requiring profiles with a lower Vulkan version, pulls the aliases of the supported
+    required profiles capabilities which only exist with the profile Vulkan version, e.g. the
+    VkPhysicalDeviceVulkan11Features::multiview alias of a Vulkan 1.1 required profile
+    VkPhysicalDeviceMultiviewFeatures::multiview, for a Vulkan 1.2 profile. The aliases are added to the
+    '<required profile>_to_vulkan<version>' transition block of the profile.
+    """
+    ignore_unratified = PullBits.IGNORE_UNRATIFIED in pull_bits
+    version = VK_VERSION.from_string(profile_obj["api-version"])
+    capabilities_dict = json_file_data.setdefault("capabilities", {})
+    profile_caps_list = profile_obj.setdefault("capabilities", [])
+
+    for required_profile_name in profile_obj.get("profiles", []):
+        required_obj, _ = get_profile_and_file_data(json_files_dict, required_profile_name)
+        if not required_obj:
+            continue
+        required_version = VK_VERSION.from_string(required_obj.get("api-version", "1.0.0"))
+        if version <= required_version:
+            continue
+
+        inherited_caps = collect_required_profiles_capabilities_recursive(json_files_dict, [required_profile_name])
+        profile_caps = collect_profile_capabilities(json_files_dict, json_file_data, profile_obj)
+        enabled_exts = set(profile_caps.get("extensions", {}).keys())
+        if ignore_unratified:
+            enabled_exts = {ext for ext in enabled_exts if ext in vk.extensions and vk.extensions[ext].ratified}
+
+        inherited_aliases = {}
+        for category in ("features", "properties"):
+            for struct_name, members in inherited_caps.get(category, {}).items():
+                if not isinstance(members, dict):
+                    continue
+                for member, val in members.items():
+                    query_id = StructCapabilityAlias(struct_name, member)
+                    required_version_aliases = gatherDependentCapabilityAliases(vk, required_version, query_id)
+                    for alias in gatherDependentCapabilityAliases(vk, version, query_id):
+                        if not isinstance(alias, StructCapabilityAlias) or alias in required_version_aliases:
+                            continue
+                        if not isStructExtensionEnabled(vk, alias.struct, version, enabled_exts):
+                            continue
+                        if ignore_unratified:
+                            def_exts = getStructDefiningExtensions(vk, alias.struct)
+                            if def_exts and any(ext in vk.extensions and not vk.extensions[ext].ratified for ext in def_exts):
+                                continue
+                        if alias.member in profile_caps.get(category, {}).get(alias.struct, {}):
+                            continue
+                        # The transition block only expresses supported capabilities: unsupported default values
+                        # (e.g. false for a feature) are not requirements of the profile Vulkan version.
+                        if is_member_unsupported_default(vk, alias.struct, alias.member, val):
+                            continue
+
+                        target_members = inherited_aliases.setdefault(category, {}).setdefault(alias.struct, {})
+                        if alias.member in target_members:
+                            target_members[alias.member] = merge_capability_value(alias.member, target_members[alias.member], val)
+                        else:
+                            target_members[alias.member] = copy.deepcopy(val)
+
+        if not inherited_aliases:
+            continue
+
+        ver_tuple = version.as_tuple()
+        transition_block_name = f"{required_profile_name}_to_vulkan{ver_tuple[0]}{ver_tuple[1]}"
+        deep_merge_dict(capabilities_dict.setdefault(transition_block_name, {}), inherited_aliases)
+        if transition_block_name not in collect_block_names(profile_caps_list):
+            profile_caps_list.insert(0, transition_block_name)
+
+
 def pull_aliases_profiles_file(vk: VulkanObject, pull_bits: list[PullBits], json_files_dict: dict, json_file_data: dict):
     profiles_data = json_file_data["profiles"]
     json_profiles_capabilities = json_file_data["capabilities"]
@@ -179,6 +255,8 @@ def pull_aliases_profiles_file(vk: VulkanObject, pull_bits: list[PullBits], json
                 pull_aliases_capabilities_block(
                     vk, version, json_profiles_capabilities[block_name], inherited_caps, profile_enabled_exts, pull_bits
                 )
+
+        pull_inherited_aliases_profile(vk, json_files_dict, json_file_data, key, value, pull_bits)
 
 
 def pull_aliases_profiles_files(vk: VulkanObject, pull_bits: list[PullBits], json_files_dict: dict):

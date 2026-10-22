@@ -207,15 +207,7 @@ class TestConvertPullRequiredCapabilitiesCore10(unittest.TestCase):
                                 "sampledImageStencilSampleCounts": ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"],
                                 "maxSampleMaskWords": 1,
                                 "discreteQueuePriorities": 2,
-                                "nonCoherentAtomSize": 256,
-                                "viewportSubPixelBits": 0
-                            },
-                            "sparseProperties": {
-                                "residencyStandard2DBlockShape": false,
-                                "residencyStandard2DMultisampleBlockShape": false,
-                                "residencyStandard3DBlockShape": false,
-                                "residencyAlignedMipSize": true,
-                                "residencyNonResidentStrict": false
+                                "nonCoherentAtomSize": 256
                             }
                         }
                     }

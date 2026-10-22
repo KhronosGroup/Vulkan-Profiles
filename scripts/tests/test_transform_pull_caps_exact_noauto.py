@@ -163,10 +163,12 @@ class TestConvertPullCapsExactNoauto(unittest.TestCase):
         v13_props = baseline_props.get("VkPhysicalDeviceVulkan13Properties", {})
         self.assertNotIn("minSubgroupSize", v13_props)
         self.assertNotIn("maxSubgroupSize", v13_props)
-        self.assertNotIn("maxComputeWorkgroupSubgroups", v13_props)
-        self.assertNotIn("requiredSubgroupSizeStages", v13_props)
         self.assertNotIn("storageTexelBufferOffsetAlignmentBytes", v13_props)
         self.assertNotIn("uniformTexelBufferOffsetAlignmentBytes", v13_props)
+
+        # 6. Members without Vulkan core requirement but with a valid unsupported default value MUST get the default value
+        self.assertEqual(v13_props["maxComputeWorkgroupSubgroups"], 0)
+        self.assertEqual(v13_props["requiredSubgroupSizeStages"], [])
 
     def test_pull_exact_noauto_ignore_unsupported_vulkan14(self):
         """

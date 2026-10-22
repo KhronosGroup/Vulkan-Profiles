@@ -97,7 +97,7 @@ set_target_properties(VpTestHostImageCopy PROPERTIES FOLDER "Profiles generator/
 add_dependencies(VpTestHostImageCopy VpProfilesProcessor)
 
 add_custom_target(VpTestGeneratedRequirements ALL
-    COMMAND ${CMAKE_COMMAND} -E rm -rf ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/1_transform ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/2_extract ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/3_consolidate ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/4_diff
+    COMMAND ${CMAKE_COMMAND} -E rm -rf ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/1_transform ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/2_extract ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/3_consolidate ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/4_diff ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/5_sort
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/1_transform
     COMMAND ${VKPROFILES_EXE} transform
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
@@ -247,6 +247,36 @@ add_custom_target(VpTestGeneratedRequirements ALL
         --input ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/3_consolidate/vulkan14
         --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/4_diff/vulkan14
         --mode difference
+        --format flatten
+    COMMAND ${VKPROFILES_EXE} transform
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/4_diff/vulkan10
+        --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/5_sort/vulkan10
+        --sort
+        --format flatten
+    COMMAND ${VKPROFILES_EXE} transform
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/4_diff/vulkan11
+        --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/5_sort/vulkan11
+        --sort
+        --format flatten
+    COMMAND ${VKPROFILES_EXE} transform
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/4_diff/vulkan12
+        --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/5_sort/vulkan12
+        --sort
+        --format flatten
+    COMMAND ${VKPROFILES_EXE} transform
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/4_diff/vulkan13
+        --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/5_sort/vulkan13
+        --sort
+        --format flatten
+    COMMAND ${VKPROFILES_EXE} transform
+        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --input ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/4_diff/vulkan14
+        --output ${CMAKE_CURRENT_SOURCE_DIR}/data/VP_LUNARG_generated_requirements/5_sort/vulkan14
+        --sort
         --format flatten
     VERBATIM
     SOURCES ${FILES_UNIT_TEST}

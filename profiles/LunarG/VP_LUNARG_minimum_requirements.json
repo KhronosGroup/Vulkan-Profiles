@@ -70,11 +70,11 @@
                         "mipmapPrecisionBits": 4,
                         "maxDrawIndexedIndexValue": 16777215,
                         "maxDrawIndirectCount": 1,
-                        "maxSamplerLodBias": 2,
-                        "maxSamplerAnisotropy": 1,
+                        "maxSamplerLodBias": 2.0,
+                        "maxSamplerAnisotropy": 1.0,
                         "maxViewports": 1,
                         "maxViewportDimensions": [ 4096, 4096 ],
-                        "viewportBoundsRange": [ -8192, 8191 ],
+                        "viewportBoundsRange": [ -8192.0, 8191.0 ],
                         "viewportSubPixelBits": 0,
                         "minMemoryMapAlignment": 64,
                         "minTexelBufferOffsetAlignment": 256,
@@ -120,7 +120,7 @@
                 }
             }
         },
-        "vulkan11requirements_split": {
+        "vulkan11requirements": {
             "features": {
                 "VkPhysicalDeviceMultiviewFeatures": {
                     "multiview": true
@@ -137,24 +137,6 @@
                     "maxMultiviewInstanceIndex": 134217727
                 },
                 "VkPhysicalDeviceMaintenance3Properties": {
-                    "maxPerSetDescriptors": 1024,
-                    "maxMemoryAllocationSize": 1073741824
-                }
-            }
-        },
-        "vulkan11requirements": {
-            "features": {
-                "VkPhysicalDeviceVulkan11Features": {
-                    "multiview": true
-                }
-            },
-            "properties": {
-                "VkPhysicalDeviceVulkan11Properties": {
-                    "subgroupSize": 1,
-                    "subgroupSupportedStages": [ "VK_SHADER_STAGE_COMPUTE_BIT" ],
-                    "subgroupSupportedOperations": [ "VK_SUBGROUP_FEATURE_BASIC_BIT" ],
-                    "maxMultiviewViewCount": 6,
-                    "maxMultiviewInstanceIndex": 134217727,
                     "maxPerSetDescriptors": 1024,
                     "maxMemoryAllocationSize": 1073741824
                 }
@@ -364,10 +346,10 @@
                         "subTexelPrecisionBits": 8,
                         "mipmapPrecisionBits": 6,
                         "maxDrawIndexedIndexValue": 4294967295,
-                        "maxSamplerLodBias": 14,
-                        "maxSamplerAnisotropy": 16,
+                        "maxSamplerLodBias": 14.0,
+                        "maxSamplerAnisotropy": 16.0,
                         "maxViewportDimensions": [ 7680, 7680 ],
-                        "viewportBoundsRange": [ -15360, 15359 ],
+                        "viewportBoundsRange": [ -15360.0, 15359.0 ],
                         "minTexelGatherOffset": -8,
                         "maxTexelGatherOffset": 7,
                         "minInterpolationOffset": -0.5,
@@ -419,7 +401,7 @@
             "api-version": "1.1.70",
             "label": "Vulkan 1.1 Minimum Requirements",
             "description": "Vulkan 1.1 Minimum Requirements.",
-            "capabilities": [ "vulkan11requirements_split" ],
+            "capabilities": [ "vulkan11requirements" ],
             "profiles": [
                 "VP_LUNARG_minimum_requirements_1_0"
             ]
