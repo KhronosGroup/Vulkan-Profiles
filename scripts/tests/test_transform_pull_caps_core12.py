@@ -187,7 +187,6 @@ class TestConvertPullRequiredCapabilitiesCore12(unittest.TestCase):
                                 "maxSamplerLodBias": 2.0,
                                 "maxViewportDimensions": [4096, 4096],
                                 "viewportBoundsRange": [-8192.0, 8191.0],
-                                "viewportSubPixelBits": 0,
                                 "minMemoryMapAlignment": 64,
                                 "minTexelBufferOffsetAlignment": 256,
                                 "minUniformBufferOffsetAlignment": 256,
@@ -209,13 +208,6 @@ class TestConvertPullRequiredCapabilitiesCore12(unittest.TestCase):
                                 "maxSampleMaskWords": 1,
                                 "discreteQueuePriorities": 2,
                                 "nonCoherentAtomSize": 256
-                            },
-                            "sparseProperties": {
-                                "residencyStandard2DBlockShape": false,
-                                "residencyStandard2DMultisampleBlockShape": false,
-                                "residencyStandard3DBlockShape": false,
-                                "residencyAlignedMipSize": true,
-                                "residencyNonResidentStrict": false
                             }
                         }
                     }
@@ -315,7 +307,6 @@ class TestConvertPullRequiredCapabilitiesCore12(unittest.TestCase):
                                 "maxSamplerLodBias": 2.0,
                                 "maxViewportDimensions": [4096, 4096],
                                 "viewportBoundsRange": [-8192.0, 8191.0],
-                                "viewportSubPixelBits": 0,
                                 "minMemoryMapAlignment": 64,
                                 "minTexelBufferOffsetAlignment": 256,
                                 "minUniformBufferOffsetAlignment": 256,
@@ -337,13 +328,6 @@ class TestConvertPullRequiredCapabilitiesCore12(unittest.TestCase):
                                 "maxSampleMaskWords": 1,
                                 "discreteQueuePriorities": 2,
                                 "nonCoherentAtomSize": 256
-                            },
-                            "sparseProperties": {
-                                "residencyStandard2DBlockShape": false,
-                                "residencyStandard2DMultisampleBlockShape": false,
-                                "residencyStandard3DBlockShape": false,
-                                "residencyAlignedMipSize": true,
-                                "residencyNonResidentStrict": false
                             }
                         },
                         "VkPhysicalDeviceMaintenance3Properties": {
@@ -357,8 +341,7 @@ class TestConvertPullRequiredCapabilitiesCore12(unittest.TestCase):
                         "VkPhysicalDeviceSubgroupProperties": {
                             "subgroupSize": 1,
                             "supportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT"],
-                            "supportedOperations": ["VK_SUBGROUP_FEATURE_BASIC_BIT"],
-                            "quadOperationsInAllStages": false
+                            "supportedOperations": ["VK_SUBGROUP_FEATURE_BASIC_BIT"]
                         }
                     }
                 }
@@ -466,7 +449,6 @@ class TestConvertPullRequiredCapabilitiesCore12(unittest.TestCase):
                                 "maxSamplerLodBias": 2.0,
                                 "maxViewportDimensions": [4096, 4096],
                                 "viewportBoundsRange": [-8192.0, 8191.0],
-                                "viewportSubPixelBits": 0,
                                 "minMemoryMapAlignment": 64,
                                 "minTexelBufferOffsetAlignment": 256,
                                 "minUniformBufferOffsetAlignment": 256,
@@ -488,53 +470,20 @@ class TestConvertPullRequiredCapabilitiesCore12(unittest.TestCase):
                                 "maxSampleMaskWords": 1,
                                 "discreteQueuePriorities": 2,
                                 "nonCoherentAtomSize": 256
-                            },
-                            "sparseProperties": {
-                                "residencyStandard2DBlockShape": false,
-                                "residencyStandard2DMultisampleBlockShape": false,
-                                "residencyStandard3DBlockShape": false,
-                                "residencyAlignedMipSize": true,
-                                "residencyNonResidentStrict": false
                             }
                         },
                         "VkPhysicalDeviceVulkan11Properties": {
                             "subgroupSize": 1,
                             "subgroupSupportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT"],
                             "subgroupSupportedOperations": ["VK_SUBGROUP_FEATURE_BASIC_BIT"],
-                            "subgroupQuadOperationsInAllStages": false,
                             "maxMultiviewViewCount": 6,
                             "maxMultiviewInstanceIndex": 134217727,
                             "maxPerSetDescriptors": 1024,
                             "maxMemoryAllocationSize": 1073741824
                         },
                         "VkPhysicalDeviceVulkan12Properties": {
-                            "shaderSignedZeroInfNanPreserveFloat16": false,
-                            "shaderSignedZeroInfNanPreserveFloat32": false,
-                            "shaderSignedZeroInfNanPreserveFloat64": false,
-                            "shaderDenormPreserveFloat16": false,
-                            "shaderDenormPreserveFloat32": false,
-                            "shaderDenormPreserveFloat64": false,
-                            "shaderDenormFlushToZeroFloat16": false,
-                            "shaderDenormFlushToZeroFloat32": false,
-                            "shaderDenormFlushToZeroFloat64": false,
-                            "shaderRoundingModeRTEFloat16": false,
-                            "shaderRoundingModeRTEFloat32": false,
-                            "shaderRoundingModeRTEFloat64": false,
-                            "shaderRoundingModeRTZFloat16": false,
-                            "shaderRoundingModeRTZFloat32": false,
-                            "shaderRoundingModeRTZFloat64": false,
-                            "shaderUniformBufferArrayNonUniformIndexingNative": false,
-                            "shaderSampledImageArrayNonUniformIndexingNative": false,
-                            "shaderStorageBufferArrayNonUniformIndexingNative": false,
-                            "shaderStorageImageArrayNonUniformIndexingNative": false,
-                            "shaderInputAttachmentArrayNonUniformIndexingNative": false,
-                            "robustBufferAccessUpdateAfterBind": false,
-                            "quadDivergentImplicitLod": false,
                             "supportedDepthResolveModes": ["VK_RESOLVE_MODE_SAMPLE_ZERO_BIT"],
                             "supportedStencilResolveModes": ["VK_RESOLVE_MODE_SAMPLE_ZERO_BIT"],
-                            "independentResolveNone": false,
-                            "independentResolve": false,
-                            "filterMinmaxImageComponentMapping": false,
                             "maxTimelineSemaphoreValueDifference": 2147483647,
                             "framebufferIntegerColorSampleCounts": ["VK_SAMPLE_COUNT_1_BIT"]
                         }

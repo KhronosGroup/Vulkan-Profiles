@@ -39,6 +39,7 @@ profiles/test/data/VP_LUNARG_generated_requirements/1_transform
 profiles/test/data/VP_LUNARG_generated_requirements/2_extract
 profiles/test/data/VP_LUNARG_generated_requirements/3_consolidate
 profiles/test/data/VP_LUNARG_generated_requirements/4_diff
+profiles/test/data/VP_LUNARG_generated_requirements/5_sort
 profiles/test/data/VP_LUNARG_generated_requirements.json
 profiles/test/data/VP_LUNARG_test_host_image_copy.json
 profiles/test/data/VP_LUNARG_test_generated_name.json

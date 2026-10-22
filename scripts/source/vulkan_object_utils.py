@@ -1067,6 +1067,11 @@ def get_member_unsupported_default(vk: VulkanObject, struct_name: str, member_na
     return 0
 
 
+def is_member_unsupported_default(vk: VulkanObject, struct_name: str, member_name: str, value: Any) -> bool:
+    """Returns True if value is the default value of an unsupported struct_name::member_name capability."""
+    return value == get_member_unsupported_default(vk, struct_name, member_name)
+
+
 def parse_property_value(vk: VulkanObject, struct_name: str, prop_name: str, val_str: str) -> Any:
     if val_str is None or val_str == '???':
         return None
@@ -1117,7 +1122,8 @@ def gatherSatisfiedCoreRequiredPropertiesForVersion(
     api_version: VK_VERSION, 
     enabled_exts: set[str], 
     enabled_features: set[tuple[str, str]],
-    ignore_unsupported: bool = False
+    ignore_unsupported: bool = False,
+    skip_unsupported_defaults: bool = False
 ) -> dict[str, Any]:
     from source.profiles_json_utils import merge_capability_value
     satisfied_properties: dict[str, Any] = {}
@@ -1140,6 +1146,12 @@ def gatherSatisfiedCoreRequiredPropertiesForVersion(
         if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
             parsed_val = parse_property_value(vk, req.struct, req.name, req.value)
             if parsed_val is None:
+                continue
+
+            # A value equal to the unsupported default (e.g. false for a 'max' VkBool32 limit) expresses that the
+            # capability is unsupported: it's not a requirement but a default value. It's skipped when unsupported
+            # values are ignored, or when requested because the default values are populated separately.
+            if (ignore_unsupported or skip_unsupported_defaults) and is_member_unsupported_default(vk, req.struct, req.name, parsed_val):
                 continue
 
             if req.struct == 'VkPhysicalDeviceLimits':
@@ -1172,7 +1184,8 @@ def gatherSatisfiedExtensionRequiredProperties(
     api_version: VK_VERSION, 
     enabled_exts: set[str], 
     enabled_features: set[tuple[str, str]],
-    ignore_unsupported: bool = False
+    ignore_unsupported: bool = False,
+    skip_unsupported_defaults: bool = False
 ) -> dict[str, Any]:
     from source.profiles_json_utils import merge_capability_value
     satisfied_properties: dict[str, Any] = {}
@@ -1192,6 +1205,12 @@ def gatherSatisfiedExtensionRequiredProperties(
         if evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
             parsed_val = parse_property_value(vk, req.struct, req.name, req.value)
             if parsed_val is None:
+                continue
+
+            # A value equal to the unsupported default (e.g. false for a 'max' VkBool32 limit) expresses that the
+            # capability is unsupported: it's not a requirement but a default value. It's skipped when unsupported
+            # values are ignored, or when requested because the default values are populated separately.
+            if (ignore_unsupported or skip_unsupported_defaults) and is_member_unsupported_default(vk, req.struct, req.name, parsed_val):
                 continue
 
             struct_dict = satisfied_properties.setdefault(req.struct, {})

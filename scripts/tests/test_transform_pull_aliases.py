@@ -305,10 +305,23 @@ class TestConvertPullAliases(unittest.TestCase):
                     "version": 1,
                     "api-version": "1.2.0",
                     "profiles": ["VP_TEST_profile_a"],
-                    "capabilities": ["block_b"]
+                    "capabilities": ["VP_TEST_profile_a_to_vulkan12", "block_b"]
                 }
             },
             "capabilities": {
+                "VP_TEST_profile_a_to_vulkan12": {
+                    "features": {
+                        "VkPhysicalDeviceVulkan11Features": {
+                            "storageBuffer16BitAccess": true,
+                            "multiview": true
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceVulkan11Properties": {
+                            "maxMultiviewViewCount": 6
+                        }
+                    }
+                },
                 "block_a": {
                     "extensions": {
                         "VK_KHR_multiview": 1
@@ -666,6 +679,80 @@ class TestConvertPullAliases(unittest.TestCase):
 
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(expected_json_text))
 
+
+    def test_pull_inherited_aliases_skips_profile_defined_aliases(self):
+        """
+        Verifies that pulling the aliases of the capabilities inherited from a lower Vulkan version
+        required profile doesn't duplicate the aliases already defined by the profile, doesn't pull
+        unsupported default values (e.g. multiviewGeometryShader = false), and doesn't add a transition
+        block when every supported inherited alias is already defined.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-131.json#",
+            "profiles": {
+                "VP_TEST_profile_a": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": ["block_a"]
+                },
+                "VP_TEST_profile_b": {
+                    "version": 1,
+                    "api-version": "1.2.0",
+                    "profiles": ["VP_TEST_profile_a"],
+                    "capabilities": ["block_b"]
+                },
+                "VP_TEST_profile_c": {
+                    "version": 1,
+                    "api-version": "1.2.0",
+                    "profiles": ["VP_TEST_profile_a"],
+                    "capabilities": ["block_c"]
+                }
+            },
+            "capabilities": {
+                "block_a": {
+                    "features": {
+                        "VkPhysicalDeviceMultiviewFeatures": {
+                            "multiview": true,
+                            "multiviewGeometryShader": false
+                        },
+                        "VkPhysicalDevice16BitStorageFeatures": {
+                            "storageBuffer16BitAccess": true
+                        }
+                    }
+                },
+                "block_b": {
+                    "features": {
+                        "VkPhysicalDeviceVulkan11Features": {
+                            "multiview": true
+                        }
+                    }
+                },
+                "block_c": {
+                    "features": {
+                        "VkPhysicalDeviceVulkan11Features": {
+                            "multiview": true,
+                            "storageBuffer16BitAccess": true
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_aliases_profiles_files(self.vk, [PullBits.ALIASES], json_files_dict)
+
+        data = json_files_dict["test_profile.json"]
+        capabilities = data["capabilities"]
+
+        # 1. Only the supported inherited aliases not defined by the profile MUST be pulled into the transition block
+        self.assertEqual(data["profiles"]["VP_TEST_profile_b"]["capabilities"], ["VP_TEST_profile_a_to_vulkan12", "block_b"])
+        self.assertEqual(
+            capabilities["VP_TEST_profile_a_to_vulkan12"],
+            {"features": {"VkPhysicalDeviceVulkan11Features": {"storageBuffer16BitAccess": True}}}
+        )
+
+        # 2. No transition block MUST be added when every supported inherited alias is defined by the profile
+        self.assertEqual(data["profiles"]["VP_TEST_profile_c"]["capabilities"], ["block_c"])
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

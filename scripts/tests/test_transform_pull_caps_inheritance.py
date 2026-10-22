@@ -443,6 +443,122 @@ class TestConvertPullRequiredCapabilitiesCoreInheriance(unittest.TestCase):
         # 2. Other requirements MUST be pulled
         self.assertTrue(transition_features["VkPhysicalDeviceVulkan12Features"]["vulkanMemoryModel"])
 
+    def test_pull_required_capabilities_inheritance_unsupported_defaults_not_pulled(self):
+        """
+        Verifies that a Vulkan version requirement equal to the unsupported default value (e.g.
+        VkPhysicalDeviceSubgroupProperties::quadOperationsInAllStages = false, a 'max' limit type) is
+        not pulled into the transition block when promoting a profile to a higher Vulkan version, but
+        populated as a default value in the structure defined by the profile.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-108.json#",
+            "profiles": {
+                "VP_TEST_base_profile": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["baseline"]
+                },
+                "VP_TEST_derived_profile": {
+                    "version": 1,
+                    "api-version": "1.1.108",
+                    "profiles": ["VP_TEST_base_profile"],
+                    "capabilities": ["derived"]
+                }
+            },
+            "capabilities": {
+                "baseline": {},
+                "derived": {
+                    "features": {
+                        "VkPhysicalDeviceMultiviewFeatures": {
+                            "multiview": true
+                        }
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceSubgroupProperties": {
+                            "subgroupSize": 1,
+                            "supportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT"],
+                            "supportedOperations": ["VK_SUBGROUP_FEATURE_BASIC_BIT"]
+                        },
+                        "VkPhysicalDeviceMultiviewProperties": {
+                            "maxMultiviewViewCount": 6,
+                            "maxMultiviewInstanceIndex": 134217727
+                        },
+                        "VkPhysicalDeviceMaintenance3Properties": {
+                            "maxPerSetDescriptors": 1024,
+                            "maxMemoryAllocationSize": 1073741824
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(self.vk, [PullBits.REQUIRED_CAPABILITIES], json_files_dict)
+
+        capabilities = json_files_dict["test_profile.json"]["capabilities"]
+        subgroup_props = capabilities["derived"]["properties"]["VkPhysicalDeviceSubgroupProperties"]
+
+        # 1. The unsupported default value MUST be populated in the structure defined by the profile
+        self.assertIn("quadOperationsInAllStages", subgroup_props)
+        self.assertFalse(subgroup_props["quadOperationsInAllStages"])
+
+        # 2. The unsupported default value MUST NOT be pulled as a Vulkan 1.1 requirement
+        transition_block = capabilities.get("VP_TEST_base_profile_to_vulkan11", {})
+        self.assertNotIn("VkPhysicalDeviceSubgroupProperties", transition_block.get("properties", {}))
+
+    def test_pull_required_capabilities_inheritance_earlier_versions_feature_dependent_requirements(self):
+        """
+        Verifies that promoting a profile to a higher Vulkan version pulls the requirements of the
+        earlier Vulkan versions which depend on features required by the higher Vulkan version: Vulkan
+        1.4 requires samplerAnisotropy and fullDrawIndexUint32, so the Vulkan 1.0 maxSamplerAnisotropy = 16
+        and maxDrawIndexedIndexValue = 4294967295 requirements replace the Vulkan 1.0 required profile
+        values of the unsupported features.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-304.json#",
+            "profiles": {
+                "VP_TEST_base_profile": {
+                    "version": 1,
+                    "api-version": "1.0.68",
+                    "capabilities": ["baseline"]
+                },
+                "VP_TEST_derived_profile": {
+                    "version": 1,
+                    "api-version": "1.4.304",
+                    "profiles": ["VP_TEST_base_profile"],
+                    "capabilities": ["derived"]
+                }
+            },
+            "capabilities": {
+                "baseline": {},
+                "derived": {}
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_required_capabilities_profiles_files(self.vk, [PullBits.REQUIRED_CAPABILITIES], json_files_dict)
+
+        capabilities = json_files_dict["test_profile.json"]["capabilities"]
+        base_limits = capabilities["baseline"]["properties"]["VkPhysicalDeviceProperties"]["limits"]
+        transition_block = capabilities["VP_TEST_base_profile_to_vulkan14"]
+        transition_features = transition_block["features"]["VkPhysicalDeviceFeatures"]
+        transition_limits = transition_block["properties"]["VkPhysicalDeviceProperties"]["limits"]
+
+        # 1. The Vulkan 1.0 required profile MUST keep the values of the unsupported features
+        self.assertEqual(base_limits["maxSamplerAnisotropy"], 1.0)
+        self.assertEqual(base_limits["maxDrawIndexedIndexValue"], 16777215)
+
+        # 2. The Vulkan 1.4 required features MUST be pulled
+        self.assertTrue(transition_features["samplerAnisotropy"])
+        self.assertTrue(transition_features["fullDrawIndexUint32"])
+
+        # 3. The Vulkan 1.0 requirements depending on these features MUST be pulled
+        self.assertEqual(transition_limits["maxSamplerAnisotropy"], 16.0)
+        self.assertEqual(transition_limits["maxDrawIndexedIndexValue"], 4294967295)
+
+        # 4. The Vulkan 1.0 requirements already satisfied by the required profile MUST NOT be duplicated
+        self.assertNotIn("maxStorageBufferRange", transition_limits)
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(

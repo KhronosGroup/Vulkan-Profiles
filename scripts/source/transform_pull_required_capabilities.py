@@ -461,24 +461,36 @@ def pull_required_capabilities_single_profile(
 
                 transition_features = {}
                 transition_properties = {}
-                for ver in VK_VERSION.versions():
-                    if parent_api_version < ver <= api_version:
-                        satisfied_feat, _ = gatherSatisfiedCoreRequiredFeaturesForVersion(
-                            vk, ver, api_version, all_exts, all_enabled_features_set
-                        )
-                        if satisfied_feat:
-                            deep_merge_dict(transition_features, satisfied_feat)
-                            for s_name, members in satisfied_feat.items():
-                                if isinstance(members, dict):
-                                    for m_name, val in members.items():
-                                        if val:
-                                            all_enabled_features_set.add((s_name, m_name))
 
-                        satisfied_prop = gatherSatisfiedCoreRequiredPropertiesForVersion(
-                            vk, ver, api_version, all_exts, all_enabled_features_set, ignore_unsupported=ignore_unsupported
-                        )
-                        if satisfied_prop:
-                            deep_merge_dict(transition_properties, satisfied_prop)
+                # The features required by the new Vulkan versions are gathered first, followed by the features of
+                # the required profile Vulkan versions which depend on them, so that the requirements of every
+                # Vulkan version are evaluated with all the features enabled by the profile.
+                new_versions = [ver for ver in VK_VERSION.versions() if parent_api_version < ver <= api_version]
+                required_versions = [ver for ver in VK_VERSION.versions() if ver <= parent_api_version]
+                for ver in new_versions + required_versions:
+                    satisfied_feat, _ = gatherSatisfiedCoreRequiredFeaturesForVersion(
+                        vk, ver, api_version, all_exts, all_enabled_features_set
+                    )
+                    if satisfied_feat:
+                        deep_merge_dict(transition_features, satisfied_feat)
+                        for s_name, members in satisfied_feat.items():
+                            if isinstance(members, dict):
+                                for m_name, val in members.items():
+                                    if val:
+                                        all_enabled_features_set.add((s_name, m_name))
+
+                # The property requirements of the required profile Vulkan versions are gathered too: the ones depending
+                # on features newly enabled by the profile (e.g. the Vulkan 1.0 maxSamplerAnisotropy = 16 requirement
+                # once Vulkan 1.4 requires samplerAnisotropy) are not satisfied by the required profile capabilities.
+                # Default values are not requirements of the Vulkan version: they are not pulled into the transition
+                # block but populated afterward in the structures of the profile.
+                for ver in required_versions + new_versions:
+                    satisfied_prop = gatherSatisfiedCoreRequiredPropertiesForVersion(
+                        vk, ver, api_version, all_exts, all_enabled_features_set, ignore_unsupported=ignore_unsupported,
+                        skip_unsupported_defaults=True
+                    )
+                    if satisfied_prop:
+                        deep_merge_dict(transition_properties, satisfied_prop)
 
                 # The capabilities defined by the profile itself take precedence over the pulled requirements,
                 # unless ignore_subcore is set.
