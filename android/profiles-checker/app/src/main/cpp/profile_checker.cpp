@@ -38,6 +38,8 @@
 #define VP_DEBUG_MESSAGE_CALLBACK VpCheckerDebugCallback
 #include VP_CHECKER_GENERATED_HEADER
 
+#include "vp_checker_build_info.h"  // generated at build time by gen_build_info.cmake
+
 namespace {
 
 constexpr const char* kLogTag = "VulkanProfilesChecker";
@@ -194,8 +196,48 @@ const char* RequirementKindName(RequirementKind kind) {
     }
 }
 
+namespace {
+
+std::string AppVersionString() {
+    return std::string(VP_CHECKER_VERSION_NAME) + " (" + std::to_string(VP_CHECKER_VERSION_CODE) + ")";
+}
+
+// ABI of the running process. Distinct from ro.product.cpu.abi: a universal APK
+// on a 64-bit device runs arm64-v8a, but a single-ABI test build may run armeabi-v7a.
+constexpr const char* kAppAbi =
+#if defined(__aarch64__)
+    "arm64-v8a";
+#elif defined(__arm__)
+    "armeabi-v7a";
+#elif defined(__x86_64__)
+    "x86_64";
+#elif defined(__i386__)
+    "x86";
+#elif defined(__riscv)
+    "riscv64";
+#else
+    "unknown";
+#endif
+
+std::string AppGitCommitString() {
+    std::string commit = VP_CHECKER_GIT_COMMIT;
+    if (VP_CHECKER_GIT_DIRTY) commit += "-dirty";
+    return commit;
+}
+
+}  // namespace
+
+std::string AppBuildIdentityLine() {
+    // Plain ASCII separators: the bundled font rasterizer only covers Latin-1.
+    return "v" + AppVersionString() + " " + kAppAbi + " | built " + VP_CHECKER_BUILD_TIME_UTC + " | " + AppGitCommitString();
+}
+
 CheckReport RunProfileChecks() {
     CheckReport report;
+    report.appVersion = AppVersionString();
+    report.buildTime = VP_CHECKER_BUILD_TIME_UTC;
+    report.gitCommit = AppGitCommitString();
+    report.appAbi = kAppAbi;
     report.vulkanHeadersVersion = VP_CHECKER_VULKAN_HEADERS_TAG;
     report.system = QuerySystemInfo();
 

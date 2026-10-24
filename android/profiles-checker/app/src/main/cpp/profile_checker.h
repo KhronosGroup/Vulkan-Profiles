@@ -74,6 +74,11 @@ struct GpuReport {
 struct CheckReport {
     bool ok = false;         // false when checks could not run at all
     std::string error;       // populated when ok == false
+    // Build identity of the app itself (from the generated vp_checker_build_info.h).
+    std::string appVersion;   // e.g. "1.0.0 (10000)"
+    std::string buildTime;    // e.g. "2026-10-22 04:50 UTC"
+    std::string gitCommit;    // e.g. "4af21a7f1" or "4af21a7f1-dirty"
+    std::string appAbi;       // ABI this process was built for (arm64-v8a, armeabi-v7a, x86_64, x86)
     std::string vulkanHeadersVersion;
     std::string instanceVersion;  // loader/instance API version
     uint32_t instanceVersionRaw = 0;
@@ -84,3 +89,7 @@ struct CheckReport {
 
 // Runs all profile checks. Safe to call from a worker thread.
 CheckReport RunProfileChecks();
+
+// One-line build identity, e.g. "v1.0.0 (10000) arm64-v8a | built 2026-10-22 04:50 UTC | 4af21a7db".
+// Available before any checks run so the UI can show it in every state.
+std::string AppBuildIdentityLine();
