@@ -148,6 +148,10 @@ function(LayerTestAndroid NAME)
     target_link_libraries(${ANDROID_APK_NAME} log android dl vulkan)
     target_link_libraries(${ANDROID_APK_NAME} Vulkan::Headers GTest::gtest GTest::gtest_main Vulkan::LayerSettings Vulkan::CompilerConfiguration Vulkan::CompilerConfigurationExtra)
 
+    # Support 16KB page sizes, required for NDK r28 and Android 15+ devices
+    # https://developer.android.com/guide/practices/page-sizes#compile-r28
+    target_link_options(${ANDROID_APK_NAME} PRIVATE "-Wl,-z,max-page-size=16384")
+
     set(_android_jar ${ANDROID_SDK_HOME}/platforms/android-${ANDROID_PLATFORM}/android.jar)
     set(_aapt ${ANDROID_SDK_HOME}/build-tools/${ANDROID_BUILD_TOOLS}/aapt)
     set(_zipalign ${ANDROID_SDK_HOME}/build-tools/${ANDROID_BUILD_TOOLS}/zipalign)
