@@ -137,6 +137,10 @@ endif()
 
 elseif(ANDROID)
     message(DEBUG "Functions are exported via PROFILES_EXPORT")
+
+    # Support 16KB page sizes, required for NDK r28 and Android 15+ devices
+    # https://developer.android.com/guide/practices/page-sizes#compile-r28
+    target_link_options(ProfilesLayer PRIVATE "-Wl,-z,max-page-size=16384")
 else()
     target_link_options(ProfilesLayer PRIVATE LINKER:--version-script=${CMAKE_CURRENT_SOURCE_DIR}/${LAYER_NAME}.map,-Bsymbolic,--exclude-libs,ALL)
 endif()
