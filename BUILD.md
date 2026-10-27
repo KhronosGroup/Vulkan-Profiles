@@ -73,27 +73,32 @@ Optional software packages:
 
 ### macOS System Requirements
 
-MacOS 10.15 have been tested with this repo.
+macOS 27 on Apple Silicon has been tested with this repo.
 
-- [CMake 3.22.1](https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1-Darwin-x86_64.tar.gz) is recommended.
+- Xcode Command Line Tools (`xcode-select --install`).
+- [CMake 3.22.1](https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1-macos-universal.tar.gz) or later is required.
 
 Setup Homebrew and components
 
-- Ensure Homebrew is at the beginning of your PATH:
+- Ensure Homebrew is in your PATH (`/opt/homebrew` on Apple Silicon, `/usr/local` on Intel):
 ```
-export PATH=/usr/local/bin:$PATH
-```
-
-- Add packages with the following (may need refinement)
-```
-brew install python python3 git
+eval "$(/opt/homebrew/bin/brew shellenv)"
 ```
 
-- Install python packages
+- Add packages with the following
 ```
-pip3 install jsonschema
-pip3 install pyparsing
-pip3 install pyinstaller
+brew install cmake python git
+```
+
+- Python packages: by default, CMake creates a Python virtual environment in the build directory
+  and installs the packages listed in `requirements.txt`, so no manual installation is needed.
+  Homebrew's Python rejects global `pip3 install` (PEP 668). To use your own environment
+  instead, configure with `-D SKIP_PYTHON_AUTO_INSTALL=ON` and install the packages into a venv,
+  from the repository root:
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
 ### Android Additional System Requirements
@@ -160,8 +165,8 @@ ctest -C Debug --output-on-failure --parallel 16
 ```
 git clone git@github.com:KhronosGroup/Vulkan-Profiles.git
 cd Vulkan-Profiles
-cmake -S . -B build/ -D CMAKE_BUILD_TYPE=Debug -D UPDATE_DEPS=ON
-cmake --build ./build/
+cmake -S . -B build/ -D CMAKE_BUILD_TYPE=Debug -D BUILD_TESTS=ON -D UPDATE_DEPS=ON
+cmake --build ./build/ --parallel
 ```
 
 ### Linux and macOS Unit Tests
