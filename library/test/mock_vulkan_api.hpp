@@ -277,7 +277,6 @@ public:
 
     void SetInstanceAPIVersion(uint32_t version)
     {
-        VpInstanceFunctionsLoadFlags loadInstanceFlags{};
         m_instanceAPIVersion = version;
         if (version >= VK_API_VERSION_1_1) {
             AddInstanceProc(nullptr, "vkEnumerateInstanceVersion", &vkEnumerateInstanceVersion);
@@ -298,7 +297,6 @@ public:
             RemoveInstanceProc(vkInstance, "vkGetPhysicalDeviceProperties2");
             RemoveInstanceProc(vkInstance, "vkGetPhysicalDeviceFormatProperties2");
             RemoveInstanceProc(vkInstance, "vkGetPhysicalDeviceQueueFamilyProperties2");
-            loadInstanceFlags = VP_INSTANCE_FUNCTIONS_LOAD_KHR_GET_PHYSICAL_DEVICE_PROPERTIES2_BIT;
         }
     }
 
