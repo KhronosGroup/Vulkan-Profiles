@@ -140,6 +140,51 @@ def _bakeDefaultPropertiesIfMissing(vk: VulkanObject):
                         ext_obj.propertyRequirement.append(dp)
 
 
+def _checkMissingPropertyRequirements(vk: VulkanObject) -> list[str]:
+    """Logs and returns every property structure member that has no PropertyRequirement in vk.
+
+    Property structures are VkPhysicalDeviceProperties and the structures extending VkPhysicalDeviceProperties2.
+    A requirement with a None value (implementation-dependent) counts as listed. Members missing a requirement
+    typically come from a new vk.xml and need to be added to DEFAULT_CORE_PROPERTY_REQUIREMENTS or
+    DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS.
+    """
+    listed_members = set()
+    for owner in list(vk.versions.values()) + list(vk.extensions.values()):
+        for req in getattr(owner, 'propertyRequirement', None) or []:
+            struct_obj = getStructByName(vk.structs, req.struct)
+            listed_members.add((struct_obj.name if struct_obj else req.struct, req.name))
+    listed_structs = {struct_name for struct_name, _ in listed_members}
+
+    missing_members = []
+
+    def checkStruct(struct_name: str):
+        for member in vk.structs[struct_name].members:
+            if member.name in ('sType', 'pNext'):
+                continue
+            # Nested structures with their own requirements (VkPhysicalDeviceLimits, VkPhysicalDeviceSparseProperties)
+            if member.type in listed_structs and not member.pointer:
+                checkStruct(member.type)
+            elif (struct_name, member.name) not in listed_members:
+                missing_members.append(f'{struct_name}::{member.name}')
+
+    property_structs = ['VkPhysicalDeviceProperties'] + sorted(
+        struct_name for struct_name, struct_obj in vk.structs.items()
+        if 'VkPhysicalDeviceProperties2' in struct_obj.extends
+    )
+    for struct_name in property_structs:
+        if struct_name in vk.structs:
+            checkStruct(struct_name)
+
+    if missing_members:
+        logging.error(
+            f'{len(missing_members)} property structure members have no default property requirement, '
+            'add them to DEFAULT_CORE_PROPERTY_REQUIREMENTS or DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS:\n'
+            + '\n'.join(f'    {name}' for name in missing_members)
+        )
+
+    return missing_members
+
+
 def _applyPropertyLimitTypeWorkarounds(xml_root: ElementTree.Element | None = None, vk: VulkanObject | None = None) -> None:
     """Applies overrides for incorrect limittypes in vk.xml and the generated VulkanObject."""
     if xml_root is not None:
@@ -221,6 +266,7 @@ def initVulkanObject(target_api: str = 'vulkan', alternative_xml: str = None, vi
         
         _bakeDefaultVersionsIfMissing(vk)
         _bakeDefaultPropertiesIfMissing(vk)
+        _checkMissingPropertyRequirements(vk)
 
         return vk
 
