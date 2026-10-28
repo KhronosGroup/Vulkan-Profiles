@@ -364,7 +364,7 @@ VPAPI_ATTR VkResult vpGetProfileRequiredProfiles(
     uint32_t*                                   pPropertyCount,
     VpProfileProperties*                        pProperties);
 
-// Query the profile required Vulkan API version
+// Query the profile required Vulkan API version, returns 0 on failure
 VPAPI_ATTR uint32_t vpGetProfileAPIVersion(
 #ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
@@ -1480,7 +1480,7 @@ VPAPI_ATTR uint32_t vpGetProfileAPIVersion(
 
     VkResult result_validate = vp.validate(false);
     if (result_validate != VK_SUCCESS) {
-        return result_validate;
+        return 0;
     }
 
     const std::vector<VpProfileProperties>& gathered_profiles = detail::GatherProfiles(*pProfile, nullptr);
