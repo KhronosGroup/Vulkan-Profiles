@@ -187,6 +187,7 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceLimits', 'maxSampleMaskWords', '1', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'discreteQueuePriorities', '2', None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'nonCoherentAtomSize', '256', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'strictLines', 'false', None),
         PropertyRequirement('VkPhysicalDeviceSparseProperties', 'residencyStandard2DBlockShape', 'false', None),
         PropertyRequirement('VkPhysicalDeviceSparseProperties', 'residencyStandard2DMultisampleBlockShape', 'false', None),
         PropertyRequirement('VkPhysicalDeviceSparseProperties', 'residencyStandard3DBlockShape', 'false', None),
@@ -204,6 +205,15 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceLimits', 'timestampPeriod', None, None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'optimalBufferCopyOffsetAlignment', None, None),
         PropertyRequirement('VkPhysicalDeviceLimits', 'optimalBufferCopyRowPitchAlignment', None, None),
+
+        # Device identification, reported by the implementation
+        PropertyRequirement('VkPhysicalDeviceProperties', 'apiVersion', None, None),
+        PropertyRequirement('VkPhysicalDeviceProperties', 'driverVersion', None, None),
+        PropertyRequirement('VkPhysicalDeviceProperties', 'vendorID', None, None),
+        PropertyRequirement('VkPhysicalDeviceProperties', 'deviceID', None, None),
+        PropertyRequirement('VkPhysicalDeviceProperties', 'deviceType', None, None),
+        PropertyRequirement('VkPhysicalDeviceProperties', 'deviceName', None, None),
+        PropertyRequirement('VkPhysicalDeviceProperties', 'pipelineCacheUUID', None, None),
 
         # Unsupported
         PropertyRequirement('VkPhysicalDeviceLimits', 'sparseAddressSpaceSize', '0', '!VkPhysicalDeviceFeatures::sparseBinding'),
@@ -340,6 +350,7 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceFloatControlsProperties', 'shaderRoundingModeRTZFloat32', 'false', None),
         PropertyRequirement('VkPhysicalDeviceFloatControlsProperties', 'shaderRoundingModeRTZFloat64', 'false', None),
 
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'filterMinmaxImageComponentMapping', 'false', None),
         PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSignedZeroInfNanPreserveFloat16', 'false', None),
         PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSignedZeroInfNanPreserveFloat32', 'false', None),
         PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSignedZeroInfNanPreserveFloat64', 'false', None),
@@ -740,6 +751,9 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         # bit would reject conformant devices. Left as implementation-dependent until profiles can
         # express "at least one of" requirements.
         PropertyRequirement('VkPhysicalDeviceCopyMemoryIndirectPropertiesKHR', 'supportedQueues', None, 'VkPhysicalDeviceCopyMemoryIndirectFeaturesKHR::indirectMemoryCopy,VkPhysicalDeviceCopyMemoryIndirectFeaturesKHR::indirectMemoryToImageCopy'),
+    ],
+    'VK_KHR_compute_shader_derivatives': [
+        PropertyRequirement('VkPhysicalDeviceComputeShaderDerivativesPropertiesKHR', 'meshAndTaskShaderDerivatives', 'false', None),
     ],
     'VK_KHR_cooperative_matrix': [
         PropertyRequirement('VkPhysicalDeviceCooperativeMatrixPropertiesKHR', 'cooperativeMatrixSupportedStages', 'VK_SHADER_STAGE_COMPUTE_BIT', 'VkPhysicalDeviceCooperativeMatrixFeaturesKHR::cooperativeMatrix'),
