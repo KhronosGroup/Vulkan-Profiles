@@ -35,16 +35,6 @@ if (ANDROID)
     set(LAYER_TEST_FILES
         tests_mechanism.cpp
     )
-elseif(APPLE)
-    set(LAYER_TEST_FILES
-        tests
-        tests_promoted
-        tests_generated
-        tests_mechanism
-        tests_mechanism_format
-        tests_mechanism_check_values
-        tests_util
-    )
 else()
     set(LAYER_TEST_FILES
         tests
