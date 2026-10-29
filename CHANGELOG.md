@@ -16,6 +16,7 @@
 ### Improvements:
 - Add `validate` analysis check to report unratified extensions in profiles files
 - Add `transform --strip unratified` to remove all unratified extensions in profiles files
+- Speed up profiles files schema validation by checking the profiles schema only once
 
 ### Profiles:
 - Add VP_ANDROID_18_requirements profile

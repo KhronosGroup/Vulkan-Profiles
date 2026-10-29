@@ -369,10 +369,36 @@ def collect_profile_capabilities(json_files_dict: dict, json_file_data: dict, pr
     return combined_caps
 
 
+# Validators keyed by id() of the schema dict. The schema dict is stored with its validator so that
+# its id() can't be reused by another object while the entry exists.
+_schema_validators: dict[int, tuple[dict, Any]] = {}
+
+
+def _get_schema_validator(schema_data: dict):
+    """Returns a validator for the schema, checking the schema itself only the first time it is seen.
+
+    jsonschema.validate() checks the schema against its meta-schema on every call, which costs ~45 ms
+    for the profiles schema, more than validating most profile files.
+    """
+    import jsonschema
+
+    cached = _schema_validators.get(id(schema_data))
+    if cached is not None and cached[0] is schema_data:
+        return cached[1]
+
+    validator_class = jsonschema.validators.validator_for(schema_data)
+    validator_class.check_schema(schema_data)
+    validator = validator_class(schema_data)
+    _schema_validators[id(schema_data)] = (schema_data, validator)
+    return validator
+
+
 def _validate_profiles_json_data(json_data, schema_data) -> bool:
     try:
         import jsonschema
-        jsonschema.validate(json_data, schema_data)
+        error = jsonschema.exceptions.best_match(_get_schema_validator(schema_data).iter_errors(json_data))
+        if error is not None:
+            raise error
         return True
     except jsonschema.exceptions.ValidationError as e:
         # TODO: Schema failures are logged at INFO level, so they only show with --verbose, and
