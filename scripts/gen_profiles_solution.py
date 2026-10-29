@@ -724,6 +724,7 @@ VPAPI_ATTR bool isPowerOfTwo(double source) {
 
 using PFN_vpStructFiller = void(*)(VkBaseOutStructure* p);
 using PFN_vpStructComparator = bool(*)(VkBaseOutStructure* p);
+using PFN_vpPropertyComparator = bool(*)(VkBaseOutStructure* p, const VkPhysicalDeviceFeatures& features);
 using PFN_vpStructChainerCb = void(*)(VkBaseOutStructure* p, void* pUser);
 using PFN_vpStructChainer = void(*)(VkBaseOutStructure* p, void* pUser, PFN_vpStructChainerCb pfnCb);
 using PFN_vpStructArrayChainerCb = void(*)(uint32_t count, VkBaseOutStructure* p, void* pUser);
@@ -736,7 +737,7 @@ struct VpFeatureDesc {
 
 struct VpPropertyDesc {
     PFN_vpStructFiller              pfnFiller;
-    PFN_vpStructComparator          pfnComparator;
+    PFN_vpPropertyComparator        pfnComparator;
 };
 
 struct VpQueueFamilyDesc {
@@ -2024,9 +2025,12 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
                                 pUserData->physicalDevice,
                                 static_cast<VkPhysicalDeviceProperties2KHR*>(static_cast<void*>(p)));
 
+                            VkPhysicalDeviceFeatures2KHR device_features2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR };
+                            pUserData->gpdp2.pfnGetPhysicalDeviceFeatures2(pUserData->physicalDevice, &device_features2);
+
                             pUserData->supported = true;
                             while (p != nullptr) {
-                                if (!pUserData->variant->property.pfnComparator(p)) {
+                                if (!pUserData->variant->property.pfnComparator(p, device_features2.features)) {
                                     pUserData->supported = false;
                                 }
                                 p = p->pNext;
@@ -3020,6 +3024,15 @@ VPAPI_ATTR VkResult vpGetProfileVideoFormatStructureTypes(
 }
 #endif  // VK_KHR_video_queue
 '''
+
+# Workaround until this generator uses VulkanObject and the 'depends' of its property requirements:
+# VkPhysicalDeviceLimits members whose required limits only apply when the VkPhysicalDeviceFeatures member is supported.
+LIMITS_FEATURE_DEPENDS = {
+    'lineWidthRange': 'wideLines',
+    'lineWidthGranularity': 'wideLines',
+    'pointSizeRange': 'largePoints',
+    'pointSizeGranularity': 'largePoints',
+}
 
 PRIVATE_IMPL_FEATURES_CHAIN_IMPL = '''
     VkPhysicalDeviceFeatures2KHR requiredFeaturesChain{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR, nullptr};
@@ -5194,6 +5207,14 @@ class VulkanProfile():
                 else:
                     logging.error("Unsupported limittype '{0}' in member '{1}' of structure '{2}'".format(limittype, member, structDef.name))
 
+                # Only check the limit when the device supports the feature it depends on
+                dependFeature = LIMITS_FEATURE_DEPENDS.get(member) if structDef.name == 'VkPhysicalDeviceLimits' else None
+                if dependFeature is not None:
+                    if type(comparePredFmt) == list:
+                        comparePredFmt = [ '!features.' + dependFeature + ' || (' + predFmt + ')' for predFmt in comparePredFmt ]
+                    else:
+                        comparePredFmt = '!features.' + dependFeature + ' || (' + comparePredFmt + ')'
+
                 if type(value) == dict:
                     # Nested structure
                     memberDef = self.registry.structs.get(structDef.members[member].type)
@@ -5397,7 +5418,7 @@ class VulkanProfile():
                 '    [](VkBaseOutStructure* p) { (void)p;\n')
         gen += self.gen_structFunc(self.structs.property, capabilities.properties, self.gen_structFill, fillFmt)
         gen += ('    },\n'
-                '    [](VkBaseOutStructure* p) -> bool { (void)p;\n'
+                '    [](VkBaseOutStructure* p, const VkPhysicalDeviceFeatures& features) -> bool { (void)p; (void)features;\n'
                 '        bool ret = true;\n')
         gen += self.gen_structFunc(self.structs.property, capabilities.properties, self.gen_structCompare, cmpFmtProperties, debugMessages)
         gen += ('        return ret;\n'
