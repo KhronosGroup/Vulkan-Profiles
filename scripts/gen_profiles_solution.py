@@ -5640,6 +5640,9 @@ class VulkanProfilesFiles():
         if validate and schema is None:
             schema = VulkanProfilesSchemaGenerator(registry).schema
 
+        # Built once: jsonschema.validate() would check the schema itself again for every profile file
+        schema_validator = None
+
         if os.path.isfile(profiles_dir):
             dirAbsPath = os.path.dirname(os.path.abspath(profiles_dir))
             filenames = [os.path.basename(profiles_dir)]
@@ -5662,7 +5665,13 @@ class VulkanProfilesFiles():
                         try:
                             import jsonschema
                             logging.info("Validating profile file: '{0}'".format(filename))
-                            jsonschema.validate(json_root, schema)
+                            if schema_validator is None:
+                                validator_class = jsonschema.validators.validator_for(schema)
+                                validator_class.check_schema(schema)
+                                schema_validator = validator_class(schema)
+                            error = jsonschema.exceptions.best_match(schema_validator.iter_errors(json_root))
+                            if error is not None:
+                                raise error
                         except ModuleNotFoundError:
                             logging.warning("`jsonschema` module is not installed, schema validation skip")
                     self.json_profiles_database.json_files.append(json_root)
