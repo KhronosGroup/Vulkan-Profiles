@@ -146,10 +146,8 @@ function(add_unit_test_object NAME)
 endfunction(add_unit_test_object)
 
 add_unit_test(test_api_reflection ${vulkan_profiles_source_roadmap})
-if(NOT APPLE)
-    add_unit_test_object(test_api_profile_object ${vulkan_profiles_source_roadmap})
-    add_unit_test(test_api_create_device ${vulkan_profiles_source_requirements})
-endif()
+add_unit_test_object(test_api_profile_object ${vulkan_profiles_source_roadmap})
+add_unit_test(test_api_create_device ${vulkan_profiles_source_requirements})
 
 function (create_android_package NAME)
     if (NOT ANDROID_SDK_HOME)
