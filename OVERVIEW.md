@@ -213,6 +213,6 @@ vkprofiles validate --registry vk.xml --input path/to/profiles
 
 Alternatively, web-based validators can also be used:
 
-* [http://www.jsonschemavalidator.net/](http://www.jsonschemavalidator.net/)
-* [https://json-schema-validator.herokuapp.com/](https://json-schema-validator.herokuapp.com/)
+* [https://www.jsonschemavalidator.net/](https://www.jsonschemavalidator.net/)
+* [https://jsonviewertool.com/json-schema-validator/](https://jsonviewertool.com/json-schema-validator)
 * [https://jsonschemalint.com/#/version/draft-04/markup/json/](https://jsonschemalint.com/%23/version/draft-04/markup/json/)
