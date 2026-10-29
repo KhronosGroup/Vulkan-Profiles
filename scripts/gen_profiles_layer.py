@@ -120,10 +120,13 @@ const VkExtensionProperties kInstanceExtensionProperties[] = {
 const uint32_t kInstanceExtensionPropertiesCount = static_cast<uint32_t>(std::size(kInstanceExtensionProperties));
 
 // Device extensions that this layer provides:
-const std::array<VkExtensionProperties, 2> kDeviceExtensionProperties = {
-    {{VK_EXT_TOOLING_INFO_EXTENSION_NAME, VK_EXT_TOOLING_INFO_SPEC_VERSION},
-     {VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, VK_KHR_PORTABILITY_SUBSET_SPEC_VERSION}}};
-const uint32_t kDeviceExtensionPropertiesCount = static_cast<uint32_t>(kDeviceExtensionProperties.size());
+const VkExtensionProperties kDeviceExtensionProperties[] = {
+    {VK_EXT_TOOLING_INFO_EXTENSION_NAME, VK_EXT_TOOLING_INFO_SPEC_VERSION},
+#ifdef VK_KHR_portability_subset
+    {VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, VK_KHR_PORTABILITY_SUBSET_SPEC_VERSION},
+#endif  // VK_KHR_portability_subset
+};
+const uint32_t kDeviceExtensionPropertiesCount = static_cast<uint32_t>(std::size(kDeviceExtensionProperties));
 '''
 
 GLOBAL_VARS = '''
@@ -2667,7 +2670,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
     ProfileLayerSettings* layer_settings = &JsonLoader::Find(pdd->instance())->layer_settings;
     if (pLayerName) {
         if (strcmp(pLayerName, kLayerName) == 0)
-            result = EnumerateProperties(kDeviceExtensionPropertiesCount, kDeviceExtensionProperties.data(), pCount, pProperties);
+            result = EnumerateProperties(kDeviceExtensionPropertiesCount, kDeviceExtensionProperties, pCount, pProperties);
         else
             result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
     } else if (pdd == nullptr || (!(layer_settings->simulate.capabilities & SIMULATE_EXTENSIONS_BIT) &&
@@ -2677,6 +2680,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
         result = EnumerateExtensions(pdd->simulation_extensions_, pCount, pProperties);
     }
 
+#ifdef VK_KHR_portability_subset
     if (result == VK_SUCCESS && !pLayerName && layer_settings->simulate.emulate_portability &&
         !PhysicalDeviceData::HasSimulatedOrRealExtension(physicalDevice, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {
         if (pProperties) {
@@ -2689,6 +2693,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
             *pCount += 1;
         }
     }
+#endif  // VK_KHR_portability_subset
 
     return result;
 }
@@ -3340,6 +3345,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                 VkPhysicalDeviceFeatures2KHR feature_chain = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR};
                 VkPhysicalDeviceMemoryProperties2KHR memory_chain = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PROPERTIES_2_KHR};
 
+#ifdef VK_KHR_portability_subset
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {
                     property_chain.pNext = &(pdd.physical_device_portability_subset_properties_);
                     feature_chain.pNext = &(pdd.physical_device_portability_subset_features_);
@@ -3365,6 +3371,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                         layer_settings->portability.triangleFans,
                         layer_settings->portability.vertexAttributeAccessBeyondStride};
                 }
+#endif  // VK_KHR_portability_subset
 '''
 
 ENUMERATE_PHYSICAL_DEVICES_MIDDLE = '''
@@ -3504,6 +3511,7 @@ bool JsonLoader::GetStruct(const char* device_name, bool requested_profile, cons
 '''
 
 GET_VALUE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES = '''
+#ifdef VK_KHR_portability_subset
 bool JsonLoader::GetStruct(const char* device_name, bool requested_profile, const Json::Value &parent, VkPhysicalDevicePortabilitySubsetPropertiesKHR *dest) {
     LogMessage(&layer_settings, DEBUG_REPORT_DEBUG_BIT, \"\\tJsonLoader::GetStruct(VkPhysicalDevicePortabilitySubsetPropertiesKHR)\\n");
     bool valid = true;
@@ -3512,9 +3520,11 @@ bool JsonLoader::GetStruct(const char* device_name, bool requested_profile, cons
     }
     return valid;
 }
+#endif  // VK_KHR_portability_subset
 '''
 
 GET_VALUE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES = '''
+#ifdef VK_KHR_portability_subset
 bool JsonLoader::GetStruct(const char* device_name, bool requested_profile, const Json::Value &parent, VkPhysicalDevicePortabilitySubsetFeaturesKHR *dest) {
     LogMessage(&layer_settings, DEBUG_REPORT_DEBUG_BIT, \"\\tJsonLoader::GetStruct(VkPhysicalDevicePortabilitySubsetFeaturesKHR)\\n");
     bool valid = true;
@@ -3555,6 +3565,7 @@ bool JsonLoader::GetStruct(const char* device_name, bool requested_profile, cons
     }
     return valid;
 }
+#endif  // VK_KHR_portability_subset
 '''
 
 class VulkanProfilesLayerGenerator():
@@ -5157,6 +5168,7 @@ class VulkanProfilesLayerGenerator():
         gen += '        // These switch statements check which struct is in the pNext chain and, if the physical device has the proper extension,\n'
         gen += '        // fill the struct with any override data provided by the PhysicalDeviceData object.\n\n'
         gen += '        switch (structure->sType) {\n'
+        gen += '#ifdef VK_KHR_portability_subset\n'
         gen += '            // VK_KHR_portability_subset is a special case since it can also be emulated by the Profiles layer.\n'
         gen += '            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR:\n'
         gen += '                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) ||\n'
@@ -5170,6 +5182,7 @@ class VulkanProfilesLayerGenerator():
         gen += '                    psp->pNext = pNext;\n'
         gen += '                }\n'
         gen += '                break;\n'
+        gen += '#endif  // VK_KHR_portability_subset\n'
 
         for property in self.non_extension_properties:
             gen += self.generate_fill_case(property)
@@ -5538,10 +5551,12 @@ class VulkanProfilesLayerGenerator():
                 if feature != 'VkPhysicalDevicePortabilitySubsetFeaturesKHR':
                     gen += '    bool GetStruct(const char* device_name, bool requested_profile, const Json::Value &parent, ' + feature + ' *dest);\n'
             gen += self.generate_platform_protect_end(ext)
-        for struct in self.additional_features:
+        for struct in self.additional_features + self.additional_properties:
+            if struct.startswith('VkPhysicalDevicePortabilitySubset'):
+                gen += '#ifdef VK_KHR_portability_subset\n'
             gen += '    bool GetStruct(const char* device_name, bool requested_profile, const Json::Value &parent, ' + struct + ' *dest);\n'
-        for struct in self.additional_properties:
-            gen += '    bool GetStruct(const char* device_name, bool requested_profile, const Json::Value &parent, ' + struct + ' *dest);\n'
+            if struct.startswith('VkPhysicalDevicePortabilitySubset'):
+                gen += '#endif  // VK_KHR_portability_subset\n'
 
         gen += WARN_FUNCTIONS
         gen += GET_VALUE_FUNCTIONS

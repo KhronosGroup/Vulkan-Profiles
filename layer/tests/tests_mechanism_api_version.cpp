@@ -204,6 +204,7 @@ TEST_F(TestsMechanismApiVersion, api_versions) {
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
         ASSERT_EQ(result, VK_SUCCESS);
 
+#ifdef VK_KHR_portability_subset
         EXPECT_EQ(1, extCount);
 
         std::vector<VkExtensionProperties> ext(extCount);
@@ -211,6 +212,9 @@ TEST_F(TestsMechanismApiVersion, api_versions) {
         ASSERT_EQ(result, VK_SUCCESS);
 
         EXPECT_STREQ(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, ext[0].extensionName);
+#else
+        EXPECT_EQ(0, extCount);
+#endif  // VK_KHR_portability_subset
 
         inst_builder.reset();
     }
@@ -322,7 +326,11 @@ TEST_F(TestsMechanismApiVersion, api_versions) {
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
         ASSERT_EQ(result, VK_SUCCESS);
 
+#ifdef VK_KHR_portability_subset
         EXPECT_EQ(24, extCount);
+#else
+        EXPECT_EQ(23, extCount);
+#endif  // VK_KHR_portability_subset
 
         std::vector<VkExtensionProperties> ext(extCount);
         result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
@@ -351,7 +359,10 @@ TEST_F(TestsMechanismApiVersion, api_versions) {
                                           VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME,
                                           VK_KHR_BIND_MEMORY_2_EXTENSION_NAME,
                                           VK_KHR_MAINTENANCE_3_EXTENSION_NAME,
-                                          VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME};
+#ifdef VK_KHR_portability_subset
+                                          VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME,
+#endif  // VK_KHR_portability_subset
+                                          };
         for (const auto& extension : ext) {
             bool found = false;
             for (const auto& expected : expected_extensions) {
