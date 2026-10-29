@@ -39,7 +39,7 @@ class TestsIntersection : public VkTestFramework {
 
         const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_combine_intersect.json";
         const char* profile_name_data = "VP_LUNARG_test_combine_intersect"; 
-        VkBool32 emulate_portability_data = VK_TRUE;
+        VkBool32 emulate_portability_data = VK_FALSE;
         const std::vector<const char*> simulate_capabilities = {
             "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT", "SIMULATE_FORMATS_BIT",
             "SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT", "SIMULATE_VIDEO_CAPABILITIES_BIT", "SIMULATE_VIDEO_FORMATS_BIT"};
@@ -73,8 +73,11 @@ TEST_F(TestsIntersection, Extension) {
     std::vector<VkExtensionProperties> device_extensions(count);
     vkEnumerateDeviceExtensionProperties(gpu_profile, nullptr, &count, device_extensions.data());
 
-    ASSERT_STREQ("VK_KHR_maintenance3", device_extensions[0].extensionName);
-    ASSERT_STREQ("VK_KHR_portability_subset", device_extensions[1].extensionName);
+    // The extensions order is implementation-dependent
+    ASSERT_EQ(2, count);
+    const bool maintenance3_first = strcmp("VK_KHR_maintenance3", device_extensions[0].extensionName) == 0;
+    ASSERT_STREQ("VK_KHR_maintenance3", device_extensions[maintenance3_first ? 0 : 1].extensionName);
+    ASSERT_STREQ("VK_KHR_variable_pointers", device_extensions[maintenance3_first ? 1 : 0].extensionName);
 }
 
 TEST_F(TestsIntersection, Feature) {
