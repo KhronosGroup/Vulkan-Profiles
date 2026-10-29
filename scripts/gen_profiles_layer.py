@@ -2668,6 +2668,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
 
     PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
     ProfileLayerSettings* layer_settings = &JsonLoader::Find(pdd->instance())->layer_settings;
+    bool simulated_extensions = false;
     if (pLayerName) {
         if (strcmp(pLayerName, kLayerName) == 0)
             result = EnumerateProperties(kDeviceExtensionPropertiesCount, kDeviceExtensionProperties, pCount, pProperties);
@@ -2678,11 +2679,15 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
         result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
     } else {
         result = EnumerateExtensions(pdd->simulation_extensions_, pCount, pProperties);
+        simulated_extensions = true;
     }
 
 #ifdef VK_KHR_portability_subset
-    if (result == VK_SUCCESS && !pLayerName && layer_settings->simulate.emulate_portability &&
-        !PhysicalDeviceData::HasSimulatedOrRealExtension(physicalDevice, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {
+    // Only append the emulated extension when it is missing from the list that was just returned
+    const bool has_portability_subset =
+        simulated_extensions ? PhysicalDeviceData::HasSimulatedExtension(pdd, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)
+                             : PhysicalDeviceData::HasExtension(pdd, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME);
+    if (result == VK_SUCCESS && !pLayerName && layer_settings->simulate.emulate_portability && !has_portability_subset) {
         if (pProperties) {
             if (pCount_copy >= *pCount + 1) {
                 strncpy(pProperties[*pCount].extensionName, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, VK_MAX_EXTENSION_NAME_SIZE);
