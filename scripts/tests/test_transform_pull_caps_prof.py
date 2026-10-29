@@ -120,6 +120,9 @@ class TestConvertPullRequiredCapabilitiesProf(unittest.TestCase):
         """
         Verifies that when VK_KHR_portability_subset is set, robustBufferAccess is not added.
         """
+        if 'VK_KHR_portability_subset' not in self.vk.extensions:
+            self.skipTest("VK_KHR_portability_subset is not defined in the Vulkan registry")
+
         original_json_text = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-106.json#",
             "profiles": {

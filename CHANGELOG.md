@@ -21,6 +21,10 @@
 ### Profiles:
 - Add VP_ANDROID_18_requirements profile
 
+### Deprecation:
+- `VK_KHR_portability_subset` support is deprecated
+  - The Profiles layer `VK_KHR_portability_subset` emulation and its `emulate_portability` and portability settings are deprecated and ignored when the extension is not available
+
 ## [Vulkan Profiles Tools 1.4.363](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.363.0) - September 2026
 
 ### Features:
