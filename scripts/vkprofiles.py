@@ -210,6 +210,7 @@ def main(argv):
     library_parser.add_argument('--debug', '-d', action='store_true', help='Also generate library variant with debug messages.')
     library_parser.add_argument('--config', '-c', action='store', default='release', choices=['release', 'debug'], help='Select build configuration.')
     library_parser.add_argument('--include-header', action='store', help='Override the header file include directive in generated C++ source files.')
+    library_parser.add_argument('--legacy', action='store_true', help='Generate the library with the legacy gen_profiles_solution.py code path.')
 
     doc_parser = subparsers.add_parser('doc', parents=[log_parser], help='Generate markdown documentation for Vulkan profiles.')
     doc_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")

@@ -541,6 +541,7 @@ vkprofiles library --registry vk.xml --input path/to/profiles --output path/to/i
 
 When `--input-profiles` is set, every required parent profile of a listed profile must also be listed, otherwise the command fails.
 * `--include-header`: Override the header file include directive in generated C++ source files.
+* `--legacy`: Generate the library with the legacy `gen_profiles_solution.py` code path instead of `source/generate_api_library.py`.
 
 **Example (Header + Source with automatic conversion):**
 
