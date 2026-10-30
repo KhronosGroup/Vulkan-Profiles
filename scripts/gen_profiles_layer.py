@@ -2664,11 +2664,8 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
 
-    uint32_t pCount_copy = *pCount;
-
     PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
     ProfileLayerSettings* layer_settings = &JsonLoader::Find(pdd->instance())->layer_settings;
-    bool simulated_extensions = false;
     if (pLayerName) {
         if (strcmp(pLayerName, kLayerName) == 0)
             result = EnumerateProperties(kDeviceExtensionPropertiesCount, kDeviceExtensionProperties, pCount, pProperties);
@@ -2679,26 +2676,7 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumerateDeviceExtensionProperties(VkPhysicalDevi
         result = dt->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pCount, pProperties);
     } else {
         result = EnumerateExtensions(pdd->simulation_extensions_, pCount, pProperties);
-        simulated_extensions = true;
     }
-
-#ifdef VK_KHR_portability_subset
-    // Only append the emulated extension when it is missing from the list that was just returned
-    const bool has_portability_subset =
-        simulated_extensions ? PhysicalDeviceData::HasSimulatedExtension(pdd, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)
-                             : PhysicalDeviceData::HasExtension(pdd, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME);
-    if (result == VK_SUCCESS && !pLayerName && layer_settings->simulate.emulate_portability && !has_portability_subset) {
-        if (pProperties) {
-            if (pCount_copy >= *pCount + 1) {
-                strncpy(pProperties[*pCount].extensionName, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, VK_MAX_EXTENSION_NAME_SIZE);
-                pProperties[*pCount].specVersion = VK_KHR_PORTABILITY_SUBSET_SPEC_VERSION;
-                *pCount += 1;
-            }
-        } else {
-            *pCount += 1;
-        }
-    }
-#endif  // VK_KHR_portability_subset
 
     return result;
 }
@@ -3354,27 +3332,6 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDevices(VkInstance instance, uin
                 if (PhysicalDeviceData::HasExtension(&pdd, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {
                     property_chain.pNext = &(pdd.physical_device_portability_subset_properties_);
                     feature_chain.pNext = &(pdd.physical_device_portability_subset_features_);
-                } else if (layer_settings->simulate.emulate_portability) {
-                    pdd.physical_device_portability_subset_properties_ = {
-                        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR, nullptr, layer_settings->portability.minVertexInputBindingStrideAlignment};
-                    pdd.physical_device_portability_subset_features_ = {
-                        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES_KHR,
-                        nullptr,
-                        layer_settings->portability.constantAlphaColorBlendFactors,
-                        layer_settings->portability.events,
-                        layer_settings->portability.imageViewFormatReinterpretation,
-                        layer_settings->portability.imageViewFormatSwizzle,
-                        layer_settings->portability.imageView2DOn3DImage,
-                        layer_settings->portability.multisampleArrayImage,
-                        layer_settings->portability.mutableComparisonSamplers,
-                        layer_settings->portability.pointPolygons,
-                        layer_settings->portability.samplerMipLodBias,
-                        layer_settings->portability.separateStencilMaskRef,
-                        layer_settings->portability.shaderSampleRateInterpolationFunctions,
-                        layer_settings->portability.tessellationIsolines,
-                        layer_settings->portability.tessellationPointMode,
-                        layer_settings->portability.triangleFans,
-                        layer_settings->portability.vertexAttributeAccessBeyondStride};
                 }
 #endif  // VK_KHR_portability_subset
 '''
@@ -3534,39 +3491,21 @@ bool JsonLoader::GetStruct(const char* device_name, bool requested_profile, cons
     LogMessage(&layer_settings, DEBUG_REPORT_DEBUG_BIT, \"\\tJsonLoader::GetStruct(VkPhysicalDevicePortabilitySubsetFeaturesKHR)\\n");
     bool valid = true;
     for (const auto &member : parent.getMemberNames()) {
-        if (layer_settings.simulate.emulate_portability) {
-            dest->constantAlphaColorBlendFactors = layer_settings.portability.constantAlphaColorBlendFactors;
-            dest->events = layer_settings.portability.events;
-            dest->imageViewFormatReinterpretation = layer_settings.portability.imageViewFormatReinterpretation;
-            dest->imageViewFormatSwizzle = layer_settings.portability.imageViewFormatSwizzle;
-            dest->imageView2DOn3DImage = layer_settings.portability.imageView2DOn3DImage;
-            dest->multisampleArrayImage = layer_settings.portability.multisampleArrayImage;
-            dest->mutableComparisonSamplers = layer_settings.portability.mutableComparisonSamplers;
-            dest->pointPolygons = layer_settings.portability.pointPolygons;
-            dest->samplerMipLodBias = layer_settings.portability.samplerMipLodBias;
-            dest->separateStencilMaskRef = layer_settings.portability.separateStencilMaskRef;
-            dest->shaderSampleRateInterpolationFunctions = layer_settings.portability.shaderSampleRateInterpolationFunctions;
-            dest->tessellationIsolines = layer_settings.portability.tessellationIsolines;
-            dest->tessellationPointMode = layer_settings.portability.tessellationPointMode;
-            dest->triangleFans = layer_settings.portability.triangleFans;
-            dest->vertexAttributeAccessBeyondStride = layer_settings.portability.vertexAttributeAccessBeyondStride;
-        } else {
-            GET_VALUE_WARN(member, constantAlphaColorBlendFactors, false, requested_profile, WarnIfNotEqualBool);
-            GET_VALUE_WARN(member, events, false, requested_profile, WarnIfNotEqualBool);
-            GET_VALUE_WARN(member, imageViewFormatReinterpretation, false, requested_profile, WarnIfNotEqualBool);
-            GET_VALUE_WARN(member, imageViewFormatSwizzle, false, requested_profile, WarnIfNotEqualBool);
-            GET_VALUE_WARN(member, imageView2DOn3DImage, false, requested_profile, WarnIfNotEqualBool);
-            GET_VALUE_WARN(member, multisampleArrayImage, false, requested_profile, WarnIfNotEqualBool);
-            GET_VALUE_WARN(member, mutableComparisonSamplers, false, requested_profile, WarnIfNotEqualBool);
-            GET_VALUE_WARN(member, pointPolygons, false, requested_profile, WarnIfNotEqualBool);
-            GET_VALUE_WARN(member, samplerMipLodBias, false, requested_profile, WarnIfNotEqualBool);
-            GET_VALUE_WARN(member, separateStencilMaskRef, false, requested_profile, WarnIfNotEqualBool);
-            GET_VALUE_WARN(member, shaderSampleRateInterpolationFunctions, false, requested_profile, WarnIfNotEqualBool);
-            GET_VALUE_WARN(member, tessellationIsolines, false, requested_profile, WarnIfNotEqualBool);
-            GET_VALUE_WARN(member, tessellationPointMode, false, requested_profile, WarnIfNotEqualBool);
-            GET_VALUE_WARN(member, triangleFans, false, requested_profile, WarnIfNotEqualBool);
-            GET_VALUE_WARN(member, vertexAttributeAccessBeyondStride, false, requested_profile, WarnIfNotEqualBool);
-        }
+        GET_VALUE_WARN(member, constantAlphaColorBlendFactors, false, requested_profile, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, events, false, requested_profile, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, imageViewFormatReinterpretation, false, requested_profile, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, imageViewFormatSwizzle, false, requested_profile, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, imageView2DOn3DImage, false, requested_profile, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, multisampleArrayImage, false, requested_profile, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, mutableComparisonSamplers, false, requested_profile, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, pointPolygons, false, requested_profile, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, samplerMipLodBias, false, requested_profile, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, separateStencilMaskRef, false, requested_profile, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, shaderSampleRateInterpolationFunctions, false, requested_profile, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, tessellationIsolines, false, requested_profile, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, tessellationPointMode, false, requested_profile, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, triangleFans, false, requested_profile, WarnIfNotEqualBool);
+        GET_VALUE_WARN(member, vertexAttributeAccessBeyondStride, false, requested_profile, WarnIfNotEqualBool);
     }
     return valid;
 }
@@ -5167,23 +5106,18 @@ class VulkanProfilesLayerGenerator():
 
     def generate_fill_physical_device_pnext_chain(self):
         gen = '\nvoid FillPNextChain(PhysicalDeviceData *physicalDeviceData, void *place) {\n'
-        gen += '    ProfileLayerSettings *layer_settings = &JsonLoader::Find(physicalDeviceData->instance())->layer_settings;\n'
         gen += '    while (place) {\n'
         gen += '        VkBaseOutStructure *structure = (VkBaseOutStructure *)place;\n\n'
         gen += '        // These switch statements check which struct is in the pNext chain and, if the physical device has the proper extension,\n'
         gen += '        // fill the struct with any override data provided by the PhysicalDeviceData object.\n\n'
         gen += '        switch (structure->sType) {\n'
         gen += '#ifdef VK_KHR_portability_subset\n'
-        gen += '            // VK_KHR_portability_subset is a special case since it can also be emulated by the Profiles layer.\n'
+        gen += '            // VK_KHR_portability_subset is a special case handled separately from the other extensions.\n'
         gen += '            case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_PROPERTIES_KHR:\n'
-        gen += '                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME) ||\n'
-        gen += '                    layer_settings->simulate.emulate_portability) {\n'
+        gen += '                if (PhysicalDeviceData::HasSimulatedExtension(physicalDeviceData, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {\n'
         gen += '                    VkPhysicalDevicePortabilitySubsetPropertiesKHR *psp = (VkPhysicalDevicePortabilitySubsetPropertiesKHR *)place;\n'
         gen += '                    void *pNext = psp->pNext;\n'
         gen += '                    *psp = physicalDeviceData->physical_device_portability_subset_properties_;\n'
-        gen += '                    if (layer_settings->portability.vertexAttributeAccessBeyondStride) {\n'
-        gen += '                        psp->minVertexInputBindingStrideAlignment = layer_settings->portability.minVertexInputBindingStrideAlignment;\n'
-        gen += '                    }\n'
         gen += '                    psp->pNext = pNext;\n'
         gen += '                }\n'
         gen += '                break;\n'

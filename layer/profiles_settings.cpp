@@ -207,23 +207,6 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
                                               kLayerSettingsProfileDirs,
                                               kLayerSettingsProfileName,
                                               kLayerSettingsProfileValidation,
-                                              kLayerSettingsEmulatePortability,
-                                              kLayerSettings_constantAlphaColorBlendFactors,
-                                              kLayerSettings_events,
-                                              kLayerSettings_imageViewFormatReinterpretation,
-                                              kLayerSettings_imageViewFormatSwizzle,
-                                              kLayerSettings_imageView2DOn3DImage,
-                                              kLayerSettings_multisampleArrayImage,
-                                              kLayerSettings_mutableComparisonSamplers,
-                                              kLayerSettings_pointPolygons,
-                                              kLayerSettings_samplerMipLodBias,
-                                              kLayerSettings_separateStencilMaskRef,
-                                              kLayerSettings_shaderSampleRateInterpolationFunctions,
-                                              kLayerSettings_tessellationIsolines,
-                                              kLayerSettings_tessellationPointMode,
-                                              kLayerSettings_triangleFans,
-                                              kLayerSettings_vertexAttributeAccessBeyondStride,
-                                              kLayerSettings_minVertexInputBindingStrideAlignment,
                                               kLayerSettingsSimulateCapabilities,
                                               kLayerSettingsDebugActions,
                                               kLayerSettingsDebugFilename,
@@ -308,87 +291,6 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
         vkuGetLayerSettingValues(layerSettingSet, kLayerSettingsExcludeFormats, layer_settings->simulate.exclude_formats);
     }
 
-    if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsEmulatePortability)) {
-        vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsEmulatePortability, layer_settings->simulate.emulate_portability);
-
-        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_constantAlphaColorBlendFactors)) {
-            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_constantAlphaColorBlendFactors,
-                                    layer_settings->portability.constantAlphaColorBlendFactors);
-        }
-
-        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_events)) {
-            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_events, layer_settings->portability.events);
-        }
-
-        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_imageViewFormatReinterpretation)) {
-            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_imageViewFormatReinterpretation,
-                                    layer_settings->portability.imageViewFormatReinterpretation);
-        }
-
-        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_imageViewFormatSwizzle)) {
-            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_imageViewFormatSwizzle,
-                                    layer_settings->portability.imageViewFormatSwizzle);
-        }
-
-        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_imageView2DOn3DImage)) {
-            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_imageView2DOn3DImage,
-                                    layer_settings->portability.imageView2DOn3DImage);
-        }
-
-        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_multisampleArrayImage)) {
-            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_multisampleArrayImage,
-                                    layer_settings->portability.multisampleArrayImage);
-        }
-
-        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_mutableComparisonSamplers)) {
-            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_mutableComparisonSamplers,
-                                    layer_settings->portability.mutableComparisonSamplers);
-        }
-
-        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_pointPolygons)) {
-            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_pointPolygons, layer_settings->portability.pointPolygons);
-        }
-
-        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_samplerMipLodBias)) {
-            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_samplerMipLodBias,
-                                    layer_settings->portability.samplerMipLodBias);
-        }
-
-        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_separateStencilMaskRef)) {
-            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_separateStencilMaskRef,
-                                    layer_settings->portability.separateStencilMaskRef);
-        }
-
-        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_shaderSampleRateInterpolationFunctions)) {
-            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_shaderSampleRateInterpolationFunctions,
-                                    layer_settings->portability.shaderSampleRateInterpolationFunctions);
-        }
-
-        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_tessellationIsolines)) {
-            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_tessellationIsolines,
-                                    layer_settings->portability.tessellationIsolines);
-        }
-
-        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_tessellationPointMode)) {
-            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_tessellationPointMode,
-                                    layer_settings->portability.tessellationPointMode);
-        }
-
-        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_triangleFans)) {
-            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_triangleFans, layer_settings->portability.triangleFans);
-        }
-
-        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_vertexAttributeAccessBeyondStride)) {
-            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_vertexAttributeAccessBeyondStride,
-                                    layer_settings->portability.vertexAttributeAccessBeyondStride);
-        }
-
-        if (vkuHasLayerSetting(layerSettingSet, kLayerSettings_minVertexInputBindingStrideAlignment)) {
-            vkuGetLayerSettingValue(layerSettingSet, kLayerSettings_minVertexInputBindingStrideAlignment,
-                                    layer_settings->portability.minVertexInputBindingStrideAlignment);
-        }
-    }
-
     if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsDebugFailOnError)) {
         vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsDebugFailOnError, layer_settings->log.debug_fail_on_error);
     }
@@ -454,39 +356,6 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
     settings_log += format("\t%s: %s\n", kLayerSettingsDefaultFeatureValues, default_feature_values.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsUnknownFeatureValues, unknown_feature_values.c_str());
 
-    settings_log +=
-        format("\t%s: %s\n", kLayerSettingsEmulatePortability, layer_settings->simulate.emulate_portability ? "true" : "false");
-    if (layer_settings->simulate.emulate_portability) {
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_constantAlphaColorBlendFactors,
-                               layer_settings->portability.constantAlphaColorBlendFactors ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_events, layer_settings->portability.events ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_imageViewFormatReinterpretation,
-                               layer_settings->portability.imageViewFormatReinterpretation ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_imageViewFormatSwizzle,
-                               layer_settings->portability.imageViewFormatSwizzle ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_imageView2DOn3DImage,
-                               layer_settings->portability.imageView2DOn3DImage ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_multisampleArrayImage,
-                               layer_settings->portability.multisampleArrayImage ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_mutableComparisonSamplers,
-                               layer_settings->portability.mutableComparisonSamplers ? "true" : "false");
-        settings_log +=
-            format("\t\t%s: %s\n", kLayerSettings_pointPolygons, layer_settings->portability.pointPolygons ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_samplerMipLodBias,
-                               layer_settings->portability.samplerMipLodBias ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_separateStencilMaskRef,
-                               layer_settings->portability.separateStencilMaskRef ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_shaderSampleRateInterpolationFunctions,
-                               layer_settings->portability.shaderSampleRateInterpolationFunctions ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_tessellationIsolines,
-                               layer_settings->portability.tessellationIsolines ? "true" : "false");
-        settings_log +=
-            format("\t\t%s: %s\n", kLayerSettings_triangleFans, layer_settings->portability.triangleFans ? "true" : "false");
-        settings_log += format("\t\t%s: %s\n", kLayerSettings_vertexAttributeAccessBeyondStride,
-                               layer_settings->portability.vertexAttributeAccessBeyondStride ? "true" : "false");
-        settings_log += format("\t\t%s: %d\n", kLayerSettings_minVertexInputBindingStrideAlignment,
-                               static_cast<int>(layer_settings->portability.minVertexInputBindingStrideAlignment));
-    }
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugActions, debug_actions_log.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugFilename, layer_settings->log.debug_filename.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsDebugFileClear, layer_settings->log.debug_file_discard ? "true" : "false");
