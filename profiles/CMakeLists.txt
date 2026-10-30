@@ -58,12 +58,14 @@ add_custom_target(VpGenerate-Profiles ALL
         ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/profiles/VP_KHR_roadmap.json
         ${CMAKE_CURRENT_LIST_DIR}/build/VP_KHR_roadmap.json
     COMMAND ${VKPROFILES_EXE} transform
+        --strict
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/LunarG/VP_LUNARG_minimum_requirements.json
         --output ${CMAKE_CURRENT_LIST_DIR}/build/VP_LUNARG_minimum_requirements.json
         --pull aliases ignore-extension-versions
         --format flatten
     COMMAND ${VKPROFILES_EXE} graph
+        --strict
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/vkprofiles_graph.json
         --verbose

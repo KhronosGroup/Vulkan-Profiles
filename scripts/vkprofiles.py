@@ -38,6 +38,7 @@ from source.main_min_api_version import main_min_api_version, MinApiVersionMode
 from source.main_summary import main_summary
 from source.main_graph import main_graph
 from source.main_version import main_version, get_version_string
+from source.vulkan_object_utils import setStrictPropertyRequirements
 
 
 class AnalyseAction(argparse.Action):
@@ -120,6 +121,7 @@ def main(argv):
     log_group.add_argument('--quiet', action='store_true', help='Suppress warning and informational messages (ERROR level only).')
     log_group.add_argument('--verbose', action='store_true', help='Enable verbose output (INFO, WARNING, and ERROR levels).')
     log_group.add_argument('--log', nargs='*', action=LogTypeAction, default=None, help='Filter output by specific message types (choices: none, all, info, warning, error, critical). Cannot be combined with --quiet or --verbose.')
+    log_parser.add_argument('--strict', action='store_true', help='Fail when vk.xml has property structure members without a default property requirement.')
 
     parser = argparse.ArgumentParser(
         description='Transform Vulkan profile JSON file',
@@ -258,6 +260,9 @@ def main(argv):
         log_level = logging.WARNING
 
     logging.basicConfig(level=log_level, format='%(levelname)s: %(message)s', force=True)
+
+    if args.strict:
+        setStrictPropertyRequirements(True)
 
     start_time = time.perf_counter()
 

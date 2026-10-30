@@ -25,6 +25,7 @@ import logging
 import tempfile
 import os
 import re
+import sys
 from xml.etree import ElementTree
 from typing import Any
 from dataclasses import dataclass
@@ -58,6 +59,14 @@ __all__ = [
     'VulkanObject',
     'get_member_unsupported_default'
 ]
+
+_strict_property_requirements = False
+
+
+def setStrictPropertyRequirements(enabled: bool) -> None:
+    """When enabled, initVulkanObject exits with an error if property structure members have no default property requirement."""
+    global _strict_property_requirements
+    _strict_property_requirements = enabled
 
 
 def _bakeDefaultVersionsIfMissing(vk: VulkanObject):
@@ -181,6 +190,8 @@ def _checkMissingPropertyRequirements(vk: VulkanObject) -> list[str]:
             'add them to DEFAULT_CORE_PROPERTY_REQUIREMENTS or DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS:\n'
             + '\n'.join(f'    {name}' for name in missing_members)
         )
+        if _strict_property_requirements:
+            sys.exit(1)
 
     return missing_members
 
