@@ -743,6 +743,10 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceMaintenance10PropertiesKHR', 'resolveSrgbFormatAppliesTransferFunction', None, 'VkPhysicalDeviceMaintenance10FeaturesKHR::maintenance10'),
         PropertyRequirement('VkPhysicalDeviceMaintenance10PropertiesKHR', 'resolveSrgbFormatSupportsTransferFunctionControl', 'false', 'VkPhysicalDeviceMaintenance10FeaturesKHR::maintenance10'),
     ],
+    'VK_KHR_maintenance12': [
+        # Spec requires at least maxPerStageDescriptorInputAttachments, whose core minimum is 4
+        PropertyRequirement('VkPhysicalDeviceMaintenance12PropertiesKHR', 'maxInputAttachmentIndex', '4', 'VkPhysicalDeviceMaintenance12FeaturesKHR::maintenance12'),
+    ],
 
     'VK_KHR_copy_memory_indirect': [
         # TODO: The spec requires supportedQueues to "return at least one supported queue type" when
