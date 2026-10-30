@@ -23,9 +23,30 @@
 #include <vulkan/vulkan_core.h>
 
 #include <gtest/gtest.h>
+#include <json/json.h>
 #include "profiles_test_helper.h"
 
+#include <algorithm>
 #include <array>
+#include <fstream>
+#include <set>
+#include <string>
+
+// Returns the extensions required by the capabilities of a profile defined in a profiles file
+static std::set<std::string> GetProfileExtensions(const char* profile_file, const char* profile_name) {
+    std::ifstream file(profile_file);
+    Json::Value root;
+    file >> root;
+
+    std::set<std::string> extensions;
+    for (const Json::Value& capability_name : root["profiles"][profile_name]["capabilities"]) {
+        const Json::Value& capability_extensions = root["capabilities"][capability_name.asString()]["extensions"];
+        for (const std::string& extension_name : capability_extensions.getMemberNames()) {
+            extensions.insert(extension_name);
+        }
+    }
+    return extensions;
+}
 
 class LayerTests : public VkTestFramework {
   public:
@@ -106,7 +127,7 @@ TEST_F(LayerTests, TestSetCombinationMode) {
     }
 
     {
-        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api.json";
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_generated.json";
         const char* profile_name_data = "VP_LUNARG_test_api";
         VkBool32 emulate_portability_data = VK_TRUE;
         const char* simulate_capabilities = "";
@@ -152,7 +173,7 @@ TEST_F(LayerTests, TestSetCombinationMode) {
     }
 
     {
-        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api.json";
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_generated.json";
         const char* profile_name_data = "VP_LUNARG_test_api";
         VkBool32 emulate_portability_data = VK_TRUE;
         const std::vector<const char*> simulate_capabilities = {"SIMULATE_EXTENSIONS_BIT"};
@@ -183,14 +204,14 @@ TEST_F(LayerTests, TestSetCombinationMode) {
             std::vector<VkExtensionProperties> extensions(count);
             vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, extensions.data());
 
-            ASSERT_EQ(268, extensions.size()); // Number of extensions in "VP_LUNARG_test_api.json"
+            ASSERT_EQ(GetProfileExtensions(profile_file_data, profile_name_data).size(), extensions.size());
         }
 
         inst_builder.reset();
     }
 
     {
-        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api.json";
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_generated.json";
         const char* profile_name_data = "VP_LUNARG_test_api";
         VkBool32 emulate_portability_data = VK_TRUE;
         const std::vector<const char*> simulate_capabilities = {"SIMULATE_EXTENSIONS_BIT"};
@@ -222,7 +243,7 @@ TEST_F(LayerTests, TestSetCombinationMode) {
             std::vector<VkExtensionProperties> extensions(count);
             vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, extensions.data());
 
-            ASSERT_GE(extensions.size(), 234);
+            ASSERT_GE(extensions.size(), GetProfileExtensions(profile_file_data, profile_name_data).size());
         }
 
         inst_builder.reset();
@@ -233,7 +254,7 @@ TEST_F(LayerTests, TestSetCombinationMode) {
 TEST_F(LayerTests, TestExtensionNotSupported) {
     TEST_DESCRIPTION("Test using a profile with an unsupported extension for the device");
 
-    const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api.json";
+    const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_generated.json";
     const char* profile_name_data = "VP_LUNARG_test_api";
     VkBool32 emulate_portability_data = VK_TRUE;
     const std::vector<const char*> simulate_capabilities = {"SIMULATE_EXTENSIONS_BIT"};
@@ -266,7 +287,13 @@ TEST_F(LayerTests, TestExtensionNotSupported) {
         VkPhysicalDevice gpu;
         err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
 
-        if (device_extensions.size() < 233) {
+        // The profile requires at least one extension not supported by the device
+        const std::set<std::string> profile_extensions = GetProfileExtensions(profile_file_data, profile_name_data);
+        const bool all_supported = std::all_of(profile_extensions.begin(), profile_extensions.end(), [&](const std::string& name) {
+            return std::any_of(device_extensions.begin(), device_extensions.end(),
+                               [&](const VkExtensionProperties& ext) { return name == ext.extensionName; });
+        });
+        if (!all_supported) {
             ASSERT_EQ(err, VK_ERROR_INITIALIZATION_FAILED);
         }
     }
@@ -453,7 +480,7 @@ TEST_F(LayerTests, TestExcludedExtensions) {
     VkPhysicalDeviceTransformFeedbackPropertiesEXT device_properties{};
     device_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT;
     {
-        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api.json";
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_generated.json";
         const char* profile_name_data = "VP_LUNARG_test_api";
         VkBool32 emulate_portability_data = VK_TRUE;
         VkBool32 debug_fail_on_error = VK_FALSE;
@@ -483,7 +510,7 @@ TEST_F(LayerTests, TestExcludedExtensions) {
     }
 
     {
-        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api.json";
+        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_generated.json";
         const char* profile_name_data = "VP_LUNARG_test_api";
         VkBool32 emulate_portability_data = VK_TRUE;
         VkBool32 debug_fail_on_error = VK_FALSE;

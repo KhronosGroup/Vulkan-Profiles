@@ -183,22 +183,6 @@ TEST(test_validate_unit, VP_LUNARG_test_vkqueuefamilyproperties) {
     EXPECT_TRUE(validator.Check(document));
 }
 
-TEST(test_validate_unit, VP_LUNARG_test_api) {
-    JsonValidator validator;
-
-    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_api.json";
-    const Json::Value document = ParseJsonFile(path.c_str());
-    EXPECT_TRUE(validator.Check(document));
-}
-
-TEST(test_validate_unit, VP_LUNARG_test_api_alternate) {
-    JsonValidator validator;
-
-    const std::string path = std::string(JSON_TEST_FILES_PATH) + "VP_LUNARG_test_api_alternate.json";
-    const Json::Value document = ParseJsonFile(path.c_str());
-    EXPECT_TRUE(validator.Check(document));
-}
-
 TEST(test_validate_unit, VP_LUNARG_test_promoted_api) {
     JsonValidator validator;
 
