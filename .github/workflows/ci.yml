@@ -67,6 +67,12 @@ jobs:
         run: cmake -S. -B build -D BUILD_TESTS=OFF -D SKIP_PYTHON_AUTO_INSTALL=ON -D UPDATE_DEPS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}}
       - name: Build
         run: cmake --build build --config ${{matrix.config}}
+      - name: Check generated schema is up to date
+        run: |
+          git diff --exit-code -- schema/ || {
+            echo "::error::schema/profiles-0.8-latest.json is out of date: build and commit the regenerated file"
+            exit 1
+          }
       - name: Install
         run: cmake --install build --prefix build/install --config ${{matrix.config}}
 
