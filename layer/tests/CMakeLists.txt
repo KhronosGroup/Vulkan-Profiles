@@ -64,7 +64,7 @@ function(LayerTest NAME)
                    layer_tests_main.cpp
                    vktestframework.cpp)
     add_dependencies(${TEST_NAME} ProfilesLayer VpTestIntersect VpTestUnion VpTestGeneratedName VpTestHostImageCopy VpLayer_generate_tests ${TEST_JSON_FILES})
-    target_link_libraries(${TEST_NAME} Vulkan::CompilerConfiguration Vulkan::CompilerConfigurationExtra Vulkan::Headers Vulkan::Loader GTest::gtest GTest::gtest_main Vulkan::LayerSettings)
+    target_link_libraries(${TEST_NAME} Vulkan::CompilerConfiguration Vulkan::CompilerConfigurationExtra Vulkan::Headers Vulkan::Loader GTest::gtest GTest::gtest_main Vulkan::LayerSettings jsoncpp_static)
     target_compile_definitions(${TEST_NAME} PUBLIC JSON_TEST_FILES_PATH="${CMAKE_SOURCE_DIR}/profiles/test/data/")
     target_compile_definitions(${TEST_NAME} PUBLIC JSON_PROFILES_PATH="${CMAKE_SOURCE_DIR}/profiles/")
     target_compile_definitions(${TEST_NAME} PUBLIC TEST_BINARY_PATH="$<TARGET_FILE_DIR:ProfilesLayer>")
