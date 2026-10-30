@@ -105,7 +105,6 @@ class TestsCapabilitiesGenerated : public VkTestFramework {
 
         const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_generated.json";
         const char* profile_name_data = "VP_LUNARG_test_api";
-        VkBool32 emulate_portability_data = VK_TRUE;
         const std::vector<const char*> simulate_capabilities = {
             "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT", "SIMULATE_FORMATS_BIT",
             "SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT", "SIMULATE_VIDEO_CAPABILITIES_BIT", "SIMULATE_VIDEO_FORMATS_BIT"};
@@ -115,7 +114,6 @@ class TestsCapabilitiesGenerated : public VkTestFramework {
         std::vector<VkLayerSettingEXT> settings = {
             {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
             {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
             {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
             {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(debug_reports.size()), &debug_reports[0]}
         };

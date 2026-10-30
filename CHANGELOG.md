@@ -23,7 +23,7 @@
 
 ### Deprecation:
 - `VK_KHR_portability_subset` support is deprecated
-  - The Profiles layer `VK_KHR_portability_subset` emulation and its `emulate_portability` and portability settings are deprecated and ignored when the extension is not available
+  - Remove the Profiles layer `VK_KHR_portability_subset` emulation, its `emulate_portability` and portability settings, and the *Emulate a Vulkan Portability Profile* preset
 
 ## [Vulkan Profiles Tools 1.4.363](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.363.0) - September 2026
 

@@ -45,13 +45,11 @@ TEST_F(TestsMechanismCheckValues, reading_sparseProperties) {
     const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_device_properties.json";
     const char* profile_name_data = "VP_LUNARG_test_device_properties";
     const std::vector<const char*> simulate_capabilities = {"SIMULATE_MAX_ENUM"};
-    VkBool32 emulate_portability_data = VK_TRUE;
 
     std::vector<VkLayerSettingEXT> settings = {
         {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
         {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-        {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
-        {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data}
+        {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]}
     };
 
     err = inst_builder.init(settings);
@@ -85,13 +83,11 @@ TEST_F(TestsMechanismCheckValues, reading_mutable_descriptor_type) {
     const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_device_features.json";
     const char* profile_name_data = "VP_LUNARG_test_device_features";
     const std::vector<const char*> simulate_capabilities = {"SIMULATE_FEATURES_BIT"};
-    VkBool32 emulate_portability_data = VK_FALSE;
 
     std::vector<VkLayerSettingEXT> settings = {
         {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
         {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-        {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
-        {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data}};
+        {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]}};
 
     err = inst_builder.init(settings);
     ASSERT_EQ(err, VK_SUCCESS);

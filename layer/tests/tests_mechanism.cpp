@@ -102,14 +102,12 @@ TEST_F(TestsMechanism, selecting_profile_file) {
     {
         const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_device_extensions.json";
         const char* profile_name_data = "VP_LUNARG_test_device_extensions";
-        VkBool32 emulate_portability_data = VK_FALSE;
         const std::vector<const char*> simulate_capabilities = {"SIMULATE_EXTENSIONS_BIT"};
         const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
         std::vector<VkLayerSettingEXT> settings = {
             {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
             {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
             {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
             {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
 
@@ -145,14 +143,12 @@ TEST_F(TestsMechanism, selecting_profile_file) {
     {
         const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_device_extensions.json";
         const char* profile_name_data = "VP_LUNARG_test_device_extensions";
-        VkBool32 emulate_portability_data = VK_FALSE;
         const std::vector<const char*> simulate_capabilities = {"SIMULATE_MAX_ENUM"};
         const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
         std::vector<VkLayerSettingEXT> settings = {
             {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
             {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
             {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
             {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
 
@@ -187,13 +183,11 @@ TEST_F(TestsMechanism, selecting_profile_file) {
     {
         const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_selecting_profile.json";
         const char* profile_name_data = "VP_LUNARG_test_selecting_profile";
-        VkBool32 emulate_portability_data = VK_TRUE;
         const std::vector<const char*> simulate_capabilities = {"SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT"};
 
         std::vector<VkLayerSettingEXT> settings = {
             {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
             {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
             {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]}
         };
 
@@ -219,13 +213,11 @@ TEST_F(TestsMechanism, selecting_profile_file) {
     {
         const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_selecting_profile.json";
         const char* profile_name_data = "VP_LUNARG_test_selecting_profile_subset";
-        VkBool32 emulate_portability_data = VK_TRUE;
         const std::vector<const char*> simulate_capabilities = {"SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT"};
 
         std::vector<VkLayerSettingEXT> settings = {
             {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
             {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
             {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]}};
 
         err = inst_builder.init(settings);
@@ -259,14 +251,12 @@ TEST_F(TestsMechanism, selecting_profile_file_not_found) {
     {
         const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_not_found.json";
         const char* profile_name_data = "VP_LUNARG_test_not_found";
-        VkBool32 emulate_portability_data = VK_FALSE;
         const std::vector<const char*> simulate_capabilities = {"SIMULATE_EXTENSIONS_BIT"};
         const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
         std::vector<VkLayerSettingEXT> settings = {
             {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
             {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
             {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT,
              static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
             {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
@@ -296,14 +286,12 @@ TEST_F(TestsMechanism, selecting_profile_dirs) {
     {
         const char* profile_dirs_data = JSON_TEST_FILES_PATH;
         const char* profile_name_data = "VP_LUNARG_test_device_extensions";
-        VkBool32 emulate_portability_data = VK_FALSE;
         const std::vector<const char*> simulate_capabilities = {"SIMULATE_MAX_ENUM"};
         const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
         std::vector<VkLayerSettingEXT> settings = {
             {kLayerName, kLayerSettingsProfileDirs, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_dirs_data},
             {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
             {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
             {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
 
@@ -346,14 +334,12 @@ TEST_F(TestsMechanism, selecting_profile_dirs_not_found) {
     {
         const char* profile_dirs_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_device_extensions.json"; // Not a dir!
         const char* profile_name_data = "VP_LUNARG_test_device_extensions";
-        VkBool32 emulate_portability_data = VK_FALSE;
         const std::vector<const char*> simulate_capabilities = {"SIMULATE_MAX_ENUM"};
         const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
         std::vector<VkLayerSettingEXT> settings = {
             {kLayerName, kLayerSettingsProfileDirs, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_dirs_data},
             {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
             {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT,
              static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
             {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
@@ -397,14 +383,12 @@ TEST_F(TestsMechanism, selecting_profile_with_required_profiles) {
     {
         const char* profile_dirs_data = JSON_TEST_FILES_PATH;
         const char* profile_name_data = "VP_LUNARG_test_required_profiles2";
-        VkBool32 emulate_portability_data = VK_FALSE;
         const std::vector<const char*> simulate_capabilities = {"SIMULATE_MAX_ENUM"};
         const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
         std::vector<VkLayerSettingEXT> settings = {
             {kLayerName, kLayerSettingsProfileDirs, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_dirs_data},
             {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
             {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT,
              static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
             {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
@@ -440,7 +424,6 @@ TEST_F(TestsMechanism, profile_variants_all) {
     {
         const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_variants.json";
         const char* profile_name_data = "VP_LUNARG_test_variants";
-        VkBool32 emulate_portability_data = VK_FALSE;
         const std::vector<const char*> simulate_capabilities = {"SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT",
                                                                 "SIMULATE_PROPERTIES_BIT", "SIMULATE_EXTENSIONS_BIT"};
         const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
@@ -448,7 +431,6 @@ TEST_F(TestsMechanism, profile_variants_all) {
         std::vector<VkLayerSettingEXT> settings = {
             {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
             {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
             {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT,
              static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
             {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
@@ -511,7 +493,6 @@ TEST_F(TestsMechanism, default_feature_values) {
     {
         const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_0.json";
         const char* profile_name_data = "VP_LUNARG_test_api_1_0";
-        VkBool32 emulate_portability_data = VK_FALSE;
         const std::vector<const char*> simulate_capabilities = {"SIMULATE_API_VERSION_BIT", "SIMULATE_EXTENSIONS_BIT"};
         const char* default_feature_values_data = "DEFAULT_FEATURE_VALUES_FALSE";
         const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
@@ -519,7 +500,6 @@ TEST_F(TestsMechanism, default_feature_values) {
         const std::vector<VkLayerSettingEXT> settings = {
             {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
             {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
             {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
             {kLayerName, kLayerSettingsDefaultFeatureValues, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &default_feature_values_data},
             {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
@@ -562,14 +542,12 @@ TEST_F(TestsMechanism, reading_duplicated_members) {
 
     const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_duplicated.json";
     const char* profile_name_data = "VP_LUNARG_test_duplicated";
-    VkBool32 emulate_portability_data = VK_TRUE;
     const std::vector<const char*> simulate_capabilities = {"SIMULATE_MAX_ENUM"};
     VkBool32 debug_fail_on_error = VK_TRUE;
 
     std::vector<VkLayerSettingEXT> settings = {
         {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
         {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-        {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
         {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
         {kLayerName, kLayerSettingsDebugFailOnError, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &debug_fail_on_error}
     };
@@ -587,14 +565,12 @@ TEST_F(TestsMechanism, capabilities_or) {
 
     const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_capabilities.json";
     const char* profile_name_data = "VP_LUNARG_test_capabilities_or";
-    VkBool32 emulate_portability_data = VK_TRUE;
     const std::vector<const char*> simulate_capabilities = {"SIMULATE_MAX_ENUM"};
     VkBool32 debug_fail_on_error = VK_TRUE;
 
     std::vector<VkLayerSettingEXT> settings = {
         {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
         {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-        {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
         {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
         {kLayerName, kLayerSettingsDebugFailOnError, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &debug_fail_on_error}};
 

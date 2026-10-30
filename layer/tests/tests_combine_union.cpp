@@ -39,7 +39,6 @@ class TestsUnion : public VkTestFramework {
 
         const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_combine_union.json";
         const char* profile_name_data = "VP_LUNARG_test_combine_union";
-        VkBool32 emulate_portability_data = VK_TRUE;
         const std::vector<const char*> simulate_capabilities = {
             "SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_PROPERTIES_BIT",  "SIMULATE_EXTENSIONS_BIT",
             "SIMULATE_FORMATS_BIT", "SIMULATE_QUEUE_FAMILY_PROPERTIES_BIT", "SIMULATE_VIDEO_CAPABILITIES_BIT", "SIMULATE_VIDEO_FORMATS_BIT"};
@@ -49,7 +48,6 @@ class TestsUnion : public VkTestFramework {
         std::vector<VkLayerSettingEXT> settings = {
             {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
             {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
             {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
             {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(debug_reports.size()), &debug_reports[0]}
         };
@@ -73,10 +71,10 @@ TEST_F(TestsUnion, Extension) {
     std::vector<VkExtensionProperties> device_extensions(count);
     vkEnumerateDeviceExtensionProperties(gpu_profile, nullptr, &count, device_extensions.data());
     ASSERT_EQ(device_extensions.size(), count);
-    std::array<const char*, 8> expected_extensions = {
+    std::array<const char*, 7> expected_extensions = {
         "VK_AMD_device_coherent_memory", "VK_EXT_extended_dynamic_state", "VK_EXT_shader_demote_to_helper_invocation",
         "VK_KHR_maintenance1",           "VK_KHR_maintenance2",           "VK_KHR_maintenance3",
-        "VK_KHR_variable_pointers",      "VK_KHR_portability_subset"};
+        "VK_KHR_variable_pointers"};
     for (const auto& extension : device_extensions) {
         bool found = false;
         for (const auto& expected : expected_extensions) {

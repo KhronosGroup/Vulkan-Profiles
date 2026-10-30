@@ -186,27 +186,7 @@ struct ProfileLayerSettings {
         UnknownFeatureValues unknown_feature_values{UNKNOWN_FEATURE_VALUES_UNCHANGED};
         std::vector<std::string> exclude_device_extensions;
         std::vector<std::string> exclude_formats;
-        bool emulate_portability{true};
     } simulate;
-
-    struct Portability {
-        bool constantAlphaColorBlendFactors{false};
-        bool events{false};
-        bool imageViewFormatReinterpretation{false};
-        bool imageViewFormatSwizzle{false};
-        bool imageView2DOn3DImage{false};
-        bool multisampleArrayImage{false};
-        bool mutableComparisonSamplers{false};
-        bool pointPolygons{false};
-        bool samplerMipLodBias{false};
-        bool separateStencilMaskRef{false};
-        bool shaderSampleRateInterpolationFunctions{false};
-        bool tessellationIsolines{false};
-        bool tessellationPointMode{false};
-        bool triangleFans{false};
-        bool vertexAttributeAccessBeyondStride{false};
-        uint32_t minVertexInputBindingStrideAlignment{4};
-    } portability;
 
     struct Log {
         DebugActionFlags debug_actions{DEBUG_ACTION_STDOUT_BIT};

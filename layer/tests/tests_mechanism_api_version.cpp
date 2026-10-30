@@ -139,14 +139,12 @@ TEST_F(TestsMechanismApiVersion, api_versions) {
     {
         const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_0.json";
         const char* profile_name_data = "VP_LUNARG_test_api_1_0";
-        VkBool32 emulate_portability_data = VK_FALSE;
         const std::vector<const char*> simulate_capabilities = {"SIMULATE_API_VERSION_BIT", "SIMULATE_EXTENSIONS_BIT"};
         const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
         std::vector<VkLayerSettingEXT> settings = {
             {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
             {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
             {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
             {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
 
@@ -168,53 +166,6 @@ TEST_F(TestsMechanismApiVersion, api_versions) {
         ASSERT_EQ(result, VK_SUCCESS);
 
         EXPECT_EQ(0, extCount);
-
-        inst_builder.reset();
-    }
-
-    // Vulkan 1.0 + emulate_portability = true
-    {
-        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_0.json";
-        const char* profile_name_data = "VP_LUNARG_test_api_1_0";
-        VkBool32 emulate_portability_data = VK_TRUE;
-        const std::vector<const char*> simulate_capabilities = {"SIMULATE_API_VERSION_BIT", "SIMULATE_EXTENSIONS_BIT"};
-        const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
-
-        std::vector<VkLayerSettingEXT> settings = {
-            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
-            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
-            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
-            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
-
-        err = inst_builder.init(settings);
-        ASSERT_EQ(err, VK_SUCCESS);
-
-        VkPhysicalDevice gpu;
-        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
-        if (err != VK_SUCCESS) {
-            printf("Profile not supported on device, skipping test.\n");
-            inst_builder.reset();
-            return;
-        }
-
-        VkResult result = VK_SUCCESS;
-
-        uint32_t extCount = 0;
-        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
-        ASSERT_EQ(result, VK_SUCCESS);
-
-#ifdef VK_KHR_portability_subset
-        EXPECT_EQ(1, extCount);
-
-        std::vector<VkExtensionProperties> ext(extCount);
-        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
-        ASSERT_EQ(result, VK_SUCCESS);
-
-        EXPECT_STREQ(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME, ext[0].extensionName);
-#else
-        EXPECT_EQ(0, extCount);
-#endif  // VK_KHR_portability_subset
 
         inst_builder.reset();
     }
@@ -223,14 +174,12 @@ TEST_F(TestsMechanismApiVersion, api_versions) {
     {
         const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_1.json";
         const char* profile_name_data = "VP_LUNARG_test_api_1_1";
-        VkBool32 emulate_portability_data = VK_FALSE;
         const std::vector<const char*> simulate_capabilities = {"SIMULATE_API_VERSION_BIT", "SIMULATE_EXTENSIONS_BIT"};
         const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
         std::vector<VkLayerSettingEXT> settings = {
             {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
             {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
             {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
             {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
 
@@ -294,101 +243,16 @@ TEST_F(TestsMechanismApiVersion, api_versions) {
         inst_builder.reset();
     }
 
-    // Vulkan 1.1 + emulate_portability = true
-    {
-        const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_1.json";
-        const char* profile_name_data = "VP_LUNARG_test_api_1_1";
-        VkBool32 emulate_portability_data = VK_TRUE;
-        const std::vector<const char*> simulate_capabilities = {"SIMULATE_API_VERSION_BIT", "SIMULATE_EXTENSIONS_BIT"};
-        const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
-
-        std::vector<VkLayerSettingEXT> settings = {
-            {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
-            {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
-            {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
-            {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
-
-        err = inst_builder.init(settings);
-        ASSERT_EQ(err, VK_SUCCESS);
-
-        VkPhysicalDevice gpu;
-        err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
-        if (err != VK_SUCCESS) {
-            printf("Profile not supported on device, skipping test.\n");
-            inst_builder.reset();
-            return;
-        }
-
-        VkResult result = VK_SUCCESS;
-
-        uint32_t extCount = 0;
-        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, nullptr);
-        ASSERT_EQ(result, VK_SUCCESS);
-
-#ifdef VK_KHR_portability_subset
-        EXPECT_EQ(24, extCount);
-#else
-        EXPECT_EQ(23, extCount);
-#endif  // VK_KHR_portability_subset
-
-        std::vector<VkExtensionProperties> ext(extCount);
-        result = vkEnumerateDeviceExtensionProperties(gpu, nullptr, &extCount, ext.data());
-        ASSERT_EQ(result, VK_SUCCESS);
-        ASSERT_EQ(ext.size(), extCount);
-        std::array expected_extensions = {VK_KHR_MULTIVIEW_EXTENSION_NAME,
-                                          VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
-                                          VK_KHR_DEVICE_GROUP_EXTENSION_NAME,
-                                          VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME,
-                                          VK_KHR_MAINTENANCE_1_EXTENSION_NAME,
-                                          VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME,
-                                          VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME,
-                                          VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME,
-                                          VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME,
-                                          VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME,
-                                          VK_KHR_16BIT_STORAGE_EXTENSION_NAME,
-                                          VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME,
-                                          VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME,
-                                          VK_KHR_EXTERNAL_FENCE_EXTENSION_NAME,
-                                          VK_KHR_MAINTENANCE_2_EXTENSION_NAME,
-                                          VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME,
-                                          VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME,
-                                          VK_KHR_STORAGE_BUFFER_STORAGE_CLASS_EXTENSION_NAME,
-                                          VK_KHR_RELAXED_BLOCK_LAYOUT_EXTENSION_NAME,
-                                          VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME,
-                                          VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME,
-                                          VK_KHR_BIND_MEMORY_2_EXTENSION_NAME,
-                                          VK_KHR_MAINTENANCE_3_EXTENSION_NAME,
-#ifdef VK_KHR_portability_subset
-                                          VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME,
-#endif  // VK_KHR_portability_subset
-                                          };
-        for (const auto& extension : ext) {
-            bool found = false;
-            for (const auto& expected : expected_extensions) {
-                if (strcmp(expected, extension.extensionName) == 0) {
-                    ASSERT_FALSE(found);  // make sure there are no duplicates
-                    found = true;
-                }
-            }
-            ASSERT_TRUE(found);
-        }
-
-        inst_builder.reset();
-    }
-
     // Vulkan 1.2
     {
         const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_2.json";
         const char* profile_name_data = "VP_LUNARG_test_api_1_2";
-        VkBool32 emulate_portability_data = VK_FALSE;
         const std::vector<const char*> simulate_capabilities = {"SIMULATE_API_VERSION_BIT", "SIMULATE_EXTENSIONS_BIT"};
         const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
         std::vector<VkLayerSettingEXT> settings = {
             {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
             {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
             {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
             {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
 
@@ -481,14 +345,12 @@ TEST_F(TestsMechanismApiVersion, api_versions) {
     {
         const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_3.json";
         const char* profile_name_data = "VP_LUNARG_test_api_1_3";
-        VkBool32 emulate_portability_data = VK_FALSE;
         const std::vector<const char*> simulate_capabilities = {"SIMULATE_API_VERSION_BIT", "SIMULATE_EXTENSIONS_BIT"};
         const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
 
         std::vector<VkLayerSettingEXT> settings = {
             {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
             {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
-            {kLayerName, kLayerSettingsEmulatePortability, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &emulate_portability_data},
             {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
             {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data}};
 
