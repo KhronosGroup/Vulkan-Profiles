@@ -231,6 +231,11 @@ class TestVkProfilesExhaustiveArgs(unittest.TestCase):
                         self.assertEqual(args.config, config)
                         self.assertTrue(args.strip)
                         self.assertTrue(args.debug)
+                        self.assertFalse(args.legacy)
+
+        with patch("vkprofiles.main_library") as mock_lib:
+            vkprofiles.main(["library", "-i", "in_dir", "-r", "vk.xml", "--legacy"])
+            self.assertTrue(mock_lib.call_args[0][0].legacy)
 
     def test_doc_layer_tests_schema_flags(self):
         """Tests parameter parsing for doc, layer, tests, and schema subcommands."""
