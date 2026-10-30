@@ -1,0 +1,405 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-graph.json#",
+    "nodes": [
+        {
+            "id": "transform_minimum_requirements",
+            "description": "Transform the minimum requirements profiles",
+            "command": "transform",
+            "args": {
+                "input": "profiles/LunarG/VP_LUNARG_minimum_requirements.json",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/1_transform",
+                "pull": [
+                    "requirements",
+                    "aliases",
+                    "ignore-extension-versions"
+                ],
+                "sort": true,
+                "format": "flatten"
+            }
+        },
+        {
+            "id": "transform_generated_requirements",
+            "description": "Transform the generated requirements profiles",
+            "command": "transform",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/1_transform/VP_LUNARG_generated_requirements.json",
+                "pull": [
+                    "requirements",
+                    "aliases",
+                    "ignore-extension-versions"
+                ],
+                "sort": true,
+                "format": "flatten"
+            },
+            "depends_on": [
+                "transform_minimum_requirements"
+            ]
+        },
+        {
+            "id": "extract_gen_min_requirements_1_0",
+            "description": "Extract VP_LUNARG_gen_min_requirements_1_0 with its required profiles",
+            "command": "extract",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/1_transform",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/2_extract/vulkan10/VP_LUNARG_gen_min_requirements_1_0.json",
+                "input-profiles": "VP_LUNARG_gen_min_requirements_1_0",
+                "mode": "pull-required-profiles",
+                "format": "flatten"
+            },
+            "depends_on": [
+                "transform_generated_requirements"
+            ]
+        },
+        {
+            "id": "extract_minimum_requirements_1_0",
+            "description": "Extract VP_LUNARG_minimum_requirements_1_0 with its required profiles",
+            "command": "extract",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/1_transform",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/2_extract/vulkan10/VP_LUNARG_minimum_requirements_1_0.json",
+                "input-profiles": "VP_LUNARG_minimum_requirements_1_0",
+                "mode": "pull-required-profiles",
+                "format": "flatten"
+            },
+            "depends_on": [
+                "extract_gen_min_requirements_1_0"
+            ]
+        },
+        {
+            "id": "extract_gen_min_requirements_1_1",
+            "description": "Extract VP_LUNARG_gen_min_requirements_1_1 with its required profiles",
+            "command": "extract",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/1_transform",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/2_extract/vulkan11/VP_LUNARG_gen_min_requirements_1_1.json",
+                "input-profiles": "VP_LUNARG_gen_min_requirements_1_1",
+                "mode": "pull-required-profiles",
+                "format": "flatten"
+            },
+            "depends_on": [
+                "extract_minimum_requirements_1_0"
+            ]
+        },
+        {
+            "id": "extract_minimum_requirements_1_1",
+            "description": "Extract VP_LUNARG_minimum_requirements_1_1 with its required profiles",
+            "command": "extract",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/1_transform",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/2_extract/vulkan11/VP_LUNARG_minimum_requirements_1_1.json",
+                "input-profiles": "VP_LUNARG_minimum_requirements_1_1",
+                "mode": "pull-required-profiles",
+                "format": "flatten"
+            },
+            "depends_on": [
+                "extract_gen_min_requirements_1_1"
+            ]
+        },
+        {
+            "id": "extract_gen_min_requirements_1_2",
+            "description": "Extract VP_LUNARG_gen_min_requirements_1_2 with its required profiles",
+            "command": "extract",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/1_transform",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/2_extract/vulkan12/VP_LUNARG_gen_min_requirements_1_2.json",
+                "input-profiles": "VP_LUNARG_gen_min_requirements_1_2",
+                "mode": "pull-required-profiles",
+                "format": "flatten"
+            },
+            "depends_on": [
+                "extract_minimum_requirements_1_1"
+            ]
+        },
+        {
+            "id": "extract_minimum_requirements_1_2",
+            "description": "Extract VP_LUNARG_minimum_requirements_1_2 with its required profiles",
+            "command": "extract",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/1_transform",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/2_extract/vulkan12/VP_LUNARG_minimum_requirements_1_2.json",
+                "input-profiles": "VP_LUNARG_minimum_requirements_1_2",
+                "mode": "pull-required-profiles",
+                "format": "flatten"
+            },
+            "depends_on": [
+                "extract_gen_min_requirements_1_2"
+            ]
+        },
+        {
+            "id": "extract_gen_min_requirements_1_3",
+            "description": "Extract VP_LUNARG_gen_min_requirements_1_3 with its required profiles",
+            "command": "extract",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/1_transform",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/2_extract/vulkan13/VP_LUNARG_gen_min_requirements_1_3.json",
+                "input-profiles": "VP_LUNARG_gen_min_requirements_1_3",
+                "mode": "pull-required-profiles",
+                "format": "flatten"
+            },
+            "depends_on": [
+                "extract_minimum_requirements_1_2"
+            ]
+        },
+        {
+            "id": "extract_minimum_requirements_1_3",
+            "description": "Extract VP_LUNARG_minimum_requirements_1_3 with its required profiles",
+            "command": "extract",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/1_transform",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/2_extract/vulkan13/VP_LUNARG_minimum_requirements_1_3.json",
+                "input-profiles": "VP_LUNARG_minimum_requirements_1_3",
+                "mode": "pull-required-profiles",
+                "format": "flatten"
+            },
+            "depends_on": [
+                "extract_gen_min_requirements_1_3"
+            ]
+        },
+        {
+            "id": "extract_gen_min_requirements_1_4",
+            "description": "Extract VP_LUNARG_gen_min_requirements_1_4 with its required profiles",
+            "command": "extract",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/1_transform",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/2_extract/vulkan14/VP_LUNARG_gen_min_requirements_1_4.json",
+                "input-profiles": "VP_LUNARG_gen_min_requirements_1_4",
+                "mode": "pull-required-profiles",
+                "format": "flatten"
+            },
+            "depends_on": [
+                "extract_minimum_requirements_1_3"
+            ]
+        },
+        {
+            "id": "extract_minimum_requirements_1_4",
+            "description": "Extract VP_LUNARG_minimum_requirements_1_4 with its required profiles",
+            "command": "extract",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/1_transform",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/2_extract/vulkan14/VP_LUNARG_minimum_requirements_1_4.json",
+                "input-profiles": "VP_LUNARG_minimum_requirements_1_4",
+                "mode": "pull-required-profiles",
+                "format": "flatten"
+            },
+            "depends_on": [
+                "extract_gen_min_requirements_1_4"
+            ]
+        },
+        {
+            "id": "consolidate_vulkan10",
+            "description": "Consolidate the Vulkan 1.0 profiles",
+            "command": "transform",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/2_extract/vulkan10",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/3_consolidate/vulkan10",
+                "consolidate": true,
+                "sort": true,
+                "format": "flatten"
+            },
+            "depends_on": [
+                "extract_minimum_requirements_1_4"
+            ]
+        },
+        {
+            "id": "consolidate_vulkan11",
+            "description": "Consolidate the Vulkan 1.1 profiles",
+            "command": "transform",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/2_extract/vulkan11",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/3_consolidate/vulkan11",
+                "consolidate": true,
+                "sort": true,
+                "format": "flatten"
+            },
+            "depends_on": [
+                "consolidate_vulkan10"
+            ]
+        },
+        {
+            "id": "consolidate_vulkan12",
+            "description": "Consolidate the Vulkan 1.2 profiles",
+            "command": "transform",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/2_extract/vulkan12",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/3_consolidate/vulkan12",
+                "consolidate": true,
+                "sort": true,
+                "format": "flatten"
+            },
+            "depends_on": [
+                "consolidate_vulkan11"
+            ]
+        },
+        {
+            "id": "consolidate_vulkan13",
+            "description": "Consolidate the Vulkan 1.3 profiles",
+            "command": "transform",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/2_extract/vulkan13",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/3_consolidate/vulkan13",
+                "consolidate": true,
+                "sort": true,
+                "format": "flatten"
+            },
+            "depends_on": [
+                "consolidate_vulkan12"
+            ]
+        },
+        {
+            "id": "consolidate_vulkan14",
+            "description": "Consolidate the Vulkan 1.4 profiles",
+            "command": "transform",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/2_extract/vulkan14",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/3_consolidate/vulkan14",
+                "consolidate": true,
+                "sort": true,
+                "format": "flatten"
+            },
+            "depends_on": [
+                "consolidate_vulkan13"
+            ]
+        },
+        {
+            "id": "diff_vulkan10",
+            "description": "Difference of the Vulkan 1.0 profiles",
+            "command": "combine",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/3_consolidate/vulkan10",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/4_diff/vulkan10",
+                "mode": "difference",
+                "format": "flatten"
+            },
+            "depends_on": [
+                "consolidate_vulkan14"
+            ]
+        },
+        {
+            "id": "diff_vulkan11",
+            "description": "Difference of the Vulkan 1.1 profiles",
+            "command": "combine",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/3_consolidate/vulkan11",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/4_diff/vulkan11",
+                "mode": "difference",
+                "format": "flatten"
+            },
+            "depends_on": [
+                "diff_vulkan10"
+            ]
+        },
+        {
+            "id": "diff_vulkan12",
+            "description": "Difference of the Vulkan 1.2 profiles",
+            "command": "combine",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/3_consolidate/vulkan12",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/4_diff/vulkan12",
+                "mode": "difference",
+                "format": "flatten"
+            },
+            "depends_on": [
+                "diff_vulkan11"
+            ]
+        },
+        {
+            "id": "diff_vulkan13",
+            "description": "Difference of the Vulkan 1.3 profiles",
+            "command": "combine",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/3_consolidate/vulkan13",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/4_diff/vulkan13",
+                "mode": "difference",
+                "format": "flatten"
+            },
+            "depends_on": [
+                "diff_vulkan12"
+            ]
+        },
+        {
+            "id": "diff_vulkan14",
+            "description": "Difference of the Vulkan 1.4 profiles",
+            "command": "combine",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/3_consolidate/vulkan14",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/4_diff/vulkan14",
+                "mode": "difference",
+                "format": "flatten"
+            },
+            "depends_on": [
+                "diff_vulkan13"
+            ]
+        },
+        {
+            "id": "sort_vulkan10",
+            "description": "Sort the Vulkan 1.0 difference profiles",
+            "command": "transform",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/4_diff/vulkan10",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/5_sort/vulkan10",
+                "sort": true,
+                "format": "flatten"
+            },
+            "depends_on": [
+                "diff_vulkan14"
+            ]
+        },
+        {
+            "id": "sort_vulkan11",
+            "description": "Sort the Vulkan 1.1 difference profiles",
+            "command": "transform",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/4_diff/vulkan11",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/5_sort/vulkan11",
+                "sort": true,
+                "format": "flatten"
+            },
+            "depends_on": [
+                "sort_vulkan10"
+            ]
+        },
+        {
+            "id": "sort_vulkan12",
+            "description": "Sort the Vulkan 1.2 difference profiles",
+            "command": "transform",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/4_diff/vulkan12",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/5_sort/vulkan12",
+                "sort": true,
+                "format": "flatten"
+            },
+            "depends_on": [
+                "sort_vulkan11"
+            ]
+        },
+        {
+            "id": "sort_vulkan13",
+            "description": "Sort the Vulkan 1.3 difference profiles",
+            "command": "transform",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/4_diff/vulkan13",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/5_sort/vulkan13",
+                "sort": true,
+                "format": "flatten"
+            },
+            "depends_on": [
+                "sort_vulkan12"
+            ]
+        },
+        {
+            "id": "sort_vulkan14",
+            "description": "Sort the Vulkan 1.4 difference profiles",
+            "command": "transform",
+            "args": {
+                "input": "profiles/test/data/VP_LUNARG_generated_requirements/4_diff/vulkan14",
+                "output": "profiles/test/data/VP_LUNARG_generated_requirements/5_sort/vulkan14",
+                "sort": true,
+                "format": "flatten"
+            },
+            "depends_on": [
+                "sort_vulkan13"
+            ]
+        }
+    ]
+}

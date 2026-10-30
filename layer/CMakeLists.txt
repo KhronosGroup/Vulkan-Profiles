@@ -78,15 +78,18 @@ add_definitions(-DVK_ENABLE_BETA_EXTENSIONS)
 source_group("JSON Manifest" FILES ${LAYER_NAME}.json.in)
 source_group("Export Files" FILES ${LAYER_NAME}.def ${LAYER_NAME}.map)
 
-add_custom_target(VpLayer_generate ALL
+add_custom_command(
+    OUTPUT ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp
     COMMAND ${VKPROFILES_EXE} layer
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --output ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp
     VERBATIM
-    DEPENDS ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+    DEPENDS ${VKPROFILES_EXE}
+            ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
             ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/video.xml
-            )
+    COMMENT "Generating the Profiles layer source...")
+add_custom_target(VpLayer_generate ALL DEPENDS ${CMAKE_SOURCE_DIR}/layer/profiles_generated.cpp)
 set_target_properties(VpLayer_generate PROPERTIES FOLDER "Profiles layer")
 add_dependencies(VpLayer_generate VpProfilesProcessor)
 
