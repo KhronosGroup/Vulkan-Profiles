@@ -91,7 +91,8 @@ find_package(valijson REQUIRED CONFIG)
 find_package(jsoncpp REQUIRED CONFIG)
 
 # Write baked_version.py immediately after VulkanHeaders is found, BEFORE file(GLOB) is executed
-file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/baked_version.py" "BAKED_VERSION = \"${VulkanHeaders_VERSION}\"\n")
+# file(CONFIGURE) only rewrites the file when its content changes, so reconfiguring doesn't trigger a PyInstaller rebuild
+file(CONFIGURE OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/source/baked_version.py" CONTENT "BAKED_VERSION = \"${VulkanHeaders_VERSION}\"\n")
 
 # Workaround AppleClang using the wrong headers when there are headers in /usr/local/include
 if (CMAKE_CXX_COMPILER_ID STREQUAL AppleClang AND TARGET Vulkan::Headers AND TARGET Vulkan::LayerSettings AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)

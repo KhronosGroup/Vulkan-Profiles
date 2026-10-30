@@ -21,14 +21,22 @@
 
 set_source_files_properties("${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp" PROPERTIES GENERATED true)
 
-add_custom_target(VpLayer_generate_tests ALL
+add_custom_command(
+    OUTPUT ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_api_generated.json
+           ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp
     COMMAND ${VKPROFILES_EXE} tests
         --api ${API_TYPE}
         --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
         --output-profile ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_api_generated.json
         --output-cpp ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp
     VERBATIM
-    DEPENDS ProfilesLayer)
+    DEPENDS ${VKPROFILES_EXE}
+            ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+    COMMENT "Generating the Profiles layer tests...")
+add_custom_target(VpLayer_generate_tests ALL
+    DEPENDS ${CMAKE_SOURCE_DIR}/profiles/test/data/VP_LUNARG_test_api_generated.json
+            ${CMAKE_SOURCE_DIR}/layer/tests/tests_generated.cpp)
+add_dependencies(VpLayer_generate_tests ProfilesLayer)
 set_target_properties(VpLayer_generate_tests PROPERTIES FOLDER "Profiles layer")
 
 if (ANDROID)

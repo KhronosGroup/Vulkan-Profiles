@@ -30,29 +30,74 @@ else()
     list(APPEND test_libraries Vulkan::Loader)
 endif()
 
-add_custom_target(VpGenerate-Test-Profiles
+set(VULKAN_REGISTRY_FILES_DIR ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry)
+
+file(GLOB_RECURSE TEST_PROFILES_GRAPH_INPUTS CONFIGURE_DEPENDS
+    ${PROJECT_SOURCE_DIR}/profiles/*.json
+    ${PROJECT_SOURCE_DIR}/profiles/Android/*.json
+    ${PROJECT_SOURCE_DIR}/profiles/LunarG/VP_LUNARG_desktop_max_*/*.json)
+list(FILTER TEST_PROFILES_GRAPH_INPUTS EXCLUDE REGEX "/profiles/(build|test)/")
+
+# Files written on every execution of the test generation graph
+set(TEST_PROFILES_GRAPH_OUTPUTS
+    ${PROJECT_SOURCE_DIR}/profiles/test/data/VP_LUNARG_desktop_max_2024.json
+    ${PROJECT_SOURCE_DIR}/profiles/test/data/VP_LUNARG_desktop_max_2026.json)
+foreach(generated_library
+        generated_vulkan_profiles
+        generated_vulkan_profiles_debug
+        generated_vulkan_profiles_roadmap
+        generated_vulkan_profiles_roadmap_debug
+        generated_vulkan_profiles_android
+        generated_vulkan_requirements_debug)
+    list(APPEND TEST_PROFILES_GRAPH_OUTPUTS
+        ${CMAKE_CURRENT_LIST_DIR}/${generated_library}.h
+        ${CMAKE_CURRENT_LIST_DIR}/${generated_library}.hpp
+        ${CMAKE_CURRENT_LIST_DIR}/${generated_library}.cpp)
+endforeach()
+
+add_custom_command(
+    OUTPUT ${TEST_PROFILES_GRAPH_OUTPUTS}
     COMMAND ${VKPROFILES_EXE} graph
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --registry ${VULKAN_REGISTRY_FILES_DIR}/vk.xml
         --input ${CMAKE_CURRENT_LIST_DIR}/vkprofiles_test_graph.json
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     VERBATIM
-    DEPENDS VpGenerate-Profiles)
+    DEPENDS ${VKPROFILES_EXE}
+            ${VULKAN_REGISTRY_FILES_DIR}/vk.xml
+            ${VULKAN_REGISTRY_FILES_DIR}/profiles/VP_KHR_roadmap.json
+            ${CMAKE_CURRENT_LIST_DIR}/vkprofiles_test_graph.json
+            ${PROJECT_SOURCE_DIR}/profiles/build/VP_LUNARG_minimum_requirements.json
+            ${PROJECT_SOURCE_DIR}/profiles/build/VP_LUNARG_desktop_baseline.json
+            ${TEST_PROFILES_GRAPH_INPUTS}
+    COMMENT "Executing the Vulkan Profiles test generation graph...")
+add_custom_target(VpGenerate-Test-Profiles DEPENDS ${TEST_PROFILES_GRAPH_OUTPUTS})
+add_dependencies(VpGenerate-Test-Profiles VpGenerate-Profiles)
 set_target_properties(VpGenerate-Test-Profiles PROPERTIES FOLDER "Profiles API library/Tests")
 
-add_custom_target(VpLibrary_test_generated_library
+file(GLOB TEST_LIBRARY_PROFILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_LIST_DIR}/profiles/*.json)
+set(TEST_LIBRARY_OUTPUTS
+    ${CMAKE_CURRENT_LIST_DIR}/test_vulkan_profiles.h
+    ${CMAKE_CURRENT_LIST_DIR}/test_vulkan_profiles.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/test_vulkan_profiles.cpp)
+
+add_custom_command(
+    OUTPUT ${TEST_LIBRARY_OUTPUTS}
     COMMAND ${VKPROFILES_EXE} library
         --api ${API_TYPE}
-        --registry ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
+        --registry ${VULKAN_REGISTRY_FILES_DIR}/vk.xml
         --input ${PROJECT_SOURCE_DIR}/library/test/profiles
         --output ${PROJECT_SOURCE_DIR}/library/test
         --output-filename "test_vulkan_profiles"
     VERBATIM
-    SOURCES ${CMAKE_CURRENT_LIST_DIR}/profiles
-    DEPENDS ${CMAKE_CURRENT_LIST_DIR}/profiles
-            ${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml
-            VpProfilesProcessor)
+    DEPENDS ${VKPROFILES_EXE}
+            ${VULKAN_REGISTRY_FILES_DIR}/vk.xml
+            ${TEST_LIBRARY_PROFILES}
+    COMMENT "Generating the test Vulkan Profiles library...")
+add_custom_target(VpLibrary_test_generated_library
+    SOURCES ${TEST_LIBRARY_PROFILES}
+    DEPENDS ${TEST_LIBRARY_OUTPUTS})
 set_target_properties(VpLibrary_test_generated_library PROPERTIES FOLDER "Profiles API library")
-add_dependencies(VpLibrary_test_generated_library VpGenerate-Profiles VpGenerate-Test-Profiles)
+add_dependencies(VpLibrary_test_generated_library VpProfilesProcessor VpGenerate-Profiles VpGenerate-Test-Profiles)
 
 # Use generated profile source files from the current CMake directory based on build configuration
 set(vulkan_profiles_source ${CMAKE_CURRENT_LIST_DIR}/generated_vulkan_profiles$<$<CONFIG:Debug>:_debug>.cpp)
