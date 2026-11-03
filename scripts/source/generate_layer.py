@@ -2058,13 +2058,28 @@ VkResult JsonLoader::LoadProfilesDatabase() {
     for (std::size_t i = 0, n = layer_settings.simulate.profile_dirs.size(); i < n; ++i) {
         const std::string& path = layer_settings.simulate.profile_dirs[i];
 
-        if (fs::is_regular_file(path)) {
+        // The std::error_code overloads don't throw when the path doesn't exist or can't be accessed
+        std::error_code error;
+        if (fs::is_regular_file(path, error)) {
             this->LoadFile(path);
             continue;
         }
 
-        for (const auto& entry : fs::directory_iterator(path)) {
-            if (fs::is_directory(entry.path())) {
+        fs::directory_iterator it(path, error);
+        if (error) {
+            LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "Fail to open profiles directory \\"%s\\"\\n", path.c_str());
+            continue;
+        }
+
+        for (const fs::directory_iterator end; it != end; it.increment(error)) {
+            if (error) {
+                LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT, "Fail to read profiles directory \\"%s\\"\\n", path.c_str());
+                break;
+            }
+
+            const fs::directory_entry& entry = *it;
+            std::error_code entry_error;
+            if (entry.is_directory(entry_error)) {
                 continue;
             }
 
