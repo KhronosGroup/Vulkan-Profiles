@@ -21,6 +21,7 @@
 
 from vulkan_object import VulkanObject, Format
 from source.generate_layer import LayerRegistry
+from source.vulkan_object_version import VK_VERSION
 
 PROFILES = '''
     "profiles": {
@@ -156,6 +157,32 @@ class TestsRegistry(LayerRegistry):
         self.constants = { name: constant.value for name, constant in self.vk.constants.items() }
 
         self.specVersions = { extension.name: extension.specVersionValue for extension in self.vk.extensions.values() }
+
+        # The structure names of all the structure aliases
+        self.structNames = { name: struct.name for struct in self.vk.structs.values() for name in [ struct.name ] + struct.aliases }
+
+        # The Vulkan required property values by structure and member name, from the VulkanObject property requirements
+        # of the extensions and the versions. Requirements depending on an unsupported feature or extension ('!') are
+        # the values when the capability is missing so they are skipped, and the values of the later Vulkan versions
+        # replace the earlier ones.
+        owners = list(self.vk.extensions.values()) + sorted(self.vk.versions.values(), key=lambda version: VK_VERSION.from_string(version.name))
+        self.requiredPropertyValues = dict()
+        # All the members with a property requirement, including the implementation-dependent ones without a required value
+        self.listedProperties = set()
+        for owner in owners:
+            for requirement in getattr(owner, 'propertyRequirement', None) or []:
+                self.listedProperties.add((self.structNames.get(requirement.struct, requirement.struct), requirement.name))
+                if requirement.value is None or requirement.value == '???':
+                    continue
+                if requirement.depends is not None and '!' in requirement.depends:
+                    continue
+                self.requiredPropertyValues[(self.structNames.get(requirement.struct, requirement.struct), requirement.name)] = requirement.value
+
+    def getRequiredPropertyValue(self, struct_name, member_name):
+        return self.requiredPropertyValues.get((self.structNames.get(struct_name, struct_name), member_name))
+
+    def hasPropertyRequirement(self, struct_name, member_name):
+        return (self.structNames.get(struct_name, struct_name), member_name) in self.listedProperties
 
 class ProfileGenerator():
     i = 1
@@ -342,10 +369,54 @@ class ProfileGenerator():
         gen += '\n                    }'
         return gen, (self.i, self.i + 1, self.i + 2, self.i + 3)
 
+    def gen_required_property(self, name, property_name, property_type, property_size):
+        # Returns the JSON value and the test value of a property set to its Vulkan required value,
+        # or None when the property has no Vulkan required value or the type is not handled
+        value = self.registry.getRequiredPropertyValue(name, property_name)
+        if value is None:
+            return None
+        values = [ element.strip() for element in value.split(',') ]
+
+        if property_type == "VkBool32":
+            if value not in ('true', 'false'):
+                return None
+            return value, 'VK_TRUE' if value == 'true' else 'VK_FALSE'
+        elif property_type in ("uint32_t", "uint64_t", "int64_t", "VkDeviceSize", "size_t", "float"):
+            convert = float if property_type == "float" else int
+            if len(values) == 1:
+                values = values * property_size
+            if len(values) != property_size:
+                return None
+            try:
+                test_value = [ convert(element) for element in values ]
+            except ValueError:
+                # Required values expressed relative to other members, e.g. '96 * samplerDescriptorSize'
+                return None
+            gen = ', '.join(str(element) for element in test_value)
+            if property_size > 1:
+                gen = '[ ' + gen + ' ]'
+            return gen, test_value
+        elif property_type == "VkExtent2D":
+            if len(values) != 2:
+                return None
+            gen = '{\n'
+            gen += '                        \"width\": ' + values[0] + ',\n'
+            gen += '                        \"height\": ' + values[1] + '\n'
+            gen += '                    }'
+            return gen, (int(values[0]), int(values[1]))
+        elif property_type.endswith("Flags") or property_type.endswith("FlagsEXT"):
+            flags = [ flag.strip() for flag in value.split('|') if flag.strip() != '0' ]
+            gen = '[ ' + ', '.join('\"' + flag + '\"' for flag in flags) + ' ]' if flags else '[]'
+            return gen, ' | '.join(flags) if flags else '0'
+        elif property_type in self.registry.enums and value.startswith('VK_'):
+            return '\"' + value + '\"', value
+        return None
+
     def gen_properties(self, extensions):
         gen = ''
         first = True
         self.test_values = dict()
+        missing_requirements = list()
         for name, value in self.registry.structs.items():
             if ('VkPhysicalDeviceProperties2' in value.extends and value.definedByExtensions):
                 if (name in self.skipped_properties_structs):
@@ -384,7 +455,14 @@ class ProfileGenerator():
                     gen += '                    \"'
                     gen += property_name
                     gen += '\": '
-                    if property_type == "VkBool32":
+                    # Members without a property requirement come from a new vk.xml, the counter values would hide them
+                    if not self.registry.hasPropertyRequirement(name, property_name):
+                        missing_requirements.append(name + '::' + property_name)
+                    required_property = self.gen_required_property(name, property_name, property_type, property_size)
+                    if required_property is not None:
+                        gen += required_property[0]
+                        self.test_values[name][property] = required_property[1]
+                    elif property_type == "VkBool32":
                         gen += "true"
                         self.test_values[name][property] = 'VK_TRUE'
                     elif property_type == "uint8_t":
@@ -590,6 +668,11 @@ class ProfileGenerator():
                         gen += property_type
                 gen += '\n'
                 gen += '                }'
+        if missing_requirements:
+            raise RuntimeError(
+                f'{len(missing_requirements)} property structure members have no default property requirement, '
+                'add them to DEFAULT_CORE_PROPERTY_REQUIREMENTS or DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS:\n'
+                + '\n'.join(f'    {member}' for member in missing_requirements))
         return gen
 
     def get_max_format_features(self, format: Format) -> tuple[list[str], list[str], list[str]]:
