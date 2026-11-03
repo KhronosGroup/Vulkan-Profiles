@@ -19,18 +19,24 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
+import logging
+import sys
+from pathlib import Path
+
 from source.generate_layer import generate_layer
 from source.vulkan_object_utils import initVulkanObject
 
 def main_layer(args):
-    registry_path = '../external/Debug/Vulkan-Headers/build/install/share/vulkan/registry/vk.xml'
-    if getattr(args, 'registry', None) is not None:
-        registry_path = args.registry
+    registry_path = getattr(args, 'registry', None)
+    if registry_path is None or not Path(registry_path).is_file():
+        logging.error(f"Registry file '{registry_path}' not found, use --registry to specify the path to vk.xml")
+        sys.exit(1)
 
     output_path = "../layer/profiles_generated.cpp"
     out_val = getattr(args, 'output', None) or getattr(args, 'out_layer', None)
     if out_val is not None:
         output_path = out_val
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
 
     api = getattr(args, 'api', 'vulkan') or 'vulkan'
 
