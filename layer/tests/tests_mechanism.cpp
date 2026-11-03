@@ -689,6 +689,81 @@ TEST_F(TestsMechanism, debug_utils_layer_extension) {
     inst_builder.reset();
 }
 
+static VkResult CreateTestDevice(VkPhysicalDevice gpu, const VkPhysicalDeviceFeatures* enabled_features, const void* next,
+                                 VkDevice* device) {
+    const float queue_priority = 1.0f;
+
+    VkDeviceQueueCreateInfo queue_create_info{VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO};
+    queue_create_info.queueFamilyIndex = 0;
+    queue_create_info.queueCount = 1;
+    queue_create_info.pQueuePriorities = &queue_priority;
+
+    VkDeviceCreateInfo device_create_info{VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO};
+    device_create_info.pNext = next;
+    device_create_info.queueCreateInfoCount = 1;
+    device_create_info.pQueueCreateInfos = &queue_create_info;
+    device_create_info.pEnabledFeatures = enabled_features;
+
+    return vkCreateDevice(gpu, &device_create_info, nullptr, device);
+}
+
+TEST_F(TestsMechanism, create_device_unsupported_feature) {
+    TEST_DESCRIPTION("Test that vkCreateDevice returns VK_ERROR_FEATURE_NOT_PRESENT for a feature the simulated device doesn't support");
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    // The profile has no features, so all features are reported unsupported with DEFAULT_FEATURE_VALUES_FALSE
+    const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_0.json";
+    const char* profile_name_data = "VP_LUNARG_test_api_1_0";
+    const char* default_feature_values_data = "DEFAULT_FEATURE_VALUES_FALSE";
+
+    const std::vector<VkLayerSettingEXT> settings = {
+        {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+        {kLayerName, kLayerSettingsDefaultFeatureValues, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &default_feature_values_data}};
+
+    ASSERT_EQ(inst_builder.init(settings), VK_SUCCESS);
+
+    VkPhysicalDevice gpu_native = VK_NULL_HANDLE;
+    VkPhysicalDevice gpu = VK_NULL_HANDLE;
+    if (inst_builder.getPhysicalDevice(profiles_test::MODE_NATIVE, &gpu_native) != VK_SUCCESS ||
+        inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu) != VK_SUCCESS) {
+        printf("Profile not supported on device, skipping test.\n");
+        inst_builder.reset();
+        return;
+    }
+
+    // The device supports the feature, only the simulated device doesn't
+    VkPhysicalDeviceFeatures native_features{};
+    vkGetPhysicalDeviceFeatures(gpu_native, &native_features);
+    if (!native_features.independentBlend) {
+        printf("independentBlend not supported on device, skipping test.\n");
+        inst_builder.reset();
+        return;
+    }
+
+    VkPhysicalDeviceFeatures reported_features{};
+    vkGetPhysicalDeviceFeatures(gpu, &reported_features);
+    EXPECT_EQ(reported_features.independentBlend, VK_FALSE);
+
+    // Requested with VkDeviceCreateInfo::pEnabledFeatures
+    VkPhysicalDeviceFeatures enabled_features{};
+    enabled_features.independentBlend = VK_TRUE;
+    VkDevice device = VK_NULL_HANDLE;
+    EXPECT_EQ(CreateTestDevice(gpu, &enabled_features, nullptr, &device), VK_ERROR_FEATURE_NOT_PRESENT);
+
+    // Requested with VkPhysicalDeviceFeatures2
+    VkPhysicalDeviceFeatures2 enabled_features2{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
+    enabled_features2.features.independentBlend = VK_TRUE;
+    EXPECT_EQ(CreateTestDevice(gpu, nullptr, &enabled_features2, &device), VK_ERROR_FEATURE_NOT_PRESENT);
+
+    // No requested feature
+    ASSERT_EQ(CreateTestDevice(gpu, nullptr, nullptr, &device), VK_SUCCESS);
+    vkDestroyDevice(device, nullptr);
+
+    inst_builder.reset();
+}
+
 TEST_F(TestsMechanism, debug_utils_instance_messenger) {
     TEST_DESCRIPTION("Test that the messenger of VkInstanceCreateInfo::pNext reports the messages of vkCreateInstance and vkDestroyInstance only");
 
@@ -812,4 +887,45 @@ TEST_F(TestsMechanism, debug_utils_explicit_debug_actions) {
     ASSERT_TRUE(log_file.is_open());
     const std::string log((std::istreambuf_iterator<char>(log_file)), std::istreambuf_iterator<char>());
     EXPECT_NE(log.find("Fail to open file"), std::string::npos);
+}
+
+TEST_F(TestsMechanism, create_device_supported_feature) {
+    TEST_DESCRIPTION("Test that vkCreateDevice succeeds for a feature the simulated device supports");
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    // The profile has no features, so the device features are reported with DEFAULT_FEATURE_VALUES_DEVICE
+    const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_0.json";
+    const char* profile_name_data = "VP_LUNARG_test_api_1_0";
+    const char* default_feature_values_data = "DEFAULT_FEATURE_VALUES_DEVICE";
+
+    const std::vector<VkLayerSettingEXT> settings = {
+        {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+        {kLayerName, kLayerSettingsDefaultFeatureValues, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &default_feature_values_data}};
+
+    ASSERT_EQ(inst_builder.init(settings), VK_SUCCESS);
+
+    VkPhysicalDevice gpu = VK_NULL_HANDLE;
+    if (inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu) != VK_SUCCESS) {
+        printf("Profile not supported on device, skipping test.\n");
+        inst_builder.reset();
+        return;
+    }
+
+    VkPhysicalDeviceFeatures reported_features{};
+    vkGetPhysicalDeviceFeatures(gpu, &reported_features);
+    if (!reported_features.independentBlend) {
+        printf("independentBlend not supported on device, skipping test.\n");
+        inst_builder.reset();
+        return;
+    }
+
+    VkPhysicalDeviceFeatures enabled_features{};
+    enabled_features.independentBlend = VK_TRUE;
+    VkDevice device = VK_NULL_HANDLE;
+    ASSERT_EQ(CreateTestDevice(gpu, &enabled_features, nullptr, &device), VK_SUCCESS);
+    vkDestroyDevice(device, nullptr);
+
+    inst_builder.reset();
 }

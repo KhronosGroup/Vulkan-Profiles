@@ -20,6 +20,7 @@
 LIBRARY VkLayer_khronos_profiles
 EXPORTS
 vkGetInstanceProcAddr
+vkGetDeviceProcAddr
 vkCreateInstance
 vkEnumerateInstanceLayerProperties
 vkEnumerateInstanceExtensionProperties

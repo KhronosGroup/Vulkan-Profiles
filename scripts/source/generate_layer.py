@@ -2720,6 +2720,124 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFeatures2KHR(VkPhysicalDevice physic
 }
 '''
 
+DEVICE_FUNCTIONS = '''
+// Returns the names of the features requested by pCreateInfo that the layer doesn't report as supported by the physical device
+static std::vector<std::string> GetUnsupportedFeatures(VkPhysicalDevice physicalDevice, const VkDeviceCreateInfo *pCreateInfo) {
+    std::vector<std::string> unsupported;
+
+    // The layer reports the features of the same structures as the requested ones, as vkGetPhysicalDeviceFeatures2 does
+    VkPhysicalDeviceFeatures2KHR reported{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR};
+    std::vector<std::unique_ptr<char[]>> reported_structs;
+    const VkPhysicalDeviceFeatures *requested_features = pCreateInfo->pEnabledFeatures;
+    for (const VkBaseInStructure *p = reinterpret_cast<const VkBaseInStructure *>(pCreateInfo->pNext); p != nullptr; p = p->pNext) {
+        if (p->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) {
+            requested_features = &reinterpret_cast<const VkPhysicalDeviceFeatures2 *>(p)->features;
+            continue;
+        }
+
+        const std::size_t size = GetFeatureStructSize(p->sType);
+        if (size == 0) {
+            continue;
+        }
+
+        reported_structs.push_back(std::make_unique<char[]>(size));
+        VkBaseOutStructure *reported_struct = reinterpret_cast<VkBaseOutStructure *>(reported_structs.back().get());
+        reported_struct->sType = p->sType;
+        reported_struct->pNext = reinterpret_cast<VkBaseOutStructure *>(reported.pNext);
+        reported.pNext = reported_struct;
+    }
+
+    GetPhysicalDeviceFeatures2Impl(physicalDevice, &reported, VK_API_VERSION_MINOR(requested_version) > 0);
+
+    if (requested_features != nullptr) {
+        CollectUnsupportedFeatures(*requested_features, reported.features, &unsupported);
+    }
+
+    for (const VkBaseInStructure *p = reinterpret_cast<const VkBaseInStructure *>(pCreateInfo->pNext); p != nullptr; p = p->pNext) {
+        for (const VkBaseOutStructure *r = reinterpret_cast<const VkBaseOutStructure *>(reported.pNext); r != nullptr; r = r->pNext) {
+            if (r->sType == p->sType) {
+                CollectUnsupportedFeatures(p, r, &unsupported);
+                break;
+            }
+        }
+    }
+
+    return unsupported;
+}
+
+VKAPI_ATTR VkResult VKAPI_CALL CreateDevice(VkPhysicalDevice physicalDevice, const VkDeviceCreateInfo *pCreateInfo,
+                                            const VkAllocationCallbacks *pAllocator, VkDevice *pDevice) {
+    std::lock_guard<std::recursive_mutex> lock(global_lock);
+
+    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
+    if (pdd != nullptr) {
+        // As a Vulkan implementation, vkCreateDevice fails when a requested feature is not reported as supported by
+        // vkGetPhysicalDeviceFeatures2. The reported features may differ from the device features even without
+        // SIMULATE_FEATURES_BIT, e.g. with DEFAULT_FEATURE_VALUES_FALSE
+        const std::vector<std::string> unsupported = GetUnsupportedFeatures(physicalDevice, pCreateInfo);
+        if (!unsupported.empty()) {
+            std::string features;
+            for (const std::string &feature : unsupported) {
+                features += "\\n\\t" + feature;
+            }
+            ProfileLayerSettings *layer_settings = &JsonLoader::Find(pdd->instance())->layer_settings;
+            LogMessage(layer_settings, DEBUG_REPORT_ERROR_BIT,
+                       "vkCreateDevice returns VK_ERROR_FEATURE_NOT_PRESENT, the requested features are not supported by the "
+                       "simulated physical device:%s\\n", features.c_str());
+            return VK_ERROR_FEATURE_NOT_PRESENT;
+        }
+    }
+
+    VkLayerDeviceCreateInfo *chain_info = get_chain_info(pCreateInfo, VK_LAYER_LINK_INFO);
+    assert(chain_info->u.pLayerInfo);
+
+    PFN_vkGetInstanceProcAddr fp_get_instance_proc_addr = chain_info->u.pLayerInfo->pfnNextGetInstanceProcAddr;
+    PFN_vkGetDeviceProcAddr fp_get_device_proc_addr = chain_info->u.pLayerInfo->pfnNextGetDeviceProcAddr;
+    PFN_vkCreateDevice fp_create_device = reinterpret_cast<PFN_vkCreateDevice>(
+        fp_get_instance_proc_addr(pdd != nullptr ? pdd->instance() : VK_NULL_HANDLE, "vkCreateDevice"));
+    if (!fp_create_device) {
+        return VK_ERROR_INITIALIZATION_FAILED;
+    }
+
+    chain_info->u.pLayerInfo = chain_info->u.pLayerInfo->pNext;
+    VkResult result = fp_create_device(physicalDevice, pCreateInfo, pAllocator, pDevice);
+    if (result == VK_SUCCESS) {
+        initDeviceTable(*pDevice, fp_get_device_proc_addr);
+    }
+    return result;
+}
+
+VKAPI_ATTR void VKAPI_CALL DestroyDevice(VkDevice device, const VkAllocationCallbacks *pAllocator) {
+    if (device) {
+        std::lock_guard<std::recursive_mutex> lock(global_lock);
+
+        dispatch_key key = get_dispatch_key(device);
+        device_dispatch_table(device)->DestroyDevice(device, pAllocator);
+        destroy_device_dispatch_table(key);
+    }
+}
+
+VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL GetDeviceProcAddr(VkDevice device, const char *pName) {
+#define GET_PROC_ADDR(func) \\
+    if (strcmp("vk" #func, pName) == 0) return reinterpret_cast<PFN_vkVoidFunction>(func);
+    GET_PROC_ADDR(GetDeviceProcAddr);
+    GET_PROC_ADDR(DestroyDevice);
+#undef GET_PROC_ADDR
+
+    if (!device) {
+        return nullptr;
+    }
+
+    std::lock_guard<std::recursive_mutex> lock(global_lock);
+    const auto dt = device_dispatch_table(device);
+
+    if (!dt->GetDeviceProcAddr) {
+        return nullptr;
+    }
+    return dt->GetDeviceProcAddr(device, pName);
+}
+'''
+
 ENUMERATE_FUNCTIONS = '''
 VKAPI_ATTR VkResult VKAPI_CALL EnumerateInstanceLayerProperties(uint32_t *pCount, VkLayerProperties *pProperties) {
     return EnumerateProperties(kLayerPropertiesCount, kLayerProperties, pCount, pProperties);
@@ -3493,6 +3611,9 @@ VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL GetInstanceProcAddr(VkInstance instance
     GET_PROC_ADDR(DestroyInstance);
     GET_PROC_ADDR(CreateDebugUtilsMessengerEXT);
     GET_PROC_ADDR(DestroyDebugUtilsMessengerEXT);
+    GET_PROC_ADDR(CreateDevice);
+    GET_PROC_ADDR(DestroyDevice);
+    GET_PROC_ADDR(GetDeviceProcAddr);
     GET_PROC_ADDR(GetPhysicalDeviceProperties);
     GET_PROC_ADDR(GetPhysicalDeviceProperties2);
     GET_PROC_ADDR(GetPhysicalDeviceProperties2KHR);
@@ -3821,6 +3942,8 @@ class VulkanProfilesLayerGenerator():
             f.write(self.generate_fill_queue_family_properties_pnext_chain())
             f.write(FORMAT_PROPERTIES_PNEXT)
             f.write(GET_PHYSICAL_DEVICE_FEATURES_PROPERTIES_FUNCTIONS)
+            f.write(self.generate_check_device_features())
+            f.write(DEVICE_FUNCTIONS)
             f.write(ENUMERATE_FUNCTIONS)
             f.write(QUEUE_FAMILY_PROPERTIES_FUNCTIONS)
             f.write(PHYSICAL_DEVICE_FORMAT_FUNCTIONS)
@@ -5603,6 +5726,52 @@ class VulkanProfilesLayerGenerator():
             else:
                 gen += '    TRANSFER_VALUE(' + member_name + ');\n'
         gen += '}\n'
+        return gen
+
+    def generate_check_device_features(self):
+        # The feature structures of the physical device data, as filled by FillPNextChain
+        features = [ (None, feature) for feature in self.non_extension_features ]
+        for ext, properties, ext_features in self.extension_structs:
+            features.extend([ (ext, feature) for feature in ext_features ])
+        features = [ (ext, feature) for ext, feature in features if feature not in self.ignored_structs ]
+
+        gen = '\nstatic std::size_t GetFeatureStructSize(VkStructureType sType) {\n'
+        gen += '    switch (sType) {\n'
+        for ext, feature in features:
+            gen += self.generate_platform_protect_begin(ext)
+            gen += '        case ' + self.registry.structs[feature].sType + ':\n'
+            gen += '            return sizeof(' + feature + ');\n'
+            gen += self.generate_platform_protect_end(ext)
+        gen += '        default:\n'
+        gen += '            return 0;\n'
+        gen += '    }\n'
+        gen += '}\n'
+
+        gen += '\nstatic void CollectUnsupportedFeatures(const VkPhysicalDeviceFeatures &requested, const VkPhysicalDeviceFeatures &reported,\n'
+        gen += '                                       std::vector<std::string> *unsupported) {\n'
+        for member in self.registry.structs['VkPhysicalDeviceFeatures'].members.values():
+            if member.type == 'VkBool32':
+                gen += '    if (requested.' + member.name + ' && !reported.' + member.name + ') unsupported->push_back("VkPhysicalDeviceFeatures::' + member.name + '");\n'
+        gen += '}\n'
+
+        gen += '\nstatic void CollectUnsupportedFeatures(const VkBaseInStructure *requested, const VkBaseOutStructure *reported,\n'
+        gen += '                                       std::vector<std::string> *unsupported) {\n'
+        gen += '    switch (requested->sType) {\n'
+        for ext, feature in features:
+            gen += self.generate_platform_protect_begin(ext)
+            gen += '        case ' + self.registry.structs[feature].sType + ': {\n'
+            gen += '            const ' + feature + ' *requested_features = reinterpret_cast<const ' + feature + ' *>(requested);\n'
+            gen += '            const ' + feature + ' *reported_features = reinterpret_cast<const ' + feature + ' *>(reported);\n'
+            for member in self.registry.structs[feature].members.values():
+                if member.type == 'VkBool32':
+                    gen += '            if (requested_features->' + member.name + ' && !reported_features->' + member.name + ') unsupported->push_back("' + feature + '::' + member.name + '");\n'
+            gen += '        } break;\n'
+            gen += self.generate_platform_protect_end(ext)
+        gen += '        default:\n'
+        gen += '            break;\n'
+        gen += '    }\n'
+        gen += '}\n'
+
         return gen
 
     def generate_fill_case(self, struct):
