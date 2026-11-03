@@ -1,6 +1,7 @@
 {
   global:
     vkGetInstanceProcAddr;
+    vkGetDeviceProcAddr;
     vkCreateInstance;
     vkEnumerateInstanceLayerProperties;
     vkEnumerateInstanceExtensionProperties;

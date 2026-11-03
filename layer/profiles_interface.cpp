@@ -39,6 +39,10 @@ PROFILES_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetInstanceProcAddr(V
     return GetInstanceProcAddr(instance, pName);
 }
 
+PROFILES_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetDeviceProcAddr(VkDevice device, const char *pName) {
+    return GetDeviceProcAddr(device, pName);
+}
+
 PROFILES_EXPORT VKAPI_ATTR VkResult VKAPI_CALL vkCreateInstance(const VkInstanceCreateInfo *pCreateInfo,
                                                                 const VkAllocationCallbacks *pAllocator, VkInstance *pInstance) {
     return CreateInstance(pCreateInfo, pAllocator, pInstance);
@@ -73,7 +77,8 @@ PROFILES_EXPORT VKAPI_ATTR VkResult VKAPI_CALL vkNegotiateLoaderLayerInterfaceVe
 
     if (pVersionStruct->loaderLayerInterfaceVersion >= 2) {
         pVersionStruct->pfnGetInstanceProcAddr = vkGetInstanceProcAddr;
-        pVersionStruct->pfnGetDeviceProcAddr = nullptr;
+        // The layer is in the device chain to check the features requested to vkCreateDevice
+        pVersionStruct->pfnGetDeviceProcAddr = vkGetDeviceProcAddr;
         pVersionStruct->pfnGetPhysicalDeviceProcAddr = nullptr;
     }
 
