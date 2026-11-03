@@ -218,6 +218,7 @@ def main(argv):
     doc_parser.add_argument('--input', '-i', action='store', required=True, help='Path to directory with profiles.')
     doc_parser.add_argument('--input-profiles', action='store', help='Comma separated list of profiles.')
     doc_parser.add_argument('--output', '-o', action='store', required=True, help='Output markdown file for profiles documentation.')
+    doc_parser.add_argument('--legacy', action='store_true', help='Generate the documentation with the legacy gen_profiles_solution.py code path.')
 
     layer_parser = subparsers.add_parser('layer', parents=[log_parser], help='Generate the Vulkan profiles layer source file.')
     layer_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
