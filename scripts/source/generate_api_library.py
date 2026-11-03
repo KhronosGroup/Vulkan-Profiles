@@ -3204,8 +3204,6 @@ class LibraryRegistry():
             return struct.sType
 
         # Some extensions define multiple sType aliases (e.g. a renamed one), prefer the one matching the structure alias name
-        # TODO: The legacy generator picked VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES for all the
-        # VkPhysicalDeviceVariablePointersFeatures aliases. All candidates have the same value, check which name is preferred.
         aliasKey = alias[len('Vk'):].upper()
         for candidate in candidates:
             if candidate[len('VK_STRUCTURE_TYPE_'):].replace('_', '') == aliasKey:
