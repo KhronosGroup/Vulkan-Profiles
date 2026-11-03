@@ -40,8 +40,6 @@ set(CMAKE_C_VISIBILITY_PRESET "hidden")
 set(CMAKE_VISIBILITY_INLINES_HIDDEN "YES")
 
 add_subdirectory(scripts)
-set(MERGE_SCRIPT ${PROJECT_SOURCE_DIR}/scripts/gen_profiles_file.py)
-set(SOLUTION_SCRIPT ${PROJECT_SOURCE_DIR}/scripts/gen_profiles_solution.py)
 set(PROFILES_SCRIPT ${PROJECT_SOURCE_DIR}/scripts/vkprofiles.py)
 
 # We need Python 3.10 or better to use pyinstaller 6.
@@ -180,10 +178,6 @@ file(GLOB PYTHON_SOURCE_FILES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/scr
 
 set(PYTHON_DEPENDENCIES
     "${PROFILES_SCRIPT}"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/gen_profiles_file.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/gen_profiles_layer.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/gen_profiles_solution.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/gen_profiles_tests.py"
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/vkprofiles.py"
     ${PYTHON_SOURCE_FILES}
 )

@@ -65,18 +65,18 @@ The profile definitions are enabled depending on the pre-processor definitions c
 
 For many use cases, existing Vulkan Profiles are not very useful, a Vulkan application may require to create it's own Vulkan Profiles to better represent the ecosystem devices the Vulkan application is designed to run on and the rendering code paths.
 
-For this purpose, the Vulkan SDK ships with the `gen_profiles_solution.py` python script in the `share/vulkan/registry` directory. To use this script, simply copy your Vulkan Profiles in a `profiles` directory and use the command:
+For this purpose, the Vulkan SDK ships with the `vkprofiles` executable. To generate the library, simply copy your Vulkan Profiles in a `profiles` directory and use the command:
 
 ```
-    python gen_profiles_solution.py --registry ./vk.xml --input ./profiles --output-library-inc . --output-library-src .
+    vkprofiles library --registry ./vk.xml --input ./profiles --output . --output-src .
 ```
 
-When `--output-library-src` is not specified, the header-only library is generated but not the header + source pair.
+Use `--mode header-only` to generate the header-only library but not the header + source pair.
 
 For more information about the Vulkan Profiles library generation, use the command:
 
 ```
-    python gen_profiles_solution.py --help
+    vkprofiles library --help
 ```
 
 ## Basic usage
