@@ -114,6 +114,16 @@ VK_XML_PROPERTY_LIMIT_TYPE_WORKAROUNDS: dict[str, dict[str, str]] = {
         # Same member as VkPhysicalDeviceMaintenance6Properties (promoted to Vulkan 1.4).
         'maxCombinedImageSamplerDescriptorCount': 'exact',
     },
+
+    # -------------------------------------------------------------------------
+    # 5. Core Limits
+    # -------------------------------------------------------------------------
+    'VkPhysicalDeviceLimits': {
+        # Duration of a timestamp increment: an implementation property, not a capability.
+        # The Required Limits table lists it with the 'duration' limit type, without a required value.
+        # In vk.xml this is mislabeled 'min,mul'.
+        'timestampPeriod': 'noauto',
+    },
 }
 
 

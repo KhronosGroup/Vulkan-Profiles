@@ -395,9 +395,8 @@ class TestCombineLimitType(unittest.TestCase):
 
     def test_combine_limittype_min_mul(self):
         """
-        Tests 'min,mul' compound limit types (e.g. bufferImageGranularity, timestampPeriod).
+        Tests 'min,mul' compound limit types (e.g. bufferImageGranularity).
         - Finding a value: Integer LCM (12 vs 16 -> 48) in intersection; GCD (12 vs 16 -> 4) in union.
-        - Not finding a value: Incompatible floating-point periods (1.0 vs 83.3333) omit the member.
         """
         input_json_a = """{
             "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
@@ -413,8 +412,7 @@ class TestCombineLimitType(unittest.TestCase):
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
-                                "bufferImageGranularity": 12,
-                                "timestampPeriod": 1.0
+                                "bufferImageGranularity": 12
                             }
                         }
                     }
@@ -436,8 +434,7 @@ class TestCombineLimitType(unittest.TestCase):
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
-                                "bufferImageGranularity": 16,
-                                "timestampPeriod": 83.3333
+                                "bufferImageGranularity": 16
                             }
                         }
                     }
@@ -525,7 +522,7 @@ class TestCombineLimitType(unittest.TestCase):
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
-                                "timestampPeriod": 2.5
+                                "pointSizeGranularity": 2.5
                             }
                         }
                     }
@@ -547,7 +544,7 @@ class TestCombineLimitType(unittest.TestCase):
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
-                                "timestampPeriod": 5.0
+                                "pointSizeGranularity": 5.0
                             }
                         }
                     }
@@ -562,7 +559,7 @@ class TestCombineLimitType(unittest.TestCase):
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
-                                "timestampPeriod": 5.0
+                                "pointSizeGranularity": 5.0
                             }
                         }
                     }
@@ -588,7 +585,7 @@ class TestCombineLimitType(unittest.TestCase):
                     "properties": {
                         "VkPhysicalDeviceProperties": {
                             "limits": {
-                                "timestampPeriod": 2.5
+                                "pointSizeGranularity": 2.5
                             }
                         }
                     }

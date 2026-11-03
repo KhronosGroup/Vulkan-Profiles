@@ -253,6 +253,11 @@ class TestVkProfilesExhaustiveArgs(unittest.TestCase):
         with patch("vkprofiles.main_layer") as mock_layer:
             vkprofiles.main(["layer", "-r", "vk.xml", "-o", "layer.cpp"])
             self.assertEqual(mock_layer.call_args[0][0].output, "layer.cpp")
+            self.assertFalse(mock_layer.call_args[0][0].legacy)
+
+        with patch("vkprofiles.main_layer") as mock_layer:
+            vkprofiles.main(["layer", "-r", "vk.xml", "-o", "layer.cpp", "--legacy"])
+            self.assertTrue(mock_layer.call_args[0][0].legacy)
 
         # tests
         with patch("vkprofiles.main_tests") as mock_tests:
