@@ -22,6 +22,7 @@
 import argparse
 import io
 import sys
+import tempfile
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
@@ -286,6 +287,7 @@ class TestVkProfilesExhaustiveArgs(unittest.TestCase):
             ["min-api-version"],                      # missing -i
             ["library"],                              # missing -i, -r
             ["doc"],                                  # missing -i, -o, -r
+            ["layer"],                                # missing -r
             ["summary"],                              # missing -i
             ["tests"]                                 # missing -r, --output-profile
         ]
@@ -294,6 +296,24 @@ class TestVkProfilesExhaustiveArgs(unittest.TestCase):
             with self.subTest(subcommand=cmd_args[0]):
                 exit_code, _ = self._run_cli_capture_exit(cmd_args)
                 self.assertNotEqual(exit_code, 0)
+
+    def test_layer_invalid_paths(self):
+        """Verifies that the layer command reports a missing registry file and creates missing output directories."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output = Path(temp_dir) / "missing" / "dir" / "profiles_generated.cpp"
+
+            for legacy in [[], ["--legacy"]]:
+                with self.subTest(legacy=bool(legacy)):
+                    exit_code, _ = self._run_cli_capture_exit(["layer", "-r", str(Path(temp_dir) / "missing.xml"), "-o", str(output)] + legacy)
+                    self.assertEqual(exit_code, 1)
+                    self.assertFalse(output.exists())
+
+            if self.registry_path is None:
+                self.skipTest("--registry is required to generate the layer")
+            with patch("source.main_layer.generate_layer") as mock_generate:
+                vkprofiles.main(["layer", "-r", self.registry_path, "-o", str(output)])
+                self.assertTrue(output.parent.is_dir())
+                self.assertEqual(mock_generate.call_args[0][1], str(output))
 
 
 if __name__ == '__main__':
