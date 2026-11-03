@@ -115,6 +115,24 @@ def add_transform_arguments(parser: argparse.ArgumentParser) -> None:
     )
 
 
+# Development stage of the vkprofiles commands, the commands not listed are stable and their help has no stage label
+COMMAND_STAGES = {
+    'transform': 'BETA',
+    'combine': 'BETA',
+    'extract': 'BETA',
+    'min-api-version': 'BETA',
+}
+
+
+def add_command_parser(subparsers, command, help, **kwargs):
+    """Adds a command parser, with the development stage of the command in its help and description."""
+    stage = COMMAND_STAGES.get(command)
+    if stage is not None:
+        help = '{0} ({1})'.format(help, stage)
+        kwargs.setdefault('description', help)
+    return subparsers.add_parser(command, help=help, **kwargs)
+
+
 def main(argv):
     log_parser = argparse.ArgumentParser(add_help=False)
     log_group = log_parser.add_mutually_exclusive_group()
@@ -133,19 +151,19 @@ def main(argv):
     subparsers = parser.add_subparsers(dest='command', required=True)
 
     # 1. Pipeline Orchestrator (Graph)
-    graph_parser = subparsers.add_parser('graph', parents=[log_parser], help='Execute a pipeline graph of vkprofiles operations from a JSON configuration file.')
+    graph_parser = add_command_parser(subparsers, 'graph', parents=[log_parser], help='Execute a pipeline graph of vkprofiles operations from a JSON configuration file.')
     graph_parser.add_argument('--input', '-i', action='store', required=True, help='Path to graph execution JSON configuration file.')
     graph_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified Vulkan registry file (vk.xml) across all graph steps.')
 
     # 2. Atomic Pipeline Operations
-    validate_parser = subparsers.add_parser('validate', parents=[log_parser], help='Validate a profile file against a profile schema or perform static analysis.')
+    validate_parser = add_command_parser(subparsers, 'validate', parents=[log_parser], help='Validate a profile file against a profile schema or perform static analysis.')
     validate_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     validate_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
     validate_parser.add_argument('--schema', '-s', action='store', help='Use a profile schema (profiles-*.json). By default, generate a profile schema from vk.xml.')
     validate_parser.add_argument('--input', '-i', action='store', required=True, help='Path to the input profiles files.')
     validate_parser.add_argument('--analyse',  nargs='*', action=AnalyseAction, default=None, metavar='CHECK', help='Static analysis checks to execute (choices: ' + ', '.join([e.value for e in AnalyseBits]) + '). If specified without arguments, all checks are executed.')
 
-    schema_parser = subparsers.add_parser('schema', parents=[log_parser], help='Generate a profile json schema file or upgrade profile JSON file(s) to schema 0.8.2.')
+    schema_parser = add_command_parser(subparsers, 'schema', parents=[log_parser], help='Generate a profile json schema file or upgrade profile JSON file(s) to schema 0.8.2.')
     schema_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
     schema_parser.add_argument('--input', '-i', action='store', help='Path to input profiles JSON file or directory to upgrade.')
     schema_parser.add_argument('--output', '-o', action='store', required=True, help='Path to output profile schema file or upgraded profiles file/directory.')
@@ -153,7 +171,7 @@ def main(argv):
     schema_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for output files.')
     schema_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
 
-    transform_parser = subparsers.add_parser('transform', parents=[log_parser], help='Transform an implicit profile to an explicit profile by pulling Vulkan capabilities dependencies from vk.xml.')
+    transform_parser = add_command_parser(subparsers, 'transform', parents=[log_parser], help='Transform an implicit profile to an explicit profile by pulling Vulkan capabilities dependencies from vk.xml.')
     transform_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     transform_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
     transform_parser.add_argument('--input', '-i', action='store', required=True, help='Path to the input profiles files.')
@@ -162,7 +180,7 @@ def main(argv):
     transform_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the profiles files (default: pretty).')
     add_transform_arguments(transform_parser)
 
-    combine_parser = subparsers.add_parser('combine', parents=[log_parser], help='Generate combined Vulkan profile JSON files.')
+    combine_parser = add_command_parser(subparsers, 'combine', parents=[log_parser], help='Generate combined Vulkan profile JSON files.')
     combine_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     combine_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
     combine_parser.add_argument('--input', '-i', action='store', required=True, help='Path to directory with profiles.')
@@ -179,7 +197,7 @@ def main(argv):
     combine_parser.add_argument('--mode', '-m', action='store', choices=list(CombineMode), default=CombineMode.INTERSECTION, help='Mode of profile combination.')
     combine_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the profiles files (default: pretty).')
 
-    extract_parser = subparsers.add_parser('extract', parents=[log_parser], help='Extract profile(s) from profile JSON file(s) into a single profile JSON file.')
+    extract_parser = add_command_parser(subparsers, 'extract', parents=[log_parser], help='Extract profile(s) from profile JSON file(s) into a single profile JSON file.')
     extract_parser.add_argument('--registry', '-r', action='store', help='Use specified Vulkan registry file (vk.xml).')
     extract_parser.add_argument('--input', '-i', action='store', required=True, help='Path to input profiles file or directory.')
     extract_parser.add_argument('--output', '-o', action='store', required=True, help='Path to output profile JSON file.')
@@ -187,7 +205,7 @@ def main(argv):
     extract_parser.add_argument('--mode', '-m', type=ExtractMode, choices=list(ExtractMode), default=ExtractMode.REFERENCE, help='Extraction mode: "reference-required-profiles" keeps parent profile references external, "pull-required-profiles" includes required parent profiles and blocks.')
     extract_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the output file.')
 
-    min_api_parser = subparsers.add_parser('min-api-version', parents=[log_parser], help='Display or process the minimum Vulkan API version of profile(s).')
+    min_api_parser = add_command_parser(subparsers, 'min-api-version', parents=[log_parser], help='Display or process the minimum Vulkan API version of profile(s).')
     min_api_parser.add_argument('--registry', '-r', action='store', help='Use specified Vulkan registry file (vk.xml).')
     min_api_parser.add_argument('--input', '-i', action='store', required=True, help='Path to input profiles file or directory.')
     min_api_parser.add_argument('--input-profiles', action='store', help='Comma separated list of profile names to process.')
@@ -196,7 +214,7 @@ def main(argv):
     min_api_parser.add_argument('--mode', '-m', type=MinApiVersionMode, choices=list(MinApiVersionMode), default=MinApiVersionMode.SHOW, help='Operation mode: "display" (display api-version/schema read from input), "evaluate" (evaluate schemas to determine min Vulkan header version and update JSONs if output path is provided). Default: display.')
     min_api_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for output JSON files.')
 
-    library_parser = subparsers.add_parser('library', parents=[log_parser], help='Generate the Vulkan profiles C/C++ API library headers and source files.')
+    library_parser = add_command_parser(subparsers, 'library', parents=[log_parser], help='Generate the Vulkan profiles C/C++ API library headers and source files.')
     library_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     library_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
     library_parser.add_argument('--input', '-i', action='store', required=True, help='Path to directory with profiles.')
@@ -212,7 +230,7 @@ def main(argv):
     library_parser.add_argument('--include-header', action='store', help='Override the header file include directive in generated C++ source files.')
     library_parser.add_argument('--legacy', action='store_true', help='Generate the library with the legacy gen_profiles_solution.py code path.')
 
-    doc_parser = subparsers.add_parser('doc', parents=[log_parser], help='Generate markdown documentation for Vulkan profiles.')
+    doc_parser = add_command_parser(subparsers, 'doc', parents=[log_parser], help='Generate markdown documentation for Vulkan profiles.')
     doc_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     doc_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
     doc_parser.add_argument('--input', '-i', action='store', required=True, help='Path to directory with profiles.')
@@ -220,26 +238,26 @@ def main(argv):
     doc_parser.add_argument('--output', '-o', action='store', required=True, help='Output markdown file for profiles documentation.')
     doc_parser.add_argument('--legacy', action='store_true', help='Generate the documentation with the legacy gen_profiles_solution.py code path.')
 
-    layer_parser = subparsers.add_parser('layer', parents=[log_parser], help='Generate the Vulkan profiles layer source file.')
+    layer_parser = add_command_parser(subparsers, 'layer', parents=[log_parser], help='Generate the Vulkan profiles layer source file.')
     layer_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     layer_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
     layer_parser.add_argument('--output', '-o', '--out-layer', action='store', help='Output the layer source file.')
     layer_parser.add_argument('--legacy', action='store_true', help='Generate the layer source file with the legacy gen_profiles_layer.py code path.')
 
-    tests_parser = subparsers.add_parser('tests', parents=[log_parser], help='Generate test profile and test C++ source file.')
+    tests_parser = add_command_parser(subparsers, 'tests', parents=[log_parser], help='Generate test profile and test C++ source file.')
     tests_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     tests_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
     tests_parser.add_argument('--output-profile', action='store', required=True, help='Output profile test file.')
     tests_parser.add_argument('--output-cpp', action='store', help='Output C++ tests file.')
     tests_parser.add_argument('--legacy', action='store_true', help='Generate the tests with the legacy gen_profiles_tests.py code path.')
 
-    summary_parser = subparsers.add_parser('summary', parents=[log_parser], help='List profiles from a file or directory with profile version, Vulkan API version, and schema header version.')
+    summary_parser = add_command_parser(subparsers, 'summary', parents=[log_parser], help='List profiles from a file or directory with profile version, Vulkan API version, and schema header version.')
     summary_parser.add_argument('--registry', '-r', action='store', help='Use specified Vulkan registry file (vk.xml).')
     summary_parser.add_argument('--input', '-i', action='store', required=True, help='Path to input profiles file or directory.')
     summary_parser.add_argument('--input-profiles', action='store', help='Comma separated list of profile names to summarize.')
     summary_parser.add_argument('--output', '-o', action='store', help='Path to output file for summary report.')
 
-    subparsers.add_parser('version', parents=[log_parser], help='Print vkprofiles version.')
+    add_command_parser(subparsers, 'version', parents=[log_parser], help='Print vkprofiles version.')
 
     args = parser.parse_args(argv)
 

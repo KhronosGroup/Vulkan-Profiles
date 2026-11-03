@@ -320,6 +320,42 @@ class TestVkProfilesExhaustiveArgs(unittest.TestCase):
                 self.assertTrue(output.parent.is_dir())
                 self.assertEqual(mock_generate.call_args[0][1], str(output))
 
+    # -------------------------------------------------------------------------
+    # 8. Development Stage of the Commands
+    # -------------------------------------------------------------------------
+    def _run_cli_help(self, args: list[str]) -> str:
+        """Helper to execute vkprofiles.main with --help, returning the help text with whitespaces collapsed."""
+        stdout_buf = io.StringIO()
+        with redirect_stdout(stdout_buf):
+            with self.assertRaises(SystemExit) as cm:
+                vkprofiles.main(args + ["--help"])
+        self.assertEqual(cm.exception.code, 0)
+        return ' '.join(stdout_buf.getvalue().split())
+
+    def test_command_stages(self):
+        """Verifies that only the beta commands have a stage label in the help."""
+        expected_stages = {
+            "transform": "BETA",
+            "combine": "BETA",
+            "extract": "BETA",
+            "min-api-version": "BETA",
+        }
+        self.assertEqual(vkprofiles.COMMAND_STAGES, expected_stages)
+
+        top_level_help = self._run_cli_help([])
+        self.assertEqual(top_level_help.count("(BETA)"), 4)
+        self.assertNotIn("(ALPHA)", top_level_help)
+
+        for command, stage in expected_stages.items():
+            with self.subTest(command=command):
+                self.assertIn("(" + stage + ")", self._run_cli_help([command]))
+
+        for command in ["graph", "validate", "schema", "library", "doc", "layer", "tests", "summary", "version"]:
+            with self.subTest(command=command):
+                command_help = self._run_cli_help([command])
+                self.assertNotIn("(ALPHA)", command_help)
+                self.assertNotIn("(BETA)", command_help)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
