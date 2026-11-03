@@ -785,7 +785,12 @@ TEST_F(TestsMechanism, debug_utils_explicit_debug_actions) {
     const char* profile_dirs_data = JSON_TEST_FILES_PATH;
     const char* profile_name_data = "VP_LUNARG_test_device_extensions";
     const char* debug_actions_data = "DEBUG_ACTION_FILE_BIT";
+#if defined(__ANDROID__)
+    // The working directory of the test application is not writable on Android, unlike the directory of the test files
+    const char* debug_filename_data = JSON_TEST_FILES_PATH "profiles_layer_debug_utils_test_log.txt";
+#else
     const char* debug_filename_data = "profiles_layer_debug_utils_test_log.txt";
+#endif
     const VkBool32 debug_file_clear_data = VK_TRUE;
 
     std::vector<VkLayerSettingEXT> settings = {
