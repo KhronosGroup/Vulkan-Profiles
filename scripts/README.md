@@ -680,6 +680,7 @@ vkprofiles tests --registry vk.xml --output-profile path/to/test.json --output-c
 * `--output-profile`: *(Required)* Output path for synthetic test profile JSON.
 * `--output-cpp`: Output path for C++ test source file.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
+* `--legacy`: Generate the tests with the legacy `gen_profiles_tests.py` code path instead of `source/generate_tests.py`.
 
 **Example:**
 

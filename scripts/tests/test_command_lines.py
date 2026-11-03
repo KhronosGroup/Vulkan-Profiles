@@ -265,6 +265,11 @@ class TestVkProfilesExhaustiveArgs(unittest.TestCase):
             args = mock_tests.call_args[0][0]
             self.assertEqual(args.output_profile, "test.json")
             self.assertEqual(args.output_cpp, "test.cpp")
+            self.assertFalse(args.legacy)
+
+        with patch("vkprofiles.main_tests") as mock_tests:
+            vkprofiles.main(["tests", "-r", "vk.xml", "--output-profile", "test.json", "--legacy"])
+            self.assertTrue(mock_tests.call_args[0][0].legacy)
 
         # schema upgrade
         with patch("vkprofiles.main_schema") as mock_schema:
