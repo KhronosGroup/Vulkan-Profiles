@@ -19,10 +19,7 @@
 # - Ziga Markus <ziga@lunarg.com>
 # - Christophe Riccio <christophe@lunarg.com>
 
-import math
-from fractions import Fraction
-
-from vulkan_object import VulkanObject
+from vulkan_object import VulkanObject, Format
 from source.generate_layer import LayerRegistry
 
 PROFILES = '''
@@ -160,12 +157,6 @@ class TestsRegistry(LayerRegistry):
 
         self.specVersions = { extension.name: extension.specVersionValue for extension in self.vk.extensions.values() }
 
-        # Format alias names, the format tests only cover the non-alias formats
-        self.aliasFormats = list(self.enums['VkFormat'].aliasValues.keys())
-
-        # Format features only defined with VK_ENABLE_BETA_EXTENSIONS, which the generated tests don't use
-        self.betaFormatFeatures = [ flag.name for flag in self.vk.bitmasks['VkFormatFeatureFlagBits'].flags if flag.protect == 'VK_ENABLE_BETA_EXTENSIONS' ]
-
 class ProfileGenerator():
     i = 1
     skipped_features = []
@@ -174,6 +165,54 @@ class ProfileGenerator():
     # VkPhysicalDeviceTileShadingPropertiesQCOM currently crashes in a driver
     # VkPhysicalDeviceRobustness2PropertiesEXT is an alias of VkPhysicalDeviceRobustness2PropertiesKHR
     skipped_test_structs = ["VkPhysicalDeviceTileShadingPropertiesQCOM", "VkPhysicalDeviceRobustness2PropertiesEXT"]
+
+    # The maximum format features, set depending on the vk.xml <format> definitions
+    # Buffer features of all formats, only set in bufferFeatures
+    buffer_format_features = [
+        "VK_FORMAT_FEATURE_2_UNIFORM_TEXEL_BUFFER_BIT",
+        "VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_BIT",
+        "VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
+        "VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT",
+        "VK_FORMAT_FEATURE_2_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR"]
+    # Image features of all formats, only set in linearTilingFeatures and optimalTilingFeatures as the following features
+    image_format_features = [
+        "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT",
+        "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT",
+        "VK_FORMAT_FEATURE_2_STORAGE_IMAGE_ATOMIC_BIT",
+        "VK_FORMAT_FEATURE_2_BLIT_SRC_BIT",
+        "VK_FORMAT_FEATURE_2_BLIT_DST_BIT",
+        "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+        "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_CUBIC_BIT",
+        "VK_FORMAT_FEATURE_2_TRANSFER_SRC_BIT",
+        "VK_FORMAT_FEATURE_2_TRANSFER_DST_BIT",
+        "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_MINMAX_BIT",
+        "VK_FORMAT_FEATURE_2_STORAGE_READ_WITHOUT_FORMAT_BIT",
+        "VK_FORMAT_FEATURE_2_STORAGE_WRITE_WITHOUT_FORMAT_BIT",
+        "VK_FORMAT_FEATURE_2_FRAGMENT_DENSITY_MAP_BIT_EXT",
+        "VK_FORMAT_FEATURE_2_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR"]
+    # Formats with a depth or a stencil component
+    depth_stencil_format_features = [
+        "VK_FORMAT_FEATURE_2_DEPTH_STENCIL_ATTACHMENT_BIT",
+        "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_DEPTH_COMPARISON_BIT"]
+    # Formats without a depth or a stencil component
+    color_format_features = [
+        "VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BIT",
+        "VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT"]
+    # Formats with planes
+    ycbcr_format_features = [
+        "VK_FORMAT_FEATURE_2_MIDPOINT_CHROMA_SAMPLES_BIT",
+        "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT",
+        "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT",
+        "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT",
+        "VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT",
+        "VK_FORMAT_FEATURE_2_DISJOINT_BIT",
+        "VK_FORMAT_FEATURE_2_COSITED_CHROMA_SAMPLES_BIT"]
+    # Video features of all formats
+    video_format_features = [
+        "VK_FORMAT_FEATURE_2_VIDEO_DECODE_OUTPUT_BIT_KHR",
+        "VK_FORMAT_FEATURE_2_VIDEO_DECODE_DPB_BIT_KHR",
+        "VK_FORMAT_FEATURE_2_VIDEO_ENCODE_INPUT_BIT_KHR",
+        "VK_FORMAT_FEATURE_2_VIDEO_ENCODE_DPB_BIT_KHR"]
 
     def __init__(self, registry: TestsRegistry):
         self.registry = registry
@@ -553,51 +592,32 @@ class ProfileGenerator():
                 gen += '                }'
         return gen
 
-    def pseudo_random(self, s):
-        return Fraction(math.sin(s * 12.9898) * 43758.5453123)
+    def get_max_format_features(self, format: Format) -> tuple[list[str], list[str], list[str]]:
+        # Returns all the linear tiling, optimal tiling and buffer features a format could have, from its vk.xml <format> definition
+        image_features = list(self.image_format_features)
+        if any(component.type in ('D', 'S') for component in format.components):
+            image_features += self.depth_stencil_format_features
+        else:
+            image_features += self.color_format_features
+        if format.planes:
+            image_features += self.ycbcr_format_features
+        image_features += self.video_format_features
+        return image_features, image_features, list(self.buffer_format_features)
 
-    def gen_random_format_features(self, name, list_index):
-        # Choose from 0 to including 3 number of format features
-        num = int(self.pseudo_random(self.i) * 1000) % 5
-        self.i += 1
-        gen = ''
-        first = True
-        used = list()
-        for j in range(num):
-            index = int(self.pseudo_random(self.i) * 1000) % len(self.registry.enums['VkFormatFeatureFlagBits'].values)
-            if (index in used):
-                continue
-            feature = self.registry.enums['VkFormatFeatureFlagBits'].values[index]
-            if feature in self.registry.betaFormatFeatures:
-                continue
-            if first:
-                first = False
-            else:
-                gen += ', '
-            self.i += 1
-            gen += '\"'
-            gen += feature
-            gen += '\"'
-            self.test_features[name][list_index].append(feature)
-            used.append(index)
-
-        if num > 0:
-            gen += ' '
-
-        return gen
+    def gen_format_features(self, features: list[str]) -> str:
+        return ', '.join('\"{0}\"'.format(feature) for feature in features) + ' ' if features else ''
 
     def gen_formats(self):
         gen = ''
         first = True
         self.test_features = dict()
         for name in self.registry.enums['VkFormat'].values:
-            if name in self.registry.aliasFormats:
+            # The format aliases and VK_FORMAT_UNDEFINED have no vk.xml <format> definition
+            format = self.registry.vk.formats.get(name)
+            if format is None:
                 continue
-            self.test_features[name] = list()
             # List for each of linear, optimal and buffer features
-            self.test_features[name].append(list())
-            self.test_features[name].append(list())
-            self.test_features[name].append(list())
+            self.test_features[name] = list(self.get_max_format_features(format))
             if (first):
                 first = False
             else:
@@ -605,15 +625,15 @@ class ProfileGenerator():
             gen += '\n                \"'
             gen += name
             gen += '\": {\n'
-            gen += '                    "VkFormatProperties": {\n'
+            gen += '                    "VkFormatProperties3": {\n'
             gen += '                        "linearTilingFeatures": [ '
-            gen += self.gen_random_format_features(name, 0)
+            gen += self.gen_format_features(self.test_features[name][0])
             gen += '],\n'
             gen += '                        "optimalTilingFeatures": [ '
-            gen += self.gen_random_format_features(name, 1)
+            gen += self.gen_format_features(self.test_features[name][1])
             gen += '],\n'
             gen += '                        "bufferFeatures": [ '
-            gen += self.gen_random_format_features(name, 2)
+            gen += self.gen_format_features(self.test_features[name][2])
             gen += ']\n'
             gen += '                    }\n'
             gen += '                }'
@@ -785,48 +805,17 @@ class ProfileGenerator():
     def gen_format_test(self, name, values):
         gen = 'TEST_F(TestsCapabilitiesGenerated, Test' + name[2:] + ') {\n'
         gen += '    VkFormat format = ' + name + ';\n'
-        gen += '    VkFormatProperties format_properties;\n'
-        gen += '    vkGetPhysicalDeviceFormatProperties(gpu_profile, format, &format_properties);\n\n'
+        # The format features are VkFormatFeatureFlags2 values, including bits beyond the 32 bits of VkFormatFeatureFlags
+        gen += '    VkFormatProperties3 format_properties_3{VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3};\n'
+        gen += '    VkFormatProperties2 format_properties{VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2, &format_properties_3};\n'
+        gen += '    vkGetPhysicalDeviceFormatProperties2(gpu_profile, format, &format_properties);\n\n'
 
-        gen += '    VkFormatFeatureFlags linear_tiling_features = '
-        first = True
-        for feature in values[0]:
-            if first:
-                first = False
-            else:
-                gen += ' | '
-            gen += feature
-        if first:
-            gen += '0'
-        gen += ';\n'
+        for variable, features in zip(['linear_tiling_features', 'optimal_tiling_features', 'buffer_features'], values):
+            gen += '    VkFormatFeatureFlags2 ' + variable + ' = ' + (' | '.join(features) if features else '0') + ';\n'
 
-        gen += '    VkFormatFeatureFlags optimal_tiling_features = '
-        first = True
-        for feature in values[1]:
-            if first:
-                first = False
-            else:
-                gen += ' | '
-            gen += feature
-        if first:
-            gen += '0'
-        gen += ';\n'
-
-        gen += '    VkFormatFeatureFlags buffer_features = '
-        first = True
-        for feature in values[2]:
-            if first:
-                first = False
-            else:
-                gen += ' | '
-            gen += feature
-        if first:
-            gen += '0'
-        gen += ';\n'
-
-        gen += '    EXPECT_EQ(format_properties.linearTilingFeatures & linear_tiling_features, linear_tiling_features);\n'
-        gen += '    EXPECT_EQ(format_properties.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);\n'
-        gen += '    EXPECT_EQ(format_properties.bufferFeatures & buffer_features, buffer_features);\n'
+        gen += '    EXPECT_EQ(format_properties_3.linearTilingFeatures & linear_tiling_features, linear_tiling_features);\n'
+        gen += '    EXPECT_EQ(format_properties_3.optimalTilingFeatures & optimal_tiling_features, optimal_tiling_features);\n'
+        gen += '    EXPECT_EQ(format_properties_3.bufferFeatures & buffer_features, buffer_features);\n'
 
         gen += '}\n\n'
         return gen
