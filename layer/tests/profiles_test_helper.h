@@ -73,6 +73,9 @@ class VulkanInstanceBuilder {
 
     void addExtension(const char* extension_name) { _extension_names.push_back(extension_name); }
 
+    // Chains a structure in VkInstanceCreateInfo::pNext of the profile instance, e.g. a VkDebugUtilsMessengerCreateInfoEXT
+    void setNext(const void* next) { _next = next; }
+
     VkResult init();
     VkResult init(const std::vector<VkLayerSettingEXT>& settings);
     VkResult init(uint32_t apiVersion);
@@ -88,6 +91,7 @@ class VulkanInstanceBuilder {
 
     std::vector<const char*> _layer_names;
     std::vector<const char*> _extension_names;
+    const void* _next{nullptr};
 };
 
 }  // namespace profiles_test

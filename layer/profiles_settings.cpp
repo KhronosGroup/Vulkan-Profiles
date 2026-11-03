@@ -23,7 +23,7 @@
 void WarnMissingFormatFeatures(ProfileLayerSettings *layer_settings, const char *device_name, const std::string &format_name,
                                const std::string &features, VkFormatFeatureFlags profile_features,
                                VkFormatFeatureFlags device_features) {
-    if (!(layer_settings->log.debug_reports & DEBUG_REPORT_WARNING_BIT)) {
+    if (!IsLogEnabled(layer_settings, DEBUG_REPORT_WARNING_BIT)) {
         return;
     }
 
@@ -37,7 +37,7 @@ void WarnMissingFormatFeatures(ProfileLayerSettings *layer_settings, const char 
 void WarnMissingFormatFeatures2(ProfileLayerSettings *layer_settings, const char *device_name, const std::string &format_name,
                                 const std::string &features, VkFormatFeatureFlags2 profile_features,
                                 VkFormatFeatureFlags2 device_features) {
-    if (!(layer_settings->log.debug_reports & DEBUG_REPORT_WARNING_BIT)) {
+    if (!IsLogEnabled(layer_settings, DEBUG_REPORT_WARNING_BIT)) {
         return;
     }
 
@@ -102,6 +102,104 @@ const char *GetLogPrefix(DebugReportBits report) {
     }
 }
 
+static VkDebugUtilsMessageSeverityFlagBitsEXT GetDebugUtilsMessageSeverity(DebugReportBits report) {
+    switch (report) {
+        case DEBUG_REPORT_NOTIFICATION_BIT:
+            return VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT;
+        default:
+        case DEBUG_REPORT_WARNING_BIT:
+            return VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
+        case DEBUG_REPORT_ERROR_BIT:
+            return VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        case DEBUG_REPORT_DEBUG_BIT:
+            return VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
+    }
+}
+
+// The layer messages are about the simulated capabilities rather than API usage validation
+static const VkDebugUtilsMessageTypeFlagsEXT kDebugUtilsMessageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT;
+
+void AddDebugUtilsMessenger(ProfileLayerSettings *layer_settings, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
+                            VkDebugUtilsMessengerEXT messenger, bool instance) {
+    assert(layer_settings != nullptr && pCreateInfo != nullptr);
+
+    DebugUtilsMessenger debug_utils_messenger;
+    debug_utils_messenger.handle = messenger;
+    debug_utils_messenger.message_severity = pCreateInfo->messageSeverity;
+    debug_utils_messenger.message_type = pCreateInfo->messageType;
+    debug_utils_messenger.callback = pCreateInfo->pfnUserCallback;
+    debug_utils_messenger.user_data = pCreateInfo->pUserData;
+    debug_utils_messenger.instance = instance;
+
+    std::lock_guard<std::mutex> lock(layer_settings->log.debug_utils_mutex);
+    layer_settings->log.debug_utils_messengers.push_back(debug_utils_messenger);
+}
+
+void RemoveDebugUtilsMessenger(ProfileLayerSettings *layer_settings, VkDebugUtilsMessengerEXT messenger) {
+    assert(layer_settings != nullptr);
+
+    std::lock_guard<std::mutex> lock(layer_settings->log.debug_utils_mutex);
+    std::vector<DebugUtilsMessenger> &messengers = layer_settings->log.debug_utils_messengers;
+    messengers.erase(std::remove_if(messengers.begin(), messengers.end(),
+                                    [messenger](const DebugUtilsMessenger &item) { return !item.instance && item.handle == messenger; }),
+                     messengers.end());
+}
+
+void StoreInstanceDebugUtilsMessengers(ProfileLayerSettings *layer_settings, const VkInstanceCreateInfo *pCreateInfo) {
+    assert(layer_settings != nullptr && pCreateInfo != nullptr);
+
+    layer_settings->log.instance_debug_utils_messengers.clear();
+    for (const VkBaseInStructure *next = reinterpret_cast<const VkBaseInStructure *>(pCreateInfo->pNext); next != nullptr;
+         next = next->pNext) {
+        if (next->sType == VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT) {
+            VkDebugUtilsMessengerCreateInfoEXT create_info = *reinterpret_cast<const VkDebugUtilsMessengerCreateInfoEXT *>(next);
+            create_info.pNext = nullptr;
+            layer_settings->log.instance_debug_utils_messengers.push_back(create_info);
+        }
+    }
+}
+
+InstanceDebugUtilsMessengersScope::InstanceDebugUtilsMessengersScope(ProfileLayerSettings *layer_settings)
+    : layer_settings_(layer_settings) {
+    assert(layer_settings_ != nullptr);
+
+    for (const VkDebugUtilsMessengerCreateInfoEXT &create_info : layer_settings_->log.instance_debug_utils_messengers) {
+        AddDebugUtilsMessenger(layer_settings_, &create_info, VK_NULL_HANDLE, true);
+    }
+}
+
+InstanceDebugUtilsMessengersScope::~InstanceDebugUtilsMessengersScope() {
+    std::lock_guard<std::mutex> lock(layer_settings_->log.debug_utils_mutex);
+    std::vector<DebugUtilsMessenger> &messengers = layer_settings_->log.debug_utils_messengers;
+    messengers.erase(std::remove_if(messengers.begin(), messengers.end(), [](const DebugUtilsMessenger &item) { return item.instance; }),
+                     messengers.end());
+}
+
+// The debug utils mutex must be held by the caller
+static bool UseDebugActions(const ProfileLayerSettings *layer_settings, DebugReportBits report) {
+    // As with the validation layer report_flags, debug_reports only filters the messages of the debug actions, not of the messengers
+    if (!(layer_settings->log.debug_reports & report)) {
+        return false;
+    }
+
+    // As with the validation layer VK_DBG_LAYER_ACTION_DEFAULT, the default debug actions are replaced by the debug utils messengers
+    return layer_settings->log.debug_utils_messengers.empty() || !layer_settings->log.debug_actions_default;
+}
+
+bool IsLogEnabled(ProfileLayerSettings *layer_settings, DebugReportBits report) {
+    std::lock_guard<std::mutex> lock(layer_settings->log.debug_utils_mutex);
+    const std::vector<DebugUtilsMessenger> &messengers = layer_settings->log.debug_utils_messengers;
+
+    if (UseDebugActions(layer_settings, report)) {
+        return true;
+    }
+
+    const VkDebugUtilsMessageSeverityFlagBitsEXT severity = GetDebugUtilsMessageSeverity(report);
+    return std::any_of(messengers.begin(), messengers.end(), [severity](const DebugUtilsMessenger &item) {
+        return (item.message_severity & severity) && (item.message_type & kDebugUtilsMessageType);
+    });
+}
+
 void LogMessage(ProfileLayerSettings *layer_settings, DebugReportBits report, const char *message, ...) {
 #if defined(__ANDROID__)
     if (!layer_settings) return;
@@ -109,7 +207,21 @@ void LogMessage(ProfileLayerSettings *layer_settings, DebugReportBits report, co
     assert(layer_settings);
 #endif
 
-    if (!(layer_settings->log.debug_reports & report)) {
+    // The matching messengers are copied so that the application callbacks are called without holding the lock
+    std::vector<DebugUtilsMessenger> messengers;
+    bool use_debug_actions = false;
+    const VkDebugUtilsMessageSeverityFlagBitsEXT severity = GetDebugUtilsMessageSeverity(report);
+    {
+        std::lock_guard<std::mutex> lock(layer_settings->log.debug_utils_mutex);
+        use_debug_actions = UseDebugActions(layer_settings, report);
+        for (const DebugUtilsMessenger &item : layer_settings->log.debug_utils_messengers) {
+            if ((item.message_severity & severity) && (item.message_type & kDebugUtilsMessageType)) {
+                messengers.push_back(item);
+            }
+        }
+    }
+
+    if (!use_debug_actions && messengers.empty()) {
         return;
     }
 
@@ -127,6 +239,28 @@ void LogMessage(ProfileLayerSettings *layer_settings, DebugReportBits report, co
     va_start(list, message);
     vsnprintf(log + len, STRING_BUFFER - len, message, list);
     va_end(list);
+
+    if (!messengers.empty()) {
+        // The severity is reported by the messenger callback, so the message has no prefix, nor a trailing new line
+        std::string text(log + len);
+        if (!text.empty() && text.back() == '\n') {
+            text.pop_back();
+        }
+
+        VkDebugUtilsMessengerCallbackDataEXT callback_data{VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CALLBACK_DATA_EXT};
+        callback_data.pMessageIdName = kLayerName;
+        callback_data.messageIdNumber = 0;
+        callback_data.pMessage = text.c_str();
+
+        // The VkBool32 returned by the callback is ignored, VK_TRUE is reserved for layer development and the layer doesn't abort calls
+        for (const DebugUtilsMessenger &item : messengers) {
+            item.callback(severity, kDebugUtilsMessageType, &callback_data, item.user_data);
+        }
+    }
+
+    if (!use_debug_actions) {
+        return;
+    }
 
     if (layer_settings->log.debug_actions & DEBUG_ACTION_STDOUT_BIT) {
 #if defined(__ANDROID__)
@@ -302,6 +436,7 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
             values[i] = ToUpper(values[i]);
         }
         layer_settings->log.debug_actions = GetDebugActionFlags(values);
+        layer_settings->log.debug_actions_default = false;
     }
 
     if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsDebugFilename)) {

@@ -126,7 +126,7 @@ VkResult profiles_test::VulkanInstanceBuilder::init(uint32_t apiVersion, const s
     this->addExtension(VK_EXT_LAYER_SETTINGS_EXTENSION_NAME);
 
     VkLayerSettingsCreateInfoEXT layer_settings_create_info{
-        VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT, nullptr,
+        VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT, _next,
         settings.empty() ? 0 : static_cast<uint32_t>(settings.size()),
         settings.empty() ? nullptr : &settings[0]};
 
@@ -134,7 +134,7 @@ VkResult profiles_test::VulkanInstanceBuilder::init(uint32_t apiVersion, const s
     inst_create_info.ppEnabledExtensionNames = _extension_names.data();
     inst_create_info.enabledLayerCount = static_cast<uint32_t>(_layer_names.size());
     inst_create_info.ppEnabledLayerNames = _layer_names.data();
-    inst_create_info.pNext = settings.empty() ? nullptr : &layer_settings_create_info;
+    inst_create_info.pNext = settings.empty() ? _next : &layer_settings_create_info;
 
     _instances[MODE_PROFILE] = VK_NULL_HANDLE;
     return vkCreateInstance(&inst_create_info, nullptr, &_instances[MODE_PROFILE]);
@@ -162,6 +162,7 @@ void profiles_test::VulkanInstanceBuilder::reset() {
 
     _layer_names.clear();
     _extension_names.clear();
+    _next = nullptr;
 }
 
 bool profiles_test::IsExtensionSupported(VkPhysicalDevice physical_device, const char* extension_name) {

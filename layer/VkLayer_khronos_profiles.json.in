@@ -12,6 +12,10 @@
         "url": "https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_layer.html",
         "instance_extensions": [
             {
+                "name": "VK_EXT_debug_utils",
+                "spec_version": "2"
+            },
+            {
                 "name": "VK_EXT_layer_settings",
                 "spec_version": "2"
             }
@@ -704,7 +708,7 @@
                 {
                     "key": "debug_actions",
                     "label": "Debug Actions",
-                    "description": "This indicates what action is to be taken when a layer wants to report information",
+                    "description": "This indicates what action is to be taken when a layer wants to report information. When not set, the default actions are replaced by the VK_EXT_debug_utils messengers of the application, when there are any.",
                     "status": "STABLE",
                     "type": "FLAGS",
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
@@ -837,7 +841,7 @@
                 {
                     "key": "debug_reports",
                     "label": "Message Types",
-                    "description": "This is a comma-delineated list of options telling the layer what types of messages it should report back",
+                    "description": "This is a comma-delineated list of options telling the layer what types of messages it should report back with the debug actions. The VK_EXT_debug_utils messengers of the application receive the messages of the severities they were created with.",
                     "status": "STABLE",
                     "type": "FLAGS",
                     "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
