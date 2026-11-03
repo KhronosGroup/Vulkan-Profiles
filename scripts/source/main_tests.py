@@ -21,8 +21,8 @@
 
 import sys
 
-import gen_profiles_solution
-import gen_profiles_tests
+from source.generate_tests import generate_tests
+from source.vulkan_object_utils import initVulkanObject
 
 def main_tests(args):
     registry_arg = getattr(args, 'registry', None)
@@ -33,12 +33,25 @@ def main_tests(args):
         sys.exit(1)
 
     api = getattr(args, 'api', 'vulkan') or 'vulkan'
-    registry = gen_profiles_solution.VulkanRegistry(registry_arg, api)
-    
+    output_cpp = getattr(args, 'output_cpp', None)
+
+    if getattr(args, 'legacy', False):
+        main_tests_legacy(registry_arg, api, output_profile, output_cpp)
+        return
+
+    vk = initVulkanObject(api, registry_arg, video=True)
+    generate_tests(vk, output_profile, output_cpp)
+
+
+def main_tests_legacy(registry_path, api, output_profile, output_cpp):
+    # Legacy code path loading vk.xml with gen_profiles_solution.VulkanRegistry
+    import gen_profiles_solution
+    import gen_profiles_tests
+
+    registry = gen_profiles_solution.VulkanRegistry(registry_path, api)
+
     generator = gen_profiles_tests.ProfileGenerator(registry)
     generator.generate_profile(output_profile)
-
-    output_cpp = getattr(args, 'output_cpp', None)
     if output_cpp is not None:
         generator.generate_tests(output_cpp)
         

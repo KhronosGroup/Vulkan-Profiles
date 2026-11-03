@@ -231,6 +231,7 @@ def main(argv):
     tests_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
     tests_parser.add_argument('--output-profile', action='store', required=True, help='Output profile test file.')
     tests_parser.add_argument('--output-cpp', action='store', help='Output C++ tests file.')
+    tests_parser.add_argument('--legacy', action='store_true', help='Generate the tests with the legacy gen_profiles_tests.py code path.')
 
     summary_parser = subparsers.add_parser('summary', parents=[log_parser], help='List profiles from a file or directory with profile version, Vulkan API version, and schema header version.')
     summary_parser.add_argument('--registry', '-r', action='store', help='Use specified Vulkan registry file (vk.xml).')
