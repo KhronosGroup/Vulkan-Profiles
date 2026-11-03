@@ -22,6 +22,8 @@ Pass `--quiet`, `--verbose`, and `--log` after the subcommand name (for example 
 
 The parser registers commands in the following order in [scripts/vkprofiles.py](vkprofiles.py): `graph`, `validate`, `schema`, `transform`, `combine`, `extract`, `min-api-version`, `library`, `doc`, `layer`, `tests`, `summary`, and `version`.
 
+The development stage of `transform`, `combine`, `extract` and `min-api-version` is *Beta*: their help ends with `(BETA)`. All other commands are stable and their help has no stage label.
+
 Within a graph file, `nodes[].command` is limited to the pipeline operations supported by the executor (`schema`, `transform`, `combine`, `validate`, `library`, `doc`, `extract`, `min-api-version`, `summary`, `layer`, and `tests`). Top-level `graph` and `version` are CLI entry points, not valid node commands.
 
 ---
@@ -344,7 +346,7 @@ vkprofiles schema \
 
 ---
 
-### 4. `transform`
+### 4. `transform` *(Beta)*
 
 Transforms implicit profile JSON files to explicit profile JSON files by pulling Vulkan capabilities, extension dependencies, and feature aliases directly from `vk.xml`.
 
@@ -397,7 +399,7 @@ vkprofiles transform \
 
 ---
 
-### 5. `combine`
+### 5. `combine` *(Beta)*
 
 Combines multiple profile JSON files into a single output profile JSON file using one of the supported combination modes: `intersection`, `union`, or `difference`.
 
@@ -437,7 +439,7 @@ vkprofiles combine \
 
 ---
 
-### 6. `extract`
+### 6. `extract` *(Beta)*
 
 Extracts one or more named profiles from a larger profile JSON file or directory into a standalone output profile JSON file.
 
@@ -466,7 +468,7 @@ vkprofiles extract \
 
 ---
 
-### 7. `min-api-version`
+### 7. `min-api-version` *(Beta)*
 
 Displays the profile `api-version` and schema URI from input JSON, or evaluates the minimum compatible Vulkan profile schema version and updates profile JSON files as needed.
 

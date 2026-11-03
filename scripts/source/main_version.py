@@ -27,7 +27,7 @@ def get_version_string() -> str:
     try:
         from source.baked_version import BAKED_VERSION
         if BAKED_VERSION:
-            return f"vkprofiles version {BAKED_VERSION} (ALPHA)"
+            return f"vkprofiles version {BAKED_VERSION}"
     except ImportError:
         pass
 
