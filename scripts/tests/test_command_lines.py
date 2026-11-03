@@ -243,6 +243,11 @@ class TestVkProfilesExhaustiveArgs(unittest.TestCase):
         with patch("vkprofiles.main_doc") as mock_doc:
             vkprofiles.main(["doc", "-i", "in_dir", "-r", "vk.xml", "-o", "PROFILES.md"])
             self.assertEqual(mock_doc.call_args[0][0].output, "PROFILES.md")
+            self.assertFalse(mock_doc.call_args[0][0].legacy)
+
+        with patch("vkprofiles.main_doc") as mock_doc:
+            vkprofiles.main(["doc", "-i", "in_dir", "-r", "vk.xml", "-o", "PROFILES.md", "--legacy"])
+            self.assertTrue(mock_doc.call_args[0][0].legacy)
 
         # layer
         with patch("vkprofiles.main_layer") as mock_layer:

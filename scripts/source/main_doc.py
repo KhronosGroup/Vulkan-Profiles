@@ -22,7 +22,9 @@
 import sys
 import logging
 import argparse
-import gen_profiles_solution
+from source.generate_profiles_doc import generate_profiles_doc
+from source.vulkan_object_utils import initVulkanObject
+from source.profiles_json_utils import load_profiles_jsons
 from source.main_validate import main_validate
 
 
@@ -41,12 +43,35 @@ def main_doc(args):
         main_validate(validate_args)
 
     api = getattr(args, 'api', 'vulkan') or 'vulkan'
-    registry = gen_profiles_solution.VulkanRegistry(args.registry, api)
 
     input_profiles = None
     raw_profiles = getattr(args, 'input_profiles', None)
     if raw_profiles:
         input_profiles = [p.strip() for p in raw_profiles.split(',') if p.strip()]
+
+    if getattr(args, 'legacy', False):
+        main_doc_legacy(args, api, input_profiles)
+        return
+
+    # Only profiles files are loaded, as the legacy code path does
+    json_files = [ data for data in load_profiles_jsons(args.input).values() if 'capabilities' in data ]
+
+    if input_profiles:
+        available_profiles = { p_name for data in json_files for p_name in data['profiles'].keys() }
+        missing_profiles = [p for p in input_profiles if p not in available_profiles]
+        if missing_profiles:
+            logging.error(f"Profile(s) specified in '--input-profiles' not found in database: {', '.join(missing_profiles)}")
+            sys.exit(1)
+
+    vk = initVulkanObject(api, args.registry, video=True)
+    generate_profiles_doc(vk, json_files, input_profiles, args.output)
+
+
+def main_doc_legacy(args, api, input_profiles):
+    # Legacy code path loading vk.xml with gen_profiles_solution.VulkanRegistry
+    import gen_profiles_solution
+
+    registry = gen_profiles_solution.VulkanRegistry(args.registry, api)
 
     validate = getattr(args, 'validate', False)
     schema = None

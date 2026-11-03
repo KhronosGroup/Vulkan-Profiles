@@ -585,6 +585,7 @@ vkprofiles doc --registry vk.xml --input path/to/profiles --output PROFILES.md [
 * `--input-profiles`: Comma-separated list of profile names to document.
 * `--output`, `-o`: *(Required)* Output Markdown file path.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
+* `--legacy`: Generate the documentation with the legacy `gen_profiles_solution.py` code path instead of `source/generate_profiles_doc.py`.
 
 **Example:**
 
