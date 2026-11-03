@@ -27,6 +27,7 @@
 #include "profiles_test_helper.h"
 
 #include <cstdarg>
+#include <fstream>
 
 class TestsMechanism : public VkTestFramework {
    public:
@@ -36,6 +37,43 @@ class TestsMechanism : public VkTestFramework {
     static void SetUpTestSuite(){}
     static void TearDownTestSuite(){}
 };
+
+// Collects the profiles layer messages reported to a VK_EXT_debug_utils messenger
+struct DebugUtilsMessages {
+    std::vector<std::pair<VkDebugUtilsMessageSeverityFlagBitsEXT, std::string>> messages;
+
+    bool Contains(VkDebugUtilsMessageSeverityFlagBitsEXT severity, const char* text) const {
+        for (const auto& message : messages) {
+            if (message.first == severity && message.second.find(text) != std::string::npos) {
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+static VKAPI_ATTR VkBool32 VKAPI_CALL CollectDebugUtilsMessage(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+                                                               VkDebugUtilsMessageTypeFlagsEXT type,
+                                                               const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
+                                                               void* user_data) {
+    (void)type;
+    // The loader also reports its own messages to the messengers
+    if (callback_data->pMessageIdName != nullptr && strcmp(callback_data->pMessageIdName, kLayerName) == 0) {
+        static_cast<DebugUtilsMessages*>(user_data)->messages.push_back({severity, callback_data->pMessage});
+    }
+    return VK_FALSE;
+}
+
+static VkDebugUtilsMessengerCreateInfoEXT GetDebugUtilsMessengerCreateInfo(DebugUtilsMessages* messages) {
+    VkDebugUtilsMessengerCreateInfoEXT create_info{VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT};
+    create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
+                                  VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+    create_info.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                              VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+    create_info.pfnUserCallback = CollectDebugUtilsMessage;
+    create_info.pUserData = messages;
+    return create_info;
+}
 
 TEST_F(TestsMechanism, check_extension) {
     VkResult err = VK_SUCCESS;
@@ -577,4 +615,147 @@ TEST_F(TestsMechanism, capabilities_or) {
     profiles_test::VulkanInstanceBuilder inst_builder;
     VkResult err = inst_builder.init(settings);
     EXPECT_EQ(err, VK_SUCCESS);
+}
+
+TEST_F(TestsMechanism, debug_utils_layer_extension) {
+    TEST_DESCRIPTION("Test that the layer provides VK_EXT_debug_utils");
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+    ASSERT_EQ(inst_builder.init(), VK_SUCCESS);
+
+    uint32_t count = 0;
+    ASSERT_EQ(vkEnumerateInstanceExtensionProperties(kLayerName, &count, nullptr), VK_SUCCESS);
+    std::vector<VkExtensionProperties> properties(count);
+    ASSERT_EQ(vkEnumerateInstanceExtensionProperties(kLayerName, &count, properties.data()), VK_SUCCESS);
+
+    bool found = false;
+    for (const VkExtensionProperties& property : properties) {
+        if (strcmp(property.extensionName, VK_EXT_DEBUG_UTILS_EXTENSION_NAME) == 0) {
+            found = true;
+            EXPECT_EQ(property.specVersion, static_cast<uint32_t>(VK_EXT_DEBUG_UTILS_SPEC_VERSION));
+        }
+    }
+    EXPECT_TRUE(found);
+
+    inst_builder.reset();
+}
+
+TEST_F(TestsMechanism, debug_utils_instance_messenger) {
+    TEST_DESCRIPTION("Test that the messenger of VkInstanceCreateInfo::pNext reports the messages of vkCreateInstance and vkDestroyInstance only");
+
+    DebugUtilsMessages messages;
+    const VkDebugUtilsMessengerCreateInfoEXT messenger_create_info = GetDebugUtilsMessengerCreateInfo(&messages);
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+    inst_builder.addExtension(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    inst_builder.setNext(&messenger_create_info);
+
+    // The missing profile file makes the layer report an error during vkCreateInstance
+    const char* profile_file_data = JSON_TEST_FILES_PATH "missing_profile_file.json";
+    const char* profile_dirs_data = JSON_TEST_FILES_PATH;
+    const char* profile_name_data = "VP_LUNARG_test_device_extensions";
+
+    std::vector<VkLayerSettingEXT> settings = {
+        {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+        {kLayerName, kLayerSettingsProfileDirs, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_dirs_data},
+        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data}};
+
+    ASSERT_EQ(inst_builder.init(settings), VK_SUCCESS);
+
+    EXPECT_TRUE(messages.Contains(VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT, "Fail to open file"));
+    EXPECT_TRUE(messages.Contains(VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT, "CreateInstance"));
+    EXPECT_FALSE(messages.Contains(VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT, "DestroyInstance"));
+
+    // The messenger is not active after vkCreateInstance
+    const std::size_t create_instance_count = messages.messages.size();
+    VkPhysicalDevice gpu = VK_NULL_HANDLE;
+    inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+    EXPECT_EQ(messages.messages.size(), create_instance_count);
+
+    // The messenger is active again during vkDestroyInstance
+    inst_builder.reset();
+    EXPECT_TRUE(messages.Contains(VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT, "DestroyInstance"));
+}
+
+TEST_F(TestsMechanism, debug_utils_messenger) {
+    TEST_DESCRIPTION("Test that a messenger created with vkCreateDebugUtilsMessengerEXT reports the layer messages until it is destroyed");
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+    inst_builder.addExtension(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+
+    const char* profile_dirs_data = JSON_TEST_FILES_PATH;
+    const char* profile_name_data = "VP_LUNARG_test_device_extensions";
+    const std::vector<const char*> simulate_capabilities = {"SIMULATE_MAX_ENUM"};
+
+    std::vector<VkLayerSettingEXT> settings = {
+        {kLayerName, kLayerSettingsProfileDirs, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_dirs_data},
+        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+        {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT,
+         static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]}};
+
+    ASSERT_EQ(inst_builder.init(settings), VK_SUCCESS);
+
+    VkInstance instance = inst_builder.getInstance(profiles_test::MODE_PROFILE);
+    PFN_vkCreateDebugUtilsMessengerEXT create_messenger =
+        reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT"));
+    PFN_vkDestroyDebugUtilsMessengerEXT destroy_messenger =
+        reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT"));
+    ASSERT_NE(create_messenger, nullptr);
+    ASSERT_NE(destroy_messenger, nullptr);
+
+    DebugUtilsMessages messages;
+    const VkDebugUtilsMessengerCreateInfoEXT messenger_create_info = GetDebugUtilsMessengerCreateInfo(&messages);
+    VkDebugUtilsMessengerEXT messenger = VK_NULL_HANDLE;
+    ASSERT_EQ(create_messenger(instance, &messenger_create_info, nullptr, &messenger), VK_SUCCESS);
+
+    // Loading the profile for the physical devices is reported
+    VkPhysicalDevice gpu = VK_NULL_HANDLE;
+    inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+    EXPECT_FALSE(messages.messages.empty());
+
+    // A destroyed messenger doesn't report the messages of vkDestroyInstance
+    destroy_messenger(instance, messenger, nullptr);
+    const std::size_t destroy_messenger_count = messages.messages.size();
+    inst_builder.reset();
+    EXPECT_EQ(messages.messages.size(), destroy_messenger_count);
+    EXPECT_FALSE(messages.Contains(VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT, "DestroyInstance"));
+}
+
+TEST_F(TestsMechanism, debug_utils_explicit_debug_actions) {
+    TEST_DESCRIPTION("Test that explicitly set debug actions are still used when there is a debug utils messenger");
+
+    DebugUtilsMessages messages;
+    const VkDebugUtilsMessengerCreateInfoEXT messenger_create_info = GetDebugUtilsMessengerCreateInfo(&messages);
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+    inst_builder.addExtension(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    inst_builder.setNext(&messenger_create_info);
+
+    // The missing profile file makes the layer report an error during vkCreateInstance
+    const char* profile_file_data = JSON_TEST_FILES_PATH "missing_profile_file.json";
+    const char* profile_dirs_data = JSON_TEST_FILES_PATH;
+    const char* profile_name_data = "VP_LUNARG_test_device_extensions";
+    const char* debug_actions_data = "DEBUG_ACTION_FILE_BIT";
+    const char* debug_filename_data = "profiles_layer_debug_utils_test_log.txt";
+    const VkBool32 debug_file_clear_data = VK_TRUE;
+
+    std::vector<VkLayerSettingEXT> settings = {
+        {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+        {kLayerName, kLayerSettingsProfileDirs, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_dirs_data},
+        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+        {kLayerName, kLayerSettingsDebugActions, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_actions_data},
+        {kLayerName, kLayerSettingsDebugFilename, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_filename_data},
+        {kLayerName, kLayerSettingsDebugFileClear, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &debug_file_clear_data}};
+
+    ASSERT_EQ(inst_builder.init(settings), VK_SUCCESS);
+
+    // Destroying the instance closes the log file
+    inst_builder.reset();
+
+    EXPECT_TRUE(messages.Contains(VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT, "Fail to open file"));
+
+    std::ifstream log_file(debug_filename_data);
+    ASSERT_TRUE(log_file.is_open());
+    const std::string log((std::istreambuf_iterator<char>(log_file)), std::istreambuf_iterator<char>());
+    EXPECT_NE(log.find("Fail to open file"), std::string::npos);
 }

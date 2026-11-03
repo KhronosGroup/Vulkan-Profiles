@@ -116,6 +116,7 @@ const uint32_t kLayerPropertiesCount = (sizeof(kLayerProperties) / sizeof(kLayer
 
 // Instance extensions that this layer provides:
 const VkExtensionProperties kInstanceExtensionProperties[] = {
+    VkExtensionProperties{VK_EXT_DEBUG_UTILS_EXTENSION_NAME, VK_EXT_DEBUG_UTILS_SPEC_VERSION},
     VkExtensionProperties{VK_EXT_LAYER_SETTINGS_EXTENSION_NAME, VK_EXT_LAYER_SETTINGS_SPEC_VERSION}};
 const uint32_t kInstanceExtensionPropertiesCount = static_cast<uint32_t>(std::size(kInstanceExtensionProperties));
 
@@ -2353,6 +2354,10 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
 
     ProfileLayerSettings *layer_settings = &json_loader.layer_settings;
 
+    // As with the validation layer, the messengers of VkInstanceCreateInfo::pNext report the messages of vkCreateInstance
+    StoreInstanceDebugUtilsMessengers(layer_settings, pCreateInfo);
+    InstanceDebugUtilsMessengersScope instance_debug_utils_messengers(layer_settings);
+
     InitProfilesLayerSettings(pCreateInfo, pAllocator, layer_settings);
 
     LogMessage(layer_settings, DEBUG_REPORT_DEBUG_BIT, "CreateInstance\\n");
@@ -2510,9 +2515,12 @@ VKAPI_ATTR void VKAPI_CALL DestroyInstance(VkInstance instance, const VkAllocati
 
         ProfileLayerSettings* layer_settings = &JsonLoader::Find(instance)->layer_settings;
 
-        LogMessage(layer_settings, DEBUG_REPORT_DEBUG_BIT, "DestroyInstance\\n");
-
         {
+            // As with the validation layer, the messengers of VkInstanceCreateInfo::pNext report the messages of vkDestroyInstance
+            InstanceDebugUtilsMessengersScope instance_debug_utils_messengers(layer_settings);
+
+            LogMessage(layer_settings, DEBUG_REPORT_DEBUG_BIT, "DestroyInstance\\n");
+
             const auto dt = instance_dispatch_table(instance);
 
             std::vector<VkPhysicalDevice> physical_devices;
@@ -2528,6 +2536,34 @@ VKAPI_ATTR void VKAPI_CALL DestroyInstance(VkInstance instance, const VkAllocati
         destroy_instance_dispatch_table(get_dispatch_key(instance));
 
         JsonLoader::Destroy(instance);
+    }
+}
+
+VKAPI_ATTR VkResult VKAPI_CALL CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
+                                                            const VkAllocationCallbacks *pAllocator,
+                                                            VkDebugUtilsMessengerEXT *pMessenger) {
+    std::lock_guard<std::recursive_mutex> lock(global_lock);
+    const auto dt = instance_dispatch_table(instance);
+    if (!dt->CreateDebugUtilsMessengerEXT) {
+        return VK_ERROR_EXTENSION_NOT_PRESENT;
+    }
+
+    // As with the validation layer, the messenger is created down the chain and the layer messages are also reported to it
+    VkResult result = dt->CreateDebugUtilsMessengerEXT(instance, pCreateInfo, pAllocator, pMessenger);
+    if (result == VK_SUCCESS) {
+        AddDebugUtilsMessenger(&JsonLoader::Find(instance)->layer_settings, pCreateInfo, *pMessenger, false);
+    }
+    return result;
+}
+
+VKAPI_ATTR void VKAPI_CALL DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT messenger,
+                                                         const VkAllocationCallbacks *pAllocator) {
+    std::lock_guard<std::recursive_mutex> lock(global_lock);
+    const auto dt = instance_dispatch_table(instance);
+
+    RemoveDebugUtilsMessenger(&JsonLoader::Find(instance)->layer_settings, messenger);
+    if (dt->DestroyDebugUtilsMessengerEXT) {
+        dt->DestroyDebugUtilsMessengerEXT(instance, messenger, pAllocator);
     }
 }
 '''
@@ -3414,6 +3450,8 @@ VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL GetInstanceProcAddr(VkInstance instance
     GET_PROC_ADDR(EnumerateDeviceExtensionProperties);
     GET_PROC_ADDR(EnumeratePhysicalDevices);
     GET_PROC_ADDR(DestroyInstance);
+    GET_PROC_ADDR(CreateDebugUtilsMessengerEXT);
+    GET_PROC_ADDR(DestroyDebugUtilsMessengerEXT);
     GET_PROC_ADDR(GetPhysicalDeviceProperties);
     GET_PROC_ADDR(GetPhysicalDeviceProperties2);
     GET_PROC_ADDR(GetPhysicalDeviceProperties2KHR);
