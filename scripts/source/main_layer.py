@@ -19,8 +19,8 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
-import gen_profiles_solution
-import gen_profiles_layer
+from source.generate_layer import generate_layer
+from source.vulkan_object_utils import initVulkanObject
 
 def main_layer(args):
     registry_path = '../external/Debug/Vulkan-Headers/build/install/share/vulkan/registry/vk.xml'
@@ -33,6 +33,20 @@ def main_layer(args):
         output_path = out_val
 
     api = getattr(args, 'api', 'vulkan') or 'vulkan'
+
+    if getattr(args, 'legacy', False):
+        main_layer_legacy(registry_path, api, output_path)
+        return
+
+    vk = initVulkanObject(api, registry_path, video=True)
+    generate_layer(vk, output_path)
+
+
+def main_layer_legacy(registry_path, api, output_path):
+    # Legacy code path loading vk.xml with gen_profiles_solution.VulkanRegistry
+    import gen_profiles_solution
+    import gen_profiles_layer
+
     registry = gen_profiles_solution.VulkanRegistry(registry_path, api)
 
     generator = gen_profiles_layer.VulkanProfilesLayerGenerator()

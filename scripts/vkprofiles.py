@@ -224,6 +224,7 @@ def main(argv):
     layer_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     layer_parser.add_argument('--registry', '-r', action='store', help='Use specified registry file instead of vk.xml.')
     layer_parser.add_argument('--output', '-o', '--out-layer', action='store', help='Output the layer source file.')
+    layer_parser.add_argument('--legacy', action='store_true', help='Generate the layer source file with the legacy gen_profiles_layer.py code path.')
 
     tests_parser = subparsers.add_parser('tests', parents=[log_parser], help='Generate test profile and test C++ source file.')
     tests_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")

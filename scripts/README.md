@@ -655,6 +655,7 @@ vkprofiles layer --registry vk.xml --output layer/profiles_generated.cpp
 * `--registry`, `-r`: Path to `vk.xml`.
 * `--output`, `-o`, `--out-layer`: Output path for the generated layer source file.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
+* `--legacy`: Generate the layer source file with the legacy `gen_profiles_layer.py` code path instead of `source/generate_layer.py`.
 
 **Example:**
 

@@ -155,6 +155,14 @@ class ProfileGenerator():
     i = 1
     skipped_features = []
     skipped_members = ["sType", "pNext", "physicalDevices", "driverID", "copySrcLayoutCount", "copyDstLayoutCount"]
+    # Members skipped by their exact name, unlike skipped_members which skips the members starting with these names
+    # The layer doesn't simulate these members: deviceLUID is 'noauto' (deviceLUIDValid is still tested), the others are 'exact'
+    # in the shared VK_XML_PROPERTY_LIMIT_TYPE_WORKAROUNDS while this legacy registry reads 'max' from vk.xml
+    skipped_member_names = ["deviceLUID",
+                            "maxCombinedImageSamplerDescriptorCount",
+                            "maxPreferredTaskWorkGroupInvocations", "maxPreferredMeshWorkGroupInvocations",
+                            "prefersLocalInvocationVertexOutput", "prefersLocalInvocationPrimitiveOutput",
+                            "prefersCompactVertexOutput", "prefersCompactPrimitiveOutput"]
     skipped_properties_structs = ["VkPhysicalDeviceLineRasterizationPropertiesEXT", "VkPhysicalDeviceLayeredApiPropertiesListKHR", "VkPhysicalDeviceFragmentDensityMapOffsetPropertiesEXT", "VkPhysicalDeviceCopyMemoryIndirectPropertiesNV", "VkPhysicalDeviceMemoryDecompressionPropertiesNV", 'VkPhysicalDeviceGpaPropertiesAMD']
     # VkPhysicalDeviceTileShadingPropertiesQCOM currently crashes in a driver
     # VkPhysicalDeviceRobustness2PropertiesEXT is an alias of VkPhysicalDeviceRobustness2PropertiesKHR
@@ -313,7 +321,7 @@ class ProfileGenerator():
                             property_size = int(self.registry.constants[member.arraySize])
                         else:
                             property_size = member.arraySize
-                    skip = False
+                    skip = property_name in self.skipped_member_names
                     for skipped in self.skipped_members:
                         if (property_name.startswith(skipped)):
                             skip = True
