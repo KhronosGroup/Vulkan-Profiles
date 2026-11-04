@@ -20,9 +20,6 @@
  * - Daniel Rakos <daniel.rakos@rastergrid.com>
  */
 
-#ifndef VP_USE_OBJECT
-#define VP_USE_OBJECT 1
-#endif
 
 #include <vulkan/vulkan_profiles.hpp>
 
