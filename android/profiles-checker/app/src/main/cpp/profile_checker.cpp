@@ -451,7 +451,7 @@ CheckReport RunProfileChecks() {
             std::vector<VpBlockProperties> blocks(kMaxBlocks);
 
             VkResult result = vpGetPhysicalDeviceProfileVariantsSupport(
-                functions, instanceGuard.instance, physicalDevice, &profiles[i], &supported, &blockCount,
+                functions, physicalDevice, &profiles[i], &supported, &blockCount,
                 blocks.data());
             if (result == VK_INCOMPLETE) {
                 blockCount = std::min(blockCount, kMaxBlocks);

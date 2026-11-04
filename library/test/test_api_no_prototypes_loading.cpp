@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-#ifndef VP_USE_OBJECT
-#define VP_USE_OBJECT 1
-#endif
 
 #ifndef VK_NO_PROTOTYPES
 #define VK_NO_PROTOTYPES 1

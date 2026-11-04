@@ -52,7 +52,7 @@ TEST(api_create_device_profile, check_support_vulkan_1_0) {
     const VpProfileProperties profile = {VP_LUNARG_MINIMUM_REQUIREMENTS_1_0_NAME, VP_LUNARG_MINIMUM_REQUIREMENTS_1_0_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(nullptr, scaffold->physicalDevice, &profile, &supported);
     EXPECT_TRUE(result == VK_SUCCESS);
     EXPECT_TRUE(supported == VK_TRUE);
 }
@@ -61,7 +61,7 @@ TEST(api_create_device_profile, check_support_vulkan_1_1) {
     const VpProfileProperties profile = {VP_LUNARG_MINIMUM_REQUIREMENTS_1_1_NAME, VP_LUNARG_MINIMUM_REQUIREMENTS_1_1_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(nullptr, scaffold->physicalDevice, &profile, &supported);
     EXPECT_TRUE(result == VK_SUCCESS);
     EXPECT_TRUE(supported == VK_TRUE);
 }
@@ -70,7 +70,7 @@ TEST(api_create_device_profile, check_support_vulkan_1_2) {
     const VpProfileProperties profile = {VP_LUNARG_MINIMUM_REQUIREMENTS_1_2_NAME, VP_LUNARG_MINIMUM_REQUIREMENTS_1_2_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(nullptr, scaffold->physicalDevice, &profile, &supported);
     EXPECT_TRUE(result == VK_SUCCESS);
     EXPECT_TRUE(supported == VK_TRUE);
 }
@@ -87,7 +87,7 @@ TEST(api_create_device_profile, check_support_vulkan_1_3) {
     vkGetPhysicalDeviceFeatures2(scaffold->physicalDevice, &features);
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(nullptr, scaffold->physicalDevice, &profile, &supported);
     EXPECT_TRUE(result == VK_SUCCESS);
     EXPECT_TRUE(supported == VK_TRUE);
 }
@@ -96,7 +96,7 @@ TEST(api_create_device_profile, check_support_vulkan_1_4) {
     const VpProfileProperties profile = {VP_LUNARG_MINIMUM_REQUIREMENTS_1_4_NAME, VP_LUNARG_MINIMUM_REQUIREMENTS_1_4_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(nullptr, scaffold->physicalDevice, &profile, &supported);
     EXPECT_TRUE(result == VK_SUCCESS);
 }
 
@@ -105,7 +105,7 @@ TEST(api_create_device_profile, check_support_desktop_2022) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2022_NAME, VP_LUNARG_DESKTOP_BASELINE_2022_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(nullptr, scaffold->physicalDevice, &profile, &supported);
     EXPECT_TRUE(result == VK_SUCCESS);
     EXPECT_TRUE(supported == VK_TRUE);
 }
@@ -114,7 +114,7 @@ TEST(api_create_device_profile, check_support_desktop_2023) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2023_NAME, VP_LUNARG_DESKTOP_BASELINE_2023_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(nullptr, scaffold->physicalDevice, &profile, &supported);
     EXPECT_TRUE(result == VK_SUCCESS);
     EXPECT_TRUE(supported == VK_TRUE);
 }
@@ -123,7 +123,7 @@ TEST(api_create_device_profile, check_support_desktop_2024) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2024_NAME, VP_LUNARG_DESKTOP_BASELINE_2024_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(nullptr, scaffold->physicalDevice, &profile, &supported);
     EXPECT_TRUE(result == VK_SUCCESS);
     EXPECT_TRUE(supported == VK_TRUE);
 }
@@ -132,7 +132,7 @@ TEST(api_create_device_profile, check_support_desktop_2026) {
     const VpProfileProperties profile = {VP_LUNARG_DESKTOP_BASELINE_2026_NAME, VP_LUNARG_DESKTOP_BASELINE_2026_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(nullptr, scaffold->physicalDevice, &profile, &supported);
     EXPECT_TRUE(result == VK_SUCCESS);
     EXPECT_TRUE(supported == VK_TRUE);
 }
@@ -150,7 +150,7 @@ TEST(api_create_device_profile, check_support_roadmap_2022) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2022_NAME, VP_KHR_ROADMAP_2022_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(nullptr, scaffold->physicalDevice, &profile, &supported);
     EXPECT_TRUE(result == VK_SUCCESS);
     EXPECT_TRUE(supported == VK_TRUE);
 }
@@ -159,7 +159,7 @@ TEST(api_create_device_profile, check_support_roadmap_2024) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2024_NAME, VP_KHR_ROADMAP_2024_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(nullptr, scaffold->physicalDevice, &profile, &supported);
     EXPECT_TRUE(result == VK_SUCCESS);
     EXPECT_TRUE(supported == VK_TRUE);
 }
@@ -168,7 +168,7 @@ TEST(api_create_device_profile, check_support_roadmap_2026) {
     const VpProfileProperties profile = {VP_KHR_ROADMAP_2026_NAME, VP_KHR_ROADMAP_2026_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(nullptr, scaffold->physicalDevice, &profile, &supported);
     EXPECT_TRUE(result == VK_SUCCESS);
 }
 
@@ -193,7 +193,7 @@ TEST(api_create_device_profile, create_roadmap_2022) {
     profileInfo.pEnabledFullProfiles = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
+    VkResult res = vpCreateDevice(nullptr, scaffold->physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_TRUE(res == VK_SUCCESS);
     EXPECT_TRUE(device != VK_NULL_HANDLE);
 }
@@ -219,7 +219,7 @@ TEST(api_create_device_profile, create_roadmap_2024) {
     profileInfo.pEnabledFullProfiles = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
+    VkResult res = vpCreateDevice(nullptr, scaffold->physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_TRUE(res == VK_SUCCESS);
     EXPECT_TRUE(device != VK_NULL_HANDLE);
 }
@@ -245,7 +245,7 @@ TEST(api_create_device_profile, create_roadmap_2026) {
     profileInfo.pEnabledFullProfiles = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
+    VkResult res = vpCreateDevice(nullptr, scaffold->physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_TRUE(res == VK_SUCCESS || res == VK_ERROR_EXTENSION_NOT_PRESENT);
 }
 
@@ -267,7 +267,7 @@ TEST(api_create_device_profile, overrite_with_profile_only) {
     profileInfo.pEnabledFullProfiles = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
+    VkResult res = vpCreateDevice(nullptr, scaffold->physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_TRUE(res == VK_SUCCESS);
     EXPECT_TRUE(device != VK_NULL_HANDLE);
 }
@@ -292,7 +292,7 @@ TEST(api_create_device_profile, overrite_with_supported_extensions) {
     profileInfo.pEnabledFullProfiles = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
+    VkResult res = vpCreateDevice(nullptr, scaffold->physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_TRUE(res == VK_SUCCESS);
     EXPECT_TRUE(device != VK_NULL_HANDLE);
 }
@@ -318,7 +318,7 @@ TEST(api_create_device_profile, overrite_with_enabled_features) {
     profileInfo.pEnabledFullProfiles = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
+    VkResult res = vpCreateDevice(nullptr, scaffold->physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_TRUE(res == VK_SUCCESS);
     EXPECT_TRUE(device != VK_NULL_HANDLE);
 }
@@ -347,7 +347,7 @@ TEST(api_create_device_profile, overrite_with_pnext_features) {
     profileInfo.pEnabledFullProfiles = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
+    VkResult res = vpCreateDevice(nullptr, scaffold->physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_TRUE(res == VK_SUCCESS);
     EXPECT_TRUE(device != VK_NULL_HANDLE);
 }
@@ -375,7 +375,7 @@ TEST(api_create_device_profile, with_extensions_flag) {
         info.ppEnabledExtensionNames = extensions;
 
         VkDevice device = VK_NULL_HANDLE;
-        VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
+        VkResult res = vpCreateDevice(nullptr, scaffold->physicalDevice, &profileInfo, nullptr, &device);
         EXPECT_TRUE(res == VK_SUCCESS);
         EXPECT_TRUE(device != VK_NULL_HANDLE);
     }
@@ -386,7 +386,7 @@ TEST(api_create_device_profile, with_extensions_flag) {
         info.ppEnabledExtensionNames = nullptr;
 
         VkDevice device = VK_NULL_HANDLE;
-        VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
+        VkResult res = vpCreateDevice(nullptr, scaffold->physicalDevice, &profileInfo, nullptr, &device);
         EXPECT_TRUE(res == VK_SUCCESS);
         EXPECT_TRUE(device != VK_NULL_HANDLE);
     }
@@ -415,7 +415,7 @@ TEST(api_create_device_profile, overrite_with_unsupported_extensions) {
     profileInfo.flags = 0;
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult res = vpCreateDevice(scaffold->physicalDevice, &profileInfo, nullptr, &device);
+    VkResult res = vpCreateDevice(nullptr, scaffold->physicalDevice, &profileInfo, nullptr, &device);
     EXPECT_TRUE(res != VK_SUCCESS);
     EXPECT_TRUE(device == VK_NULL_HANDLE);
 }
@@ -424,7 +424,7 @@ TEST(api_get_profile_support, unsupported_name) {
     VpProfileProperties profile{"Bouuahhhh", VP_LUNARG_MINIMUM_REQUIREMENTS_1_3_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(nullptr, scaffold->physicalDevice, &profile, &supported);
     EXPECT_EQ(VK_FALSE, supported);
 }
 
@@ -432,7 +432,7 @@ TEST(api_get_profile_support, unsupported_version) {
     VpProfileProperties profile{VP_LUNARG_MINIMUM_REQUIREMENTS_1_3_NAME, VP_LUNARG_MINIMUM_REQUIREMENTS_1_3_SPEC_VERSION + 1};
 
     VkBool32 supported = VK_FALSE;
-    vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(nullptr, scaffold->physicalDevice, &profile, &supported);
     EXPECT_EQ(VK_FALSE, supported);
 }
 
@@ -440,6 +440,6 @@ TEST(api_get_profile_support, empty) {
     VpProfileProperties profile = {};
 
     VkBool32 supported = VK_FALSE;
-    vpGetPhysicalDeviceProfileSupport(scaffold->instance, scaffold->physicalDevice, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(nullptr, scaffold->physicalDevice, &profile, &supported);
     EXPECT_EQ(VK_FALSE, supported);
 }
