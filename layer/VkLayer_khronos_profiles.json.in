@@ -115,6 +115,23 @@
                                     }
                                 ]
                             }
+                        },
+                        {
+                            "key": "profile_cache",
+                            "label": "Cache Profile Files",
+                            "description": "Keep the parsed profile files in memory for the lifetime of the process, instead of parsing them again for every VkInstance. Only useful for applications that create a very large number of instances, such as test suites. A cached file is loaded again if its modification time changes.",
+                            "type": "BOOL",
+                            "default": false,
+                            "platforms": [ "WINDOWS", "LINUX", "MACOS" ],
+                            "dependence": {
+                                "mode": "ALL",
+                                "settings": [
+                                    {
+                                        "key": "profile_emulation",
+                                        "value": true
+                                    }
+                                ]
+                            }
                         }
                     ]
                 },

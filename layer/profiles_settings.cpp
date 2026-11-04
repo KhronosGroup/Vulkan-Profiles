@@ -341,6 +341,7 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
                                               kLayerSettingsProfileDirs,
                                               kLayerSettingsProfileName,
                                               kLayerSettingsProfileValidation,
+                                              kLayerSettingsProfileCache,
                                               kLayerSettingsSimulateCapabilities,
                                               kLayerSettingsDebugActions,
                                               kLayerSettingsDebugFilename,
@@ -392,6 +393,10 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
 
         if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileValidation)) {
             vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileValidation, layer_settings->simulate.profile_validation);
+        }
+
+        if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsProfileCache)) {
+            vkuGetLayerSettingValue(layerSettingSet, kLayerSettingsProfileCache, layer_settings->simulate.profile_cache);
         }
 
         if (vkuHasLayerSetting(layerSettingSet, kLayerSettingsSimulateCapabilities)) {
@@ -487,6 +492,7 @@ void InitProfilesLayerSettings(const VkInstanceCreateInfo *pCreateInfo, const Vk
     settings_log += format("\t%s: %s\n", kLayerSettingsProfileName, layer_settings->simulate.profile_name.c_str());
     settings_log +=
         format("\t%s: %s\n", kLayerSettingsProfileValidation, layer_settings->simulate.profile_validation ? "true" : "false");
+    settings_log += format("\t%s: %s\n", kLayerSettingsProfileCache, layer_settings->simulate.profile_cache ? "true" : "false");
     settings_log += format("\t%s: %s\n", kLayerSettingsSimulateCapabilities, simulation_capabilities_log.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsDefaultFeatureValues, default_feature_values.c_str());
     settings_log += format("\t%s: %s\n", kLayerSettingsUnknownFeatureValues, unknown_feature_values.c_str());
