@@ -228,7 +228,6 @@ def main(argv):
     library_parser.add_argument('--debug', '-d', action='store_true', help='Also generate library variant with debug messages.')
     library_parser.add_argument('--config', '-c', action='store', default='release', choices=['release', 'debug'], help='Select build configuration.')
     library_parser.add_argument('--include-header', action='store', help='Override the header file include directive in generated C++ source files.')
-    library_parser.add_argument('--legacy', action='store_true', help='Generate the library with the legacy gen_profiles_solution.py code path.')
 
     doc_parser = add_command_parser(subparsers, 'doc', parents=[log_parser], help='Generate markdown documentation for Vulkan profiles.')
     doc_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
@@ -236,20 +235,17 @@ def main(argv):
     doc_parser.add_argument('--input', '-i', action='store', required=True, help='Path to directory with profiles.')
     doc_parser.add_argument('--input-profiles', action='store', help='Comma separated list of profiles.')
     doc_parser.add_argument('--output', '-o', action='store', required=True, help='Output markdown file for profiles documentation.')
-    doc_parser.add_argument('--legacy', action='store_true', help='Generate the documentation with the legacy gen_profiles_solution.py code path.')
 
     layer_parser = add_command_parser(subparsers, 'layer', parents=[log_parser], help='Generate the Vulkan profiles layer source file.')
     layer_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     layer_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
     layer_parser.add_argument('--output', '-o', '--out-layer', action='store', help='Output the layer source file.')
-    layer_parser.add_argument('--legacy', action='store_true', help='Generate the layer source file with the legacy gen_profiles_layer.py code path.')
 
     tests_parser = add_command_parser(subparsers, 'tests', parents=[log_parser], help='Generate test profile and test C++ source file.')
     tests_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
     tests_parser.add_argument('--registry', '-r', action='store', required=True, help='Use specified registry file instead of vk.xml.')
     tests_parser.add_argument('--output-profile', action='store', required=True, help='Output profile test file.')
     tests_parser.add_argument('--output-cpp', action='store', help='Output C++ tests file.')
-    tests_parser.add_argument('--legacy', action='store_true', help='Generate the tests with the legacy gen_profiles_tests.py code path.')
 
     summary_parser = add_command_parser(subparsers, 'summary', parents=[log_parser], help='List profiles from a file or directory with profile version, Vulkan API version, and schema header version.')
     summary_parser.add_argument('--registry', '-r', action='store', help='Use specified Vulkan registry file (vk.xml).')

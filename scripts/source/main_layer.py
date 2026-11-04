@@ -40,21 +40,5 @@ def main_layer(args):
 
     api = getattr(args, 'api', 'vulkan') or 'vulkan'
 
-    if getattr(args, 'legacy', False):
-        main_layer_legacy(registry_path, api, output_path)
-        return
-
     vk = initVulkanObject(api, registry_path, video=True)
     generate_layer(vk, output_path)
-
-
-def main_layer_legacy(registry_path, api, output_path):
-    # Legacy code path loading vk.xml with gen_profiles_solution.VulkanRegistry
-    import gen_profiles_solution
-    import gen_profiles_layer
-
-    registry = gen_profiles_solution.VulkanRegistry(registry_path, api)
-
-    generator = gen_profiles_layer.VulkanProfilesLayerGenerator()
-    generator.generate(output_path, registry)
-    

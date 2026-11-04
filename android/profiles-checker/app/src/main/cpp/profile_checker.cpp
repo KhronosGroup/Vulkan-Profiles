@@ -78,7 +78,7 @@ struct Prefix {
     bool stripPrefix;
 };
 
-// Known message prefixes emitted by gen_profiles_solution.py in debug mode.
+// Known message prefixes emitted by the Vulkan Profiles library generated in debug mode.
 const Prefix kPrefixes[] = {
     {"Unsupported extension: ", RequirementKind::Extension, true},
     {"Unsupported feature condition: ", RequirementKind::Feature, true},
@@ -451,7 +451,7 @@ CheckReport RunProfileChecks() {
             std::vector<VpBlockProperties> blocks(kMaxBlocks);
 
             VkResult result = vpGetPhysicalDeviceProfileVariantsSupport(
-                functions, instanceGuard.instance, physicalDevice, &profiles[i], &supported, &blockCount,
+                functions, physicalDevice, &profiles[i], &supported, &blockCount,
                 blocks.data());
             if (result == VK_INCOMPLETE) {
                 blockCount = std::min(blockCount, kMaxBlocks);
