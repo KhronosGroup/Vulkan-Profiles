@@ -193,6 +193,7 @@ struct ProfileLayerSettings {
         std::vector<std::string> profile_dirs;
         std::string profile_name{"${VP_DEFAULT}"};
         bool profile_validation{false};
+        bool profile_cache{false};
         SimulateCapabilityFlags capabilities{SIMULATE_API_VERSION_BIT | SIMULATE_FEATURES_BIT | SIMULATE_PROPERTIES_BIT};
         DefaultFeatureValues default_feature_values{DEFAULT_FEATURE_VALUES_DEVICE};
         UnknownFeatureValues unknown_feature_values{UNKNOWN_FEATURE_VALUES_UNCHANGED};

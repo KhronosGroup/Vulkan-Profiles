@@ -84,6 +84,9 @@ INCLUDES_HEADER = '''
 #include <algorithm>
 #include <filesystem>
 #include <functional>
+#include <map>
+#include <memory>
+#include <mutex>
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
@@ -325,7 +328,7 @@ class JsonLoader {
    private:
     PhysicalDeviceData *pdd_;
 
-    std::map<std::string, Json::Value> profiles_file_roots_;
+    std::map<std::string, std::shared_ptr<const Json::Value>> profiles_file_roots_;
 
     std::uint32_t profile_api_version_;
     std::vector<std::string> excluded_extensions_;
@@ -1999,6 +2002,21 @@ VkResult JsonLoader::LoadFile(const std::string& filename) {
         return VK_SUCCESS;
     }
 
+    // Parsing a large profile for every VkInstance is slow for applications creating a lot of them (like test suites)
+    static std::mutex cache_mutex;
+    static std::map<std::pair<std::string, fs::file_time_type>, std::shared_ptr<const Json::Value>> cache;
+    std::error_code ec;
+    const auto cache_key = std::make_pair(filename, fs::last_write_time(filename, ec));
+    const bool use_cache = layer_settings.simulate.profile_cache && !ec;
+    if (use_cache) {
+        std::lock_guard<std::mutex> lock(cache_mutex);
+        const auto it = cache.find(cache_key);
+        if (it != cache.end()) {
+            this->profiles_file_roots_.emplace(filename, it->second);
+            return VK_SUCCESS;
+        }
+    }
+
     Json::Value root = Json::nullValue;
     Json::CharReaderBuilder builder;
     std::string errs;
@@ -2043,7 +2061,12 @@ VkResult JsonLoader::LoadFile(const std::string& filename) {
         }
     }
 
-    this->profiles_file_roots_.insert(std::pair(filename, root));
+    auto shared_root = std::make_shared<const Json::Value>(std::move(root));
+    if (use_cache) {
+        std::lock_guard<std::mutex> lock(cache_mutex);
+        cache.emplace(cache_key, shared_root);
+    }
+    this->profiles_file_roots_.emplace(filename, std::move(shared_root));
 
     return VK_SUCCESS;
 }
@@ -2107,7 +2130,7 @@ void JsonLoader::LogFoundProfiles() {
     for (const auto& root : this->profiles_file_roots_) {
         LogMessage(&layer_settings, DEBUG_REPORT_NOTIFICATION_BIT, "Profiles found in \'%s\' file:\\n", root.first.c_str());
 
-        const Json::Value &profiles = root.second["profiles"];
+        const Json::Value &profiles = (*root.second)["profiles"];
 
         for (const std::string &profile : profiles.getMemberNames()) {
             LogMessage(&layer_settings, DEBUG_REPORT_NOTIFICATION_BIT, "- %s\\n", profile.c_str());
@@ -2117,11 +2140,11 @@ void JsonLoader::LogFoundProfiles() {
 
 const Json::Value& JsonLoader::FindRootFromProfileName(const std::string& profile_name) const {
     for (const auto& root : this->profiles_file_roots_) {
-        const Json::Value &profiles = root.second["profiles"];
+        const Json::Value &profiles = (*root.second)["profiles"];
 
         for (const auto &profile : profiles.getMemberNames()) {
             if (profile_name.empty() || profile_name == "${VP_DEFAULT}" || profile == profile_name) {
-                return root.second;
+                return *root.second;
             }
         }
     }

@@ -45,6 +45,7 @@ std::string GetDebugReportsLog(DebugActionFlags flags);
 #define kLayerSettingsProfileDirs "profile_dirs"
 #define kLayerSettingsProfileName "profile_name"
 #define kLayerSettingsProfileValidation "profile_validation"
+#define kLayerSettingsProfileCache "profile_cache"
 #define kLayerSettingsSimulateCapabilities "simulate_capabilities"
 #define kLayerSettingsDebugActions "debug_actions"
 #define kLayerSettingsDebugFilename "debug_filename"
