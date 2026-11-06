@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://schema.khronos.org/vulkan/profiles-0.8.2-367.json#",
-    "title": "Vulkan Profiles Schema for Vulkan 1.4.367",
+    "$id": "https://schema.khronos.org/vulkan/profiles-0.8.2-368.json#",
+    "title": "Vulkan Profiles Schema for Vulkan 1.4.368",
     "additionalProperties": true,
     "required": [
         "capabilities",
@@ -3277,6 +3277,15 @@
                     "type": "boolean"
                 },
                 "variablePointersStorageBuffer": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "VkPhysicalDeviceVertexAddressBindingUnrestrictedFeaturesEXT": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "vertexAddressBindingUnrestricted": {
                     "type": "boolean"
                 }
             }
@@ -10632,6 +10641,9 @@
                             "VK_EXT_validation_flags": {
                                 "type": "integer"
                             },
+                            "VK_EXT_vertex_address_binding_unrestricted": {
+                                "type": "integer"
+                            },
                             "VK_EXT_vertex_attribute_divisor": {
                                 "type": "integer"
                             },
@@ -11308,6 +11320,9 @@
                                 "type": "integer"
                             },
                             "VK_NV_inherited_viewport_scissor": {
+                                "type": "integer"
+                            },
+                            "VK_NV_internal_handle": {
                                 "type": "integer"
                             },
                             "VK_NV_linear_color_attachment": {
@@ -12468,6 +12483,9 @@
                             },
                             "VkPhysicalDeviceVariablePointersFeaturesKHR": {
                                 "$ref": "#/definitions/VkPhysicalDeviceVariablePointersFeatures"
+                            },
+                            "VkPhysicalDeviceVertexAddressBindingUnrestrictedFeaturesEXT": {
+                                "$ref": "#/definitions/VkPhysicalDeviceVertexAddressBindingUnrestrictedFeaturesEXT"
                             },
                             "VkPhysicalDeviceVertexAttributeDivisorFeatures": {
                                 "$ref": "#/definitions/VkPhysicalDeviceVertexAttributeDivisorFeatures"
