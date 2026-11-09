@@ -105,7 +105,7 @@ jobs:
             echo "No PROFILES_CHECKER_DEBUG_KEYSTORE secret; a fresh debug keystore will be generated"
           fi
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
 
       - name: Build universal debug APK
         shell: bash
