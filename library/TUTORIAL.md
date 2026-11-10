@@ -65,18 +65,18 @@ The profile definitions are enabled depending on the pre-processor definitions c
 
 For many use cases, existing Vulkan Profiles are not very useful, a Vulkan application may require to create it's own Vulkan Profiles to better represent the ecosystem devices the Vulkan application is designed to run on and the rendering code paths.
 
-For this purpose, the Vulkan SDK ships with the `gen_profiles_solution.py` python script in the `share/vulkan/registry` directory. To use this script, simply copy your Vulkan Profiles in a `profiles` directory and use the command:
+For this purpose, the Vulkan SDK ships with the `vkprofiles` executable. To generate the library, simply copy your Vulkan Profiles in a `profiles` directory and use the command:
 
 ```
-    python gen_profiles_solution.py --registry ./vk.xml --input ./profiles --output-library-inc . --output-library-src .
+    vkprofiles library --registry ./vk.xml --input ./profiles --output . --output-src .
 ```
 
-When `--output-library-src` is not specified, the header-only library is generated but not the header + source pair.
+Use `--mode header-only` to generate the header-only library but not the header + source pair.
 
 For more information about the Vulkan Profiles library generation, use the command:
 
 ```
-    python gen_profiles_solution.py --help
+    vkprofiles library --help
 ```
 
 ## Basic usage
@@ -84,11 +84,9 @@ For more information about the Vulkan Profiles library generation, use the comma
 The typically expected usage of the Vulkan Profiles library is for applications to target a specific profile with their application and leave it to the Vulkan Profiles library to enable any necessary extensions and features required by that profile.
 
 The Vulkan Header version 1.4.358 introduced the `VpFunctions` object which broke backward compatibility with previous version of the library. The `VpFunctions` object enables using the Profiles API library with Vulkan functions provided external and dynamic Vulkan API loading.
-While this new API remains at the `BETA` development stage, it's protected by the `VP_USE_OBJECT` `#define` which must be defined to use the new API described bellow.
+The `VpFunctions` object is required by every function of the library: the `VP_USE_OBJECT` `#define` is no longer used and the legacy API without the `VpFunctions` object was removed.
 
-```C++
-    #define VP_USE_OBJECT 1
-```
+Passing `VK_NULL_HANDLE` as the `functions` parameter makes the library use a default `VpFunctions` object shared by the whole application. Without `VK_NO_PROTOTYPES`, the default object is initialized with the static Vulkan functions. With `VK_NO_PROTOTYPES`, it must be initialized by calling `vpInitializeGlobalFunctions` and `vpInitializeInstanceFunctions` with `VK_NULL_HANDLE`. The default object isn't thread safe: `vpInitializeGlobalFunctions`, `vpInitializeInstanceFunctions` and `vpCreateInstance` modify it without synchronization.
 
 In order to use the Profiles API library, the application first has to create a `VpFunctions` object as follows:
 ```C++
@@ -187,7 +185,7 @@ However, if the application doesn't use `vpCreateInstance` but `vkCreateInstance
 Once the instance-level functions are loaded, the application can check whether individual physical devices support the selected profile as follows:
 
 ```C++
-    result = vpGetPhysicalDeviceProfileSupport(capabilities, instance, physicalDevice,
+    result = vpGetPhysicalDeviceProfileSupport(functions, physicalDevice,
                                                &profile, &supported);
     if (result != VK_SUCCESS) {
         // something went wrong
@@ -336,6 +334,10 @@ typedef struct VpFunctionsCreateInfo
     PFN_vkGetPhysicalDeviceProperties2 GetPhysicalDeviceProperties2 = nullptr;
     PFN_vkGetPhysicalDeviceFormatProperties2 GetPhysicalDeviceFormatProperties2 = nullptr;
     PFN_vkGetPhysicalDeviceQueueFamilyProperties2 GetPhysicalDeviceQueueFamilyProperties2 = nullptr;
+#ifdef VK_KHR_video_queue
+    PFN_vkGetPhysicalDeviceVideoCapabilitiesKHR GetPhysicalDeviceVideoCapabilitiesKHR = nullptr;
+    PFN_vkGetPhysicalDeviceVideoFormatPropertiesKHR GetPhysicalDeviceVideoFormatPropertiesKHR = nullptr;
+#endif  // VK_KHR_video_queue
 } VpFunctionsCreateInfo;
 ```
 
@@ -349,7 +351,7 @@ When `VK_NO_PROTOTYPES` is defined, the `VpFunctions` object are not initialized
 
 #### Loading instance-level functions
 
-Once a Vulkan instance has been created, the instance-level Vulkan functions the library needs for device-level queries and device creation (such as `vkCreateDevice` and `vkGetPhysicalDeviceFeatures2`) must be loaded by calling the following command:
+Once a Vulkan instance has been created, the instance-level Vulkan functions the library needs for device-level queries and device creation (such as `vkCreateDevice`, `vkGetPhysicalDeviceFeatures2` and, when `VK_KHR_video_queue` is available, `vkGetPhysicalDeviceVideoCapabilitiesKHR` and `vkGetPhysicalDeviceVideoFormatPropertiesKHR`) must be loaded by calling the following command:
 
 ```C++
 VkResult vpInitializeInstanceFunctions(
@@ -378,6 +380,8 @@ If `VP_INSTANCE_FUNCTIONS_LOAD_KHR_GET_PHYSICAL_DEVICE_PROPERTIES2_BIT` is speci
 If `VP_INSTANCE_FUNCTIONS_LOAD_MISSING_ONLY_BIT` is specified, only uninitilized functions will be loaded. This flag prevents overwritting Vulkan functions set with `VpFunctionCreateInfo`.
 
 `vpInitializeInstanceFunctions` may be called after `vpCreateInstance` (or after any other means of instance creation) and before querying device-level profile support or creating a device with `vpCreateDevice`.
+
+The physical device support commands no longer take a `VkInstance` parameter: they use the instance-level functions stored in the `VpFunctions` object. If the video functions are not loaded, the video profile requirements are not checked.
 
 #### Checking instance level support
 
@@ -490,7 +494,6 @@ In order to query whether a Vulkan physical device supports the necessary device
 ```C++
 VkResult vpGetPhysicalDeviceProfileSupport(
     VpFunctions                     functions,
-    VkInstance                      instance,
     VkPhysicalDevice                physicalDevice,
     const VpProfileProperties*      pProfile,
     VkBool32*                       pSupported);
@@ -498,7 +501,6 @@ VkResult vpGetPhysicalDeviceProfileSupport(
 
 Where:
 * `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
-* `instance` is the Vulkan instance.
 * `physicalDevice` is the physical device to check support on.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile to check support for.
 * `pSupported` is a pointer to a `VkBool32`, which is set to `VK_TRUE` to indicate support, and `VK_FALSE` otherwise.
@@ -517,7 +519,6 @@ When a profile supports multiple variants, it might be useful to know what capab
 ```C++
 VkResult vpGetPhysicalDeviceProfileVariantsSupport(
     VpFunctions                     functions,
-    VkInstance                      instance,
     VkPhysicalDevice                physicalDevice,
     const VpProfileProperties*      pProfile,
     VkBool32*                       pSupported,
@@ -527,7 +528,6 @@ VkResult vpGetPhysicalDeviceProfileVariantsSupport(
 
 Where:
 * `functions` must be one of the functions handles returned from a call to `vpCreateFunctions`.
-* `instance` is the Vulkan instance.
 * `physicalDevice` is the physical device to check support on.
 * `pProfile` is a pointer to the `VpProfileProperties` structure specifying the profile to check support for.
 * `pSupported` is a pointer to a `VkBool32`, which is set to `VK_TRUE` to indicate support, and `VK_FALSE` otherwise.

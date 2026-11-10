@@ -232,11 +232,6 @@ class TestVkProfilesExhaustiveArgs(unittest.TestCase):
                         self.assertEqual(args.config, config)
                         self.assertTrue(args.strip)
                         self.assertTrue(args.debug)
-                        self.assertFalse(args.legacy)
-
-        with patch("vkprofiles.main_library") as mock_lib:
-            vkprofiles.main(["library", "-i", "in_dir", "-r", "vk.xml", "--legacy"])
-            self.assertTrue(mock_lib.call_args[0][0].legacy)
 
     def test_doc_layer_tests_schema_flags(self):
         """Tests parameter parsing for doc, layer, tests, and schema subcommands."""
@@ -244,21 +239,11 @@ class TestVkProfilesExhaustiveArgs(unittest.TestCase):
         with patch("vkprofiles.main_doc") as mock_doc:
             vkprofiles.main(["doc", "-i", "in_dir", "-r", "vk.xml", "-o", "PROFILES.md"])
             self.assertEqual(mock_doc.call_args[0][0].output, "PROFILES.md")
-            self.assertFalse(mock_doc.call_args[0][0].legacy)
-
-        with patch("vkprofiles.main_doc") as mock_doc:
-            vkprofiles.main(["doc", "-i", "in_dir", "-r", "vk.xml", "-o", "PROFILES.md", "--legacy"])
-            self.assertTrue(mock_doc.call_args[0][0].legacy)
 
         # layer
         with patch("vkprofiles.main_layer") as mock_layer:
             vkprofiles.main(["layer", "-r", "vk.xml", "-o", "layer.cpp"])
             self.assertEqual(mock_layer.call_args[0][0].output, "layer.cpp")
-            self.assertFalse(mock_layer.call_args[0][0].legacy)
-
-        with patch("vkprofiles.main_layer") as mock_layer:
-            vkprofiles.main(["layer", "-r", "vk.xml", "-o", "layer.cpp", "--legacy"])
-            self.assertTrue(mock_layer.call_args[0][0].legacy)
 
         # tests
         with patch("vkprofiles.main_tests") as mock_tests:
@@ -266,11 +251,6 @@ class TestVkProfilesExhaustiveArgs(unittest.TestCase):
             args = mock_tests.call_args[0][0]
             self.assertEqual(args.output_profile, "test.json")
             self.assertEqual(args.output_cpp, "test.cpp")
-            self.assertFalse(args.legacy)
-
-        with patch("vkprofiles.main_tests") as mock_tests:
-            vkprofiles.main(["tests", "-r", "vk.xml", "--output-profile", "test.json", "--legacy"])
-            self.assertTrue(mock_tests.call_args[0][0].legacy)
 
         # schema upgrade
         with patch("vkprofiles.main_schema") as mock_schema:
@@ -307,11 +287,9 @@ class TestVkProfilesExhaustiveArgs(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             output = Path(temp_dir) / "missing" / "dir" / "profiles_generated.cpp"
 
-            for legacy in [[], ["--legacy"]]:
-                with self.subTest(legacy=bool(legacy)):
-                    exit_code, _ = self._run_cli_capture_exit(["layer", "-r", str(Path(temp_dir) / "missing.xml"), "-o", str(output)] + legacy)
-                    self.assertEqual(exit_code, 1)
-                    self.assertFalse(output.exists())
+            exit_code, _ = self._run_cli_capture_exit(["layer", "-r", str(Path(temp_dir) / "missing.xml"), "-o", str(output)])
+            self.assertEqual(exit_code, 1)
+            self.assertFalse(output.exists())
 
             if self.registry_path is None:
                 self.skipTest("--registry is required to generate the layer")

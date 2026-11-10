@@ -129,31 +129,5 @@ def main_library(args):
     out_inc_str = str(output_inc_path) if output_inc_path else None
     out_src_str = str(output_src_path) if ('header+source' in raw_modes and output_src_path) else (out_inc_str if 'header+source' in raw_modes else None)
 
-    if getattr(args, 'legacy', False):
-        main_library_legacy(registry_path, api, json_files_dict, output_filename, is_debug, include_header, out_inc_str, out_src_str)
-    else:
-        generate_api_library(vk, list(json_files_dict.values()), output_filename, is_debug, include_header, out_inc_str, out_src_str)
+    generate_api_library(vk, list(json_files_dict.values()), output_filename, is_debug, include_header, out_inc_str, out_src_str)
     logging.info(f"Generated C/C++ Vulkan Profiles library files ('{output_filename}')")
-
-
-def main_library_legacy(registry_path, api, json_files_dict, output_filename, is_debug, include_header, out_inc_str, out_src_str):
-    # Legacy code path loading vk.xml with gen_profiles_solution.VulkanRegistry
-    import gen_profiles_solution
-
-    registry = gen_profiles_solution.VulkanRegistry(registry_path, api)
-
-    input_profiles_files = gen_profiles_solution.VulkanProfilesFiles.__new__(gen_profiles_solution.VulkanProfilesFiles)
-    input_profiles_files.profiles = dict()
-    input_profiles_files.json_profiles_database = gen_profiles_solution.VulkanProfilesDatabase()
-    input_profiles_files.json_profiles_database.json_files = list(json_files_dict.values())
-    for json_file_data in input_profiles_files.json_profiles_database.json_files:
-        input_profiles_files.parseProfiles(registry, json_file_data['profiles'], json_file_data['capabilities'])
-
-    generator = gen_profiles_solution.VulkanProfilesLibraryGenerator(
-        registry,
-        input_profiles_files,
-        output_filename,
-        is_debug,
-        include_header
-    )
-    generator.generate(out_inc_str, out_src_str)

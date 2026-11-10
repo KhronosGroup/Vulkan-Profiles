@@ -24,6 +24,10 @@
 ### Deprecation:
 - `VK_KHR_portability_subset` support is deprecated
   - Remove the Profiles layer `VK_KHR_portability_subset` emulation, its `emulate_portability` and portability settings, and the *Emulate a Vulkan Portability Profile* preset
+- Remove the Vulkan Profiles API library `VP_USE_OBJECT` define, deprecated in the September 2026 1.4.363 release
+  - The `VpFunctions` object is now always required as the first parameter of every Vulkan Profiles API library function
+  - Remove the `VkInstance` parameter of `vpGetPhysicalDeviceProfileSupport` and `vpGetPhysicalDeviceProfileVariantsSupport`
+  - Instance-level video functions are loaded by `vpInitializeInstanceFunctions` or `vpCreateInstance`, or set with `VpFunctionsCreateInfo`
 
 ## [Vulkan Profiles Tools 1.4.363](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.363.0) - September 2026
 

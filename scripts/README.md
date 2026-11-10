@@ -543,7 +543,6 @@ vkprofiles library --registry vk.xml --input path/to/profiles --output path/to/i
 
 When `--input-profiles` is set, every required parent profile of a listed profile must also be listed, otherwise the command fails.
 * `--include-header`: Override the header file include directive in generated C++ source files.
-* `--legacy`: Generate the library with the legacy `gen_profiles_solution.py` code path instead of `source/generate_api_library.py`.
 
 **Example (Header + Source with automatic conversion):**
 
@@ -587,7 +586,6 @@ vkprofiles doc --registry vk.xml --input path/to/profiles --output PROFILES.md [
 * `--input-profiles`: Comma-separated list of profile names to document.
 * `--output`, `-o`: *(Required)* Output Markdown file path.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
-* `--legacy`: Generate the documentation with the legacy `gen_profiles_solution.py` code path instead of `source/generate_profiles_doc.py`.
 
 **Example:**
 
@@ -657,7 +655,6 @@ vkprofiles layer --registry vk.xml --output layer/profiles_generated.cpp
 * `--registry`, `-r`: *(Required)* Path to `vk.xml`.
 * `--output`, `-o`, `--out-layer`: Output path for the generated layer source file. Missing parent directories are created.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
-* `--legacy`: Generate the layer source file with the legacy `gen_profiles_layer.py` code path instead of `source/generate_layer.py`.
 
 **Example:**
 
@@ -682,7 +679,6 @@ vkprofiles tests --registry vk.xml --output-profile path/to/test.json --output-c
 * `--output-profile`: *(Required)* Output path for synthetic test profile JSON.
 * `--output-cpp`: Output path for C++ test source file.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
-* `--legacy`: Generate the tests with the legacy `gen_profiles_tests.py` code path instead of `source/generate_tests.py`.
 
 **Example:**
 

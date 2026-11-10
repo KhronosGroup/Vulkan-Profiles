@@ -49,11 +49,7 @@ def main_doc(args):
     if raw_profiles:
         input_profiles = [p.strip() for p in raw_profiles.split(',') if p.strip()]
 
-    if getattr(args, 'legacy', False):
-        main_doc_legacy(args, api, input_profiles)
-        return
-
-    # Only profiles files are loaded, as the legacy code path does
+    # Only profiles files are loaded
     json_files = [ data for data in load_profiles_jsons(args.input).values() if 'capabilities' in data ]
 
     if input_profiles:
@@ -65,26 +61,3 @@ def main_doc(args):
 
     vk = initVulkanObject(api, args.registry, video=True)
     generate_profiles_doc(vk, json_files, input_profiles, args.output)
-
-
-def main_doc_legacy(args, api, input_profiles):
-    # Legacy code path loading vk.xml with gen_profiles_solution.VulkanRegistry
-    import gen_profiles_solution
-
-    registry = gen_profiles_solution.VulkanRegistry(args.registry, api)
-
-    validate = getattr(args, 'validate', False)
-    schema = None
-
-    input_profiles_files = gen_profiles_solution.VulkanProfilesFiles(
-        registry, args.input, input_profiles, validate, schema
-    )
-
-    if input_profiles:
-        missing_profiles = [p for p in input_profiles if p not in input_profiles_files.profiles]
-        if missing_profiles:
-            logging.error(f"Profile(s) specified in '--input-profiles' not found in database: {', '.join(missing_profiles)}")
-            sys.exit(1)
-
-    generator = gen_profiles_solution.VulkanProfilesDocGenerator(registry, input_profiles_files)
-    generator.generate(args.output)

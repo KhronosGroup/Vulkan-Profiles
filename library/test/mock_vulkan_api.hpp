@@ -31,9 +31,6 @@
 #include <unordered_map>
 #include <algorithm>
 
-#ifndef VP_USE_OBJECT
-#define VP_USE_OBJECT 1
-#endif
 
 struct VulkanStructData {
     VkStructureType         sType;
@@ -661,6 +658,10 @@ public:
     {
         AddInstanceProc(vkInstance, "vkGetPhysicalDeviceVideoCapabilitiesKHR", &vkGetPhysicalDeviceVideoCapabilitiesKHR);
         AddInstanceProc(vkInstance, "vkGetPhysicalDeviceVideoFormatPropertiesKHR", &vkGetPhysicalDeviceVideoFormatPropertiesKHR);
+
+        // Load the video entry points into the VpFunctions object
+        VkResult result = vpInitializeInstanceFunctions(functions, vkInstance, VP_INSTANCE_FUNCTIONS_LOAD_MISSING_ONLY_BIT);
+        EXPECT_EQ(result, VK_SUCCESS);
     }
 
     void RemoveVideoProfile(const VkVideoProfileInfoKHR& profile_info) {
