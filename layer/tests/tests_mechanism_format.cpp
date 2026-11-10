@@ -269,3 +269,75 @@ TEST_F(TestsMechanismFormat, TestParsingAllFormatProperties) {
     }
 #endif
 }
+
+TEST_F(TestsMechanismFormat, TestFormatPropertiesPNextChainStructures) {
+    TEST_DESCRIPTION("Test the VkFormatProperties2 pNext chain structures, other than VkFormatProperties3, set by a profile");
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_formats_pnext.json";
+    const char* profile_name_data = "VP_LUNARG_test_formats_pnext";
+    const std::vector<const char*> simulate_capabilities = {"SIMULATE_MAX_ENUM"};
+
+    std::vector<VkLayerSettingEXT> settings = {
+        {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+        {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT,
+         static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]}};
+
+    ASSERT_EQ(inst_builder.init(settings), VK_SUCCESS);
+
+    VkPhysicalDevice gpu = VK_NULL_HANDLE;
+    if (inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu) != VK_SUCCESS) {
+        printf("Profile not supported on device, skipping test.\n");
+        return;
+    }
+
+    const VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
+
+    VkSubpassResolvePerformanceQueryEXT subpass_resolve_performance_query{VK_STRUCTURE_TYPE_SUBPASS_RESOLVE_PERFORMANCE_QUERY_EXT};
+    VkTensorFormatPropertiesARM tensor_format_properties{VK_STRUCTURE_TYPE_TENSOR_FORMAT_PROPERTIES_ARM, &subpass_resolve_performance_query};
+    VkDrmFormatModifierPropertiesListEXT drm_format_modifier_properties_list{VK_STRUCTURE_TYPE_DRM_FORMAT_MODIFIER_PROPERTIES_LIST_EXT,
+                                                                            &tensor_format_properties};
+    VkFormatProperties2 format_properties2{VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2, &drm_format_modifier_properties_list};
+    vkGetPhysicalDeviceFormatProperties2(gpu, format, &format_properties2);
+
+    EXPECT_EQ(subpass_resolve_performance_query.optimal, VK_TRUE);
+    EXPECT_EQ(tensor_format_properties.linearTilingTensorFeatures, VK_FORMAT_FEATURE_2_TENSOR_SHADER_BIT_ARM);
+    EXPECT_EQ(tensor_format_properties.optimalTilingTensorFeatures,
+              VK_FORMAT_FEATURE_2_TENSOR_SHADER_BIT_ARM | VK_FORMAT_FEATURE_2_TENSOR_IMAGE_ALIASING_BIT_ARM);
+
+    // The DRM format modifiers are returned with the Vulkan two-call idiom
+    ASSERT_EQ(drm_format_modifier_properties_list.drmFormatModifierCount, 2u);
+
+    std::vector<VkDrmFormatModifierPropertiesEXT> drm_format_modifier_properties(drm_format_modifier_properties_list.drmFormatModifierCount);
+    drm_format_modifier_properties_list.pDrmFormatModifierProperties = drm_format_modifier_properties.data();
+    vkGetPhysicalDeviceFormatProperties2(gpu, format, &format_properties2);
+
+    ASSERT_EQ(drm_format_modifier_properties_list.drmFormatModifierCount, 2u);
+    EXPECT_EQ(drm_format_modifier_properties[0].drmFormatModifier, 0u);
+    EXPECT_EQ(drm_format_modifier_properties[0].drmFormatModifierPlaneCount, 1u);
+    EXPECT_EQ(drm_format_modifier_properties[0].drmFormatModifierTilingFeatures,
+              static_cast<VkFormatFeatureFlags>(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT));
+    EXPECT_EQ(drm_format_modifier_properties[1].drmFormatModifier, 72057594037927935ull);
+    EXPECT_EQ(drm_format_modifier_properties[1].drmFormatModifierPlaneCount, 2u);
+    EXPECT_EQ(drm_format_modifier_properties[1].drmFormatModifierTilingFeatures,
+              static_cast<VkFormatFeatureFlags>(VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT | VK_FORMAT_FEATURE_TRANSFER_SRC_BIT));
+
+    // A smaller array only receives the first DRM format modifiers
+    drm_format_modifier_properties_list.drmFormatModifierCount = 1;
+    drm_format_modifier_properties[1] = VkDrmFormatModifierPropertiesEXT{};
+    vkGetPhysicalDeviceFormatProperties2(gpu, format, &format_properties2);
+
+    EXPECT_EQ(drm_format_modifier_properties_list.drmFormatModifierCount, 1u);
+    EXPECT_EQ(drm_format_modifier_properties[0].drmFormatModifierPlaneCount, 1u);
+    EXPECT_EQ(drm_format_modifier_properties[1].drmFormatModifierPlaneCount, 0u);
+
+    // A format not defined by the profile has no value
+    VkTensorFormatPropertiesARM other_tensor_format_properties{VK_STRUCTURE_TYPE_TENSOR_FORMAT_PROPERTIES_ARM};
+    VkFormatProperties2 other_format_properties2{VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2, &other_tensor_format_properties};
+    vkGetPhysicalDeviceFormatProperties2(gpu, VK_FORMAT_R8G8B8A8_SNORM, &other_format_properties2);
+
+    EXPECT_EQ(other_tensor_format_properties.optimalTilingTensorFeatures, 0u);
+    EXPECT_EQ(other_tensor_format_properties.linearTilingTensorFeatures, 0u);
+}

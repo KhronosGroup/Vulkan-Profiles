@@ -816,6 +816,33 @@ template <typename T>
 VPAPI_ATTR bool vpCheckFlags(const T& actual, const uint64_t expected) {
     return (actual & expected) == expected;
 }
+
+// Checks that a returned array (e.g. VkDrmFormatModifierPropertiesListEXT::pDrmFormatModifierProperties) contains an element
+// matching the profile element requirements
+template <typename T, typename Pred>
+VPAPI_ATTR bool vpCheckArrayElement(const T* pArray, uint32_t count, Pred pred) {
+    if (pArray == nullptr) return false;
+    for (uint32_t i = 0; i < count; ++i) {
+        if (pred(pArray[i])) return true;
+    }
+    return false;
+}
+
+// Fills a returned array (e.g. VkDrmFormatModifierPropertiesListEXT::pDrmFormatModifierProperties) with the profile elements,
+// following the Vulkan two-call idiom: when the array is null, only the number of profile elements is returned
+template <typename T, typename Fill>
+VPAPI_ATTR void vpFillArray(T* pArray, uint32_t* pCount, uint32_t profileCount, Fill fill) {
+    if (pArray == nullptr) {
+        *pCount = profileCount;
+        return;
+    }
+    const uint32_t count = std::min(*pCount, profileCount);
+    for (uint32_t i = 0; i < count; ++i) {
+        pArray[i] = T{};
+        fill(i, pArray[i]);
+    }
+    *pCount = count;
+}
 '''
 
 PRIVATE_IMPL_BODY = '''
@@ -2052,6 +2079,14 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
                                 pUserData->physicalDevice,
                                 pUserData->variant->pFormats[pUserData->index].format,
                                 static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p)));
+                            // Query again the structures returning arrays (e.g. VkDrmFormatModifierPropertiesListEXT) once allocated
+                            std::vector<std::vector<uint64_t>> arrays_storage;
+                            if (detail::vpAllocateFormatPropertiesArrays(p, arrays_storage)) {
+                                pUserData->gpdp2.pfnGetPhysicalDeviceFormatProperties2(
+                                    pUserData->physicalDevice,
+                                    pUserData->variant->pFormats[pUserData->index].format,
+                                    static_cast<VkFormatProperties2KHR*>(static_cast<void*>(p)));
+                            }
                             pUserData->supported = true;
                             while (p != nullptr) {
                                 if (!pUserData->variant->pFormats[pUserData->index].pfnComparator(p)) {
@@ -3161,7 +3196,7 @@ class LibraryRegistry():
             return self.structs[name]
 
         struct = getStructByName(self.vk.structs, name)
-        if struct is None or struct.union or struct.name in STRUCTS_DISALLOWED:
+        if struct is None or struct.union:
             return None
 
         if struct.name not in self.members:
@@ -3879,10 +3914,48 @@ class VulkanProfile():
         return gen
 
 
+    def is_array_count_member(self, structDef, member):
+        """Returns True for the count member of a dynamic array member (e.g. drmFormatModifierCount), defined by the array length."""
+        return any(m.arraySizeMember == member for m in structDef.members.values())
+
+    def get_struct_array_element_def(self, structDef, member, value):
+        """Returns the element structure of a dynamic array of structures member (e.g. pDrmFormatModifierProperties)."""
+        memberDef = structDef.members[member]
+        if not memberDef.isArray or memberDef.arraySizeMember is None or not isinstance(value, list):
+            return None
+        if not all(isinstance(element, dict) for element in value):
+            return None
+        return self.registry.getStruct(memberDef.type)
+
+    def gen_structArrayFill(self, fmt, structDef, var, member, value):
+        elementDef = self.get_struct_array_element_def(structDef, member, value)
+        cases = ''
+        for i, element in enumerate(value):
+            elementFill = self.gen_structFill('{0}; ', elementDef, 'e.', element)
+            cases += 'case {0}: {1}break; '.format(i, elementFill)
+        fill = 'vpFillArray({0}{1}, &{0}{2}, {3}, [](uint32_t i, {4}& e) {{ (void)e; switch (i) {{ {5}default: break; }} }})'.format(
+            var, member, structDef.members[member].arraySizeMember, len(value), elementDef.name, cases)
+        return fmt.format(fill)
+
+    def gen_structArrayCompare(self, fmt, structDef, var, member, value):
+        elementDef = self.get_struct_array_element_def(structDef, member, value)
+        gen = ''
+        for element in value:
+            preds = [ pred for pred in self.gen_structCompare('{0}\n', elementDef, 'e.', element).split('\n') if pred ]
+            check = 'vpCheckArrayElement({0}{1}, {0}{2}, []({3} const& e) {{ return {4}; }})'.format(
+                var, member, structDef.members[member].arraySizeMember, elementDef.name, ' && '.join(preds) if preds else 'true')
+            gen += fmt.format(check)
+        return gen
+
     def gen_structFill(self, fmt, structDef, var, values):
         gen = ''
         for member, value in sorted(values.items()):
-            if member in structDef.members:
+            if member not in structDef.members and self.is_array_count_member(structDef, member):
+                # The count of a dynamic array is defined by the array elements
+                continue
+            if member in structDef.members and self.get_struct_array_element_def(structDef, member, value) is not None:
+                gen += self.gen_structArrayFill(fmt, structDef, var, member, value)
+            elif member in structDef.members:
                 if type(value) == dict:
                     # Nested structure
                     memberDef = self.registry.getStruct(structDef.members[member].type)
@@ -3939,7 +4012,12 @@ class VulkanProfile():
     def gen_structCompare(self, fmt, structDef, var, values, parentLimittype = None):
         gen = ''
         for member, value in sorted(values.items()):
-            if member in structDef.members:
+            if member not in structDef.members and self.is_array_count_member(structDef, member):
+                # The count of a dynamic array is defined by the array elements
+                continue
+            if member in structDef.members and self.get_struct_array_element_def(structDef, member, value) is not None:
+                gen += self.gen_structArrayCompare(fmt, structDef, var, member, value)
+            elif member in structDef.members:
                 limittype = structDef.members[member].limittype
                 membertype = structDef.members[member].type
                 if limittype == None:
@@ -4517,6 +4595,7 @@ class VulkanProfilesLibraryGenerator():
         gen = '\n'
         gen += 'namespace detail {\n\n'
         gen += PRIVATE_DEFS
+        gen += self.gen_formatPropertiesArraysAllocator()
         gen += self.gen_videoProfileEnumerator()
         gen += self.gen_profilePrivateImpl()
         gen += self.gen_profileDescTable()
@@ -4751,6 +4830,47 @@ struct FeaturesChain {
         gen += PRIVATE_IMPL_FEATURES_CHAIN_IMPL
 
         gen += '}; // struct FeaturesChain\n'
+        return gen
+
+    def gen_formatPropertiesArraysAllocator(self):
+        """
+        Generates the function allocating the arrays returned by the VkFormatProperties2 pNext chain structures with
+        count and pointer members (e.g. VkDrmFormatModifierPropertiesListEXT), after a first query returned their counts.
+        """
+        vk = self.registry.vk
+        gen = ('\n'
+               'VPAPI_ATTR bool vpAllocateFormatPropertiesArrays(VkBaseOutStructure* p, std::vector<std::vector<uint64_t>>& storage) {\n'
+               '    (void)storage;\n'
+               '    bool allocated = false;\n'
+               '    for (; p != nullptr; p = p->pNext) {\n'
+               '        switch (p->sType) {\n')
+        for structName in sorted(vk.structs['VkFormatProperties2'].extendedBy):
+            struct = vk.structs[structName]
+            arrayMembers = [
+                member for member in struct.members
+                if member.pointer and member.length is not None and member.type in vk.structs
+                and any(m.name == member.length for m in struct.members)
+            ]
+            if not arrayMembers or struct.sType is None:
+                continue
+
+            guards = ([ struct.version.name ] if struct.version else []) + struct.extensions
+            gen += '#if {0}\n'.format(' || '.join('defined({0})'.format(guard) for guard in guards)) if guards else ''
+            gen += ('            case {0}: {{\n'
+                    '                {1}* s = static_cast<{1}*>(static_cast<void*>(p));\n').format(struct.sType, struct.name)
+            for member in arrayMembers:
+                gen += ('                if (s->{0} > 0 && s->{1} == nullptr) {{\n'
+                        '                    storage.emplace_back((sizeof({2}) * s->{0} + sizeof(uint64_t) - 1) / sizeof(uint64_t));\n'
+                        '                    s->{1} = static_cast<{2}*>(static_cast<void*>(storage.back().data()));\n'
+                        '                    allocated = true;\n'
+                        '                }}\n').format(member.length, member.name, member.type)
+            gen += '            } break;\n'
+            gen += '#endif\n' if guards else ''
+        gen += ('            default: break;\n'
+                '        }\n'
+                '    }\n'
+                '    return allocated;\n'
+                '}\n')
         return gen
 
     def gen_videoProfileEnumerator(self):

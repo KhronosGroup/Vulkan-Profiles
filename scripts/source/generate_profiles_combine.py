@@ -20,6 +20,7 @@ import os
 import sys
 import logging
 import collections
+import copy
 import math
 from pathlib import Path
 
@@ -40,6 +41,11 @@ from source.profiles_json_utils import (
     deep_merge_dict,
     load_profiles_jsons
 )
+
+
+# Format features structures combined by their feature flags lists, the other VkFormatProperties2 pNext chain
+# structures are combined following the limittype of their members.
+FORMAT_FEATURES_COMBINED_STRUCTS = ['VkFormatProperties', 'VkFormatProperties3', 'VkFormatProperties3KHR']
 
 
 def check_single_profile_files(jsons_dict: dict):
@@ -163,7 +169,7 @@ class VulkanProfilesCombineGenerator:
         for xmlmember in struct_obj.members:
             array_name = xmlmember.name
             count_member_name = None
-            length_attr = getattr(xmlmember, 'len', None)
+            length_attr = getattr(xmlmember, 'length', None) or getattr(xmlmember, 'len', None)
             if length_attr and isinstance(length_attr, str):
                 count_member_name = length_attr.split(',')[0].strip()
             else:
@@ -326,15 +332,14 @@ class VulkanProfilesCombineGenerator:
                 for fmt_name in profile_cap['formats']:
                     if (fmt_name not in combined_formats) and (self.mode == 'union' or self.first):
                         combined_formats[fmt_name] = {
-                            'VkFormatProperties': {},
-                            'VkFormatProperties3': {},
-                            'VkFormatProperties3KHR': {}
+                            prop_struct_name: {} for prop_struct_name in FORMAT_FEATURES_COMBINED_STRUCTS
                         }
 
                     if fmt_name in combined_formats:
-                        for prop_struct_name in ['VkFormatProperties', 'VkFormatProperties3', 'VkFormatProperties3KHR']:
+                        for prop_struct_name in FORMAT_FEATURES_COMBINED_STRUCTS:
                             for feat_cat in ['linearTilingFeatures', 'optimalTilingFeatures', 'bufferFeatures']:
                                 self.combine_format_features(combined_formats, fmt_name, profile_cap, prop_struct_name, feat_cat)
+                        self.combine_format_structs(combined_formats[fmt_name], profile_cap['formats'][fmt_name])
 
             # Queue Families
             if profile_cap['queueFamiliesProperties']:
@@ -437,14 +442,14 @@ class VulkanProfilesCombineGenerator:
 
             formats_to_remove = []
             for fmt_name in capabilities['formats']:
-                for prop_name in ['VkFormatProperties', 'VkFormatProperties3', 'VkFormatProperties3KHR']:
+                for prop_name in FORMAT_FEATURES_COMBINED_STRUCTS:
                     for feat_cat in ['linearTilingFeatures', 'optimalTilingFeatures', 'bufferFeatures']:
                         if feat_cat in capabilities['formats'][fmt_name][prop_name]:
                             if not capabilities['formats'][fmt_name][prop_name][feat_cat]:
                                 del capabilities['formats'][fmt_name][prop_name][feat_cat]
-                    if prop_name in capabilities['formats'][fmt_name]:
-                        if not capabilities['formats'][fmt_name][prop_name]:
-                            del capabilities['formats'][fmt_name][prop_name]
+                for prop_name in list(capabilities['formats'][fmt_name]):
+                    if not capabilities['formats'][fmt_name][prop_name]:
+                        del capabilities['formats'][fmt_name][prop_name]
                 if not capabilities['formats'][fmt_name]:
                     formats_to_remove.append(fmt_name)
 
@@ -461,6 +466,57 @@ class VulkanProfilesCombineGenerator:
 
     def compareList(self, l1, l2):
         return collections.Counter(l1) == collections.Counter(l2)
+
+    def combine_format_structs(self, combined_format, format_structs):
+        """
+        Combines the VkFormatProperties2 pNext chain structures other than the format features structures
+        (e.g. VkTensorFormatPropertiesARM, VkDrmFormatModifierPropertiesListEXT) of a format, following
+        the limittype of their members in vk.xml like the properties structures.
+        """
+        if self.mode == 'intersection' and not self.first:
+            for struct_name in list(combined_format):
+                if struct_name not in FORMAT_FEATURES_COMBINED_STRUCTS and struct_name not in format_structs:
+                    del combined_format[struct_name]
+
+        for struct_name, members in format_structs.items():
+            if struct_name in FORMAT_FEATURES_COMBINED_STRUCTS or not isinstance(members, dict):
+                continue
+            if struct_name in combined_format:
+                self.add_members(combined_format[struct_name], members, struct_name)
+            elif self.mode == 'union' or self.first:
+                combined_format[struct_name] = dict()
+                self.add_members(combined_format[struct_name], members, struct_name)
+
+    def sync_format_array_count_members(self, capabilities_block):
+        """
+        Updates the count members of the format structures arrays (e.g. drmFormatModifierCount) after their arrays
+        were modified, removing the structures left without any array element.
+        """
+        formats = capabilities_block.get('formats') if isinstance(capabilities_block, dict) else None
+        if not isinstance(formats, dict):
+            return
+
+        for fmt_name in list(formats):
+            format_structs = formats[fmt_name]
+            if not isinstance(format_structs, dict):
+                continue
+            for struct_name in list(format_structs):
+                struct_obj = getStructByName(self.vk.structs, struct_name)
+                count_to_array = self.get_count_to_array_map(struct_obj)
+                if not count_to_array or not isinstance(format_structs[struct_name], dict):
+                    continue
+                self.sync_array_count_members(format_structs[struct_name], struct_obj)
+                remaining = {
+                    k: v for k, v in format_structs[struct_name].items()
+                    if not (k in count_to_array and v == 0) and v != []
+                }
+                if not remaining:
+                    del format_structs[struct_name]
+            if not format_structs:
+                del formats[fmt_name]
+
+        if not formats:
+            del capabilities_block['formats']
 
     def combine_format_features(self, combined_formats, fmt_name, capability, prop_name, features):
         if fmt_name in capability['formats'] and prop_name in capability['formats'][fmt_name]:
@@ -560,7 +616,7 @@ class VulkanProfilesCombineGenerator:
             else:
                 limittype = xmlmember.limitType if xmlmember else None
                 tokens = [t.strip() for t in limittype.split(',')] if limittype else []
-                if 'struct' in tokens and xmlmember:
+                if 'struct' in tokens and xmlmember and not self.is_pointer_array_member(xmlmember, val):
                     sub_struct_obj = getStructByName(self.vk.structs, xmlmember.type)
                     if sub_struct_obj:
                         for smember in sub_struct_obj.members:
@@ -679,6 +735,57 @@ class VulkanProfilesCombineGenerator:
             pass
         return None
 
+    def get_struct_array_key_members(self, element_struct) -> list[str]:
+        """Returns the members identifying an element of an array of structures: the members with an exact limittype."""
+        if not element_struct:
+            return []
+        return [
+            m.name for m in element_struct.members
+            if m.limitType and 'exact' in [t.strip() for t in m.limitType.split(',')]
+        ]
+
+    def combine_struct_array(self, combined, member, entry, element_struct, key_members):
+        """
+        Combines arrays of structures (e.g. VkDrmFormatModifierPropertiesListEXT::pDrmFormatModifierProperties) by
+        matching the elements with the same key members values (e.g. drmFormatModifier) and combining the other
+        members of the matched elements following their limittype.
+        """
+        def element_key(element):
+            return tuple(str(element.get(name)) for name in key_members)
+
+        entry_elements = {}
+        for element in entry[member]:
+            if isinstance(element, dict):
+                entry_elements.setdefault(element_key(element), element)
+
+        result = []
+        for element in combined[member]:
+            if not isinstance(element, dict):
+                continue
+            other = entry_elements.pop(element_key(element), None)
+            if other is None:
+                if self.mode == 'union':
+                    result.append(element)
+                continue
+
+            merged = copy.deepcopy(element)
+            for smember in element_struct.members:
+                name = smember.name
+                if name in key_members:
+                    continue
+                if name in merged and name in other:
+                    self.combine_members(merged, name, other, smember, element_struct.name)
+                elif name in other and self.mode == 'union':
+                    merged[name] = copy.deepcopy(other[name])
+                elif name in merged and self.mode == 'intersection':
+                    del merged[name]
+            result.append(merged)
+
+        if self.mode == 'union':
+            result.extend(copy.deepcopy(element) for element in entry_elements.values())
+
+        combined[member] = result
+
     def combine_members(self, combined, member, entry, xmlmember, property_name=None):
         limittype = xmlmember.limitType if xmlmember else None
         tokens = [t.strip() for t in limittype.split(',')] if limittype else []
@@ -701,6 +808,13 @@ class VulkanProfilesCombineGenerator:
                 if combined[member] != entry[member]:
                     del combined[member]
             return
+
+        if is_ptr_array and isinstance(combined[member], list) and isinstance(entry.get(member), list):
+            element_struct = getStructByName(self.vk.structs, xmlmember.type)
+            key_members = self.get_struct_array_key_members(element_struct)
+            if key_members:
+                self.combine_struct_array(combined, member, entry, element_struct, key_members)
+                return
 
         is_max = 'max' in tokens or 'bits' in tokens
         is_min = 'min' in tokens

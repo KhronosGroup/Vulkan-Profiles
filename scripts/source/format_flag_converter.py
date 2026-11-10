@@ -35,6 +35,15 @@ FORMAT_STRUCTS_4KHR = [
     "VkFormatProperties4KHR",
 ]
 
+# Structures expressing the same format features with different flag types
+FORMAT_FEATURES_STRUCTS = FORMAT_STRUCTS_32 + FORMAT_STRUCTS_64 + FORMAT_STRUCTS_4KHR
+
+# Structures wrapping VkFormatProperties in their formatProperties member
+FORMAT_PROPERTIES_2_STRUCTS = [
+    "VkFormatProperties2",
+    "VkFormatProperties2KHR",
+]
+
 
 def isFormatStructValid(vk: VulkanObject, struct_name: str, version: VK_VERSION, enabled_exts: set[str]) -> bool:
     """

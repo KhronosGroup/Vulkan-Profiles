@@ -632,6 +632,11 @@ class VulkanProfilesDocGenerator():
             elif type(value[0]) == str:
                 # Bitmask, match the Vulkan Specification's formatting
                 return '({0})'.format(' \\| '.join(value))
+            elif type(value[0]) == dict:
+                # Array of structures (e.g. VkDrmFormatModifierPropertiesListEXT::pDrmFormatModifierProperties), one structure per line
+                return '<br>'.join(
+                    '{{{0}}}'.format(', '.join('{0}: {1}'.format(name, self.formatValue(member)) for name, member in element.items()))
+                    for element in value)
             else:
                 # Array, match the Vulkan Specification's formatting
                 return '({0})'.format(','.join(str(el) for el in value))
@@ -652,7 +657,7 @@ class VulkanProfilesDocGenerator():
         memberDef = structDef.members[member]
         limittype = memberDef.limittype
 
-        if limittype in [ None, 'noauto', 'bitmask' ]:
+        if limittype in [ None, 'noauto', 'bitmask', 'struct' ]:
             return member
         elif limittype == 'exact':
             return member + ' (exact)'
@@ -957,6 +962,10 @@ class VulkanProfilesDocGenerator():
         return 'VkFormatProperties3' if struct == 'VkFormatProperties' else struct
 
 
+    def gen_formatRow(self, format, struct, member, section, row, profile = None):
+        return self.gen_format(format, struct, section, member, profile)
+
+
     def gen_format(self, format, struct, section, member, profile = None):
         # If no profile was specified then this is the first column so return the member name
         # decorated with the corresponding limittype specific info and a link to the
@@ -1030,15 +1039,20 @@ class VulkanProfilesDocGenerator():
                         structName = 'VkFormatProperties'
                     # If this is an alias structure then find the non-alias one and use that
                     structName = self.registry.getNonAliasStructName(structName)
-                    # Copy defined format property structure data
+                    # Copy defined format property structure data, the count of a dynamic array
+                    # (e.g. drmFormatModifierCount) is not a member, it is defined by the array elements
                     if not structName in definedFormatProperties:
                         definedFormatProperties[structName] = []
-                    definedFormatProperties[structName].extend(sorted(properties.keys()))
+                    structMembers = self.registry.getDocStruct(structName).members
+                    definedFormatProperties[structName].extend(sorted(m for m in properties.keys() if m in structMembers))
 
                 # Add format information
                 if not format in definedFormats:
                     definedFormats[format] = OrderedDict()
-                definedFormats[format].update(definedFormatProperties)
+                # Merge the members defined by each profile
+                for structName, members in definedFormatProperties.items():
+                    definedMembers = definedFormats[format].setdefault(structName, [])
+                    definedMembers.extend(m for m in members if m not in definedMembers)
 
 
         # Construct table data
@@ -1046,7 +1060,9 @@ class VulkanProfilesDocGenerator():
         for format in sorted(definedFormats.keys()):
             section = tableData[format] = OrderedDict()
             for structName, members in definedFormats[format].items():
-                section.update({ row: functools.partial(self.gen_format, format, structName) for row in members })
+                # Rows are keyed by structure and member, different structures may have members with the same name
+                # (e.g. VkDrmFormatModifierPropertiesListEXT and VkDrmFormatModifierPropertiesList2EXT)
+                section.update({ (structName, row): functools.partial(self.gen_formatRow, format, structName, row) for row in members })
 
         # TODO: Currently we don't include format properties that are required by the minimum
         # required API version of a profile, or those required by extensions required by the

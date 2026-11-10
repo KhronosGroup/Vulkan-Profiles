@@ -19,12 +19,17 @@
 # - Ziga Markus <ziga@lunarg.com>
 # - Christophe Riccio <christophe@lunarg.com>
 
+import logging
+import re
 from collections import OrderedDict
 
 from vulkan_object import VulkanObject
 from source.vulkan_object_version import VK_VERSION
-from source.generate_api_library import LibraryMember, STRUCTS_DISALLOWED
+from source.generate_api_library import LibraryMember
 from source.generate_profiles_doc import DocRegistry, DocStruct
+
+# Returned structures with count + pointer to array members, the VkFormatProperties2 pNext chain ones are generated separately
+STRUCTS_DISALLOWED = [ 'VkDrmFormatModifierPropertiesListEXT', 'VkDrmFormatModifierPropertiesList2EXT' ]
 
 COPYRIGHT_HEADER = '''
 /*
@@ -351,6 +356,8 @@ class JsonLoader {
     bool GetProperty(const char *device_name, bool requested_profile, const Json::Value &props, const std::string &name);
     bool GetFormat(const char *device_name, bool requested_profile, const Json::Value &formats, const std::string &format_name, MapOfVkFormatProperties *dest,
                    MapOfVkFormatProperties3 *dest3);
+    bool GetFormatStruct(const char *device_name, bool requested_profile, VkFormat format, const std::string &format_name,
+                         const std::string &name, const Json::Value &props);
     bool CheckVersionSupport(uint32_t version, const std::string &name);
     ExtensionSupport CheckExtensionSupport(const char *extension, const std::string &name);
     bool valid(ExtensionSupport support);
@@ -1061,6 +1068,7 @@ bool JsonLoader::GetFormat(const char *device_name, bool requested_profile, cons
     (void)requested_profile;
 
     VkFormat format = StringToFormat(format_name);
+    bool structs_valid = true;
     VkFormatProperties profile_properties = {};
     VkFormatProperties3 profile_properties_3 = {VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3};
     const auto &member = formats[format_name];
@@ -1097,6 +1105,9 @@ bool JsonLoader::GetFormat(const char *device_name, bool requested_profile, cons
             for (const auto &feature : props["bufferFeatures"]) {
                 profile_properties_3.bufferFeatures |= StringToVkFormatFeatureFlags2(feature.asString());
             }
+        } else if (!GetFormatStruct(device_name, requested_profile, format, format_name, name, props)) {
+            // The other VkFormatProperties2 pNext chain structures
+            structs_valid = false;
         }
     }
 
@@ -1168,7 +1179,7 @@ bool JsonLoader::GetFormat(const char *device_name, bool requested_profile, cons
         valid = false;
     }
 
-    return valid;
+    return valid && structs_valid;
 }
 
 bool JsonLoader::CheckVersionSupport(uint32_t version, const std::string &name) {
@@ -2609,32 +2620,6 @@ VKAPI_ATTR void VKAPI_CALL DestroyDebugUtilsMessengerEXT(VkInstance instance, Vk
 }
 '''
 
-FORMAT_PROPERTIES_PNEXT = '''
-void FillFormatPropertiesPNextChain(PhysicalDeviceData *physicalDeviceData, void *place, VkFormat format) {
-    while (place) {
-        VkBaseOutStructure *structure = (VkBaseOutStructure *)place;
-
-        // These switch statements check which struct is in the pNext chain and, if the physical device has the proper extension,
-        // fill the struct with any override data provided by the PhysicalDeviceData object.
-
-        switch (structure->sType) {
-            case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3: {
-                if (!physicalDeviceData->map_of_format_properties_3_.empty()) {
-                    VkFormatProperties3 *sp = (VkFormatProperties3 *)place;
-                    void *pNext = sp->pNext;
-                    *sp = physicalDeviceData->map_of_format_properties_3_[format];
-                    sp->pNext = pNext;
-                }
-            } break;
-            default:
-                break;
-        }
-
-        place = structure->pNext;
-    }
-}
-'''
-
 GET_PHYSICAL_DEVICE_FEATURES_PROPERTIES_FUNCTIONS = '''
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceProperties(VkPhysicalDevice physicalDevice, VkPhysicalDeviceProperties *pProperties) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
@@ -3949,6 +3934,7 @@ class VulkanProfilesLayerGenerator():
             f.write(self.generate_get_feature())
             f.write(self.generate_get_property())
             f.write(JSON_LOADER_NON_GENERATED)
+            f.write(self.generate_get_format_struct())
             f.write(self.generate_get_queue_family_properties())
             f.write(QUEUE_FAMILY_FUNCTIONS)
             f.write(self.generate_add_promoted_extensions())
@@ -3958,7 +3944,7 @@ class VulkanProfilesLayerGenerator():
             f.write(INSTANCE_FUNCTIONS)
             f.write(self.generate_fill_physical_device_pnext_chain())
             f.write(self.generate_fill_queue_family_properties_pnext_chain())
-            f.write(FORMAT_PROPERTIES_PNEXT)
+            f.write(self.generate_fill_format_properties_pnext_chain())
             f.write(GET_PHYSICAL_DEVICE_FEATURES_PROPERTIES_FUNCTIONS)
             f.write(self.generate_check_device_features())
             f.write(DEVICE_FUNCTIONS)
@@ -4043,6 +4029,7 @@ class VulkanProfilesLayerGenerator():
 
         enums = set(('VkToolPurposeFlagBits', 'VkSampleCountFlagBits', 'VkResolveModeFlagBits', 'VkShaderStageFlagBits', 'VkSubgroupFeatureFlagBits', 'VkShaderFloatControlsIndependence', 'VkPointClippingBehavior', 'VkOpticalFlowGridSizeFlagBitsNV', 'VkQueueFlagBits', 'VkMemoryDecompressionMethodFlagBitsNV', 'VkLayeredDriverUnderlyingApiMSFT', 'VkImageUsageFlagBits', 'VkBufferUsageFlagBits', 'VkPhysicalDeviceSchedulingControlsFlagBitsARM', 'VkIndirectCommandsInputModeFlagBitsEXT', 'VkPipelineRobustnessBufferBehavior', 'VkPipelineRobustnessImageBehavior', 'VkDefaultVertexAttributeValueKHR'))
         enums = enums.union(self.get_video_enums())
+        enums = enums.union(self.get_format_pnext_flag_bits())
         # The enums are sorted, the legacy generator iterated a set making the generated code depend on the string hash seed
         gen += self.generate_string_to_uint(sorted(enums), self.registry.enums)
 
@@ -4084,6 +4071,8 @@ class VulkanProfilesLayerGenerator():
             for feature in features:
                 gen += '    ' + feature + ' ' + self.create_var_name(feature) + ';\n'
             gen += self.generate_platform_protect_end(ext)
+
+        gen += self.generate_format_struct_pdd_members()
 
         gen += PHYSICAL_DEVICE_DATA_CONSTRUCTOR_BEGIN
 
@@ -5503,6 +5492,7 @@ class VulkanProfilesLayerGenerator():
                 gen += GET_VALUE_PHYSICAL_DEVICE_PORTABILITY_SUBSET_FEATURES
             else:
                 gen += self.generate_get_value_function(struct)
+        gen += self.generate_format_struct_get_struct_definitions()
         for struct in self.additional_properties:
             if struct == 'VkPhysicalDeviceProperties':
                 gen += GET_VALUE_PHYSICAL_DEVICE_PROPERTIES
@@ -5622,11 +5612,266 @@ class VulkanProfilesLayerGenerator():
 
         return gen
 
+    def get_format_pnext_structs(self):
+        """
+        Returns the VkFormatProperties2 pNext chain structures defined in vk.xml with their dynamic array members
+        (e.g. VkDrmFormatModifierPropertiesListEXT::pDrmFormatModifierProperties).
+        VkFormatProperties3 has dedicated code as its format features are merged with the VkFormatProperties ones.
+        """
+        vk = self.registry.vk
+        result = []
+        for name in sorted(vk.structs['VkFormatProperties2'].extendedBy):
+            if name == 'VkFormatProperties3':
+                continue
+            struct = vk.structs[name]
+            arrays = [
+                member for member in struct.members
+                if member.pointer and member.length is not None and member.type in vk.structs
+                and any(m.name == member.length for m in struct.members)
+            ]
+            result.append((struct, arrays))
+        return result
+
+    def get_format_pnext_flag_bits(self):
+        """Returns the flag bits types of the VkFormatProperties2 pNext chain structures members, array elements included."""
+        vk = self.registry.vk
+        flag_bits = set()
+        for struct, arrays in self.get_format_pnext_structs():
+            structs = [ struct ] + [ vk.structs[member.type] for member in arrays ]
+            for s in structs:
+                for member in s.members:
+                    bitmask = self.registry.bitmasks.get(member.type)
+                    if bitmask is not None and bitmask.bitsType is not None:
+                        flag_bits.add(bitmask.bitsType.name)
+        return flag_bits
+
+    def get_format_struct_protect_name(self, struct):
+        """Returns the extension defining a structure to protect platform-specific code, None for a core structure."""
+        return struct.extensions[0] if struct.version is None and struct.extensions else None
+
+    def get_format_struct_var_name(self, struct_name, member_name = None):
+        var_name = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', struct_name[len('Vk'):]).lower()
+        if member_name is not None:
+            # Pointer members without their 'p' prefix, e.g. pDrmFormatModifierProperties -> drm_format_modifier_properties
+            if re.match(r'^p[A-Z]', member_name):
+                member_name = member_name[1:]
+            var_name += '_' + re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', member_name).lower()
+        return var_name
+
+    def get_format_struct_device_support(self, struct, pdd):
+        conditions = []
+        if struct.version is not None:
+            conditions.append('{0}->GetEffectiveVersion() >= {1}'.format(pdd, LayerVersion(VK_VERSION(struct.version.name)).versionMacro))
+        for extension in struct.extensions:
+            conditions.append('PhysicalDeviceData::HasExtension({0}, {1}_EXTENSION_NAME)'.format(pdd, self.registry.extensions[extension].upperCaseName))
+        return ' || '.join(conditions) if conditions else 'true'
+
+    def generate_format_struct_pdd_members(self):
+        gen = '\n    // VkFormatProperties2 pNext chain structures, the device values and the profile values per format\n'
+        for struct, arrays in self.get_format_pnext_structs():
+            gen += self.generate_platform_protect_begin(self.get_format_struct_protect_name(struct))
+            var_name = self.get_format_struct_var_name(struct.name)
+            if arrays:
+                for member in arrays:
+                    array_var_name = self.get_format_struct_var_name(struct.name, member.name)
+                    gen += '    std::map<VkFormat, std::vector<{0}>> device_format_{1}_{{}};\n'.format(member.type, array_var_name)
+                    gen += '    std::map<VkFormat, std::vector<{0}>> map_of_format_{1}_{{}};\n'.format(member.type, array_var_name)
+            else:
+                gen += '    std::map<VkFormat, {0}> device_format_{1}_{{}};\n'.format(struct.name, var_name)
+                gen += '    std::map<VkFormat, {0}> map_of_format_{1}_{{}};\n'.format(struct.name, var_name)
+            gen += self.generate_platform_protect_end(self.get_format_struct_protect_name(struct))
+        return gen
+
+    def generate_format_struct_get_struct_declarations(self):
+        gen = ''
+        for struct, arrays in self.get_format_pnext_structs():
+            if not arrays:
+                gen += self.generate_platform_protect_begin(self.get_format_struct_protect_name(struct))
+                gen += '    bool GetStruct(const char* device_name, bool requested_profile, const Json::Value &parent, ' + struct.name + ' *dest);\n'
+                gen += self.generate_platform_protect_end(self.get_format_struct_protect_name(struct))
+        return gen
+
+    def generate_format_struct_get_struct_definitions(self):
+        gen = ''
+        for struct, arrays in self.get_format_pnext_structs():
+            if not arrays:
+                gen += self.generate_get_value_function(struct.name)
+        return gen
+
+    def generate_array_element_parsing(self, indent, element_struct, json_var, element_var):
+        gen = ''
+        for member in element_struct.members:
+            if member.name in ('sType', 'pNext'):
+                continue
+            json_member = '{0}["{1}"]'.format(json_var, member.name)
+            if member.type in self.registry.bitmasks or member.limitType == 'bitmask':
+                gen += '{0}for (const auto &entry : {1}) {{\n'.format(indent, json_member)
+                gen += '{0}    {1}.{2} |= static_cast<{3}>(VkStringToUint64(entry.asString()));\n'.format(indent, element_var, member.name, member.type)
+                gen += '{0}}}\n'.format(indent)
+            elif member.type in ('uint64_t', 'VkDeviceSize'):
+                gen += '{0}{1}.{2} = {3}.asUInt64();\n'.format(indent, element_var, member.name, json_member)
+            elif member.type == 'uint32_t':
+                gen += '{0}{1}.{2} = {3}.asUInt();\n'.format(indent, element_var, member.name, json_member)
+            elif member.type == 'int32_t':
+                gen += '{0}{1}.{2} = {3}.asInt();\n'.format(indent, element_var, member.name, json_member)
+            elif member.type == 'VkBool32':
+                gen += '{0}{1}.{2} = {3}.asBool() ? VK_TRUE : VK_FALSE;\n'.format(indent, element_var, member.name, json_member)
+            elif member.type == 'float':
+                gen += '{0}{1}.{2} = {3}.asFloat();\n'.format(indent, element_var, member.name, json_member)
+            else:
+                logging.error("Unsupported member '{0}' type '{1}' in the array element structure '{2}'".format(member.name, member.type, element_struct.name))
+        return gen
+
+    def generate_array_element_support(self, element_struct, device_var, profile_var):
+        conditions = []
+        for member in element_struct.members:
+            if member.name in ('sType', 'pNext'):
+                continue
+            tokens = [ t.strip() for t in member.limitType.split(',') ] if member.limitType else []
+            device_member = '{0}.{1}'.format(device_var, member.name)
+            profile_member = '{0}.{1}'.format(profile_var, member.name)
+            if 'bitmask' in tokens or member.type in self.registry.bitmasks:
+                conditions.append('({0} & {1}) == {1}'.format(device_member, profile_member))
+            elif 'max' in tokens or 'bits' in tokens:
+                conditions.append('{0} >= {1}'.format(device_member, profile_member))
+            elif 'min' in tokens:
+                conditions.append('{0} <= {1}'.format(device_member, profile_member))
+            else:
+                conditions.append('{0} == {1}'.format(device_member, profile_member))
+        return ' && '.join(conditions) if conditions else 'true'
+
+    def generate_get_format_struct(self):
+        """
+        Generates the loading of the VkFormatProperties2 pNext chain structures of a profile format, other than
+        VkFormatProperties[2|3] which have dedicated code in JsonLoader::GetFormat.
+        """
+        vk = self.registry.vk
+        gen = ('\nbool JsonLoader::GetFormatStruct(const char *device_name, bool requested_profile, VkFormat format, const std::string &format_name,\n'
+               '                                 const std::string &name, const Json::Value &props) {\n'
+               '    (void)device_name;\n'
+               '    (void)requested_profile;\n'
+               '    (void)format;\n'
+               '    (void)format_name;\n'
+               '    (void)props;\n')
+        for struct, arrays in self.get_format_pnext_structs():
+            names = [ struct.name ] + [ alias for alias in struct.aliases if alias != struct.name ]
+            gen += self.generate_platform_protect_begin(self.get_format_struct_protect_name(struct))
+            gen += '    if ({0}) {{\n'.format(' || '.join('name == "{0}"'.format(name) for name in names))
+            if struct.version is not None and VK_VERSION(struct.version.name) > VK_VERSION.V1_0:
+                gen += '        if (!CheckVersionSupport({0}, name)) return false;\n'.format(LayerVersion(VK_VERSION(struct.version.name)).versionMacro)
+            elif struct.extensions:
+                gen += '        auto support = CheckExtensionSupport({0}_EXTENSION_NAME, name);\n'.format(self.registry.extensions[struct.extensions[0]].upperCaseName)
+                gen += '        if (support != ExtensionSupport::SUPPORTED) return valid(support);\n'
+            if arrays:
+                gen += '        bool result = true;\n'
+                for member in arrays:
+                    element_struct = vk.structs[member.type]
+                    array_var_name = self.get_format_struct_var_name(struct.name, member.name)
+                    gen += '        {\n'
+                    gen += '            const std::vector<{0}> &device_array = pdd_->device_format_{1}_[format];\n'.format(member.type, array_var_name)
+                    gen += '            std::vector<{0}> &profile_array = pdd_->map_of_format_{1}_[format];\n'.format(member.type, array_var_name)
+                    gen += '            profile_array.clear();\n'
+                    gen += '            for (const auto &json_element : props["{0}"]) {{\n'.format(member.name)
+                    gen += '                {0} element{{}};\n'.format(member.type)
+                    gen += self.generate_array_element_parsing('                ', element_struct, 'json_element', 'element')
+                    gen += '                bool supported = false;\n'
+                    gen += '                for (const auto &device_element : device_array) {\n'
+                    gen += '                    if ({0}) {{\n'.format(self.generate_array_element_support(element_struct, 'device_element', 'element'))
+                    gen += '                        supported = true;\n'
+                    gen += '                        break;\n'
+                    gen += '                    }\n'
+                    gen += '                }\n'
+                    gen += '                if (!supported) {\n'
+                    gen += ('                    LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,\n'
+                            '                               "For %s `%s::{0}`, the Device (%s) doesn\'t support the element %u required by the Profile.\\n"\n'
+                            '                               "The element can\'t be simulated on this Device.\\n",\n'
+                            '                               format_name.c_str(), name.c_str(), device_name, static_cast<uint32_t>(profile_array.size()));\n').format(member.name)
+                    gen += '                    result = false;\n'
+                    gen += '                }\n'
+                    gen += '                profile_array.push_back(element);\n'
+                    gen += '            }\n'
+                    gen += '        }\n'
+                gen += '        return result;\n'
+            else:
+                var_name = self.get_format_struct_var_name(struct.name)
+                gen += '        // The profile values start from the device values to warn about the values the device doesn\'t support\n'
+                gen += '        {0} value = pdd_->device_format_{1}_[format];\n'.format(struct.name, var_name)
+                gen += '        const bool result = GetStruct(device_name, requested_profile, props, &value);\n'
+                gen += '        value.sType = {0};\n'.format(struct.sType)
+                gen += '        value.pNext = nullptr;\n'
+                gen += '        pdd_->map_of_format_{0}_[format] = value;\n'.format(var_name)
+                gen += '        return result;\n'
+            gen += '    }\n'
+            gen += self.generate_platform_protect_end(self.get_format_struct_protect_name(struct))
+        gen += ('    LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT, "Unsupported format structure %s for %s, ignored.\\n", name.c_str(), format_name.c_str());\n'
+                '    return true;\n'
+                '}\n')
+        return gen
+
+    def generate_fill_format_properties_pnext_chain(self):
+        gen = ('\nvoid FillFormatPropertiesPNextChain(PhysicalDeviceData *physicalDeviceData, void *place, VkFormat format) {\n'
+               '    while (place) {\n'
+               '        VkBaseOutStructure *structure = (VkBaseOutStructure *)place;\n'
+               '\n'
+               '        // These switch statements check which struct is in the pNext chain and, if the physical device has the proper extension,\n'
+               '        // fill the struct with any override data provided by the PhysicalDeviceData object.\n'
+               '\n'
+               '        switch (structure->sType) {\n'
+               '            case VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3: {\n'
+               '                if (!physicalDeviceData->map_of_format_properties_3_.empty()) {\n'
+               '                    VkFormatProperties3 *sp = (VkFormatProperties3 *)place;\n'
+               '                    void *pNext = sp->pNext;\n'
+               '                    *sp = physicalDeviceData->map_of_format_properties_3_[format];\n'
+               '                    sp->pNext = pNext;\n'
+               '                }\n'
+               '            } break;\n')
+        for struct, arrays in self.get_format_pnext_structs():
+            gen += self.generate_platform_protect_begin(self.get_format_struct_protect_name(struct))
+            gen += '            case {0}: {{\n'.format(struct.sType)
+            gen += '                {0} *sp = ({0} *)place;\n'.format(struct.name)
+            if arrays:
+                for member in arrays:
+                    array_var_name = self.get_format_struct_var_name(struct.name, member.name)
+                    gen += '                const auto &profile_arrays = physicalDeviceData->map_of_format_{0}_;\n'.format(array_var_name)
+                    gen += '                if (!profile_arrays.empty()) {\n'
+                    gen += '                    // Returns the profile array following the Vulkan two-call idiom\n'
+                    gen += '                    const auto iter = profile_arrays.find(format);\n'
+                    gen += '                    const uint32_t profile_count = iter != profile_arrays.end() ? static_cast<uint32_t>(iter->second.size()) : 0;\n'
+                    gen += '                    if (sp->{0} == nullptr) {{\n'.format(member.name)
+                    gen += '                        sp->{0} = profile_count;\n'.format(member.length)
+                    gen += '                    } else {\n'
+                    gen += '                        sp->{0} = std::min(sp->{0}, profile_count);\n'.format(member.length)
+                    gen += '                        for (uint32_t i = 0; i < sp->{0}; ++i) {{\n'.format(member.length)
+                    gen += '                            sp->{0}[i] = iter->second[i];\n'.format(member.name)
+                    gen += '                        }\n'
+                    gen += '                    }\n'
+                    gen += '                }\n'
+            else:
+                var_name = self.get_format_struct_var_name(struct.name)
+                gen += '                const auto &profile_values = physicalDeviceData->map_of_format_{0}_;\n'.format(var_name)
+                gen += '                if (!profile_values.empty()) {\n'
+                gen += '                    void *pNext = sp->pNext;\n'
+                gen += '                    const auto iter = profile_values.find(format);\n'
+                gen += '                    *sp = iter != profile_values.end() ? iter->second : {0}{{}};\n'.format(struct.name)
+                gen += '                    sp->sType = {0};\n'.format(struct.sType)
+                gen += '                    sp->pNext = pNext;\n'
+                gen += '                }\n'
+            gen += '            } break;\n'
+            gen += self.generate_platform_protect_end(self.get_format_struct_protect_name(struct))
+        gen += ('            default:\n'
+                '                break;\n'
+                '        }\n'
+                '\n'
+                '        place = structure->pNext;\n'
+                '    }\n'
+                '}\n')
+        return gen
+
     def generate_load_device_formats(self):
+        vk = self.registry.vk
         gen = '\nvoid LoadDeviceFormats(VkInstance instance, PhysicalDeviceData *pdd, VkPhysicalDevice pd, MapOfVkFormatProperties *dest,\n'
         gen += '                       MapOfVkFormatProperties3 *dest3) {\n'
         gen += '    std::vector<VkFormat> formats = {\n'
-        a = self.registry.enums['VkFormat']
         for format in self.registry.enums['VkFormat'].values:
             if format not in self.registry.enums['VkFormat'].aliasValues:
                 gen += '        ' + format + ',\n'
@@ -5638,13 +5883,67 @@ class VulkanProfilesLayerGenerator():
         gen += '        VkFormatProperties2 format_properties = {};\n'
         gen += '        format_properties.sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2;\n'
         gen += '        format_properties.pNext = &format_properties_3;\n\n'
-        gen += '        if (pdd->GetEffectiveVersion() >= VK_API_VERSION_1_1) {\n'
-        gen += '            dt->GetPhysicalDeviceFormatProperties2(pd, format, &format_properties);\n'
-        gen += '        } else {\n'
-        gen += '            dt->GetPhysicalDeviceFormatProperties2KHR(pd, format, &format_properties);\n'
-        gen += '        }\n'
-        gen += '        (*dest)[format] = format_properties.formatProperties;\n'
+
+        # The other VkFormatProperties2 pNext chain structures supported by the device
+        format_structs = self.get_format_pnext_structs()
+        for struct, arrays in format_structs:
+            var_name = self.get_format_struct_var_name(struct.name)
+            gen += self.generate_platform_protect_begin(self.get_format_struct_protect_name(struct))
+            gen += '        {0} {1} = {{{2}}};\n'.format(struct.name, var_name, struct.sType)
+            gen += '        const bool has_{0} = {1};\n'.format(var_name, self.get_format_struct_device_support(struct, 'pdd'))
+            gen += '        if (has_{0}) {{\n'.format(var_name)
+            gen += '            {0}.pNext = format_properties.pNext;\n'.format(var_name)
+            gen += '            format_properties.pNext = &{0};\n'.format(var_name)
+            gen += '        }\n'
+            gen += self.generate_platform_protect_end(self.get_format_struct_protect_name(struct))
+        gen += '\n'
+
+        gen += '        const auto get_format_properties = [&]() {\n'
+        gen += '            if (pdd->GetEffectiveVersion() >= VK_API_VERSION_1_1) {\n'
+        gen += '                dt->GetPhysicalDeviceFormatProperties2(pd, format, &format_properties);\n'
+        gen += '            } else {\n'
+        gen += '                dt->GetPhysicalDeviceFormatProperties2KHR(pd, format, &format_properties);\n'
+        gen += '            }\n'
+        gen += '        };\n'
+        gen += '        get_format_properties();\n'
+
+        # Query again the structures returning arrays once allocated, following the Vulkan two-call idiom
+        if any(arrays for _, arrays in format_structs):
+            gen += '\n        bool query_arrays = false;\n'
+            for struct, arrays in format_structs:
+                if not arrays:
+                    continue
+                var_name = self.get_format_struct_var_name(struct.name)
+                gen += self.generate_platform_protect_begin(self.get_format_struct_protect_name(struct))
+                for member in arrays:
+                    array_var_name = self.get_format_struct_var_name(struct.name, member.name)
+                    gen += '        std::vector<{0}> {1};\n'.format(member.type, array_var_name)
+                    gen += '        if (has_{0} && {0}.{1} > 0) {{\n'.format(var_name, member.length)
+                    gen += '            {0}.resize({1}.{2});\n'.format(array_var_name, var_name, member.length)
+                    gen += '            {0}.{1} = {2}.data();\n'.format(var_name, member.name, array_var_name)
+                    gen += '            query_arrays = true;\n'
+                    gen += '        }\n'
+                gen += self.generate_platform_protect_end(self.get_format_struct_protect_name(struct))
+            gen += '        if (query_arrays) {\n'
+            gen += '            get_format_properties();\n'
+            gen += '        }\n'
+
+        gen += '\n        (*dest)[format] = format_properties.formatProperties;\n'
         gen += '        (*dest3)[format] = format_properties_3;\n'
+        for struct, arrays in format_structs:
+            var_name = self.get_format_struct_var_name(struct.name)
+            gen += self.generate_platform_protect_begin(self.get_format_struct_protect_name(struct))
+            gen += '        if (has_{0}) {{\n'.format(var_name)
+            if arrays:
+                for member in arrays:
+                    array_var_name = self.get_format_struct_var_name(struct.name, member.name)
+                    gen += '            {0}.resize(std::min(static_cast<uint32_t>({0}.size()), {1}.{2}));\n'.format(array_var_name, var_name, member.length)
+                    gen += '            pdd->device_format_{0}_[format] = std::move({0});\n'.format(array_var_name)
+            else:
+                gen += '            {0}.pNext = nullptr;\n'.format(var_name)
+                gen += '            pdd->device_format_{0}_[format] = {0};\n'.format(var_name)
+            gen += '        }\n'
+            gen += self.generate_platform_protect_end(self.get_format_struct_protect_name(struct))
         gen += '    }\n'
         gen += '}\n'
         return gen
@@ -5955,6 +6254,7 @@ class VulkanProfilesLayerGenerator():
 
         gen += WARN_FUNCTIONS
         gen += GET_VALUE_FUNCTIONS
+        gen += self.generate_format_struct_get_struct_declarations()
         gen += JSON_LOADER_END
         return gen
 
