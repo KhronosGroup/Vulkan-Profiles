@@ -103,6 +103,7 @@ def main_combine(args):
             diff_file_data = json.loads(json.dumps(file_data))
             for cap_block in diff_file_data.get("capabilities", {}).values():
                 strip_dict_duplication(cap_block, common_caps, strip_list_elements=True)
+                generator.sync_format_array_count_members(cap_block)
             diff_files_dict[file_key] = diff_file_data
 
         save_profiles_jsons(diff_files_dict, output_path, format_type)

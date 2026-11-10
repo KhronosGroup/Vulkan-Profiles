@@ -39,7 +39,11 @@ from source.profiles_json_utils import (
     get_profile_and_file_data,
     merge_capability_value
 )
-from source.format_flag_converter import FormatFeatureFlagConverter 
+from source.format_flag_converter import (
+    FormatFeatureFlagConverter,
+    FORMAT_FEATURES_STRUCTS,
+    FORMAT_PROPERTIES_2_STRUCTS
+)
 from source.transform_utils import (
     PullBits,
     _restore_member_orders,
@@ -146,11 +150,23 @@ def pull_aliases_capabilities_block(
             new_structs_dict = {}
 
             for src_struct_name, members_dict in structs_dict.items():
-                if isinstance(members_dict, dict):
+                if not isinstance(members_dict, dict):
+                    continue
+
+                if src_struct_name in FORMAT_PROPERTIES_2_STRUCTS:
+                    # VkFormatProperties2[KHR] wraps the VkFormatProperties data in its formatProperties member
+                    src_struct_name = "VkFormatProperties"
+                    members_dict = members_dict.get("formatProperties", {})
+
+                if src_struct_name in FORMAT_FEATURES_STRUCTS:
+                    # The format features are expressed by each of these structures, expand them to all the valid ones
                     expanded = flag_converter.expand_format_struct(
                         vk, src_struct_name, members_dict, version, enabled_exts
                     )
                     deep_merge_dict(new_structs_dict, expanded)
+                else:
+                    # The other VkFormatProperties2 pNext chain structures have no alias, keep them as they are
+                    deep_merge_dict(new_structs_dict, {src_struct_name: members_dict})
 
             if new_structs_dict:
                 new_formats_block[format_name] = new_structs_dict

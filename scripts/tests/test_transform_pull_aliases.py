@@ -754,6 +754,76 @@ class TestConvertPullAliases(unittest.TestCase):
         # 2. No transition block MUST be added when every supported inherited alias is defined by the profile
         self.assertEqual(data["profiles"]["VP_TEST_profile_c"]["capabilities"], ["block_c"])
 
+    def test_pull_aliases_format_properties2_pnext_chain(self):
+        """
+        Verifies that pulling aliases expands the VkFormatProperties2 format features to the VkFormatProperties[3]
+        structures, and keeps the other VkFormatProperties2 pNext chain structures as they are.
+        """
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8-latest.json#",
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.3.204",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "extensions": {
+                        "VK_EXT_image_drm_format_modifier": 1,
+                        "VK_EXT_multisampled_render_to_single_sampled": 1,
+                        "VK_ARM_tensors": 1
+                    },
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties2": {
+                                "formatProperties": {
+                                    "optimalTilingFeatures": ["VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"]
+                                }
+                            },
+                            "VkSubpassResolvePerformanceQueryEXT": {
+                                "optimal": true
+                            },
+                            "VkTensorFormatPropertiesARM": {
+                                "optimalTilingTensorFeatures": ["VK_FORMAT_FEATURE_2_TENSOR_SHADER_BIT_ARM"]
+                            },
+                            "VkDrmFormatModifierPropertiesListEXT": {
+                                "drmFormatModifierCount": 1,
+                                "pDrmFormatModifierProperties": [
+                                    {
+                                        "drmFormatModifier": 0,
+                                        "drmFormatModifierPlaneCount": 1,
+                                        "drmFormatModifierTilingFeatures": ["VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"]
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }"""
+
+        original_formats = json.loads(original_json_text)["capabilities"]["baseline"]["formats"]["VK_FORMAT_R8G8B8A8_UNORM"]
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        pull_aliases_profiles_files(self.vk, [PullBits.ALIASES], json_files_dict)
+
+        formats = json_files_dict["test_profile.json"]["capabilities"]["baseline"]["formats"]["VK_FORMAT_R8G8B8A8_UNORM"]
+
+        # 1. The VkFormatProperties2 format features MUST be expanded to VkFormatProperties and VkFormatProperties3, without the formatProperties wrapper
+        self.assertNotIn("VkFormatProperties2", formats)
+        self.assertEqual(formats["VkFormatProperties"], {"optimalTilingFeatures": ["VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"]})
+        self.assertEqual(formats["VkFormatProperties3"], {"optimalTilingFeatures": ["VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT"]})
+
+        # 2. The other VkFormatProperties2 pNext chain structures MUST be kept as they are
+        for struct_name in ["VkSubpassResolvePerformanceQueryEXT", "VkTensorFormatPropertiesARM", "VkDrmFormatModifierPropertiesListEXT"]:
+            self.assertEqual(formats[struct_name], original_formats[struct_name])
+
+        # 3. Their members MUST NOT be added to the format features structures
+        self.assertNotIn("optimalTilingTensorFeatures", formats["VkFormatProperties3"])
+        self.assertNotIn("optimal", formats["VkFormatProperties"])
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
