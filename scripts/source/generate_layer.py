@@ -2877,6 +2877,8 @@ void GetPhysicalDeviceFormatProperties2Impl(VkPhysicalDevice physicalDevice, VkF
                                             VkFormatProperties2KHR *pFormatProperties, bool core) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
+    // The driver overwrites the array counts of the pNext chain structures, the layer needs the application array capacities
+    const std::vector<uint32_t> array_capacities = GetFormatPropertiesPNextChainArrayCapacities(pFormatProperties->pNext);
     if (core) {
         dt->GetPhysicalDeviceFormatProperties2(physicalDevice, format, pFormatProperties);
     } else {
@@ -2884,7 +2886,7 @@ void GetPhysicalDeviceFormatProperties2Impl(VkPhysicalDevice physicalDevice, VkF
     }
     GetPhysicalDeviceFormatProperties(physicalDevice, format, &pFormatProperties->formatProperties);
     PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
-    FillFormatPropertiesPNextChain(pdd, pFormatProperties->pNext, format);
+    FillFormatPropertiesPNextChain(pdd, pFormatProperties->pNext, format, array_capacities);
 }
 
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties2(VkPhysicalDevice physicalDevice, VkFormat format,
@@ -5667,8 +5669,37 @@ class VulkanProfilesLayerGenerator():
                 '}\n')
         return gen
 
+    def generate_get_format_properties_pnext_chain_array_capacities(self):
+        # The capacities are stored in the pNext chain order, in the order FillFormatPropertiesPNextChain consumes them
+        gen = ('\n// Returns the array counts of the VkFormatProperties2 pNext chain structures, as provided by the application\n'
+               'static std::vector<uint32_t> GetFormatPropertiesPNextChainArrayCapacities(const void *place) {\n'
+               '    std::vector<uint32_t> capacities;\n'
+               '    for (const VkBaseInStructure *structure = (const VkBaseInStructure *)place; structure != nullptr; structure = structure->pNext) {\n'
+               '        switch (structure->sType) {\n')
+        for struct, arrays in self.get_format_pnext_structs():
+            if not arrays:
+                continue
+            gen += self.generate_platform_protect_begin(self.get_format_struct_protect_name(struct))
+            gen += '            case {0}: {{\n'.format(struct.sType)
+            gen += '                const {0} *sp = (const {0} *)structure;\n'.format(struct.name)
+            for member in arrays:
+                gen += '                capacities.push_back(sp->{0});\n'.format(member.length)
+            gen += '            } break;\n'
+            gen += self.generate_platform_protect_end(self.get_format_struct_protect_name(struct))
+        gen += ('            default:\n'
+                '                break;\n'
+                '        }\n'
+                '    }\n'
+                '    return capacities;\n'
+                '}\n')
+        return gen
+
     def generate_fill_format_properties_pnext_chain(self):
-        gen = ('\nvoid FillFormatPropertiesPNextChain(PhysicalDeviceData *physicalDeviceData, void *place, VkFormat format) {\n'
+        gen = self.generate_get_format_properties_pnext_chain_array_capacities()
+        gen += ('\nvoid FillFormatPropertiesPNextChain(PhysicalDeviceData *physicalDeviceData, void *place, VkFormat format,\n'
+               '                                    const std::vector<uint32_t> &array_capacities) {\n'
+               '    // Index of the next array capacity of array_capacities, as returned by GetFormatPropertiesPNextChainArrayCapacities\n'
+               '    std::size_t array_index = 0;\n'
                '    while (place) {\n'
                '        VkBaseOutStructure *structure = (VkBaseOutStructure *)place;\n'
                '\n'
@@ -5691,17 +5722,22 @@ class VulkanProfilesLayerGenerator():
             if arrays:
                 for member in arrays:
                     array_var_name = self.get_format_struct_var_name(struct.name, member.name)
-                    gen += '                const auto &profile_arrays = physicalDeviceData->map_of_format_{0}_;\n'.format(array_var_name)
-                    gen += '                if (!profile_arrays.empty()) {\n'
-                    gen += '                    // Returns the profile array following the Vulkan two-call idiom\n'
-                    gen += '                    const auto iter = profile_arrays.find(format);\n'
-                    gen += '                    const uint32_t profile_count = iter != profile_arrays.end() ? static_cast<uint32_t>(iter->second.size()) : 0;\n'
-                    gen += '                    if (sp->{0} == nullptr) {{\n'.format(member.name)
-                    gen += '                        sp->{0} = profile_count;\n'.format(member.length)
-                    gen += '                    } else {\n'
-                    gen += '                        sp->{0} = std::min(sp->{0}, profile_count);\n'.format(member.length)
-                    gen += '                        for (uint32_t i = 0; i < sp->{0}; ++i) {{\n'.format(member.length)
-                    gen += '                            sp->{0}[i] = iter->second[i];\n'.format(member.name)
+                    gen += '                {\n'
+                    gen += '                    // The application array capacity, sp->{0} was overwritten by the driver\n'.format(member.length)
+                    gen += '                    const uint32_t capacity = array_index < array_capacities.size() ? array_capacities[array_index] : 0;\n'
+                    gen += '                    ++array_index;\n'
+                    gen += '                    const auto &profile_arrays = physicalDeviceData->map_of_format_{0}_;\n'.format(array_var_name)
+                    gen += '                    if (!profile_arrays.empty()) {\n'
+                    gen += '                        // Returns the profile array following the Vulkan two-call idiom\n'
+                    gen += '                        const auto iter = profile_arrays.find(format);\n'
+                    gen += '                        const uint32_t profile_count = iter != profile_arrays.end() ? static_cast<uint32_t>(iter->second.size()) : 0;\n'
+                    gen += '                        if (sp->{0} == nullptr) {{\n'.format(member.name)
+                    gen += '                            sp->{0} = profile_count;\n'.format(member.length)
+                    gen += '                        } else {\n'
+                    gen += '                            sp->{0} = std::min(capacity, profile_count);\n'.format(member.length)
+                    gen += '                            for (uint32_t i = 0; i < sp->{0}; ++i) {{\n'.format(member.length)
+                    gen += '                                sp->{0}[i] = iter->second[i];\n'.format(member.name)
+                    gen += '                            }\n'
                     gen += '                        }\n'
                     gen += '                    }\n'
                     gen += '                }\n'
