@@ -32,6 +32,7 @@ if str(scripts_dir) not in sys.path:
 from vulkan_object import VulkanObject
 from source.vulkan_object_utils import initVulkanObject
 from source.transform_sort import sort_profiles_files
+from source.profiles_json_utils import merge_capability_value
 
 
 class TestConvertSort(unittest.TestCase):
@@ -522,6 +523,63 @@ class TestConvertSort(unittest.TestCase):
 
         # 3. Sorting MUST NOT change the values
         self.assertEqual(json_files_dict["test_profile.json"], json.loads(original_json_text))
+
+    def test_sort_flag_lists(self):
+        """
+        Verifies that merging flag lists keeps their order and that sorting orders the flag lists
+        of properties and formats.
+        """
+        merged = merge_capability_value(
+            "subgroupSupportedStages",
+            ["VK_SHADER_STAGE_FRAGMENT_BIT", "VK_SHADER_STAGE_COMPUTE_BIT"],
+            ["VK_SHADER_STAGE_VERTEX_BIT", "VK_SHADER_STAGE_COMPUTE_BIT"]
+        )
+        # 1. Merging MUST keep the first-seen order of the flags, sorting is only done by sort_profiles_files
+        self.assertEqual(merged, ["VK_SHADER_STAGE_FRAGMENT_BIT", "VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_VERTEX_BIT"])
+
+        original_json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.0-304.json#",
+            "profiles": {
+                "VP_TEST_sort_flags": {
+                    "version": 1,
+                    "api-version": "1.3.204",
+                    "capabilities": ["baseline"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "properties": {
+                        "VkPhysicalDeviceVulkan11Properties": {
+                            "subgroupSupportedStages": [ "VK_SHADER_STAGE_FRAGMENT_BIT", "VK_SHADER_STAGE_COMPUTE_BIT" ]
+                        },
+                        "VkPhysicalDeviceProperties": {
+                            "limits": {
+                                "framebufferColorSampleCounts": [ "VK_SAMPLE_COUNT_4_BIT", "VK_SAMPLE_COUNT_1_BIT" ]
+                            }
+                        }
+                    },
+                    "formats": {
+                        "VK_FORMAT_R8G8B8A8_UNORM": {
+                            "VkFormatProperties3": {
+                                "bufferFeatures": [ "VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT", "VK_FORMAT_FEATURE_2_UNIFORM_TEXEL_BUFFER_BIT" ]
+                            }
+                        }
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(original_json_text)}
+        sort_profiles_files(self.vk, json_files_dict)
+
+        block = json_files_dict["test_profile.json"]["capabilities"]["baseline"]
+
+        # 2. Flag lists of properties MUST be sorted, including in structure typed members
+        self.assertEqual(block["properties"]["VkPhysicalDeviceVulkan11Properties"]["subgroupSupportedStages"], ["VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_FRAGMENT_BIT"])
+        self.assertEqual(block["properties"]["VkPhysicalDeviceProperties"]["limits"]["framebufferColorSampleCounts"], ["VK_SAMPLE_COUNT_1_BIT", "VK_SAMPLE_COUNT_4_BIT"])
+
+        # 3. Flag lists of formats MUST be sorted
+        self.assertEqual(block["formats"]["VK_FORMAT_R8G8B8A8_UNORM"]["VkFormatProperties3"]["bufferFeatures"], ["VK_FORMAT_FEATURE_2_UNIFORM_TEXEL_BUFFER_BIT", "VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT"])
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

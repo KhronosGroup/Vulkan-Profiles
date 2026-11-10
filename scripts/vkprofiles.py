@@ -225,6 +225,8 @@ def main(argv):
     library_parser.add_argument('--mode', nargs='*', action='store', choices=['header-only', 'header+source'], default=['header-only', 'header+source'], help='Library output generation mode.')
     library_parser.add_argument('--strip', action='store_true', help='Strip redundant profile capabilities before generating the library to ensure a valid Vulkan API usage when calling vkCreateDevice.')
     library_parser.add_argument('--intermediate', action='store', help='Directory path for intermediate transformed profiles (used when --strip is provided).')
+    library_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for the intermediate profiles files (default: pretty).')
+    library_parser.add_argument('--sort', action='store_true', help='Sort the capabilities of the intermediate profiles files.')
     library_parser.add_argument('--debug', '-d', action='store_true', help='Also generate library variant with debug messages.')
     library_parser.add_argument('--config', '-c', action='store', default='release', choices=['release', 'debug'], help='Select build configuration.')
     library_parser.add_argument('--include-header', action='store', help='Override the header file include directive in generated C++ source files.')

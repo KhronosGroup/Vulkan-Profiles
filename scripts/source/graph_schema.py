@@ -278,6 +278,8 @@ GRAPH_JSON_SCHEMA = {
                 },
                 "strip": { "type": "boolean" },
                 "intermediate": { "type": "string" },
+                "format": { "$ref": "#/definitions/output_format" },
+                "sort": { "type": "boolean" },
                 "debug": { "type": "boolean" },
                 "config": { "type": "string", "enum": ["release", "debug"] },
                 "include-header": { "type": "string" },

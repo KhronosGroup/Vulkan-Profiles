@@ -19,6 +19,7 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
+import copy
 import logging
 import sys
 from pathlib import Path
@@ -28,6 +29,7 @@ from source.vulkan_object_utils import initVulkanObject
 from source.profiles_json_utils import load_profiles_jsons, save_profiles_jsons, OutputFormatType
 from source.transform_utils import PullBits, StripBits
 from source.main_transform import transform_profiles_files
+from source.transform_sort import sort_profiles_files
 from source.main_validate import main_validate
 
 
@@ -118,7 +120,13 @@ def main_library(args):
             strip_modes=[StripBits.DUPLICATION, StripBits.HELPER_VALUES]
         )
         if intermediate_path:
-            save_profiles_jsons(json_files_dict, intermediate_path, OutputFormatType.PRETTY)
+            format_type = OutputFormatType(getattr(args, 'format', None) or OutputFormatType.PRETTY)
+            intermediate_dict = json_files_dict
+            if getattr(args, 'sort', False):
+                # Sort a copy so the generated library is not affected by the intermediate output options
+                intermediate_dict = copy.deepcopy(json_files_dict)
+                sort_profiles_files(vk, intermediate_dict)
+            save_profiles_jsons(intermediate_dict, intermediate_path, format_type)
 
     output_filename = getattr(args, 'output_filename', 'vulkan_profiles') or 'vulkan_profiles'
     is_debug = getattr(args, 'debug', False) or getattr(args, 'config', 'release') == 'debug'
