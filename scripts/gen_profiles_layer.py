@@ -2739,6 +2739,21 @@ static std::vector<std::string> GetUnsupportedFeatures(VkPhysicalDevice physical
     return unsupported;
 }
 
+// Unlike get_chain_info, returns nullptr instead of asserting when there is no device link info: the Android loader may
+// call the vkCreateDevice of the layer instance chain without adding the layer to the device chain
+static VkLayerDeviceCreateInfo *FindDeviceLinkInfo(const VkDeviceCreateInfo *pCreateInfo) {
+    for (const VkBaseInStructure *p = reinterpret_cast<const VkBaseInStructure *>(pCreateInfo->pNext); p != nullptr; p = p->pNext) {
+        if (p->sType != VK_STRUCTURE_TYPE_LOADER_DEVICE_CREATE_INFO) {
+            continue;
+        }
+        VkLayerDeviceCreateInfo *info = reinterpret_cast<VkLayerDeviceCreateInfo *>(const_cast<VkBaseInStructure *>(p));
+        if (info->function == VK_LAYER_LINK_INFO) {
+            return info;
+        }
+    }
+    return nullptr;
+}
+
 VKAPI_ATTR VkResult VKAPI_CALL CreateDevice(VkPhysicalDevice physicalDevice, const VkDeviceCreateInfo *pCreateInfo,
                                             const VkAllocationCallbacks *pAllocator, VkDevice *pDevice) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
@@ -2762,17 +2777,20 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateDevice(VkPhysicalDevice physicalDevice, con
         }
     }
 
-    VkLayerDeviceCreateInfo *chain_info = get_chain_info(pCreateInfo, VK_LAYER_LINK_INFO);
-    assert(chain_info->u.pLayerInfo);
-
-    PFN_vkGetInstanceProcAddr fp_get_instance_proc_addr = chain_info->u.pLayerInfo->pfnNextGetInstanceProcAddr;
-    PFN_vkGetDeviceProcAddr fp_get_device_proc_addr = chain_info->u.pLayerInfo->pfnNextGetDeviceProcAddr;
-    PFN_vkCreateDevice fp_create_device = reinterpret_cast<PFN_vkCreateDevice>(
-        fp_get_instance_proc_addr(pdd != nullptr ? pdd->instance() : VK_NULL_HANDLE, "vkCreateDevice"));
+    // The next vkCreateDevice of the instance chain, valid whether the layer is in the device chain or not
+    PFN_vkCreateDevice fp_create_device = instance_dispatch_table(physicalDevice)->CreateDevice;
     if (!fp_create_device) {
         return VK_ERROR_INITIALIZATION_FAILED;
     }
 
+    VkLayerDeviceCreateInfo *chain_info = FindDeviceLinkInfo(pCreateInfo);
+    if (chain_info == nullptr) {
+        // The layer is not in the device chain, e.g. with the Android loader, so the layer only forwards the call
+        return fp_create_device(physicalDevice, pCreateInfo, pAllocator, pDevice);
+    }
+    assert(chain_info->u.pLayerInfo);
+
+    PFN_vkGetDeviceProcAddr fp_get_device_proc_addr = chain_info->u.pLayerInfo->pfnNextGetDeviceProcAddr;
     chain_info->u.pLayerInfo = chain_info->u.pLayerInfo->pNext;
     VkResult result = fp_create_device(physicalDevice, pCreateInfo, pAllocator, pDevice);
     if (result == VK_SUCCESS) {
