@@ -109,7 +109,7 @@ def merge_capability_value(prop_name: str, val1: Any, val2: Any) -> Any:
         for item in val2:
             if item not in merged_list:
                 merged_list.append(item)
-        merged_list.sort(key=get_flag_sort_key)
+        # The flags keep their first-seen order, sorting is done by 'transform --sort' (sort_profiles_files)
         return merged_list
 
     # 4. Dicts

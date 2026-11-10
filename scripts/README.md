@@ -76,7 +76,7 @@ A `oneOf` on the node object binds each `command` value to its `args` definition
 | `transform` | `registry`, `input`, `input-profiles`, `output`, `format`, `pull`, `consolidate`, `strip`, `sort`, `api` |
 | `combine` | `registry`, `input`, `input-profiles`, `output`, `profile-name`, `profile-version`, `profile-label`, `profile-desc`, `profile-date`, `profile-api-version`, `profile-stage`, `profile-required-profiles`, `mode`, `format`, `contributors`, `history`, `profiles`, `api` |
 | `validate` | `registry`, `input`, `schema`, `analyse`, `api` |
-| `library` | `registry`, `input`, `input-profiles`, `output`, `output-inc`, `output-src`, `output-filename`, `mode`, `strip`, `intermediate`, `debug`, `config`, `include-header`, `api` |
+| `library` | `registry`, `input`, `input-profiles`, `output`, `output-inc`, `output-src`, `output-filename`, `mode`, `strip`, `intermediate`, `format`, `sort`, `debug`, `config`, `include-header`, `api` |
 | `doc` | `registry`, `input`, `input-profiles`, `output`, `api` |
 | `extract` | `registry`, `input`, `output`, `input-profiles`, `mode`, `format` |
 | `min-api-version` | `registry`, `input`, `input-profiles`, `output`, `schemas`, `mode`, `format` |
@@ -363,7 +363,7 @@ vkprofiles transform --registry vk.xml --input path/to/input_dir --output path/t
 * `--pull [OPTION ...]`: Pull capability options: `requirements`, `promoted`, `aliases`, `ignore-extension-versions`, `ignore-unsupported`, `ignore-subcore`, or `ignore-unratified`.
 * `--consolidate`: Consolidate capabilities.
 * `--strip [OPTION ...]`: Strip options: `helper-values`, `duplication`, `promoted-extensions`, or `unratified`.
-* `--sort`: Sort profile capabilities.
+* `--sort`: Sort profile capabilities, including the flag lists. Without `--sort`, the flag lists keep their input order.
 
 #### Transformation Options
 
@@ -383,7 +383,7 @@ Conversion flags are processed in a fixed internal order regardless of the order
 | `--strip duplication` | Removes redundant duplicate features, properties, and extension requirements across inheritance trees and within blocks. |
 | `--strip promoted-extensions` | Removes extensions already promoted to the profile's target core Vulkan version. |
 | `--strip unratified` | Removes extensions and extension structures that are not ratified for Vulkan. |
-| `--sort` | Sorts profile capabilities into canonical Vulkan order. |
+| `--sort` | Sorts profile capabilities into canonical Vulkan order and sorts the flag lists. |
 
 **Example:**
 
@@ -538,6 +538,8 @@ vkprofiles library --registry vk.xml --input path/to/profiles --output path/to/i
 * `--mode [MODES ...]`: Library generation modes (`header-only`, `header+source`). Default: both modes are generated.
 * `--strip`: Strip redundant capability structures before generating the library to keep `VkDevice` creation valid. This is equivalent to running `transform --pull aliases --strip duplication helper-values` on the input profiles first.
 * `--intermediate`: Directory path where the transformed profile JSON files are saved (only used with `--strip`).
+* `--format`: Formatting style of the intermediate profile JSON files (`pretty`, `flatten`). Default: `pretty`.
+* `--sort`: Sort the capabilities of the intermediate profile JSON files, as `transform --sort` does. Does not affect the generated library.
 * `--debug`, `-d`: Generate the library with debug messages. Same effect as `--config debug`.
 * `--config`, `-c`: Build configuration (`release` or `debug`). Default: `release`.
 

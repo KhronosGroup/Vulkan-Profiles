@@ -28,7 +28,7 @@ from source.vulkan_object_utils import (
     getStructCoreVersion,
     is_extension_struct_name
 )
-from source.profiles_json_utils import collect_block_names
+from source.profiles_json_utils import collect_block_names, get_flag_sort_key
 from source.transform_utils import (
     CategoryPriority,
     CoreStructTier,
@@ -108,6 +108,13 @@ def sort_extensions(vk: VulkanObject, exts: dict | list, profile_name: str = "")
         return sorted_exts
 
 
+def sort_member_value(value):
+    """Returns value with its flag / enum string list sorted, other values are returned unchanged."""
+    if isinstance(value, list) and value and all(isinstance(item, str) for item in value):
+        return sorted(value, key=get_flag_sort_key)
+    return value
+
+
 def sort_struct_members(vk: VulkanObject, struct_name: str, struct_data):
     """
     Returns struct_data with its members ordered following the struct definition order in vk.xml.
@@ -127,7 +134,7 @@ def sort_struct_members(vk: VulkanObject, struct_name: str, struct_data):
         key=lambda item: (member_idx_map.get(item[0], MemberSortFallback.UNKNOWN_MEMBER_INDEX), item[0])
     )
     return {
-        name: sort_struct_members(vk, member_type_map[name], value) if name in member_type_map and isinstance(value, dict) else value
+        name: sort_struct_members(vk, member_type_map[name], value) if name in member_type_map and isinstance(value, dict) else sort_member_value(value)
         for name, value in sorted_members
     }
 
@@ -159,7 +166,7 @@ def sort_capabilities_block(vk: VulkanObject, json_block: dict, profile_name: st
                 for s_name in sorted(fmt_structs.keys(), key=lambda s: get_struct_sort_key(vk, s)):
                     s_data = fmt_structs[s_name]
                     if isinstance(s_data, dict):
-                        sorted_fmt_structs[s_name] = dict(sorted(s_data.items(), key=lambda item: item[0]))
+                        sorted_fmt_structs[s_name] = {name: sort_member_value(value) for name, value in sorted(s_data.items(), key=lambda item: item[0])}
                     else:
                         sorted_fmt_structs[s_name] = s_data
                 sorted_formats[fmt_name] = sorted_fmt_structs
