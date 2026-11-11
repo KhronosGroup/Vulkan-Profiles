@@ -2877,16 +2877,18 @@ void GetPhysicalDeviceFormatProperties2Impl(VkPhysicalDevice physicalDevice, VkF
                                             VkFormatProperties2KHR *pFormatProperties, bool core) {
     std::lock_guard<std::recursive_mutex> lock(global_lock);
     const auto dt = instance_dispatch_table(physicalDevice);
-    // The driver overwrites the array counts of the pNext chain structures, the layer needs the application array capacities
-    const std::vector<uint32_t> array_capacities = GetFormatPropertiesPNextChainArrayCapacities(pFormatProperties->pNext);
+    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
+    // The driver overwrites the array counts of the pNext chain structures and must not write into the application arrays
+    // the profile overrides: some drivers write beyond the application array capacity
+    const std::vector<FormatPropertiesPNextChainArray> application_arrays =
+        HideFormatPropertiesPNextChainArrays(pdd, pFormatProperties->pNext);
     if (core) {
         dt->GetPhysicalDeviceFormatProperties2(physicalDevice, format, pFormatProperties);
     } else {
         dt->GetPhysicalDeviceFormatProperties2KHR(physicalDevice, format, pFormatProperties);
     }
     GetPhysicalDeviceFormatProperties(physicalDevice, format, &pFormatProperties->formatProperties);
-    PhysicalDeviceData *pdd = PhysicalDeviceData::Find(physicalDevice);
-    FillFormatPropertiesPNextChain(pdd, pFormatProperties->pNext, format, array_capacities);
+    FillFormatPropertiesPNextChain(pdd, pFormatProperties->pNext, format, application_arrays);
 }
 
 VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceFormatProperties2(VkPhysicalDevice physicalDevice, VkFormat format,
@@ -5669,36 +5671,48 @@ class VulkanProfilesLayerGenerator():
                 '}\n')
         return gen
 
-    def generate_get_format_properties_pnext_chain_array_capacities(self):
-        # The capacities are stored in the pNext chain order, in the order FillFormatPropertiesPNextChain consumes them
-        gen = ('\n// Returns the array counts of the VkFormatProperties2 pNext chain structures, as provided by the application\n'
-               'static std::vector<uint32_t> GetFormatPropertiesPNextChainArrayCapacities(const void *place) {\n'
-               '    std::vector<uint32_t> capacities;\n'
-               '    for (const VkBaseInStructure *structure = (const VkBaseInStructure *)place; structure != nullptr; structure = structure->pNext) {\n'
+    def generate_hide_format_properties_pnext_chain_arrays(self):
+        # The arrays are stored in the pNext chain order, in the order FillFormatPropertiesPNextChain consumes them
+        gen = ('\n// An application array of a VkFormatProperties2 pNext chain structure\n'
+               'struct FormatPropertiesPNextChainArray {\n'
+               '    uint32_t capacity;  // The application array count, overwritten by the driver\n'
+               '    void *data;         // The application array pointer, hidden from the driver when the profile defines the array\n'
+               '};\n'
+               '\n'
+               '// Saves the application arrays of the VkFormatProperties2 pNext chain structures and hides from the driver\n'
+               '// the arrays defined by the profile, so the driver only returns its array counts and never writes into the\n'
+               '// application arrays the layer overrides. FillFormatPropertiesPNextChain restores the application arrays.\n'
+               'static std::vector<FormatPropertiesPNextChainArray> HideFormatPropertiesPNextChainArrays(const PhysicalDeviceData *physicalDeviceData, void *place) {\n'
+               '    std::vector<FormatPropertiesPNextChainArray> arrays;\n'
+               '    for (VkBaseOutStructure *structure = (VkBaseOutStructure *)place; structure != nullptr; structure = structure->pNext) {\n'
                '        switch (structure->sType) {\n')
         for struct, arrays in self.get_format_pnext_structs():
             if not arrays:
                 continue
             gen += self.generate_platform_protect_begin(self.get_format_struct_protect_name(struct))
             gen += '            case {0}: {{\n'.format(struct.sType)
-            gen += '                const {0} *sp = (const {0} *)structure;\n'.format(struct.name)
+            gen += '                {0} *sp = ({0} *)structure;\n'.format(struct.name)
             for member in arrays:
-                gen += '                capacities.push_back(sp->{0});\n'.format(member.length)
+                array_var_name = self.get_format_struct_var_name(struct.name, member.name)
+                gen += '                arrays.push_back({{sp->{0}, sp->{1}}});\n'.format(member.length, member.name)
+                gen += '                if (physicalDeviceData != nullptr && !physicalDeviceData->map_of_format_{0}_.empty()) {{\n'.format(array_var_name)
+                gen += '                    sp->{0} = nullptr;\n'.format(member.name)
+                gen += '                }\n'
             gen += '            } break;\n'
             gen += self.generate_platform_protect_end(self.get_format_struct_protect_name(struct))
         gen += ('            default:\n'
                 '                break;\n'
                 '        }\n'
                 '    }\n'
-                '    return capacities;\n'
+                '    return arrays;\n'
                 '}\n')
         return gen
 
     def generate_fill_format_properties_pnext_chain(self):
-        gen = self.generate_get_format_properties_pnext_chain_array_capacities()
+        gen = self.generate_hide_format_properties_pnext_chain_arrays()
         gen += ('\nvoid FillFormatPropertiesPNextChain(PhysicalDeviceData *physicalDeviceData, void *place, VkFormat format,\n'
-               '                                    const std::vector<uint32_t> &array_capacities) {\n'
-               '    // Index of the next array capacity of array_capacities, as returned by GetFormatPropertiesPNextChainArrayCapacities\n'
+               '                                    const std::vector<FormatPropertiesPNextChainArray> &application_arrays) {\n'
+               '    // Index of the next application array of application_arrays, as returned by HideFormatPropertiesPNextChainArrays\n'
                '    std::size_t array_index = 0;\n'
                '    while (place) {\n'
                '        VkBaseOutStructure *structure = (VkBaseOutStructure *)place;\n'
@@ -5723,8 +5737,11 @@ class VulkanProfilesLayerGenerator():
                 for member in arrays:
                     array_var_name = self.get_format_struct_var_name(struct.name, member.name)
                     gen += '                {\n'
-                    gen += '                    // The application array capacity, sp->{0} was overwritten by the driver\n'.format(member.length)
-                    gen += '                    const uint32_t capacity = array_index < array_capacities.size() ? array_capacities[array_index] : 0;\n'
+                    gen += '                    // Restores the application array, sp->{0} was overwritten by the driver\n'.format(member.length)
+                    gen += '                    const uint32_t capacity = array_index < application_arrays.size() ? application_arrays[array_index].capacity : 0;\n'
+                    gen += '                    if (array_index < application_arrays.size()) {\n'
+                    gen += '                        sp->{0} = static_cast<decltype(sp->{0})>(application_arrays[array_index].data);\n'.format(member.name)
+                    gen += '                    }\n'
                     gen += '                    ++array_index;\n'
                     gen += '                    const auto &profile_arrays = physicalDeviceData->map_of_format_{0}_;\n'.format(array_var_name)
                     gen += '                    if (!profile_arrays.empty()) {\n'
