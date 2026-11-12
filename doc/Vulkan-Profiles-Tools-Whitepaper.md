@@ -13,6 +13,7 @@ Christophe Riccio, LunarG — April 2024
   - [Projects using Vulkan Profiles](#projects-using-vulkan-profiles)
   - [Different types of Vulkan Profiles](#different-types-of-vulkan-profiles)
 - [The Vulkan Profiles Tools Components](#the-vulkan-profiles-tools-components)
+  - [The vkprofiles command-line tool](#the-vkprofiles-command-line-tool)
   - [Vulkan Capability minimum requirements](#vulkan-capability-minimum-requirements)
   - [The Vulkan Profiles Tools Code Generation](#the-vulkan-profiles-tools-code-generation)
   - [The Vulkan Profiles documentation](#the-vulkan-profiles-documentation)
@@ -35,6 +36,7 @@ Christophe Riccio, LunarG — April 2024
   - [Advanced usage of the Vulkan Profiles library](#advanced-usage-of-the-vulkan-profiles-library)
 - [Vulkan Profiles Tools future improvements](#vulkan-profiles-tools-future-improvements)
 - [Revision History](#revision-history)
+- [TODO](#todo)
 
 ## Why do Vulkan Profiles matter?
 
@@ -114,8 +116,11 @@ The Vulkan Profiles Tools include the following components:
   - A JSON data format to exchange Vulkan capabilities: extensions, features, properties, formats, and queue properties.
   - Each revision of Vulkan API is represented by a schema that supersedes older versions of Vulkan API.
   - The schema covers Vulkan 1.3 and all extensions.
-- **The Vulkan Profiles merge script**
-  - A Python script to merge multiple Vulkan Profiles into a single Vulkan Profile using either an intersection or union operation on the Vulkan capabilities listed by the source Vulkan Profiles.
+- **The `vkprofiles` command-line tool**
+  - A standalone executable, shipped with the Vulkan SDK since SDK 1.4.363, which bundles the Vulkan Profiles generation scripts so no Python installation is required.
+  - It combines multiple Vulkan Profiles into a single Vulkan Profile using an intersection, union or difference operation on the Vulkan capabilities listed by the source Vulkan Profiles (`vkprofiles combine`).
+  - It validates Vulkan Profiles files against the Vulkan Profiles schema and analyses their semantics (`vkprofiles validate`), and generates the Vulkan Profiles API library (`vkprofiles library`) and the Vulkan Profiles documentation (`vkprofiles doc`).
+  - It replaces the deprecated `gen_profiles_file.py` and `gen_profiles_solution.py` Python scripts.
 - **The Vulkan Profiles layer**
   - A layer used during application development to ensure adherence to the requirements of a chosen Vulkan Profile.
   - It simulates but doesn't emulate Vulkan capabilities. It works together with the Validation layer which reports errors when using capabilities not exposed by the Vulkan developer system.
@@ -152,17 +157,48 @@ As a result, the Vulkan Profiles library is compatible with any Vulkan 1.0 drive
 **Vulkan application side:**
 
 - The Vulkan applications are built with the Vulkan Profiles API library.
-- The Vulkan Profiles API library is generated using the `gen_profiles_solution.py` python script and the Engine Profiles file.
+- The Vulkan Profiles API library is generated using the `vkprofiles library` command and the Engine Profiles file.
 - The Engine Profiles JSON file is written by the Vulkan application developers based on the actual rendering code paths Vulkan capabilities requirements.
 - The Engine Profiles JSON file is written and validated against a Vulkan Profiles schema.
-- The Engine Profiles Definition doc is a markdown file generated using the `gen_profiles_solution.py` python script.
+- The Engine Profiles Definition doc is a markdown file generated using the `vkprofiles doc` command.
 
 **Vulkan development environment side:**
 
 - The Vulkan Validation layer and the Vulkan Profiles layer are set up using the *Portability* built-in configuration in Vulkan Configurator.
 - The Vulkan Profiles layer is configured so that the system simulates the Vulkan capabilities listed in the Platform Profile file.
-- The Platform Profile file is generated using the `gen_profiles_file.py` python script and Device Profiles files.
+- The Platform Profile file is generated using the `vkprofiles combine` command and Device Profiles files.
 - The Device Profiles files are selected and downloaded from GPUInfo.org. The criteria for the Device Profiles files depends on the developers of the Vulkan application and the device ecosystem they want to reach for typically technical and economical reasons.
+
+### The vkprofiles command-line tool
+
+Since SDK 1.4.363, the Vulkan SDK ships `vkprofiles`, a standalone executable installed alongside the other Vulkan SDK tools. It bundles the Vulkan Profiles generation code, so Vulkan developers no longer need a Python installation to create Vulkan Profiles files, generate the Vulkan Profiles API library or generate the Vulkan Profiles documentation.
+
+The `gen_profiles_file.py` and `gen_profiles_solution.py` Python scripts are deprecated and replaced by the following `vkprofiles` commands:
+
+| Deprecated script | `vkprofiles` replacement |
+|-------------------|--------------------------|
+| `gen_profiles_file.py` | `vkprofiles combine` to combine profiles from the command line, or a `combine` node of a `vkprofiles graph` file to replace the `--config` JSON configuration file. |
+| `gen_profiles_solution.py --output-library-inc` / `--output-library-src` | `vkprofiles library` |
+| `gen_profiles_solution.py --output-doc` | `vkprofiles doc` |
+| `gen_profiles_solution.py --output-schema` | `vkprofiles schema` |
+| `gen_profiles_solution.py --validate` | `vkprofiles validate` |
+
+`vkprofiles` also provides new commands:
+
+- `vkprofiles validate` checks Vulkan Profiles files against the Vulkan Profiles schema and, with `--analyse`, reports semantic issues that schema validation can't catch.
+- `vkprofiles schema` generates the Vulkan Profiles schema from `vk.xml` and upgrades existing Vulkan Profiles files to the latest schema.
+- `vkprofiles transform` (beta) pulls extension dependencies, promoted extensions and aliased capabilities from `vk.xml` into Vulkan Profiles files, and strips redundant capabilities.
+- `vkprofiles extract` (beta) extracts some profiles of a Vulkan Profiles file into a separate file.
+- `vkprofiles summary` lists the profiles of a set of Vulkan Profiles files with their versions.
+- `vkprofiles graph` runs a pipeline of `vkprofiles` commands described in a JSON file, for example to generate a platform profile, validate it and generate its documentation and API library in one step.
+
+For the list of commands and options, we can use the command:
+
+```bash
+vkprofiles --help
+```
+
+Each command also has its own help, for example `vkprofiles combine --help`.
 
 ### Vulkan Capability minimum requirements
 
@@ -214,9 +250,9 @@ Vulkan Hardware Capability Viewer is part of the Khronos Vulkan SDK.
 
 ### Generating a Platform Vulkan Profiles JSON files
 
-The LunarG Desktop Baseline profiles were generated by downloading a set of Vulkan Device Profiles on GPUInfo.org and using a Python script to merge these Vulkan Device Profiles into Vulkan Platform Profiles by doing an intersection of all the capability of all Vulkan Device Profiles: a platform profile reports the list of all the capabilities available in all Vulkan Device profiles.
+The LunarG Desktop Baseline profiles were generated by downloading a set of Vulkan Device Profiles on GPUInfo.org and using the `vkprofiles combine` command to merge these Vulkan Device Profiles into Vulkan Platform Profiles by doing an intersection of all the capability of all Vulkan Device Profiles: a platform profile reports the list of all the capabilities available in all Vulkan Device profiles.
 
-This Python script is shipping as part of the Vulkan SDK in the `share/vulkan/registry` directory and is named `gen_profiles_file.py`.
+`vkprofiles combine` replaces the deprecated `gen_profiles_file.py` Python script. On top of the intersection mode, it supports the `union` mode, which lists the capabilities available in any of the source profiles, and the `difference` mode, which outputs the differences across a set of Vulkan profiles. The mode is selected with `--mode`.
 
 > As an example, the `VP_LUNARG_desktop_baseline_2024` is a Vulkan Platform Profile generated from multiple Vulkan Device Profiles downloaded from GPUInfo.org.
 
@@ -225,101 +261,122 @@ This Python script is shipping as part of the Vulkan SDK in the `share/vulkan/re
 The command to generate the LunarG Desktop Baseline profiles is:
 
 ```bash
-python gen_profiles_file.py \
+vkprofiles combine \
     --registry vk.xml \
     --input ./VP_LUNARG_desktop_baseline_2024 \
-    --output-path ./VP_LUNARG_desktop_baseline_2024.json \
-    --output-profile VP_LUNARG_desktop_baseline_2024 \
+    --output ./VP_LUNARG_desktop_baseline_2024.json \
+    --mode intersection \
+    --profile-name VP_LUNARG_desktop_baseline_2024 \
     --profile-label "LunarG Vulkan Desktop Baseline 2024 profile" \
     --profile-desc "A profile generated by the intersection of a collection of GPUInfo.org device reports to support a large number of actual systems in the Vulkan ecosystem. This profile is meant to be a usage example for Vulkan application developer." \
     --profile-date 2023-11-01 \
     --profile-api-version "1.2.197" \
-    --profile-required-profiles "VP_LUNARG_minimum_requirements_1_2" \
-    --strip-duplicate-structs
+    --profile-required-profiles "VP_LUNARG_minimum_requirements_1_2"
+```
+
+`vkprofiles combine` has no equivalent of the `--strip-duplicate-structs` option of `gen_profiles_file.py`: the generated profile keeps the aliased structures of the device profiles, for example both `VkPhysicalDeviceVulkan11Properties` and `VkPhysicalDeviceMultiviewPropertiesKHR`. These redundant structures are removed with `vkprofiles transform --strip duplication`. The input directory must also contain the profiles required by the generated profile, here `VP_LUNARG_minimum_requirements.json`:
+
+```bash
+vkprofiles transform \
+    --registry vk.xml \
+    --input ./my_profiles/ \
+    --input-profiles VP_LUNARG_desktop_baseline_2024 \
+    --output ./my_stripped_profiles/ \
+    --strip duplication
 ```
 
 We insist that the LunarG Desktop Baseline profiles are only usage examples of Vulkan Platform profiles. Nobody knows better what the set of platforms a Vulkan application should support than the Vulkan developer of that Vulkan application.
 
 With this whitepaper, Vulkan developers should be able to produce their own platform profiles representing the ecosystem of Vulkan devices and drivers their Vulkan applications should support.
 
-For more information on how to use `gen_profiles_file.py`, we can use the command:
+For more information on how to use `vkprofiles combine`, we can use the command:
 
 ```bash
-python gen_profiles_file.py --help
+vkprofiles combine --help
 ```
 
 ### JSON script to generate merged Vulkan profiles
 
 In some scenarios, generating Vulkan Profiles using the command line and command line arguments might be not particularly convenient, especially if the generated profiles are being updated over time.
 
-For this, we create a JSON configuration file to store all these data. Furthermore, with this JSON file we can generate multiple profiles stored into a single Vulkan Profiles JSON file. Following is an example of the JSON configuration file used to generate the LunarG desktop profiles.
+For this, we create a `vkprofiles graph` JSON file to store all these data. A graph file describes a pipeline of `vkprofiles` commands, called nodes. A `combine` node with a `profiles` element generates multiple profiles stored into a single Vulkan Profiles JSON file. It replaces the JSON configuration file of the deprecated `gen_profiles_file.py --config` option, and uses the same `profiles`, `contributors` and `history` elements. Following is an example of the graph file used to generate the LunarG desktop profiles.
 
 ```json
 {
-    "$schema": "profiles-config-latest",
-    "profiles": {
-        "VP_LUNARG_desktop_baseline_2022": {
-            "version": 2,
-            "input": "VP_LUNARG_desktop_baseline_2022",
-            "label": "LunarG Vulkan Desktop Baseline 2022 profile",
-            "description": "A profile generated...",
-            "date": "2023-01-26",
-            "stage": "STABLE",
-            "api-version": "1.1.139",
-            "required-profiles": ""
-        },
-        "VP_LUNARG_desktop_baseline_2023": {
-            "version": 2,
-            "input": "VP_LUNARG_desktop_baseline_2023",
-            "label": "LunarG Vulkan Desktop Baseline 2023 profile",
-            "description": "A profile generated...",
-            "date": "2023-01-30",
-            "stage": "STABLE",
-            "api-version": "1.2.148",
-            "required-profiles": ""
-        },
-        "VP_LUNARG_desktop_baseline_2024": {
-            "version": 1,
-            "input": "VP_LUNARG_desktop_baseline_2024",
-            "label": "LunarG Vulkan Desktop Baseline 2024 profile",
-            "description": "A profile generated...",
-            "date": "2024-02-20",
-            "stage": "STABLE",
-            "api-version": "1.2.197",
-            "required-profiles": ""
-        }
-    },
-    "contributors": {
-        "Christophe Riccio": {
-            "company": "LunarG",
-            "email": "christophe@lunarg.com",
-            "contact": true
-        }
-    },
-    "history": [
+    "$schema": "https://schema.khronos.org/vulkan/profiles-graph.json#",
+    "nodes": [
         {
-            "revision": 2,
-            "date": "2024-02-21",
-            "author": "Christophe Riccio",
-            "comment": "Updated Desktop Baseline 2023 and 2022 to version 2 with ARC support"
-        },
-        {
-            "revision": 1,
-            "date": "2024-02-21",
-            "author": "Christophe Riccio",
-            "comment": "Merged Desktop Baseline 2024, 2023 and 2022 into a single file"
+            "id": "desktop_baseline",
+            "description": "Generate the VP_LUNARG_desktop_baseline profiles",
+            "command": "combine",
+            "args": {
+                "output": "./VP_LUNARG_desktop_baseline.json",
+                "mode": "intersection",
+                "profiles": {
+                    "VP_LUNARG_desktop_baseline_2022": {
+                        "version": 2,
+                        "input": "VP_LUNARG_desktop_baseline_2022",
+                        "label": "LunarG Vulkan Desktop Baseline 2022 profile",
+                        "description": "A profile generated...",
+                        "date": "2023-01-26",
+                        "stage": "STABLE",
+                        "api-version": "1.1.139",
+                        "required-profiles": ""
+                    },
+                    "VP_LUNARG_desktop_baseline_2023": {
+                        "version": 2,
+                        "input": "VP_LUNARG_desktop_baseline_2023",
+                        "label": "LunarG Vulkan Desktop Baseline 2023 profile",
+                        "description": "A profile generated...",
+                        "date": "2023-01-30",
+                        "stage": "STABLE",
+                        "api-version": "1.2.148",
+                        "required-profiles": ""
+                    },
+                    "VP_LUNARG_desktop_baseline_2024": {
+                        "version": 1,
+                        "input": "VP_LUNARG_desktop_baseline_2024",
+                        "label": "LunarG Vulkan Desktop Baseline 2024 profile",
+                        "description": "A profile generated...",
+                        "date": "2024-02-20",
+                        "stage": "STABLE",
+                        "api-version": "1.2.197",
+                        "required-profiles": ""
+                    }
+                },
+                "contributors": {
+                    "Christophe Riccio": {
+                        "company": "LunarG",
+                        "email": "christophe@lunarg.com",
+                        "contact": true
+                    }
+                },
+                "history": [
+                    {
+                        "revision": 2,
+                        "date": "2024-02-21",
+                        "author": "Christophe Riccio",
+                        "comment": "Updated Desktop Baseline 2023 and 2022 to version 2 with ARC support"
+                    },
+                    {
+                        "revision": 1,
+                        "date": "2024-02-21",
+                        "author": "Christophe Riccio",
+                        "comment": "Merged Desktop Baseline 2024, 2023 and 2022 into a single file"
+                    }
+                ]
+            }
         }
     ]
 }
 ```
 
-The JSON configuration file for the file generation script is being executed by the following command line:
+The graph file is executed by the following command line:
 
 ```bash
-python gen_profiles_file.py \
+vkprofiles graph \
     --registry vk.xml \
-    --config VP_LUNARG_desktop_baseline_config.json \
-    --output-path ./VP_LUNARG_desktop_baseline.json
+    --input VP_LUNARG_desktop_baseline_graph.json
 ```
 
 ### Creating a Vulkan Profiles JSON files manually
@@ -335,6 +392,14 @@ Validating Vulkan Profiles JSON files against the schema can be performed using 
 - <https://jsonschemalint.com/#/version/draft-04/markup/json/>
 
 This can also be done with C++ libraries such as Valijson and most likely any JSON schema validation library already integrated into a Vulkan project codebase.
+
+The `vkprofiles validate` command validates Vulkan Profiles files against the Vulkan Profiles schema generated from `vk.xml`, or against an explicit schema file using `--schema`:
+
+```bash
+vkprofiles validate \
+    --registry vk.xml \
+    --input ./my_profiles/
+```
 
 *Example of Vulkan Profiles file:*
 
@@ -434,7 +499,16 @@ For this reason, we recommend using the Vulkan Profiles schema revision that mat
 
 Similarly, the Profiles JSON Schema can't validate a lot of the semantic aspects. For example, the `runtimeDescriptorArray` Vulkan feature can be enabled using multiple structures: `VkPhysicalDeviceDescriptorIndexingFeaturesEXT`, `VkPhysicalDeviceDescriptorIndexingFeatures`, and `VkPhysicalDeviceVulkan12Features`. Syntactically, all these structures can be used simultaneously for the definition of a profile; but what happens if they are specified with different values?
 
-To address these cases, we can use the Vulkan Profiles layer which reports warning messages.
+To address these cases, we can use the static analysis of `vkprofiles validate`, enabled with `--analyse`. It checks, for example, that the members of aliased capability structures are consistent (`aliases`), that the profile capabilities are available with the profile API version (`api-version`), and that capability values are not below the Vulkan core requirements (`subcore`). Without a list of checks, all the checks run:
+
+```bash
+vkprofiles validate \
+    --registry vk.xml \
+    --input ./my_profiles/ \
+    --analyse
+```
+
+The Vulkan Profiles layer also reports warning messages for these cases.
 
 ### Human readable Vulkan Profiles documentation
 
@@ -443,16 +517,16 @@ The Vulkan SDK provides a human readable documentation for Vulkan Profiles.
 This table can be generated for any set of profiles using the following command:
 
 ```bash
-python gen_profiles_solution.py \
+vkprofiles doc \
     --registry vk.xml \
     --input ./my_profiles/ \
-    --output-doc ./PROFILES.md
+    --output ./PROFILES.md
 ```
 
-For more information, use the following command:
+`vkprofiles doc` replaces the `--output-doc` option of the deprecated `gen_profiles_solution.py` Python script. For more information, use the following command:
 
 ```bash
-python gen_profiles_solution.py --help
+vkprofiles doc --help
 ```
 
 ## Using the Vulkan Profiles layer
@@ -585,23 +659,28 @@ The Vulkan Profiles API library is a generated header-only, C++ library. It does
 
 The Vulkan Profiles API library shipping with the Vulkan SDK serves mostly as an example because it bakes many profiles, most of them being useful for only very restricted scenarios. We expect that most Vulkan developers may be interested in creating their own profiles and generate a copy of the Vulkan Profiles API library for their profiles.
 
-The `gen_profiles_solution.py` python script is used to generate the Vulkan Profiles API library and is delivered as part of the Vulkan SDK in the `share/vulkan/registry` directory. Following, a command line example:
+The `vkprofiles library` command is used to generate the Vulkan Profiles API library. It replaces the `--output-library-inc` and `--output-library-src` options of the deprecated `gen_profiles_solution.py` Python script. Following, a command line example:
 
 ```bash
-python gen_profiles_solution.py \
+vkprofiles library \
     --registry vk.xml \
     --input ./my_profiles/ \
-    --output-library-inc ./my_library/ \
-    --output-library-src ./my_library/ \
+    --output ./my_library/include/ \
+    --output-src ./my_library/source/ \
+    --strip \
     --debug
 ```
 
+The `--strip` argument removes redundant capability structures from the profiles before generating the library. The Vulkan specification prohibits passing aliased feature structures together in the `VkDeviceCreateInfo` `pNext` chain, so using `--strip` ensures that the generated library creates valid `VkDevice` instances.
+
 The `--debug` argument is optional and useful during the development phase for the Vulkan Profiles API library to output useful debug information.
 
-For more information on how to use `gen_profiles_solution.py`, we can use the command:
+By default, `vkprofiles library` generates both the header-only variant and the header + source variant of the library; `--mode` selects one of them. `--input-profiles` restricts the library to a comma-separated list of profiles.
+
+For more information on how to use `vkprofiles library`, we can use the command:
 
 ```bash
-python gen_profiles_solution.py --help
+vkprofiles library --help
 ```
 
 Alternatively, the Vulkan Profiles API library can be trivially generated from the Vulkan Profiles repository to include support for any desired Vulkan Profiles. The Vulkan developer just needs to clone the Vulkan Profiles repository and replace the list of profiles files and edit the `${PROFILES_FILES_FOR_API_LIBRARY}` variable in the CMake file before rebuilding the project and grabbing the regenerated `vulkan_profiles.hpp` to check it in the project repository.
@@ -729,7 +808,7 @@ For more information on the Vulkan Profiles Library API, have a look at the API 
 ## Vulkan Profiles Tools future improvements
 
 - It would be nice to be able to emulate with the Vulkan Profiles Layer more precisely the capabilities expressed in a Vulkan Profile by selecting capability blocks individually.
-- It would be convenient to be able to run the Vulkan Profiles generator scripts from Vulkan Configurator, to quickly iterate between updating Vulkan Engine profiles and regenerating the Vulkan Profiles API library and Vulkan Profiles documentation.
+- It would be convenient to be able to run the `vkprofiles` commands from Vulkan Configurator, to quickly iterate between updating Vulkan Engine profiles and regenerating the Vulkan Profiles API library and Vulkan Profiles documentation.
 - It would be interesting to add a new operator to the merge script to generate a profile that lists all the capabilities of a source (engine) profile that are not supported by a destination (platform) profile.
 - Add dependencies between features and properties: some capabilities change values depending on whether some features or extensions are supported or not. For example, `pointSizeRange` depends on `largePoints`.
 - It would be a good addition to provide a library form of Vulkaninfo so that any Vulkan tool could generate Vulkan Profiles files easily, for example, to integrate the Vulkan capabilities of the system into a crash log.
@@ -738,7 +817,18 @@ For more information on the Vulkan Profiles Library API, have a look at the API 
 
 | Revision Date | SDK Release   | Comments |
 |---------------|---------------|----------|
-| November 2026 | —             | - Convert the whitepaper from PDF to Markdown.<br>- Fix the `VpInstanceCreateInfo` and `VpDeviceCreateInfo` usage in the API library code samples. |
+| November 2026 | —             | - Convert the whitepaper from PDF to Markdown.<br>- Fix the `VpInstanceCreateInfo` and `VpDeviceCreateInfo` usage in the API library code samples.<br>- Add the `vkprofiles` command-line tool, introduced in SDK 1.4.363.<br>- Replace the deprecated `gen_profiles_file.py` and `gen_profiles_solution.py` Python scripts by the `vkprofiles` commands in all examples.<br>- Add `vkprofiles validate` schema validation and static analysis. |
 | April 2024    | SDK 1.3.280.0 | - Introduce Capabilities object and externally loaded Vulkan functions.<br>- Add Vulkan profiles combination script.<br>- Various bug fixes. |
 | January 2024  | SDK 1.3.275.0 | - Add a section for user examples of Vulkan Profiles.<br>- Add information about the profiles merge script.<br>- Update Vulkan Profiles API Library section, API changes.<br>- Update Vulkan Layer: `VK_KHR_portability_subset` settings.<br>- Update future improvements section. |
 | January 2022  | SDK 1.3.204.0 | - Initial release. |
+
+## TODO
+
+Open items of the November 2026 revision that need input from the Vulkan Profiles Tools maintainers:
+
+- [ ] Two diagrams still show the deprecated Python scripts and need to be redrawn with the `vkprofiles` commands: `images/developer-system-setup.png` (`gen_profiles_solution.py` and `gen_profiles_file.py`) and `images/platform-profile-generation.png` (`gen_profiles_file.py`).
+- [ ] Confirm whether `vkprofiles combine --mode difference` implements the future improvement "a profile that lists all the capabilities of a source (engine) profile that are not supported by a destination (platform) profile", and remove that item from the future improvements if it does.
+- [ ] *Generating Vulkan Profiles API library* refers to the `${PROFILES_FILES_FOR_API_LIBRARY}` CMake variable, which no longer exists in the Vulkan Profiles repository. Describe how to select the profiles of the generated library when building the repository.
+- [ ] Confirm the Vulkan SDK release in which the `gen_profiles_file.py` and `gen_profiles_solution.py` scripts will be removed, and whether the Vulkan SDK still ships them in `share/vulkan/registry`.
+- [ ] Other parts of the whitepaper predate this revision and were not reviewed: the schema "covers Vulkan 1.3", the list of Vulkan Profiles shipped with the Vulkan SDK (for example the `VP_ANDROID_baseline_2021` and `VP_ANDROID_15_minimums` profiles, which Android rebranded), the Vulkan 1.0 requirement of the API library (the CHANGELOG says the tools require Vulkan 1.1 since SDK 1.4.363), and the `VK_KHR_portability_subset` emulation, which was removed from the Profiles layer.
+- [ ] The byline date (April 2024) wasn't updated; decide whether it should reflect the latest revision.
