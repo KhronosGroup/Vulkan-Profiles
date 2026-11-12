@@ -48,6 +48,12 @@ set(PROFILES_SCRIPT ${PROJECT_SOURCE_DIR}/scripts/vkprofiles.py)
 find_package(Python3 3.10 REQUIRED COMPONENTS Interpreter)
 
 option(SKIP_PYTHON_AUTO_INSTALL "Skip Python Modules installation" OFF)
+option(BUILD_WHITEPAPER_PDF "Generate the Vulkan Profiles Tools whitepaper PDF from its Markdown source" OFF)
+
+set(PYTHON_REQUIREMENTS "${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt")
+if (BUILD_WHITEPAPER_PDF)
+    list(APPEND PYTHON_REQUIREMENTS "${CMAKE_CURRENT_SOURCE_DIR}/doc/requirements.txt")
+endif()
 
 if (NOT SKIP_PYTHON_AUTO_INSTALL)
     # Some Python-based build operations (e.g. turning a Python script into a standalone
@@ -64,12 +70,17 @@ if (NOT SKIP_PYTHON_AUTO_INSTALL)
     # that if the venv's dependencies are changed, the venv will be updated.
     set(VENV_STAMP "${VENV_DIR}/venv.stamp")
 
+    set(PIP_REQUIREMENTS_ARGS "")
+    foreach(REQUIREMENTS_FILE ${PYTHON_REQUIREMENTS})
+        list(APPEND PIP_REQUIREMENTS_ARGS -r "${REQUIREMENTS_FILE}")
+    endforeach()
+
     add_custom_command(
         OUTPUT "${VENV_STAMP}"
         COMMAND ${Python3_EXECUTABLE} -m venv "${VENV_DIR}"
-        COMMAND "${VENV_PYTHON_EXECUTABLE}" -m pip install --no-cache-dir -r "${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt"
+        COMMAND "${VENV_PYTHON_EXECUTABLE}" -m pip install --no-cache-dir ${PIP_REQUIREMENTS_ARGS}
         COMMAND ${CMAKE_COMMAND} -E touch "${VENV_STAMP}"
-        DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt"
+        DEPENDS ${PYTHON_REQUIREMENTS}
         COMMENT "Creating Python virtual environment and installing dependencies..."
         VERBATIM
     )
@@ -231,4 +242,8 @@ endif()
 option(BUILD_PROFILES_LAYER "Build Profiles Layer" ON)
 if (BUILD_PROFILES_LAYER)
     add_subdirectory(layer)
+endif()
+
+if (BUILD_WHITEPAPER_PDF)
+    add_subdirectory(doc)
 endif()
