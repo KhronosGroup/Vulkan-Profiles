@@ -176,6 +176,18 @@ cd build/
 ctest --parallel 8 --output-on-failure
 ```
 
+### Whitepaper PDF
+
+The Vulkan Profiles Tools whitepaper is maintained as Markdown in `doc/Vulkan-Profiles-Tools-Whitepaper.md`.
+Configure with `-D BUILD_WHITEPAPER_PDF=ON` to also regenerate `doc/Vulkan-Profiles-Tools-Whitepaper.pdf` in the
+source tree whenever the Markdown, its images or the generator change. The Python modules it needs are listed in `doc/requirements.txt` and are installed into
+the build's Python virtual environment, unless `SKIP_PYTHON_AUTO_INSTALL` is ON.
+
+```
+cmake -S . -B build/ -D BUILD_WHITEPAPER_PDF=ON
+cmake --build ./build/ --target VpWhitepaperPdf
+```
+
 ### Android Build
 Use the following to ensure the Android build works.
 

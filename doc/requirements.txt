@@ -1,0 +1,5 @@
+# Python modules needed to generate the documentation PDF (BUILD_WHITEPAPER_PDF)
+markdown-it-py >= 3.0
+# PyMuPDF 1.27 and 1.28 drop content when an image falls at a page break, and PyMuPDF 2.x
+# pulls in large unneeded dependencies (onnxruntime, numpy, ...).
+PyMuPDF >= 1.25, < 1.27
