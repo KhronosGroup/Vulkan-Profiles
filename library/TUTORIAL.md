@@ -65,18 +65,28 @@ The profile definitions are enabled depending on the pre-processor definitions c
 
 For many use cases, existing Vulkan Profiles are not very useful, a Vulkan application may require to create it's own Vulkan Profiles to better represent the ecosystem devices the Vulkan application is designed to run on and the rendering code paths.
 
-For this purpose, the Vulkan SDK ships with the `gen_profiles_solution.py` python script in the `share/vulkan/registry` directory. To use this script, simply copy your Vulkan Profiles in a `profiles` directory and use the command:
+For this purpose, the Vulkan SDK ships with the `vkprofiles` command-line tool. To generate the library, simply copy your Vulkan Profiles in a `profiles` directory and use the command:
 
 ```
-    python gen_profiles_solution.py --registry ./vk.xml --input ./profiles --output-library-inc . --output-library-src .
+    vkprofiles library --registry ./vk.xml --input ./profiles --output . --strip
 ```
 
-When `--output-library-src` is not specified, the header-only library is generated but not the header + source pair.
-
-For more information about the Vulkan Profiles library generation, use the command:
+By default, both the header-only library (`vulkan_profiles.hpp`) and the header + source pair (`vulkan_profiles.h` and `vulkan_profiles.cpp`) are generated. To generate only the header-only library, use `--mode header-only`:
 
 ```
-    python gen_profiles_solution.py --help
+    vkprofiles library --registry ./vk.xml --input ./profiles --output . --mode header-only --strip
+```
+
+The header + source pair is written in the `--output-src` directory, or in the `--output` directory when `--output-src` is not specified. The output directories must exist before running the command.
+
+The `--strip` option removes redundant capability structures from the profiles before generating the library: the Vulkan specification prohibits passing aliased feature structures together in the `VkDeviceCreateInfo` `pNext` chain, so `--strip` ensures that the generated library creates valid `VkDevice` instances. `--input-profiles` restricts the library to a comma-separated list of profiles, and `--debug` generates the library with debug messages reporting the unsupported capabilities when checking the support of a profile.
+
+`vkprofiles library` replaces the `gen_profiles_solution.py` python script, deprecated in Vulkan SDK 1.4.363 and removed in the December 2026 Vulkan SDK.
+
+For more information about the Vulkan Profiles library generation, see the [`library` command](../scripts/README.md#8-library) of the `vkprofiles` documentation, or use the command:
+
+```
+    vkprofiles library --help
 ```
 
 ## Basic usage
@@ -84,7 +94,7 @@ For more information about the Vulkan Profiles library generation, use the comma
 The typically expected usage of the Vulkan Profiles library is for applications to target a specific profile with their application and leave it to the Vulkan Profiles library to enable any necessary extensions and features required by that profile.
 
 The Vulkan Header version 1.4.358 introduced the `VpFunctions` object which broke backward compatibility with previous version of the library. The `VpFunctions` object enables using the Profiles API library with Vulkan functions provided external and dynamic Vulkan API loading.
-While this new API remains at the `BETA` development stage, it's protected by the `VP_USE_OBJECT` `#define` which must be defined to use the new API described bellow.
+The `VpFunctions` API is stable. It's enabled by the `VP_USE_OBJECT` `#define`, which must be defined before including the library to use the API described below. Using the library without `VP_USE_OBJECT`, with the legacy API that has no `VpFunctions` object, is deprecated since Vulkan SDK 1.4.363, and the legacy API will be removed in the December 2026 Vulkan SDK.
 
 ```C++
     #define VP_USE_OBJECT 1
@@ -187,7 +197,7 @@ However, if the application doesn't use `vpCreateInstance` but `vkCreateInstance
 Once the instance-level functions are loaded, the application can check whether individual physical devices support the selected profile as follows:
 
 ```C++
-    result = vpGetPhysicalDeviceProfileSupport(capabilities, instance, physicalDevice,
+    result = vpGetPhysicalDeviceProfileSupport(functions, instance, physicalDevice,
                                                &profile, &supported);
     if (result != VK_SUCCESS) {
         // something went wrong
