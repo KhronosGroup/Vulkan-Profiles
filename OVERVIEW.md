@@ -75,6 +75,7 @@ The VP_ANDROID_15_minimums profile has been deprecated by Android, rebranded int
 
 The `VP_LUNARG_desktop_baseline` profiles are generated arbritarily as examples of *Platform* profiles from hand picked Vulkan devices profiles. They are not expected to be used by Vulkan applications as defined. Instead, Vulkan application developers should create *Platform* profiles dedicated to their Vulkan applications that match the ecosystem of devices they want the Vulkan applications to run on.
 
+* [VP_LUNARG_desktop_baseline_2027](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_LUNARG_desktop_baseline_2027) (Vulkan 1.4, MoltenVK not supported)
 * [VP_LUNARG_desktop_baseline_2026](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_LUNARG_desktop_baseline_2026) (Vulkan 1.4)
 * [VP_LUNARG_desktop_baseline_2024](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_LUNARG_desktop_baseline_2024) (Vulkan 1.2)
 * [VP_LUNARG_desktop_baseline_2023](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/profiles/VP_LUNARG_desktop_baseline_2023) (Vulkan 1.2)

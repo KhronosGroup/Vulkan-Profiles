@@ -158,6 +158,12 @@ Create a graph file such as `profiles/desktop_baseline_pipeline.json`:
         },
         "history": [
           {
+            "revision": 5,
+            "date": "2026-11-16",
+            "author": "Christophe Riccio",
+            "comment": "Add Desktop Baseline 2027 without MoltenVK support"
+          },
+          {
             "revision": 4,
             "date": "2026-09-16",
             "author": "Christophe Riccio",
@@ -203,6 +209,16 @@ Create a graph file such as `profiles/desktop_baseline_pipeline.json`:
             "date": "2026-09-16",
             "stage": "STABLE",
             "api-version": "1.4.303",
+            "required-profiles": ""
+          },
+          "VP_LUNARG_desktop_baseline_2027": {
+            "version": 1,
+            "input": "profiles/LunarG/VP_LUNARG_desktop_baseline_2027",
+            "label": "LunarG Vulkan Desktop Baseline 2027 profile",
+            "description": "Desktop baseline profile for 2027-era systems, without MoltenVK support.",
+            "date": "2026-11-16",
+            "stage": "STABLE",
+            "api-version": "1.4.315",
             "required-profiles": ""
           }
         }
@@ -496,7 +512,7 @@ vkprofiles min-api-version --input path/to/profiles [options]
 ```bash
 vkprofiles min-api-version \
     --input profiles/LunarG \
-    --input-profiles VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2026 \
+    --input-profiles VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2027 \
     --mode display \
     --verbose
 ```
@@ -554,7 +570,7 @@ vkprofiles library \
     --api vulkan \
     --registry vk.xml \
     --input profiles \
-  --input-profiles "VP_KHR_roadmap_2022,VP_KHR_roadmap_2024,VP_KHR_roadmap_2026,VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2023,VP_LUNARG_desktop_baseline_2024,VP_LUNARG_desktop_baseline_2026" \
+  --input-profiles "VP_KHR_roadmap_2022,VP_KHR_roadmap_2024,VP_KHR_roadmap_2026,VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2023,VP_LUNARG_desktop_baseline_2024,VP_LUNARG_desktop_baseline_2026,VP_LUNARG_desktop_baseline_2027" \
     --output library/include/vulkan \
     --output-src library/source \
     --output-filename vulkan_profiles \
