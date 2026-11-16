@@ -541,21 +541,33 @@ TEST_F(TestsMechanism, selecting_profile_with_required_profiles_extensions) {
     ASSERT_EQ(err, VK_SUCCESS);
 
     {
-        VkPhysicalDevice gpu_native = VK_NULL_HANDLE;
-        err = inst_builder.getPhysicalDevice(profiles_test::MODE_NATIVE, &gpu_native);
+        // The layer loads the profile on every physical device, and debug_fail_on_error makes vkEnumeratePhysicalDevices fail
+        // when any of them doesn't support the profile extensions, such as the Dozen devices on Windows ARM.
+        const VkInstance instance_native = inst_builder.getInstance(profiles_test::MODE_NATIVE);
+
+        uint32_t gpu_count = 0;
+        err = vkEnumeratePhysicalDevices(instance_native, &gpu_count, nullptr);
+        ASSERT_EQ(err, VK_SUCCESS);
+        std::vector<VkPhysicalDevice> gpus_native(gpu_count);
+        err = vkEnumeratePhysicalDevices(instance_native, &gpu_count, gpus_native.data());
         ASSERT_EQ(err, VK_SUCCESS);
 
-        uint32_t count = 0;
-        vkEnumerateDeviceExtensionProperties(gpu_native, nullptr, &count, nullptr);
-        std::vector<VkExtensionProperties> device_extensions(count);
-        vkEnumerateDeviceExtensionProperties(gpu_native, nullptr, &count, device_extensions.data());
+        for (const VkPhysicalDevice gpu_native : gpus_native) {
+            uint32_t count = 0;
+            vkEnumerateDeviceExtensionProperties(gpu_native, nullptr, &count, nullptr);
+            std::vector<VkExtensionProperties> device_extensions(count);
+            vkEnumerateDeviceExtensionProperties(gpu_native, nullptr, &count, device_extensions.data());
 
-        const bool supported = std::any_of(device_extensions.begin(), device_extensions.end(), [](const VkExtensionProperties& ext) {
-            return std::strcmp(ext.extensionName, VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME) == 0;
-        });
-        if (!supported) {
-            inst_builder.reset();
-            GTEST_SKIP() << VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME << " not supported by the device";
+            const bool supported =
+                std::any_of(device_extensions.begin(), device_extensions.end(), [](const VkExtensionProperties& ext) {
+                    return std::strcmp(ext.extensionName, VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME) == 0;
+                });
+            if (!supported) {
+                VkPhysicalDeviceProperties properties{};
+                vkGetPhysicalDeviceProperties(gpu_native, &properties);
+                inst_builder.reset();
+                GTEST_SKIP() << VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME << " not supported by " << properties.deviceName;
+            }
         }
     }
 

@@ -17,7 +17,7 @@
     "profiles": {
         "VP_LUNARG_test_required_profiles_extensions_base": {
             "version": 1,
-            "api-version": "1.1.142",
+            "api-version": "1.1.0",
             "label": "LunarG test required profiles extensions base profile",
             "description": "Required profile declaring an extension.",
             "contributors": {
@@ -42,7 +42,7 @@
         },
         "VP_LUNARG_test_required_profiles_extensions": {
             "version": 1,
-            "api-version": "1.1.142",
+            "api-version": "1.1.0",
             "label": "LunarG test required profiles extensions profile",
             "description": "Profile setting properties of an extension declared by a required profile.",
             "contributors": {
