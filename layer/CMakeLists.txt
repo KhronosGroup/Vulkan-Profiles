@@ -184,8 +184,24 @@ if(ANDROID)
     target_link_Libraries(ProfilesLayer PRIVATE log)
 endif()
 
-set(INPUT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${LAYER_NAME}.json.in")
+set(TEMPLATE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${LAYER_NAME}.json.in")
+set(INPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/json/${LAYER_NAME}.json.in")
 set(INTERMEDIATE_FILE "${CMAKE_CURRENT_BINARY_DIR}/json/profile.json")
+
+# Fill the manifest lists generated from vk.xml, such as the exclude_device_extensions and exclude_formats setting lists,
+# before configure_file() replaces the other placeholders
+set(MANIFEST_LISTS_SCRIPT "${PROJECT_SOURCE_DIR}/scripts/gen_layer_manifest_lists.py")
+set(MANIFEST_LISTS_REGISTRY "${VULKAN_HEADERS_INSTALL_DIR}/${CMAKE_INSTALL_DATADIR}/vulkan/registry/vk.xml")
+execute_process(
+    COMMAND ${Python3_EXECUTABLE} "${MANIFEST_LISTS_SCRIPT}"
+        --registry "${MANIFEST_LISTS_REGISTRY}"
+        --input "${TEMPLATE_FILE}"
+        --output "${INPUT_FILE}"
+    RESULT_VARIABLE MANIFEST_LISTS_RESULT)
+if (NOT MANIFEST_LISTS_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed to generate the ${LAYER_NAME}.json lists with ${MANIFEST_LISTS_SCRIPT}")
+endif()
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${TEMPLATE_FILE}" "${MANIFEST_LISTS_SCRIPT}" "${MANIFEST_LISTS_REGISTRY}")
 set(OUTPUT_FILE_FINAL_NAME "${LAYER_NAME}.json")
 set(LAYER_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})
 if (WIN32)
