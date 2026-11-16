@@ -20,6 +20,7 @@
 
 ### Profiles:
 - Add VP_ANDROID_18_requirements profile
+- Add the generated `VP_LUNARG_desktop_baseline_2027` profile, MoltenVK is not supported, macOS support is limited to Mesa Vulkan drivers
 
 ### Deprecation:
 - `VK_KHR_portability_subset` support is deprecated
