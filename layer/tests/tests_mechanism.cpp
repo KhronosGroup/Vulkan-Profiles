@@ -26,7 +26,9 @@
 #include <gtest/gtest.h>
 #include "profiles_test_helper.h"
 
+#include <algorithm>
 #include <cstdarg>
+#include <cstring>
 #include <fstream>
 
 class TestsMechanism : public VkTestFramework {
@@ -499,8 +501,79 @@ TEST_F(TestsMechanism, selecting_profile_with_required_profiles) {
         EXPECT_EQ(2048, gpu_props2.properties.limits.maxImageDimension1D);
         EXPECT_EQ(4096, gpu_props2.properties.limits.maxImageDimension2D);
 
+        // Extensions of both the requested profile and its required profile are exposed
+        uint32_t count = 0;
+        vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, nullptr);
+        std::vector<VkExtensionProperties> extensions(count);
+        vkEnumerateDeviceExtensionProperties(gpu, nullptr, &count, extensions.data());
+
+        const auto has_extension = [&extensions](const char* name) {
+            return std::any_of(extensions.begin(), extensions.end(),
+                               [name](const VkExtensionProperties& ext) { return std::strcmp(ext.extensionName, name) == 0; });
+        };
+
+        EXPECT_TRUE(has_extension(VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME));  // VP_LUNARG_test_required_profiles2
+        EXPECT_TRUE(has_extension(VK_KHR_SWAPCHAIN_EXTENSION_NAME));        // VP_LUNARG_test_required_profiles
+
         inst_builder.reset();
     }
+}
+
+TEST_F(TestsMechanism, selecting_profile_with_required_profiles_extensions) {
+    TEST_DESCRIPTION("Test that the extensions of a required profile are kept while loading the requested profile");
+
+    const char* profile_dirs_data = JSON_TEST_FILES_PATH;
+    const char* profile_name_data = "VP_LUNARG_test_required_profiles_extensions";
+    const std::vector<const char*> simulate_capabilities = {"SIMULATE_MAX_ENUM"};
+    const char* debug_reports_data = "DEBUG_REPORT_MAX_ENUM";
+    const VkBool32 debug_fail_on_error = VK_TRUE;
+
+    const std::vector<VkLayerSettingEXT> settings = {
+        {kLayerName, kLayerSettingsProfileDirs, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_dirs_data},
+        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+        {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT,
+         static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+        {kLayerName, kLayerSettingsDebugReports, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &debug_reports_data},
+        {kLayerName, kLayerSettingsDebugFailOnError, VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &debug_fail_on_error}};
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+    VkResult err = inst_builder.init(settings);
+    ASSERT_EQ(err, VK_SUCCESS);
+
+    {
+        VkPhysicalDevice gpu_native = VK_NULL_HANDLE;
+        err = inst_builder.getPhysicalDevice(profiles_test::MODE_NATIVE, &gpu_native);
+        ASSERT_EQ(err, VK_SUCCESS);
+
+        uint32_t count = 0;
+        vkEnumerateDeviceExtensionProperties(gpu_native, nullptr, &count, nullptr);
+        std::vector<VkExtensionProperties> device_extensions(count);
+        vkEnumerateDeviceExtensionProperties(gpu_native, nullptr, &count, device_extensions.data());
+
+        const bool supported = std::any_of(device_extensions.begin(), device_extensions.end(), [](const VkExtensionProperties& ext) {
+            return std::strcmp(ext.extensionName, VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME) == 0;
+        });
+        if (!supported) {
+            inst_builder.reset();
+            GTEST_SKIP() << VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME << " not supported by the device";
+        }
+    }
+
+    VkPhysicalDevice gpu = VK_NULL_HANDLE;
+    err = inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+    ASSERT_EQ(err, VK_SUCCESS);
+
+    VkPhysicalDevicePushDescriptorPropertiesKHR push_descriptor_properties{};
+    push_descriptor_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PUSH_DESCRIPTOR_PROPERTIES_KHR;
+
+    VkPhysicalDeviceProperties2 gpu_props2{};
+    gpu_props2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    gpu_props2.pNext = &push_descriptor_properties;
+    vkGetPhysicalDeviceProperties2(gpu, &gpu_props2);
+
+    EXPECT_EQ(31u, push_descriptor_properties.maxPushDescriptors);
+
+    inst_builder.reset();
 }
 
 TEST_F(TestsMechanism, profile_variants_all) {
