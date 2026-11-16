@@ -337,14 +337,14 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'maxMemoryAllocationSize', '1073741824', None),
         PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'protectedNoFault', None, None),
 
-        PropertyRequirement('VkPhysicalDeviceSamplerFilterMinmaxProperties', 'filterMinmaxImageComponentMapping', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceSamplerFilterMinmaxProperties', 'filterMinmaxImageComponentMapping', 'false', 'VkPhysicalDeviceVulkan12Features::samplerFilterMinmax'),
         PropertyRequirement('VkPhysicalDeviceDepthStencilResolveProperties', 'supportedDepthResolveModes', 'VK_RESOLVE_MODE_SAMPLE_ZERO_BIT', None),
         PropertyRequirement('VkPhysicalDeviceDepthStencilResolveProperties', 'supportedStencilResolveModes', 'VK_RESOLVE_MODE_SAMPLE_ZERO_BIT', None),
         PropertyRequirement('VkPhysicalDeviceDepthStencilResolveProperties', 'independentResolveNone', 'false', None),
         PropertyRequirement('VkPhysicalDeviceDepthStencilResolveProperties', 'independentResolve', 'false', None),
-        PropertyRequirement('VkPhysicalDeviceTimelineSemaphoreProperties', 'maxTimelineSemaphoreValueDifference', '2147483647', None),
+        PropertyRequirement('VkPhysicalDeviceTimelineSemaphoreProperties', 'maxTimelineSemaphoreValueDifference', '2147483647', 'VkPhysicalDeviceTimelineSemaphoreFeatures::timelineSemaphore'),
 
-        PropertyRequirement('VkPhysicalDeviceFloatControlsProperties', 'shaderSignedZeroInfNanPreserveFloat16', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceFloatControlsProperties', 'shaderSignedZeroInfNanPreserveFloat16', 'false', 'VkPhysicalDeviceShaderFloat16Int8Features::shaderFloat16'),
         PropertyRequirement('VkPhysicalDeviceFloatControlsProperties', 'shaderSignedZeroInfNanPreserveFloat32', 'false', None),
         PropertyRequirement('VkPhysicalDeviceFloatControlsProperties', 'shaderSignedZeroInfNanPreserveFloat64', 'false', None),
         PropertyRequirement('VkPhysicalDeviceFloatControlsProperties', 'shaderDenormPreserveFloat16', 'false', None),
@@ -360,8 +360,8 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceFloatControlsProperties', 'shaderRoundingModeRTZFloat32', 'false', None),
         PropertyRequirement('VkPhysicalDeviceFloatControlsProperties', 'shaderRoundingModeRTZFloat64', 'false', None),
 
-        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'filterMinmaxImageComponentMapping', 'false', None),
-        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSignedZeroInfNanPreserveFloat16', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'filterMinmaxImageComponentMapping', 'false', 'VkPhysicalDeviceVulkan12Features::samplerFilterMinmax'),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSignedZeroInfNanPreserveFloat16', 'false', 'VkPhysicalDeviceVulkan12Features::shaderFloat16'),
         PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSignedZeroInfNanPreserveFloat32', 'false', None),
         PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSignedZeroInfNanPreserveFloat64', 'false', None),
         PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderDenormPreserveFloat16', 'false', None),
@@ -387,7 +387,7 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'supportedStencilResolveModes', 'VK_RESOLVE_MODE_SAMPLE_ZERO_BIT', None),
         PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'independentResolveNone', 'false', None),
         PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'independentResolve', 'false', None),
-        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxTimelineSemaphoreValueDifference', '2147483647', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'maxTimelineSemaphoreValueDifference', '2147483647', 'VkPhysicalDeviceVulkan12Features::timelineSemaphore'),
         PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'framebufferIntegerColorSampleCounts', 'VK_SAMPLE_COUNT_1_BIT', None),
 
         # Implementation-dependent
@@ -567,7 +567,7 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         PropertyRequirement('VkPhysicalDeviceShaderIntegerDotProductProperties', 'integerDotProductAccumulatingSaturating64BitSignedAccelerated', 'false', None),
         PropertyRequirement('VkPhysicalDeviceShaderIntegerDotProductProperties', 'integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated', 'false', None),
 
-        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'maxBufferSize', '1073741824', None),
+        PropertyRequirement('VkPhysicalDeviceVulkan13Properties', 'maxBufferSize', '1073741824', 'VkPhysicalDeviceVulkan13Features::maintenance4'),
 
         PropertyRequirement('VkPhysicalDeviceMaintenance4Properties', 'maxBufferSize', '1073741824', 'VkPhysicalDeviceMaintenance4Features::maintenance4'),
 
@@ -624,14 +624,13 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         # TODO: Hard-coded worst case. Ideally derived from the granularity limit (e.g. a ULP-aware
         # limittype or attribute) rather than baked in here.
         # Vulkan 1.4 requires pointSizeGranularity to be at most 0.125, so the worst case is 256.0 - 0.125 = 255.875.
-        PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeRange', '1.0, 255.875', None),
-        PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeGranularity', '0.125', None),
-        PropertyRequirement('VkPhysicalDeviceLimits', 'lineWidthGranularity', '0.5', None),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeRange', '1.0, 255.875', 'VkPhysicalDeviceFeatures::largePoints'),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'pointSizeGranularity', '0.125', 'VkPhysicalDeviceFeatures::largePoints'),
+        PropertyRequirement('VkPhysicalDeviceLimits', 'lineWidthGranularity', '0.5', 'VkPhysicalDeviceFeatures::wideLines'),
         PropertyRequirement('VkPhysicalDeviceLimits', 'standardSampleLocations', 'true', None),
         PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'subgroupSupportedStages', 'VK_SHADER_STAGE_COMPUTE_BIT', None),
         PropertyRequirement('VkPhysicalDeviceVulkan11Properties', 'subgroupSupportedOperations', 'VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_CLUSTERED_BIT | VK_SUBGROUP_FEATURE_ROTATE_BIT | VK_SUBGROUP_FEATURE_ROTATE_CLUSTERED_BIT', None),
         PropertyRequirement('VkPhysicalDeviceSubgroupProperties', 'supportedOperations', 'VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_CLUSTERED_BIT | VK_SUBGROUP_FEATURE_ROTATE_BIT | VK_SUBGROUP_FEATURE_ROTATE_CLUSTERED_BIT', None),
-        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSignedZeroInfNanPreserveFloat16', 'true', None),
         PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSignedZeroInfNanPreserveFloat32', 'true', None),
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'lineSubPixelPrecisionBits', '4', None),
         PropertyRequirement('VkPhysicalDeviceLineRasterizationProperties', 'lineSubPixelPrecisionBits', '4', None),
@@ -679,6 +678,8 @@ DEFAULT_CORE_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = {
         
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'optimalTilingLayoutUUID', None, None),
         PropertyRequirement('VkPhysicalDeviceHostImageCopyProperties', 'optimalTilingLayoutUUID', None, None),
+
+        PropertyRequirement('VkPhysicalDeviceVulkan12Properties', 'shaderSignedZeroInfNanPreserveFloat16', 'true', 'VkPhysicalDeviceVulkan12Features::shaderFloat16'),
 
         # Implementation-dependent
         PropertyRequirement('VkPhysicalDeviceVulkan14Properties', 'defaultRobustnessStorageBuffers', None, None),
@@ -873,10 +874,10 @@ DEFAULT_EXTENSION_PROPERTY_REQUIREMENTS: dict[str, list[PropertyRequirement]] = 
         PropertyRequirement('VkPhysicalDeviceDepthStencilResolvePropertiesKHR', 'independentResolve', 'false', None),
     ],
     'VK_KHR_timeline_semaphore': [
-        PropertyRequirement('VkPhysicalDeviceTimelineSemaphorePropertiesKHR', 'maxTimelineSemaphoreValueDifference', '2147483647', None),
+        PropertyRequirement('VkPhysicalDeviceTimelineSemaphorePropertiesKHR', 'maxTimelineSemaphoreValueDifference', '2147483647', 'VkPhysicalDeviceTimelineSemaphoreFeaturesKHR::timelineSemaphore'),
     ],
     'VK_KHR_shader_float_controls': [
-        PropertyRequirement('VkPhysicalDeviceFloatControlsPropertiesKHR', 'shaderSignedZeroInfNanPreserveFloat16', 'false', None),
+        PropertyRequirement('VkPhysicalDeviceFloatControlsPropertiesKHR', 'shaderSignedZeroInfNanPreserveFloat16', 'false', 'VkPhysicalDeviceShaderFloat16Int8FeaturesKHR::shaderFloat16'),
         PropertyRequirement('VkPhysicalDeviceFloatControlsPropertiesKHR', 'shaderSignedZeroInfNanPreserveFloat32', 'false', None),
         PropertyRequirement('VkPhysicalDeviceFloatControlsPropertiesKHR', 'shaderSignedZeroInfNanPreserveFloat64', 'false', None),
         PropertyRequirement('VkPhysicalDeviceFloatControlsPropertiesKHR', 'shaderDenormPreserveFloat16', 'false', None),

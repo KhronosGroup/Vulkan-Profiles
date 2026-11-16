@@ -256,7 +256,6 @@ class TestConvertPullRequiredCapabilitiesCore14(unittest.TestCase):
                                 "discreteQueuePriorities": 2,
                                 "pointSizeRange": [1.0, 255.875],
                                 "pointSizeGranularity": 0.125,
-                                "lineWidthGranularity": 0.5,
                                 "standardSampleLocations": true,
                                 "nonCoherentAtomSize": 256
                             }
@@ -276,7 +275,6 @@ class TestConvertPullRequiredCapabilitiesCore14(unittest.TestCase):
                             "maxMemoryAllocationSize": 1073741824
                         },
                         "VkPhysicalDeviceVulkan12Properties": {
-                            "shaderSignedZeroInfNanPreserveFloat16": true,
                             "shaderSignedZeroInfNanPreserveFloat32": true,
                             "supportedDepthResolveModes": ["VK_RESOLVE_MODE_SAMPLE_ZERO_BIT"],
                             "supportedStencilResolveModes": ["VK_RESOLVE_MODE_SAMPLE_ZERO_BIT"],

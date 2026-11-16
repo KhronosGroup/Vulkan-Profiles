@@ -361,7 +361,6 @@
                         "timestampComputeAndGraphics": true,
                         "pointSizeRange": [ 1.0, 255.875 ],
                         "pointSizeGranularity": 0.125,
-                        "lineWidthGranularity": 0.5,
                         "standardSampleLocations": true
                     }
                 },
@@ -370,7 +369,6 @@
                     "subgroupSupportedOperations": [ "VK_SUBGROUP_FEATURE_BASIC_BIT", "VK_SUBGROUP_FEATURE_CLUSTERED_BIT", "VK_SUBGROUP_FEATURE_ROTATE_BIT", "VK_SUBGROUP_FEATURE_ROTATE_CLUSTERED_BIT" ]
                 },
                 "VkPhysicalDeviceVulkan12Properties": {
-                    "shaderSignedZeroInfNanPreserveFloat16": true,
                     "shaderSignedZeroInfNanPreserveFloat32": true
                 },
                 "VkPhysicalDeviceVulkan14Properties": {
@@ -446,6 +444,12 @@
         }
     },
     "history": [
+        {
+            "revision": 4,
+            "date": "2026-11-16",
+            "author": "Christophe Riccio",
+            "comment": "Remove Vulkan 1.4 lineWidthGranularity and shaderSignedZeroInfNanPreserveFloat16 requirements, which depend on the optional wideLines and shaderFloat16 features"
+        },
         {
             "revision": 3,
             "date": "2026-10-16",
