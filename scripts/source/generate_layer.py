@@ -1565,7 +1565,10 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
             const auto &cap_definision = cap_definisions[capability_variant];
             const auto &properties = cap_definision["properties"];
 
-            if (VK_API_VERSION_PATCH(this->profile_api_version_) > VK_API_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion)) {
+            // Compare the whole major.minor.patch version, without the variant
+            const uint32_t profile_version = VK_MAKE_API_VERSION(0, VK_API_VERSION_MAJOR(this->profile_api_version_), VK_API_VERSION_MINOR(this->profile_api_version_), VK_API_VERSION_PATCH(this->profile_api_version_));
+            const uint32_t device_version = VK_MAKE_API_VERSION(0, VK_API_VERSION_MAJOR(pdd_->physical_device_properties_.apiVersion), VK_API_VERSION_MINOR(pdd_->physical_device_properties_.apiVersion), VK_API_VERSION_PATCH(pdd_->physical_device_properties_.apiVersion));
+            if (profile_version > device_version) {
                 LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
                     "Profile apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ") is greater than the device apiVersion (%" PRIu32 ".%" PRIu32 ".%" PRIu32 ").\\n",
                         VK_API_VERSION_MAJOR(this->profile_api_version_),
