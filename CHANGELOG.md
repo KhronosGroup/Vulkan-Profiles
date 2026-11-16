@@ -17,6 +17,9 @@
 - Add `validate` analysis check to report unratified extensions in profiles files
 - Add `transform --strip unratified` to remove all unratified extensions in profiles files
 - Speed up profiles files schema validation by checking the profiles schema only once
+- Rename the Profiles layer *Emulate a Vulkan Conformant Profile* preset to *Emulate a Desktop Profile*, using the `VP_LUNARG_desktop_baseline_2026` profile
+- Add the Profiles layer *Emulate a Roadmap Profile* preset, using the `VP_KHR_roadmap_2022` profile
+- Update the Profiles layer `exclude_device_extensions` setting list with all the device extensions of the Vulkan 1.4.368 headers
 
 ### Profiles:
 - Add VP_ANDROID_18_requirements profile
