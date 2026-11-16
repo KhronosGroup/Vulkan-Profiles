@@ -10,38 +10,49 @@ This whitepaper presents the Vulkan Profiles Tools and how they fit together. Ea
 
 ## Table of Contents
 
-- [Why do Vulkan Profiles matter?](#why-do-vulkan-profiles-matter)
-  - [Explicit Vulkan capability requirements](#explicit-vulkan-capability-requirements)
-  - [Projects using Vulkan Profiles](#projects-using-vulkan-profiles)
-  - [Different types of Vulkan Profiles](#different-types-of-vulkan-profiles)
-- [The Vulkan Profiles Tools Components](#the-vulkan-profiles-tools-components)
-  - [The vkprofiles command-line tool](#the-vkprofiles-command-line-tool)
-  - [Vulkan Capability minimum requirements](#vulkan-capability-minimum-requirements)
-  - [The Vulkan Profiles Tools Code Generation](#the-vulkan-profiles-tools-code-generation)
-  - [The Vulkan Profiles documentation](#the-vulkan-profiles-documentation)
-- [Creating a Vulkan Profiles JSON files](#creating-a-vulkan-profiles-json-files)
-  - [Generating a Device Vulkan Profiles files](#generating-a-device-vulkan-profiles-files)
-  - [Generating a Platform Vulkan Profiles JSON files](#generating-a-platform-vulkan-profiles-json-files)
-  - [JSON script to generate merged Vulkan profiles](#json-script-to-generate-merged-vulkan-profiles)
-  - [Creating a Vulkan Profiles JSON files manually](#creating-a-vulkan-profiles-json-files-manually)
-  - [Identifying the minimum Vulkan API version of a profile](#identifying-the-minimum-vulkan-api-version-of-a-profile)
-  - [Comparing engine profiles with platform profiles](#comparing-engine-profiles-with-platform-profiles)
-  - [Limitations of Vulkan Profiles schema validation](#limitations-of-vulkan-profiles-schema-validation)
-  - [Human readable Vulkan Profiles documentation](#human-readable-vulkan-profiles-documentation)
-- [Using the Vulkan Profiles layer](#using-the-vulkan-profiles-layer)
-  - [Simulation vs. Emulation](#simulation-vs-emulation)
-  - [Reducing Vulkan application development time](#reducing-vulkan-application-development-time)
-  - [Enabling the Profiles layer using Vulkan Configurator](#enabling-the-profiles-layer-using-vulkan-configurator)
-  - [Vulkan Profiles layer limitations](#vulkan-profiles-layer-limitations)
-- [Using the Vulkan Profiles API library](#using-the-vulkan-profiles-api-library)
-  - [Integration of the Vulkan Profiles API library in an application](#integration-of-the-vulkan-profiles-api-library-in-an-application)
-  - [Generating Vulkan Profiles API library](#generating-vulkan-profiles-api-library)
-  - [Basic usage of the Vulkan Profiles API library](#basic-usage-of-the-vulkan-profiles-api-library)
-  - [Advanced usage of the Vulkan Profiles library](#advanced-usage-of-the-vulkan-profiles-library)
-- [Vulkan Profiles Tools future improvements](#vulkan-profiles-tools-future-improvements)
-- [Related documentation](#related-documentation)
-- [Revision History](#revision-history)
-- [TODO](#todo)
+- [The Vulkan Profiles Tools](#the-vulkan-profiles-tools)
+  - [Table of Contents](#table-of-contents)
+  - [Why do Vulkan Profiles matter?](#why-do-vulkan-profiles-matter)
+    - [Explicit Vulkan capability requirements](#explicit-vulkan-capability-requirements)
+    - [Projects using Vulkan Profiles](#projects-using-vulkan-profiles)
+      - [Unreal Engine: A real-time 3D creation tool](#unreal-engine-a-real-time-3d-creation-tool)
+      - [DXVK: A Vulkan-based translation layer for Direct3D 9/10/11](#dxvk-a-vulkan-based-translation-layer-for-direct3d-91011)
+      - [vkd3d-proton: An implementation of the full Direct3D 12 API on top of Vulkan](#vkd3d-proton-an-implementation-of-the-full-direct3d-12-api-on-top-of-vulkan)
+      - [Zink: a Gallium driver that emits Vulkan API calls](#zink-a-gallium-driver-that-emits-vulkan-api-calls)
+      - [Android Baseline Profiles](#android-baseline-profiles)
+      - [Android 15 Minimums Profile](#android-15-minimums-profile)
+      - [Khronos Roadmap Profiles](#khronos-roadmap-profiles)
+    - [Different types of Vulkan Profiles](#different-types-of-vulkan-profiles)
+  - [The Vulkan Profiles Tools Components](#the-vulkan-profiles-tools-components)
+    - [The vkprofiles command-line tool](#the-vkprofiles-command-line-tool)
+    - [Vulkan Capability minimum requirements](#vulkan-capability-minimum-requirements)
+    - [The Vulkan Profiles Tools Code Generation](#the-vulkan-profiles-tools-code-generation)
+    - [The Vulkan Profiles documentation](#the-vulkan-profiles-documentation)
+  - [Creating a Vulkan Profiles JSON files](#creating-a-vulkan-profiles-json-files)
+    - [Generating a Device Vulkan Profiles files](#generating-a-device-vulkan-profiles-files)
+      - [Vulkaninfo](#vulkaninfo)
+      - [GPUInfo.org](#gpuinfoorg)
+    - [Generating a Platform Vulkan Profiles JSON files](#generating-a-platform-vulkan-profiles-json-files)
+      - [Newer platform profiles are not necessarily supersets of older ones](#newer-platform-profiles-are-not-necessarily-supersets-of-older-ones)
+    - [JSON script to generate merged Vulkan profiles](#json-script-to-generate-merged-vulkan-profiles)
+    - [Creating a Vulkan Profiles JSON files manually](#creating-a-vulkan-profiles-json-files-manually)
+    - [Identifying the minimum Vulkan API version of a profile](#identifying-the-minimum-vulkan-api-version-of-a-profile)
+    - [Comparing engine profiles with platform profiles](#comparing-engine-profiles-with-platform-profiles)
+    - [Limitations of Vulkan Profiles schema validation](#limitations-of-vulkan-profiles-schema-validation)
+    - [Human readable Vulkan Profiles documentation](#human-readable-vulkan-profiles-documentation)
+  - [Using the Vulkan Profiles layer](#using-the-vulkan-profiles-layer)
+    - [Simulation vs. Emulation](#simulation-vs-emulation)
+    - [Reducing Vulkan application development time](#reducing-vulkan-application-development-time)
+    - [Enabling the Profiles layer using Vulkan Configurator](#enabling-the-profiles-layer-using-vulkan-configurator)
+    - [Vulkan Profiles layer limitations](#vulkan-profiles-layer-limitations)
+  - [Using the Vulkan Profiles API library](#using-the-vulkan-profiles-api-library)
+    - [Integration of the Vulkan Profiles API library in an application](#integration-of-the-vulkan-profiles-api-library-in-an-application)
+    - [Generating Vulkan Profiles API library](#generating-vulkan-profiles-api-library)
+    - [Basic usage of the Vulkan Profiles API library](#basic-usage-of-the-vulkan-profiles-api-library)
+    - [Advanced usage of the Vulkan Profiles library](#advanced-usage-of-the-vulkan-profiles-library)
+  - [Vulkan Profiles Tools future improvements](#vulkan-profiles-tools-future-improvements)
+  - [Related documentation](#related-documentation)
+  - [Revision History](#revision-history)
 
 ## Why do Vulkan Profiles matter?
 
@@ -149,7 +160,7 @@ Furthermore, the Vulkan Profiles Tools install implementations of some Vulkan Pr
 |----------------------|-----------------|
 | `VP_KHR_roadmap.json` | `VP_KHR_roadmap_2022`, `VP_KHR_roadmap_2024`, `VP_KHR_roadmap_2026` |
 | `VP_LUNARG_minimum_requirements.json` | `VP_LUNARG_minimum_requirements_1_0` to `VP_LUNARG_minimum_requirements_1_4` |
-| `VP_LUNARG_desktop_baseline.json` | `VP_LUNARG_desktop_baseline_2022`, `VP_LUNARG_desktop_baseline_2023`, `VP_LUNARG_desktop_baseline_2024`, `VP_LUNARG_desktop_baseline_2026` |
+| `VP_LUNARG_desktop_baseline.json` | `VP_LUNARG_desktop_baseline_2022`, `VP_LUNARG_desktop_baseline_2023`, `VP_LUNARG_desktop_baseline_2024`, `VP_LUNARG_desktop_baseline_2026`, `VP_LUNARG_desktop_baseline_2027` |
 | `VP_ANDROID_vulkan_profile_2021.json` | `VP_ANDROID_vulkan_profile_2021` |
 | `VP_ANDROID_vulkan_profile_2022.json` | `VP_ANDROID_vulkan_profile_2022` |
 | `VP_ANDROID_vulkan_profile_2025.json` | `VP_ANDROID_vulkan_profile_2025` |
@@ -272,24 +283,24 @@ The LunarG Desktop Baseline profiles were generated by downloading a set of Vulk
 
 `vkprofiles combine` replaces the deprecated `gen_profiles_file.py` Python script. On top of the intersection mode, it supports the `union` mode, which lists the capabilities available in any of the source profiles, and the `difference` mode, which outputs the differences across a set of Vulkan profiles (see [Comparing engine profiles with platform profiles](#comparing-engine-profiles-with-platform-profiles)). The mode is selected with `--mode`.
 
-> As an example, the `VP_LUNARG_desktop_baseline_2026` is a Vulkan Platform Profile generated from multiple Vulkan Device Profiles downloaded from GPUInfo.org, stored in the `profiles/LunarG/VP_LUNARG_desktop_baseline_2026` directory of the Vulkan Profiles repository.
+> As an example, the `VP_LUNARG_desktop_baseline_2027` is a Vulkan Platform Profile generated from multiple Vulkan Device Profiles downloaded from GPUInfo.org, stored in the `profiles/LunarG/VP_LUNARG_desktop_baseline_2027` directory of the Vulkan Profiles repository.
 
 ![Generating a platform profile from device profiles](images/platform-profile-generation.png)
 
-The command to generate the `VP_LUNARG_desktop_baseline_2026` profile is:
+The command to generate the `VP_LUNARG_desktop_baseline_2027` profile is:
 
 ```bash
 vkprofiles combine \
     --registry vk.xml \
-    --input ./VP_LUNARG_desktop_baseline_2026 \
-    --output ./VP_LUNARG_desktop_baseline_2026.json \
+    --input ./VP_LUNARG_desktop_baseline_2027 \
+    --output ./VP_LUNARG_desktop_baseline_2027.json \
     --mode intersection \
-    --profile-name VP_LUNARG_desktop_baseline_2026 \
-    --profile-version 2 \
-    --profile-label "LunarG Vulkan Desktop Baseline 2026 profile" \
-    --profile-desc "A profile generated by the intersection of a collection of GPUInfo.org device reports to support a large number of actual systems in the Vulkan ecosystem. This profile is meant to be a usage example for Vulkan application developer." \
-    --profile-date 2026-09-16 \
-    --profile-api-version "1.4.312"
+    --profile-name VP_LUNARG_desktop_baseline_2027 \
+    --profile-version 1 \
+    --profile-label "LunarG Vulkan Desktop Baseline 2027 profile" \
+    --profile-desc "A profile generated by the intersection of a collection of GPUInfo.org device reports to support a large number of actual systems in the Vulkan ecosystem. This profile is meant to be a usage example for Vulkan application developer. On macOS, this profile only supports Mesa Vulkan drivers: MoltenVK is not supported." \
+    --profile-date 2026-11-16 \
+    --profile-api-version "1.4.315"
 ```
 
 When the generated profile builds on other profiles, `--profile-required-profiles` lists them, for example `--profile-required-profiles "VP_LUNARG_minimum_requirements_1_4"`.
@@ -300,7 +311,7 @@ When the generated profile builds on other profiles, `--profile-required-profile
 vkprofiles transform \
     --registry vk.xml \
     --input ./my_profiles/ \
-    --input-profiles VP_LUNARG_desktop_baseline_2026 \
+    --input-profiles VP_LUNARG_desktop_baseline_2027 \
     --output ./my_stripped_profiles/ \
     --strip duplication
 ```
@@ -314,6 +325,55 @@ For more information on how to use `vkprofiles combine`, see [`combine`](https:/
 ```bash
 vkprofiles combine --help
 ```
+
+#### Newer platform profiles are not necessarily supersets of older ones
+
+A newer platform profile is not necessarily a superset of an older one. Each LunarG Desktop Baseline profile is the intersection of the device reports selected at the time it was generated. A newer profile typically requires a newer Vulkan version and more extensions, but the device ecosystem doesn't only gain capabilities over time: new vendors, new drivers and new kinds of implementations, such as software rasterizers or drivers layered on top of another graphics API, enter the market with their own limitations, while some older devices remain relevant.
+
+The `difference` mode of `vkprofiles combine` checks whether a profile is a superset of another one. For example, to compare the `VP_LUNARG_desktop_baseline_2024` and `VP_LUNARG_desktop_baseline_2026` profiles:
+
+```bash
+vkprofiles extract \
+    --input ./VP_LUNARG_desktop_baseline.json \
+    --input-profiles VP_LUNARG_desktop_baseline_2024 \
+    --output ./compare/VP_LUNARG_desktop_baseline_2024.json
+
+vkprofiles extract \
+    --input ./VP_LUNARG_desktop_baseline.json \
+    --input-profiles VP_LUNARG_desktop_baseline_2026 \
+    --output ./compare/VP_LUNARG_desktop_baseline_2026.json
+
+vkprofiles combine \
+    --registry vk.xml \
+    --input ./compare/ \
+    --output ./difference/ \
+    --mode difference
+```
+
+The `difference/VP_LUNARG_desktop_baseline_2024.json` file lists the capabilities guaranteed by the older profile but not by the newer one: when it is empty, the newer profile is a superset of the older one. The profiles are compared without stripping their aliased structures: profiles targeting different Vulkan versions express the same capabilities with different structures, for example `VkPhysicalDeviceScalarBlockLayoutFeaturesEXT` in a Vulkan 1.1 profile and `VkPhysicalDeviceVulkan12Features` in a Vulkan 1.2 profile, and the aliased structures let the comparison match them.
+
+Comparing each LunarG Desktop Baseline profile with the previous one gives the following results:
+
+| Older profile | Newer profile | Superset? | Capabilities of the older profile missing from the newer profile | Cause |
+|---------------|---------------|-----------|-------------------------------------------------------------------|-------|
+| `VP_LUNARG_desktop_baseline_2022` | `VP_LUNARG_desktop_baseline_2023` | No | `scalarBlockLayout` feature, `maxMemoryAllocationSize` reduced from 2 GiB to 1.5 GiB | Older GPUs added: AMD Radeon Pitcairn (GCN 1.0) with RADV, GeForce GTX 680MX with MoltenVK |
+| `VP_LUNARG_desktop_baseline_2023` | `VP_LUNARG_desktop_baseline_2024` | Yes | - | - |
+| `VP_LUNARG_desktop_baseline_2024` | `VP_LUNARG_desktop_baseline_2026` | No | `tessellationShader`, `fillModeNonSolid` and `inheritedQueries` features, `VK_EXT_robustness2`, `VK_EXT_memory_budget` and `VK_EXT_external_memory_host` extensions, 2x MSAA sample counts, `timestampComputeAndGraphics`, `subgroupSize` reduced from 32 to 4, `maxSamplerAllocationCount` reduced from 4000 to 1024 | New drivers added: Mesa KosmicKrisp on Apple M1 and M5, llvmpipe on Windows, Linux and macOS, MoltenVK on Apple M1 |
+| `VP_LUNARG_desktop_baseline_2026` | `VP_LUNARG_desktop_baseline_2027` | Yes | - | - |
+
+The `VP_LUNARG_desktop_baseline_2026` profile is the clearest example. It added drivers that didn't exist or weren't considered in 2024:
+
+- Mesa KosmicKrisp, a Vulkan driver layered on top of Metal on Apple Silicon. Its Apple M5 report doesn't support tessellation shaders, and its Apple M1 and M5 reports don't support `fillModeNonSolid`, `VK_EXT_robustness2`, `VK_EXT_memory_budget`, `VK_EXT_external_memory_host` and `timestampComputeAndGraphics`.
+- llvmpipe, the Mesa software rasterizer, which doesn't support `inheritedQueries` or 2x multisampling, and reports subgroups of four or eight invocations.
+- MoltenVK on Apple M1, which only guarantees 1024 sampler allocations.
+
+A Vulkan application relying on tessellation shaders under the `VP_LUNARG_desktop_baseline_2024` profile can't move to the `VP_LUNARG_desktop_baseline_2026` profile without a code path that doesn't use tessellation shaders, even though the newer profile requires Vulkan 1.4 and many more extensions.
+
+The `VP_LUNARG_desktop_baseline_2022` to `VP_LUNARG_desktop_baseline_2023` transition shows the opposite case: the newer profile added older GPUs, from 2012, that weren't part of the older profile, and these GPUs lower some of its guarantees.
+
+On the other hand, the `VP_LUNARG_desktop_baseline_2027` profile is a superset of the `VP_LUNARG_desktop_baseline_2026` profile, even though its set of drivers changed and it no longer supports MoltenVK: every capability guaranteed by the `VP_LUNARG_desktop_baseline_2026` profile is still supported by all the device reports of the `VP_LUNARG_desktop_baseline_2027` profile.
+
+> **The Vulkan device market doesn't evolve in an entirely progressive and linear fashion.** When Vulkan developers create their own platform profiles, they should never assume that a platform profile for a newer set of devices is a superset of the platform profile it replaces. A new vendor, a new driver or a new kind of Vulkan implementation can remove capabilities that every device of the older platform supported. Vulkan developers should check the difference between the older and the newer platform profiles with `vkprofiles combine --mode difference`, and review the rendering code paths relying on the capabilities that the newer platform profile no longer guarantees.
 
 ### JSON script to generate merged Vulkan profiles
 
@@ -346,6 +406,12 @@ Following is the part of the [`profiles/vkprofiles_graph.json`](https://github.c
                     }
                 },
                 "history": [
+                    {
+                        "revision": 5,
+                        "date": "2026-11-16",
+                        "author": "Christophe Riccio",
+                        "comment": "Add Desktop Baseline 2027 without MoltenVK support"
+                    },
                     {
                         "revision": 4,
                         "date": "2026-09-16",
@@ -411,6 +477,16 @@ Following is the part of the [`profiles/vkprofiles_graph.json`](https://github.c
                         "stage": "STABLE",
                         "api-version": "1.4.312",
                         "required-profiles": ""
+                    },
+                    "VP_LUNARG_desktop_baseline_2027": {
+                        "version": 1,
+                        "input": "profiles/LunarG/VP_LUNARG_desktop_baseline_2027",
+                        "label": "LunarG Vulkan Desktop Baseline 2027 profile",
+                        "description": "A profile generated by the intersection of a collection of GPUInfo.org device reports to support a large number of actual systems in the Vulkan ecosystem. This profile is meant to be a usage example for Vulkan application developer. On macOS, this profile only supports Mesa Vulkan drivers: MoltenVK is not supported.",
+                        "date": "2026-11-16",
+                        "stage": "STABLE",
+                        "api-version": "1.4.315",
+                        "required-profiles": ""
                     }
                 }
             }
@@ -424,7 +500,7 @@ Following is the part of the [`profiles/vkprofiles_graph.json`](https://github.c
             "command": "transform",
             "args": {
                 "input": "profiles/build",
-                "input-profiles": "VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2023,VP_LUNARG_desktop_baseline_2024,VP_LUNARG_desktop_baseline_2026",
+                "input-profiles": "VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2023,VP_LUNARG_desktop_baseline_2024,VP_LUNARG_desktop_baseline_2026,VP_LUNARG_desktop_baseline_2027",
                 "output": "profiles/build",
                 "pull": [
                     "requirements",
@@ -651,8 +727,9 @@ For the LunarG Desktop Baseline profiles file, the command reports the following
 | `VP_LUNARG_desktop_baseline_2023` | 1.2.148 | 1.2.148 |
 | `VP_LUNARG_desktop_baseline_2024` | 1.3.204 | 1.3.204 |
 | `VP_LUNARG_desktop_baseline_2026` | 1.4.312 | 1.4.303 |
+| `VP_LUNARG_desktop_baseline_2027` | 1.4.315 | 1.4.303 |
 
-The evaluated version is only a minimum: it's the oldest Vulkan API version with which the profile definition is valid. There are plenty of good reasons to declare a higher `api-version`, as the `VP_LUNARG_desktop_baseline_2026` profile does. For example, to exclude drivers that are too old: they may have known bugs, lack fixes or performance improvements, or simply not represent the ecosystem the Vulkan application targets. A higher version may also reflect the Vulkan Headers the Vulkan application is developed and tested with, so that the profile matches what the Vulkan application effectively requires.
+The evaluated version is only a minimum: it's the oldest Vulkan API version with which the profile definition is valid. There are plenty of good reasons to declare a higher `api-version`, as the `VP_LUNARG_desktop_baseline_2027` profile does. For example, to exclude drivers that are too old: they may have known bugs, lack fixes or performance improvements, or simply not represent the ecosystem the Vulkan application targets. A higher version may also reflect the Vulkan Headers the Vulkan application is developed and tested with, so that the profile matches what the Vulkan application effectively requires.
 
 When checking the support of a profile, the Vulkan Profiles API library compares the major and minor versions of the device API version with the profile `api-version`, but not the patch version. Raising the minor version, for example requiring Vulkan 1.3 instead of Vulkan 1.2, excludes the drivers that only support older Vulkan versions. To exclude drivers older than a specific Vulkan Header revision, the Vulkan application has to check the patch version of `VkPhysicalDeviceProperties::apiVersion` itself.
 
@@ -713,18 +790,18 @@ As an example, the following Engine profile describes the requirements of a ray 
 }
 ```
 
-To compare it with the `VP_LUNARG_desktop_baseline_2026` Platform profile, we copy the Engine profile file into a `compare` directory, extract the Platform profile, strip its redundant aliased structures into the same directory, and compute the difference:
+To compare it with the `VP_LUNARG_desktop_baseline_2027` Platform profile, we copy the Engine profile file into a `compare` directory, extract the Platform profile, strip its redundant aliased structures into the same directory, and compute the difference:
 
 ```bash
 vkprofiles extract \
     --input ./VP_LUNARG_desktop_baseline.json \
-    --input-profiles VP_LUNARG_desktop_baseline_2026 \
-    --output ./platform/VP_LUNARG_desktop_baseline_2026.json
+    --input-profiles VP_LUNARG_desktop_baseline_2027 \
+    --output ./platform/VP_LUNARG_desktop_baseline_2027.json
 
 vkprofiles transform \
     --registry vk.xml \
-    --input ./platform/VP_LUNARG_desktop_baseline_2026.json \
-    --output ./compare/VP_LUNARG_desktop_baseline_2026.json \
+    --input ./platform/VP_LUNARG_desktop_baseline_2027.json \
+    --output ./compare/VP_LUNARG_desktop_baseline_2027.json \
     --strip duplication
 
 vkprofiles combine \
@@ -734,7 +811,7 @@ vkprofiles combine \
     --mode difference
 ```
 
-The resulting `difference/VP_EXAMPLE_engine_raytracing.json` file only keeps the ray query requirements. The `VP_LUNARG_desktop_baseline_2026` profile supports the `dynamicRendering` and `synchronization2` features and eight bound descriptor sets, so these requirements are removed:
+The resulting `difference/VP_EXAMPLE_engine_raytracing.json` file only keeps the ray query requirements. The `VP_LUNARG_desktop_baseline_2027` profile supports the `dynamicRendering` and `synchronization2` features and eight bound descriptor sets, so these requirements are removed:
 
 ```json
 "raytracing": {
@@ -753,7 +830,7 @@ The resulting `difference/VP_EXAMPLE_engine_raytracing.json` file only keeps the
 }
 ```
 
-If the Engine profile required `"maxBoundDescriptorSets": 64`, this limit would also remain in the result, as the `VP_LUNARG_desktop_baseline_2026` profile only guarantees eight bound descriptor sets.
+If the Engine profile required `"maxBoundDescriptorSets": 64`, this limit would also remain in the result, as the `VP_LUNARG_desktop_baseline_2027` profile only guarantees eight bound descriptor sets.
 
 Stripping the Platform profile with `vkprofiles transform --strip duplication` doesn't change the Engine profile result, but it keeps the Platform profile result readable: otherwise, the Platform profile result also keeps the aliased structures of the common capabilities, for example `VkPhysicalDeviceDynamicRenderingFeaturesKHR` for the `dynamicRendering` feature.
 
@@ -946,7 +1023,7 @@ Alternatively, the Vulkan Profiles API library can be trivially generated from t
     "command": "library",
     "args": {
         "input": "profiles/build",
-        "input-profiles": "VP_KHR_roadmap_2022,VP_KHR_roadmap_2024,VP_KHR_roadmap_2026,VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2023,VP_LUNARG_desktop_baseline_2024,VP_LUNARG_desktop_baseline_2026",
+        "input-profiles": "VP_KHR_roadmap_2022,VP_KHR_roadmap_2024,VP_KHR_roadmap_2026,VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2023,VP_LUNARG_desktop_baseline_2024,VP_LUNARG_desktop_baseline_2026,VP_LUNARG_desktop_baseline_2027",
         "output": "library/include/vulkan",
         "output-src": "library/source",
         "output-filename": "vulkan_profiles",
@@ -998,7 +1075,7 @@ Then the application has to make sure that the Vulkan implementation supports th
 ```cpp
 VkBool32 supported = VK_FALSE;
 VpProfileProperties profile{
-    VP_LUNARG_DESKTOP_BASELINE_2026_NAME, VP_LUNARG_DESKTOP_BASELINE_2026_SPEC_VERSION
+    VP_LUNARG_DESKTOP_BASELINE_2027_NAME, VP_LUNARG_DESKTOP_BASELINE_2027_SPEC_VERSION
 };
 
 result = vpGetInstanceProfileSupport(functions, nullptr, &profile, &supported);
@@ -1012,7 +1089,7 @@ else if (supported != VK_TRUE) {
 }
 ```
 
-The above code example verifies the instance-level profile requirements of the `VP_LUNARG_desktop_baseline_2026` profile, including required API version and instance extensions.
+The above code example verifies the instance-level profile requirements of the `VP_LUNARG_desktop_baseline_2027` profile, including required API version and instance extensions.
 
 If the profile is supported by the Vulkan implementation at the instance level, then a Vulkan instance can be created with the instance extensions required by the profile as follows:
 
@@ -1020,7 +1097,7 @@ If the profile is supported by the Vulkan implementation at the instance level, 
 VkApplicationInfo vkAppInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO };
 
 // Set API version to the minimum API version required by the profile
-vkAppInfo.apiVersion = VP_LUNARG_DESKTOP_BASELINE_2026_MIN_API_VERSION;
+vkAppInfo.apiVersion = VP_LUNARG_DESKTOP_BASELINE_2027_MIN_API_VERSION;
 VkInstanceCreateInfo vkCreateInfo{ VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
 vkCreateInfo.pApplicationInfo = &vkAppInfo;
 // set up your own instance creation parameters, except instance extensions
@@ -1131,13 +1208,7 @@ The Vulkan Profiles repository documents each Vulkan Profiles Tools component in
 
 | Revision Date | SDK Release   | Comments |
 |---------------|---------------|----------|
-| November 2026 | —             | - Convert the whitepaper from PDF to Markdown.<br>- Fix the `VpInstanceCreateInfo` and `VpDeviceCreateInfo` usage in the API library code samples.<br>- Add the `vkprofiles` command-line tool, introduced in SDK 1.4.363.<br>- Replace the deprecated `gen_profiles_file.py` and `gen_profiles_solution.py` Python scripts by the `vkprofiles` commands in all examples.<br>- Add `vkprofiles validate` schema validation and static analysis.<br>- Update the list of installed Vulkan Profiles files.<br>- Add links to the Vulkan Profiles repository documentation.<br>- Add a section on comparing engine profiles with platform profiles using `vkprofiles combine --mode difference`, which implements the future improvement to list the capabilities of an engine profile not supported by a platform profile.<br>- Add a section on identifying the minimum Vulkan API version of a profile using `vkprofiles min-api-version`.<br>- Insist on the semantic feedback of `vkprofiles validate --analyse` when creating Vulkan Profiles files manually.<br>- Update the API library code samples to the `VpFunctions` object, which replaces the `VpCapabilities` object, and generate a header-only library in the library generation example.<br>- Update the schema coverage to Vulkan 1.4, the API library requirement to Vulkan 1.1, and remove the `VK_KHR_portability_subset` emulation of the Profiles layer. |
+| November 2026 | —             | - Add the `vkprofiles` command-line tool, introduced in SDK 1.4.363.<br>- Replace the deprecated `gen_profiles_file.py` and `gen_profiles_solution.py` Python scripts by the `vkprofiles` commands in all examples.<br>- Add a section on comparing engine profiles with platform profiles using `vkprofiles combine --mode difference`, which implements the future improvement to list the capabilities of an engine profile not supported by a platform profile.<br>- Add a section on identifying the minimum Vulkan API version of a profile using `vkprofiles min-api-version`.<br>- Improve platform profiles development approach and assistance with `vkprofiles validate --analyse`. |
 | April 2024    | SDK 1.3.280.0 | - Introduce Capabilities object and externally loaded Vulkan functions.<br>- Add Vulkan profiles combination script.<br>- Various bug fixes. |
 | January 2024  | SDK 1.3.275.0 | - Add a section for user examples of Vulkan Profiles.<br>- Add information about the profiles merge script.<br>- Update Vulkan Profiles API Library section, API changes.<br>- Update Vulkan Layer: `VK_KHR_portability_subset` settings.<br>- Update future improvements section. |
 | January 2022  | SDK 1.3.204.0 | - Initial release. |
-
-## TODO
-
-Open items of the November 2026 revision that need input from the Vulkan Profiles Tools maintainers:
-
-- [ ] `images/platform-profile-generation.png` still shows the deprecated `gen_profiles_file.py` Python script and the `VP_LUNARG_desktop_baseline_2024` profile with its device reports: redraw it with `vkprofiles combine`, the `VP_LUNARG_desktop_baseline_2026` profile and the device reports of `profiles/LunarG/VP_LUNARG_desktop_baseline_2026`.
