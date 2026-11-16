@@ -2,6 +2,9 @@
     "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-204.json#",
     "capabilities": {
         "baseline": {
+            "extensions": {
+                "VK_KHR_swapchain": 1
+            },
             "properties": {
                 "VkPhysicalDeviceProperties": {
                     "limits": {

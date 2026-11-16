@@ -2202,6 +2202,11 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
     std::vector<std::string> required_profiles;
     CollectProfiles(requested_profile_name, required_profiles);
 
+    // Clear the device extensions once, so the extensions of the required profiles are kept while loading the requested profile
+    if (layer_settings.simulate.capabilities & SIMULATE_EXTENSIONS_BIT) {
+        pdd_->simulation_extensions_.clear();
+    }
+
     for (const std::string& profile_name : required_profiles) {
         const auto& root = FindRootFromProfileName(profile_name);
 
@@ -2294,10 +2299,6 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
             }
 
             VkResult tmp_result = VK_SUCCESS;
-            if (layer_settings.simulate.capabilities & SIMULATE_EXTENSIONS_BIT) {
-                pdd_->simulation_extensions_.clear();
-            }
-
             tmp_result = ReadProfile(device_name, root, capabilities, requested_profile_name == profile_name, required_profiles.size() == 1);
             if (tmp_result != VK_SUCCESS) {
                 result = tmp_result;
