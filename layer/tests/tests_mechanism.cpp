@@ -1014,3 +1014,54 @@ TEST_F(TestsMechanism, create_device_supported_feature) {
 
     inst_builder.reset();
 }
+
+static DebugUtilsMessages LoadProfileWithMessenger(const char* profile_file_data, const char* profile_name_data) {
+    profiles_test::VulkanInstanceBuilder inst_builder;
+    inst_builder.addExtension(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+
+    std::vector<VkLayerSettingEXT> settings = {
+        {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data}};
+
+    DebugUtilsMessages messages;
+    EXPECT_EQ(inst_builder.init(settings), VK_SUCCESS);
+
+    VkInstance instance = inst_builder.getInstance(profiles_test::MODE_PROFILE);
+    PFN_vkCreateDebugUtilsMessengerEXT create_messenger =
+        reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT"));
+    PFN_vkDestroyDebugUtilsMessengerEXT destroy_messenger =
+        reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT"));
+    EXPECT_NE(create_messenger, nullptr);
+    EXPECT_NE(destroy_messenger, nullptr);
+    if (create_messenger == nullptr || destroy_messenger == nullptr) {
+        inst_builder.reset();
+        return messages;
+    }
+
+    const VkDebugUtilsMessengerCreateInfoEXT messenger_create_info = GetDebugUtilsMessengerCreateInfo(&messages);
+    VkDebugUtilsMessengerEXT messenger = VK_NULL_HANDLE;
+    EXPECT_EQ(create_messenger(instance, &messenger_create_info, nullptr, &messenger), VK_SUCCESS);
+
+    // The profile is loaded for the physical devices
+    VkPhysicalDevice gpu = VK_NULL_HANDLE;
+    inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu);
+
+    destroy_messenger(instance, messenger, nullptr);
+    inst_builder.reset();
+    return messages;
+}
+
+TEST_F(TestsMechanism, profile_newer_vulkan_header) {
+    TEST_DESCRIPTION("Test that a profile written against a newer Vulkan Header than the layer is reported");
+
+    const DebugUtilsMessages newer_messages =
+        LoadProfileWithMessenger(JSON_TEST_FILES_PATH "VP_LUNARG_test_newer_header.json", "VP_LUNARG_test_newer_header");
+    EXPECT_TRUE(newer_messages.Contains(VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT,
+                                        "the profile is written against Vulkan Header 99999"));
+
+    // The schema patch version of 'profiles-0.8.0-204' is not mistaken for the Vulkan Header version
+    const DebugUtilsMessages older_messages =
+        LoadProfileWithMessenger(JSON_TEST_FILES_PATH "VP_LUNARG_test_api_1_0.json", "VP_LUNARG_test_api_1_0");
+    EXPECT_FALSE(older_messages.messages.empty());
+    EXPECT_FALSE(older_messages.Contains(VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT, "the profile is written against Vulkan Header"));
+}

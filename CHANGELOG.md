@@ -20,6 +20,7 @@
 - Rename the Profiles layer *Emulate a Vulkan Conformant Profile* preset to *Emulate a Desktop Profile*, using the `VP_LUNARG_desktop_baseline_2026` profile
 - Add the Profiles layer *Emulate a Roadmap Profile* preset, using the `VP_KHR_roadmap_2022` profile
 - Update the Profiles layer `exclude_device_extensions` setting list with all the device extensions of the Vulkan 1.4.368 headers
+- Fix the Profiles layer warning of a profile written against a newer Vulkan Header than the layer, which read the schema patch version as the Vulkan Header version
 
 ### Fixes:
 - Fix `vkprofiles validate` exiting with success when a profiles file fails the schema validation: the schema errors are reported at error level and the command fails, also when `--validate` is used by the other commands
