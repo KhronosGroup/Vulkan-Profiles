@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-328.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.3-328.json#",
     "capabilities": {
         "vulkan10requirements_roadmap2022": {
             "features": {
@@ -54,6 +54,7 @@
             }
         },
         "vulkan14dependent": {
+            "depends": "VkPhysicalDeviceVulkan11Features::protectedMemory",
             "features": {
                 "VkPhysicalDeviceVulkan14Features": {
                     "pipelineProtectedAccess": true
@@ -510,7 +511,7 @@
     },
     "profiles": {
         "VP_KHR_roadmap_2026": {
-            "version": 2,
+            "version": 3,
             "api-version": "1.4.328",
             "label": "Khronos Vulkan Roadmap 2026 profile",
             "description": "This roadmap profile is intended to be supported by newer devices shipping in 2026 across mainstream smartphone, tablet, laptops, console and desktop devices.",
@@ -528,9 +529,7 @@
                     "vulkan14requirements_roadmap2026_line4",
                     "vulkan14requirements_roadmap2026_line5"
                 ],
-                "vulkanextensionrequirements_roadmap2026"
-            ],
-            "optionals": [
+                "vulkanextensionrequirements_roadmap2026",
                 "vulkan14dependent"
             ]
         },
@@ -587,6 +586,12 @@
         }
     },
     "history": [
+        {
+            "revision": 14,
+            "date": "2026-11-16",
+            "author": "Christophe Riccio",
+            "comment": "Require Roadmap 2026 pipelineProtectedAccess when protectedMemory is supported, using a capability block 'depends' condition"
+        },
         {
             "revision": 13,
             "date": "2026-09-09",

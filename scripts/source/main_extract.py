@@ -31,6 +31,8 @@ from source.profiles_json_utils import (
     save_profiles_jsons,
     get_profile_and_file_data,
     collect_profile_capabilities,
+    collect_profile_dependent_blocks,
+    collect_required_profiles_dependent_blocks,
     SCHEMA_VERSION,
     OutputFormatType
 )
@@ -118,8 +120,17 @@ def extract_profile(
             block_name = f"{p_name}_block"
             extracted_capabilities[block_name] = combined_caps
 
+            # The capability blocks with a 'depends' condition are not merged: they are kept as separate blocks
+            new_caps_refs = [block_name]
+            dependent_blocks = collect_required_profiles_dependent_blocks(json_files_dict, profile_obj.get("profiles", []))
+            dependent_blocks.update(collect_profile_dependent_blocks(source_file_data, profile_obj))
+            for dep_block_name, dep_block in dependent_blocks.items():
+                new_dep_block_name = dep_block_name if dep_block_name.startswith(f"{p_name}_") else f"{p_name}_{dep_block_name}"
+                extracted_capabilities[new_dep_block_name] = json.loads(json.dumps(dep_block))
+                new_caps_refs.append(new_dep_block_name)
+
             new_p_obj = json.loads(json.dumps(profile_obj))
-            new_p_obj["capabilities"] = [block_name]
+            new_p_obj["capabilities"] = new_caps_refs
             new_p_obj["profiles"] = []
             extracted_profiles[p_name] = new_p_obj
         else:

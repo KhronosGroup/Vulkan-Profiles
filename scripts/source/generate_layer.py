@@ -87,6 +87,10 @@ INCLUDES_HEADER = '''
 #include "profiles_json.h"
 #include "profiles_settings.h"
 #include <algorithm>
+#include <cctype>
+#include <cstddef>
+#include <cstdio>
+#include <cstring>
 #include <filesystem>
 #include <functional>
 #include <map>
@@ -353,6 +357,8 @@ class JsonLoader {
     bool WarnDuplicatedFeature(const Json::Value &parent);
     bool WarnDuplicatedProperty(const Json::Value &parent);
     bool GetFeature(const char *device_name, bool requested_profile, const Json::Value &features, const std::string &name);
+    bool GetFeatureValue(const std::string &name, const std::string &member, bool *value) const;
+    bool CheckDepends(const std::string &block_name, const std::string &depends, uint32_t api_version);
     bool GetProperty(const char *device_name, bool requested_profile, const Json::Value &props, const std::string &name);
     bool GetFormat(const char *device_name, bool requested_profile, const Json::Value &formats, const std::string &format_name, MapOfVkFormatProperties *dest,
                    MapOfVkFormatProperties3 *dest3);
@@ -1536,14 +1542,158 @@ bool JsonLoader::OrderQueueFamilyProperties(ArrayOfVkQueueFamilyProperties *qfp)
 '''
 
 READ_PROFILE = '''
-VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& root, const std::vector<std::vector<std::string>> &capabilities, bool requested_profile, bool enable_warnings) {
+// Evaluates a vk.xml 'depends' expression: symbols combined with '+' (AND), ',' (OR) and parentheses,
+// where '!' (NOT) may prefix a symbol. Returns false when the expression is invalid.
+class DependsExpression {
+  public:
+    DependsExpression(const std::string &expression, const std::function<bool(const std::string &)> &is_symbol_enabled)
+        : expression_(expression), is_symbol_enabled_(is_symbol_enabled) {}
+
+    bool Evaluate(bool *valid) {
+        this->pos_ = 0;
+        this->valid_ = true;
+        const bool result = this->ParseOr();
+        this->SkipSpaces();
+        if (this->pos_ != this->expression_.size()) {
+            this->valid_ = false;
+        }
+        *valid = this->valid_;
+        return this->valid_ && result;
+    }
+
+  private:
+    void SkipSpaces() {
+        while (this->pos_ < this->expression_.size() && std::isspace(static_cast<unsigned char>(this->expression_[this->pos_]))) {
+            ++this->pos_;
+        }
+    }
+
+    bool Accept(char c) {
+        this->SkipSpaces();
+        if (this->pos_ < this->expression_.size() && this->expression_[this->pos_] == c) {
+            ++this->pos_;
+            return true;
+        }
+        return false;
+    }
+
+    bool ParseOr() {
+        bool result = this->ParseAnd();
+        while (this->Accept(',')) {
+            const bool rhs = this->ParseAnd();
+            result = result || rhs;
+        }
+        return result;
+    }
+
+    bool ParseAnd() {
+        bool result = this->ParseTerm();
+        while (this->Accept('+')) {
+            const bool rhs = this->ParseTerm();
+            result = result && rhs;
+        }
+        return result;
+    }
+
+    bool ParseTerm() {
+        if (this->Accept('(')) {
+            const bool result = this->ParseOr();
+            if (!this->Accept(')')) {
+                this->valid_ = false;
+            }
+            return result;
+        }
+
+        const bool negate = this->Accept('!');
+        this->SkipSpaces();
+        const std::size_t begin = this->pos_;
+        while (this->pos_ < this->expression_.size()) {
+            const char c = this->expression_[this->pos_];
+            if (!(std::isalnum(static_cast<unsigned char>(c)) || c == '_' || c == ':')) {
+                break;
+            }
+            ++this->pos_;
+        }
+        if (begin == this->pos_) {
+            this->valid_ = false;
+            return false;
+        }
+        const bool enabled = this->is_symbol_enabled_(this->expression_.substr(begin, this->pos_ - begin));
+        return negate ? !enabled : enabled;
+    }
+
+    const std::string &expression_;
+    const std::function<bool(const std::string &)> &is_symbol_enabled_;
+    std::size_t pos_ = 0;
+    bool valid_ = true;
+};
+
+bool JsonLoader::CheckDepends(const std::string &block_name, const std::string &depends, uint32_t api_version) {
+    const std::function<bool(const std::string &)> is_symbol_enabled = [&](const std::string &symbol) -> bool {
+        // Vulkan version: VK_VERSION_<major>_<minor>
+        uint32_t major = 0;
+        uint32_t minor = 0;
+        if (std::sscanf(symbol.c_str(), "VK_VERSION_%u_%u", &major, &minor) == 2) {
+            return VK_API_VERSION_MAJOR(api_version) > major || (VK_API_VERSION_MAJOR(api_version) == major && VK_API_VERSION_MINOR(api_version) >= minor);
+        }
+
+        // Feature: <feature structure>::<member>
+        const std::size_t separator = symbol.find("::");
+        if (separator != std::string::npos) {
+            bool value = false;
+            if (!this->GetFeatureValue(symbol.substr(0, separator), symbol.substr(separator + 2), &value)) {
+                LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
+                    "Unknown feature \\"%s\\" in the 'depends' condition of capability block \\"%s\\", the feature is considered not supported.\\n",
+                    symbol.c_str(), block_name.c_str());
+            }
+            return value;
+        }
+
+        // Device extension
+        if (layer_settings.simulate.capabilities & SIMULATE_EXTENSIONS_BIT) {
+            return pdd_->map_of_extension_properties_.count(symbol) > 0;
+        }
+        return pdd_->device_extensions_.count(symbol) > 0;
+    };
+
+    bool valid = true;
+    DependsExpression expression(depends, is_symbol_enabled);
+    const bool result = expression.Evaluate(&valid);
+    if (!valid) {
+        LogMessage(&layer_settings, DEBUG_REPORT_ERROR_BIT,
+            "Invalid 'depends' condition \\"%s\\" of capability block \\"%s\\", the capability block is ignored.\\n",
+            depends.c_str(), block_name.c_str());
+    }
+    return result;
+}
+
+VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& root, const std::vector<std::vector<std::string>> &all_capabilities, bool requested_profile, bool enable_warnings) {
     bool failed = false;
 
     uint32_t properties_api_version = 0;
     uint32_t simulated_version = 0;
 
     const auto &cap_definisions = root["capabilities"];
-    for (const auto &capability_variants : capabilities) {
+
+    // The capability blocks with a 'depends' condition are loaded after the other capability blocks, if the simulated device
+    // satisfies the condition. The condition is evaluated against the device capabilities overridden by the other capability blocks.
+    std::vector<std::vector<std::string>> capabilities;
+    std::vector<std::string> dependent_capabilities;
+    for (const auto &capability_variants : all_capabilities) {
+        std::vector<std::string> variants;
+        for (const auto &cap_variant : capability_variants) {
+            if (cap_definisions[cap_variant].isMember("depends")) {
+                dependent_capabilities.push_back(cap_variant);
+            } else {
+                variants.push_back(cap_variant);
+            }
+        }
+        if (!variants.empty()) {
+            capabilities.push_back(variants);
+        }
+    }
+
+    for (const auto &capability_variants : all_capabilities) {
         for (const auto &cap_variant : capability_variants) {
             const auto &cap_definision = cap_definisions[cap_variant];
 
@@ -1560,7 +1710,26 @@ VkResult JsonLoader::ReadProfile(const char *device_name, const Json::Value& roo
         AddPromotedExtensions(simulated_version);
     }
 
-    for (const auto &capability_variants : capabilities) {
+    const std::size_t unconditional_capability_count = capabilities.size();
+    for (std::size_t capability_index = 0;; ++capability_index) {
+        if (capability_index == unconditional_capability_count) {
+            // All the unconditional capability blocks are loaded, load the capability blocks which 'depends' condition is satisfied
+            const uint32_t api_version = simulated_version != 0 ? simulated_version : pdd_->physical_device_properties_.apiVersion;
+            for (const auto &dependent_capability : dependent_capabilities) {
+                const std::string depends = cap_definisions[dependent_capability]["depends"].asString();
+                if (CheckDepends(dependent_capability, depends, api_version)) {
+                    LogMessage(&layer_settings, DEBUG_REPORT_DEBUG_BIT, "Loading capability block \\"%s\\", its 'depends' condition \\"%s\\" is satisfied.\\n", dependent_capability.c_str(), depends.c_str());
+                    capabilities.push_back({dependent_capability});
+                } else {
+                    LogMessage(&layer_settings, DEBUG_REPORT_DEBUG_BIT, "Ignoring capability block \\"%s\\", its 'depends' condition \\"%s\\" is not satisfied.\\n", dependent_capability.c_str(), depends.c_str());
+                }
+            }
+        }
+        if (capability_index >= capabilities.size()) {
+            break;
+        }
+
+        const auto &capability_variants = capabilities[capability_index];
         for (const auto &capability_variant : capability_variants) {
             const auto &cap_definision = cap_definisions[capability_variant];
             const auto &properties = cap_definision["properties"];
@@ -3942,6 +4111,7 @@ class VulkanProfilesLayerGenerator():
             f.write(self.generate_is_format_functions())
             f.write(self.generate_warn_duplicated())
             f.write(self.generate_get_feature())
+            f.write(self.generate_get_feature_value())
             f.write(self.generate_get_property())
             f.write(JSON_LOADER_NON_GENERATED)
             f.write(self.generate_get_format_struct())
@@ -5326,6 +5496,66 @@ class VulkanProfilesLayerGenerator():
         gen += '    const Json::Value &feature = features[name];\n\n'
         gen += self.generate_get_struct('feature', 'VkPhysicalDeviceFeatures2', self.additional_features)
         gen += '\n\n    return true;\n'
+        gen += '}\n'
+        return gen
+
+    def generate_get_feature_value(self):
+        # Reads a feature value of the simulated physical device, to evaluate the 'depends' condition of capability blocks
+        gen = '\n'
+        gen += 'struct FeatureMemberOffset {\n'
+        gen += '    const char *name;\n'
+        gen += '    std::size_t offset;\n'
+        gen += '};\n\n'
+        gen += 'static bool GetFeatureMemberValue(const void *data, const FeatureMemberOffset *members, std::size_t member_count, const std::string &member, bool *value) {\n'
+        gen += '    for (std::size_t i = 0; i < member_count; ++i) {\n'
+        gen += '        if (member == members[i].name) {\n'
+        gen += '            VkBool32 member_value = VK_FALSE;\n'
+        gen += '            std::memcpy(&member_value, static_cast<const uint8_t *>(data) + members[i].offset, sizeof(VkBool32));\n'
+        gen += '            *value = member_value == VK_TRUE;\n'
+        gen += '            return true;\n'
+        gen += '        }\n'
+        gen += '    }\n'
+        gen += '    return false;\n'
+        gen += '}\n\n'
+        gen += 'bool JsonLoader::GetFeatureValue(const std::string &name, const std::string &member, bool *value) const {\n'
+
+        for name, value in self.registry.structs.items():
+            if name in self.ignored_structs:
+                continue
+            if not (('VkPhysicalDeviceFeatures2' in value.extends and value.isAlias == False) or (name in self.additional_features)):
+                continue
+
+            if name == 'VkPhysicalDeviceFeatures':
+                pdd_type = name
+                pdd_var = 'physical_device_features_'
+            else:
+                pdd_type = self.pdd_struct_names.get(name) or name
+                pdd_var = self.create_var_name(pdd_type)
+
+            members = [member.name for member in value.members.values() if member.type == 'VkBool32']
+            if not members:
+                continue
+
+            names = [name] + [alias for alias in value.aliases if alias != name]
+
+            if name.startswith('VkPhysicalDevicePortabilitySubset'):
+                protect_begin = '#ifdef VK_KHR_portability_subset\n'
+                protect_end = '#endif  // VK_KHR_portability_subset\n'
+            else:
+                protect_begin = self.generate_platform_protect_begin(name)
+                protect_end = self.generate_platform_protect_end(name)
+
+            gen += protect_begin
+            gen += '    if (' + ' || '.join('name == "{0}"'.format(n) for n in names) + ') {\n'
+            gen += '        static const FeatureMemberOffset members[] = {\n'
+            for member in members:
+                gen += '            {{"{0}", offsetof({1}, {0})}},\n'.format(member, pdd_type)
+            gen += '        };\n'
+            gen += '        return GetFeatureMemberValue(&pdd_->{0}, members, sizeof(members) / sizeof(members[0]), member, value);\n'.format(pdd_var)
+            gen += '    }\n'
+            gen += protect_end
+
+        gen += '    return false;\n'
         gen += '}\n'
         return gen
 

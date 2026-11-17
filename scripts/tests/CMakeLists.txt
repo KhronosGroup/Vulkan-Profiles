@@ -68,6 +68,7 @@ add_vulkan_python_test(VkProfiles_TestTransformPullPromotedExts    test_transfor
 add_vulkan_python_test(VkProfiles_TestTransformPullAliases         test_transform_pull_aliases.py)
 add_vulkan_python_test(VkProfiles_TestTransformPullUnratified      test_transform_pull_unratified.py)
 add_vulkan_python_test(VkProfiles_TestTransformConsolidate         test_transform_consolidate.py)
+add_vulkan_python_test(VkProfiles_TestCapabilityBlockDepends       test_capability_block_depends.py)
 add_vulkan_python_test(VkProfiles_TestTransformStripHelper         test_transform_strip_helper.py)
 add_vulkan_python_test(VkProfiles_TestTransformStripDups           test_transform_strip_duplication.py)
 add_vulkan_python_test(VkProfiles_TestTransformStripFormats        test_transform_strip_formats.py)

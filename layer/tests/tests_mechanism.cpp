@@ -1065,3 +1065,45 @@ TEST_F(TestsMechanism, profile_newer_vulkan_header) {
     EXPECT_FALSE(older_messages.messages.empty());
     EXPECT_FALSE(older_messages.Contains(VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT, "the profile is written against Vulkan Header"));
 }
+
+TEST_F(TestsMechanism, capabilities_depends) {
+    TEST_DESCRIPTION("Test that the capability blocks are only loaded when the simulated device satisfies their 'depends' condition");
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+
+    const char* profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_depends.json";
+    const char* profile_name_data = "VP_LUNARG_test_depends";
+    const std::vector<const char*> simulate_capabilities = {"SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT", "SIMULATE_EXTENSIONS_BIT"};
+    const char* default_feature_values_data = "DEFAULT_FEATURE_VALUES_FALSE";
+
+    const std::vector<VkLayerSettingEXT> settings = {
+        {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+        {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+        {kLayerName, kLayerSettingsDefaultFeatureValues, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &default_feature_values_data}};
+
+    ASSERT_EQ(inst_builder.init(settings), VK_SUCCESS);
+
+    VkPhysicalDevice gpu = VK_NULL_HANDLE;
+    if (inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu) != VK_SUCCESS) {
+        printf("Profile not supported on device, skipping test.\n");
+        inst_builder.reset();
+        return;
+    }
+
+    VkPhysicalDeviceFeatures features{};
+    vkGetPhysicalDeviceFeatures(gpu, &features);
+
+    // Unconditional capability block
+    EXPECT_EQ(features.depthClamp, VK_TRUE);
+    // 'depends' satisfied by the simulated depthClamp, loaded after the unconditional capability blocks
+    EXPECT_EQ(features.sampleRateShading, VK_TRUE);
+    // 'depends' not satisfied
+    EXPECT_EQ(features.geometryShader, VK_FALSE);
+    // 'depends' satisfied by the simulated Vulkan 1.1 version and the simulated depthClamp
+    EXPECT_EQ(features.dualSrcBlend, VK_TRUE);
+    // 'depends' not satisfied by the simulated extensions
+    EXPECT_EQ(features.logicOp, VK_FALSE);
+
+    inst_builder.reset();
+}
