@@ -80,6 +80,7 @@ add_vulkan_python_test(VkProfiles_TestMinimumRequirementsDiff      test_minimum_
 add_vulkan_python_test(VkProfiles_TestValidate                     test_validate.py)
 add_vulkan_python_test(VkProfiles_TestValidateSchema               test_validate_schema.py)
 add_vulkan_python_test(VkProfiles_TestProfilesSchema               test_profiles_schema.py)
+add_vulkan_python_test(VkProfiles_TestProfilesDoc                  test_profiles_doc.py)
 add_vulkan_python_test(VkProfiles_TestValidateAnalyse              test_validate_analyse.py)
 add_vulkan_python_test(VkProfiles_TestCommandLines                 test_command_lines.py)
 

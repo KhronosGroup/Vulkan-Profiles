@@ -3679,16 +3679,20 @@ class VulkanProfilesDatabase():
                 return json_file['profiles'][profile_key], json_file
         return None, None
 
-    def collectProfileCapabilities(self, profile_requirements: list[str]) -> list[dict]:
+    def collectProfileCapabilities(self, profile_requirements: list[str], include_alternatives: bool = True) -> list[dict]:
         capabilities_list = []
         for required_profile in profile_requirements:
             json_profile_value, json_file = self.findProfile(required_profile)
             if json_profile_value is None:
                 continue
             # When we have multiple possible capabilities blocks, we load them all but effectively the API library can't effectively implement this behavior.
-            for cap_key in collect_block_names(json_profile_value['capabilities']):
-                if cap_key in json_file['capabilities']:
-                    capabilities_list.append(json_file['capabilities'][cap_key])
+            # Without include_alternatives, the alternative capability blocks are skipped: only one of them is required.
+            for cap_entry in json_profile_value['capabilities']:
+                if isinstance(cap_entry, list) and not include_alternatives:
+                    continue
+                for cap_key in collect_block_names([cap_entry]):
+                    if cap_key in json_file['capabilities']:
+                        capabilities_list.append(json_file['capabilities'][cap_key])
         return capabilities_list
 
 
