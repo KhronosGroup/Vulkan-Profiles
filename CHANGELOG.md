@@ -14,6 +14,7 @@
 ## [Vulkan Profiles Tools 1.4.363](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - December 2026
 
 ### Improvements:
+- Generate `PROFILES_CORE.md`, the documentation of the `VP_LUNARG_minimum_requirements_1_x` profiles of the Vulkan core specification requirements
 - Add `validate` analysis check to report unratified extensions in profiles files
 - Add `transform --strip unratified` to remove all unratified extensions in profiles files
 - Speed up profiles files schema validation by checking the profiles schema only once
