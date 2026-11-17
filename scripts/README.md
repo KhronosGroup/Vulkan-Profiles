@@ -95,7 +95,7 @@ Every `*_args` definition also accepts `verbose` (boolean), `quiet` (boolean), a
 | `pull` (`transform`) | array of `pull_bits`: `requirements`, `promoted`, `aliases`, `ignore-extension-versions`, `ignore-unsupported`, `ignore-subcore`, `ignore-unratified` |
 | `strip` (`transform`) | array of `strip_bits`: `helper-values`, `duplication`, `promoted-extensions`, `unratified` |
 | `strip` (`library`) | boolean |
-| `analyse` (`validate`) | array of `analyse_bits`: `api-version`, `extensions`, `aliases`, `unratified`, `subcore` |
+| `analyse` (`validate`) | array of `analyse_bits`: `api-version`, `extensions`, `aliases`, `unratified`, `subcore`, `depends` |
 | `mode` (`combine`) | string: `intersection`, `union`, `difference`, `limittype` |
 | `mode` (`library`) | array of `header-only`, `header+source` |
 | `mode` (`extract`) | string: `reference-required-profiles`, `pull-required-profiles` |
@@ -298,7 +298,7 @@ vkprofiles validate --input path/to/profiles [options]
 * `--input`, `-i`: *(Required)* Path to profile JSON file or directory to validate.
 * `--registry`, `-r`: Path to `vk.xml` (used to generate schema if `--schema` is omitted and required for static analysis checks).
 * `--schema`, `-s`: Path to an explicit JSON schema file (`profiles-*.json`). By default, generates a schema from `vk.xml`.
-* `--analyse [CHECK ...]`: Optional static analysis checks to execute (`api-version`, `extensions`, `aliases`, `unratified`, `subcore`). Values may be comma-separated or space-separated. If specified without values, all checks run.
+* `--analyse [CHECK ...]`: Optional static analysis checks to execute (`api-version`, `extensions`, `aliases`, `unratified`, `subcore`, `depends`). Values may be comma-separated or space-separated. If specified without values, all checks run.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
 
 #### Static Analysis Checks (`--analyse`)
@@ -310,6 +310,7 @@ vkprofiles validate --input path/to/profiles [options]
 | `aliases` | Validates member consistency across aliased capability structures. |
 | `unratified` | Flags enabled extensions or structures that are not ratified for Vulkan. |
 | `subcore` | Flags profile capability values (features/properties) below the Vulkan core specification requirements for the profile API version. |
+| `depends` | Reports as errors the instance extensions in capability blocks with a `depends` condition: the condition is evaluated on a physical device, so the Vulkan Profiles API library and the Profiles layer ignore these instance extensions. |
 
 Schema validation always runs by default. Static analysis is enabled only when `--analyse` is supplied.
 

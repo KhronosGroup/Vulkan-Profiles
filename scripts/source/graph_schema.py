@@ -161,7 +161,8 @@ GRAPH_JSON_SCHEMA = {
                 "extensions",
                 "aliases",
                 "unratified",
-                "subcore"
+                "subcore",
+                "depends"
             ]
         },
         "common_args": {

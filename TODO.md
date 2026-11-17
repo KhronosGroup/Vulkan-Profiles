@@ -19,4 +19,4 @@ Items left to deal with after adding the capability block `depends` condition (s
 
 ## Vulkan Profiles API library
 
-- [ ] **Instance level support of `depends` blocks.** `vpGetInstanceProfileSupport` ignores the blocks with a `depends` condition and `vpCreateInstance` doesn't enable their instance extensions, as the condition is evaluated on a physical device. Decide whether instance extensions of conditional blocks should be enabled when available.
+- [ ] **Instance level support of `depends` blocks.** `vpGetInstanceProfileSupport` ignores the blocks with a `depends` condition and `vpCreateInstance` doesn't enable their instance extensions, as the condition is evaluated on a physical device. `vkprofiles validate --analyse depends` reports these instance extensions as errors: decide whether instance extensions of conditional blocks should be enabled when available instead.
