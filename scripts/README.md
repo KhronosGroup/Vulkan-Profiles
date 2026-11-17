@@ -328,7 +328,7 @@ vkprofiles validate \
 
 ### 3. `schema`
 
-Generates a Vulkan Profiles JSON schema file from `vk.xml`, or upgrades existing profile JSON files to schema 0.8.2.
+Generates a Vulkan Profiles JSON schema file from `vk.xml`, or upgrades existing profile JSON schema files to schema 0.8.3. Schema 0.8.3 adds the `depends` condition of capability blocks and deprecates the profile `optionals` list.
 
 ```bash
 vkprofiles schema --registry vk.xml --output path/to/output [options]
@@ -337,7 +337,7 @@ vkprofiles schema --registry vk.xml --output path/to/output [options]
 * `--registry`, `-r`: Path to `vk.xml`.
 * `--input`, `-i`: Path to input profile JSON file or directory to upgrade.
 * `--output`, `-o`: *(Required)* Output path for the generated schema file or upgraded output directory/file.
-* `--upgrade`: Upgrade input profile JSON file(s) from schema 0.8.0 / 0.8.1 to 0.8.2.
+* `--upgrade`: Upgrade input profile JSON schema file(s) from schema 0.8.0 / 0.8.1 / 0.8.2 to 0.8.3.
 * `--format`: Output formatting style (`flatten` or `pretty`). Default: `pretty`.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
 

@@ -100,7 +100,7 @@ The Profiles layer builds its internal data tables by querying the capabilities 
 
 ```json
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-280.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.3-280.json#",
     "capabilities": {
         "baseline": {
             "extensions": {},

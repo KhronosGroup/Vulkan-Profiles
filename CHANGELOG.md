@@ -21,6 +21,7 @@
 - Add the Profiles layer *Emulate a Roadmap Profile* preset, using the `VP_KHR_roadmap_2022` profile
 - Update the Profiles layer `exclude_device_extensions` setting list with all the device extensions of the Vulkan 1.4.368 headers
 - Fix the Profiles layer warning of a profile written against a newer Vulkan Header than the layer, which read the schema patch version as the Vulkan Header version
+- Generate the profiles schema 0.8.3, adding the `depends` property of capability blocks, and upgrade the profiles schemas to 0.8.3 with `vkprofiles schema --upgrade`
 
 ### Fixes:
 - Fix `vkprofiles validate` exiting with success when a profiles file fails the schema validation: the schema errors are reported at error level and the command fails, also when `--validate` is used by the other commands
@@ -30,6 +31,7 @@
 - Add the generated `VP_LUNARG_desktop_baseline_2027` profile, MoltenVK is not supported, macOS support is limited to Mesa Vulkan drivers
 
 ### Deprecation:
+- The profile `optionals` list is deprecated in the profiles schema 0.8.3, replaced by the capability blocks with a `depends` condition
 - `VK_KHR_portability_subset` support is deprecated
   - Remove the Profiles layer `VK_KHR_portability_subset` emulation, its `emulate_portability` and portability settings, and the *Emulate a Vulkan Portability Profile* preset
 

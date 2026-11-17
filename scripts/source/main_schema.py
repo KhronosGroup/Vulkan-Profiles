@@ -19,27 +19,29 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
+import copy
 import logging
 import re
 from pathlib import Path
 
 from source.vulkan_object_utils import initVulkanObject
-from source.generate_profiles_schema import VulkanProfilesSchemaGenerator2
+from source.generate_profiles_schema import VulkanProfilesSchemaGenerator2, CAPABILITY_BLOCK_DEPENDS_SCHEMA, OPTIONALS_DESCRIPTION
 from source.profiles_json_utils import (
     load_schema_jsons,
     save_profiles_jsons,
+    SCHEMA_VERSION,
     OutputFormatType
 )
 
 
 def upgrade_schema_json_data(schema_data: dict) -> dict:
-    """Upgrades a Vulkan profile JSON Schema document from 0.8.0/0.8.1 to 0.8.2 layout."""
+    """Upgrades a Vulkan profile JSON Schema document from 0.8.0/0.8.1/0.8.2 to 0.8.3 layout."""
     if not isinstance(schema_data, dict):
         return schema_data
 
-    # 1. Update $id URL: profiles-0.8.0 / profiles-0.8.1 -> profiles-0.8.2
+    # 1. Update $id URL: profiles-0.8.0 / profiles-0.8.1 / profiles-0.8.2 -> profiles-0.8.3
     if "$id" in schema_data and isinstance(schema_data["$id"], str):
-        schema_data["$id"] = re.sub(r'profiles-0\.8\.[01]', 'profiles-0.8.2', schema_data["$id"])
+        schema_data["$id"] = re.sub(r'profiles-0\.8\.[012]-', f'profiles-{SCHEMA_VERSION}-', schema_data["$id"])
 
     definitions = schema_data.get("definitions", {})
 
@@ -82,10 +84,12 @@ def upgrade_schema_json_data(schema_data: dict) -> dict:
                 ]
             }
 
-        # Ensure optionals property definition exists
-        if "optionals" not in props:
+        # Ensure optionals property definition exists, deprecated since 0.8.3
+        if "optionals" in props and isinstance(props["optionals"], dict):
+            props["optionals"]["description"] = OPTIONALS_DESCRIPTION
+        else:
             props["optionals"] = {
-                "description": "The list of optional capability sets that can be referenced by a profile.",
+                "description": OPTIONALS_DESCRIPTION,
                 "type": "array",
                 "uniqueItems": True,
                 "items": {
@@ -112,6 +116,12 @@ def upgrade_schema_json_data(schema_data: dict) -> dict:
                 }
             }
 
+    # 4. Add the 'depends' condition of capability blocks (0.8.3)
+    caps_block_def = schema_data.get("properties", {}).get("capabilities", {}).get("additionalProperties", {})
+    if isinstance(caps_block_def, dict) and isinstance(caps_block_def.get("properties"), dict):
+        if "depends" not in caps_block_def["properties"]:
+            caps_block_def["properties"] = {"depends": copy.deepcopy(CAPABILITY_BLOCK_DEPENDS_SCHEMA), **caps_block_def["properties"]}
+
     # Remove deprecated root properties
     root_props = schema_data.get("properties", {})
     root_props.pop("contributors", None)
@@ -135,7 +145,7 @@ def main_schema(args):
         upgraded_dict = {}
 
         for file_key, file_data in schema_files_dict.items():
-            new_filename = re.sub(r'profiles-0\.8\.[01]', 'profiles-0.8.2', file_key.name)
+            new_filename = re.sub(r'profiles-0\.8\.[012]-', f'profiles-{SCHEMA_VERSION}-', file_key.name)
             print(f"Upgrading schema '{file_key.name}' to '{new_filename}'...")
             
             upgraded_data = upgrade_schema_json_data(file_data)

@@ -35,6 +35,7 @@ from source.profiles_json_utils import (
     validate_profiles_json_data,
     get_profile_and_file_data,
     collect_profile_capabilities,
+    SCHEMA_VERSION,
     OutputFormatType
 )
 from source.vulkan_object_version import VK_VERSION
@@ -303,7 +304,7 @@ def find_min_schema_for_profile(profile_file_data: dict, schemas: list[tuple[int
     last_passing_schema = None
 
     for idx, (header_ver, schema_identifier, schema_data) in enumerate(schemas):
-        schema_file_name = Path(str(schema_identifier)).name if schema_identifier else f"profiles-0.8.2-{header_ver}.json"
+        schema_file_name = Path(str(schema_identifier)).name if schema_identifier else f"profiles-{SCHEMA_VERSION}-{header_ver}.json"
         prof_str = f" for profile '{profile_name}'" if profile_name else ""
         logging.info(f"Checking schema '{schema_file_name}'{prof_str}...")
 
@@ -459,7 +460,7 @@ def main_min_api_version(args):
                 max_header_ver = max([h for h in profile_min_headers.values() if h is not None] or [0])
                 logging.info(f"File '{file_key}': overall file schema header version = {max_header_ver}")
 
-                new_file_data["$schema"] = f"https://schema.khronos.org/vulkan/profiles-0.8.2-{max_header_ver}.json#"
+                new_file_data["$schema"] = f"https://schema.khronos.org/vulkan/profiles-{SCHEMA_VERSION}-{max_header_ver}.json#"
                 updated_files_dict[file_key] = new_file_data
                 summary_files[file_key] = max_header_ver
 
