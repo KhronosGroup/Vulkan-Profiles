@@ -76,6 +76,7 @@ set(PROFILES_GRAPH_OUTPUTS
     ${PROJECT_SOURCE_DIR}/library/include/vulkan/android_vulkan_requirements_debug.hpp
     ${PROJECT_SOURCE_DIR}/PROFILES.md
     ${PROJECT_SOURCE_DIR}/PROFILES_DESKTOP.md
+    ${PROJECT_SOURCE_DIR}/PROFILES_CORE.md
     ${PROJECT_SOURCE_DIR}/PROFILES_ANDROID.md
 )
 

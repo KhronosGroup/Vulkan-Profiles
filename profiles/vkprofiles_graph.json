@@ -274,9 +274,20 @@
             }
         },
         {
+            "id": "doc_core",
+            "description": "Generate PROFILES_CORE.md documentation",
+            "depends_on": [ "validate_profiles" ],
+            "command": "doc",
+            "args": {
+                "input": "profiles/build",
+                "input-profiles": "VP_LUNARG_minimum_requirements_1_0,VP_LUNARG_minimum_requirements_1_1,VP_LUNARG_minimum_requirements_1_2,VP_LUNARG_minimum_requirements_1_3,VP_LUNARG_minimum_requirements_1_4",
+                "output": "PROFILES_CORE.md"
+            }
+        },
+        {
             "id": "summary_build",
             "description": "Print summary report of profiles in build directory",
-            "depends_on": [ "doc_summary", "doc_desktop", "doc_android" ],
+            "depends_on": [ "doc_summary", "doc_desktop", "doc_android", "doc_core" ],
             "command": "summary",
             "args": {
                 "input": "profiles/build"
