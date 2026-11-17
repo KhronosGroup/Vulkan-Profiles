@@ -19,6 +19,7 @@
   - Evaluate the `depends` condition on the physical device in the Vulkan Profiles API library and on the simulated device in the Profiles layer
   - Check the `depends` condition in `vkprofiles validate`, and report the instance extensions of capability blocks with a `depends` condition with `vkprofiles validate --analyse depends`
   - Keep the capability blocks with a `depends` condition separate in `vkprofiles transform` and `vkprofiles extract`
+  - List the capability blocks with a `depends` condition, their condition and their requirements in a "Conditional Requirements" section of the `vkprofiles doc` documentation
 
 ### Improvements:
 - Generate `PROFILES_CORE.md`, the documentation of the `VP_LUNARG_minimum_requirements_1_x` profiles of the Vulkan core specification requirements

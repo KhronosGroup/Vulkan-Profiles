@@ -29,6 +29,8 @@ from vulkan_object import VulkanObject, VideoCodec
 from source.vulkan_object_utils import getStructByName
 from source.vulkan_object_version import VK_VERSION
 from source.generate_api_library import LibraryRegistry, LibraryMember, VulkanProfile, VulkanProfileCapabilities, VulkanProfilesDatabase
+from source.profiles_json_utils import get_block_depends
+from source.vulkan_object_expression_parsing import tokenizeDependsExpression
 
 
 DOC_MD_HEADER = '''
@@ -261,14 +263,18 @@ class DocRegistry(LibraryRegistry):
 
 class VulkanProfilesDocGenerator():
     def __init__(self, registry: DocRegistry, profiles: dict[str, VulkanProfile], doc_capabilities: dict[str, VulkanProfileCapabilities],
-                 alternative_groups: dict[str, list[tuple[str, str, dict[str, dict]]]] | None = None):
+                 alternative_groups: dict[str, list[tuple[str, str, dict[str, dict]]]] | None = None,
+                 dependent_blocks: dict[str, dict[str, tuple[str, str, dict]]] | None = None):
         self.registry = registry
-        # The requirements of every device supporting each profile: the alternative capability blocks are not included,
-        # they are documented separately
+        # The requirements of every device supporting each profile: the alternative capability blocks and the capability
+        # blocks with a 'depends' condition are not included, they are documented separately
         self.doc_capabilities = doc_capabilities
         # The groups of alternative capability blocks of each profile, including those of its required profiles,
         # as (profile defining the group, API version of that profile, alternative capability blocks by block name)
         self.alternative_groups = alternative_groups if alternative_groups is not None else dict()
+        # The capability blocks with a 'depends' condition of each profile, including those of its required profiles,
+        # by block name, as (profile defining the block, API version of that profile, block)
+        self.dependent_blocks = dependent_blocks if dependent_blocks is not None else dict()
         # The header of the first column of the tables
         self.tableHeader = 'Profiles'
         self.profiles = sorted(profiles.values(), key = self.sort_KHR_EXT_first)
@@ -334,6 +340,7 @@ class VulkanProfilesDocGenerator():
         if self.has_capabilities('videoProfiles'):
             gen += self.gen_videoProfiles()
         gen += self.gen_alternativeGroups()
+        gen += self.gen_dependentBlocks()
         return gen
 
 
@@ -388,6 +395,8 @@ class VulkanProfilesDocGenerator():
         })
         if self.has_alternativeGroups():
             rows['Alternative capability blocks'] = lambda _, profile : self.gen_alternativeGroupsCell(profile)
+        if self.has_dependentBlocks():
+            rows['Conditional capability blocks'] = lambda _, profile : self.gen_dependentBlocksCell(profile)
         return '\n## Vulkan Profiles List\n\n{0}\n'.format(self.gen_table(rows))
 
 
@@ -395,8 +404,13 @@ class VulkanProfilesDocGenerator():
         return any(self.alternative_groups.get(profile.key) for profile in self.profiles)
 
 
-    def gen_alternativeGroupTables(self, api_version: str, blocks: dict[str, dict]) -> str:
-        # Documents a group of alternative capability blocks with the comparison tables of the document, one column per capability block
+    def has_dependentBlocks(self) -> bool:
+        return any(self.dependent_blocks.get(profile.key) for profile in self.profiles)
+
+
+    def gen_alternativeGroupTables(self, api_version: str, blocks: dict[str, dict], table_header: str = 'Alternatives') -> str:
+        # Documents capability blocks, e.g. a group of alternative capability blocks, with the comparison tables of the
+        # document, one column per capability block
         json_file = {
             'capabilities': dict(blocks),
             'profiles': OrderedDict((block_name, {
@@ -415,8 +429,8 @@ class VulkanProfilesDocGenerator():
 
         generator = VulkanProfilesDocGenerator(self.registry, profiles, doc_capabilities)
         generator.profiles = [profiles[block_name] for block_name in blocks.keys()]
-        generator.tableHeader = 'Alternatives'
-        # Only the extensions of the alternative capability blocks are listed, not all the extensions promoted to core
+        generator.tableHeader = table_header
+        # Only the extensions of the capability blocks are listed, not all the extensions promoted to core
         generator.coreInstanceExtensions = []
         generator.coreDeviceExtensions = []
 
@@ -490,6 +504,59 @@ class VulkanProfilesDocGenerator():
             gen += '* Profiles: {0}\n'.format(', '.join(profile_keys))
             gen += '* Alternatives: {0}\n'.format(' **or** '.join('`{0}`'.format(block_name) for block_name in blocks.keys()))
             gen += self.gen_alternativeGroupTables(api_version, blocks)
+
+        return gen
+
+
+    def formatDependsCondition(self, depends: str) -> str:
+        # Writes the vk.xml 'depends' expression with words: '+' is AND, ',' is OR and '!' is NOT
+        gen = ''
+        for token in tokenizeDependsExpression(depends):
+            if token == '+':
+                gen += ' **and** '
+            elif token == ',':
+                gen += ' **or** '
+            elif token in ('(', ')'):
+                gen += token
+            elif token.startswith('!'):
+                gen += '**not** `{0}`'.format(token[1:].strip())
+            else:
+                gen += '`{0}`'.format(token)
+        return gen
+
+
+    def collectDependentBlocks(self) -> OrderedDict[str, tuple[str, str, dict, list[str]]]:
+        # Returns the capability blocks with a 'depends' condition of the documented profiles, by block name, as
+        # (profile defining the block, API version of that profile, block, profiles requiring the block).
+        # A capability block required by several profiles is listed once.
+        blocks: OrderedDict[str, list] = OrderedDict()
+        for profile in self.profiles:
+            for block_name, (defining_profile, api_version, block) in self.dependent_blocks.get(profile.key, {}).items():
+                if block_name not in blocks:
+                    blocks[block_name] = [defining_profile, api_version, block, []]
+                blocks[block_name][3].append(profile.key)
+        return OrderedDict((block_name, tuple(block)) for block_name, block in blocks.items())
+
+
+    def gen_dependentBlocksCell(self, profile: VulkanProfile) -> str:
+        # Each capability block with a 'depends' condition of the profile links to its definition
+        return '<br>'.join('[{0}]({1})'.format(block_name, self.gen_headingAnchor(block_name))
+                           for block_name in self.dependent_blocks.get(profile.key, {}).keys()) or '-'
+
+
+    def gen_dependentBlocks(self):
+        if not self.has_dependentBlocks():
+            return ''
+
+        gen = '\n## Vulkan Profiles Conditional Requirements\n\n'
+        gen += ('The requirements of a capability block with a `depends` condition only apply to the devices satisfying the condition. '
+                'These requirements are not listed in the other tables of this document, which only list the requirements of every device supporting a profile.\n')
+
+        for block_name, (defining_profile, api_version, block, profile_keys) in self.collectDependentBlocks().items():
+            gen += '\n### {0}\n\n'.format(block_name)
+            gen += '* Profiles: {0}\n'.format(', '.join(profile_keys))
+            gen += '* Condition: {0}\n'.format(self.formatDependsCondition(get_block_depends(block)))
+            gen += self.gen_alternativeGroupTables(api_version, {block_name: block}, 'Capability block')
 
         return gen
 
@@ -1509,6 +1576,7 @@ def generate_profiles_doc(vk: VulkanObject, json_files: list[dict], input_profil
     profiles = dict()
     doc_capabilities = dict()
     alternative_groups = dict()
+    dependent_blocks = dict()
     for json_file in json_files:
         for json_profile_key, json_profile_value in json_file['profiles'].items():
             if input_profiles and json_profile_key not in input_profiles:
@@ -1518,21 +1586,30 @@ def generate_profiles_doc(vk: VulkanObject, json_files: list[dict], input_profil
                 required_profiles = database.collectRequiredProfiles(json_profile_key)
 
                 # The documentation shows the capabilities of every device supporting the profile, including those of its required profiles:
-                # the alternative capability blocks are listed separately
+                # the alternative capability blocks and the capability blocks with a 'depends' condition are listed separately
                 collected_json_capabilities = database.collectProfileCapabilities(required_profiles, False)
                 doc_capabilities[json_profile_key] = VulkanProfileCapabilities(registry, '"DOC"', collected_json_capabilities, False, True)
 
-                # The groups of alternative capability blocks of the profile and of its required profiles, required profiles first
+                # The groups of alternative capability blocks and the capability blocks with a 'depends' condition of the
+                # profile and of its required profiles, required profiles first. The alternative capability blocks with a
+                # 'depends' condition are only listed with their alternatives.
                 profile_alternative_groups = []
+                profile_dependent_blocks = OrderedDict()
                 for required_profile in required_profiles:
                     required_profile_value, required_profile_file = database.findProfile(required_profile)
                     if required_profile_value is None:
                         continue
+                    api_version = required_profile_value['api-version']
                     for cap_entry in required_profile_value['capabilities']:
                         if isinstance(cap_entry, list):
                             blocks = OrderedDict((block_name, required_profile_file['capabilities'].get(block_name, {})) for block_name in cap_entry)
-                            profile_alternative_groups.append((required_profile, required_profile_value['api-version'], blocks))
+                            profile_alternative_groups.append((required_profile, api_version, blocks))
+                        else:
+                            block = required_profile_file['capabilities'].get(cap_entry)
+                            if get_block_depends(block) is not None:
+                                profile_dependent_blocks[cap_entry] = (required_profile, api_version, block)
                 alternative_groups[json_profile_key] = profile_alternative_groups
+                dependent_blocks[json_profile_key] = profile_dependent_blocks
 
-    generator = VulkanProfilesDocGenerator(registry, profiles, doc_capabilities, alternative_groups)
+    generator = VulkanProfilesDocGenerator(registry, profiles, doc_capabilities, alternative_groups, dependent_blocks)
     generator.generate(output)

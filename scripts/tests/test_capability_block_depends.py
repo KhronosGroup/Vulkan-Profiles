@@ -17,6 +17,7 @@
 import argparse
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 
 scripts_dir = Path(__file__).resolve().parent.parent
@@ -39,6 +40,7 @@ from source.transform_pull_required_capabilities import (
     pull_extension_dependencies_profiles_files
 )
 from source.main_validate import VulkanProfilesDataValidation
+from source.generate_profiles_doc import generate_profiles_doc
 
 
 def make_profiles_file(capabilities: dict, profile_capabilities: list, api_version: str = "1.4.304") -> dict:
@@ -232,6 +234,51 @@ class TestCapabilityBlockDependsProfiles(unittest.TestCase):
             issues = validator.validate_data({"test.json": invalid_profile}, [])
             self.assertEqual(len(issues), 1, depends)
             self.assertIn(error, issues[0], depends)
+
+    def test_doc_depends(self):
+        profile = self.make_protected_profile()
+        profile["capabilities"]["protected"]["depends"] = "(VK_KHR_maintenance5,VK_VERSION_1_4)+!VkPhysicalDeviceFeatures::wideLines"
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output = Path(temp_dir) / "PROFILES.md"
+            generate_profiles_doc(self.vk, [profile], None, str(output))
+            doc = output.read_text()
+
+        # The capability block with a 'depends' condition is linked from the profiles list
+        self.assertIn("| Conditional capability blocks | [protected](#protected) |", doc)
+
+        # The capability block is listed at the end of the document with its condition and the comparison tables of its requirements
+        other_sections, conditional_section = doc.split("## Vulkan Profiles Conditional Requirements", 1)
+        self.assertNotIn("\n## ", conditional_section)
+        self.assertIn("\n### protected\n", conditional_section)
+        self.assertIn("* Profiles: VP_LUNARG_test_depends", conditional_section)
+        self.assertIn("* Condition: (`VK_KHR_maintenance5` **or** `VK_VERSION_1_4`) **and** **not** `VkPhysicalDeviceFeatures::wideLines`", conditional_section)
+        self.assertIn("#### Vulkan Profile Features", conditional_section)
+        self.assertIn("| Capability block | protected |", conditional_section)
+        self.assertIn("[pipelineProtectedAccess]", conditional_section)
+
+        # Its requirements are not part of the requirements of every device supporting the profile
+        self.assertNotIn("[pipelineProtectedAccess]", other_sections)
+        self.assertIn("pushDescriptor", other_sections)
+
+    def test_doc_without_depends(self):
+        profile = make_profiles_file({
+            "baseline": {
+                "features": {
+                    "VkPhysicalDeviceVulkan14Features": {
+                        "pushDescriptor": True
+                    }
+                }
+            }
+        }, ["baseline"])
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output = Path(temp_dir) / "PROFILES.md"
+            generate_profiles_doc(self.vk, [profile], None, str(output))
+            doc = output.read_text()
+
+        # Without a capability block with a 'depends' condition, the documentation is unchanged
+        self.assertNotIn("Conditional", doc)
 
 
 if __name__ == '__main__':
