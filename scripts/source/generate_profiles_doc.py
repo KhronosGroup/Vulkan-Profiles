@@ -326,11 +326,20 @@ class VulkanProfilesDocGenerator():
         gen += self.gen_extensions()
         gen += self.gen_features()
         gen += self.gen_limits()
-        gen += self.gen_queueFamilies()
-        gen += self.gen_formats()
-        gen += self.gen_videoProfiles()
+        # The queue families, formats and video profiles sections are skipped when no profile defines requirements for them
+        if self.has_capabilities('queueFamiliesProperties'):
+            gen += self.gen_queueFamilies()
+        if self.has_capabilities('formats'):
+            gen += self.gen_formats()
+        if self.has_capabilities('videoProfiles'):
+            gen += self.gen_videoProfiles()
         gen += self.gen_alternativeGroups()
         return gen
+
+
+    def has_capabilities(self, category: str) -> bool:
+        # Returns whether any documented profile defines requirements of a capabilities category, e.g. 'formats'
+        return any(getattr(self.getDocCapabilities(profile), category) for profile in self.profiles)
 
 
     def gen_manPageLink(self, entry, text):
@@ -378,8 +387,7 @@ class VulkanProfilesDocGenerator():
             'Fallback profiles': lambda _, profile : ', '.join(profile.fallbacks) if profile.fallbacks != None else '-'
         })
         if self.has_alternativeGroups():
-            rows['Alternative capability blocks'] = lambda _, profile : '<br>'.join(
-                ' **or** '.join(blocks.keys()) for _, _, blocks in self.alternative_groups.get(profile.key, [])) or '-'
+            rows['Alternative capability blocks'] = lambda _, profile : self.gen_alternativeGroupsCell(profile)
         return '\n## Vulkan Profiles List\n\n{0}\n'.format(self.gen_table(rows))
 
 
@@ -413,51 +421,71 @@ class VulkanProfilesDocGenerator():
         generator.coreDeviceExtensions = []
 
         # Only the tables with requirements are generated
-        capabilities = doc_capabilities.values()
         gen = ''
-        if any(caps.extensions for caps in capabilities):
+        if generator.has_capabilities('extensions'):
             gen += generator.gen_extensions()
-        if any(caps.features for caps in capabilities):
+        if generator.has_capabilities('features'):
             gen += generator.gen_features()
-        if any(caps.properties for caps in capabilities):
+        if generator.has_capabilities('properties'):
             gen += generator.gen_limits()
-        if any(caps.queueFamiliesProperties for caps in capabilities):
+        if generator.has_capabilities('queueFamiliesProperties'):
             gen += generator.gen_queueFamilies()
-        if any(caps.formats for caps in capabilities):
+        if generator.has_capabilities('formats'):
             gen += generator.gen_formats()
-        if any(caps.videoProfiles for caps in capabilities):
+        if generator.has_capabilities('videoProfiles'):
             gen += generator.gen_videoProfiles()
         return gen.replace('\n## ', '\n#### ')
+
+
+    def collectAlternativeGroups(self) -> OrderedDict[tuple[str, ...], tuple[str, str, str, dict[str, dict], list[str]]]:
+        # Returns the groups of alternative capability blocks of the documented profiles, by block names, as
+        # (section title, profile defining the group, API version of that profile, blocks, profiles requiring the group).
+        # A group of alternative capability blocks required by several profiles is listed once.
+        groups: OrderedDict[tuple[str, ...], list] = OrderedDict()
+        for profile in self.profiles:
+            for defining_profile, api_version, blocks in self.alternative_groups.get(profile.key, []):
+                group_key = tuple(blocks.keys())
+                if group_key not in groups:
+                    groups[group_key] = [None, defining_profile, api_version, blocks, []]
+                groups[group_key][4].append(profile.key)
+
+        defined_group_counts: dict[str, int] = dict()
+        for _, defining_profile, _, _, _ in groups.values():
+            defined_group_counts[defining_profile] = defined_group_counts.get(defining_profile, 0) + 1
+
+        defined_group_indices: dict[str, int] = dict()
+        for group in groups.values():
+            defining_profile = group[1]
+            defined_group_indices[defining_profile] = defined_group_indices.get(defining_profile, 0) + 1
+            group[0] = '{0} alternatives'.format(defining_profile)
+            if defined_group_counts[defining_profile] > 1:
+                group[0] += ' {0}'.format(defined_group_indices[defining_profile])
+
+        return OrderedDict((group_key, tuple(group)) for group_key, group in groups.items())
+
+
+    def gen_headingAnchor(self, title: str) -> str:
+        # The anchor GitHub generates for a heading: lowercase, punctuation removed and spaces replaced by '-'
+        return '#' + re.sub(r'[^\w\- ]', '', title.lower()).replace(' ', '-')
+
+
+    def gen_alternativeGroupsCell(self, profile: VulkanProfile) -> str:
+        # Each group of alternative capability blocks of the profile links to its definition
+        titles = { group_key: group[0] for group_key, group in self.collectAlternativeGroups().items() }
+        return '<br>'.join(
+            '[{0}]({1})'.format(' **or** '.join(blocks.keys()), self.gen_headingAnchor(titles[tuple(blocks.keys())]))
+            for _, _, blocks in self.alternative_groups.get(profile.key, [])) or '-'
 
 
     def gen_alternativeGroups(self):
         if not self.has_alternativeGroups():
             return ''
 
-        # A group of alternative capability blocks required by several profiles is listed once
-        groups: OrderedDict[tuple[str, ...], tuple[str, str, dict[str, dict], list[str]]] = OrderedDict()
-        for profile in self.profiles:
-            for defining_profile, api_version, blocks in self.alternative_groups.get(profile.key, []):
-                group_key = tuple(blocks.keys())
-                if group_key not in groups:
-                    groups[group_key] = (defining_profile, api_version, blocks, [])
-                groups[group_key][3].append(profile.key)
-
         gen = '\n## Vulkan Profiles Alternative Requirements\n\n'
         gen += ('A device supporting a profile satisfies the requirements of at least one capability block of each group of alternative capability blocks. '
                 'These requirements are not listed in the other tables of this document, which only list the requirements of every device supporting a profile.\n')
 
-        defined_group_counts: dict[str, int] = dict()
-        for defining_profile, _, _, _ in groups.values():
-            defined_group_counts[defining_profile] = defined_group_counts.get(defining_profile, 0) + 1
-
-        defined_group_indices: dict[str, int] = dict()
-        for defining_profile, api_version, blocks, profile_keys in groups.values():
-            defined_group_indices[defining_profile] = defined_group_indices.get(defining_profile, 0) + 1
-            title = '{0} alternatives'.format(defining_profile)
-            if defined_group_counts[defining_profile] > 1:
-                title += ' {0}'.format(defined_group_indices[defining_profile])
-
+        for title, defining_profile, api_version, blocks, profile_keys in self.collectAlternativeGroups().values():
             gen += '\n### {0}\n\n'.format(title)
             gen += '* Profiles: {0}\n'.format(', '.join(profile_keys))
             gen += '* Alternatives: {0}\n'.format(' **or** '.join('`{0}`'.format(block_name) for block_name in blocks.keys()))

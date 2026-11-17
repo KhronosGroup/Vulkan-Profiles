@@ -101,7 +101,10 @@ class TestProfilesDoc(unittest.TestCase):
 
         # The profiles with alternative capability blocks are documented
         self.assertIn("| Profiles | VP_LUNARG_test_alternatives | VP_LUNARG_test_alternatives_required |", doc)
-        self.assertIn("| Alternative capability blocks | rectangular_lines **or** bresenham_lines | rectangular_lines **or** bresenham_lines |", doc)
+        # The alternative capability blocks of the profiles list link to their definition
+        link = "[rectangular_lines **or** bresenham_lines](#vp_lunarg_test_alternatives-alternatives)"
+        self.assertIn("| Alternative capability blocks | {0} | {0} |".format(link), doc)
+        self.assertIn("\n### VP_LUNARG_test_alternatives alternatives\n", doc)
 
         # The alternative requirements are documented at the end of the document
         other_sections, alternatives = doc.split("## Vulkan Profiles Alternative Requirements", 1)
@@ -131,6 +134,31 @@ class TestProfilesDoc(unittest.TestCase):
         self.assertNotIn("bresenhamLines", other_sections)
         self.assertNotIn("VK_KHR_line_rasterization.html) | :heavy_check_mark:", other_sections)
         self.assertIn("pushDescriptor", other_sections)
+
+    def test_doc_skips_undefined_sections(self):
+        profiles_file = make_profiles_file()
+        doc = self.generate_doc([profiles_file])
+
+        # Without queue families, formats and video profiles requirements, their sections are skipped
+        self.assertNotIn("## Vulkan Profile Queue Families", doc)
+        self.assertNotIn("## Vulkan Profile Formats", doc)
+        self.assertNotIn("## Vulkan Profile Video Profiles", doc)
+        self.assertIn("## Vulkan Profiles Extensions", doc)
+        self.assertIn("## Vulkan Profile Features", doc)
+        self.assertIn("## Vulkan Profile Limits (Properties)", doc)
+
+        # A section is generated as soon as a profile defines requirements for it
+        profiles_file["capabilities"]["baseline"]["formats"] = {
+            "VK_FORMAT_R8_UNORM": {
+                "VkFormatProperties": {
+                    "optimalTilingFeatures": ["VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT"]
+                }
+            }
+        }
+        doc = self.generate_doc([profiles_file])
+        self.assertIn("## Vulkan Profile Formats", doc)
+        self.assertNotIn("## Vulkan Profile Queue Families", doc)
+        self.assertNotIn("## Vulkan Profile Video Profiles", doc)
 
     def test_doc_without_alternatives(self):
         profiles_file = make_profiles_file()
