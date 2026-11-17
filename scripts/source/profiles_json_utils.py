@@ -393,50 +393,59 @@ def _get_schema_validator(schema_data: dict):
     return validator
 
 
-def _validate_profiles_json_data(json_data, schema_data) -> bool:
+def _validate_profiles_json_data(json_data, schema_data, log_level: int = logging.INFO, file_name: Path | str | None = None) -> bool:
+    """
+    Validates a profiles JSON object against a schema dictionary. The schema validation failure is logged at
+    log_level: INFO when a failure is expected (e.g. checking which schema versions a profile supports), ERROR
+    when the profiles file must be valid.
+    """
+    file_prefix = f"'{file_name}': " if file_name is not None else ""
     try:
         import jsonschema
         error = jsonschema.exceptions.best_match(_get_schema_validator(schema_data).iter_errors(json_data))
         if error is not None:
             raise error
         return True
+    except ModuleNotFoundError:
+        logging.error("`jsonschema` module is not installed, the schema validation can't be performed")
+        return False
     except jsonschema.exceptions.ValidationError as e:
-        # TODO: Schema failures are logged at INFO level, so they only show with --verbose, and
-        # 'vkprofiles validate' still exits 0 for a file that fails. Log at ERROR and fail the command.
-        logging.info(f"Validation Message: {e.message}")
-        logging.info(f"Location in JSON: {' -> '.join([str(p) for p in e.path])}")
-        logging.info(f"Invalid value/context: {e.instance}")
+        logging.log(log_level, f"{file_prefix}Schema validation failed: {e.message}")
+        logging.log(log_level, f"{file_prefix}Location in JSON: {' -> '.join([str(p) for p in e.path])}")
+        logging.log(log_level, f"{file_prefix}Invalid value/context: {e.instance}")
         return False
     except jsonschema.exceptions.SchemaError as e:
         logging.error(f"The provided schema itself is invalid: {e.message}")
         return False
-    except ModuleNotFoundError:
-        logging.warning("`jsonschema` module is not installed, schema validation skipped")
-        return False
 
 
-def validate_profiles_json_data(json_data: dict, schema_data: dict) -> bool:
+def validate_profiles_json_data(json_data: dict, schema_data: dict, log_level: int = logging.INFO) -> bool:
     """Validates a single profile JSON object against a schema dictionary."""
-    return _validate_profiles_json_data(json_data, schema_data)
+    return _validate_profiles_json_data(json_data, schema_data, log_level)
 
 
-def validate_profiles_json(json_data_path: Path, json_schema_path: Path) -> bool:
+def validate_profiles_json(json_data_path: Path, json_schema_path: Path, log_level: int = logging.INFO) -> bool:
     schema_data = load_schema_json(json_schema_path)
     if schema_data is None:
-        logging.error(f"[ERROR] Invalid profile file: {json_schema_path}")
+        logging.error(f"Invalid profiles schema file: {json_schema_path}")
         return False
 
     json_data = load_profiles_json(json_data_path)
     if json_data is None:
-        logging.debug(f"[DEBUG] Invalid profile file: {json_data_path}")
+        logging.log(log_level, f"Invalid profiles file: {json_data_path}")
         return False
 
     logging.info(f"Validating profile file: {json_data_path} with {json_schema_path}")
 
-    return _validate_profiles_json_data(json_data, schema_data)
+    return _validate_profiles_json_data(json_data, schema_data, log_level, json_data_path)
 
 
-def validate_profiles_jsons_data(json_data_dir: Path, json_schema_data) -> int:
+def validate_profiles_jsons_data(json_data_dir: Path, json_schema_data, log_level: int = logging.INFO, invalid_files: list[Path] | None = None) -> int:
+    """
+    Validates the profiles file or the profiles files of a directory against a schema dictionary and returns the
+    number of valid profiles files. The files failing the validation are appended to invalid_files. A JSON file of
+    a directory which isn't a profiles file is skipped, while a profiles file path that can't be loaded is invalid.
+    """
     profiles_files_paths = []
     if json_data_dir.is_file():
         profiles_files_paths.append(json_data_dir)
@@ -445,27 +454,41 @@ def validate_profiles_jsons_data(json_data_dir: Path, json_schema_data) -> int:
             if pos_json.endswith('.json'):
                 full_path = json_data_dir / pos_json
                 profiles_files_paths.append(full_path)
+    else:
+        logging.error(f"Input path '{json_data_dir}' does not exist")
+        if invalid_files is not None:
+            invalid_files.append(json_data_dir)
+        return 0
 
     result = 0
-    for i in range(len(profiles_files_paths)):
-        json_data = load_profiles_json(profiles_files_paths[i])
+    for profiles_file_path in profiles_files_paths:
+        json_data = load_profiles_json(profiles_file_path)
         if json_data is None:
-            logging.debug(f"Invalid profile file: {profiles_files_paths[i]}")
+            if json_data_dir.is_file():
+                logging.log(log_level, f"Invalid profiles file: {profiles_file_path}")
+                if invalid_files is not None:
+                    invalid_files.append(profiles_file_path)
+            else:
+                logging.debug(f"Skipping '{profiles_file_path}': not a profiles file")
             continue
 
-        if _validate_profiles_json_data(json_data, json_schema_data):
+        if _validate_profiles_json_data(json_data, json_schema_data, log_level, profiles_file_path):
             result += 1
+        elif invalid_files is not None:
+            invalid_files.append(profiles_file_path)
 
     return result
 
 
-def validate_profiles_jsons(json_data_dir: Path, json_schema_path: Path) -> int:
+def validate_profiles_jsons(json_data_dir: Path, json_schema_path: Path, log_level: int = logging.INFO, invalid_files: list[Path] | None = None) -> int:
     schema_data = load_schema_json(json_schema_path)
     if schema_data is None:
-        logging.error(f"Invalid profile file: {json_schema_path}")
+        logging.error(f"Invalid profiles schema file: {json_schema_path}")
+        if invalid_files is not None:
+            invalid_files.append(json_schema_path)
         return 0
 
-    return validate_profiles_jsons_data(json_data_dir, schema_data)
+    return validate_profiles_jsons_data(json_data_dir, schema_data, log_level, invalid_files)
 
 
 def load_schema_json(input_file: Path | str) -> dict | None:

@@ -21,6 +21,9 @@
 - Add the Profiles layer *Emulate a Roadmap Profile* preset, using the `VP_KHR_roadmap_2022` profile
 - Update the Profiles layer `exclude_device_extensions` setting list with all the device extensions of the Vulkan 1.4.368 headers
 
+### Fixes:
+- Fix `vkprofiles validate` exiting with success when a profiles file fails the schema validation: the schema errors are reported at error level and the command fails, also when `--validate` is used by the other commands
+
 ### Profiles:
 - Add VP_ANDROID_18_requirements profile
 - Add the generated `VP_LUNARG_desktop_baseline_2027` profile, MoltenVK is not supported, macOS support is limited to Mesa Vulkan drivers

@@ -38,9 +38,8 @@ from source.vulkan_object_utils import (
 )
 from source.profiles_json_utils import (
     load_profiles_jsons,
-    validate_profiles_json,
-    validate_profiles_jsons,
     validate_profiles_jsons_data,
+    load_schema_json,
     collect_profile_capabilities,
     get_profile_and_file_data,
     deep_merge_dict,
@@ -394,18 +393,25 @@ def main_validate(args):
 
     vk = initVulkanObject(getattr(args, 'api', 'vulkan') or 'vulkan', getattr(args, 'registry', None))
 
-    # 1. Systematically perform JSON schema validation first
+    # 1. Systematically perform JSON schema validation first, failing the command when a profiles file is invalid
+    invalid_files: list[Path] = []
     if schema_path is None:
         schema_gen = VulkanProfilesSchemaGenerator2(vk)
         schema_data = schema_gen.schema
-        count = validate_profiles_jsons_data(input_path, schema_data)
-        logging.info(f"Validated {count} file(s) against generated schema.")
+        schema_name = "generated schema"
+        count = validate_profiles_jsons_data(input_path, schema_data, logging.ERROR, invalid_files)
     else:
-        if input_path.is_file():
-            validate_profiles_json(input_path, schema_path)
-        else:
-            count = validate_profiles_jsons(input_path, schema_path)
-            logging.info(f"Validated {count} file(s) against schema {schema_path}.")
+        schema_data = load_schema_json(schema_path)
+        if schema_data is None:
+            logging.error(f"Invalid profiles schema file: {schema_path}")
+            sys.exit(1)
+        schema_name = f"schema {schema_path}"
+        count = validate_profiles_jsons_data(input_path, schema_data, logging.ERROR, invalid_files)
+
+    logging.info(f"Validated {count} file(s) against {schema_name}.")
+    if invalid_files:
+        logging.error(f"Schema validation failed for {len(invalid_files)} file(s) against {schema_name}: {', '.join(str(f) for f in invalid_files)}")
+        sys.exit(1)
 
     # 2. Perform static analysis if --analyse was specified
     if analyse_bits:
