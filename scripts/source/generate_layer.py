@@ -110,7 +110,7 @@ GLOBAL_CONSTANTS = '''
 
 const uint32_t kVersionProfilesMajor = 1;
 const uint32_t kVersionProfilesMinor = 3;
-const uint32_t kVersionProfilesPatch = 0;
+const uint32_t kVersionProfilesPatch = 1;
 const uint32_t kVersionProfilesImplementation =
     VK_MAKE_VERSION(kVersionProfilesMajor, kVersionProfilesMinor, kVersionProfilesPatch);
 
