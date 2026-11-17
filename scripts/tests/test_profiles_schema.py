@@ -16,7 +16,6 @@
 
 import argparse
 import copy
-import json
 from pathlib import Path
 import sys
 import unittest
@@ -28,7 +27,6 @@ if str(scripts_dir) not in sys.path:
 from vulkan_object import VulkanObject
 from source.vulkan_object_utils import initVulkanObject
 from source.profiles_json_utils import validate_profiles_json_data, SCHEMA_VERSION
-from source.main_schema import upgrade_schema_json_data
 from source.generate_profiles_schema import VulkanProfilesSchemaGenerator2
 
 
@@ -87,23 +85,10 @@ class TestProfilesSchema(unittest.TestCase):
         invalid_profile["capabilities"]["protected"]["depends"] = 1
         self.assertFalse(validate_profiles_json_data(invalid_profile, schema))
 
-    def test_schema_upgrade(self):
+    def test_schema_optionals_deprecated(self):
         schema = VulkanProfilesSchemaGenerator2(self.vk).schema
-        old_schema = copy.deepcopy(schema)
-        old_schema["$id"] = old_schema["$id"].replace(f"profiles-{SCHEMA_VERSION}-", "profiles-0.8.2-")
-        del old_schema["properties"]["capabilities"]["additionalProperties"]["properties"]["depends"]
-        old_profile_props = next(iter(old_schema["properties"]["profiles"]["patternProperties"].values()))["properties"]
-        old_profile_props["optionals"]["description"] = "The list of optional capability sets that can be referenced by a profile."
-
-        upgraded = upgrade_schema_json_data(old_schema)
-        self.assertIn(f"profiles-{SCHEMA_VERSION}-", upgraded["$id"])
-        self.assertEqual(
-            upgraded["properties"]["capabilities"]["additionalProperties"]["properties"]["depends"],
-            schema["properties"]["capabilities"]["additionalProperties"]["properties"]["depends"])
-
-        # The upgraded schema is the generated schema
-        self.assertEqual(json.dumps(upgraded, indent=4), json.dumps(schema, indent=4))
-        self.assertTrue(old_profile_props["optionals"]["description"].startswith("Deprecated:"))
+        profile_props = next(iter(schema["properties"]["profiles"]["patternProperties"].values()))["properties"]
+        self.assertTrue(profile_props["optionals"]["description"].startswith("Deprecated:"))
 
 
 if __name__ == '__main__':

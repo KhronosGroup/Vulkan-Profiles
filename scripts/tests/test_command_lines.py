@@ -272,10 +272,10 @@ class TestVkProfilesExhaustiveArgs(unittest.TestCase):
             vkprofiles.main(["tests", "-r", "vk.xml", "--output-profile", "test.json", "--legacy"])
             self.assertTrue(mock_tests.call_args[0][0].legacy)
 
-        # schema upgrade
+        # schema
         with patch("vkprofiles.main_schema") as mock_schema:
-            vkprofiles.main(["schema", "-i", "in_path", "-o", "out_path", "--upgrade"])
-            self.assertTrue(mock_schema.call_args[0][0].upgrade)
+            vkprofiles.main(["schema", "-r", "vk.xml", "-o", "out_path"])
+            self.assertEqual(mock_schema.call_args[0][0].output, "out_path")
 
     # -------------------------------------------------------------------------
     # 7. Missing Required Arguments

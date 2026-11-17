@@ -182,10 +182,7 @@ GRAPH_JSON_SCHEMA = {
             "type": "object",
             "properties": {
                 "registry": { "type": "string" },
-                "input": { "type": "string" },
                 "output": { "type": "string" },
-                "upgrade": { "type": "boolean" },
-                "format": { "$ref": "#/definitions/output_format" },
                 "api": { "type": "string", "enum": ["vulkan"] },
                 "verbose": { "type": "boolean" },
                 "quiet": { "type": "boolean" },

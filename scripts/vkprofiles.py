@@ -163,12 +163,9 @@ def main(argv):
     validate_parser.add_argument('--input', '-i', action='store', required=True, help='Path to the input profiles files.')
     validate_parser.add_argument('--analyse',  nargs='*', action=AnalyseAction, default=None, metavar='CHECK', help='Static analysis checks to execute (choices: ' + ', '.join([e.value for e in AnalyseBits]) + '). If specified without arguments, all checks are executed.')
 
-    schema_parser = add_command_parser(subparsers, 'schema', parents=[log_parser], help='Generate a profile json schema file or upgrade profile JSON schema file(s) to schema 0.8.3.')
+    schema_parser = add_command_parser(subparsers, 'schema', parents=[log_parser], help='Generate a profile json schema file.')
     schema_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
-    schema_parser.add_argument('--input', '-i', action='store', help='Path to input profiles JSON file or directory to upgrade.')
-    schema_parser.add_argument('--output', '-o', action='store', required=True, help='Path to output profile schema file or upgraded profiles file/directory.')
-    schema_parser.add_argument('--upgrade', action='store_true', help='Upgrade input profile JSON schema file(s) from schema 0.8.0 / 0.8.1 / 0.8.2 to 0.8.3.')
-    schema_parser.add_argument('--format', type=OutputFormatType, choices=list(OutputFormatType), default=OutputFormatType.PRETTY, help='Formatting style for output files.')
+    schema_parser.add_argument('--output', '-o', action='store', required=True, help='Path to output profile schema file.')
     schema_parser.add_argument('--api', action='store', default='vulkan', choices=['vulkan'], help="Target API")
 
     transform_parser = add_command_parser(subparsers, 'transform', parents=[log_parser], help='Transform an implicit profile to an explicit profile by pulling Vulkan capabilities dependencies from vk.xml.')
