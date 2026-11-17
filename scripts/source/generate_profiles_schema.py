@@ -24,6 +24,17 @@ import logging
 from collections import OrderedDict
 
 from source.vulkan_object_utils import gatherDynamicStructs
+from source.profiles_json_utils import SCHEMA_VERSION
+
+# The 'depends' condition of a capability block, added in schema 0.8.3
+CAPABILITY_BLOCK_DEPENDS_SCHEMA = {
+    "description": "The condition on which the capability block requirements apply, using the vk.xml 'depends' expression syntax: extension names, Vulkan versions (VK_VERSION_<major>_<minor>) and features (<feature structure>::<member>), combined with '+' (AND), ',' (OR), '!' (NOT) and parentheses. When the Vulkan device doesn't satisfy the condition, the capability block requirements don't apply.",
+    "type": "string",
+    "pattern": "^[A-Za-z0-9_:+,()! ]+$"
+}
+
+# The profile 'optionals' are deprecated since schema 0.8.3, replaced by the capability block 'depends' condition
+OPTIONALS_DESCRIPTION = "Deprecated: use capability blocks with a 'depends' condition referenced by 'capabilities' instead. The list of optional capability sets that can be referenced by a profile. The Vulkan Profiles Tools ignore the optional capability sets."
 
 EXTERNAL_TYPES = {
     "Display", "VisualID", "Window", "ANativeWindow", "wl_display", "wl_surface",
@@ -101,7 +112,7 @@ class VulkanProfilesSchemaGenerator2():
 
         return OrderedDict({
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "$id": "https://schema.khronos.org/vulkan/profiles-0.8.2-{0}.json#".format(self.vk.headerVersion),
+            "$id": "https://schema.khronos.org/vulkan/profiles-{0}-{1}.json#".format(SCHEMA_VERSION, self.vk.headerVersion),
             "title": "Vulkan Profiles Schema for Vulkan {0}".format(versionStr),
             "additionalProperties": True,
             "required": [
@@ -117,6 +128,7 @@ class VulkanProfilesSchemaGenerator2():
                         "type": "object",
                         "additionalProperties": False,
                         "properties": OrderedDict({
+                            "depends": OrderedDict(CAPABILITY_BLOCK_DEPENDS_SCHEMA),
                             "extensions": OrderedDict({
                                 "description": "The block that stores required extensions.",
                                 "type": "object",
@@ -285,7 +297,7 @@ class VulkanProfilesSchemaGenerator2():
                                     })
                                 }),
                                 "optionals": OrderedDict({
-                                    "description": "The list of optional capability sets that can be referenced by a profile.",
+                                    "description": OPTIONALS_DESCRIPTION,
                                     "type": "array",
                                     "uniqueItems": True,
                                     "items": OrderedDict({

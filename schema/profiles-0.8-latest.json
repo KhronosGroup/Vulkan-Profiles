@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://schema.khronos.org/vulkan/profiles-0.8.2-368.json#",
+    "$id": "https://schema.khronos.org/vulkan/profiles-0.8.3-368.json#",
     "title": "Vulkan Profiles Schema for Vulkan 1.4.368",
     "additionalProperties": true,
     "required": [
@@ -10066,6 +10066,11 @@
                 "type": "object",
                 "additionalProperties": false,
                 "properties": {
+                    "depends": {
+                        "description": "The condition on which the capability block requirements apply, using the vk.xml 'depends' expression syntax: extension names, Vulkan versions (VK_VERSION_<major>_<minor>) and features (<feature structure>::<member>), combined with '+' (AND), ',' (OR), '!' (NOT) and parentheses. When the Vulkan device doesn't satisfy the condition, the capability block requirements don't apply.",
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_:+,()! ]+$"
+                    },
                     "extensions": {
                         "description": "The block that stores required extensions.",
                         "type": "object",
@@ -14400,7 +14405,7 @@
                             }
                         },
                         "optionals": {
-                            "description": "The list of optional capability sets that can be referenced by a profile.",
+                            "description": "Deprecated: use capability blocks with a 'depends' condition referenced by 'capabilities' instead. The list of optional capability sets that can be referenced by a profile. The Vulkan Profiles Tools ignore the optional capability sets.",
                             "type": "array",
                             "uniqueItems": true,
                             "items": {

@@ -31,6 +31,7 @@ from source.profiles_json_utils import (
     save_profiles_jsons,
     get_profile_and_file_data,
     collect_profile_capabilities,
+    SCHEMA_VERSION,
     OutputFormatType
 )
 
@@ -145,7 +146,7 @@ def extract_profile(
             new_p_obj["capabilities"] = new_caps_refs
             extracted_profiles[p_name] = new_p_obj
 
-    newest_schema = max(candidate_schemas, key=parse_schema_version) if candidate_schemas else "https://schema.khronos.org/vulkan/profiles-0.8.2-303.json#"
+    newest_schema = max(candidate_schemas, key=parse_schema_version) if candidate_schemas else f"https://schema.khronos.org/vulkan/profiles-{SCHEMA_VERSION}-303.json#"
 
     result = {
         "$schema": newest_schema,
