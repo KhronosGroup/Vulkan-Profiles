@@ -420,6 +420,33 @@ class VulkanProfilesDataValidation:
 
         return issues
 
+    def validate_capability_block_depends_instance_extensions(
+        self,
+        profile_name: str,
+        block_name: str,
+        block: dict
+    ) -> list[ValidationIssue]:
+        """Analysis Case 6: Checks that a capability block with a 'depends' condition doesn't require instance extensions.
+
+        The 'depends' condition is evaluated against a physical device, after the instance creation: the Profiles API
+        library and the Profiles layer ignore the instance extensions of the capability blocks with a 'depends' condition.
+        """
+        issues = []
+        if not isinstance(block, dict) or get_block_depends(block) is None:
+            return issues
+
+        for ext_name in sorted(block.get("extensions", {}).keys()):
+            ext_obj = self.vk.extensions.get(ext_name)
+            if ext_obj is not None and ext_obj.instance:
+                issues.append(ValidationIssue(
+                    f"Capability block '{block_name}' of profile '{profile_name}' has a 'depends' condition and requires "
+                    f"the instance extension '{ext_name}': the instance extensions of a capability block with a 'depends' "
+                    f"condition are ignored, as the condition is evaluated on a physical device",
+                    level=logging.ERROR
+                ))
+
+        return issues
+
     def validate_data(self, json_files_dict: dict, analyse_bits: list[AnalyseBits] = None) -> list[ValidationIssue]:
         """Executes selected static analysis validation cases across loaded profile files."""
         if analyse_bits is None:
@@ -444,6 +471,14 @@ class VulkanProfilesDataValidation:
                             profile_name, block_name, capabilities_dict.get(block_name)
                         )
                     )
+
+                    # Analysis Case 6: Instance extensions of the capability blocks with a 'depends' condition
+                    if AnalyseBits.DEPENDS in analyse_bits:
+                        issues.extend(
+                            self.validate_capability_block_depends_instance_extensions(
+                                profile_name, block_name, capabilities_dict.get(block_name)
+                            )
+                        )
 
                 # Analysis Case 1: Required Profile API Version Inheritance Checks
                 if AnalyseBits.API_VERSION in analyse_bits:

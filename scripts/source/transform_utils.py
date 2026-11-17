@@ -72,6 +72,7 @@ class AnalyseBits(str, Enum):
     ALIASES = 'aliases'                            # Checks member value consistency across aliased capability structures.
     UNRATIFIED = 'unratified'                      # Checks that all enabled extensions in the profile are ratified for Vulkan.
     SUBCORE_CAPABILITIES = 'subcore'               # Checks for profile capability values (features/properties) below Vulkan core specification baselines.
+    DEPENDS = 'depends'                            # Checks that the capability blocks with a 'depends' condition don't require instance extensions.
 
 
 class CategoryPriority(IntEnum):
