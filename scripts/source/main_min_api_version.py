@@ -48,7 +48,8 @@ from source.vulkan_object_utils import (
 )
 
 SCHEMA_GITHUB_RAW_URL = "https://raw.githubusercontent.com/KhronosGroup/Khronos-Schemas/main/vulkan/"
-SCHEMA_GITHUB_API_URL = "https://api.github.com/repos/KhronosGroup/Khronos-Schemas/contents/vulkan"
+# The Git Trees API lists the whole directory, unlike the contents API which returns at most 1,000 entries
+SCHEMA_GITHUB_API_URL = "https://api.github.com/repos/KhronosGroup/Khronos-Schemas/git/trees/main:vulkan"
 
 
 class MinApiVersionMode(str, Enum):
@@ -240,14 +241,28 @@ def load_available_schemas(schemas_dir: str | Path = None) -> list[tuple[int, Pa
     try:
         req = urllib.request.Request(SCHEMA_GITHUB_API_URL, headers={"User-Agent": "vkprofiles"})
         with urllib.request.urlopen(req, timeout=5) as resp:
-            contents = json.loads(resp.read().decode("utf-8"))
-            for item in contents:
-                filename = item.get("name", "")
-                if filename.startswith("profiles-") and filename.endswith(".json"):
-                    remote_manifest[filename] = {
-                        "sha": item.get("sha"),
-                        "download_url": item.get("download_url") or (SCHEMA_GITHUB_RAW_URL + filename)
-                    }
+            tree = json.loads(resp.read().decode("utf-8"))
+            if tree.get("truncated", False):
+                logging.warning("The list of schemas from the remote GitHub repository is truncated.")
+
+            # Only the newest schema revision of each Vulkan header version is used: skip downloading the older revisions
+            newest_remote_by_header: dict[int, tuple[tuple[int, ...], str, str]] = {}
+            for item in tree.get("tree", []):
+                filename = item.get("path", "")
+                if item.get("type") != "blob" or not filename.startswith("profiles-"):
+                    continue
+                parsed = parse_schema_filename(filename)
+                if not parsed:
+                    continue
+                schema_ver_tuple, header_ver = parsed
+                if header_ver not in newest_remote_by_header or schema_ver_tuple > newest_remote_by_header[header_ver][0]:
+                    newest_remote_by_header[header_ver] = (schema_ver_tuple, filename, item.get("sha"))
+
+            for _, filename, sha in newest_remote_by_header.values():
+                remote_manifest[filename] = {
+                    "sha": sha,
+                    "download_url": SCHEMA_GITHUB_RAW_URL + filename
+                }
     except Exception as e:
         logging.debug(f"Could not query remote GitHub repository: {e}")
 
