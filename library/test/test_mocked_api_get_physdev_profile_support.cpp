@@ -19,9 +19,6 @@
  * - Daniel Rakos <daniel.rakos@rastergrid.com>
  */
 
-#ifndef VP_USE_OBJECT
-#define VP_USE_OBJECT 1
-#endif
 
 #include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan_android.h>
@@ -120,7 +117,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_supported) {
     mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -206,7 +203,7 @@ TEST(DISABLED_mocked_api_get_physdev_profile_support, vulkan10_no_gpdp2) {
     mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_ERROR_EXTENSION_NOT_PRESENT);
     EXPECT_EQ(supported, VK_TRUE);
@@ -284,7 +281,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_version) {
     mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -375,7 +372,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_extension) {
     mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -467,7 +464,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_feature) {
     mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -558,7 +555,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_property) {
     mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -643,7 +640,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan10_unsupported_format) {
     mock.AddQueueFamily({ VK_STRUCT(queueFamilyProps) });
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -716,7 +713,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_version) {
     mock.AddQueueFamily({VK_STRUCT(queueFamilyProps)});
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -757,7 +754,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_extension) {
     mock.SetProperties({VK_STRUCT(props), VK_STRUCT(vulkan11Properties), VK_STRUCT(vulkan12Properties), VK_STRUCT(vulkan13Properties)});
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -801,7 +798,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_feature) {
     mock.SetProperties({VK_STRUCT(props), VK_STRUCT(vulkan11Properties), VK_STRUCT(vulkan12Properties), VK_STRUCT(vulkan13Properties)});
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -846,7 +843,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_unsupported_property) {
         {VK_STRUCT(props), VK_STRUCT(vulkan11Properties), VK_STRUCT(vulkan12Properties), VK_STRUCT(vulkan13Properties)});
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -905,7 +902,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan11_unsupported_format) {
     }
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -979,7 +976,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_supported_queue_family) {
     mock.AddQueueFamily({VK_STRUCT(queueFamilyProps)});
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -1032,7 +1029,7 @@ TEST(mocked_api_get_physdev_profile_support, vulkan13_supported_version) {
     }
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);

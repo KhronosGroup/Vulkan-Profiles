@@ -243,7 +243,6 @@ target_include_directories(profiles_checker PRIVATE
 target_compile_definitions(profiles_checker PRIVATE
     VK_NO_PROTOTYPES=1                 # Vulkan is dlopen'ed so 1.0-only devices still get a report
     VK_USE_PLATFORM_ANDROID_KHR=1      # Required for VP_ANDROID_* profiles (VK_KHR_android_surface)
-    VP_USE_OBJECT=1                    # Use the VpFunctions object API of the profiles library
     VP_CHECKER_GENERATED_HEADER="${GEN_HEADER_NAME}.hpp"
     VP_CHECKER_VULKAN_HEADERS_TAG="${VULKAN_HEADERS_GIT_TAG}"
 )

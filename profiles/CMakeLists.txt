@@ -137,8 +137,6 @@ install(
 
 install(
     FILES
-        ${MERGE_SCRIPT}
-        ${SOLUTION_SCRIPT}
         ${PROJECT_SOURCE_DIR}/schema/${PROFILES_SCHEMA_FILENAME}
     DESTINATION
         "${CMAKE_INSTALL_DATADIR}/vulkan/registry"

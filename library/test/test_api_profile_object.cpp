@@ -18,9 +18,6 @@
  * - Christophe Riccio <christophe@lunarg.com>
  */
 
-#ifndef VP_USE_OBJECT
-#define VP_USE_OBJECT 1
-#endif
 
 #define VK_ENABLE_BETA_EXTENSIONS 1
 
