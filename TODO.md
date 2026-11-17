@@ -10,13 +10,8 @@ Items left to deal with after adding the capability block `depends` condition (s
 ## vkprofiles
 
 - [ ] **Generate `depends` blocks when pulling requirements.** `transform --pull requirements` respects existing `depends` blocks, but it doesn't create them from vk.xml conditional requirements (e.g. `<require depends="VkPhysicalDeviceProtectedMemoryFeatures::protectedMemory">` for `pipelineProtectedAccess`, or property requirements depending on `wideLines` / `largePoints`). This changes the desktop and Android generated profiles, the library and the documentation.
-- [ ] **Show `depends` blocks in the generated documentation.** `vkprofiles doc` reuses the library merged capabilities, which exclude the blocks with a `depends` condition: `PROFILES*.md` currently omit the conditional requirements.
 - [ ] **Combine `depends` blocks.** `vkprofiles combine` skips the blocks with a `depends` condition with a warning. Union, intersection and difference could combine the blocks sharing the same condition.
 
 ## Profiles layer
 
 - [ ] **Evaluate feature aliases in `depends`.** The layer reads the named feature structure of the simulated device. Before the end of the profile loading, a promoted structure and its Vulkan 1.x equivalent (e.g. `VkPhysicalDeviceProtectedMemoryFeatures` / `VkPhysicalDeviceVulkan11Features`) may not be synchronized yet, so a condition naming one may miss a value the profile set on the other.
-
-## Vulkan Profiles API library
-
-- [ ] **Instance level support of `depends` blocks.** `vpGetInstanceProfileSupport` ignores the blocks with a `depends` condition and `vpCreateInstance` doesn't enable their instance extensions, as the condition is evaluated on a physical device. `vkprofiles validate --analyse depends` reports these instance extensions as errors: decide whether instance extensions of conditional blocks should be enabled when available instead.
