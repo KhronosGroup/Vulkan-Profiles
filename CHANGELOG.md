@@ -24,6 +24,7 @@
 
 ### Fixes:
 - Fix `vkprofiles validate` exiting with success when a profiles file fails the schema validation: the schema errors are reported at error level and the command fails, also when `--validate` is used by the other commands
+- Fix `vkprofiles min-api-version evaluate` missing schemas when the Khronos-Schemas `vulkan` directory has more than 1,000 files: the schemas are listed with the GitHub Git Trees API and only the newest schema revision of each Vulkan header version is downloaded
 
 ### Profiles:
 - Add VP_ANDROID_18_requirements profile
