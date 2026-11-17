@@ -2323,19 +2323,21 @@ VkResult JsonLoader::LoadDevice(const char* device_name, PhysicalDeviceData *pdd
                 return layer_settings.log.debug_fail_on_error ? VK_ERROR_INITIALIZATION_FAILED : VK_SUCCESS;
             }
 
-            const std::size_t size_schema = schema.size();
-            const std::size_t size_base = std::strlen(SCHEMA_URI_BASE);
-            const std::size_t size_version = std::strlen(".json#");
-            const std::string version = schema.substr(size_base, size_schema - size_base - size_version);
+            // The schema URI ends with "profiles-<major>.<minor>.<patch>-<Vulkan Header version>.json#",
+            // or with "profiles-<major>.<minor>-latest.json#" which doesn't tell the Vulkan Header version
+            const std::size_t version_begin = schema.find(SCHEMA_URI_BASE) + std::strlen(SCHEMA_URI_BASE);
+            const std::size_t version_end = schema.find(".json", version_begin);
+            const std::string version = schema.substr(version_begin, version_end == std::string::npos ? std::string::npos : version_end - version_begin);
 
-            uint32_t version_major = 0;
-            uint32_t version_minor = 0;
-            uint32_t version_patch = 0;
-            std::sscanf(version.c_str(), "%u.%u.%u", &version_major, &version_minor, &version_patch);
-            if (VK_HEADER_VERSION < version_patch) {
+            uint32_t schema_major = 0;
+            uint32_t schema_minor = 0;
+            uint32_t schema_patch = 0;
+            uint32_t schema_header_version = 0;
+            const int parsed_count = std::sscanf(version.c_str(), "%u.%u.%u-%u", &schema_major, &schema_minor, &schema_patch, &schema_header_version);
+            if (parsed_count == 4 && static_cast<uint32_t>(VK_HEADER_VERSION) < schema_header_version) {
                 LogMessage(&layer_settings, DEBUG_REPORT_WARNING_BIT,
-                    "%s is built against Vulkan Header %d but the profile is written against Vulkan Header %d.\\n\\t- All newer capabilities in the profile will be ignored by the layer.\\n",
-                    kLayerName, VK_HEADER_VERSION, version_patch);
+                    "%s is built against Vulkan Header %u but the profile is written against Vulkan Header %u.\\n\\t- All newer capabilities in the profile will be ignored by the layer.\\n",
+                    kLayerName, static_cast<uint32_t>(VK_HEADER_VERSION), schema_header_version);
             }
 
             VkResult tmp_result = VK_SUCCESS;

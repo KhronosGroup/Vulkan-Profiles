@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-99999.json#",
+    "capabilities": {
+        "baseline": {
+        }
+    },
+    "profiles": {
+        "VP_LUNARG_test_newer_header": {
+            "version": 1,
+            "api-version": "1.0.198",
+            "label": "Newer Vulkan Header",
+            "description": "Unit test file of a profile written against a Vulkan Header newer than the Profiles layer",
+            "capabilities": [
+                "baseline"
+            ]
+        }
+    }
+}
