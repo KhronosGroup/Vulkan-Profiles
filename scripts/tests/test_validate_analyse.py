@@ -248,6 +248,45 @@ class TestAnalyseBits(unittest.TestCase):
         self.assertIn("is set to false in profile", feat_issue)
         self.assertEqual(getattr(feat_issue, "level", None), logging.INFO)
 
+    def test_analyse_depends(self):
+        """
+        AnalyseBits.DEPENDS:
+        Verifies detection when a capability block with a 'depends' condition requires an instance extension,
+        while its device extensions and the instance extensions of unconditional blocks are not reported.
+        """
+        json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.3-106.json#",
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": ["baseline", "conditional"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "extensions": {
+                        "VK_KHR_surface": 1
+                    }
+                },
+                "conditional": {
+                    "depends": "VkPhysicalDeviceFeatures::depthClamp",
+                    "extensions": {
+                        "VK_KHR_get_surface_capabilities2": 1,
+                        "VK_KHR_swapchain": 1
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(json_text)}
+        issues = self.validator.validate_data(json_files_dict, [AnalyseBits.DEPENDS])
+
+        self.assertEqual(len(issues), 1)
+        self.assertIn("'conditional'", issues[0])
+        self.assertIn("instance extension 'VK_KHR_get_surface_capabilities2'", issues[0])
+        self.assertEqual(getattr(issues[0], "level", None), logging.ERROR)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
