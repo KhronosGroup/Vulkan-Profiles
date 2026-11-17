@@ -289,6 +289,8 @@ Validates one or more profile JSON files against the Vulkan Profiles JSON schema
 
 By default, schema validation dynamically generates a schema from `vk.xml`. To validate profile JSON files against an explicit or externally published profile schema file (`profiles-*.json`), developers can supply the `--schema` (`-s`) parameter.
 
+The command reports the schema validation errors and exits with a non-zero status when a profiles file fails the schema validation, when the input path doesn't exist, or when the `--schema` file isn't a profiles schema. In a directory, the JSON files which aren't profiles files are skipped.
+
 ```bash
 vkprofiles validate --input path/to/profiles [options]
 ```

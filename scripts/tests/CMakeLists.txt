@@ -78,6 +78,7 @@ add_vulkan_python_test(VkProfiles_TestExtract                      test_extract.
 add_vulkan_python_test(VkProfiles_TestMinApiVersion                test_min_api_version.py)
 add_vulkan_python_test(VkProfiles_TestMinimumRequirementsDiff      test_minimum_requirements_diff.py)
 add_vulkan_python_test(VkProfiles_TestValidate                     test_validate.py)
+add_vulkan_python_test(VkProfiles_TestValidateSchema               test_validate_schema.py)
 add_vulkan_python_test(VkProfiles_TestValidateAnalyse              test_validate_analyse.py)
 add_vulkan_python_test(VkProfiles_TestCommandLines                 test_command_lines.py)
 
