@@ -516,37 +516,6 @@ def load_schema_json(input_file: Path | str) -> dict | None:
         return None
 
 
-def load_schema_jsons(input_dir: str | Path) -> dict[Path, dict]:
-    """Loads schema JSON file(s) starting with 'profiles-' from a file path or directory."""
-    if isinstance(input_dir, str):
-        input_dir = Path(input_dir)
-    if input_dir is None:
-        logging.error('No input directory or file set, use --input')
-        sys.exit(1)
-
-    schema_files_paths = []
-    if input_dir.is_file():
-        if input_dir.name.startswith('profiles-') and input_dir.name.endswith('.json'):
-            schema_files_paths.append(input_dir)
-        else:
-            logging.warning(f"Skipping '{input_dir.name}': filename does not start with 'profiles-'")
-    elif input_dir.is_dir():
-        for pos_json in os.listdir(input_dir):
-            if pos_json.startswith('profiles-') and pos_json.endswith('.json'):
-                schema_files_paths.append(input_dir / pos_json)
-    else:
-        logging.error(f"Input path '{input_dir}' does not exist")
-        sys.exit(1)
-
-    json_files_dict = {}
-    for path in schema_files_paths:
-        schema_data = load_schema_json(path)
-        if schema_data:
-            json_files_dict[path] = schema_data
-
-    return json_files_dict
-
-
 def load_profiles_json(input_file: Path | str) -> dict | None:
     """Loads a single profile JSON file."""
     if isinstance(input_file, str):

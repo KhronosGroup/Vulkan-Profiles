@@ -328,38 +328,23 @@ vkprofiles validate \
 
 ### 3. `schema`
 
-Generates a Vulkan Profiles JSON schema file from `vk.xml`, or upgrades existing profile JSON schema files to schema 0.8.3. Schema 0.8.3 adds the `depends` condition of capability blocks and deprecates the profile `optionals` list.
+Generates a Vulkan Profiles JSON schema file from `vk.xml`, using the schema 0.8.3. Schema 0.8.3 adds the `depends` condition of capability blocks and deprecates the profile `optionals` list.
 
 ```bash
 vkprofiles schema --registry vk.xml --output path/to/output [options]
 ```
 
 * `--registry`, `-r`: Path to `vk.xml`.
-* `--input`, `-i`: Path to input profile JSON file or directory to upgrade.
-* `--output`, `-o`: *(Required)* Output path for the generated schema file or upgraded output directory/file.
-* `--upgrade`: Upgrade input profile JSON schema file(s) from schema 0.8.0 / 0.8.1 / 0.8.2 to 0.8.3.
-* `--format`: Output formatting style (`flatten` or `pretty`). Default: `pretty`.
+* `--output`, `-o`: *(Required)* Output path for the generated schema file.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
 
-**Example (generate a schema):**
+**Example:**
 
 ```bash
 vkprofiles schema \
     --api vulkan \
     --registry vk.xml \
     --output schema/profiles-0.8-latest.json
-```
-
-**Example (upgrade a profile directory):**
-
-```bash
-vkprofiles schema \
-    --api vulkan \
-    --registry vk.xml \
-    --input profiles/LunarG \
-    --output profiles/LunarG/upgraded \
-    --upgrade \
-    --format pretty
 ```
 
 ---
