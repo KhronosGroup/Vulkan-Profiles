@@ -103,18 +103,30 @@ class TestProfilesDoc(unittest.TestCase):
         self.assertIn("| Profiles | VP_LUNARG_test_alternatives | VP_LUNARG_test_alternatives_required |", doc)
         self.assertIn("| Alternative capability blocks | rectangular_lines **or** bresenham_lines | rectangular_lines **or** bresenham_lines |", doc)
 
-        # The group of alternative capability blocks is listed once, with the profiles requiring it and the requirements of each alternative
-        alternatives = doc.split("## Vulkan Profiles Alternative Requirements", 1)[1].split("## Vulkan Profiles Extensions", 1)[0]
+        # The alternative requirements are documented at the end of the document
+        other_sections, alternatives = doc.split("## Vulkan Profiles Alternative Requirements", 1)
+        self.assertNotIn("\n## ", alternatives)
+
+        # The group of alternative capability blocks is listed once, with the profiles requiring it and a comparison table
+        # column per alternative capability block
         self.assertEqual(alternatives.count("### VP_LUNARG_test_alternatives alternatives"), 1)
         self.assertIn("* Profiles: VP_LUNARG_test_alternatives, VP_LUNARG_test_alternatives_required", alternatives)
         self.assertIn("* Alternatives: `rectangular_lines` **or** `bresenham_lines`", alternatives)
-        self.assertIn("#### rectangular_lines", alternatives)
-        self.assertIn("::rectangularLines | VK_TRUE |", alternatives)
-        self.assertIn("#### bresenham_lines", alternatives)
-        self.assertIn("::bresenhamLines | VK_TRUE |", alternatives)
+        self.assertIn("#### Vulkan Profiles Extensions", alternatives)
+        self.assertIn("#### Vulkan Profile Features", alternatives)
+        self.assertNotIn("#### Vulkan Profile Formats", alternatives)
+        self.assertIn("| Alternatives | rectangular_lines | bresenham_lines |", alternatives)
+        # Each alternative capability block column only shows its own requirements
+        rectangular_row = next(line for line in alternatives.splitlines() if line.startswith("| [rectangularLines]"))
+        self.assertEqual(rectangular_row.count(":x:"), 1)
+        self.assertTrue(rectangular_row.endswith("| :x: |"))
+        bresenham_row = next(line for line in alternatives.splitlines() if line.startswith("| [bresenhamLines]"))
+        self.assertEqual(bresenham_row.count(":x:"), 1)
+        self.assertIn("| [bresenhamLines]", bresenham_row)
+        self.assertTrue(bresenham_row.split(" | ")[1].strip() == ":x:")
+        self.assertIn("| [VK_KHR_line_rasterization]", alternatives)
 
         # The alternative requirements are not requirements of every device supporting the profile
-        other_sections = doc.split("## Vulkan Profiles Extensions", 1)[1]
         self.assertNotIn("rectangularLines", other_sections)
         self.assertNotIn("bresenhamLines", other_sections)
         self.assertNotIn("VK_KHR_line_rasterization.html) | :heavy_check_mark:", other_sections)

@@ -21,7 +21,6 @@
 
 import functools
 import itertools
-import json
 import logging
 import re
 from collections import OrderedDict
@@ -262,14 +261,16 @@ class DocRegistry(LibraryRegistry):
 
 class VulkanProfilesDocGenerator():
     def __init__(self, registry: DocRegistry, profiles: dict[str, VulkanProfile], doc_capabilities: dict[str, VulkanProfileCapabilities],
-                 alternative_groups: dict[str, list[tuple[str, dict[str, dict]]]] | None = None):
+                 alternative_groups: dict[str, list[tuple[str, str, dict[str, dict]]]] | None = None):
         self.registry = registry
         # The requirements of every device supporting each profile: the alternative capability blocks are not included,
         # they are documented separately
         self.doc_capabilities = doc_capabilities
         # The groups of alternative capability blocks of each profile, including those of its required profiles,
-        # as (profile defining the group, alternative capability blocks by block name)
+        # as (profile defining the group, API version of that profile, alternative capability blocks by block name)
         self.alternative_groups = alternative_groups if alternative_groups is not None else dict()
+        # The header of the first column of the tables
+        self.tableHeader = 'Profiles'
         self.profiles = sorted(profiles.values(), key = self.sort_KHR_EXT_first)
 
         if not self.profiles:
@@ -322,13 +323,13 @@ class VulkanProfilesDocGenerator():
         gen = DOC_MD_HEADER
         gen += '\n# Vulkan Profiles Definitions\n'
         gen += self.gen_profilesList()
-        gen += self.gen_alternativeGroups()
         gen += self.gen_extensions()
         gen += self.gen_features()
         gen += self.gen_limits()
         gen += self.gen_queueFamilies()
         gen += self.gen_formats()
         gen += self.gen_videoProfiles()
+        gen += self.gen_alternativeGroups()
         return gen
 
 
@@ -339,7 +340,7 @@ class VulkanProfilesDocGenerator():
 
 
     def gen_table(self, rowHandlers):
-        gen = '| Profiles |'
+        gen = '| {0} |'.format(self.tableHeader)
         cellFmt = ' {0} |'
         for profile in self.profiles:
             gen += cellFmt.format(profile.key)
@@ -352,7 +353,7 @@ class VulkanProfilesDocGenerator():
 
 
     def gen_sectionedTable(self, rowHandlers):
-        gen = '| Profiles |'
+        gen = '| {0} |'.format(self.tableHeader)
         cellFmt = ' {0} |'
         for profile in self.profiles:
             gen += cellFmt.format(profile.key)
@@ -378,7 +379,7 @@ class VulkanProfilesDocGenerator():
         })
         if self.has_alternativeGroups():
             rows['Alternative capability blocks'] = lambda _, profile : '<br>'.join(
-                ' **or** '.join(blocks.keys()) for _, blocks in self.alternative_groups.get(profile.key, [])) or '-'
+                ' **or** '.join(blocks.keys()) for _, _, blocks in self.alternative_groups.get(profile.key, [])) or '-'
         return '\n## Vulkan Profiles List\n\n{0}\n'.format(self.gen_table(rows))
 
 
@@ -386,48 +387,47 @@ class VulkanProfilesDocGenerator():
         return any(self.alternative_groups.get(profile.key) for profile in self.profiles)
 
 
-    def gen_blockRequirementRows(self, block: dict) -> list[tuple[str, str]]:
-        # Lists the requirements of a capability block as (requirement, value) rows
-        rows = []
-        for extension in block.get('extensions', {}).keys():
-            rows.append(('{0} extension'.format(self.gen_manPageLink(extension, extension)), ':heavy_check_mark:'))
+    def gen_alternativeGroupTables(self, api_version: str, blocks: dict[str, dict]) -> str:
+        # Documents a group of alternative capability blocks with the comparison tables of the document, one column per capability block
+        json_file = {
+            'capabilities': dict(blocks),
+            'profiles': OrderedDict((block_name, {
+                'version': 1,
+                'api-version': api_version,
+                'label': block_name,
+                'description': '',
+                'capabilities': [block_name]
+            }) for block_name in blocks.keys())
+        }
+        database = VulkanProfilesDatabase([json_file])
+        profiles = { block_name: VulkanProfile(self.registry, database, block_name, json_profile_value, json_file['capabilities'])
+                     for block_name, json_profile_value in json_file['profiles'].items() }
+        doc_capabilities = { block_name: VulkanProfileCapabilities(self.registry, '"DOC"', [block], False, True)
+                             for block_name, block in blocks.items() }
 
-        def add_struct_rows(prefix: str, struct_name: str, members: dict):
-            for member, value in members.items():
-                # The nested structures of VkPhysicalDeviceProperties are listed member by member
-                if isinstance(value, dict) and member in ('limits', 'sparseProperties'):
-                    for sub_member, sub_value in value.items():
-                        rows.append(('{0}{1}::{2}.{3}'.format(prefix, self.gen_manPageLink(struct_name, struct_name), member, sub_member),
-                                     self.formatValue(sub_value)))
-                else:
-                    rows.append(('{0}{1}::{2}'.format(prefix, self.gen_manPageLink(struct_name, struct_name), member), self.formatValue(value)))
+        generator = VulkanProfilesDocGenerator(self.registry, profiles, doc_capabilities)
+        generator.profiles = [profiles[block_name] for block_name in blocks.keys()]
+        generator.tableHeader = 'Alternatives'
+        # Only the extensions of the alternative capability blocks are listed, not all the extensions promoted to core
+        generator.coreInstanceExtensions = []
+        generator.coreDeviceExtensions = []
 
-        for category in ('features', 'properties'):
-            for struct_name, members in block.get(category, {}).items():
-                add_struct_rows('', struct_name, members)
-
-        for format_name, format_structs in block.get('formats', {}).items():
-            for struct_name, members in format_structs.items():
-                add_struct_rows('`{0}` '.format(format_name), struct_name, members)
-
-        for index, queue_family_structs in enumerate(block.get('queueFamiliesProperties', [])):
-            for struct_name, members in queue_family_structs.items():
-                add_struct_rows('Queue family {0} '.format(index), struct_name, members)
-
-        for video_profile in block.get('videoProfiles', []):
-            rows.append(('Video profile', '`{0}`'.format(json.dumps(video_profile.get('profile', video_profile)))))
-
-        return rows
-
-
-    def gen_blockRequirementsTable(self, block: dict) -> str:
-        gen = '| Requirement | Value |\n|-------------|-------|\n'
-        rows = self.gen_blockRequirementRows(block)
-        if not rows:
-            return gen + '| - | - |\n'
-        for requirement, value in rows:
-            gen += '| {0} | {1} |\n'.format(requirement, value)
-        return gen
+        # Only the tables with requirements are generated
+        capabilities = doc_capabilities.values()
+        gen = ''
+        if any(caps.extensions for caps in capabilities):
+            gen += generator.gen_extensions()
+        if any(caps.features for caps in capabilities):
+            gen += generator.gen_features()
+        if any(caps.properties for caps in capabilities):
+            gen += generator.gen_limits()
+        if any(caps.queueFamiliesProperties for caps in capabilities):
+            gen += generator.gen_queueFamilies()
+        if any(caps.formats for caps in capabilities):
+            gen += generator.gen_formats()
+        if any(caps.videoProfiles for caps in capabilities):
+            gen += generator.gen_videoProfiles()
+        return gen.replace('\n## ', '\n#### ')
 
 
     def gen_alternativeGroups(self):
@@ -435,24 +435,24 @@ class VulkanProfilesDocGenerator():
             return ''
 
         # A group of alternative capability blocks required by several profiles is listed once
-        groups: OrderedDict[tuple[str, ...], tuple[str, dict[str, dict], list[str]]] = OrderedDict()
+        groups: OrderedDict[tuple[str, ...], tuple[str, str, dict[str, dict], list[str]]] = OrderedDict()
         for profile in self.profiles:
-            for defining_profile, blocks in self.alternative_groups.get(profile.key, []):
+            for defining_profile, api_version, blocks in self.alternative_groups.get(profile.key, []):
                 group_key = tuple(blocks.keys())
                 if group_key not in groups:
-                    groups[group_key] = (defining_profile, blocks, [])
-                groups[group_key][2].append(profile.key)
+                    groups[group_key] = (defining_profile, api_version, blocks, [])
+                groups[group_key][3].append(profile.key)
 
         gen = '\n## Vulkan Profiles Alternative Requirements\n\n'
         gen += ('A device supporting a profile satisfies the requirements of at least one capability block of each group of alternative capability blocks. '
                 'These requirements are not listed in the other tables of this document, which only list the requirements of every device supporting a profile.\n')
 
         defined_group_counts: dict[str, int] = dict()
-        for defining_profile, _, _ in groups.values():
+        for defining_profile, _, _, _ in groups.values():
             defined_group_counts[defining_profile] = defined_group_counts.get(defining_profile, 0) + 1
 
         defined_group_indices: dict[str, int] = dict()
-        for defining_profile, blocks, profile_keys in groups.values():
+        for defining_profile, api_version, blocks, profile_keys in groups.values():
             defined_group_indices[defining_profile] = defined_group_indices.get(defining_profile, 0) + 1
             title = '{0} alternatives'.format(defining_profile)
             if defined_group_counts[defining_profile] > 1:
@@ -461,9 +461,7 @@ class VulkanProfilesDocGenerator():
             gen += '\n### {0}\n\n'.format(title)
             gen += '* Profiles: {0}\n'.format(', '.join(profile_keys))
             gen += '* Alternatives: {0}\n'.format(' **or** '.join('`{0}`'.format(block_name) for block_name in blocks.keys()))
-            for block_name, block in blocks.items():
-                gen += '\n#### {0}\n\n'.format(block_name)
-                gen += self.gen_blockRequirementsTable(block)
+            gen += self.gen_alternativeGroupTables(api_version, blocks)
 
         return gen
 
@@ -1505,7 +1503,7 @@ def generate_profiles_doc(vk: VulkanObject, json_files: list[dict], input_profil
                     for cap_entry in required_profile_value['capabilities']:
                         if isinstance(cap_entry, list):
                             blocks = OrderedDict((block_name, required_profile_file['capabilities'].get(block_name, {})) for block_name in cap_entry)
-                            profile_alternative_groups.append((required_profile, blocks))
+                            profile_alternative_groups.append((required_profile, required_profile_value['api-version'], blocks))
                 alternative_groups[json_profile_key] = profile_alternative_groups
 
     generator = VulkanProfilesDocGenerator(registry, profiles, doc_capabilities, alternative_groups)
