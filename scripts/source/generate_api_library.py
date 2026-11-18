@@ -29,7 +29,7 @@ from vulkan_object import VulkanObject, Struct, Member, VideoCodec, VideoFormat
 from source.vulkan_object_utils import getStructByName
 from source.vulkan_object_version import VK_VERSION
 from source.vulkan_object_expression_parsing import evalExpression, tokenizeDependsExpression
-from source.profiles_json_utils import collect_block_names, get_block_depends
+from source.profiles_json_utils import collect_block_names, get_block_depends, get_depends_implied_capabilities
 
 COPYRIGHT_HEADER = '''
 /*
@@ -3902,12 +3902,19 @@ class VulkanProfile():
             logging.error("Struct '{0}' in profile '{1}' does not exist in the registry".format(structName, self.key))
             return
 
+        # The requirements of a capability block with a 'depends' condition apply with the unconditional requirements
+        # of the profile and the extensions required by the condition
+        enabledExtensions = set(capabilities_value.extensions)
+        if capabilities_value.depends is not None:
+            enabledExtensions |= set(self.merge_capabilities.extensions)
+            enabledExtensions |= get_depends_implied_capabilities(capabilities_value.depends)[0]
+
         def isDefined(name):
             # Check if the required API version or any required extension defines the struct by this name
             definedByVersion, definedByExtensions = self.registry.getStructRequirements(name)
             if definedByVersion is not None and definedByVersion <= self.apiVersionNumber:
                 return True
-            return any(extension in capabilities_value.extensions for extension in definedByExtensions)
+            return any(extension in enabledExtensions for extension in definedByExtensions)
 
         if isDefined(structName):
             return

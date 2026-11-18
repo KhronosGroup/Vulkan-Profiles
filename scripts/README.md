@@ -92,7 +92,7 @@ Every `*_args` definition also accepts `verbose` (boolean), `quiet` (boolean), a
 | --- | --- |
 | `api` | string: `vulkan` |
 | `format` | `output_format`: `pretty`, `flatten`, `compact` |
-| `pull` (`transform`) | array of `pull_bits`: `requirements`, `promoted`, `aliases`, `ignore-extension-versions`, `ignore-unsupported`, `ignore-subcore`, `ignore-unratified` |
+| `pull` (`transform`) | array of `pull_bits`: `requirements`, `promoted`, `aliases`, `ignore-extension-versions`, `ignore-unsupported`, `ignore-subcore`, `ignore-unratified`, `depends` |
 | `strip` (`transform`) | array of `strip_bits`: `helper-values`, `duplication`, `promoted-extensions`, `unratified` |
 | `strip` (`library`) | boolean |
 | `analyse` (`validate`) | array of `analyse_bits`: `api-version`, `extensions`, `aliases`, `unratified`, `subcore`, `depends` |
@@ -364,14 +364,14 @@ vkprofiles transform --registry vk.xml --input path/to/input_dir --output path/t
 * `--registry`, `-r`: Path to `vk.xml`.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
 * `--format`: Output formatting style (`flatten` or `pretty`). Default: `pretty`.
-* `--pull [OPTION ...]`: Pull capability options: `requirements`, `promoted`, `aliases`, `ignore-extension-versions`, `ignore-unsupported`, `ignore-subcore`, or `ignore-unratified`.
+* `--pull [OPTION ...]`: Pull capability options: `requirements`, `promoted`, `aliases`, `ignore-extension-versions`, `ignore-unsupported`, `ignore-subcore`, `ignore-unratified`, or `depends`.
 * `--consolidate`: Consolidate capabilities.
 * `--strip [OPTION ...]`: Strip options: `helper-values`, `duplication`, `promoted-extensions`, or `unratified`.
 * `--sort`: Sort profile capabilities, including the flag lists. Without `--sort`, the flag lists keep their input order.
 
 #### Transformation Options
 
-Conversion flags are processed in a fixed internal order regardless of the order specified on the command line: `--pull requirements`, `--pull promoted`, `--pull aliases`, `--consolidate`, `--strip helper-values`, `--strip duplication`, `--strip promoted-extensions`, `--strip unratified`, then `--sort`. The `ignore-*` pull values do not run a step on their own; they modify the behavior of the `requirements`, `promoted`, and `aliases` pull steps.
+Conversion flags are processed in a fixed internal order regardless of the order specified on the command line: `--pull requirements`, `--pull promoted`, `--pull aliases`, `--consolidate`, `--strip helper-values`, `--strip duplication`, `--strip promoted-extensions`, `--strip unratified`, then `--sort`. The `ignore-*` and `depends` pull values do not run a step on their own; they modify the behavior of the `requirements`, `promoted`, and `aliases` pull steps.
 
 | Option value | Description |
 | --- | --- |
@@ -382,6 +382,7 @@ Conversion flags are processed in a fixed internal order regardless of the order
 | `--pull ignore-unsupported` | Skips pulling default values for feature-dependent properties when the corresponding feature is unsupported. |
 | `--pull ignore-subcore` | Allows `requirements` pulling to override profile capability values that are below Vulkan core specification requirements. |
 | `--pull ignore-unratified` | Skips pulling unratified extensions and capability aliases. |
+| `--pull depends` | With `requirements`, extracts the properties of the unconditional capability blocks which contradict a Vulkan core requirement of the devices not supporting a capability the profile doesn't require into capability blocks with a `depends` condition on that capability, one per condition. E.g. a device without `wideLines` has a `lineWidthGranularity` of 1.0: the `lineWidthGranularity` of 0.5 of a profile not requiring `wideLines` is moved into a block with the `VkPhysicalDeviceFeatures::wideLines` condition, and the unconditional `lineWidthGranularity` is set to 1.0. The features, and the properties which don't contradict such a requirement, are unconditional requirements of the profile: they are not extracted. |
 | `--consolidate` | Combines capability blocks into a consolidated requirements block per profile. |
 | `--strip helper-values` | Removes non-bit-position bitmask helper values (composites, all-flags, and zero/none constants) from capability blocks. |
 | `--strip duplication` | Removes redundant duplicate features, properties, and extension requirements across inheritance trees and within blocks. |

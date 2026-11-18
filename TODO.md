@@ -2,15 +2,11 @@
 
 Items left to deal with after adding the capability block `depends` condition (schema 0.8.3, #1090).
 
-## Profiles
-
-- [ ] **Upstream the Roadmap 2026 change.** `profiles/Khronos/VP_KHR_roadmap.json` now uses a `depends` block for `pipelineProtectedAccess`, but the build copies `VP_KHR_roadmap.json` from the Vulkan-Headers registry. The change must land in the Vulkan-Docs registry to reach the generated library, documentation and tests.
-- [ ] **Convert `VP_LUNARG_minimum_requirements` to `depends` blocks**: `vulkan14dependent` (still in `optionals`), and the requirements removed in revision 4 because they depend on optional features (`lineWidthGranularity` on `wideLines`, `shaderSignedZeroInfNanPreserveFloat16` on `shaderFloat16`). Blocked by the pull transform item below, otherwise `VkProfiles_TestMinimumRequirementsDiff` fails.
-
 ## vkprofiles
 
-- [ ] **Generate `depends` blocks when pulling requirements.** `transform --pull requirements` respects existing `depends` blocks, but it doesn't create them from vk.xml conditional requirements (e.g. `<require depends="VkPhysicalDeviceProtectedMemoryFeatures::protectedMemory">` for `pipelineProtectedAccess`, or property requirements depending on `wideLines` / `largePoints`). This changes the desktop and Android generated profiles, the library and the documentation.
-- [ ] **Combine `depends` blocks.** `vkprofiles combine` skips the blocks with a `depends` condition with a warning. Union, intersection and difference could combine the blocks sharing the same condition.
+- [ ] **Strip the capabilities of unsatisfied conditions.** Add `transform --strip depends`: set the capabilities whose condition isn't satisfied by the profile to the value of the devices not supporting the condition, or remove them when there is no such value, including the capability blocks with a `depends` condition not satisfied by the profile.
+- [ ] **Combine `depends` blocks with union and intersection.** `vkprofiles combine --mode difference` compares the blocks sharing the same condition, but union and intersection skip the blocks with a `depends` condition with a warning.
+- [ ] **Document `depends` in the whitepaper and in `vkprofiles doc`.** Explain how `--pull depends` extracts the conditional capabilities: a profile only lists a dependency when the profile doesn't satisfy it, e.g. `maxGeometryShaderInvocations` 0 unconditionally and 32 in a block with the `geometryShader` condition.
 
 ## Profiles layer
 
