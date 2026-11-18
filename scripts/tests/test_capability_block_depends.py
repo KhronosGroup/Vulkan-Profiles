@@ -43,6 +43,7 @@ from source.main_validate import VulkanProfilesDataValidation
 from source.generate_profiles_doc import generate_profiles_doc
 from source.generate_profiles_combine import VulkanProfilesCombineGenerator
 from source.main_combine import combine_dependent_capabilities
+from source.transform_strip_depends import strip_dependent_capabilities_profiles_files
 
 
 def make_profiles_file(capabilities: dict, profile_capabilities: list, api_version: str = "1.4.304") -> dict:
@@ -260,6 +261,24 @@ class TestCapabilityBlockDependsProfiles(unittest.TestCase):
         # The requirements the profile doesn't set are not added
         self.assertNotIn("VP_LUNARG_test_depends_depends_tessellationShader", capabilities)
 
+    def test_pull_extract_dependent_capabilities_unsupported_value(self):
+        profile = make_profiles_file({
+            "baseline": {
+                "properties": {
+                    "VkPhysicalDeviceVulkan12Properties": {"shaderSignedZeroInfNanPreserveFloat16": True}
+                }
+            }
+        }, ["baseline"], api_version="1.3.204")
+        profile = self.pull_dependent_requirements(profile, [PullBits.REQUIRED_CAPABILITIES, PullBits.DEPENDS])
+        capabilities = profile["capabilities"]
+
+        # Without a '!condition' requirement, the unconditional property is set to the value of an unsupported
+        # property, false for a 'max' VkBool32 property, and the property value is extracted into a 'depends' block
+        self.assertFalse(capabilities["baseline"]["properties"]["VkPhysicalDeviceVulkan12Properties"]["shaderSignedZeroInfNanPreserveFloat16"])
+        float16 = capabilities["VP_LUNARG_test_depends_depends_shaderFloat16"]
+        self.assertEqual(float16["depends"], "VkPhysicalDeviceVulkan12Features::shaderFloat16")
+        self.assertTrue(float16["properties"]["VkPhysicalDeviceVulkan12Properties"]["shaderSignedZeroInfNanPreserveFloat16"])
+
     def test_pull_extract_dependent_capabilities_satisfied_condition(self):
         profile = self.pull_dependent_requirements(self.make_limits_profile(
             {"maxGeometryShaderInvocations": 32}, {"geometryShader": True}), [PullBits.REQUIRED_CAPABILITIES, PullBits.DEPENDS])
@@ -292,6 +311,81 @@ class TestCapabilityBlockDependsProfiles(unittest.TestCase):
 
         # Without PullBits.DEPENDS, the capabilities are not extracted
         self.assertFalse(any(get_block_depends(block) is not None for block in profile["capabilities"].values()))
+        limits = profile["capabilities"]["baseline"]["properties"]["VkPhysicalDeviceProperties"]["limits"]
+        self.assertEqual(limits["maxGeometryShaderInvocations"], 32)
+
+    def test_strip_depends(self):
+        profile = make_profiles_file({
+            "baseline": {
+                "features": {
+                    "VkPhysicalDeviceFeatures": {"shaderInt64": True, "depthClamp": True}
+                },
+                "properties": {
+                    "VkPhysicalDeviceProperties": {
+                        "limits": {"maxGeometryShaderInvocations": 32, "maxImageDimension2D": 8192}
+                    }
+                }
+            },
+            "protected": {
+                "depends": "VkPhysicalDeviceVulkan11Features::protectedMemory",
+                "features": {
+                    "VkPhysicalDeviceVulkan14Features": {"pipelineProtectedAccess": True}
+                }
+            }
+        }, ["baseline", "protected"])
+        strip_dependent_capabilities_profiles_files(self.vk, {"test.json": profile})
+        baseline = profile["capabilities"]["baseline"]
+
+        # The capability block with a 'depends' condition the profile doesn't satisfy is removed
+        self.assertEqual(profile["profiles"]["VP_LUNARG_test_depends"]["capabilities"], ["baseline"])
+        self.assertNotIn("protected", profile["capabilities"])
+
+        # The property with a value for the devices not satisfying its condition is set to that value
+        self.assertEqual(baseline["properties"]["VkPhysicalDeviceProperties"]["limits"]["maxGeometryShaderInvocations"], 0)
+        self.assertEqual(baseline["properties"]["VkPhysicalDeviceProperties"]["limits"]["maxImageDimension2D"], 8192)
+
+        # The feature whose condition isn't satisfied is set to the value of an unsupported feature, the unconditional features are kept
+        self.assertEqual(baseline["features"]["VkPhysicalDeviceFeatures"], {"shaderInt64": False, "depthClamp": True})
+
+    def test_strip_depends_unsupported_property_value(self):
+        profile = make_profiles_file({
+            "baseline": {
+                "properties": {
+                    "VkPhysicalDeviceVulkan12Properties": {"shaderSignedZeroInfNanPreserveFloat16": True}
+                }
+            }
+        }, ["baseline"])
+        strip_dependent_capabilities_profiles_files(self.vk, {"test.json": profile})
+
+        # Without a Vulkan core value for the devices not satisfying its condition, a property is set to the value of
+        # an unsupported capability: false for a 'max' VkBool32 property
+        properties = profile["capabilities"]["baseline"]["properties"]["VkPhysicalDeviceVulkan12Properties"]
+        self.assertEqual(properties, {"shaderSignedZeroInfNanPreserveFloat16": False})
+
+    def test_strip_depends_satisfied_condition(self):
+        profile = make_profiles_file({
+            "baseline": {
+                "features": {
+                    "VkPhysicalDeviceFeatures": {"geometryShader": True},
+                    "VkPhysicalDeviceVulkan11Features": {"protectedMemory": True}
+                },
+                "properties": {
+                    "VkPhysicalDeviceProperties": {
+                        "limits": {"maxGeometryShaderInvocations": 32}
+                    }
+                }
+            },
+            "protected": {
+                "depends": "VkPhysicalDeviceVulkan11Features::protectedMemory",
+                "features": {
+                    "VkPhysicalDeviceVulkan14Features": {"pipelineProtectedAccess": True}
+                }
+            }
+        }, ["baseline", "protected"])
+        strip_dependent_capabilities_profiles_files(self.vk, {"test.json": profile})
+
+        # The capabilities whose condition the profile satisfies are kept
+        self.assertEqual(profile["profiles"]["VP_LUNARG_test_depends"]["capabilities"], ["baseline", "protected"])
         limits = profile["capabilities"]["baseline"]["properties"]["VkPhysicalDeviceProperties"]["limits"]
         self.assertEqual(limits["maxGeometryShaderInvocations"], 32)
 

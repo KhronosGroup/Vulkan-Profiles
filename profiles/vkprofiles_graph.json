@@ -125,16 +125,26 @@
             }
         },
         {
+            "id": "analyse_desktop_baseline",
+            "description": "Analyse the Desktop profiles combined from the GPUInfo.org device reports with all the analysis checks before transforming them, e.g. the aliases check reports the device reports with inconsistent aliased structures, and the depends check reports the limits only applying to the devices supporting a feature the profiles don't require",
+            "depends_on": [ "desktop_baseline" ],
+            "command": "validate",
+            "args": {
+                "input": "profiles/build/VP_LUNARG_desktop_baseline.json",
+                "analyse": []
+            }
+        },
+        {
             "id": "transform_desktop",
             "description": "Transform Desktop profiles",
-            "depends_on": [ "desktop_baseline" ],
+            "depends_on": [ "analyse_desktop_baseline" ],
             "command": "transform",
             "args": {
                 "input": "profiles/build",
                 "input-profiles": "VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2023,VP_LUNARG_desktop_baseline_2024,VP_LUNARG_desktop_baseline_2026,VP_LUNARG_desktop_baseline_2027",
                 "output": "profiles/build",
                 "pull": [ "requirements", "ignore-unsupported", "aliases", "depends" ],
-                "strip": [ "helper-values" ],
+                "strip": [ "helper-values", "depends" ],
                 "format": "flatten"
             }
         },
