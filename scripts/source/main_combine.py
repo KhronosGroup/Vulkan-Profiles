@@ -31,6 +31,9 @@ from source.vulkan_object_utils import initVulkanObject
 from source.generate_profiles_combine import VulkanProfilesCombineGenerator, CombineConfig, check_single_profile_files
 from source.main_validate import main_validate
 from source.profiles_json_utils import (
+    collect_block_names,
+    deep_merge_dict,
+    get_block_depends,
     load_profiles_jsons,
     save_profiles_jsons,
     strip_dict_duplication,
@@ -42,6 +45,40 @@ class CombineMode(str, Enum):
     INTERSECTION = 'intersection'  # Keeps capabilities supported by all input profiles.
     UNION = 'union'                # Keeps capabilities supported by any input profile.
     DIFFERENCE = 'difference'      # Removes common capabilities, leaving only unique profile differences.
+
+
+def combine_dependent_capabilities(generator: VulkanProfilesCombineGenerator, jsons: list[dict], profile_names: list[str]) -> dict[str, dict]:
+    """
+    Returns the capabilities common to the capability blocks with the same 'depends' condition of every profile,
+    by condition. The blocks of a profile with the same condition are merged first. A condition missing from a
+    profile has no common capabilities.
+    """
+    blocks_by_condition: list[dict[str, dict]] = []
+    for json_data, profile_name in zip(jsons, profile_names):
+        profile_blocks: dict[str, dict] = {}
+        capabilities_dict = json_data.get("capabilities", {})
+        for block_name in collect_block_names(json_data["profiles"][profile_name].get("capabilities", [])):
+            block = capabilities_dict.get(block_name)
+            depends = get_block_depends(block)
+            if depends is not None:
+                block_caps = { key: value for key, value in block.items() if key != "depends" }
+                deep_merge_dict(profile_blocks.setdefault(depends, {}), json.loads(json.dumps(block_caps)))
+        blocks_by_condition.append(profile_blocks)
+
+    common_dependent_caps: dict[str, dict] = {}
+    conditions = set.intersection(*(set(profile_blocks.keys()) for profile_blocks in blocks_by_condition)) if blocks_by_condition else set()
+    for depends in sorted(conditions):
+        condition_jsons = []
+        condition_profile_names = []
+        for index, profile_blocks in enumerate(blocks_by_condition):
+            profile_name = f"profile_{index}"
+            condition_jsons.append({
+                "capabilities": { "block": profile_blocks[depends] },
+                "profiles": { profile_name: { "capabilities": ["block"] } }
+            })
+            condition_profile_names.append(profile_name)
+        common_dependent_caps[depends] = generator.combine_capabilities(condition_jsons, condition_profile_names, (1, 0))
+    return common_dependent_caps
 
 
 def main_combine(args):
@@ -97,12 +134,21 @@ def main_combine(args):
                 all_profile_names.append(profile_name)
 
         common_caps = generator.combine_capabilities(all_jsons, all_profile_names, (1, 0))
+        common_dependent_caps = combine_dependent_capabilities(generator, all_jsons, all_profile_names)
 
         diff_files_dict = {}
         for file_key, file_data in json_files_dict.items():
             diff_file_data = json.loads(json.dumps(file_data))
             for cap_block in diff_file_data.get("capabilities", {}).values():
-                strip_dict_duplication(cap_block, common_caps, strip_list_elements=True)
+                depends = get_block_depends(cap_block)
+                if depends is None:
+                    strip_dict_duplication(cap_block, common_caps, strip_list_elements=True)
+                else:
+                    # A capability block with a 'depends' condition is compared with the blocks of the other
+                    # profiles with the same condition
+                    strip_dict_duplication(cap_block, common_dependent_caps.get(depends, {}), strip_list_elements=True)
+                    if set(cap_block.keys()) == {"depends"}:
+                        del cap_block["depends"]
                 generator.sync_format_array_count_members(cap_block)
             diff_files_dict[file_key] = diff_file_data
 

@@ -31,6 +31,9 @@ if str(scripts_dir) not in sys.path:
     sys.path.insert(0, str(scripts_dir))
 
 import vkprofiles
+from source.vulkan_object_utils import initVulkanObject, parse_property_value
+from source.vulkan_object_version import VK_VERSION
+from source.transform_pull_required_capabilities import canonicalize_depends, get_capability_key
 
 profiles_dir = scripts_dir.parent / "profiles"
 minimum_requirements_file = profiles_dir / "LunarG" / "VP_LUNARG_minimum_requirements.json"
@@ -109,11 +112,13 @@ class TestMinimumRequirementsDiff(unittest.TestCase):
             "--mode", "difference", "--format", "flatten"
         ])
 
-        # 5. The difference of each profile MUST be empty
+        # 5. The difference of each profile MUST be empty. The capability blocks with a 'depends' condition of the
+        # minimum requirements are checked against the conditional requirements of VulkanObject by test_minimum_requirements_depends.
         for profile_name in profile_names:
             with open(diff_dir / f"{profile_name}.json", "r", encoding="utf-8") as f:
                 diff_data = json.load(f)
-            values = collect_capability_values(diff_data.get("capabilities", {}))
+            unconditional_blocks = { name: block for name, block in diff_data.get("capabilities", {}).items() if "depends" not in block }
+            values = collect_capability_values(unconditional_blocks)
             self.assertEqual(values, [], f"Capabilities of '{profile_name}' not found in the other Vulkan 1.{minor} profile")
 
     def test_minimum_requirements_diff_vulkan10(self):
@@ -135,6 +140,63 @@ class TestMinimumRequirementsDiff(unittest.TestCase):
     def test_minimum_requirements_diff_vulkan14(self):
         """Verifies that the generated and the minimum requirements Vulkan 1.4 profiles are identical."""
         self.assertVulkanVersionDiffEmpty(4)
+
+    def get_conditional_requirements(self, vk, api_version: VK_VERSION) -> dict:
+        """
+        Returns the values of the Vulkan core requirements with a 'depends' condition up to api_version, by
+        (condition, capability), the requirement of the newest Vulkan version taking precedence.
+        """
+        requirements = {}
+        for ver in VK_VERSION.versions():
+            ver_obj = vk.versions.get(ver.value)
+            if ver > api_version or not ver_obj:
+                continue
+            for req in getattr(ver_obj, 'featureRequirement', []) or []:
+                fields = [field.strip() for field in req.field.split(',')] if req.field else []
+                if req.depends and len(fields) == 1:
+                    key = get_capability_key(vk, api_version, req.struct, fields[0], 'features')
+                    requirements[(canonicalize_depends(vk, api_version, req.depends), key)] = True
+            for req in getattr(ver_obj, 'propertyRequirement', []) or []:
+                if req.depends and req.value not in (None, '???'):
+                    key = get_capability_key(vk, api_version, req.struct, req.name, 'properties')
+                    requirements[(canonicalize_depends(vk, api_version, req.depends), key)] = parse_property_value(vk, req.struct, req.name, req.value)
+        return requirements
+
+    def test_minimum_requirements_depends(self):
+        """
+        Verifies that the capabilities of the capability blocks with a 'depends' condition of the minimum requirements
+        profiles are the Vulkan core requirements with the same condition, as defined by VulkanObject.
+        """
+        vk = initVulkanObject('vulkan', self.registry_path)
+        with open(minimum_requirements_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        checked = 0
+        for profile_name, profile in data["profiles"].items():
+            api_version = VK_VERSION.from_string(profile["api-version"])
+            requirements = self.get_conditional_requirements(vk, api_version)
+            for block_name in profile["capabilities"]:
+                block = data["capabilities"][block_name]
+                if "depends" not in block:
+                    continue
+                depends = canonicalize_depends(vk, api_version, block["depends"])
+                capabilities = []
+                for struct_name, members in block.get("features", {}).items():
+                    capabilities.extend((get_capability_key(vk, api_version, struct_name, member, 'features'), value) for member, value in members.items())
+                for struct_name, members in block.get("properties", {}).items():
+                    if struct_name == "VkPhysicalDeviceProperties":
+                        for member, value in members.get("limits", {}).items():
+                            capabilities.append((("VkPhysicalDeviceLimits", member), value))
+                    else:
+                        capabilities.extend((get_capability_key(vk, api_version, struct_name, member, 'properties'), value) for member, value in members.items())
+
+                for key, value in capabilities:
+                    with self.subTest(profile=profile_name, block=block_name, capability=key):
+                        self.assertIn((depends, key), requirements, f"No Vulkan {api_version} requirement of {key[0]}::{key[1]} with the condition '{depends}'")
+                        self.assertEqual(value, requirements[(depends, key)])
+                        checked += 1
+
+        self.assertGreater(checked, 0, "No capability block with a 'depends' condition was checked")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
