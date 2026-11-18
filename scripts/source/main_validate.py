@@ -49,6 +49,11 @@ from source.profiles_json_utils import (
 )
 from source.vulkan_object_expression_parsing import checkDependsExpressionSyntax, tokenizeDependsExpression
 from source.transform_utils import AnalyseBits, get_parent_property_value
+from source.transform_pull_required_capabilities import (
+    find_contradicting_properties,
+    get_profile_enabled_capabilities,
+    get_unsatisfied_property_values
+)
 from source.generate_profiles_schema import VulkanProfilesSchemaGenerator2
 
 
@@ -447,6 +452,36 @@ class VulkanProfilesDataValidation:
 
         return issues
 
+    def validate_contradicting_properties(
+        self,
+        json_files_dict: dict,
+        json_file_data: dict,
+        profile_name: str,
+        profile_obj: dict
+    ) -> list[ValidationIssue]:
+        """
+        Analysis Case 7: Checks that the unconditional properties of a profile don't contradict the value of the devices
+        not supporting a capability the profile doesn't require, e.g. a maxTessellationGenerationLevel of 64 in a profile
+        not requiring tessellationShader, which only applies to the devices supporting tessellationShader.
+        """
+        issues = []
+        api_version = VK_VERSION.from_string(profile_obj.get("api-version", "1.0.0"))
+        enabled_exts, enabled_features = get_profile_enabled_capabilities(json_files_dict, json_file_data, profile_obj)
+        unsatisfied_values = get_unsatisfied_property_values(self.vk, api_version, enabled_exts, enabled_features)
+        if not unsatisfied_values:
+            return issues
+
+        block_names = collect_block_names(profile_obj.get("capabilities", []))
+        for contradiction in find_contradicting_properties(self.vk, api_version, json_file_data.get("capabilities", {}), block_names, unsatisfied_values):
+            issues.append(ValidationIssue(
+                f"Property '{contradiction['struct']}::{contradiction['member']}' (value: {contradiction['value']}) of capability block "
+                f"'{contradiction['block']}' of profile '{profile_name}' only applies to the devices satisfying '{contradiction['depends']}', "
+                f"which the profile doesn't require: the devices not satisfying it have the value {contradiction['unsatisfied_value']}. "
+                f"'vkprofiles transform --pull requirements depends' moves it into a capability block with a 'depends' condition",
+                level=logging.WARNING
+            ))
+        return issues
+
     def validate_data(self, json_files_dict: dict, analyse_bits: list[AnalyseBits] = None) -> list[ValidationIssue]:
         """Executes selected static analysis validation cases across loaded profile files."""
         if analyse_bits is None:
@@ -479,6 +514,14 @@ class VulkanProfilesDataValidation:
                                 profile_name, block_name, capabilities_dict.get(block_name)
                             )
                         )
+
+                # Analysis Case 7: Unconditional properties contradicting the value of the devices not supporting a capability
+                if AnalyseBits.DEPENDS in analyse_bits:
+                    issues.extend(
+                        self.validate_contradicting_properties(
+                            json_files_dict, json_file_data, profile_name, profile_obj
+                        )
+                    )
 
                 # Analysis Case 1: Required Profile API Version Inheritance Checks
                 if AnalyseBits.API_VERSION in analyse_bits:

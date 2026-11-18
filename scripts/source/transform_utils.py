@@ -65,6 +65,7 @@ class StripBits(str, Enum):
     DUPLICATION = 'duplication'                    # Removes redundant duplicate features, properties, and extension requirements across inheritance trees and within blocks.
     PROMOTED_EXTENSIONS = 'promoted-extensions'    # Removes extensions that are already promoted to the profile's target core Vulkan version.
     UNRATIFIED = 'unratified'                      # Removes extensions and extension structures that are not ratified for Vulkan.
+    DEPENDS = 'depends'                            # Strips the capabilities whose condition the profile doesn't satisfy, including the capability blocks with a 'depends' condition.
 
 
 class AnalyseBits(str, Enum):
@@ -73,7 +74,7 @@ class AnalyseBits(str, Enum):
     ALIASES = 'aliases'                            # Checks member value consistency across aliased capability structures.
     UNRATIFIED = 'unratified'                      # Checks that all enabled extensions in the profile are ratified for Vulkan.
     SUBCORE_CAPABILITIES = 'subcore'               # Checks for profile capability values (features/properties) below Vulkan core specification baselines.
-    DEPENDS = 'depends'                            # Checks that the capability blocks with a 'depends' condition don't require instance extensions.
+    DEPENDS = 'depends'                            # Checks that the capability blocks with a 'depends' condition don't require instance extensions, and that the unconditional properties don't contradict the value of the devices not supporting a capability the profile doesn't require.
 
 
 class CategoryPriority(IntEnum):

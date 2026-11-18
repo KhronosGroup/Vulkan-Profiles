@@ -152,7 +152,8 @@ GRAPH_JSON_SCHEMA = {
                 "helper-values",
                 "duplication",
                 "promoted-extensions",
-                "unratified"
+                "unratified",
+                "depends"
             ]
         },
         "analyse_bits": {
