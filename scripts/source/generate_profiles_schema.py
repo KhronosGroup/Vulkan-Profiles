@@ -155,7 +155,8 @@ class VulkanProfilesSchemaGenerator2():
                             }),
                             "queueFamiliesProperties": OrderedDict({
                                 "type": "array",
-                                "uniqueItems": True,
+                                # Each item describes a queue family index: a device may expose identical queue families (e.g. MoltenVK)
+                                "uniqueItems": False,
                                 "items": OrderedDict({
                                     "type": "object",
                                     "additionalProperties": False,
