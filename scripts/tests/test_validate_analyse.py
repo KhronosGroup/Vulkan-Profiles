@@ -256,6 +256,36 @@ class TestAnalyseBits(unittest.TestCase):
         self.assertIn("instance extension 'VK_KHR_get_surface_capabilities2'", issues[0])
         self.assertEqual(getattr(issues[0], "level", None), logging.ERROR)
 
+    def test_analyse_depends_contradicting_properties(self):
+        """
+        AnalyseBits.DEPENDS:
+        Verifies the detection of the unconditional properties contradicting the value of the devices not supporting
+        a feature the profile doesn't require, e.g. a maxGeometryShaderInvocations of 32 without geometryShader.
+        """
+        def make_profile(limits: dict, features: dict) -> dict:
+            return {"test_profile.json": {
+                "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.3-304.json#",
+                "profiles": {
+                    "VP_TEST_profile": {"version": 1, "api-version": "1.4.304", "capabilities": ["baseline"]}
+                },
+                "capabilities": {
+                    "baseline": {
+                        "features": {"VkPhysicalDeviceFeatures": features},
+                        "properties": {"VkPhysicalDeviceProperties": {"limits": limits}}
+                    }
+                }
+            }}
+
+        issues = self.validator.validate_data(make_profile({"maxGeometryShaderInvocations": 32}, {"depthClamp": True}), [AnalyseBits.DEPENDS])
+        self.assertEqual(len(issues), 1)
+        self.assertIn("'VkPhysicalDeviceLimits::maxGeometryShaderInvocations' (value: 32)", issues[0])
+        self.assertIn("'VkPhysicalDeviceFeatures::geometryShader'", issues[0])
+        self.assertEqual(getattr(issues[0], "level", None), logging.WARNING)
+
+        # The value of the devices not supporting the feature, or a required feature, doesn't contradict anything
+        self.assertEqual(self.validator.validate_data(make_profile({"maxGeometryShaderInvocations": 0}, {"depthClamp": True}), [AnalyseBits.DEPENDS]), [])
+        self.assertEqual(self.validator.validate_data(make_profile({"maxGeometryShaderInvocations": 32}, {"geometryShader": True}), [AnalyseBits.DEPENDS]), [])
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

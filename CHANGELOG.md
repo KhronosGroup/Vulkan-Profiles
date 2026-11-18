@@ -20,6 +20,9 @@
   - Check the `depends` condition in `vkprofiles validate`, and report the instance extensions of capability blocks with a `depends` condition with `vkprofiles validate --analyse depends`
   - Keep the capability blocks with a `depends` condition separate in `vkprofiles transform` and `vkprofiles extract`
   - Extract the properties contradicting the Vulkan core requirements of the devices not supporting a capability the profile doesn't require into capability blocks with a `depends` condition with `vkprofiles transform --pull requirements depends`, used to generate the desktop and Android profiles
+  - Strip the capabilities whose condition the profile doesn't satisfy, including the capability blocks with a `depends` condition, with `vkprofiles transform --strip depends`
+  - Report the properties contradicting the value of the devices not supporting a capability the profile doesn't require with `vkprofiles validate --analyse depends`, and analyse the combined desktop baseline profiles with all the analysis checks before transforming them
+  - Document the `depends` condition, and the checking of the GPUInfo.org device reports, in the Vulkan Profiles Tools whitepaper
   - Compare the capability blocks with the same `depends` condition with `vkprofiles combine --mode difference`
   - Require `VP_LUNARG_minimum_requirements_1_4` `pipelineProtectedAccess`, `lineWidthGranularity` and `shaderSignedZeroInfNanPreserveFloat16` with capability blocks with a `depends` condition
   - List the capability blocks with a `depends` condition, their condition and their requirements in a "Conditional Requirements" section of the `vkprofiles doc` documentation

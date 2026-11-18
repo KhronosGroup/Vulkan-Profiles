@@ -32,6 +32,7 @@ from source.vulkan_object_utils import (
     gatherSatisfiedExtensionRequiredFeatures,
     gatherSatisfiedExtensionRequiredProperties,
     get_member_unsupported_default,
+    getMemberByName,
     getStructByName,
     parse_property_value
 )
@@ -453,36 +454,31 @@ def get_capability_key(vk: VulkanObject, api_version: VK_VERSION, struct_name: s
     return (canonical_struct, member_name)
 
 
-def extract_dependent_capabilities_single_profile(
-    vk: VulkanObject,
-    json_files_dict: dict,
-    json_file_data: dict,
-    profile_obj: dict,
-    profile_name: str
-):
-    """
-    Extracts the properties set by the unconditional capability blocks of the profile which contradict a Vulkan core
-    requirement of the devices not supporting a capability the profile doesn't require, into capability blocks with a
-    'depends' condition on that capability: one capability block per condition. E.g. a device without wideLines has a
-    lineWidthGranularity of 1.0 ('!VkPhysicalDeviceFeatures::wideLines' requirement): a lineWidthGranularity of 0.5 of
-    a profile not requiring wideLines only applies to the devices supporting wideLines. The unconditional property
-    keeps the value of the devices not supporting the capability. The other capabilities are left unchanged: a feature
-    or a property which doesn't contradict such a requirement is an unconditional requirement of the profile.
-    """
-    api_version = VK_VERSION.from_string(profile_obj["api-version"])
-    capabilities_dict = json_file_data.setdefault("capabilities", {})
-    profile_caps_list = profile_obj.setdefault("capabilities", [])
-
+def get_profile_enabled_capabilities(json_files_dict: dict, json_file_data: dict, profile_obj: dict) -> tuple[set[str], set[tuple[str, str]]]:
+    """Returns the extensions and the (structure, member) features required by a profile, including its required profiles."""
     profile_caps = collect_profile_capabilities(json_files_dict, json_file_data, profile_obj)
     enabled_exts = set(profile_caps.get("extensions", {}).keys())
     enabled_features: set[tuple[str, str]] = set()
     for struct_name, members in profile_caps.get("features", {}).items():
         if isinstance(members, dict):
             enabled_features.update((struct_name, member_name) for member_name, value in members.items() if value)
+    return enabled_exts, enabled_features
 
-    # The property values of the devices not supporting a capability the profile doesn't require, by property:
-    # (the condition of the devices supporting the capability, the value of the devices not supporting it)
+
+def get_unsatisfied_property_values(
+    vk: VulkanObject,
+    api_version: VK_VERSION,
+    enabled_exts: set[str],
+    enabled_features: set[tuple[str, str]]
+) -> dict[tuple[str, str], tuple[str, Any]]:
+    """
+    Returns the property values of the devices not supporting a capability the profile doesn't require, by property:
+    (the condition of the devices supporting the capability, the value of the devices not supporting it). The value is
+    the Vulkan core value of these devices (a '!condition' requirement) or, without it, the value of an unsupported
+    property (e.g. false for a 'max' VkBool32 property), when the property has such a value.
+    """
     unsatisfied_values: dict[tuple[str, str], tuple[str, Any]] = {}
+    dependent_properties: dict[tuple[str, str], tuple[str, str, str]] = {}
     for ver in VK_VERSION.versions():
         ver_obj = vk.versions.get(ver.value)
         if ver > api_version or not ver_obj:
@@ -491,21 +487,106 @@ def extract_dependent_capabilities_single_profile(
         for req in getattr(ver_obj, 'propertyRequirement', []) or []:
             if req.value is None or req.value == '???' or not req.depends:
                 continue
+            key = get_capability_key(vk, api_version, req.struct, req.name, 'properties')
             tokens = tokenizeDependsExpression(req.depends)
-            if len(tokens) != 1 or not tokens[0].startswith('!'):
-                continue
-            condition = tokens[0][1:].strip()
-            if evaluateFeatureDepends(vk, condition, api_version, enabled_exts, enabled_features):
-                continue
-            value = parse_property_value(vk, req.struct, req.name, req.value)
-            if value is not None:
-                key = get_capability_key(vk, api_version, req.struct, req.name, 'properties')
-                unsatisfied_values[key] = (canonicalize_depends(vk, api_version, condition), value)
+            if len(tokens) == 1 and tokens[0].startswith('!'):
+                condition = tokens[0][1:].strip()
+                if evaluateFeatureDepends(vk, condition, api_version, enabled_exts, enabled_features):
+                    continue
+                value = parse_property_value(vk, req.struct, req.name, req.value)
+                if value is not None:
+                    unsatisfied_values[key] = (canonicalize_depends(vk, api_version, condition), value)
+            elif '!' not in req.depends and not evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
+                dependent_properties.setdefault(key, (canonicalize_depends(vk, api_version, req.depends), req.struct, req.name))
 
+    for key, (depends, struct_name, member_name) in dependent_properties.items():
+        if key in unsatisfied_values:
+            continue
+        struct_obj = vk.structs.get(struct_name) or getStructByName(vk.structs, struct_name)
+        member_obj = getMemberByName(struct_obj, member_name) if struct_obj else None
+        if member_obj is not None and is_member_default_applicable(vk, struct_obj, member_obj):
+            unsatisfied_values[key] = (depends, get_member_unsupported_default(vk, struct_name, member_name))
+
+    return unsatisfied_values
+
+
+def find_contradicting_properties(
+    vk: VulkanObject,
+    api_version: VK_VERSION,
+    capabilities_dict: dict,
+    block_names: list[str],
+    unsatisfied_values: dict[tuple[str, str], tuple[str, Any]]
+) -> list[dict]:
+    """
+    Returns the properties of the unconditional capability blocks which contradict the value of the devices not
+    supporting a capability the profile doesn't require, e.g. a maxTessellationGenerationLevel of 64 in a profile not
+    requiring tessellationShader: the value only applies to the devices supporting the capability. Each property is
+    described by its block name, its members dictionary, its member name, its path in the block, its structure name,
+    its value, its condition and the value of the devices not satisfying the condition.
+    """
+    contradictions = []
+
+    def check(block_name: str, members: dict, member_name: str, key: tuple[str, str], struct_name: str, path: list[str]):
+        if key not in unsatisfied_values:
+            return
+        depends, unsatisfied_value = unsatisfied_values[key]
+        if members[member_name] == unsatisfied_value:
+            return
+        contradictions.append({
+            "block": block_name, "members": members, "member": member_name, "path": path, "struct": struct_name,
+            "value": members[member_name], "depends": depends, "unsatisfied_value": unsatisfied_value
+        })
+
+    for block_name in block_names:
+        block = capabilities_dict.get(block_name)
+        if not isinstance(block, dict) or get_block_depends(block) is not None:
+            continue
+
+        for struct_name, members in block.get("properties", {}).items():
+            if not isinstance(members, dict):
+                continue
+            if struct_name == 'VkPhysicalDeviceProperties':
+                for sub_name, sub_struct_name in (('limits', 'VkPhysicalDeviceLimits'), ('sparseProperties', 'VkPhysicalDeviceSparseProperties')):
+                    sub_members = members.get(sub_name)
+                    if isinstance(sub_members, dict):
+                        for member_name in list(sub_members.keys()):
+                            check(block_name, sub_members, member_name, (sub_struct_name, member_name), sub_struct_name,
+                                  ["properties", struct_name, sub_name])
+            else:
+                for member_name in list(members.keys()):
+                    key = get_capability_key(vk, api_version, struct_name, member_name, 'properties')
+                    check(block_name, members, member_name, key, struct_name, ["properties", struct_name])
+
+    return contradictions
+
+
+def extract_dependent_capabilities_single_profile(
+    vk: VulkanObject,
+    json_files_dict: dict,
+    json_file_data: dict,
+    profile_obj: dict,
+    profile_name: str
+):
+    """
+    Extracts the properties set by the unconditional capability blocks of the profile which contradict the value of the
+    devices not supporting a capability the profile doesn't require, into capability blocks with a 'depends' condition
+    on that capability: one capability block per condition. E.g. a device without wideLines has a lineWidthGranularity
+    of 1.0 ('!VkPhysicalDeviceFeatures::wideLines' requirement): a lineWidthGranularity of 0.5 of a profile not
+    requiring wideLines only applies to the devices supporting wideLines. The unconditional property keeps the value of
+    the devices not supporting the capability. The other capabilities are left unchanged: a feature or a property which
+    doesn't contradict such a value is an unconditional requirement of the profile.
+    """
+    api_version = VK_VERSION.from_string(profile_obj["api-version"])
+    capabilities_dict = json_file_data.setdefault("capabilities", {})
+    profile_caps_list = profile_obj.setdefault("capabilities", [])
+
+    enabled_exts, enabled_features = get_profile_enabled_capabilities(json_files_dict, json_file_data, profile_obj)
+    unsatisfied_values = get_unsatisfied_property_values(vk, api_version, enabled_exts, enabled_features)
     if not unsatisfied_values:
         return
 
     profile_block_names = collect_block_names(profile_caps_list)
+    contradictions = find_contradicting_properties(vk, api_version, capabilities_dict, list(profile_block_names), unsatisfied_values)
 
     def get_dependent_block(depends: str) -> dict:
         # The capability block of the profile with the same condition, if any
@@ -519,39 +600,13 @@ def extract_dependent_capabilities_single_profile(
             profile_block_names.append(block_name)
         return capabilities_dict[block_name]
 
-    def extract(members: dict, member_name: str, value: Any, key: tuple[str, str], struct_name: str, path: list[str]):
-        if key not in unsatisfied_values:
-            return
-        depends, unsatisfied_value = unsatisfied_values[key]
-        if value == unsatisfied_value:
-            return
-
+    for contradiction in contradictions:
         # The value only applies to the devices satisfying the condition
-        target = get_dependent_block(depends)
-        for path_key in path:
+        target = get_dependent_block(contradiction["depends"])
+        for path_key in contradiction["path"]:
             target = target.setdefault(path_key, {})
-        target[member_name] = value
-        members[member_name] = unsatisfied_value
-
-    for block_name in list(profile_block_names):
-        block = capabilities_dict.get(block_name)
-        if not isinstance(block, dict) or get_block_depends(block) is not None:
-            continue
-
-        for struct_name, members in block.get("properties", {}).items():
-            if not isinstance(members, dict):
-                continue
-            if struct_name == 'VkPhysicalDeviceProperties':
-                for sub_name, sub_struct_name in (('limits', 'VkPhysicalDeviceLimits'), ('sparseProperties', 'VkPhysicalDeviceSparseProperties')):
-                    sub_members = members.get(sub_name)
-                    if isinstance(sub_members, dict):
-                        for member_name, value in list(sub_members.items()):
-                            extract(sub_members, member_name, value, (sub_struct_name, member_name), sub_struct_name,
-                                    ["properties", struct_name, sub_name])
-            else:
-                for member_name, value in list(members.items()):
-                    key = get_capability_key(vk, api_version, struct_name, member_name, 'properties')
-                    extract(members, member_name, value, key, struct_name, ["properties", struct_name])
+        target[contradiction["member"]] = contradiction["value"]
+        contradiction["members"][contradiction["member"]] = contradiction["unsatisfied_value"]
 
 
 def pull_required_capabilities_single_profile(
