@@ -41,6 +41,8 @@ from source.transform_pull_required_capabilities import (
 )
 from source.main_validate import VulkanProfilesDataValidation
 from source.generate_profiles_doc import generate_profiles_doc
+from source.generate_profiles_combine import VulkanProfilesCombineGenerator
+from source.main_combine import combine_dependent_capabilities
 
 
 def make_profiles_file(capabilities: dict, profile_capabilities: list, api_version: str = "1.4.304") -> dict:
@@ -213,6 +215,116 @@ class TestCapabilityBlockDependsProfiles(unittest.TestCase):
         # The features required by the dependent block extensions are not pulled into the unconditional block
         self.assertNotIn("VkPhysicalDevice8BitStorageFeatures", baseline.get("features", {}))
         self.assertNotIn("VkPhysicalDevice8BitStorageFeaturesKHR", baseline.get("features", {}))
+
+    def pull_dependent_requirements(self, profile: dict, pull_bits: list) -> dict:
+        json_files_dict = {"test.json": profile}
+        pull_extension_dependencies_profiles_files(self.vk, pull_bits, json_files_dict)
+        pull_required_capabilities_profiles_files(self.vk, pull_bits, json_files_dict)
+        return profile
+
+    def make_limits_profile(self, limits: dict, features: dict = None) -> dict:
+        block = {"properties": {"VkPhysicalDeviceProperties": {"limits": limits}}}
+        if features:
+            block["features"] = {"VkPhysicalDeviceFeatures": features}
+        return make_profiles_file({"baseline": block}, ["baseline"], api_version="1.4.304")
+
+    def test_pull_extract_dependent_capabilities(self):
+        profile = self.pull_dependent_requirements(self.make_limits_profile({
+            "maxGeometryShaderInvocations": 32,
+            "lineWidthGranularity": 0.5,
+            "sparseAddressSpaceSize": 0
+        }, {"shaderInt64": True}), [PullBits.REQUIRED_CAPABILITIES, PullBits.DEPENDS])
+        capabilities = profile["capabilities"]
+        profile_blocks = profile["profiles"]["VP_LUNARG_test_depends"]["capabilities"]
+        limits = capabilities["baseline"]["properties"]["VkPhysicalDeviceProperties"]["limits"]
+
+        # A limit contradicting the requirement of the devices not supporting a feature the profile doesn't require is
+        # extracted into a block with a 'depends' condition, the unconditional limit is the value of these devices
+        geometry = capabilities["VP_LUNARG_test_depends_depends_geometryShader"]
+        self.assertIn("VP_LUNARG_test_depends_depends_geometryShader", profile_blocks)
+        self.assertEqual(geometry["depends"], "VkPhysicalDeviceFeatures::geometryShader")
+        self.assertEqual(geometry["properties"]["VkPhysicalDeviceProperties"]["limits"], {"maxGeometryShaderInvocations": 32})
+        self.assertEqual(limits["maxGeometryShaderInvocations"], 0)
+
+        wide_lines = capabilities["VP_LUNARG_test_depends_depends_wideLines"]
+        self.assertEqual(wide_lines["properties"]["VkPhysicalDeviceProperties"]["limits"], {"lineWidthGranularity": 0.5})
+        self.assertEqual(limits["lineWidthGranularity"], 1.0)
+
+        # A limit set to the value of the devices not supporting the feature is unchanged
+        self.assertNotIn("VP_LUNARG_test_depends_depends_sparseBinding", capabilities)
+        self.assertEqual(limits["sparseAddressSpaceSize"], 0)
+
+        # The features are unconditional requirements of the profile: they are not extracted
+        self.assertTrue(capabilities["baseline"]["features"]["VkPhysicalDeviceFeatures"]["shaderInt64"])
+
+        # The requirements the profile doesn't set are not added
+        self.assertNotIn("VP_LUNARG_test_depends_depends_tessellationShader", capabilities)
+
+    def test_pull_extract_dependent_capabilities_satisfied_condition(self):
+        profile = self.pull_dependent_requirements(self.make_limits_profile(
+            {"maxGeometryShaderInvocations": 32}, {"geometryShader": True}), [PullBits.REQUIRED_CAPABILITIES, PullBits.DEPENDS])
+
+        # The limits of a feature required by the profile are unconditional
+        self.assertNotIn("VP_LUNARG_test_depends_depends_geometryShader", profile["capabilities"])
+        limits = profile["capabilities"]["baseline"]["properties"]["VkPhysicalDeviceProperties"]["limits"]
+        self.assertEqual(limits["maxGeometryShaderInvocations"], 32)
+
+    def test_pull_extract_dependent_capabilities_existing_block(self):
+        profile = self.make_limits_profile({"lineWidthGranularity": 0.5})
+        profile["capabilities"]["wide_lines"] = {
+            "depends": "VkPhysicalDeviceFeatures::wideLines",
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {"lineWidthRange": [1.0, 8.0]}
+                }
+            }
+        }
+        profile["profiles"]["VP_LUNARG_test_depends"]["capabilities"].append("wide_lines")
+        profile = self.pull_dependent_requirements(profile, [PullBits.REQUIRED_CAPABILITIES, PullBits.DEPENDS])
+
+        # The extracted limit is added to the block of the profile with the same condition
+        self.assertNotIn("VP_LUNARG_test_depends_depends_wideLines", profile["capabilities"])
+        limits = profile["capabilities"]["wide_lines"]["properties"]["VkPhysicalDeviceProperties"]["limits"]
+        self.assertEqual(limits, {"lineWidthRange": [1.0, 8.0], "lineWidthGranularity": 0.5})
+
+    def test_pull_without_extract_dependent_capabilities(self):
+        profile = self.pull_dependent_requirements(self.make_limits_profile({"maxGeometryShaderInvocations": 32}), [PullBits.REQUIRED_CAPABILITIES])
+
+        # Without PullBits.DEPENDS, the capabilities are not extracted
+        self.assertFalse(any(get_block_depends(block) is not None for block in profile["capabilities"].values()))
+        limits = profile["capabilities"]["baseline"]["properties"]["VkPhysicalDeviceProperties"]["limits"]
+        self.assertEqual(limits["maxGeometryShaderInvocations"], 32)
+
+    def test_combine_difference_depends(self):
+        def make_file(profile_name: str, granularity: float) -> dict:
+            profile = make_profiles_file({
+                "baseline": {
+                    "features": {"VkPhysicalDeviceFeatures": {"depthClamp": True}}
+                },
+                "wide_lines": {
+                    "depends": "VkPhysicalDeviceFeatures::wideLines",
+                    "properties": {
+                        "VkPhysicalDeviceProperties": {
+                            "limits": {"lineWidthRange": [1.0, 7.0], "lineWidthGranularity": granularity}
+                        }
+                    }
+                }
+            }, ["baseline", "wide_lines"])
+            profile["profiles"] = {profile_name: profile["profiles"]["VP_LUNARG_test_depends"]}
+            return profile
+
+        generator = VulkanProfilesCombineGenerator(self.vk)
+        jsons = [make_file("VP_LUNARG_test_a", 0.5), make_file("VP_LUNARG_test_b", 1.0)]
+        common = combine_dependent_capabilities(generator, jsons, ["VP_LUNARG_test_a", "VP_LUNARG_test_b"])
+
+        # The blocks with the same condition are compared: only their common requirements are common
+        limits = common["VkPhysicalDeviceFeatures::wideLines"]["properties"]["VkPhysicalDeviceProperties"]["limits"]
+        self.assertEqual(limits["lineWidthRange"], [1.0, 7.0])
+
+        # A condition of a single profile has no common requirements
+        jsons[1]["capabilities"]["wide_lines"]["depends"] = "VkPhysicalDeviceFeatures::largePoints"
+        common = combine_dependent_capabilities(generator, jsons, ["VP_LUNARG_test_a", "VP_LUNARG_test_b"])
+        self.assertEqual(common, {})
 
     def test_validate_depends(self):
         validator = VulkanProfilesDataValidation(self.vk)

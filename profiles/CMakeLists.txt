@@ -87,6 +87,9 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_LIST_DIR}/build
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/library/include/vulkan/debug
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/library/source/debug
+    # The Khronos Roadmap profiles come from the Vulkan-Headers registry, not from profiles/Khronos/VP_KHR_roadmap.json.
+    # The Roadmap 2026 'depends' block of pipelineProtectedAccess in profiles/Khronos/VP_KHR_roadmap.json only reaches
+    # the generated library, documentation and tests once it lands in the Vulkan-Docs registry.
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         ${VULKAN_REGISTRY_FILES_DIR}/profiles/VP_KHR_roadmap.json
         ${CMAKE_CURRENT_LIST_DIR}/build/VP_KHR_roadmap.json

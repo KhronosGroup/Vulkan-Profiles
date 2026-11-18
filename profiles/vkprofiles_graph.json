@@ -119,7 +119,7 @@
             "args": {
                 "input": "profiles/Android",
                 "output": "profiles/build",
-                "pull": [ "requirements", "ignore-unsupported", "aliases" ],
+                "pull": [ "requirements", "ignore-unsupported", "aliases", "depends" ],
                 "strip": [ "helper-values" ],
                 "format": "flatten"
             }
@@ -133,7 +133,7 @@
                 "input": "profiles/build",
                 "input-profiles": "VP_LUNARG_desktop_baseline_2022,VP_LUNARG_desktop_baseline_2023,VP_LUNARG_desktop_baseline_2024,VP_LUNARG_desktop_baseline_2026,VP_LUNARG_desktop_baseline_2027",
                 "output": "profiles/build",
-                "pull": [ "requirements", "ignore-unsupported", "aliases" ],
+                "pull": [ "requirements", "ignore-unsupported", "aliases", "depends" ],
                 "strip": [ "helper-values" ],
                 "format": "flatten"
             }

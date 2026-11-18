@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.2-304.json#",
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.3-304.json#",
     "capabilities": {
         "vulkan10requirements": {
             "features": {
@@ -379,9 +379,28 @@
             }
         },
         "vulkan14dependent": {
+            "depends": "VkPhysicalDeviceVulkan11Features::protectedMemory",
             "features": {
                 "VkPhysicalDeviceVulkan14Features": {
                     "pipelineProtectedAccess": true
+                }
+            }
+        },
+        "vulkan14dependent_wideLines": {
+            "depends": "VkPhysicalDeviceFeatures::wideLines",
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
+                        "lineWidthGranularity": 0.5
+                    }
+                }
+            }
+        },
+        "vulkan14dependent_shaderFloat16": {
+            "depends": "VkPhysicalDeviceVulkan12Features::shaderFloat16",
+            "properties": {
+                "VkPhysicalDeviceVulkan12Properties": {
+                    "shaderSignedZeroInfNanPreserveFloat16": true
                 }
             }
         }
@@ -425,15 +444,14 @@
             ]
         },
         "VP_LUNARG_minimum_requirements_1_4": {
-            "version": 2,
+            "version": 3,
             "api-version": "1.4.304",
             "label": "Vulkan 1.4 Minimum Requirements",
             "description": "Vulkan 1.4 Minimum Requirements.",
-            "capabilities": [ "vulkan14requirements" ],
+            "capabilities": [ "vulkan14requirements", "vulkan14dependent", "vulkan14dependent_wideLines", "vulkan14dependent_shaderFloat16" ],
             "profiles": [
                 "VP_LUNARG_minimum_requirements_1_3"
-            ],
-            "optionals": [ "vulkan14dependent" ]
+            ]
         }
     },
     "contributors": {
@@ -444,6 +462,12 @@
         }
     },
     "history": [
+        {
+            "revision": 5,
+            "date": "2026-11-17",
+            "author": "Christophe Riccio",
+            "comment": "Require Vulkan 1.4 pipelineProtectedAccess, lineWidthGranularity and shaderSignedZeroInfNanPreserveFloat16 when protectedMemory, wideLines and shaderFloat16 are supported, using capability block 'depends' conditions"
+        },
         {
             "revision": 4,
             "date": "2026-11-16",

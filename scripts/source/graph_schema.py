@@ -142,7 +142,8 @@ GRAPH_JSON_SCHEMA = {
                 "ignore-extension-versions",
                 "ignore-unsupported",
                 "ignore-subcore",
-                "ignore-unratified"
+                "ignore-unratified",
+                "depends"
             ]
         },
         "strip_bits": {

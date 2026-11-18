@@ -57,6 +57,7 @@ class PullBits(str, Enum):
     IGNORE_UNSUPPORTED = 'ignore-unsupported'                   # Skips pulling default values for feature-dependent properties when feature is unsupported.
     IGNORE_SUBCORE = 'ignore-subcore'                           # Allows 'requirements' pulling to override profile capability values that are below Vulkan core spec requirements.
     IGNORE_UNRATIFIED = 'ignore-unratified'                     # Skips pulling unratified extensions and capability aliases during pull operations.
+    DEPENDS = 'depends'                                         # With 'requirements', extracts the capabilities whose core requirement depends on a capability the profile doesn't require into capability blocks with a 'depends' condition.
 
 
 class StripBits(str, Enum):

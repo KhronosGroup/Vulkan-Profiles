@@ -19,19 +19,23 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
+import re
 from typing import Any
 
 from source.vulkan_object_utils import (
-    VulkanObject, 
-    VK_VERSION, 
-    gatherDependentExtensions, 
+    VulkanObject,
+    VK_VERSION,
+    evaluateFeatureDepends,
+    gatherDependentExtensions,
     gatherSatisfiedCoreRequiredFeaturesForVersion,
     gatherSatisfiedCoreRequiredPropertiesForVersion,
     gatherSatisfiedExtensionRequiredFeatures,
     gatherSatisfiedExtensionRequiredProperties,
     get_member_unsupported_default,
-    getStructByName
+    getStructByName,
+    parse_property_value
 )
+from source.vulkan_object_expression_parsing import tokenizeDependsExpression
 from source.profiles_json_utils import (
     collect_block_names,
     get_block_depends,
@@ -400,6 +404,156 @@ def process_or_disjunction(
             profile_caps.append(variant_block_names)
 
 
+def canonicalize_depends(vk: VulkanObject, api_version: VK_VERSION, depends: str) -> str:
+    """
+    Returns the 'depends' condition with its feature symbols named after the structures used for api_version,
+    e.g. 'VkPhysicalDeviceProtectedMemoryFeatures::protectedMemory' is 'VkPhysicalDeviceVulkan11Features::protectedMemory'
+    for Vulkan 1.1 and later, so that equivalent conditions are written the same way.
+    """
+    gen = ''
+    for token in tokenizeDependsExpression(depends):
+        symbol = token[1:].strip() if token.startswith('!') else token
+        if '::' not in symbol:
+            gen += token
+            continue
+        struct_name, member_name = symbol.split('::', 1)
+        canonical_features, _ = canonicalize_capabilities_for_version(vk, api_version, {struct_name: {member_name: True}}, {})
+        canonical_struct = next((s_name for s_name, members in canonical_features.items() if member_name in members), struct_name)
+        gen += ('!' if token.startswith('!') else '') + f"{canonical_struct}::{member_name}"
+    return gen
+
+
+def get_depends_block_suffix(depends: str) -> str:
+    """Returns a capability block name suffix describing a 'depends' condition, e.g. 'wideLines' or 'VK_EXT_descriptor_indexing_or_descriptorIndexing'."""
+    parts = []
+    for token in tokenizeDependsExpression(depends):
+        if token == '+':
+            parts.append('and')
+        elif token == ',':
+            parts.append('or')
+        elif token not in ('(', ')'):
+            parts.append(token.split('::')[-1])
+    return re.sub(r'[^A-Za-z0-9_]', '', '_'.join(parts))
+
+
+def get_capability_key(vk: VulkanObject, api_version: VK_VERSION, struct_name: str, member_name: str, category: str) -> tuple[str, str]:
+    """
+    Returns the (structure, member) identifying a capability whatever the equivalent structure defining it, e.g.
+    VkPhysicalDeviceProtectedMemoryFeatures::protectedMemory is VkPhysicalDeviceVulkan11Features::protectedMemory
+    for Vulkan 1.1 and later. The VkPhysicalDeviceProperties limits and sparse properties are identified by
+    VkPhysicalDeviceLimits and VkPhysicalDeviceSparseProperties.
+    """
+    if struct_name in ('VkPhysicalDeviceLimits', 'VkPhysicalDeviceSparseProperties'):
+        return (struct_name, member_name)
+    if category == 'features':
+        canonical, _ = canonicalize_capabilities_for_version(vk, api_version, {struct_name: {member_name: True}}, {})
+    else:
+        _, canonical = canonicalize_capabilities_for_version(vk, api_version, {}, {struct_name: {member_name: 0}})
+    canonical_struct = next((s_name for s_name, members in canonical.items() if isinstance(members, dict) and member_name in members), struct_name)
+    return (canonical_struct, member_name)
+
+
+def extract_dependent_capabilities_single_profile(
+    vk: VulkanObject,
+    json_files_dict: dict,
+    json_file_data: dict,
+    profile_obj: dict,
+    profile_name: str
+):
+    """
+    Extracts the properties set by the unconditional capability blocks of the profile which contradict a Vulkan core
+    requirement of the devices not supporting a capability the profile doesn't require, into capability blocks with a
+    'depends' condition on that capability: one capability block per condition. E.g. a device without wideLines has a
+    lineWidthGranularity of 1.0 ('!VkPhysicalDeviceFeatures::wideLines' requirement): a lineWidthGranularity of 0.5 of
+    a profile not requiring wideLines only applies to the devices supporting wideLines. The unconditional property
+    keeps the value of the devices not supporting the capability. The other capabilities are left unchanged: a feature
+    or a property which doesn't contradict such a requirement is an unconditional requirement of the profile.
+    """
+    api_version = VK_VERSION.from_string(profile_obj["api-version"])
+    capabilities_dict = json_file_data.setdefault("capabilities", {})
+    profile_caps_list = profile_obj.setdefault("capabilities", [])
+
+    profile_caps = collect_profile_capabilities(json_files_dict, json_file_data, profile_obj)
+    enabled_exts = set(profile_caps.get("extensions", {}).keys())
+    enabled_features: set[tuple[str, str]] = set()
+    for struct_name, members in profile_caps.get("features", {}).items():
+        if isinstance(members, dict):
+            enabled_features.update((struct_name, member_name) for member_name, value in members.items() if value)
+
+    # The property values of the devices not supporting a capability the profile doesn't require, by property:
+    # (the condition of the devices supporting the capability, the value of the devices not supporting it)
+    unsatisfied_values: dict[tuple[str, str], tuple[str, Any]] = {}
+    for ver in VK_VERSION.versions():
+        ver_obj = vk.versions.get(ver.value)
+        if ver > api_version or not ver_obj:
+            continue
+
+        for req in getattr(ver_obj, 'propertyRequirement', []) or []:
+            if req.value is None or req.value == '???' or not req.depends:
+                continue
+            tokens = tokenizeDependsExpression(req.depends)
+            if len(tokens) != 1 or not tokens[0].startswith('!'):
+                continue
+            condition = tokens[0][1:].strip()
+            if evaluateFeatureDepends(vk, condition, api_version, enabled_exts, enabled_features):
+                continue
+            value = parse_property_value(vk, req.struct, req.name, req.value)
+            if value is not None:
+                key = get_capability_key(vk, api_version, req.struct, req.name, 'properties')
+                unsatisfied_values[key] = (canonicalize_depends(vk, api_version, condition), value)
+
+    if not unsatisfied_values:
+        return
+
+    profile_block_names = collect_block_names(profile_caps_list)
+
+    def get_dependent_block(depends: str) -> dict:
+        # The capability block of the profile with the same condition, if any
+        block_name = next((name for name in profile_block_names if name in capabilities_dict and
+                           get_block_depends(capabilities_dict[name]) is not None and
+                           canonicalize_depends(vk, api_version, get_block_depends(capabilities_dict[name])) == depends), None)
+        if block_name is None:
+            block_name = f"{profile_name}_depends_{get_depends_block_suffix(depends)}"
+            capabilities_dict[block_name] = {"depends": depends}
+            profile_caps_list.append(block_name)
+            profile_block_names.append(block_name)
+        return capabilities_dict[block_name]
+
+    def extract(members: dict, member_name: str, value: Any, key: tuple[str, str], struct_name: str, path: list[str]):
+        if key not in unsatisfied_values:
+            return
+        depends, unsatisfied_value = unsatisfied_values[key]
+        if value == unsatisfied_value:
+            return
+
+        # The value only applies to the devices satisfying the condition
+        target = get_dependent_block(depends)
+        for path_key in path:
+            target = target.setdefault(path_key, {})
+        target[member_name] = value
+        members[member_name] = unsatisfied_value
+
+    for block_name in list(profile_block_names):
+        block = capabilities_dict.get(block_name)
+        if not isinstance(block, dict) or get_block_depends(block) is not None:
+            continue
+
+        for struct_name, members in block.get("properties", {}).items():
+            if not isinstance(members, dict):
+                continue
+            if struct_name == 'VkPhysicalDeviceProperties':
+                for sub_name, sub_struct_name in (('limits', 'VkPhysicalDeviceLimits'), ('sparseProperties', 'VkPhysicalDeviceSparseProperties')):
+                    sub_members = members.get(sub_name)
+                    if isinstance(sub_members, dict):
+                        for member_name, value in list(sub_members.items()):
+                            extract(sub_members, member_name, value, (sub_struct_name, member_name), sub_struct_name,
+                                    ["properties", struct_name, sub_name])
+            else:
+                for member_name, value in list(members.items()):
+                    key = get_capability_key(vk, api_version, struct_name, member_name, 'properties')
+                    extract(members, member_name, value, key, struct_name, ["properties", struct_name])
+
+
 def pull_required_capabilities_single_profile(
     vk: VulkanObject,
     pull_bits: list[PullBits],
@@ -686,6 +840,9 @@ def pull_required_capabilities_single_profile(
             # Nothing was pulled: do not leave an empty block behind.
             del capabilities_dict[created_block_name]
             profile_caps_list.remove(created_block_name)
+
+    if PullBits.DEPENDS in pull_bits:
+        extract_dependent_capabilities_single_profile(vk, json_files_dict, json_file_data, profile_obj, profile_name)
 
     block_names = collect_block_names(profile_obj.get("capabilities", []))
     for block_name in block_names:
