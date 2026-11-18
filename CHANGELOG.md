@@ -11,7 +11,7 @@
 
 # Release Notes
 
-## [Vulkan Profiles Tools 1.4.363](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - December 2026
+## [Vulkan Profiles Tools 1.4.XXX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - December 2026
 
 ### Improvements:
 - Generate `PROFILES_CORE.md`, the documentation of the `VP_LUNARG_minimum_requirements_1_x` profiles of the Vulkan core specification requirements
