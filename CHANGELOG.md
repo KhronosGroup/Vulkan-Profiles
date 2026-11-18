@@ -11,7 +11,7 @@
 
 # Release Notes
 
-## [Vulkan Profiles Tools 1.4.363](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - December 2026
+## [Vulkan Profiles Tools 1.4.XXX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - December 2026
 
 ### Features:
 - Support the `depends` condition of capability blocks of the profiles schema 0.8.3 #1090
