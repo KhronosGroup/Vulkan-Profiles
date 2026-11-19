@@ -28,6 +28,11 @@
   - Evaluate a `depends` condition of the Profiles layer naming a structure promoted to a Vulkan version, or the `VkPhysicalDeviceVulkan<major><minor>Features` structure of this version, with the value the profile set in either structure
   - Require `VP_LUNARG_minimum_requirements_1_4` `pipelineProtectedAccess`, `lineWidthGranularity` and `shaderSignedZeroInfNanPreserveFloat16` with capability blocks with a `depends` condition
   - List the capability blocks with a `depends` condition, their condition and their requirements in a "Conditional Requirements" section of the `vkprofiles doc` documentation
+- Fix the known issues of the GPUInfo.org device reports with `vkprofiles validate --apply-workarounds`, in place or in copies written to the `--output` directory, each workaround having its own value
+  - `driver-id`: set the `driverID` from the `driverName` for the drivers unknown to the device report exporter
+  - `64-bit-strings`: convert to numbers the 64-bit integers written as strings
+  - `flags-as-numbers`: convert to flag bit names the flags written as numbers
+  - `enums-as-numbers`: convert to enum value names the extension enum values written as numbers
 
 ### Improvements:
 - Generate `PROFILES_CORE.md`, the documentation of the `VP_LUNARG_minimum_requirements_1_x` profiles of the Vulkan core specification requirements

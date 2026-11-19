@@ -167,6 +167,15 @@ GRAPH_JSON_SCHEMA = {
                 "depends"
             ]
         },
+        "workaround_bits": {
+            "type": "string",
+            "enum": [
+                "driver-id",
+                "64-bit-strings",
+                "flags-as-numbers",
+                "enums-as-numbers"
+            ]
+        },
         "common_args": {
             "properties": {
                 "registry": { "type": "string" },
@@ -255,6 +264,11 @@ GRAPH_JSON_SCHEMA = {
                     "type": "array",
                     "items": { "$ref": "#/definitions/analyse_bits" }
                 },
+                "apply-workarounds": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/workaround_bits" }
+                },
+                "output": { "type": "string" },
                 "api": { "type": "string", "enum": ["vulkan"] },
                 "verbose": { "type": "boolean" },
                 "quiet": { "type": "boolean" },

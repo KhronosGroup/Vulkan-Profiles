@@ -84,6 +84,7 @@ add_vulkan_python_test(VkProfiles_TestValidateSchema               test_validate
 add_vulkan_python_test(VkProfiles_TestProfilesSchema               test_profiles_schema.py)
 add_vulkan_python_test(VkProfiles_TestProfilesDoc                  test_profiles_doc.py)
 add_vulkan_python_test(VkProfiles_TestValidateAnalyse              test_validate_analyse.py)
+add_vulkan_python_test(VkProfiles_TestValidateWorkarounds          test_validate_workarounds.py)
 add_vulkan_python_test(VkProfiles_TestCommandLines                 test_command_lines.py)
 
 # Convert Android Profiles custom target

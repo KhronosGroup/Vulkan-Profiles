@@ -77,6 +77,13 @@ class AnalyseBits(str, Enum):
     DEPENDS = 'depends'                            # Checks that the capability blocks with a 'depends' condition don't require instance extensions, and that the unconditional properties don't contradict the value of the devices not supporting a capability the profile doesn't require.
 
 
+class WorkaroundBits(str, Enum):
+    DRIVER_ID = 'driver-id'                        # Sets the driverID of the device reports from their driverName, when the device report exporter didn't know the driver ID (e.g. a null or '_KHR' driverID for KosmicKrisp).
+    STRINGS_64_BIT = '64-bit-strings'              # Converts to numbers the 64-bit integer values (VkDeviceSize, uint64_t, int64_t, ...) the device report exporter wrote as strings (e.g. "4096").
+    FLAGS_AS_NUMBERS = 'flags-as-numbers'          # Converts to lists of flag bit names the flags values the device report exporter wrote as numbers or numeric strings (e.g. "0" for an empty list).
+    ENUMS_AS_NUMBERS = 'enums-as-numbers'          # Converts to enum value names the enum values the device report exporter wrote as numbers or numeric strings (e.g. 1000117000 for an extension image layout).
+
+
 class CategoryPriority(IntEnum):
     """Defines structure category sorting precedence during capability block sorting (lower value = higher priority)."""
     CORE = 0    # Standard Vulkan core structures (version bundle and split core).
