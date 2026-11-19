@@ -24,6 +24,7 @@ Workarounds for the issues of the device reports exported from GPUInfo.org, appl
 in place to the input profiles files, or to copies written to the 'validate --output' directory.
 """
 
+import copy
 import json
 import logging
 from pathlib import Path
@@ -32,7 +33,7 @@ import shutil
 from vulkan_object import VulkanObject
 from source.transform_utils import WorkaroundBits
 from source.profiles_json_utils import load_profiles_json, collect_block_names
-from source.vulkan_object_utils import getUndeclaredStructExtension
+from source.vulkan_object_utils import getUndeclaredStructExtension, gatherCapabilityAliases, StructCapabilityAlias
 from source.vulkan_object_version import VK_VERSION
 
 
@@ -220,6 +221,138 @@ def apply_undeclared_extension_structures_workaround(vk: VulkanObject, json_data
     return changes
 
 
+def apply_mismatching_aliases_workaround(vk: VulkanObject, json_data: dict, limit_members: bool = True, exact_booleans: bool = False) -> list[str]:
+    """
+    Sets the aliased property members with mismatching values to their least capable value, considering the capability
+    not reliable enough to be supported:
+    - With limit_members, the members with a 'max', 'min', 'bitmask' or 'range' limittype in vk.xml, e.g. false for the
+      VkPhysicalDeviceVulkan13Properties::integerDotProduct8BitUnsignedAccelerated false and
+      VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR::integerDotProduct8BitUnsignedAccelerated true of some
+      device reports.
+    - With exact_booleans, the VkBool32 members with an 'exact' limittype, set to false, e.g. the
+      uniformTexelBufferOffsetSingleTexelAlignment of VkPhysicalDeviceVulkan13Properties and
+      VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT.
+    The other members with an 'exact' or 'noauto' limittype, or without limittype, are ignored.
+    Returns the description of each change.
+    """
+    workaround_bit = WorkaroundBits.MISMATCHING_ALIASES if limit_members else WorkaroundBits.MISMATCHING_ALIASES_EXTRA
+    structs_by_name = {name: struct for struct in vk.structs.values() for name in [struct.name] + struct.aliases}
+    flags_by_name = {name: flags for flags in vk.flags.values() for name in [flags.name] + flags.aliases}
+
+    def get_member(struct_name: str, member_name: str):
+        struct = structs_by_name.get(struct_name)
+        return next((member for member in struct.members if member.name == member_name), None) if struct else None
+
+    def get_flag_bits(member) -> dict[str, int] | None:
+        flags = flags_by_name.get(member.type)
+        bitmask = vk.bitmasks.get(flags.bitmaskName) if flags is not None and flags.bitmaskName else None
+        if bitmask is None:
+            return None
+        return {name: flag.value for flag in bitmask.flags for name in [flag.name] + flag.aliases}
+
+    def get_least_capable(member, limittypes: list[str], val1, val2):
+        """Returns the least capable of two values, or None when it can't be determined."""
+        if "max" in limittypes or "min" in limittypes:
+            pick = min if "max" in limittypes else max
+            if member.type == "VkBool32" and isinstance(val1, bool) and isinstance(val2, bool):
+                return (val1 and val2) if "max" in limittypes else (val1 or val2)
+            if isinstance(val1, dict) and isinstance(val2, dict) and val1.keys() == val2.keys():
+                return {key: pick(val1[key], val2[key]) for key in val1}
+            if isinstance(val1, list) and isinstance(val2, list) and len(val1) == len(val2):
+                return [pick(v1, v2) for v1, v2 in zip(val1, val2)]
+            if isinstance(val1, (int, float)) and isinstance(val2, (int, float)) and not isinstance(val1, bool) and not isinstance(val2, bool):
+                value = pick(val1, val2)
+                # A 'mul' limit must be a multiple of both values
+                if "mul" in limittypes and "min" in limittypes and value % min(val1, val2) != 0:
+                    return None
+                return value
+            return None
+        if "bitmask" in limittypes:
+            flag_bits = get_flag_bits(member)
+            if flag_bits is None or not isinstance(val1, list) or not isinstance(val2, list) or any(name not in flag_bits for name in val1 + val2):
+                return None
+            bits2 = 0
+            for name in val2:
+                bits2 |= flag_bits[name]
+            # The flag bits of val1, including the multi-bit flags, which are all set in val2
+            return [name for name in val1 if flag_bits[name] & ~bits2 == 0]
+        if "range" in limittypes:
+            if isinstance(val1, list) and isinstance(val2, list) and len(val1) == 2 and len(val2) == 2:
+                return [max(val1[0], val2[0]), min(val1[1], val2[1])]
+            return None
+        return None
+
+    def are_equal(member, limittypes: list[str], val1, val2) -> bool:
+        if "bitmask" in limittypes:
+            flag_bits = get_flag_bits(member)
+            if flag_bits is not None and isinstance(val1, list) and isinstance(val2, list) and all(name in flag_bits for name in val1 + val2):
+                bits1 = 0
+                for name in val1:
+                    bits1 |= flag_bits[name]
+                bits2 = 0
+                for name in val2:
+                    bits2 |= flag_bits[name]
+                return bits1 == bits2
+        return val1 == val2
+
+    changes = []
+    for block_name, block in json_data.get("capabilities", {}).items():
+        if not isinstance(block, dict):
+            continue
+        properties = block.get("properties")
+        if not isinstance(properties, dict):
+            continue
+        checked = set()
+        for struct_name, members in properties.items():
+            if not isinstance(members, dict):
+                continue
+            for member_name in members:
+                if (struct_name, member_name) in checked:
+                    continue
+                checked.add((struct_name, member_name))
+                member = get_member(struct_name, member_name)
+                if member is None or not member.limitType:
+                    continue
+                limittypes = [token.strip() for token in member.limitType.split(",")]
+                is_exact_boolean = "exact" in limittypes and member.type == "VkBool32"
+                if is_exact_boolean:
+                    if not exact_booleans:
+                        continue
+                    # An exact boolean is least capable when false, like a max boolean
+                    limittypes = ["max"]
+                elif "exact" in limittypes or "noauto" in limittypes or not limit_members:
+                    continue
+
+                # The aliased members of the block, including this member
+                aliased = [(struct_name, member_name)]
+                for alias in gatherCapabilityAliases(vk, StructCapabilityAlias(struct_name, member_name)):
+                    if not isinstance(alias, StructCapabilityAlias):
+                        continue
+                    checked.add((alias.struct, alias.member))
+                    alias_members = properties.get(alias.struct)
+                    if (alias.struct, alias.member) not in aliased and isinstance(alias_members, dict) and alias.member in alias_members:
+                        aliased.append((alias.struct, alias.member))
+                if len(aliased) < 2:
+                    continue
+
+                values = [properties[s][m] for s, m in aliased]
+                if all(are_equal(member, limittypes, values[0], value) for value in values[1:]):
+                    continue
+                least_capable = values[0]
+                for value in values[1:]:
+                    least_capable = get_least_capable(member, limittypes, least_capable, value)
+                    if least_capable is None:
+                        break
+                if least_capable is None:
+                    logging.warning(f"Skipping the '{workaround_bit.value}' workaround of '{struct_name}::{member_name}': no least capable value for the '{member.limitType}' limittype between {', '.join(json.dumps(value) for value in values)}")
+                    continue
+                for (s, m), value in zip(aliased, values):
+                    if value != least_capable:
+                        changes.append(f"capabilities -> {block_name} -> properties -> {s} -> {m}: {json.dumps(value)} -> {json.dumps(least_capable)}")
+                        properties[s][m] = copy.deepcopy(least_capable)
+    return changes
+
+
 def save_profiles_json_preserving_format(input_path: Path, output_path: Path, json_data: dict):
     """
     Writes a profiles file with an indentation of 4 spaces, preserving the line endings and the final line ending of
@@ -271,6 +404,11 @@ def apply_workarounds(vk: VulkanObject, input_path: Path, workaround_bits: list[
             changes.extend(apply_flags_as_numbers_workaround(vk, json_data))
         if WorkaroundBits.ENUMS_AS_NUMBERS in workaround_bits:
             changes.extend(apply_enums_as_numbers_workaround(vk, json_data))
+        # Last, so that the values are compared once written as expected
+        if WorkaroundBits.MISMATCHING_ALIASES in workaround_bits or WorkaroundBits.MISMATCHING_ALIASES_EXTRA in workaround_bits:
+            changes.extend(apply_mismatching_aliases_workaround(vk, json_data,
+                                                                limit_members=WorkaroundBits.MISMATCHING_ALIASES in workaround_bits,
+                                                                exact_booleans=WorkaroundBits.MISMATCHING_ALIASES_EXTRA in workaround_bits))
 
         output_path = path if output_dir is None else output_dir / path.name
         if changes:

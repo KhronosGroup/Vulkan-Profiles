@@ -82,6 +82,8 @@ class WorkaroundBits(str, Enum):
     STRINGS_64_BIT = '64-bit-strings'              # Converts to numbers the 64-bit integer values (VkDeviceSize, uint64_t, int64_t, ...) the device report exporter wrote as strings (e.g. "4096").
     FLAGS_AS_NUMBERS = 'flags-as-numbers'          # Converts to lists of flag bit names the flags values the device report exporter wrote as numbers or numeric strings (e.g. "0" for an empty list).
     ENUMS_AS_NUMBERS = 'enums-as-numbers'          # Converts to enum value names the enum values the device report exporter wrote as numbers or numeric strings (e.g. 1000117000 for an extension image layout).
+    MISMATCHING_ALIASES_EXTRA = 'mismatching-aliases-extra'  # Sets the aliased VkBool32 property members with an 'exact' limittype and mismatching values to false (e.g. uniformTexelBufferOffsetSingleTexelAlignment false in VkPhysicalDeviceVulkan13Properties and true in VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT).
+    MISMATCHING_ALIASES = 'mismatching-aliases'      # Sets the aliased property members with mismatching values to their least capable value following their limittype (e.g. false for an integerDotProduct*Accelerated member true in VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR and false in VkPhysicalDeviceVulkan13Properties).
     UNDECLARED_EXTENSION_STRUCTURES = 'undeclared-extension-structures'  # Removes the extension structures whose extension the capability block doesn't declare (e.g. VkPhysicalDeviceMaintenance7PropertiesKHR without VK_KHR_maintenance7).
 
 
