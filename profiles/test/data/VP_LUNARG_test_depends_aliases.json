@@ -1,0 +1,79 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.3-204.json#",
+    "capabilities": {
+        "vulkan_11_features": {
+            "features": {
+                "VkPhysicalDeviceVulkan11Features": {
+                    "protectedMemory": true,
+                    "multiview": true
+                }
+            }
+        },
+        "core_structure": {
+            "depends": "VkPhysicalDeviceProtectedMemoryFeatures::protectedMemory",
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "sampleRateShading": true
+                }
+            }
+        },
+        "promoted_structure": {
+            "depends": "VkPhysicalDeviceMultiviewFeatures::multiview",
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "dualSrcBlend": true
+                }
+            }
+        },
+        "promoted_structure_not_set": {
+            "depends": "VkPhysicalDevice16BitStorageFeatures::storageBuffer16BitAccess",
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "logicOp": true
+                }
+            }
+        },
+        "promoted_features": {
+            "features": {
+                "VkPhysicalDeviceProtectedMemoryFeatures": {
+                    "protectedMemory": true
+                },
+                "VkPhysicalDeviceMultiviewFeatures": {
+                    "multiview": true
+                }
+            }
+        },
+        "vulkan_11_structure": {
+            "depends": "VkPhysicalDeviceVulkan11Features::protectedMemory+VkPhysicalDeviceVulkan11Features::multiview",
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "sampleRateShading": true
+                }
+            }
+        }
+    },
+    "profiles": {
+        "VP_LUNARG_test_depends_vulkan_11": {
+            "version": 1,
+            "api-version": "1.2.204",
+            "label": "Test depends with VkPhysicalDeviceVulkan11Features",
+            "description": "Test of the 'depends' conditions naming the structures promoted to Vulkan 1.1, with a profile setting VkPhysicalDeviceVulkan11Features",
+            "capabilities": [
+                "vulkan_11_features",
+                "core_structure",
+                "promoted_structure",
+                "promoted_structure_not_set"
+            ]
+        },
+        "VP_LUNARG_test_depends_promoted": {
+            "version": 1,
+            "api-version": "1.2.204",
+            "label": "Test depends with the promoted structures",
+            "description": "Test of the 'depends' conditions naming VkPhysicalDeviceVulkan11Features, with a profile setting the structures promoted to Vulkan 1.1",
+            "capabilities": [
+                "promoted_features",
+                "vulkan_11_structure"
+            ]
+        }
+    }
+}
