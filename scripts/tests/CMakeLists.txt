@@ -48,6 +48,7 @@ add_vulkan_python_test(VkProfiles_TestVulkanObjectUtils            test_vulkan_o
 add_vulkan_python_test(VkProfiles_TestVulkanObjectDepends          test_vulkan_object_expression_parsing.py)
 add_vulkan_python_test(VkProfiles_TestVulkanProfilesJson           test_profiles_json_utils.py)
 add_vulkan_python_test(VkProfiles_TestFormatFlagsConverter         test_format_flags.py)
+add_vulkan_python_test(VkProfiles_TestCombineDepends               test_combine_depends.py)
 add_vulkan_python_test(VkProfiles_TestCombineDifference            test_combine_difference.py)
 add_vulkan_python_test(VkProfiles_TestCombineFormatPNext           test_combine_format_pnext.py)
 add_vulkan_python_test(VkProfiles_TestCombineIntersection          test_combine_intersection.py)
