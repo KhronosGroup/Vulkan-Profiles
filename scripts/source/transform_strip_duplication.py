@@ -35,6 +35,7 @@ from source.vulkan_object_utils import (
 )
 from source.profiles_json_utils import (
     parse_profile_capabilities,
+    get_block_depends,
     get_topologically_sorted_file_keys,
     collect_required_profiles_capabilities_recursive,
     strip_dict_duplication,
@@ -278,7 +279,10 @@ def strip_duplication_profiles_file(vk: VulkanObject, json_files_dict, json_file
                     strip_duplication_capabilities_block(
                         vk, json_files_dict, version, json_profiles_capabilities[item], collected_capabilities
                     )
-                    deep_merge_dict(collected_capabilities, json_profiles_capabilities[item])
+                    # The requirements of a capability block with a 'depends' condition don't apply to every device:
+                    # they don't make the requirements of the following capability blocks redundant.
+                    if get_block_depends(json_profiles_capabilities[item]) is None:
+                        deep_merge_dict(collected_capabilities, json_profiles_capabilities[item])
 
             elif isinstance(item, list):
                 for alt_block_name in item:

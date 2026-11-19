@@ -328,7 +328,7 @@ vkprofiles validate \
 
 ### 3. `schema`
 
-Generates a Vulkan Profiles JSON schema file from `vk.xml`, using the schema 0.8.3. Schema 0.8.3 adds the `depends` condition of capability blocks and deprecates the profile `optionals` list.
+Generates a Vulkan Profiles JSON schema file from `vk.xml`, using the schema 0.8.3. Schema 0.8.3 adds the `depends` condition of capability blocks and deprecates the profile `optionals` list, see [Capability block conditions](../OVERVIEW.md#capability-block-conditions).
 
 ```bash
 vkprofiles schema --registry vk.xml --output path/to/output [options]

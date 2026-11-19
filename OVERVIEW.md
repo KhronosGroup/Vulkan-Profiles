@@ -158,6 +158,7 @@ The top-level sections of such profiles files are processed as follows:
 
 Each entry in `capabilities` includes a reference name and a dictionary containing the following sections:
 
+* `depends` - Optional. The condition on which the capability block requirements apply. See [Capability block conditions](#capability-block-conditions).
 * `extensions` - Optional. List of all required extensions.
 * `features` - Optional. List of all required features.
 * `properties` - Optional. List of all required properties.
@@ -176,9 +177,62 @@ Each entry in `profiles` includes a reference name and a dictionary containing t
 * `history` - Optional. The version history of the profile.
 * `profiles` - Optional. The list of profiles required by the profile.
 * `capabilities` - Required. The list of capability sets that can be referenced by a profile.
+* `optionals` - Optional, deprecated since schema 0.8.3. The list of optional capability sets of the profile, ignored by the Vulkan Profiles Tools. Use capability blocks with a `depends` condition referenced by `capabilities` instead, see [Capability block conditions](#capability-block-conditions).
 * `fallback` - Optional. The list of profiles recommended if the checked profile is not supported by the platform.
 
 `profiles` may reference multiple `capabilities` which may define the same capability differently. In this case, the rule is that the last reference of that capability overrides any previously set values.
+
+### Capability block conditions
+
+Since schema 0.8.3, a capability block may define a `depends` condition. The capability block requirements only apply to the Vulkan devices satisfying the condition: a device that doesn't satisfy the condition supports the profile without supporting the capability block requirements. This expresses the conditional requirements of the Vulkan specification, such as the Vulkan 1.4 requirement of the `pipelineProtectedAccess` feature when the `protectedMemory` feature is supported:
+
+```json
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.3-328.json#",
+    "capabilities": {
+        "vulkan14requirements": {
+            "features": {
+                "VkPhysicalDeviceVulkan14Features": {
+                    "pushDescriptor": true
+                }
+            }
+        },
+        "vulkan14protectedmemory": {
+            "depends": "VkPhysicalDeviceVulkan11Features::protectedMemory",
+            "features": {
+                "VkPhysicalDeviceVulkan14Features": {
+                    "pipelineProtectedAccess": true
+                }
+            }
+        }
+    },
+    "profiles": {
+        "VP_LUNARG_example": {
+            "version": 1,
+            "api-version": "1.4.328",
+            "label": "LunarG Example Profile",
+            "description": "An example profile with a conditional capability block",
+            "capabilities": [
+                "vulkan14requirements",
+                "vulkan14protectedmemory"
+            ]
+        }
+    }
+}
+```
+
+The `depends` condition uses the `depends` expression syntax of `vk.xml`:
+
+* `VK_VERSION_<major>_<minor>`, e.g. `VK_VERSION_1_3`: The device supports this Vulkan API version.
+* `<extension name>`, e.g. `VK_KHR_fragment_shading_rate`: The device supports this device extension.
+* `<feature structure>::<member>`, e.g. `VkPhysicalDeviceVulkan11Features::protectedMemory`: The device supports this feature.
+* `+` is the logical AND, `,` is the logical OR, with a higher precedence for `+`. Parentheses group sub-expressions.
+* `!` prefixing a symbol is the logical NOT, e.g. `!VkPhysicalDeviceFeatures::wideLines`.
+
+A capability block with a `depends` condition is referenced by the `capabilities` list of a profile like any other capability block. It replaces the deprecated `optionals` list of a profile, which the Vulkan Profiles Tools ignore: an optional capability set required by the Vulkan specification under a condition is expressed with a `depends` condition. The Vulkan Profiles Tools handle a capability block with a `depends` condition as follows:
+
+* `vkprofiles validate` checks the syntax of the condition and that its Vulkan versions, extensions and features exist.
+* `vkprofiles transform` never merges a capability block with a `depends` condition into an unconditional capability block, and doesn't use its requirements to satisfy the requirements of other capability blocks. The extensions and features required by the condition are considered enabled when pulling the requirements of the capability block itself.
 
 ## Vulkan Profiles File Processing (`vkprofiles`)
 

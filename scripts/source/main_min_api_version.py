@@ -35,6 +35,8 @@ from source.profiles_json_utils import (
     validate_profiles_json_data,
     get_profile_and_file_data,
     collect_profile_capabilities,
+    collect_profile_dependent_blocks,
+    collect_required_profiles_dependent_blocks,
     SCHEMA_VERSION,
     OutputFormatType
 )
@@ -161,6 +163,15 @@ def collect_profile_elements(file_data_dict: dict, file_data: dict, profile_name
                         scan_dict(item)
 
     scan_dict(merged_caps)
+
+    # The capability blocks with a 'depends' condition are not part of the merged capabilities but the profile
+    # Vulkan version must support their structures and extensions too
+    if p_obj and file_data_found:
+        dependent_blocks = collect_required_profiles_dependent_blocks(file_data_dict, p_obj.get("profiles", []))
+        dependent_blocks.update(collect_profile_dependent_blocks(file_data_found, p_obj))
+        for dependent_block in dependent_blocks.values():
+            scan_dict(dependent_block)
+
     return struct_names, ext_names
 
 
@@ -444,6 +455,7 @@ def main_min_api_version(args):
         for file_key, file_data in json_files_dict.items():
             profiles = file_data.get("profiles", {})
             profile_min_headers = {}
+            profile_min_schemas = {}
             new_file_data = json.loads(json.dumps(file_data))
 
             for pname in profiles.keys():
@@ -460,6 +472,7 @@ def main_min_api_version(args):
                     sys.exit(1)
 
                 profile_min_headers[pname] = min_header_ver
+                profile_min_schemas[pname] = min_schema
 
                 min_core_ver = calculate_profile_min_core_version(vk_object, json_files_dict, extracted_data, pname)
 
@@ -475,7 +488,14 @@ def main_min_api_version(args):
                 max_header_ver = max([h for h in profile_min_headers.values() if h is not None] or [0])
                 logging.info(f"File '{file_key}': overall file schema header version = {max_header_ver}")
 
-                new_file_data["$schema"] = f"https://schema.khronos.org/vulkan/profiles-{SCHEMA_VERSION}-{max_header_ver}.json#"
+                # Use the schema version of the schema that validated the profile requiring the newest header
+                schema_url = f"https://schema.khronos.org/vulkan/profiles-{SCHEMA_VERSION}-{max_header_ver}.json#"
+                for pname, header_ver in profile_min_headers.items():
+                    schema_id = (profile_min_schemas.get(pname) or {}).get("$id")
+                    if header_ver == max_header_ver and isinstance(schema_id, str) and schema_id.startswith("https://schema.khronos.org/vulkan/profiles-"):
+                        schema_url = schema_id
+                        break
+                new_file_data["$schema"] = schema_url
                 updated_files_dict[file_key] = new_file_data
                 summary_files[file_key] = max_header_ver
 

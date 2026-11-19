@@ -39,6 +39,61 @@ class OutputFormatType(str, Enum):
 SCHEMA_VERSION = "0.8.3"
 
 
+def get_block_depends(json_capabilities_block) -> str | None:
+    """
+    Returns the 'depends' condition of a capability block, or None when the capability block requirements are
+    unconditional. The condition uses the vk.xml 'depends' expression syntax.
+    """
+    if not isinstance(json_capabilities_block, dict):
+        return None
+    depends = json_capabilities_block.get("depends")
+    if isinstance(depends, str) and depends.strip():
+        return depends.strip()
+    return None
+
+
+def get_depends_implied_capabilities(depends: str | None) -> tuple[set[str], set[tuple[str, str]]]:
+    """
+    Returns the extensions and the (struct, member) features necessarily enabled when a 'depends' condition is
+    satisfied: the extension and feature terms of the top-level AND ('+') of the condition. Terms under an OR (','),
+    a negation ('!') or parentheses are not necessarily enabled and are not returned.
+    """
+    extensions: set[str] = set()
+    features: set[tuple[str, str]] = set()
+    if not depends:
+        return extensions, features
+
+    # Split the top-level terms
+    terms = []
+    depth = 0
+    current = ''
+    for c in depends:
+        if c == '(':
+            depth += 1
+        elif c == ')':
+            depth -= 1
+        if depth == 0 and c in '+,':
+            if c == ',':
+                return set(), set()
+            terms.append(current)
+            current = ''
+        else:
+            current += c
+    terms.append(current)
+
+    for term in terms:
+        term = term.strip()
+        if not term or any(c in term for c in '()!'):
+            continue
+        if '::' in term:
+            struct_name, member_name = term.split('::', 1)
+            features.add((struct_name.strip(), member_name.strip()))
+        elif not term.startswith('VK_VERSION_') and not term.startswith('VK_API_VERSION_'):
+            extensions.add(term)
+
+    return extensions, features
+
+
 def is_min_limit_property(prop_name: str) -> bool:
     """Returns True if smaller property value is a stricter requirement (min-type limit)."""
     if prop_name.startswith("min"):
@@ -273,13 +328,17 @@ def get_profile_and_file_data(json_files_dict: dict, profile_name: str):
 
 
 def get_primary_capability_block(profile_obj: dict, capabilities_dict: dict) -> dict | None:
-    """Returns the primary (first mandatory) capability block dictionary for a profile."""
+    """
+    Returns the primary (first mandatory) capability block dictionary for a profile.
+    The capability blocks with a 'depends' condition are never the primary capability block.
+    """
     caps = profile_obj.get("capabilities", [])
     for cap_item in caps:
         if isinstance(cap_item, str) and cap_item in capabilities_dict:
-            return capabilities_dict[cap_item]
+            if get_block_depends(capabilities_dict[cap_item]) is None:
+                return capabilities_dict[cap_item]
         elif isinstance(cap_item, list) and cap_item:
-            if cap_item[0] in capabilities_dict:
+            if cap_item[0] in capabilities_dict and get_block_depends(capabilities_dict[cap_item[0]]) is None:
                 return capabilities_dict[cap_item[0]]
     return None
 
@@ -350,26 +409,70 @@ def collect_required_profiles_capabilities_recursive(json_files_dict: dict, prof
     return aggregated_caps
 
 
+def collect_profile_dependent_blocks(json_file_data: dict, profile_obj: dict) -> dict:
+    """Returns the capability blocks with a 'depends' condition referenced by a profile, by block name."""
+    capabilities_dict = json_file_data.get("capabilities", {})
+    dependent_blocks = {}
+    for block_name in collect_block_names(profile_obj.get("capabilities", [])):
+        block = capabilities_dict.get(block_name)
+        if get_block_depends(block) is not None:
+            dependent_blocks[block_name] = block
+    return dependent_blocks
+
+
+def collect_required_profiles_dependent_blocks(json_files_dict: dict, profile_names: list, visited: set = None) -> dict:
+    """
+    Recursively collects the capability blocks with a 'depends' condition of the required profiles, by block name,
+    required profiles first.
+    """
+    if visited is None:
+        visited = set()
+
+    dependent_blocks = {}
+    for pname in profile_names:
+        if pname in visited:
+            continue
+        visited.add(pname)
+
+        p_obj, p_file_data = get_profile_and_file_data(json_files_dict, pname)
+        if not p_obj or not p_file_data:
+            continue
+
+        dependent_blocks.update(collect_required_profiles_dependent_blocks(json_files_dict, p_obj.get("profiles", []), visited))
+        dependent_blocks.update(collect_profile_dependent_blocks(p_file_data, p_obj))
+
+    return dependent_blocks
+
+
 def collect_required_profiles_capabilities(json_files_dict: dict, required_profile_names: list[str], visited_profiles: set[str] = None) -> dict:
     """Traverses required parent profile hierarchies and aggregates their capabilities."""
     return collect_required_profiles_capabilities_recursive(json_files_dict, required_profile_names, visited_profiles)
 
 
 def collect_profile_capabilities(json_files_dict: dict, json_file_data: dict, profile_obj: dict) -> dict:
-    """Aggregates all capabilities (parent profile requirements + local blocks) for a given profile."""
+    """
+    Aggregates all capabilities (parent profile requirements + local blocks) for a given profile.
+    The capability blocks with a 'depends' condition are not aggregated: their requirements only apply
+    to the devices satisfying the condition, they are not capabilities of every device supporting the profile.
+    """
     required_profile_names = profile_obj.get("profiles", [])
     combined_caps = collect_required_profiles_capabilities(json_files_dict, required_profile_names)
 
     capabilities_dict = json_file_data.get("capabilities", {})
     parsed_caps = parse_profile_capabilities(profile_obj.get("capabilities", []))
 
+    def merge_block(block_name: str):
+        if isinstance(block_name, str) and block_name in capabilities_dict:
+            block = capabilities_dict[block_name]
+            if get_block_depends(block) is None:
+                deep_merge_dict(combined_caps, block)
+
     for item in parsed_caps:
-        if isinstance(item, str) and item in capabilities_dict:
-            deep_merge_dict(combined_caps, capabilities_dict[item])
+        if isinstance(item, str):
+            merge_block(item)
         elif isinstance(item, list):
             for sub_item in item:
-                if isinstance(sub_item, str) and sub_item in capabilities_dict:
-                    deep_merge_dict(combined_caps, capabilities_dict[sub_item])
+                merge_block(sub_item)
 
     return combined_caps
 

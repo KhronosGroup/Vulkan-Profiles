@@ -43,6 +43,7 @@ from source.vulkan_object_utils import (
 )
 from source.profiles_json_utils import (
     deep_merge_dict,
+    get_block_depends,
     is_property_satisfied,
     merge_capability_value
 )
@@ -433,7 +434,14 @@ def update_context_from_capabilities(
     context_properties: dict[str, Any],
     context_extensions: set[str]
 ):
-    """Updates accumulated capabilities context with entries from caps_dict."""
+    """
+    Updates accumulated capabilities context with entries from caps_dict.
+    A capability block with a 'depends' condition doesn't update the context: its requirements
+    only apply to the devices satisfying the condition.
+    """
+    if get_block_depends(caps_dict) is not None:
+        return
+
     if "extensions" in caps_dict and isinstance(caps_dict["extensions"], dict):
         context_extensions.update(caps_dict["extensions"].keys())
 
