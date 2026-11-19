@@ -307,7 +307,7 @@ vkprofiles validate --input path/to/profiles [options]
 | --- | --- |
 | `api-version` | Verifies inherited required profiles and profile API version constraints stay compatible with Vulkan versioning rules. |
 | `extensions` | Checks extension declarations, core structure coverage, and extension-related compatibility against `vk.xml`. |
-| `aliases` | Validates member consistency across aliased capability structures. |
+| `aliases` | Validates member consistency across aliased capability structures. The enum and flags values are compared by their integer values in `vk.xml`, so an enum value name and its alias, e.g. `VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE` and `VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE_KHR`, are equal. |
 | `unratified` | Flags enabled extensions or structures that are not ratified for Vulkan. |
 | `subcore` | Flags profile capability values (features/properties) below the Vulkan core specification requirements for the profile API version. |
 

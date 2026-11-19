@@ -62,6 +62,43 @@ class ValidationIssue(str):
 class VulkanProfilesDataValidation:
     def __init__(self, vk: VulkanObject):
         self.vk = vk
+        # The structures, enums and flags by name, including their aliases
+        self.structs_by_name = {name: struct for struct in vk.structs.values() for name in [struct.name] + struct.aliases}
+        self.enums_by_name = {name: enum for enum in vk.enums.values() for name in [enum.name] + enum.aliases}
+        self.flags_by_name = {name: flags for flags in vk.flags.values() for name in [flags.name] + flags.aliases}
+
+    def get_member_integer_value(self, struct_name: str, member_name: str, value) -> int | None:
+        """
+        Returns the integer value of an enum value name, or of a list of flag bit names, of a structure member whose
+        type is an enum or a flags type, including their aliases. Returns None for the other types and for the names
+        which aren't values of the member type.
+        """
+        struct = self.structs_by_name.get(struct_name)
+        member = next((member for member in struct.members if member.name == member_name), None) if struct else None
+        if member is None:
+            return None
+
+        enum = self.enums_by_name.get(member.type)
+        if enum is not None:
+            if not isinstance(value, str):
+                return None
+            field = next((field for field in enum.fields if value == field.name or value in field.aliases), None)
+            return field.value if field is not None else None
+
+        flags = self.flags_by_name.get(member.type)
+        if flags is not None and flags.bitmaskName:
+            bitmask = self.vk.bitmasks.get(flags.bitmaskName)
+            if bitmask is None or not isinstance(value, list):
+                return None
+            integer_value = 0
+            for name in value:
+                flag = next((flag for flag in bitmask.flags if name == flag.name or name in flag.aliases), None)
+                if flag is None:
+                    return None
+                integer_value |= flag.value
+            return integer_value
+
+        return None
 
     def validate_required_profile_api_versions(
         self,
@@ -162,7 +199,13 @@ class VulkanProfilesDataValidation:
         """Analysis Case 3: Checks that aliased structure members have consistent values across capability definitions."""
         issues = []
 
-        def are_values_equal(val1, val2) -> bool:
+        def are_values_equal(struct1: str, member1: str, val1, struct2: str, member2: str, val2) -> bool:
+            # Compare the enum and flags values by their integer values, so that an enum value name and its alias,
+            # e.g. 'VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE' and 'VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE_KHR', are equal
+            int1 = self.get_member_integer_value(struct1, member1, val1)
+            int2 = self.get_member_integer_value(struct2, member2, val2)
+            if int1 is not None and int2 is not None:
+                return int1 == int2
             if isinstance(val1, list) and isinstance(val2, list):
                 return sorted(val1) == sorted(val2)
             return val1 == val2
@@ -187,7 +230,7 @@ class VulkanProfilesDataValidation:
                             alias_members = category_dict[alias.struct]
                             if isinstance(alias_members, dict) and alias.member in alias_members:
                                 alias_val = alias_members[alias.member]
-                                if not are_values_equal(val, alias_val):
+                                if not are_values_equal(struct_name, member_name, val, alias.struct, alias.member, alias_val):
                                     issues.append(
                                         ValidationIssue(
                                             f"Member '{member_name}' in structure '{struct_name}' (value: {val}) "
