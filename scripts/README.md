@@ -299,7 +299,33 @@ vkprofiles validate --input path/to/profiles [options]
 * `--registry`, `-r`: Path to `vk.xml` (used to generate schema if `--schema` is omitted and required for static analysis checks).
 * `--schema`, `-s`: Path to an explicit JSON schema file (`profiles-*.json`). By default, generates a schema from `vk.xml`.
 * `--analyse [CHECK ...]`: Optional static analysis checks to execute (`api-version`, `extensions`, `aliases`, `unratified`, `subcore`, `depends`). Values may be comma-separated or space-separated. If specified without values, all checks run.
+* `--apply-workarounds [WORKAROUND ...]`: Optional workarounds of known device report issues (`driver-id`, `64-bit-strings`, `flags-as-numbers`, `enums-as-numbers`). Values may be comma-separated or space-separated. If specified without values, all workarounds are applied.
+* `--output`, `-o`: Directory where to write the input profiles files with the workarounds applied. The input profiles files are left unchanged, and the written profiles files are validated and analysed instead. Without `--output`, the workarounds are applied in place to the input profiles files, after the validation and analysis issues of the input profiles files are reported.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
+
+#### Device Report Workarounds (`--apply-workarounds`)
+
+The device reports exported from [GPUInfo.org](https://vulkan.gpuinfo.org) may have issues caused by the exporter rather than by the Vulkan driver. `--apply-workarounds` fixes the known issues and logs each change at the info level, writing the changed files with an indentation of 4 spaces and their original line endings.
+
+* With `--output`, every input profiles file is written to the output directory, with the workarounds applied when needed, and the input profiles files are left unchanged. The output directory then replaces the input directory in the next steps, and the command validates the written files: it exits with a non-zero status only for the issues the workarounds don't fix. A JSON file of the output directory which isn't in the input directory is reported, as it may be a stale output.
+* Without `--output`, the workarounds rewrite the changed input profiles files in place. The command reports the issues found before the workarounds were applied and exits with a non-zero status when a file was invalid: running it again validates the fixed files.
+
+| Workaround Value | Description |
+| --- | --- |
+| `driver-id` | Sets the `driverID` of the property structures from their `driverName` when the exporter didn't know the driver ID, e.g. `VK_DRIVER_ID_MESA_KOSMICKRISP` for `KosmicKrisp`, which the exporter wrote as `null` in `VkPhysicalDeviceVulkan12Properties` and as `"_KHR"` in `VkPhysicalDeviceDriverPropertiesKHR`. Also removes the `_KHR` suffix that the exporter added to the driver IDs without a `_KHR` alias in the Vulkan registry, the driver IDs added after Vulkan 1.2, e.g. `VK_DRIVER_ID_MOLTENVK_KHR` becomes `VK_DRIVER_ID_MOLTENVK`. |
+| `64-bit-strings` | Converts to numbers the 64-bit integer values (`VkDeviceSize`, `VkDeviceAddress`, `uint64_t`, `int64_t`) that the exporter wrote as strings, including in nested structures such as `VkPhysicalDeviceLimits`, e.g. `VkPhysicalDeviceExternalMemoryHostPropertiesEXT::minImportedHostPointerAlignment` written as `"4096"`. |
+| `flags-as-numbers` | Converts to lists of flag bit names the flags values that the exporter wrote as numbers or numeric strings, using the flag bits of the Vulkan registry, e.g. `VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV::extendedSparseImageUsageFlags` written as `"6"` becomes `["VK_IMAGE_USAGE_TRANSFER_DST_BIT", "VK_IMAGE_USAGE_SAMPLED_BIT"]`. A value with bits unknown to the Vulkan registry is left unchanged with a warning. |
+| `enums-as-numbers` | Replaces by their names the enum values that the exporter wrote as numbers or numeric strings, the values defined by extensions, e.g. `1000117000` in `VkPhysicalDeviceHostImageCopyPropertiesEXT::pCopyDstLayouts` becomes `VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL`. A value unknown to the Vulkan registry is left unchanged with a warning. |
+
+With `--output`, `--analyse` runs the static analysis checks on the written files, after the workarounds, which reports the issues that no workaround fixes yet. The `validate_desktop_baseline_*_reports` nodes of `profiles/vkprofiles_graph.json` run every check except `unratified`, since the device reports expose many unratified extensions:
+
+```bash
+vkprofiles validate \
+    --input profiles/LunarG/VP_LUNARG_desktop_baseline_2026 \
+    --output profiles/build/reports/VP_LUNARG_desktop_baseline_2026 \
+    --apply-workarounds \
+    --analyse api-version extensions aliases subcore depends
+```
 
 #### Static Analysis Checks (`--analyse`)
 
