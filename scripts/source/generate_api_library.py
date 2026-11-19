@@ -28,8 +28,8 @@ from collections import OrderedDict
 from vulkan_object import VulkanObject, Struct, Member, VideoCodec, VideoFormat
 from source.vulkan_object_utils import getStructByName
 from source.vulkan_object_version import VK_VERSION
-from source.vulkan_object_expression_parsing import evalExpression
-from source.profiles_json_utils import collect_block_names
+from source.vulkan_object_expression_parsing import evalExpression, tokenizeDependsExpression
+from source.profiles_json_utils import collect_block_names, get_block_depends
 
 COPYRIGHT_HEADER = '''
 /*
@@ -758,8 +758,38 @@ struct VpVideoProfileDesc {
     VpVideoProfileStructChainerDesc chainers;
 };
 
+// The physical device information to evaluate the 'depends' condition of a capability block
+struct VpDependsContext {
+    VkPhysicalDevice                    physicalDevice;
+    PFN_vkGetPhysicalDeviceFeatures2KHR pfnGetPhysicalDeviceFeatures2;
+    uint32_t                            apiVersion;
+    uint32_t                            extensionCount;
+    const VkExtensionProperties*        pExtensions;
+
+    bool HasVersion(uint32_t major, uint32_t minor) const {
+        const uint32_t actualMajor = VK_API_VERSION_MAJOR(this->apiVersion);
+        const uint32_t actualMinor = VK_API_VERSION_MINOR(this->apiVersion);
+        return actualMajor > major || (actualMajor == major && actualMinor >= minor);
+    }
+
+    bool HasExtension(const char* extensionName) const {
+        for (uint32_t i = 0; i < this->extensionCount; ++i) {
+            if (strcmp(this->pExtensions[i].extensionName, extensionName) == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+// Returns whether the physical device satisfies the 'depends' condition of a capability block
+typedef bool(*PFN_vpDependsCb)(const VpDependsContext& context);
+
 struct VpVariantDesc {
     char blockName[VP_MAX_PROFILE_NAME_SIZE];
+
+    // nullptr when the capability block requirements are unconditional
+    PFN_vpDependsCb pfnDepends;
 
     uint32_t instanceExtensionCount;
     const VkExtensionProperties* pInstanceExtensions;
@@ -982,6 +1012,13 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupportSingleProfile(
         for (uint32_t variant_index = 0; variant_index < capabilities_desc.variantCount; ++variant_index) {
             const VpVariantDesc& variant_desc = capabilities_desc.pVariants[variant_index];
 
+            // The 'depends' condition of a capability block is evaluated against a physical device:
+            // the capability block requirements are not instance requirements
+            if (variant_desc.pfnDepends != nullptr) {
+                supported_capabilities = VK_TRUE;
+                continue;
+            }
+
             VkBool32 supported_variant = VK_TRUE;
             for (uint32_t i = 0; i < variant_desc.instanceExtensionCount; ++i) {
                 if (!detail::CheckExtension(supported_extensions.data(), supported_extensions.size(),
@@ -1055,6 +1092,8 @@ VPAPI_ATTR VkResult vpGetProfileStructureTypes(
                         continue;
                     }
                     result = VK_SUCCESS;
+                } else if (variant.pfnDepends != nullptr) {
+                    continue; // The capability blocks with a 'depends' condition are only returned when explicitly requested
                 }
 
                 uint32_t count = 0;
@@ -1157,6 +1196,8 @@ VPAPI_ATTR VkResult vpGetProfileExtensionProperties(
                         continue;
                     }
                     result = VK_SUCCESS;
+                } else if (variant.pfnDepends != nullptr) {
+                    continue; // The capability blocks with a 'depends' condition are only returned when explicitly requested
                 }
 
                 switch (type) {
@@ -1225,6 +1266,8 @@ VPAPI_ATTR VkResult vpGetProfileVideoProfileDesc(
                         continue;
                     }
                     result = VK_SUCCESS;
+                } else if (variant.pfnDepends != nullptr) {
+                    continue; // The capability blocks with a 'depends' condition are only returned when explicitly requested
                 }
 
                 if (videoProfileIndex < curr_base_video_profile_index + variant.videoProfileCount) {
@@ -1749,6 +1792,12 @@ VPAPI_ATTR VkResult vpCreateInstance(
                     }
                 }
 
+                // The 'depends' condition of a capability block is evaluated against a physical device:
+                // the instance extensions of the capability block are not enabled
+                if (variant->pfnDepends != nullptr) {
+                    continue;
+                }
+
                 detail::GetExtensions(variant->instanceExtensionCount, variant->pInstanceExtensions, extensions);
             }
         }
@@ -1921,6 +1970,17 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
         return VK_ERROR_EXTENSION_NOT_PRESENT;
     }
 
+    detail::VpDependsContext depends_context{};
+    {
+        VkPhysicalDeviceProperties2KHR properties2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR };
+        userData.gpdp2.pfnGetPhysicalDeviceProperties2(physicalDevice, &properties2);
+        depends_context.physicalDevice = physicalDevice;
+        depends_context.pfnGetPhysicalDeviceFeatures2 = userData.gpdp2.pfnGetPhysicalDeviceFeatures2;
+        depends_context.apiVersion = properties2.properties.apiVersion;
+        depends_context.extensionCount = static_cast<uint32_t>(supported_device_extensions.size());
+        depends_context.pExtensions = supported_device_extensions.data();
+    }
+
 #ifdef VK_KHR_video_queue
     PFN_vkGetInstanceProcAddr gipa = vp.GetInstanceProcAddr;
     userData.video.pfnGetPhysicalDeviceVideoCapabilitiesKHR =
@@ -1966,6 +2026,13 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
 
             for (uint32_t variant_index = 0; variant_index < required_capabilities->variantCount; ++variant_index) {
                 const detail::VpVariantDesc& variant_desc = required_capabilities->pVariants[variant_index];
+
+                // The requirements of a capability block don't apply when the device doesn't satisfy its 'depends' condition
+                if (variant_desc.pfnDepends != nullptr && !variant_desc.pfnDepends(depends_context)) {
+                    VP_DEBUG_MSGF("Capability block %s requirements don't apply: 'depends' condition not satisfied", variant_desc.blockName);
+                    supported_block = true;
+                    break;
+                }
 
                 bool supported_variant = true;
 
@@ -2294,6 +2361,42 @@ VPAPI_ATTR VkResult vpCreateDevice(
         extensions.push_back(pCreateInfo->pCreateInfo->ppEnabledExtensionNames[ext_index]);
     }
 
+    // The capability blocks with a 'depends' condition are only enabled when the physical device satisfies the condition
+    std::vector<VkExtensionProperties> device_extensions;
+    detail::VpDependsContext depends_context{};
+    bool depends_context_initialized = false;
+    auto is_variant_enabled = [&](const detail::VpVariantDesc* variant) -> bool {
+        if (variant->pfnDepends == nullptr) {
+            return true;
+        }
+        if (!depends_context_initialized) {
+            depends_context_initialized = true;
+            if (vp.EnumerateDeviceExtensionProperties == nullptr || vp.GetPhysicalDeviceProperties2 == nullptr) {
+                return false;
+            }
+            uint32_t device_extension_count = 0;
+            if (vp.EnumerateDeviceExtensionProperties(physicalDevice, nullptr, &device_extension_count, nullptr) == VK_SUCCESS) {
+                device_extensions.resize(device_extension_count);
+                if (vp.EnumerateDeviceExtensionProperties(physicalDevice, nullptr, &device_extension_count, device_extensions.data()) == VK_SUCCESS) {
+                    device_extensions.resize(device_extension_count);
+                } else {
+                    device_extensions.clear();
+                }
+            }
+            VkPhysicalDeviceProperties2KHR properties2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR };
+            vp.GetPhysicalDeviceProperties2(physicalDevice, &properties2);
+            depends_context.physicalDevice = physicalDevice;
+            depends_context.pfnGetPhysicalDeviceFeatures2 = vp.GetPhysicalDeviceFeatures2;
+            depends_context.apiVersion = properties2.properties.apiVersion;
+            depends_context.extensionCount = static_cast<uint32_t>(device_extensions.size());
+            depends_context.pExtensions = device_extensions.data();
+        }
+        if (depends_context.pfnGetPhysicalDeviceFeatures2 == nullptr) {
+            return false;
+        }
+        return variant->pfnDepends(depends_context);
+    };
+
     for (std::size_t block_index = 0, block_count = blocks.size(); block_index < block_count; ++block_index) {
         const detail::VpProfileDesc* pProfileDesc = detail::vpGetProfileDesc(blocks[block_index].profiles.profileName);
         if (pProfileDesc == nullptr) {
@@ -2310,6 +2413,10 @@ VPAPI_ATTR VkResult vpCreateDevice(
                     if (strcmp(variant->blockName, blocks[block_index].blockName) != 0) {
                         continue;
                     }
+                }
+
+                if (!is_variant_enabled(variant)) {
+                    continue;
                 }
 
                 for (uint32_t type_index = 0; type_index < variant->featureStructTypeCount; ++type_index) {
@@ -2349,6 +2456,10 @@ VPAPI_ATTR VkResult vpCreateDevice(
 
             for (std::size_t variant_index = 0, variant_count = pCapsDesc->variantCount; variant_index < variant_count; ++variant_index) {
                 const detail::VpVariantDesc* variant = &pCapsDesc->pVariants[variant_index];
+
+                if (!is_variant_enabled(variant)) {
+                    continue;
+                }
 
                 VkBaseOutStructure* base_ptr = reinterpret_cast<VkBaseOutStructure*>(pFeatures);
                 if (variant->feature.pfnFiller != nullptr) {
@@ -2436,6 +2547,8 @@ VPAPI_ATTR VkResult vpGetProfileFeatures(
                         continue;
                     }
                     result = VK_SUCCESS;
+                } else if (variant.pfnDepends != nullptr) {
+                    continue; // The capability blocks with a 'depends' condition are only returned when explicitly requested
                 }
 
                 if (variant.feature.pfnFiller == nullptr) continue;
@@ -2490,6 +2603,8 @@ VPAPI_ATTR VkResult vpGetProfileProperties(
                         continue;
                     }
                     result = VK_SUCCESS;
+                } else if (variant.pfnDepends != nullptr) {
+                    continue; // The capability blocks with a 'depends' condition are only returned when explicitly requested
                 }
 
                 if (variant.property.pfnFiller == nullptr) continue;
@@ -2540,6 +2655,8 @@ VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(
                         continue;
                     }
                     result = VK_SUCCESS;
+                } else if (variant.pfnDepends != nullptr) {
+                    continue; // The capability blocks with a 'depends' condition are only returned when explicitly requested
                 }
 
                 if (pProperties != nullptr) {
@@ -2603,6 +2720,8 @@ VPAPI_ATTR VkResult vpGetProfileFormats(
                         continue;
                     }
                     result = VK_SUCCESS;
+                } else if (variant.pfnDepends != nullptr) {
+                    continue; // The capability blocks with a 'depends' condition are only returned when explicitly requested
                 }
 
                 for (uint32_t format_index = 0; format_index < variant.formatCount; ++format_index) {
@@ -2665,6 +2784,8 @@ VPAPI_ATTR VkResult vpGetProfileFormatProperties(
                         continue;
                     }
                     result = VK_SUCCESS;
+                } else if (variant.pfnDepends != nullptr) {
+                    continue; // The capability blocks with a 'depends' condition are only returned when explicitly requested
                 }
 
                 for (uint32_t format_index = 0; format_index < variant.formatCount; ++format_index) {
@@ -2800,6 +2921,8 @@ VPAPI_ATTR VkResult vpGetProfileVideoProfiles(
                         continue;
                     }
                     result = VK_SUCCESS;
+                } else if (variant.pfnDepends != nullptr) {
+                    continue; // The capability blocks with a 'depends' condition are only returned when explicitly requested
                 }
 
                 if (pVideoProfiles != nullptr) {
@@ -3481,6 +3604,8 @@ class VulkanProfileCapabilities():
         self.queueFamiliesProperties = []
         self.videoProfiles = []
         self.videoProfilesByName = OrderedDict()
+        # The 'depends' condition of a single capability block, None when the requirements are unconditional
+        self.depends = None if merge_mode or doc_mode else get_block_depends(json_capabilities_list)
         if merge_mode:
             for json_capabilities in json_capabilities_list:
                 self.mergeCaps(registry, json_capabilities, True)
@@ -3687,11 +3812,12 @@ class VulkanProfilesDatabase():
                 continue
             # When we have multiple possible capabilities blocks, we load them all but effectively the API library can't effectively implement this behavior.
             # Without include_alternatives, the alternative capability blocks are skipped: only one of them is required.
+            # The capability blocks with a 'depends' condition are not merged: their requirements are not unconditional.
             for cap_entry in json_profile_value['capabilities']:
                 if isinstance(cap_entry, list) and not include_alternatives:
                     continue
                 for cap_key in collect_block_names([cap_entry]):
-                    if cap_key in json_file['capabilities']:
+                    if cap_key in json_file['capabilities'] and get_block_depends(json_file['capabilities'][cap_key]) is None:
                         capabilities_list.append(json_file['capabilities'][cap_key])
         return capabilities_list
 
@@ -3857,11 +3983,106 @@ class VulkanProfile():
             gen += self.gen_extensionData(value, 'device')
             gen += self.gen_structDesc(value, debugMessages)
             gen += self.gen_videoProfileStructDesc(value, debugMessages)
+            gen += self.gen_dependsDesc(value)
             gen += ('}} // namespace {0}\n').format(key)
         gen += '} // namespace blocks\n'
 
         gen += ('}} // namespace {1}\n'
                 '#endif // {0}\n\n').format(self.key, uname)
+        return gen
+
+    def gen_dependsDesc(self, capabilities):
+        # Generates the function evaluating the 'depends' condition of a capability block on a physical device
+        if capabilities.depends is None:
+            return ''
+
+        feature_structs = OrderedDict()   # Feature structure name -> (C++ variable name, availability condition, preprocessor condition)
+        feature_values = OrderedDict()    # (structure name, member name) -> C++ variable name
+        expression = ''
+
+        for token in tokenizeDependsExpression(capabilities.depends):
+            if token == '+':
+                expression += ' && '
+                continue
+            if token == ',':
+                expression += ' || '
+                continue
+            if token in ('(', ')'):
+                expression += token
+                continue
+
+            negate = token.startswith('!')
+            symbol = token[1:].strip() if negate else token
+            expression += '!' if negate else ''
+
+            if symbol.startswith('VK_VERSION_'):
+                version = VK_VERSION.from_string(symbol)
+                expression += 'context.HasVersion({0}, {1})'.format(version.major, version.minor)
+            elif '::' in symbol:
+                struct_name, member_name = [part.strip() for part in symbol.split('::', 1)]
+                if (struct_name, member_name) not in feature_values:
+                    feature_values[(struct_name, member_name)] = 'value{0}'.format(len(feature_values))
+                    if struct_name != 'VkPhysicalDeviceFeatures' and struct_name not in feature_structs:
+                        struct_def = self.registry.getStruct(struct_name)
+                        if struct_def is None or struct_def.sType is None:
+                            # The feature value remains false
+                            logging.error("Feature structure '{0}' of the 'depends' condition of capability block '{1}' of profile '{2}' does not exist".format(struct_name, capabilities.blockName, self.key))
+                            expression += feature_values[(struct_name, member_name)]
+                            continue
+                        version, extensions = self.registry.getStructRequirements(struct_name)
+                        available = []
+                        preprocessor = []
+                        if version is not None:
+                            available.append('context.HasVersion({0}, {1})'.format(version.major, version.minor))
+                            preprocessor.append('defined({0})'.format(version.name))
+                        for extension in extensions:
+                            available.append('context.HasExtension("{0}")'.format(extension))
+                            preprocessor.append('defined({0})'.format(extension))
+                        feature_structs[struct_name] = (
+                            'struct{0}'.format(len(feature_structs)),
+                            ' || '.join(available) if available else 'true',
+                            ' || '.join(preprocessor) if preprocessor else None,
+                            struct_def.sType)
+                expression += feature_values[(struct_name, member_name)]
+            else:
+                expression += 'context.HasExtension("{0}")'.format(symbol)
+
+        gen = ('\n'
+               'static bool depends(const VpDependsContext& context) {{\n'
+               '    // {0}\n').format(capabilities.depends)
+
+        if feature_values:
+            for (struct_name, member_name), value in feature_values.items():
+                gen += '    bool {0} = false; // {1}::{2}\n'.format(value, struct_name, member_name)
+
+            gen += '    VkPhysicalDeviceFeatures2KHR features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR };\n'
+            for struct_name, (var, available, preprocessor, sType) in feature_structs.items():
+                if preprocessor:
+                    gen += '#if {0}\n'.format(preprocessor)
+                gen += ('    {0} {1}{{ {2} }};\n'
+                        '    const bool {1}Available = {3};\n'
+                        '    if ({1}Available) {{\n'
+                        '        {1}.pNext = features.pNext;\n'
+                        '        features.pNext = &{1};\n'
+                        '    }}\n').format(struct_name, var, sType, available)
+                if preprocessor:
+                    gen += '#endif\n'
+
+            gen += '    context.pfnGetPhysicalDeviceFeatures2(context.physicalDevice, &features);\n'
+
+            for (struct_name, member_name), value in feature_values.items():
+                if struct_name == 'VkPhysicalDeviceFeatures':
+                    gen += '    {0} = features.features.{1} == VK_TRUE;\n'.format(value, member_name)
+                elif struct_name in feature_structs:
+                    var, _, preprocessor, _ = feature_structs[struct_name]
+                    if preprocessor:
+                        gen += '#if {0}\n'.format(preprocessor)
+                    gen += '    {0} = {1}Available && {1}.{2} == VK_TRUE;\n'.format(value, var, member_name)
+                    if preprocessor:
+                        gen += '#endif\n'
+
+        gen += ('    return {0};\n'
+                '}}\n').format(expression)
         return gen
 
     def gen_extensionData(self, capabilities, type):
@@ -4625,6 +4846,10 @@ class VulkanProfilesLibraryGenerator():
     def gen_variants(self, capabilities_key, capabilities_value):
         gen = '                {\n'
         gen += '            ' + ('        "{0}",\n').format(capabilities_value.blockName)
+        if capabilities_value.depends is not None:
+            gen += '            ' + ('        blocks::{0}::depends,\n').format(capabilities_key)
+        else:
+            gen += '            ' + '        nullptr,\n'
         gen += '            ' + self.gen_dataArrayInfo(capabilities_value.instanceExtensions, 'blocks::{0}::instanceExtensions'.format(capabilities_key))
         gen += '            ' + self.gen_dataArrayInfo(capabilities_value.deviceExtensions, 'blocks::{0}::deviceExtensions'.format(capabilities_key))
         gen += '            ' + self.gen_dataArrayInfo(capabilities_value.features, 'featureStructTypes')
@@ -4662,6 +4887,7 @@ class VulkanProfilesLibraryGenerator():
                 gen += '    static const VpVariantDesc mergedCapabilities[] = {\n'
                 gen += '        {\n'  # <- new open curly
                 gen += ('        {0},\n').format(profile_value.merge_capabilities.blockName)
+                gen += '        nullptr,\n'
                 gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.instanceExtensions, 'instanceExtensions')
                 gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.deviceExtensions, 'deviceExtensions')
                 gen += self.gen_dataArrayInfo(profile_value.merge_capabilities.features, 'featureStructTypes')

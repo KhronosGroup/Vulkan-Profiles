@@ -16,6 +16,7 @@
 ### Features:
 - Support the `depends` condition of capability blocks of the profiles schema 0.8.3 #1090
   - The capability block requirements only apply to the devices satisfying the `depends` condition, using the `vk.xml` `depends` expression syntax
+  - Evaluate the `depends` condition on the physical device in the Vulkan Profiles API library
   - Check the `depends` condition in `vkprofiles validate`, and keep the capability blocks with a `depends` condition separate in `vkprofiles transform` and `vkprofiles extract`
 
 ### Improvements:

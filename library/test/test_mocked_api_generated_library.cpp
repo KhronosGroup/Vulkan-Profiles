@@ -26,6 +26,8 @@
 #include "test_vulkan_profiles.hpp"
 #include "mock_vulkan_api.hpp"
 
+#include <string>
+
 void initProfile(MockVulkanAPI& mock, const VpProfileProperties& profile, uint32_t apiVersion = VK_API_VERSION_1_3,
                  int profileAreas = PROFILE_AREA_ALL_BITS) {
     mock.SetInstanceAPIVersion(apiVersion);
@@ -2204,3 +2206,140 @@ TEST(mocked_api_generated_library, check_support_wildcard_video_profiles) {
         EXPECT_STREQ(block_properties[0].blockName, "general");
     }
 }
+
+static void initDependsDevice(MockVulkanAPI& mock, bool protectedMemory, bool largePoints, bool driverProperties, bool wideLines) {
+    mock.SetInstanceAPIVersion(VK_API_VERSION_1_3);
+    mock.SetDeviceAPIVersion(VK_API_VERSION_1_3);
+
+    std::vector<VkExtensionProperties> extensions;
+    if (driverProperties) {
+        extensions.push_back(VkExtensionProperties{VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME, 1});
+    }
+    mock.SetDeviceExtensions(mock.vkPhysicalDevice, extensions);
+
+    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
+    features.features.depthClamp = VK_TRUE;
+    features.features.largePoints = largePoints ? VK_TRUE : VK_FALSE;
+    features.features.wideLines = wideLines ? VK_TRUE : VK_FALSE;
+
+    VkPhysicalDeviceVulkan11Features vulkan11_features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, nullptr};
+    vulkan11_features.protectedMemory = protectedMemory ? VK_TRUE : VK_FALSE;
+
+    mock.SetFeatures({VK_STRUCT(features), VK_STRUCT(vulkan11_features)});
+
+    VkPhysicalDeviceProperties2 props{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, nullptr};
+    mock.SetProperties({VK_STRUCT(props)});
+}
+
+static void checkDependsSupport(MockVulkanAPI& mock, VkBool32 expected_supported, const std::vector<std::string>& expected_blocks) {
+    const VpProfileProperties profile{VP_LUNARG_TEST_DEPENDS_NAME, VP_LUNARG_TEST_DEPENDS_SPEC_VERSION};
+
+    VkBool32 supported = expected_supported == VK_TRUE ? VK_FALSE : VK_TRUE;
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(supported, expected_supported);
+
+    std::vector<VpBlockProperties> block_properties(10);
+    uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
+
+    supported = expected_supported == VK_TRUE ? VK_FALSE : VK_TRUE;
+    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+                                                       &block_property_count, &block_properties[0]);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(supported, expected_supported);
+    EXPECT_EQ(block_property_count, static_cast<uint32_t>(expected_blocks.size()));
+    for (std::size_t i = 0, n = std::min<std::size_t>(block_property_count, expected_blocks.size()); i < n; ++i) {
+        EXPECT_STREQ(block_properties[i].blockName, expected_blocks[i].c_str());
+    }
+}
+
+TEST(mocked_api_generated_library, check_depends_reflection) {
+    MockVulkanAPI mock;
+
+    const VpProfileProperties profile{VP_LUNARG_TEST_DEPENDS_NAME, VP_LUNARG_TEST_DEPENDS_SPEC_VERSION};
+
+    // The capability blocks with a 'depends' condition are not returned by the profile queries
+    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
+    VkResult result = vpGetProfileFeatures(mock.functions, &profile, nullptr, &features);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(features.features.depthClamp, VK_TRUE);
+    EXPECT_EQ(features.features.largePoints, VK_FALSE);
+    EXPECT_EQ(features.features.wideLines, VK_FALSE);
+
+    // ... unless they are explicitly requested
+    VkPhysicalDeviceFeatures2 dependent_features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
+    result = vpGetProfileFeatures(mock.functions, &profile, "dependent", &dependent_features);
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_EQ(dependent_features.features.depthClamp, VK_FALSE);
+    EXPECT_EQ(dependent_features.features.largePoints, VK_TRUE);
+    EXPECT_EQ(dependent_features.features.wideLines, VK_FALSE);
+}
+
+TEST(mocked_api_generated_library, check_depends_support_not_satisfied) {
+    MockVulkanAPI mock;
+
+    // The 'depends' conditions are not satisfied: the dependent capability blocks requirements don't apply
+    initDependsDevice(mock, false, false, false, false);
+    checkDependsSupport(mock, VK_TRUE, {"block"});
+}
+
+TEST(mocked_api_generated_library, check_depends_support_satisfied_supported) {
+    MockVulkanAPI mock;
+
+    initDependsDevice(mock, true, true, true, true);
+    checkDependsSupport(mock, VK_TRUE, {"block", "dependent", "dependent_extension"});
+}
+
+TEST(mocked_api_generated_library, check_depends_support_satisfied_unsupported) {
+    MockVulkanAPI mock;
+
+    // protectedMemory is supported but largePoints is not
+    initDependsDevice(mock, true, false, false, false);
+    checkDependsSupport(mock, VK_FALSE, {"dependent"});
+}
+
+TEST(mocked_api_generated_library, check_depends_support_extension_unsupported) {
+    MockVulkanAPI mock;
+
+    // VK_KHR_driver_properties is supported but wideLines is not
+    initDependsDevice(mock, false, false, true, false);
+    checkDependsSupport(mock, VK_FALSE, {"dependent_extension"});
+}
+
+static void checkDependsCreateDevice(bool protectedMemory, bool driverProperties) {
+    MockVulkanAPI mock;
+
+    initDependsDevice(mock, protectedMemory, true, driverProperties, true);
+
+    const VpProfileProperties profile{VP_LUNARG_TEST_DEPENDS_NAME, VP_LUNARG_TEST_DEPENDS_SPEC_VERSION};
+
+    VkPhysicalDeviceFeatures2 expected_features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr};
+    expected_features.features.depthClamp = VK_TRUE;
+    expected_features.features.largePoints = protectedMemory ? VK_TRUE : VK_FALSE;
+    expected_features.features.wideLines = driverProperties ? VK_TRUE : VK_FALSE;
+
+    VkDeviceQueueCreateInfo queueCreateInfo{VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO};
+    queueCreateInfo.queueFamilyIndex = 0;
+    queueCreateInfo.queueCount = 1;
+
+    VkDeviceCreateInfo inCreateInfo{VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO};
+    inCreateInfo.queueCreateInfoCount = 1;
+    inCreateInfo.pQueueCreateInfos = &queueCreateInfo;
+
+    VkDeviceCreateInfo outCreateInfo = inCreateInfo;
+    mock.SetExpectedDeviceCreateInfo(&outCreateInfo, {VK_STRUCT(expected_features)});
+
+    VpDeviceCreateInfo createInfo{&inCreateInfo, 0, 1, &profile};
+
+    VkDevice device = VK_NULL_HANDLE;
+    VkResult result = vpCreateDevice(mock.functions, mock.vkPhysicalDevice, &createInfo, &mock.vkAllocator, &device);
+
+    EXPECT_EQ(result, VK_SUCCESS);
+    EXPECT_TRUE(device == mock.vkDevice);
+}
+
+TEST(mocked_api_generated_library, create_device_depends_not_satisfied) { checkDependsCreateDevice(false, false); }
+
+TEST(mocked_api_generated_library, create_device_depends_satisfied) { checkDependsCreateDevice(true, true); }
+
+TEST(mocked_api_generated_library, create_device_depends_partially_satisfied) { checkDependsCreateDevice(true, false); }
