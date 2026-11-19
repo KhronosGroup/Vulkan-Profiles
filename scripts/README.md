@@ -483,6 +483,14 @@ vkprofiles combine \
     --profile-api-version 1.4.353
 ```
 
+**Capability blocks with a `depends` condition:** the requirements of an input profile for the devices satisfying a condition are its unconditional capability blocks merged with its blocks with that condition, or only its unconditional blocks without such a block. For each condition, these requirements are combined like the unconditional blocks, the least capable values for `intersection` and the most capable values for `union`, and the values which differ from the combined unconditional block are written to a capability block with the same condition. When the combined unconditional features satisfy the condition, these values are merged into the unconditional block instead.
+
+* `intersection` also combines the requirements for the devices satisfying several conditions, in a block with the conjunction of the conditions, e.g. `A+B` for the condition `A` of a profile and `B` of another profile. Up to 8 conditions are combined together.
+* `union` writes a block for each condition: a device satisfying only one condition doesn't have to satisfy the requirements of the other condition, so the disjunction of the conditions would require too much.
+* `difference` removes from each block with a condition the capabilities common to the blocks of every profile with that condition.
+
+The conditions are compared once their feature structures are canonicalized for the profile API version, e.g. `VkPhysicalDeviceProtectedMemoryFeatures::protectedMemory` is `VkPhysicalDeviceVulkan11Features::protectedMemory` for Vulkan 1.1 and later.
+
 ---
 
 ### 6. `extract` *(Beta)*
