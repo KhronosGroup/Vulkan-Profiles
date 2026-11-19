@@ -1,0 +1,50 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.3-266.json#",
+    "capabilities": {
+        "block": {
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "depthClamp": true
+                }
+            }
+        },
+        "dependent": {
+            "depends": "VkPhysicalDeviceVulkan11Features::protectedMemory",
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "largePoints": true
+                }
+            }
+        },
+        "dependent_extension": {
+            "depends": "VK_KHR_driver_properties+VK_VERSION_1_2",
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "wideLines": true
+                }
+            }
+        }
+    },
+    "profiles": {
+        "VP_LUNARG_test_depends": {
+            "version": 1,
+            "api-version": "1.3.204",
+            "label": "Test depends",
+            "description": "Test of the capability blocks with a 'depends' condition",
+            "capabilities": [
+                "block",
+                "dependent",
+                "dependent_extension"
+            ]
+        }
+    },
+    "contributors": {},
+    "history": [
+        {
+            "revision": 1,
+            "date": "2026-11-16",
+            "author": "Christophe Riccio",
+            "comment": "Initial revision"
+        }
+    ]
+}

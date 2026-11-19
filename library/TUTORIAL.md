@@ -554,6 +554,16 @@ typedef struct VpBlockProperties {
 } VpBlockProperties;
 ```
 
+#### Capability blocks with a `depends` condition
+
+A capability block with a `depends` condition only requires its capabilities on the physical devices satisfying the condition, see [Capability block conditions](../OVERVIEW.md#capability-block-conditions). The library evaluates the condition with the physical device API version, device extensions and features:
+
+* `vpGetPhysicalDeviceProfileSupport` and `vpGetPhysicalDeviceProfileVariantsSupport` only check the capability block requirements when the physical device satisfies the condition. When the condition is not satisfied, the capability block is reported neither as a supported block nor as an unsupported block.
+* `vpGetInstanceProfileSupport` and `vpGetInstanceProfileVariantsSupport` don't check the capability blocks with a `depends` condition, which is evaluated on a physical device.
+* `vpCreateInstance` doesn't enable the instance extensions of the capability blocks with a `depends` condition.
+* `vpCreateDevice` only enables the extensions and features of the capability blocks which `depends` condition is satisfied by the physical device.
+* The profile queries (`vpGetProfileFeatures`, `vpGetProfileDeviceExtensionProperties`, etc.) only return the capabilities of a capability block with a `depends` condition when `pBlockName` names this capability block: with `pBlockName` set to `NULL`, they only return the capabilities required by every device supporting the profile.
+
 #### Creating device with profile
 
 The Vulkan Profiles library provides the following helper function that enables easier adoption of profiles by automatically including profile requirements in the Vulkan device creation process:
