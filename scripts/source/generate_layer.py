@@ -5519,6 +5519,19 @@ class VulkanProfilesLayerGenerator():
         gen += '}\n\n'
         gen += 'bool JsonLoader::GetFeatureValue(const std::string &name, const std::string &member, bool *value) const {\n'
 
+        # The feature structures promoted to a Vulkan version, which TransferValue() synchronizes with the
+        # VkPhysicalDeviceVulkan<major><minor>Features structure once the profile is loaded. Until then, a feature is
+        # read from the structure whose value TransferValue() keeps: the VkPhysicalDeviceVulkan<major><minor>Features
+        # structure when the profile wrote it, the promoted structure otherwise. So a 'depends' condition naming either
+        # structure sees the value the application gets, e.g. VkPhysicalDeviceProtectedMemoryFeatures::protectedMemory
+        # set by the profile in VkPhysicalDeviceVulkan11Features.
+        promoted_features = self.get_promoted_feature_structs()
+        promoted_members_by_version = {}
+        for pdd_var, (major, minor, struct_name) in promoted_features.items():
+            for member in self.registry.structs[struct_name].members.values():
+                if member.type == 'VkBool32':
+                    promoted_members_by_version.setdefault((major, minor), {}).setdefault(pdd_var, (struct_name, []))[1].append(member.name)
+
         for name, value in self.registry.structs.items():
             if name in self.ignored_structs:
                 continue
@@ -5547,6 +5560,34 @@ class VulkanProfilesLayerGenerator():
 
             gen += protect_begin
             gen += '    if (' + ' || '.join('name == "{0}"'.format(n) for n in names) + ') {\n'
+
+            vulkan_version = re.fullmatch(r'VkPhysicalDeviceVulkan(\d)(\d)Features', name)
+            if pdd_var in promoted_features:
+                # A promoted structure: read the VkPhysicalDeviceVulkan<major><minor>Features value the profile wrote
+                major, minor, _ = promoted_features[pdd_var]
+                vulkan_type = 'VkPhysicalDeviceVulkan{0}{1}Features'.format(major, minor)
+                gen += '        if (pdd_->vulkan_{0}_{1}_features_written_) {{\n'.format(major, minor)
+                gen += '            static const FeatureMemberOffset vulkan_members[] = {\n'
+                for member in members:
+                    gen += '                {{"{0}", offsetof({1}, {0})}},\n'.format(member, vulkan_type)
+                gen += '            };\n'
+                gen += '            return GetFeatureMemberValue(&pdd_->physical_device_vulkan_{0}{1}_features_, vulkan_members, sizeof(vulkan_members) / sizeof(vulkan_members[0]), member, value);\n'.format(major, minor)
+                gen += '        }\n'
+            elif vulkan_version and (int(vulkan_version.group(1)), int(vulkan_version.group(2))) in promoted_members_by_version:
+                # A VkPhysicalDeviceVulkan<major><minor>Features structure the profile didn't write: read the promoted structures
+                major, minor = int(vulkan_version.group(1)), int(vulkan_version.group(2))
+                gen += '        if (!pdd_->vulkan_{0}_{1}_features_written_) {{\n'.format(major, minor)
+                for promoted_var, (promoted_type, promoted_members) in promoted_members_by_version[(major, minor)].items():
+                    array_name = 'promoted_' + promoted_var.rstrip('_')
+                    gen += '            static const FeatureMemberOffset {0}[] = {{\n'.format(array_name)
+                    for promoted_member in promoted_members:
+                        gen += '                {{"{0}", offsetof({1}, {0})}},\n'.format(promoted_member, promoted_type)
+                    gen += '            };\n'
+                    gen += '            if (GetFeatureMemberValue(&pdd_->{0}, {1}, sizeof({1}) / sizeof({1}[0]), member, value)) {{\n'.format(promoted_var, array_name)
+                    gen += '                return true;\n'
+                    gen += '            }\n'
+                gen += '        }\n'
+
             gen += '        static const FeatureMemberOffset members[] = {\n'
             for member in members:
                 gen += '            {{"{0}", offsetof({1}, {0})}},\n'.format(member, pdd_type)
@@ -5558,6 +5599,49 @@ class VulkanProfilesLayerGenerator():
         gen += '    return false;\n'
         gen += '}\n'
         return gen
+
+    def get_promoted_feature_structs(self):
+        """
+        Returns the feature structures promoted to a Vulkan version, which TransferValue() synchronizes with the
+        VkPhysicalDeviceVulkan<major><minor>Features structure, by physical device data variable:
+        (major, minor, structure name).
+        """
+        promoted = {}
+        for ext, property_names, feature_names in self.extension_structs:
+            for feature_name in feature_names:
+                feature = self.registry.structs[feature_name]
+                version = feature.definedByVersion
+                if not version:
+                    for alias_name in feature.aliases:
+                        alias = self.registry.structs[alias_name]
+                        if alias.definedByVersion:
+                            version = alias.definedByVersion
+                            break
+                if version and 'VkPhysicalDeviceVulkan{0}{1}Features'.format(version.major, version.minor) in self.registry.structs:
+                    promoted[self.create_var_name(feature_name)] = (version.major, version.minor, feature_name)
+        for major, minor, feature_name in self.get_core_transfer_feature_structs():
+            promoted[self.create_var_name(feature_name)] = (major, minor, feature_name)
+        return promoted
+
+    def get_core_transfer_feature_structs(self):
+        """
+        Returns the core feature structures which aren't promoted from an extension but whose members are all in the
+        VkPhysicalDeviceVulkan<major><minor>Features structure of their Vulkan version, as (major, minor, structure
+        name), e.g. VkPhysicalDeviceProtectedMemoryFeatures and VkPhysicalDeviceShaderDrawParametersFeatures for
+        Vulkan 1.1. TransferValue() synchronizes them like the promoted structures.
+        """
+        core_structs = []
+        for feature_name in self.non_extension_features:
+            feature = self.registry.structs[feature_name]
+            version = feature.definedByVersion
+            if not version or re.fullmatch(r'VkPhysicalDeviceVulkan\d\dFeatures', feature_name):
+                continue
+            vulkan_struct = self.registry.structs.get('VkPhysicalDeviceVulkan{0}{1}Features'.format(version.major, version.minor))
+            if vulkan_struct is None or not feature.members:
+                continue
+            if all(member_name in vulkan_struct.members for member_name in feature.members):
+                core_structs.append((version.major, version.minor, feature_name))
+        return core_structs
 
     def generate_get_property(self):
         gen = '\nbool JsonLoader::GetProperty(const char *device_name, bool requested_profile, const Json::Value &props, const std::string &name) {\n'
@@ -5849,6 +5933,10 @@ class VulkanProfilesLayerGenerator():
                                     break
                         if version and version.major == int(major) and version.minor == int(minor):
                             gen += self.generate_transfer_function(major, minor, 'Features', feature_name)
+
+                for core_major, core_minor, feature_name in self.get_core_transfer_feature_structs():
+                    if core_major == int(major) and core_minor == int(minor):
+                        gen += self.generate_transfer_function(major, minor, 'Features', feature_name)
 
         return gen
 
@@ -6288,6 +6376,10 @@ class VulkanProfilesLayerGenerator():
                                     break
                         if promoted_version and version_major == promoted_version.major and version_minor == promoted_version.minor:
                             gen += '            TransferValue(&(pdd.physical_device_vulkan_' + major + minor + '_features_), &(pdd.' + self.create_var_name(feature_name) + '), pdd.vulkan_' + major + '_' + minor + '_features_written_);\n'
+                # The core feature structures not promoted from an extension, e.g. VkPhysicalDeviceProtectedMemoryFeatures
+                for core_major, core_minor, feature_name in self.get_core_transfer_feature_structs():
+                    if version_major == core_major and version_minor == core_minor:
+                        gen += '            TransferValue(&(pdd.physical_device_vulkan_' + major + minor + '_features_), &(pdd.' + self.create_var_name(feature_name) + '), pdd.vulkan_' + major + '_' + minor + '_features_written_);\n'
 
         gen += ENUMERATE_PHYSICAL_DEVICES_END
 
