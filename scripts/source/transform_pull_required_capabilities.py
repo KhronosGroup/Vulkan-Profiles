@@ -469,13 +469,15 @@ def get_unsatisfied_property_values(
     vk: VulkanObject,
     api_version: VK_VERSION,
     enabled_exts: set[str],
-    enabled_features: set[tuple[str, str]]
+    enabled_features: set[tuple[str, str]],
+    include_unsupported_defaults: bool = True
 ) -> dict[tuple[str, str], tuple[str, Any]]:
     """
     Returns the property values of the devices not supporting a capability the profile doesn't require, by property:
     (the condition of the devices supporting the capability, the value of the devices not supporting it). The value is
-    the Vulkan core value of these devices (a '!condition' requirement) or, without it, the value of an unsupported
-    property (e.g. false for a 'max' VkBool32 property), when the property has such a value.
+    the Vulkan core value of these devices (a '!condition' requirement) or, without it and with
+    include_unsupported_defaults, the value of an unsupported property (e.g. false for a 'max' VkBool32 property), when
+    the property has such a value.
     """
     unsatisfied_values: dict[tuple[str, str], tuple[str, Any]] = {}
     dependent_properties: dict[tuple[str, str], tuple[str, str, str]] = {}
@@ -496,7 +498,7 @@ def get_unsatisfied_property_values(
                 value = parse_property_value(vk, req.struct, req.name, req.value)
                 if value is not None:
                     unsatisfied_values[key] = (canonicalize_depends(vk, api_version, condition), value)
-            elif '!' not in req.depends and not evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
+            elif include_unsupported_defaults and '!' not in req.depends and not evaluateFeatureDepends(vk, req.depends, api_version, enabled_exts, enabled_features):
                 dependent_properties.setdefault(key, (canonicalize_depends(vk, api_version, req.depends), req.struct, req.name))
 
     for key, (depends, struct_name, member_name) in dependent_properties.items():
