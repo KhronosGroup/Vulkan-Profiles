@@ -32,7 +32,7 @@ if str(scripts_dir) not in sys.path:
 
 from source.vulkan_object_utils import initVulkanObject
 from source.transform_utils import WorkaroundBits
-from source.validate_workarounds import apply_driver_id_workaround, apply_64_bit_strings_workaround, apply_flags_as_numbers_workaround, apply_enums_as_numbers_workaround, apply_undeclared_extension_structures_workaround, apply_workarounds
+from source.validate_workarounds import apply_driver_id_workaround, apply_64_bit_strings_workaround, apply_flags_as_numbers_workaround, apply_enums_as_numbers_workaround, apply_undeclared_extension_structures_workaround, apply_mismatching_aliases_workaround, apply_workarounds
 
 
 def make_report(vulkan12_driver_id, khr_driver_id, driver_name="KosmicKrisp") -> dict:
@@ -209,6 +209,77 @@ class TestValidateWorkarounds(unittest.TestCase):
         report["profiles"]["VP_GPUINFO_test"]["api-version"] = "1.4.0"
         block["properties"]["VkPhysicalDeviceHostImageCopyPropertiesEXT"] = {"copySrcLayoutCount": 0}
         self.assertEqual(apply_undeclared_extension_structures_workaround(self.vk, report), [])
+
+    def test_mismatching_aliases_workaround(self):
+        """The aliased property members with mismatching values are set to their least capable value, and the 'exact' and 'noauto' members are ignored."""
+        report = {
+            "capabilities": {
+                "device": {
+                    "properties": {
+                        "VkPhysicalDeviceVulkan13Properties": {
+                            "integerDotProduct8BitUnsignedAccelerated": False,
+                            "integerDotProduct8BitSignedAccelerated": True,
+                            "storageTexelBufferOffsetAlignmentBytes": 16
+                        },
+                        "VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR": {
+                            "integerDotProduct8BitUnsignedAccelerated": True,
+                            "integerDotProduct8BitSignedAccelerated": True
+                        },
+                        "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT": {"storageTexelBufferOffsetAlignmentBytes": 64},
+                        "VkPhysicalDeviceVulkan11Properties": {"subgroupSupportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_FRAGMENT_BIT"]},
+                        "VkPhysicalDeviceSubgroupProperties": {"supportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_ALL"]},
+                        "VkPhysicalDeviceVulkan12Properties": {"denormBehaviorIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE"},
+                        "VkPhysicalDeviceFloatControlsPropertiesKHR": {"denormBehaviorIndependence": "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL"}
+                    }
+                }
+            }
+        }
+        changes = apply_mismatching_aliases_workaround(self.vk, report)
+
+        self.assertEqual(len(changes), 3)
+        properties = report["capabilities"]["device"]["properties"]
+        # max limittype: the least capable value is false
+        self.assertFalse(properties["VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR"]["integerDotProduct8BitUnsignedAccelerated"])
+        self.assertFalse(properties["VkPhysicalDeviceVulkan13Properties"]["integerDotProduct8BitUnsignedAccelerated"])
+        self.assertTrue(properties["VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR"]["integerDotProduct8BitSignedAccelerated"])
+        # min limittype: the least capable value is the larger alignment
+        self.assertEqual(properties["VkPhysicalDeviceVulkan13Properties"]["storageTexelBufferOffsetAlignmentBytes"], 64)
+        # bitmask limittype: the bits set in both members, so the multi-bit flag VK_SHADER_STAGE_ALL, which isn't fully set
+        # in the aliased member, is removed while the fragment bit it includes is kept
+        self.assertEqual(properties["VkPhysicalDeviceSubgroupProperties"]["supportedStages"], ["VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_FRAGMENT_BIT"])
+        self.assertEqual(properties["VkPhysicalDeviceVulkan11Properties"]["subgroupSupportedStages"], ["VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_FRAGMENT_BIT"])
+        # The enum members without a least capable value are left unchanged
+        self.assertEqual(properties["VkPhysicalDeviceFloatControlsPropertiesKHR"]["denormBehaviorIndependence"], "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL")
+
+        self.assertEqual(apply_mismatching_aliases_workaround(self.vk, report), [])
+
+    def test_mismatching_aliases_extra_workaround(self):
+        """The aliased exact booleans with mismatching values are set to false only with the 'mismatching-aliases-extra' workaround, which leaves the limit members unchanged."""
+        def make_properties() -> dict:
+            return {
+                "capabilities": {
+                    "device": {
+                        "properties": {
+                            "VkPhysicalDeviceVulkan13Properties": {
+                                "uniformTexelBufferOffsetSingleTexelAlignment": False,
+                                "integerDotProduct8BitUnsignedAccelerated": False
+                            },
+                            "VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT": {"uniformTexelBufferOffsetSingleTexelAlignment": True},
+                            "VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR": {"integerDotProduct8BitUnsignedAccelerated": True}
+                        }
+                    }
+                }
+            }
+
+        report = make_properties()
+        self.assertEqual(len(apply_mismatching_aliases_workaround(self.vk, report)), 1)
+        self.assertTrue(report["capabilities"]["device"]["properties"]["VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT"]["uniformTexelBufferOffsetSingleTexelAlignment"])
+
+        report = make_properties()
+        self.assertEqual(len(apply_mismatching_aliases_workaround(self.vk, report, limit_members=False, exact_booleans=True)), 1)
+        properties = report["capabilities"]["device"]["properties"]
+        self.assertFalse(properties["VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT"]["uniformTexelBufferOffsetSingleTexelAlignment"])
+        self.assertTrue(properties["VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR"]["integerDotProduct8BitUnsignedAccelerated"])
 
     def test_apply_workarounds_preserves_format(self):
         """Only the changed files are rewritten, preserving their CRLF line endings and the missing final line ending."""

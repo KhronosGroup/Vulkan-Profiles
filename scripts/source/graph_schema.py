@@ -174,7 +174,9 @@ GRAPH_JSON_SCHEMA = {
                 "64-bit-strings",
                 "flags-as-numbers",
                 "enums-as-numbers",
-                "undeclared-extension-structures"
+                "undeclared-extension-structures",
+                "mismatching-aliases",
+                "mismatching-aliases-extra"
             ]
         },
         "common_args": {
