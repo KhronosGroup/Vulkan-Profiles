@@ -319,6 +319,14 @@ class TestAnalyseBits(unittest.TestCase):
         self.assertEqual(self.validator.validate_data(make_profile({"maxGeometryShaderInvocations": 0}, {"depthClamp": True}), [AnalyseBits.DEPENDS]), [])
         self.assertEqual(self.validator.validate_data(make_profile({"maxGeometryShaderInvocations": 32}, {"geometryShader": True}), [AnalyseBits.DEPENDS]), [])
 
+        # Without a Vulkan core value for the devices not supporting shaderFloat16, the value of an unsupported
+        # property derived from the limittype isn't checked
+        json_files_dict = make_profile({}, {"depthClamp": True})
+        json_files_dict["test_profile.json"]["capabilities"]["baseline"]["properties"]["VkPhysicalDeviceFloatControlsProperties"] = {
+            "shaderSignedZeroInfNanPreserveFloat16": True
+        }
+        self.assertEqual(self.validator.validate_data(json_files_dict, [AnalyseBits.DEPENDS]), [])
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

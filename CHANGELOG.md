@@ -35,6 +35,7 @@
   - `enums-as-numbers`: convert to enum value names the extension enum values written as numbers
   - `undeclared-extension-structures`: remove the extension structures whose extension isn't declared in the capability block nor promoted to the profile API version
   - `mismatching-aliases`: set the properties whose value differs between aliased structures to their least capable value, and with `mismatching-aliases-extra` the `exact` boolean properties to `false`
+  - `unsupported-feature-properties`: set the properties of the unsupported features to their value for the devices not supporting the feature
 
 ### Improvements:
 - Generate `PROFILES_CORE.md`, the documentation of the `VP_LUNARG_minimum_requirements_1_x` profiles of the Vulkan core specification requirements
