@@ -176,7 +176,8 @@ GRAPH_JSON_SCHEMA = {
                 "enums-as-numbers",
                 "undeclared-extension-structures",
                 "mismatching-aliases",
-                "mismatching-aliases-extra"
+                "mismatching-aliases-extra",
+                "unsupported-feature-properties"
             ]
         },
         "common_args": {

@@ -445,12 +445,15 @@ class VulkanProfilesDataValidation:
         """
         Analysis Case 7: Checks that the unconditional properties of a profile don't contradict the value of the devices
         not supporting a capability the profile doesn't require, e.g. a maxTessellationGenerationLevel of 64 in a profile
-        not requiring tessellationShader, which only applies to the devices supporting tessellationShader.
+        not requiring tessellationShader, which only applies to the devices supporting tessellationShader. Only the
+        properties with a Vulkan core value for the devices not supporting the capability (a '!condition' requirement,
+        e.g. 0 for maxTessellationGenerationLevel without tessellationShader) are checked: the value of an unsupported
+        property derived from its limittype isn't a requirement of these devices.
         """
         issues = []
         api_version = VK_VERSION.from_string(profile_obj.get("api-version", "1.0.0"))
         enabled_exts, enabled_features = get_profile_enabled_capabilities(json_files_dict, json_file_data, profile_obj)
-        unsatisfied_values = get_unsatisfied_property_values(self.vk, api_version, enabled_exts, enabled_features)
+        unsatisfied_values = get_unsatisfied_property_values(self.vk, api_version, enabled_exts, enabled_features, include_unsupported_defaults=False)
         if not unsatisfied_values:
             return issues
 

@@ -35,6 +35,11 @@ from source.transform_utils import WorkaroundBits
 from source.profiles_json_utils import load_profiles_json, collect_block_names
 from source.vulkan_object_utils import getUndeclaredStructExtension, gatherCapabilityAliases, StructCapabilityAlias
 from source.vulkan_object_version import VK_VERSION
+from source.transform_pull_required_capabilities import (
+    find_contradicting_properties,
+    get_profile_enabled_capabilities,
+    get_unsatisfied_property_values
+)
 
 
 # The driverID of the drivers unknown to the device report exporter, by driverName
@@ -353,6 +358,31 @@ def apply_mismatching_aliases_workaround(vk: VulkanObject, json_data: dict, limi
     return changes
 
 
+def apply_unsupported_feature_properties_workaround(vk: VulkanObject, json_data: dict) -> list[str]:
+    """
+    Sets the properties of a feature the device doesn't support to the Vulkan core value of the devices not supporting
+    it (a '!condition' requirement), e.g. 0 for the maxGeometryShaderInvocations of 32 of a device report without
+    geometryShader, the properties that 'validate --analyse depends' reports. The properties without such a value are
+    left unchanged. Returns the description of each change.
+    """
+    changes = []
+    json_files_dict = {"": json_data}
+    for profile_name, profile_obj in json_data.get("profiles", {}).items():
+        if not isinstance(profile_obj, dict):
+            continue
+        api_version = VK_VERSION.from_string(profile_obj.get("api-version", "1.0.0"))
+        enabled_exts, enabled_features = get_profile_enabled_capabilities(json_files_dict, json_data, profile_obj)
+        unsatisfied_values = get_unsatisfied_property_values(vk, api_version, enabled_exts, enabled_features, include_unsupported_defaults=False)
+        if not unsatisfied_values:
+            continue
+        block_names = collect_block_names(profile_obj.get("capabilities", []))
+        for contradiction in find_contradicting_properties(vk, api_version, json_data.get("capabilities", {}), block_names, unsatisfied_values):
+            path = " -> ".join(["capabilities", contradiction["block"]] + contradiction["path"] + [contradiction["member"]])
+            changes.append(f"{path}: {json.dumps(contradiction['value'])} -> {json.dumps(contradiction['unsatisfied_value'])}, '{contradiction['depends']}' is not supported")
+            contradiction["members"][contradiction["member"]] = copy.deepcopy(contradiction["unsatisfied_value"])
+    return changes
+
+
 def save_profiles_json_preserving_format(input_path: Path, output_path: Path, json_data: dict):
     """
     Writes a profiles file with an indentation of 4 spaces, preserving the line endings and the final line ending of
@@ -409,6 +439,9 @@ def apply_workarounds(vk: VulkanObject, input_path: Path, workaround_bits: list[
             changes.extend(apply_mismatching_aliases_workaround(vk, json_data,
                                                                 limit_members=WorkaroundBits.MISMATCHING_ALIASES in workaround_bits,
                                                                 exact_booleans=WorkaroundBits.MISMATCHING_ALIASES_EXTRA in workaround_bits))
+        # After the aliases, so that the aliased properties have a single value
+        if WorkaroundBits.UNSUPPORTED_FEATURE_PROPERTIES in workaround_bits:
+            changes.extend(apply_unsupported_feature_properties_workaround(vk, json_data))
 
         output_path = path if output_dir is None else output_dir / path.name
         if changes:

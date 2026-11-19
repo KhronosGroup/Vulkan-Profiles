@@ -32,7 +32,7 @@ if str(scripts_dir) not in sys.path:
 
 from source.vulkan_object_utils import initVulkanObject
 from source.transform_utils import WorkaroundBits
-from source.validate_workarounds import apply_driver_id_workaround, apply_64_bit_strings_workaround, apply_flags_as_numbers_workaround, apply_enums_as_numbers_workaround, apply_undeclared_extension_structures_workaround, apply_mismatching_aliases_workaround, apply_workarounds
+from source.validate_workarounds import apply_driver_id_workaround, apply_64_bit_strings_workaround, apply_flags_as_numbers_workaround, apply_enums_as_numbers_workaround, apply_undeclared_extension_structures_workaround, apply_mismatching_aliases_workaround, apply_unsupported_feature_properties_workaround, apply_workarounds
 
 
 def make_report(vulkan12_driver_id, khr_driver_id, driver_name="KosmicKrisp") -> dict:
@@ -280,6 +280,39 @@ class TestValidateWorkarounds(unittest.TestCase):
         properties = report["capabilities"]["device"]["properties"]
         self.assertFalse(properties["VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT"]["uniformTexelBufferOffsetSingleTexelAlignment"])
         self.assertTrue(properties["VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR"]["integerDotProduct8BitUnsignedAccelerated"])
+
+    def test_unsupported_feature_properties_workaround(self):
+        """The properties of an unsupported feature are set to the Vulkan core value of the devices not supporting it, and the properties without such a value, or of a supported feature, are left unchanged."""
+        def make_properties(features: dict) -> dict:
+            return {
+                "profiles": {
+                    "VP_GPUINFO_test": {"version": 1, "api-version": "1.4.304", "capabilities": ["device"]}
+                },
+                "capabilities": {
+                    "device": {
+                        "features": {"VkPhysicalDeviceFeatures": features},
+                        "properties": {
+                            "VkPhysicalDeviceProperties": {"limits": {"maxGeometryShaderInvocations": 32, "lineWidthGranularity": 0.5, "maxImageDimension2D": 16384}},
+                            "VkPhysicalDeviceFloatControlsProperties": {"shaderSignedZeroInfNanPreserveFloat16": True}
+                        }
+                    }
+                }
+            }
+
+        report = make_properties({"depthClamp": True})
+        changes = apply_unsupported_feature_properties_workaround(self.vk, report)
+
+        self.assertEqual(len(changes), 2)
+        properties = report["capabilities"]["device"]["properties"]
+        limits = properties["VkPhysicalDeviceProperties"]["limits"]
+        self.assertEqual(limits["maxGeometryShaderInvocations"], 0)
+        self.assertEqual(limits["lineWidthGranularity"], 1.0)
+        self.assertEqual(limits["maxImageDimension2D"], 16384)
+        # No Vulkan core value for the devices not supporting shaderFloat16
+        self.assertTrue(properties["VkPhysicalDeviceFloatControlsProperties"]["shaderSignedZeroInfNanPreserveFloat16"])
+
+        report = make_properties({"geometryShader": True, "wideLines": True})
+        self.assertEqual(apply_unsupported_feature_properties_workaround(self.vk, report), [])
 
     def test_apply_workarounds_preserves_format(self):
         """Only the changed files are rewritten, preserving their CRLF line endings and the missing final line ending."""
