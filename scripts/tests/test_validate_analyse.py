@@ -104,7 +104,9 @@ class TestAnalyseBits(unittest.TestCase):
         json_files_dict = {"test_profile.json": json.loads(json_text)}
         issues = self.validator.validate_data(json_files_dict, [AnalyseBits.EXTENSIONS])
 
-        self.assertTrue(any("belongs to extension 'VK_KHR_imageless_framebuffer'" in issue for issue in issues))
+        undeclared_issues = [issue for issue in issues if "belongs to extension 'VK_KHR_imageless_framebuffer'" in issue]
+        self.assertEqual(len(undeclared_issues), 1)
+        self.assertEqual(getattr(undeclared_issues[0], "level", None), logging.ERROR)
 
     def test_analyse_aliases(self):
         """

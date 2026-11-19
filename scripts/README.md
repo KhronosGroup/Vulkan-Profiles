@@ -299,7 +299,7 @@ vkprofiles validate --input path/to/profiles [options]
 * `--registry`, `-r`: Path to `vk.xml` (used to generate schema if `--schema` is omitted and required for static analysis checks).
 * `--schema`, `-s`: Path to an explicit JSON schema file (`profiles-*.json`). By default, generates a schema from `vk.xml`.
 * `--analyse [CHECK ...]`: Optional static analysis checks to execute (`api-version`, `extensions`, `aliases`, `unratified`, `subcore`, `depends`). Values may be comma-separated or space-separated. If specified without values, all checks run.
-* `--apply-workarounds [WORKAROUND ...]`: Optional workarounds of known device report issues (`driver-id`, `64-bit-strings`, `flags-as-numbers`, `enums-as-numbers`). Values may be comma-separated or space-separated. If specified without values, all workarounds are applied.
+* `--apply-workarounds [WORKAROUND ...]`: Optional workarounds of known device report issues (`driver-id`, `64-bit-strings`, `flags-as-numbers`, `enums-as-numbers`, `undeclared-extension-structures`). Values may be comma-separated or space-separated. If specified without values, all workarounds are applied.
 * `--output`, `-o`: Directory where to write the input profiles files with the workarounds applied. The input profiles files are left unchanged, and the written profiles files are validated and analysed instead. Without `--output`, the workarounds are applied in place to the input profiles files, after the validation and analysis issues of the input profiles files are reported.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
 
@@ -316,6 +316,7 @@ The device reports exported from [GPUInfo.org](https://vulkan.gpuinfo.org) may h
 | `64-bit-strings` | Converts to numbers the 64-bit integer values (`VkDeviceSize`, `VkDeviceAddress`, `uint64_t`, `int64_t`) that the exporter wrote as strings, including in nested structures such as `VkPhysicalDeviceLimits`, e.g. `VkPhysicalDeviceExternalMemoryHostPropertiesEXT::minImportedHostPointerAlignment` written as `"4096"`. |
 | `flags-as-numbers` | Converts to lists of flag bit names the flags values that the exporter wrote as numbers or numeric strings, using the flag bits of the Vulkan registry, e.g. `VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV::extendedSparseImageUsageFlags` written as `"6"` becomes `["VK_IMAGE_USAGE_TRANSFER_DST_BIT", "VK_IMAGE_USAGE_SAMPLED_BIT"]`. A value with bits unknown to the Vulkan registry is left unchanged with a warning. |
 | `enums-as-numbers` | Replaces by their names the enum values that the exporter wrote as numbers or numeric strings, the values defined by extensions, e.g. `1000117000` in `VkPhysicalDeviceHostImageCopyPropertiesEXT::pCopyDstLayouts` becomes `VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL`. A value unknown to the Vulkan registry is left unchanged with a warning. |
+| `undeclared-extension-structures` | Removes the feature and property extension structures of a capability block whose extension the block doesn't declare and which aren't promoted to the API version of the profiles using the block, the structures that `--analyse extensions` reports as errors, e.g. `VkPhysicalDeviceMaintenance7PropertiesKHR` in a device report not listing `VK_KHR_maintenance7`. The exporter writes the property structures of extensions it doesn't know but leaves these extensions out of `extensions`, without their feature structures. This workaround runs first, so the other workarounds don't fix the removed structures. |
 
 With `--output`, `--analyse` runs the static analysis checks on the written files, after the workarounds, which reports the issues that no workaround fixes yet. The `validate_desktop_baseline_*_reports` nodes of `profiles/vkprofiles_graph.json` run every check except `unratified`, since the device reports expose many unratified extensions:
 
@@ -332,7 +333,7 @@ vkprofiles validate \
 | Check Value | Description |
 | --- | --- |
 | `api-version` | Verifies inherited required profiles and profile API version constraints stay compatible with Vulkan versioning rules. |
-| `extensions` | Checks extension declarations, core structure coverage, and extension-related compatibility against `vk.xml`. |
+| `extensions` | Checks extension declarations, core structure coverage, and extension-related compatibility against `vk.xml`. Reports as errors the extension structures whose extension isn't declared in the profile's extensions nor promoted to the profile API version. |
 | `aliases` | Validates member consistency across aliased capability structures. The enum and flags values are compared by their integer values in `vk.xml`, so an enum value name and its alias, e.g. `VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE` and `VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE_KHR`, are equal. |
 | `unratified` | Flags enabled extensions or structures that are not ratified for Vulkan. |
 | `subcore` | Flags profile capability values (features/properties) below the Vulkan core specification requirements for the profile API version. |

@@ -32,7 +32,7 @@ if str(scripts_dir) not in sys.path:
 
 from source.vulkan_object_utils import initVulkanObject
 from source.transform_utils import WorkaroundBits
-from source.validate_workarounds import apply_driver_id_workaround, apply_64_bit_strings_workaround, apply_flags_as_numbers_workaround, apply_enums_as_numbers_workaround, apply_workarounds
+from source.validate_workarounds import apply_driver_id_workaround, apply_64_bit_strings_workaround, apply_flags_as_numbers_workaround, apply_enums_as_numbers_workaround, apply_undeclared_extension_structures_workaround, apply_workarounds
 
 
 def make_report(vulkan12_driver_id, khr_driver_id, driver_name="KosmicKrisp") -> dict:
@@ -174,6 +174,41 @@ class TestValidateWorkarounds(unittest.TestCase):
         properties["VkPhysicalDeviceHostImageCopyPropertiesEXT"]["pCopySrcLayouts"] = [999]
         with self.assertLogs(level="WARNING"):
             self.assertEqual(apply_enums_as_numbers_workaround(self.vk, report), [])
+
+    def test_undeclared_extension_structures_workaround(self):
+        """The extension structures whose extension the block doesn't declare are removed, and the declared, promoted and core structures are kept."""
+        report = {
+            "profiles": {
+                "VP_GPUINFO_test": {"version": 1, "api-version": "1.3.0", "capabilities": ["device"]}
+            },
+            "capabilities": {
+                "device": {
+                    "extensions": {"VK_KHR_maintenance5": 1},
+                    "features": {
+                        "VkPhysicalDeviceMaintenance7FeaturesKHR": {"maintenance7": True},
+                        "VkPhysicalDeviceMaintenance5FeaturesKHR": {"maintenance5": True}
+                    },
+                    "properties": {
+                        "VkPhysicalDeviceMaintenance7PropertiesKHR": {"robustFragmentShadingRateAttachmentAccess": True},
+                        "VkPhysicalDeviceHostImageCopyPropertiesEXT": {"copySrcLayoutCount": 0},
+                        "VkPhysicalDeviceMaintenance5PropertiesKHR": {"depthStencilSwizzleOneSupport": True},
+                        "VkPhysicalDeviceMaintenance4PropertiesKHR": {"maxBufferSize": 1024},
+                        "VkPhysicalDeviceVulkan12Properties": {"driverID": "VK_DRIVER_ID_MESA_RADV"}
+                    }
+                }
+            }
+        }
+        changes = apply_undeclared_extension_structures_workaround(self.vk, report)
+
+        self.assertEqual(len(changes), 3)
+        block = report["capabilities"]["device"]
+        self.assertEqual(list(block["features"].keys()), ["VkPhysicalDeviceMaintenance5FeaturesKHR"])
+        self.assertEqual(list(block["properties"].keys()), ["VkPhysicalDeviceMaintenance5PropertiesKHR", "VkPhysicalDeviceMaintenance4PropertiesKHR", "VkPhysicalDeviceVulkan12Properties"])
+
+        # VK_EXT_host_image_copy is promoted to Vulkan 1.4
+        report["profiles"]["VP_GPUINFO_test"]["api-version"] = "1.4.0"
+        block["properties"]["VkPhysicalDeviceHostImageCopyPropertiesEXT"] = {"copySrcLayoutCount": 0}
+        self.assertEqual(apply_undeclared_extension_structures_workaround(self.vk, report), [])
 
     def test_apply_workarounds_preserves_format(self):
         """Only the changed files are rewritten, preserving their CRLF line endings and the missing final line ending."""
