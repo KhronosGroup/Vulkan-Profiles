@@ -334,7 +334,7 @@ vkprofiles validate \
 | --- | --- |
 | `api-version` | Verifies inherited required profiles and profile API version constraints stay compatible with Vulkan versioning rules. |
 | `extensions` | Checks extension declarations, core structure coverage, and extension-related compatibility against `vk.xml`. Reports as errors the extension structures whose extension isn't declared in the profile's extensions nor promoted to the profile API version. |
-| `aliases` | Validates member consistency across aliased capability structures. |
+| `aliases` | Validates member consistency across aliased capability structures. The enum and flags values are compared by their integer values in `vk.xml`, so an enum value name and its alias, e.g. `VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE` and `VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE_KHR`, are equal. |
 | `unratified` | Flags enabled extensions or structures that are not ratified for Vulkan. |
 | `subcore` | Flags profile capability values (features/properties) below the Vulkan core specification requirements for the profile API version. |
 | `depends` | Reports as errors the instance extensions in capability blocks with a `depends` condition: the condition is evaluated on a physical device, so the Vulkan Profiles API library and the Profiles layer ignore these instance extensions. Reports as warnings the unconditional properties which contradict the value of the devices not supporting a capability the profile doesn't require, e.g. a `maxTessellationGenerationLevel` of 64 in a profile not requiring `tessellationShader`: `vkprofiles transform --pull requirements depends` moves them into capability blocks with a `depends` condition. |

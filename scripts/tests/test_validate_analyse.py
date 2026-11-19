@@ -142,6 +142,37 @@ class TestAnalyseBits(unittest.TestCase):
 
         self.assertTrue(any("has mismatching value" in issue and "aliased structure" in issue for issue in issues))
 
+    def test_analyse_aliases_enum_and_flags_values(self):
+        """
+        AnalyseBits.ALIASES:
+        Verifies that the enum and flags values are compared by their integer values: an enum value name and its alias,
+        and a flag bit name and its alias, are equal, while different enum values mismatch.
+        """
+        def make_profile(vulkan12_independence: str, khr_independence: str) -> dict:
+            return {"test_profile.json": {
+                "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.3-304.json#",
+                "profiles": {
+                    "VP_TEST_profile": {"version": 1, "api-version": "1.2.0", "capabilities": ["baseline"]}
+                },
+                "capabilities": {
+                    "baseline": {
+                        "properties": {
+                            "VkPhysicalDeviceVulkan12Properties": {"denormBehaviorIndependence": vulkan12_independence},
+                            "VkPhysicalDeviceFloatControlsPropertiesKHR": {"denormBehaviorIndependence": khr_independence},
+                            "VkPhysicalDeviceVulkan11Properties": {"subgroupSupportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_RAYGEN_BIT_KHR"]},
+                            "VkPhysicalDeviceSubgroupProperties": {"supportedStages": ["VK_SHADER_STAGE_RAYGEN_BIT_NV", "VK_SHADER_STAGE_COMPUTE_BIT"]}
+                        }
+                    }
+                }
+            }}
+
+        issues = self.validator.validate_data(make_profile("VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE", "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE_KHR"), [AnalyseBits.ALIASES])
+        self.assertEqual(issues, [])
+
+        issues = self.validator.validate_data(make_profile("VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE", "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL_KHR"), [AnalyseBits.ALIASES])
+        self.assertEqual(len(issues), 1)
+        self.assertIn("'denormBehaviorIndependence'", issues[0])
+
     def test_analyse_unratified(self):
         """
         AnalyseBits.UNRATIFIED:
