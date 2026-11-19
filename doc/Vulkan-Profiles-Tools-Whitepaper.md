@@ -373,6 +373,7 @@ The schema validation of the 90 device reports of the LunarG Desktop Baseline pr
 | Image layouts as raw numbers | `VkPhysicalDeviceHostImageCopyPropertiesEXT::pCopyDstLayouts` lists `1000117000` (`VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL`) or `1000314000` (`VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL`). The exporter writes every image layout defined by an extension as a number, in `pCopySrcLayouts` too | Exporter, not mapping the extension values to their names | 17 |
 | 64-bit values as strings | `VkPhysicalDeviceExternalMemoryHostPropertiesEXT::minImportedHostPointerAlignment` is `"4096"` and `VkPhysicalDeviceDrmPropertiesEXT::primaryMajor` is `"226"`. The older device reports write every `VkDeviceSize`, `uint64_t` and `int64_t` value as a string, up to 134 values in the 2022 reports | Exporter | 7 |
 | Flags as numbers | `VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV::extendedSparseBufferUsageFlags` is `"0"` instead of `[]` and `extendedSparseImageUsageFlags` is `"6"` instead of `["VK_IMAGE_USAGE_TRANSFER_DST_BIT", "VK_IMAGE_USAGE_SAMPLED_BIT"]` | Exporter | 5 |
+| Undeclared extension structures | `VkPhysicalDeviceMaintenance7PropertiesKHR` is in a device report whose `extensions` don't list `VK_KHR_maintenance7`, though the GPUInfo.org report does. The exporter writes the property structures of the extensions it doesn't know, but neither these extensions nor their feature structures. Reported by `--analyse extensions`, not by the schema | Exporter, not knowing the recent extensions | 21 for `VK_KHR_maintenance7` in the 2027 reports |
 | Identical queue families | MoltenVK reports 4 identical queue families, which the schema rejects because it requires the queue families to be unique | Schema, too strict for a valid driver behavior | 9 |
 
 The schema validation reports a single issue per device report, so a device report may have further issues behind the first one.
@@ -387,7 +388,7 @@ vkprofiles validate \
     --apply-workarounds
 ```
 
-The `profiles/vkprofiles_graph.json` graph of the Vulkan Profiles repository applies the workarounds to the device reports of each LunarG Desktop Baseline profile, writes them to the `profiles/build/reports` build directory, and validates them before combining them, in its `validate_desktop_baseline_*_reports` nodes. These nodes also run the `--analyse` checks on the device reports with the workarounds applied, to discover the issues no workaround is known for yet. They skip the `unratified` check, because the devices expose many unratified extensions. The analysis issues are warnings, which don't stop the build. The device reports of the repository stay as downloaded from GPUInfo.org.
+The `profiles/vkprofiles_graph.json` graph of the Vulkan Profiles repository applies the workarounds to the device reports of each LunarG Desktop Baseline profile, writes them to the `profiles/build/reports` build directory, and validates them before combining them, in its `validate_desktop_baseline_*_reports` nodes. These nodes also run the `--analyse` checks on the device reports with the workarounds applied, to discover the issues no workaround is known for yet. They skip the `unratified` check, because the devices expose many unratified extensions. The analysis warnings don't stop the build, while the analysis errors, such as an extension structure without its extension, do. The device reports of the repository stay as downloaded from GPUInfo.org.
 
 #### Combining the device reports
 
@@ -752,7 +753,7 @@ WARNING: Core structure 'VkPhysicalDeviceVulkan13Features' requires Vulkan 1.3 b
 WARNING: Member 'runtimeDescriptorArray' in structure 'VkPhysicalDeviceVulkan12Features' (value: True) has mismatching value with member 'runtimeDescriptorArray' in aliased structure 'VkPhysicalDeviceDescriptorIndexingFeatures' (value: False) in profile 'VP_EXAMPLE_engine_bindless'
 ```
 
-The static analysis issues are reported as warnings and don't change the `vkprofiles validate` exit code, so its output must be reviewed.
+Most static analysis issues are reported as warnings and don't change the `vkprofiles validate` exit code, so its output must be reviewed. The issues that make a profile wrong rather than questionable are reported as errors and make `vkprofiles validate` fail: an extension structure whose extension the profile doesn't declare, and an instance extension in a capability block with a `depends` condition.
 
 *Example of Vulkan Profiles file:*
 

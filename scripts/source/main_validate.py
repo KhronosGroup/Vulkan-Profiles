@@ -28,9 +28,7 @@ from source.vulkan_object_utils import (
     VulkanObject,
     initVulkanObject,
     getStructCoreVersion,
-    getStructDefiningExtensions,
-    is_extension_struct_name,
-    getExtensionPromotedTo,
+    getUndeclaredStructExtension,
     gatherCapabilityAliases,
     gatherSatisfiedCoreRequiredFeaturesForVersion,
     gatherSatisfiedCoreRequiredPropertiesForVersion,
@@ -171,31 +169,15 @@ class VulkanProfilesDataValidation:
                     )
                 )
 
-            if is_extension_struct_name(self.vk, struct_name):
-                def_exts = getStructDefiningExtensions(self.vk, struct_name)
-                if def_exts:
-                    declared = False
-                    for ext_name in def_exts:
-                        if ext_name in enabled_exts:
-                            declared = True
-                            break
-                        promoted = getExtensionPromotedTo(self.vk, ext_name)
-                        for p_target in promoted:
-                            p_ver = VK_VERSION.from_string(p_target)
-                            if p_ver != VK_VERSION.NONE and api_version >= p_ver:
-                                declared = True
-                                break
-                        if declared:
-                            break
-
-                    if not declared:
-                        issues.append(
-                            ValidationIssue(
-                                f"Structure '{struct_name}' in profile '{profile_name}' "
-                                f"belongs to extension '{def_exts[0]}' which is not declared in extensions",
-                                level=logging.WARNING
-                            )
-                        )
+            undeclared_ext = getUndeclaredStructExtension(self.vk, struct_name, api_version, enabled_exts)
+            if undeclared_ext is not None:
+                issues.append(
+                    ValidationIssue(
+                        f"Structure '{struct_name}' in profile '{profile_name}' "
+                        f"belongs to extension '{undeclared_ext}' which is not declared in extensions",
+                        level=logging.ERROR
+                    )
+                )
 
         return issues
 
