@@ -55,6 +55,7 @@ from source.transform_pull_required_capabilities import (
     get_unsatisfied_property_values
 )
 from source.generate_profiles_schema import VulkanProfilesSchemaGenerator2
+from source.validate_workarounds import apply_workarounds
 
 
 class ValidationIssue(str):
@@ -576,9 +577,34 @@ def main_validate(args):
     input_path = Path(args.input)
     schema_path = Path(args.schema) if getattr(args, 'schema', None) else None
     analyse_bits = getattr(args, 'analyse', None)
+    workaround_bits = getattr(args, 'apply_workarounds', None) or []
+    output_dir = Path(args.output) if getattr(args, 'output', None) else None
 
     vk = initVulkanObject(getattr(args, 'api', 'vulkan') or 'vulkan', getattr(args, 'registry', None))
 
+    if output_dir is not None:
+        # Write the input profiles files with the workarounds applied to the output directory, leaving the input
+        # profiles files unchanged, and validate and analyse the written profiles files
+        if output_dir.resolve() == (input_path.parent if input_path.is_file() else input_path).resolve():
+            logging.error(f"The output directory '{output_dir}' is the input directory: omit --output to apply the workarounds in place")
+            sys.exit(1)
+        changed_files = apply_workarounds(vk, input_path, workaround_bits, output_dir)
+        logging.info(f"Applied workarounds to {changed_files} file(s) written to '{output_dir}'.")
+        failed = validate_and_analyse(vk, output_dir / input_path.name if input_path.is_file() else output_dir, schema_path, analyse_bits)
+    else:
+        failed = validate_and_analyse(vk, input_path, schema_path, analyse_bits)
+
+        # Apply the workarounds in place to the input profiles files once their issues are reported, whether they are valid or not
+        if workaround_bits:
+            changed_files = apply_workarounds(vk, input_path, workaround_bits)
+            logging.info(f"Applied workarounds to {changed_files} file(s).")
+
+    if failed:
+        sys.exit(1)
+
+
+def validate_and_analyse(vk, input_path: Path, schema_path: Path | None, analyse_bits) -> bool:
+    """Validates the profiles files against the schema and analyses the valid profiles files. Returns True on failure."""
     # 1. Systematically perform JSON schema validation first, failing the command when a profiles file is invalid
     invalid_files: list[Path] = []
     if schema_path is None:
@@ -597,7 +623,7 @@ def main_validate(args):
     logging.info(f"Validated {count} file(s) against {schema_name}.")
     if invalid_files:
         logging.error(f"Schema validation failed for {len(invalid_files)} file(s) against {schema_name}: {', '.join(str(f) for f in invalid_files)}")
-        sys.exit(1)
+        return True
 
     # 2. Perform static analysis if --analyse was specified
     if analyse_bits:
@@ -614,4 +640,6 @@ def main_validate(args):
                 else:
                     logging.warning(issue)
             if any(getattr(issue, "level", logging.WARNING) == logging.ERROR for issue in issues):
-                sys.exit(1)
+                return True
+
+    return False

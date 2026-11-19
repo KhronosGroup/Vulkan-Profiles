@@ -33,6 +33,7 @@ This whitepaper presents the Vulkan Profiles Tools and how they fit together. Ea
       - [GPUInfo.org](#gpuinfoorg)
     - [Generating a Platform Vulkan Profiles JSON files](#generating-a-platform-vulkan-profiles-json-files)
       - [Checking the GPUInfo.org device reports](#checking-the-gpuinfoorg-device-reports)
+      - [Examples of device report issues](#examples-of-device-report-issues)
       - [Combining the device reports](#combining-the-device-reports)
       - [Newer platform profiles are not necessarily supersets of older ones](#newer-platform-profiles-are-not-necessarily-supersets-of-older-ones)
     - [JSON script to generate merged Vulkan profiles](#json-script-to-generate-merged-vulkan-profiles)
@@ -316,7 +317,7 @@ A GPUInfo.org device report is what a Vulkan driver reported to the Vulkan Hardw
 
 The device reports of the LunarG Desktop Baseline profiles show three kinds of issues.
 
-**Reports that don't conform to the Vulkan Profiles schema.** Some drivers report values that aren't valid Vulkan values, and some reports encode values in a way the schema doesn't accept. For example, several reports list image layouts as raw numbers, such as `1000314000`, in `VkPhysicalDeviceHostImageCopyPropertiesEXT::pCopyDstLayouts`, report `'0'` instead of a flags list for `VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV::extendedSparseBufferUsageFlags`, or describe their queue families in an invalid form. 17 of the 23 device reports of the `VP_LUNARG_desktop_baseline_2026` profile fail the schema validation:
+**Reports that don't conform to the Vulkan Profiles schema.** Some drivers report values that aren't valid Vulkan values, and some reports encode values in a way the schema doesn't accept. For example, several reports list image layouts as raw numbers, such as `1000314000`, in `VkPhysicalDeviceHostImageCopyPropertiesEXT::pCopyDstLayouts`, report `'0'` instead of a flags list for `VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV::extendedSparseBufferUsageFlags`, or describe their queue families in an invalid form. 15 of the 23 device reports of the `VP_LUNARG_desktop_baseline_2026` profile fail the schema validation (see [Examples of device report issues](#examples-of-device-report-issues)):
 
 ```bash
 vkprofiles validate \
@@ -360,6 +361,33 @@ The `profiles/vkprofiles_graph.json` graph of the Vulkan Profiles repository run
 These checks only cover what `vk.xml` and the Vulkan Profiles schema describe: the dependencies between features that the Vulkan specification only describes in valid usage statements are not checked.
 
 > **A platform profile is only as reliable as the device reports it is generated from.** Vulkan developers should validate the device reports they select on GPUInfo.org, check the aliased structures of the generated platform profile before transforming it, and review the capabilities that `vkprofiles transform --pull depends` moves into capability blocks with a `depends` condition: each of them is a value that at least one driver reports without supporting the corresponding feature. When a device report is wrong, prefer another report of the same device with a newer driver, or report the issue to the driver vendor.
+
+#### Examples of device report issues
+
+The schema validation of the 90 device reports of the LunarG Desktop Baseline profiles, with `vkprofiles validate`, found 35 invalid reports. The issues come either from the driver or from the GPUInfo.org exporter, which writes the device reports as Vulkan Profiles JSON files:
+
+| Issue | Example | Origin | Device reports |
+| --- | --- | --- | --- |
+| Unknown driver ID | `VkPhysicalDeviceVulkan12Properties::driverID` is `null` and `VkPhysicalDeviceDriverPropertiesKHR::driverID` is `"_KHR"` for the Mesa KosmicKrisp driver on Apple M1 and M5, instead of `VK_DRIVER_ID_MESA_KOSMICKRISP` | Exporter, predating the driver ID | 2 |
+| Nonexistent `_KHR` driver ID | `VkPhysicalDeviceDriverPropertiesKHR::driverID` is `VK_DRIVER_ID_MOLTENVK_KHR` instead of `VK_DRIVER_ID_MOLTENVK`: only the driver IDs defined before Vulkan 1.2 have a `_KHR` alias | Exporter | 7, behind the identical queue families |
+| Image layouts as raw numbers | `VkPhysicalDeviceHostImageCopyPropertiesEXT::pCopyDstLayouts` lists `1000117000` (`VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL`) or `1000314000` (`VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL`). The exporter writes every image layout defined by an extension as a number, in `pCopySrcLayouts` too | Exporter, not mapping the extension values to their names | 17 |
+| 64-bit values as strings | `VkPhysicalDeviceExternalMemoryHostPropertiesEXT::minImportedHostPointerAlignment` is `"4096"` and `VkPhysicalDeviceDrmPropertiesEXT::primaryMajor` is `"226"`. The older device reports write every `VkDeviceSize`, `uint64_t` and `int64_t` value as a string, up to 134 values in the 2022 reports | Exporter | 7 |
+| Flags as numbers | `VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV::extendedSparseBufferUsageFlags` is `"0"` instead of `[]` and `extendedSparseImageUsageFlags` is `"6"` instead of `["VK_IMAGE_USAGE_TRANSFER_DST_BIT", "VK_IMAGE_USAGE_SAMPLED_BIT"]` | Exporter | 5 |
+| Identical queue families | MoltenVK reports 4 identical queue families, which the schema rejects because it requires the queue families to be unique | Schema, too strict for a valid driver behavior | 9 |
+
+The schema validation reports a single issue per device report, so a device report may have further issues behind the first one.
+
+Most of these issues are in the way the values are written, not in the values themselves: the device reports remain usable once the values are rewritten. `vkprofiles validate --apply-workarounds` fixes the known issues and logs each fix. With `--output`, the device reports are written with the fixes to another directory, which `vkprofiles combine` then uses, and the downloaded device reports are left unchanged:
+
+```bash
+vkprofiles validate \
+    --registry vk.xml \
+    --input ./VP_LUNARG_desktop_baseline_2026 \
+    --output ./build/VP_LUNARG_desktop_baseline_2026 \
+    --apply-workarounds
+```
+
+The `profiles/vkprofiles_graph.json` graph of the Vulkan Profiles repository applies the workarounds to the device reports of each LunarG Desktop Baseline profile, writes them to the `profiles/build/reports` build directory, and validates them before combining them, in its `validate_desktop_baseline_*_reports` nodes. These nodes also run the `--analyse` checks on the device reports with the workarounds applied, to discover the issues no workaround is known for yet. They skip the `unratified` check, because the devices expose many unratified extensions. The analysis issues are warnings, which don't stop the build. The device reports of the repository stay as downloaded from GPUInfo.org.
 
 #### Combining the device reports
 
