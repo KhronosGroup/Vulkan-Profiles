@@ -31,7 +31,9 @@ import shutil
 
 from vulkan_object import VulkanObject
 from source.transform_utils import WorkaroundBits
-from source.profiles_json_utils import load_profiles_json
+from source.profiles_json_utils import load_profiles_json, collect_block_names
+from source.vulkan_object_utils import getUndeclaredStructExtension
+from source.vulkan_object_version import VK_VERSION
 
 
 # The driverID of the drivers unknown to the device report exporter, by driverName
@@ -185,6 +187,39 @@ def apply_enums_as_numbers_workaround(vk: VulkanObject, json_data: dict) -> list
     return apply_member_workaround(vk, json_data, convert)
 
 
+def apply_undeclared_extension_structures_workaround(vk: VulkanObject, json_data: dict) -> list[str]:
+    """
+    Removes the feature and property extension structures whose extension the capability block doesn't declare, and
+    which aren't promoted to the Vulkan version of the profiles using the block, e.g. the
+    VkPhysicalDeviceMaintenance7PropertiesKHR of the device reports not listing VK_KHR_maintenance7, written by a
+    device report exporter not knowing the extension. Returns the description of each change.
+    """
+    profiles = json_data.get("profiles", {})
+    profile_versions = [VK_VERSION.from_string(profile.get("api-version", "1.0.0")) for profile in profiles.values() if isinstance(profile, dict)]
+
+    changes = []
+    for block_name, block in json_data.get("capabilities", {}).items():
+        if not isinstance(block, dict):
+            continue
+        # The structures promoted to the Vulkan version of every profile using the block are kept
+        block_versions = [VK_VERSION.from_string(profile.get("api-version", "1.0.0")) for profile in profiles.values()
+                          if isinstance(profile, dict) and block_name in collect_block_names(profile.get("capabilities"))]
+        versions = block_versions or profile_versions
+        api_version = min(versions) if versions else VK_VERSION.from_string("1.0.0")
+        enabled_exts = set(block.get("extensions", {}).keys())
+        for category in ("features", "properties"):
+            structs = block.get(category)
+            if not isinstance(structs, dict):
+                continue
+            for struct_name in list(structs.keys()):
+                undeclared_ext = getUndeclaredStructExtension(vk, struct_name, api_version, enabled_exts)
+                if undeclared_ext is None:
+                    continue
+                changes.append(f"capabilities -> {block_name} -> {category} -> {struct_name}: removed, '{undeclared_ext}' is not declared in extensions")
+                del structs[struct_name]
+    return changes
+
+
 def save_profiles_json_preserving_format(input_path: Path, output_path: Path, json_data: dict):
     """
     Writes a profiles file with an indentation of 4 spaces, preserving the line endings and the final line ending of
@@ -225,6 +260,9 @@ def apply_workarounds(vk: VulkanObject, input_path: Path, workaround_bits: list[
             continue
 
         changes = []
+        # First, so that the other workarounds don't fix the removed structures
+        if WorkaroundBits.UNDECLARED_EXTENSION_STRUCTURES in workaround_bits:
+            changes.extend(apply_undeclared_extension_structures_workaround(vk, json_data))
         if WorkaroundBits.DRIVER_ID in workaround_bits:
             changes.extend(apply_driver_id_workaround(vk, json_data))
         if WorkaroundBits.STRINGS_64_BIT in workaround_bits:

@@ -173,7 +173,8 @@ GRAPH_JSON_SCHEMA = {
                 "driver-id",
                 "64-bit-strings",
                 "flags-as-numbers",
-                "enums-as-numbers"
+                "enums-as-numbers",
+                "undeclared-extension-structures"
             ]
         },
         "common_args": {
