@@ -1107,3 +1107,72 @@ TEST_F(TestsMechanism, capabilities_depends) {
 
     inst_builder.reset();
 }
+
+static void InitDependsAliasesProfile(profiles_test::VulkanInstanceBuilder &inst_builder, const char *profile_name_data) {
+    const char *profile_file_data = JSON_TEST_FILES_PATH "VP_LUNARG_test_depends_aliases.json";
+    const std::vector<const char *> simulate_capabilities = {"SIMULATE_API_VERSION_BIT", "SIMULATE_FEATURES_BIT"};
+    const char *default_feature_values_data = "DEFAULT_FEATURE_VALUES_FALSE";
+
+    const std::vector<VkLayerSettingEXT> settings = {
+        {kLayerName, kLayerSettingsProfileFile, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_file_data},
+        {kLayerName, kLayerSettingsProfileName, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &profile_name_data},
+        {kLayerName, kLayerSettingsSimulateCapabilities, VK_LAYER_SETTING_TYPE_STRING_EXT, static_cast<uint32_t>(simulate_capabilities.size()), &simulate_capabilities[0]},
+        {kLayerName, kLayerSettingsDefaultFeatureValues, VK_LAYER_SETTING_TYPE_STRING_EXT, 1, &default_feature_values_data}};
+
+    ASSERT_EQ(inst_builder.init(VK_API_VERSION_1_2, settings), VK_SUCCESS);
+}
+
+TEST_F(TestsMechanism, capabilities_depends_vulkan_11_features) {
+    TEST_DESCRIPTION("Test that the 'depends' conditions naming the structures promoted to Vulkan 1.1 see the VkPhysicalDeviceVulkan11Features values of the profile");
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+    InitDependsAliasesProfile(inst_builder, "VP_LUNARG_test_depends_vulkan_11");
+
+    VkPhysicalDevice gpu = VK_NULL_HANDLE;
+    if (inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu) != VK_SUCCESS) {
+        printf("Profile not supported on device, skipping test.\n");
+        inst_builder.reset();
+        return;
+    }
+
+    VkPhysicalDeviceProtectedMemoryFeatures protected_memory_features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROTECTED_MEMORY_FEATURES};
+    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &protected_memory_features};
+    vkGetPhysicalDeviceFeatures2(gpu, &features);
+
+    // VkPhysicalDeviceVulkan11Features::protectedMemory is transferred to the core VkPhysicalDeviceProtectedMemoryFeatures
+    EXPECT_EQ(protected_memory_features.protectedMemory, VK_TRUE);
+    // 'depends' naming VkPhysicalDeviceProtectedMemoryFeatures, set by the profile in VkPhysicalDeviceVulkan11Features
+    EXPECT_EQ(features.features.sampleRateShading, VK_TRUE);
+    // 'depends' naming VkPhysicalDeviceMultiviewFeatures, set by the profile in VkPhysicalDeviceVulkan11Features
+    EXPECT_EQ(features.features.dualSrcBlend, VK_TRUE);
+    // 'depends' naming VkPhysicalDevice16BitStorageFeatures, not set by the profile in VkPhysicalDeviceVulkan11Features
+    EXPECT_EQ(features.features.logicOp, VK_FALSE);
+
+    inst_builder.reset();
+}
+
+TEST_F(TestsMechanism, capabilities_depends_promoted_features) {
+    TEST_DESCRIPTION("Test that the 'depends' conditions naming VkPhysicalDeviceVulkan11Features see the values of the promoted structures of the profile");
+
+    profiles_test::VulkanInstanceBuilder inst_builder;
+    InitDependsAliasesProfile(inst_builder, "VP_LUNARG_test_depends_promoted");
+
+    VkPhysicalDevice gpu = VK_NULL_HANDLE;
+    if (inst_builder.getPhysicalDevice(profiles_test::MODE_PROFILE, &gpu) != VK_SUCCESS) {
+        printf("Profile not supported on device, skipping test.\n");
+        inst_builder.reset();
+        return;
+    }
+
+    VkPhysicalDeviceVulkan11Features vulkan_11_features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES};
+    VkPhysicalDeviceFeatures2 features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &vulkan_11_features};
+    vkGetPhysicalDeviceFeatures2(gpu, &features);
+
+    // The core VkPhysicalDeviceProtectedMemoryFeatures::protectedMemory is transferred to VkPhysicalDeviceVulkan11Features
+    EXPECT_EQ(vulkan_11_features.protectedMemory, VK_TRUE);
+    EXPECT_EQ(vulkan_11_features.multiview, VK_TRUE);
+    // 'depends' naming VkPhysicalDeviceVulkan11Features, set by the profile in the promoted structures
+    EXPECT_EQ(features.features.sampleRateShading, VK_TRUE);
+
+    inst_builder.reset();
+}

@@ -234,7 +234,7 @@ A capability block with a `depends` condition is referenced by the `capabilities
 * `vkprofiles validate` checks the syntax of the condition and that its Vulkan versions, extensions and features exist.
 * `vkprofiles transform` never merges a capability block with a `depends` condition into an unconditional capability block, and doesn't use its requirements to satisfy the requirements of other capability blocks. The extensions and features required by the condition are considered enabled when pulling the requirements of the capability block itself.
 * The Vulkan Profiles API library evaluates the condition on the physical device: `vpGetPhysicalDeviceProfileSupport` only checks the capability block requirements and `vpCreateDevice` only enables the capability block extensions and features when the device satisfies the condition. See the [library tutorial](./library/TUTORIAL.md).
-* The Vulkan Profiles layer evaluates the condition on the simulated device, after loading the capability blocks without a condition, and only loads the capability block when the condition is satisfied.
+* The Vulkan Profiles layer evaluates the condition on the simulated device, after loading the capability blocks without a condition, and only loads the capability block when the condition is satisfied. A feature of a structure promoted to a Vulkan version and of the `VkPhysicalDeviceVulkan<major><minor>Features` structure of this version has the same value whichever structure the condition names and whichever structure the profile sets, e.g. a condition on `VkPhysicalDeviceProtectedMemoryFeatures::protectedMemory` is satisfied by a profile setting `VkPhysicalDeviceVulkan11Features::protectedMemory`.
 
 ## Vulkan Profiles File Processing (`vkprofiles`)
 
