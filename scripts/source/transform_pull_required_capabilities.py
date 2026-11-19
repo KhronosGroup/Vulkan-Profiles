@@ -34,6 +34,8 @@ from source.vulkan_object_utils import (
 )
 from source.profiles_json_utils import (
     collect_block_names,
+    get_block_depends,
+    get_depends_implied_capabilities,
     parse_profile_capabilities,
     collect_profile_capabilities,
     get_primary_capability_block,
@@ -307,8 +309,20 @@ def pull_extension_dependencies_profiles_file(
         for block_name in block_names:
             if block_name in json_profiles_capabilities:
                 block = json_profiles_capabilities[block_name]
+                block_context_extensions = context_extensions
+                block_context_features = context_features
+                block_depends = get_block_depends(block)
+                if block_depends is not None:
+                    # The extensions and features required by the 'depends' condition are enabled when the
+                    # capability block requirements apply
+                    implied_exts, implied_features = get_depends_implied_capabilities(block_depends)
+                    block_context_extensions = context_extensions | implied_exts
+                    block_context_features = {}
+                    deep_merge_dict(block_context_features, context_features)
+                    for s_name, m_name in implied_features:
+                        block_context_features.setdefault(s_name, {})[m_name] = True
                 pull_extension_dependencies_capabilities_block(
-                    vk, api_version, pull_bits, block, context_extensions, context_features, context_properties, profile_key
+                    vk, api_version, pull_bits, block, block_context_extensions, block_context_features, context_properties, profile_key
                 )
                 update_context_from_capabilities(block, context_features, context_properties, context_extensions)
 
@@ -356,12 +370,18 @@ def process_or_disjunction(
             if not parent_block["extensions"]:
                 del parent_block["extensions"]
 
+    parent_depends = get_block_depends(parent_block)
+
     variant_block_names = []
     for field_name in fields:
         var_block_name = f"{block_name}_{field_name}"
         variant_block_names.append(var_block_name)
 
         var_block = capabilities_dict.setdefault(var_block_name, {})
+
+        # The variants of a capability block with a 'depends' condition have the same condition
+        if parent_depends is not None:
+            var_block["depends"] = parent_depends
 
         if ext_name:
             var_exts = var_block.setdefault("extensions", {})
@@ -497,7 +517,8 @@ def pull_required_capabilities_single_profile(
                 own_caps = {}
                 for block_name in parse_profile_capabilities(profile_caps_list):
                     if isinstance(block_name, str) and block_name in capabilities_dict:
-                        deep_merge_dict(own_caps, capabilities_dict[block_name])
+                        if get_block_depends(capabilities_dict[block_name]) is None:
+                            deep_merge_dict(own_caps, capabilities_dict[block_name])
                 transition_features = filter_features_against_context(
                     vk, transition_features, own_caps.get("features", {}), ignore_subcore
                 )
@@ -578,6 +599,9 @@ def pull_required_capabilities_single_profile(
         for block_name in parse_profile_capabilities(profile_caps_list):
             if isinstance(block_name, str) and block_name in capabilities_dict:
                 block = capabilities_dict[block_name]
+                # A capability block with a 'depends' condition only defines the conditional requirements
+                if get_block_depends(block) is not None:
+                    continue
                 populate_missing_structure_defaults(
                     vk, block.get("features", {}), block.get("properties", {}), ignore_unsupported,
                     own_blocks_context_features, own_blocks_context_properties
@@ -673,7 +697,13 @@ def pull_required_capabilities_single_profile(
             profile_caps = collect_profile_capabilities(json_files_dict, json_file_data, profile_obj)
             profile_enabled_exts = set(profile_caps.get("extensions", {}).keys())
 
-            current_enabled_features: set[tuple[str, str]] = set()
+            # The requirements of a capability block with a 'depends' condition apply when the condition is
+            # satisfied: the extensions and features the condition requires are enabled.
+            block_depends = get_block_depends(block)
+            implied_exts, implied_features = get_depends_implied_capabilities(block_depends)
+            profile_enabled_exts |= set(ext_list) | implied_exts
+
+            current_enabled_features: set[tuple[str, str]] = set(implied_features)
             for s_name, members in context_features.items():
                 if isinstance(members, dict):
                     for m_name, val in members.items():
@@ -703,7 +733,8 @@ def pull_required_capabilities_single_profile(
                     if filtered_ext_satisfied:
                         block_features = block.setdefault("features", {})
                         deep_merge_dict(block_features, filtered_ext_satisfied)
-                        deep_merge_dict(explicit_context_features, filtered_ext_satisfied)
+                        if block_depends is None:
+                            deep_merge_dict(explicit_context_features, filtered_ext_satisfied)
                         for s_name, members in filtered_ext_satisfied.items():
                             if isinstance(members, dict):
                                 for m_name, val in members.items():

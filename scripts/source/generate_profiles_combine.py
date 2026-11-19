@@ -39,6 +39,7 @@ from source.vulkan_object_version import (
 from source.profiles_json_utils import (
     collect_block_names,
     deep_merge_dict,
+    get_block_depends,
     load_profiles_jsons
 )
 
@@ -249,6 +250,12 @@ class VulkanProfilesCombineGenerator:
                 if capability_name not in jsons[i].get('capabilities', {}):
                     continue
                 cap = jsons[i]['capabilities'][capability_name]
+
+                # The requirements of a capability block with a 'depends' condition don't apply to every device:
+                # they are not combined with the requirements of the other profiles
+                if get_block_depends(cap) is not None:
+                    logging.warning(f"Capability block '{capability_name}' of profile '{profile_names[i]}' has a 'depends' condition, it is not combined")
+                    continue
 
                 if 'extensions' in cap:
                     for extension, spec_ver in cap['extensions'].items():

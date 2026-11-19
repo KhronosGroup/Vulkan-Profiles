@@ -13,6 +13,11 @@
 
 ## [Vulkan Profiles Tools 1.4.XXX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - December 2026
 
+### Features:
+- Support the `depends` condition of capability blocks of the profiles schema 0.8.3 #1090
+  - The capability block requirements only apply to the devices satisfying the `depends` condition, using the `vk.xml` `depends` expression syntax
+  - Check the `depends` condition in `vkprofiles validate`, and keep the capability blocks with a `depends` condition separate in `vkprofiles transform` and `vkprofiles extract`
+
 ### Improvements:
 - Generate `PROFILES_CORE.md`, the documentation of the `VP_LUNARG_minimum_requirements_1_x` profiles of the Vulkan core specification requirements
 - Add `validate` analysis check to report unratified extensions in profiles files

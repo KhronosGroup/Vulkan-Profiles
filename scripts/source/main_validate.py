@@ -40,11 +40,14 @@ from source.profiles_json_utils import (
     load_profiles_jsons,
     validate_profiles_jsons_data,
     load_schema_json,
+    collect_block_names,
     collect_profile_capabilities,
+    get_block_depends,
     get_profile_and_file_data,
     deep_merge_dict,
     is_property_satisfied,
 )
+from source.vulkan_object_expression_parsing import checkDependsExpressionSyntax, tokenizeDependsExpression
 from source.transform_utils import AnalyseBits, get_parent_property_value
 from source.generate_profiles_schema import VulkanProfilesSchemaGenerator2
 
@@ -364,6 +367,59 @@ class VulkanProfilesDataValidation:
 
         return issues
 
+    def validate_depends_symbol(self, symbol: str) -> str | None:
+        """Returns an error message when a 'depends' expression symbol isn't a Vulkan version, extension or feature."""
+        if symbol.startswith("VK_VERSION_"):
+            return None if symbol in self.vk.versions else f"unknown Vulkan version '{symbol}'"
+
+        if "::" in symbol:
+            struct_name, member_name = symbol.split("::", 1)
+            struct_obj = self.vk.structs.get(struct_name)
+            if struct_obj is None:
+                return f"unknown structure '{struct_name}'"
+            is_feature_struct = struct_name == "VkPhysicalDeviceFeatures" or "VkPhysicalDeviceFeatures2" in struct_obj.extends
+            if not is_feature_struct:
+                return f"structure '{struct_name}' is not a feature structure"
+            member = next((m for m in struct_obj.members if m.name == member_name), None)
+            if member is None or member.type != "VkBool32":
+                return f"'{member_name}' is not a feature of '{struct_name}'"
+            return None
+
+        return None if symbol in self.vk.extensions else f"unknown extension '{symbol}'"
+
+    def validate_capability_block_depends(
+        self,
+        profile_name: str,
+        block_name: str,
+        block: dict
+    ) -> list[ValidationIssue]:
+        """Checks the syntax and the symbols of the 'depends' condition of a capability block."""
+        issues = []
+        depends = get_block_depends(block)
+        if depends is None:
+            return issues
+
+        syntax_error = checkDependsExpressionSyntax(depends)
+        if syntax_error:
+            issues.append(ValidationIssue(
+                f"Capability block '{block_name}' of profile '{profile_name}' has an invalid 'depends' condition '{depends}': {syntax_error}",
+                level=logging.ERROR
+            ))
+            return issues
+
+        for token in tokenizeDependsExpression(depends):
+            if token in ('(', ')', '+', ','):
+                continue
+            symbol = token[1:].strip() if token.startswith('!') else token
+            symbol_error = self.validate_depends_symbol(symbol)
+            if symbol_error:
+                issues.append(ValidationIssue(
+                    f"Capability block '{block_name}' of profile '{profile_name}' has an invalid 'depends' condition '{depends}': {symbol_error}",
+                    level=logging.ERROR
+                ))
+
+        return issues
+
     def validate_data(self, json_files_dict: dict, analyse_bits: list[AnalyseBits] = None) -> list[ValidationIssue]:
         """Executes selected static analysis validation cases across loaded profile files."""
         if analyse_bits is None:
@@ -379,6 +435,15 @@ class VulkanProfilesDataValidation:
                 api_version = VK_VERSION.from_string(profile_obj.get("api-version", "1.0.0"))
                 profile_caps = collect_profile_capabilities(json_files_dict, json_file_data, profile_obj)
                 enabled_exts = set(profile_caps.get("extensions", {}).keys())
+
+                # The 'depends' conditions of the capability blocks are always checked
+                capabilities_dict = json_file_data.get("capabilities", {})
+                for block_name in collect_block_names(profile_obj.get("capabilities", [])):
+                    issues.extend(
+                        self.validate_capability_block_depends(
+                            profile_name, block_name, capabilities_dict.get(block_name)
+                        )
+                    )
 
                 # Analysis Case 1: Required Profile API Version Inheritance Checks
                 if AnalyseBits.API_VERSION in analyse_bits:
@@ -466,5 +531,9 @@ def main_validate(args):
                 level = getattr(issue, "level", logging.WARNING)
                 if level == logging.INFO:
                     logging.info(issue)
+                elif level == logging.ERROR:
+                    logging.error(issue)
                 else:
                     logging.warning(issue)
+            if any(getattr(issue, "level", logging.WARNING) == logging.ERROR for issue in issues):
+                sys.exit(1)
