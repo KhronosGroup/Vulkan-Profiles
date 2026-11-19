@@ -1,0 +1,59 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.3-204.json#",
+    "capabilities": {
+        "block": {
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "depthClamp": true
+                }
+            }
+        },
+        "satisfied": {
+            "depends": "VkPhysicalDeviceFeatures::depthClamp",
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "sampleRateShading": true
+                }
+            }
+        },
+        "not_satisfied": {
+            "depends": "!VkPhysicalDeviceFeatures::depthClamp",
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "geometryShader": true
+                }
+            }
+        },
+        "satisfied_version": {
+            "depends": "VK_VERSION_1_1+(VK_KHR_unknown_extension,VkPhysicalDeviceFeatures::depthClamp)",
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "dualSrcBlend": true
+                }
+            }
+        },
+        "not_satisfied_extension": {
+            "depends": "VK_KHR_unknown_extension",
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "logicOp": true
+                }
+            }
+        }
+    },
+    "profiles": {
+        "VP_LUNARG_test_depends": {
+            "version": 1,
+            "api-version": "1.1.204",
+            "label": "Test depends",
+            "description": "Test of the capability blocks with a 'depends' condition",
+            "capabilities": [
+                "satisfied",
+                "not_satisfied",
+                "block",
+                "satisfied_version",
+                "not_satisfied_extension"
+            ]
+        }
+    }
+}
