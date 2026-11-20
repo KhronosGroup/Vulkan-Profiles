@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://schema.khronos.org/vulkan/profiles-0.8.3-368.json#",
-    "title": "Vulkan Profiles Schema for Vulkan 1.4.368",
+    "$id": "https://schema.khronos.org/vulkan/profiles-0.8.3-369.json#",
+    "title": "Vulkan Profiles Schema for Vulkan 1.4.369",
     "additionalProperties": true,
     "required": [
         "capabilities",
@@ -1834,6 +1834,15 @@
             "additionalProperties": false,
             "properties": {
                 "multiDraw": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "VkPhysicalDeviceMultiLevelAccelerationStructureFeaturesAMDX": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "multiLevelAccelerationStructure": {
                     "type": "boolean"
                 }
             }
@@ -10079,6 +10088,9 @@
                             "VK_AMDX_dense_geometry_format": {
                                 "type": "integer"
                             },
+                            "VK_AMDX_multi_level_acceleration_structure": {
+                                "type": "integer"
+                            },
                             "VK_AMDX_shader_enqueue": {
                                 "type": "integer"
                             },
@@ -12011,6 +12023,9 @@
                             },
                             "VkPhysicalDeviceMultiDrawFeaturesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceMultiDrawFeaturesEXT"
+                            },
+                            "VkPhysicalDeviceMultiLevelAccelerationStructureFeaturesAMDX": {
+                                "$ref": "#/definitions/VkPhysicalDeviceMultiLevelAccelerationStructureFeaturesAMDX"
                             },
                             "VkPhysicalDeviceMultisampledRenderToSingleSampledFeaturesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceMultisampledRenderToSingleSampledFeaturesEXT"
