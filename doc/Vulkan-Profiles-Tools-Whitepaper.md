@@ -19,8 +19,7 @@ This whitepaper presents the Vulkan Profiles Tools and how they fit together. Ea
       - [DXVK: A Vulkan-based translation layer for Direct3D 9/10/11](#dxvk-a-vulkan-based-translation-layer-for-direct3d-91011)
       - [vkd3d-proton: An implementation of the full Direct3D 12 API on top of Vulkan](#vkd3d-proton-an-implementation-of-the-full-direct3d-12-api-on-top-of-vulkan)
       - [Zink: a Gallium driver that emits Vulkan API calls](#zink-a-gallium-driver-that-emits-vulkan-api-calls)
-      - [Android Baseline Profiles](#android-baseline-profiles)
-      - [Android 15 Minimums Profile](#android-15-minimums-profile)
+      - [Android Profiles](#android-profiles)
       - [Khronos Roadmap Profiles](#khronos-roadmap-profiles)
     - [Different types of Vulkan Profiles](#different-types-of-vulkan-profiles)
   - [The Vulkan Profiles Tools Components](#the-vulkan-profiles-tools-components)
@@ -33,8 +32,12 @@ This whitepaper presents the Vulkan Profiles Tools and how they fit together. Ea
       - [Vulkaninfo](#vulkaninfo)
       - [GPUInfo.org](#gpuinfoorg)
     - [Generating a Platform Vulkan Profiles JSON files](#generating-a-platform-vulkan-profiles-json-files)
+      - [Checking the GPUInfo.org device reports](#checking-the-gpuinfoorg-device-reports)
+      - [Examples of device report issues](#examples-of-device-report-issues)
+      - [Combining the device reports](#combining-the-device-reports)
       - [Newer platform profiles are not necessarily supersets of older ones](#newer-platform-profiles-are-not-necessarily-supersets-of-older-ones)
     - [JSON script to generate merged Vulkan profiles](#json-script-to-generate-merged-vulkan-profiles)
+    - [Conditional capabilities with the `depends` condition](#conditional-capabilities-with-the-depends-condition)
     - [Creating a Vulkan Profiles JSON files manually](#creating-a-vulkan-profiles-json-files-manually)
     - [Identifying the minimum Vulkan API version of a profile](#identifying-the-minimum-vulkan-api-version-of-a-profile)
     - [Comparing engine profiles with platform profiles](#comparing-engine-profiles-with-platform-profiles)
@@ -96,17 +99,44 @@ The Zink driver is a Gallium driver that emits Vulkan API calls instead of targe
 
 The `VP_ZINK_requirements` profiles are used to list all the Vulkan capabilities required by the device Vulkan driver to be able to run each version of OpenGL. For example, the `VP_ZINK_gl46_baseline` profile lists the requirements to be able to run an OpenGL 4.6 application. The `VP_ZINK_gl46_optimal` profile is similar to the `VP_ZINK_gl46_baseline` but also includes Vulkan capabilities to get the best performance possible from the Zink OpenGL implementation.
 
-#### Android Baseline Profiles
+#### Android Profiles
 
-The Android Baseline profiles addressed the challenge of determining what functionality Vulkan developers can rely on being present in Android devices. From sets of Vulkan extensions, features, formats, and limits that were found on the vast majority of active Android devices in 2021 and 2022, the Android Baseline 2021 and the Android Baseline 2022 profiles were created. These profiles can be used to filter the Android Vulkan applications on the Google Play store for devices not supporting the capabilities of these profiles.
+The Vulkan Profiles repository ships two families of Android profiles, in the `profiles/Android` directory.
 
-#### Android 15 Minimums Profile
+The **Android Vulkan profiles**, previously named Android Baseline profiles, describe the functionality broadly supported on Android devices. They address the challenge of determining what functionality Vulkan developers can rely on being present on active Android devices, and they can be used to filter the Android Vulkan applications on the Google Play store for devices not supporting their capabilities:
 
-A collection of functionality that is mandated for chipsets that launch (or renew Google Requirements Freeze) on Android 15. This is effectively an Android Roadmap profile.
+| Profile | Vulkan version | Previously |
+|---------|----------------|------------|
+| `VP_ANDROID_vulkan_profile_2021` | 1.0.68 | Android Baseline Profile 2021 |
+| `VP_ANDROID_vulkan_profile_2022` | 1.1.106 | Android Baseline Profile 2022 |
+| `VP_ANDROID_vulkan_profile_2025` | 1.1.128 | Android Baseline Profile 2025 |
+
+The **Android requirements profiles** describe the functionality mandated for the chipsets that launch, or renew their Google Requirements Freeze, on an Android release: they are effectively Android Roadmap profiles. Each one builds on the functionality of a previous profile with the `profiles` list:
+
+| Profile | Vulkan version | Required profile | Alternative capability blocks |
+|---------|----------------|------------------|-------------------------------|
+| `VP_ANDROID_15_requirements` | 1.3.273 | `VP_ANDROID_vulkan_profile_2022` | `primitivesGeneratedQuery` or `pipelineStatisticsQuery`, and software (`VK_EXT_line_rasterization`) or hardware (`VK_IMG_relaxed_line_rasterization`) Bresenham lines |
+| `VP_ANDROID_16_requirements` | 1.3.276 | `VP_ANDROID_15_requirements` | `VK_EXT_multisampled_render_to_single_sampled` or `VK_EXT_shader_stencil_export` |
+| `VP_ANDROID_17_requirements` | 1.4.335 | `VP_ANDROID_vulkan_profile_2025` | both groups of alternatives of `VP_ANDROID_15_requirements` and `VP_ANDROID_16_requirements` |
+| `VP_ANDROID_18_requirements` | 1.4.335 | `VP_ANDROID_17_requirements` | - |
+
+The requirements of each profile are in a `MUST` capability block, and the groups of alternative capability blocks express the functionality where a device may support either of two capabilities. `VP_ANDROID_17_requirements` builds on `VP_ANDROID_vulkan_profile_2025` rather than on `VP_ANDROID_16_requirements`: it requires Vulkan 1.4, and its `MUST` block lists again the extensions of the previous requirements profiles which are not part of Vulkan 1.4.
+
+The Android profiles are written by hand, with only the capabilities that matter to Android: the `transform_android` node of the `profiles/vkprofiles_graph.json` graph pulls the Vulkan core requirements of their Vulkan version and the requirements of their extensions, and resolves their capability aliases. Pulling the requirements also adds alternatives: the `VK_KHR_shader_float16_int8` extension required by `VP_ANDROID_vulkan_profile_2025` requires `shaderFloat16` or `shaderInt8`, which become a group of alternative capability blocks of the generated profile. Pulling the conditional capabilities with `--pull depends` extracts the `lineWidthGranularity` of 0.5 of `VP_ANDROID_16_requirements`, which doesn't require `wideLines`, into a capability block with the `wideLines` condition (see [Conditional capabilities with the `depends` condition](#conditional-capabilities-with-the-depends-condition)).
+
+The Vulkan Profiles repository generates the `PROFILES_ANDROID.md` documentation of the Android Vulkan profiles, the `android_vulkan_profiles.hpp` Vulkan Profiles API library of the Android Vulkan profiles, and the `android_vulkan_requirements_debug.hpp` library which also includes the Android requirements profiles. The `android/profiles-checker` application checks the support of these profiles on an Android device.
 
 #### Khronos Roadmap Profiles
 
-The Khronos Roadmap profiles are milestones referenced by all Vulkan Working Group hardware vendors actively developing mid-to-high-end devices for smartphone, tablet, laptop, console, and desktop platforms. These vendors have committed to supporting this milestone, starting with several shipping products in 2022.
+The Khronos Roadmap profiles are the milestones of the [Vulkan Roadmap](https://docs.vulkan.org/spec/latest/appendices/roadmap.html), defined by the Vulkan specification. Each milestone is a set of extensions, features, limits and formats intended to be supported by the new mid-to-high-end smartphones, tablets, laptops, consoles and desktop devices shipping by the end of its target year or shortly thereafter. Each milestone requires the previous one:
+
+| Profile | Vulkan version | Required milestone | Highlights |
+|---------|----------------|--------------------|------------|
+| `VP_KHR_roadmap_2022` | 1.3 | - | Vulkan 1.3 with the core optional features and the limits broadly supported by mid-to-high-end devices |
+| `VP_KHR_roadmap_2024` | 1.3 | Roadmap 2022 | 8/16-bit integers and 16-bit floats in shaders, subgroup reconvergence guarantees, more consistent floating-point handling, multi-draw indirect, shader draw parameters, 8-bit indices, better line rasterization, dynamic rendering local reads, push descriptors and `VK_KHR_maintenance5` |
+| `VP_KHR_roadmap_2026` | 1.4 | Roadmap 2024 | swapchain and presentation guarantees, `VK_KHR_fragment_shading_rate`, `VK_KHR_shader_clock`, `VK_KHR_compute_shader_derivatives`, `VK_KHR_cooperative_matrix`, `VK_KHR_present_mode_fifo_latest_ready`, `VK_KHR_present_id2` and `VK_KHR_present_wait2` |
+
+The Roadmap profiles are defined in the `VP_KHR_roadmap.json` file of the Vulkan-Docs registry, shipped with the Vulkan Headers: the Vulkan Profiles repository uses it to generate the `PROFILES.md` documentation and the Vulkan Profiles API library. Some milestone requirements allow alternatives, e.g. the Roadmap 2024 line rasterization requirement is satisfied by one of several line rasterization modes, expressed with groups of alternative capability blocks.
 
 ### Different types of Vulkan Profiles
 
@@ -165,7 +195,7 @@ Furthermore, the Vulkan Profiles Tools install implementations of some Vulkan Pr
 | `VP_ANDROID_vulkan_profile_2022.json` | `VP_ANDROID_vulkan_profile_2022` |
 | `VP_ANDROID_vulkan_profile_2025.json` | `VP_ANDROID_vulkan_profile_2025` |
 
-`VP_KHR_roadmap.json` comes from the Vulkan Headers; the other files are generated when building the Vulkan Profiles Tools. Android rebranded the `VP_ANDROID_baseline_2021` and `VP_ANDROID_baseline_2022` profiles as `VP_ANDROID_vulkan_profile_2021` and `VP_ANDROID_vulkan_profile_2022`. The Android requirements profiles, `VP_ANDROID_15_requirements` to `VP_ANDROID_18_requirements`, are not installed, but they are available in the `profiles/Android` directory of the Vulkan Profiles repository and in the Vulkan Profiles API library.
+`VP_KHR_roadmap.json` is copied from the Vulkan Headers, which ship the Roadmap profiles of the Vulkan-Docs registry. The other files are generated by the `profiles/vkprofiles_graph.json` graph when building the Vulkan Profiles Tools: `VP_LUNARG_minimum_requirements.json` is transformed from `profiles/LunarG/VP_LUNARG_minimum_requirements.json`, `VP_LUNARG_desktop_baseline.json` is combined from the GPUInfo.org device reports of the `profiles/LunarG/VP_LUNARG_desktop_baseline_*` directories and then transformed, and the `VP_ANDROID_vulkan_profile_*.json` files are transformed from the `profiles/Android` directory. The Android Vulkan profiles were previously named Android Baseline profiles: Android rebranded the `VP_ANDROID_baseline_2021` and `VP_ANDROID_baseline_2022` profiles as `VP_ANDROID_vulkan_profile_2021` and `VP_ANDROID_vulkan_profile_2022`, and its Android Baseline Profile 2025 is `VP_ANDROID_vulkan_profile_2025` (see [Android Profiles](#android-profiles)). The Android requirements profiles, `VP_ANDROID_15_requirements` to `VP_ANDROID_18_requirements`, are not installed: they are available in the `profiles/Android` directory of the Vulkan Profiles repository, and in the `android_vulkan_requirements_debug.hpp` Vulkan Profiles API library generated by the Vulkan Profiles repository.
 
 The current list of Vulkan Profiles shipped with the Vulkan SDK is maintained in [Vulkan Profiles Files](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/OVERVIEW.md#vulkan-profiles-files) in `OVERVIEW.md`.
 
@@ -281,7 +311,89 @@ Vulkan Hardware Capability Viewer is part of the Khronos Vulkan SDK.
 
 The LunarG Desktop Baseline profiles were generated by downloading a set of Vulkan Device Profiles on GPUInfo.org and using the `vkprofiles combine` command to merge these Vulkan Device Profiles into Vulkan Platform Profiles by doing an intersection of all the capability of all Vulkan Device Profiles: a platform profile reports the list of all the capabilities available in all Vulkan Device profiles.
 
-`vkprofiles combine` replaces the deprecated `gen_profiles_file.py` Python script. On top of the intersection mode, it supports the `union` mode, which lists the capabilities available in any of the source profiles, and the `difference` mode, which outputs the differences across a set of Vulkan profiles (see [Comparing engine profiles with platform profiles](#comparing-engine-profiles-with-platform-profiles)). The mode is selected with `--mode`.
+#### Checking the GPUInfo.org device reports
+
+A GPUInfo.org device report is what a Vulkan driver reported to the Vulkan Hardware Capability Viewer on a given system. It records the driver as it is, bugs included: a platform profile generated from device reports inherits the errors of every report it intersects. Checking the device reports before generating a platform profile is part of creating it.
+
+The device reports of the LunarG Desktop Baseline profiles show three kinds of issues.
+
+**Reports that don't conform to the Vulkan Profiles schema.** Some drivers report values that aren't valid Vulkan values, and some reports encode values in a way the schema doesn't accept. For example, several reports list image layouts as raw numbers, such as `1000314000`, in `VkPhysicalDeviceHostImageCopyPropertiesEXT::pCopyDstLayouts`, report `'0'` instead of a flags list for `VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV::extendedSparseBufferUsageFlags`, or describe their queue families in an invalid form. 15 of the 23 device reports of the `VP_LUNARG_desktop_baseline_2026` profile fail the schema validation (see [Examples of device report issues](#examples-of-device-report-issues)):
+
+```bash
+vkprofiles validate \
+    --registry vk.xml \
+    --input ./VP_LUNARG_desktop_baseline_2026
+```
+
+**Reports with inconsistent aliased structures.** A device reports the same capability through several structures, for example `shaderSignedZeroInfNanPreserveFloat16` through `VkPhysicalDeviceVulkan12Properties` and `VkPhysicalDeviceFloatControlsPropertiesKHR`. The AMD Radeon RX 580 reports of the `VP_LUNARG_desktop_baseline_2024` profile, with both the Windows driver and RADV, report `VK_FALSE` in the first structure and `VK_TRUE` in the second one. `vkprofiles combine` intersects each structure separately, so the generated profile carries the contradiction. The `aliases` analysis check reports it:
+
+```bash
+vkprofiles validate \
+    --registry vk.xml \
+    --input ./VP_LUNARG_desktop_baseline_2024.json \
+    --analyse aliases
+```
+
+The check must run on the device reports or on the output of `vkprofiles combine`: `vkprofiles transform --pull requirements` and `--pull aliases` resolve the aliased structures into a single value, after which the contradiction is no longer visible.
+
+**Reports with limits that contradict the features they support.** The Vulkan specification defines, for the limits of an optional feature, the limit required when the feature is supported and the limit required when it isn't (see the [Required Limits](https://docs.vulkan.org/spec/latest/chapters/limits.html#limits-required) table): for example, a device not supporting `tessellationShader` reports `0` for `maxTessellationGenerationLevel`. Some drivers report the limits of a feature they don't support. The intersection of such reports is a platform profile requiring tessellation limits without requiring tessellation shaders, which no device without tessellation shaders conforming to the specification can satisfy. The `VP_LUNARG_desktop_baseline_2026` device reports produce such tessellation limits, and the `VP_LUNARG_desktop_baseline_2027` device reports such geometry shader limits. The `depends` analysis check reports these limits, only for the limits whose value for the devices not supporting the feature is defined by the specification, and `vkprofiles validate --apply-workarounds unsupported-feature-properties` sets them to that value in the device reports:
+
+```bash
+vkprofiles validate \
+    --registry vk.xml \
+    --input ./VP_LUNARG_desktop_baseline.json \
+    --analyse depends
+```
+
+`vkprofiles transform --pull requirements depends` resolves these contradictions (see [Conditional capabilities with the `depends` condition](#conditional-capabilities-with-the-depends-condition)): a limit which only holds for the devices supporting a feature the profile doesn't require is moved into a capability block with a `depends` condition on that feature, and the unconditional limit is set to the value of the devices not supporting the feature. The value is the specification "Unsupported Limit" when it defines one, or otherwise the value of an unsupported limit of that limit type, e.g. `VK_FALSE` for a `max` `VkBool32` limit. For the `VP_LUNARG_desktop_baseline_2024` profile, which doesn't require `shaderFloat16`, the `shaderSignedZeroInfNanPreserveFloat16` limit becomes `VK_FALSE` for every device, and `VK_TRUE` in a capability block with the `VkPhysicalDeviceVulkan12Features::shaderFloat16` condition. `vkprofiles transform --strip depends` instead removes the capability blocks whose condition the profile doesn't satisfy and keeps only the values of the devices not supporting the features:
+
+```bash
+vkprofiles transform \
+    --registry vk.xml \
+    --input ./my_profiles/ \
+    --output ./my_profiles/ \
+    --pull requirements aliases depends \
+    --strip depends
+```
+
+The `profiles/vkprofiles_graph.json` graph of the Vulkan Profiles repository runs all the analysis checks, including the `aliases` and `depends` checks, on the combined LunarG Desktop Baseline profiles before transforming them, in its `analyse_desktop_baseline` node.
+
+These checks only cover what `vk.xml` and the Vulkan Profiles schema describe: the dependencies between features that the Vulkan specification only describes in valid usage statements are not checked.
+
+> **A platform profile is only as reliable as the device reports it is generated from.** Vulkan developers should validate the device reports they select on GPUInfo.org, check the aliased structures of the generated platform profile before transforming it, and review the capabilities that `vkprofiles transform --pull depends` moves into capability blocks with a `depends` condition: each of them is a value that at least one driver reports without supporting the corresponding feature. When a device report is wrong, prefer another report of the same device with a newer driver, or report the issue to the driver vendor.
+
+#### Examples of device report issues
+
+The schema validation of the 90 device reports of the LunarG Desktop Baseline profiles, with `vkprofiles validate`, found 35 invalid reports. The issues come either from the driver or from the GPUInfo.org exporter, which writes the device reports as Vulkan Profiles JSON files:
+
+| Issue | Example | Origin | Device reports |
+| --- | --- | --- | --- |
+| Unknown driver ID | `VkPhysicalDeviceVulkan12Properties::driverID` is `null` and `VkPhysicalDeviceDriverPropertiesKHR::driverID` is `"_KHR"` for the Mesa KosmicKrisp driver on Apple M1 and M5, instead of `VK_DRIVER_ID_MESA_KOSMICKRISP` | Exporter, predating the driver ID | 2 |
+| Nonexistent `_KHR` driver ID | `VkPhysicalDeviceDriverPropertiesKHR::driverID` is `VK_DRIVER_ID_MOLTENVK_KHR` instead of `VK_DRIVER_ID_MOLTENVK`: only the driver IDs defined before Vulkan 1.2 have a `_KHR` alias | Exporter | 7, behind the identical queue families |
+| Image layouts as raw numbers | `VkPhysicalDeviceHostImageCopyPropertiesEXT::pCopyDstLayouts` lists `1000117000` (`VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL`) or `1000314000` (`VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL`). The exporter writes every image layout defined by an extension as a number, in `pCopySrcLayouts` too | Exporter, not mapping the extension values to their names | 17 |
+| 64-bit values as strings | `VkPhysicalDeviceExternalMemoryHostPropertiesEXT::minImportedHostPointerAlignment` is `"4096"` and `VkPhysicalDeviceDrmPropertiesEXT::primaryMajor` is `"226"`. The older device reports write every `VkDeviceSize`, `uint64_t` and `int64_t` value as a string, up to 134 values in the 2022 reports | Exporter | 7 |
+| Flags as numbers | `VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV::extendedSparseBufferUsageFlags` is `"0"` instead of `[]` and `extendedSparseImageUsageFlags` is `"6"` instead of `["VK_IMAGE_USAGE_TRANSFER_DST_BIT", "VK_IMAGE_USAGE_SAMPLED_BIT"]` | Exporter | 5 |
+| Undeclared extension structures | `VkPhysicalDeviceMaintenance7PropertiesKHR` is in a device report whose `extensions` don't list `VK_KHR_maintenance7`, though the GPUInfo.org report does. The exporter writes the property structures of the extensions it doesn't know, but neither these extensions nor their feature structures. Reported by `--analyse extensions`, not by the schema | Exporter, not knowing the recent extensions | 21 for `VK_KHR_maintenance7` in the 2027 reports |
+| Mismatching aliased properties | `VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR` has every `integerDotProduct*Accelerated` member `true` while `VkPhysicalDeviceVulkan13Properties` has most of them `false`, including on GPUs without dot product instructions. The two structures have the same members and the same meaning. Reported by `--analyse aliases`; `--apply-workarounds mismatching-aliases` keeps the least capable value, considering the capability not reliable enough to be supported, and `mismatching-aliases-extra` sets the mismatching `exact` booleans, such as `uniformTexelBufferOffsetSingleTexelAlignment`, to `false` | Older exporter or Vulkan Hardware Capability Viewer, as the 2026 and 2027 reports agree | 22, in the 2022 to 2024 reports |
+| Identical queue families | MoltenVK reports 4 identical queue families, which the schema rejects because it requires the queue families to be unique | Schema, too strict for a valid driver behavior | 9 |
+
+The schema validation reports a single issue per device report, so a device report may have further issues behind the first one.
+
+Most of these issues are in the way the values are written, not in the values themselves: the device reports remain usable once the values are rewritten. `vkprofiles validate --apply-workarounds` fixes the known issues and logs each fix. With `--output`, the device reports are written with the fixes to another directory, which `vkprofiles combine` then uses, and the downloaded device reports are left unchanged:
+
+```bash
+vkprofiles validate \
+    --registry vk.xml \
+    --input ./VP_LUNARG_desktop_baseline_2026 \
+    --output ./build/VP_LUNARG_desktop_baseline_2026 \
+    --apply-workarounds
+```
+
+The `profiles/vkprofiles_graph.json` graph of the Vulkan Profiles repository applies the workarounds to the device reports of each LunarG Desktop Baseline profile, writes them to the `profiles/build/reports` build directory, and validates them before combining them, in its `validate_desktop_baseline_*_reports` nodes. These nodes also run the `--analyse` checks on the device reports with the workarounds applied, to discover the issues no workaround is known for yet. They skip the `unratified` check, because the devices expose many unratified extensions. The analysis warnings don't stop the build, while the analysis errors, such as an extension structure without its extension, do. The device reports of the repository stay as downloaded from GPUInfo.org.
+
+#### Combining the device reports
+
+`vkprofiles combine` replaces the deprecated `gen_profiles_file.py` Python script. On top of the intersection mode, it supports the `union` mode, which lists the capabilities available in any of the source profiles, and the `difference` mode, which outputs the differences across a set of Vulkan profiles (see [Comparing engine profiles with platform profiles](#comparing-engine-profiles-with-platform-profiles)). The mode is selected with `--mode`. The capability blocks with a `depends` condition are combined by condition, into a capability block with the same condition: for the devices satisfying a condition, the requirements of each profile, its unconditional blocks and its blocks with that condition, are combined like the unconditional blocks. The `intersection` mode also combines the requirements for the devices satisfying several conditions, with the conjunction of the conditions, while the `union` mode keeps a block per condition.
 
 > As an example, the `VP_LUNARG_desktop_baseline_2027` is a Vulkan Platform Profile generated from multiple Vulkan Device Profiles downloaded from GPUInfo.org, stored in the `profiles/LunarG/VP_LUNARG_desktop_baseline_2027` directory of the Vulkan Profiles repository.
 
@@ -539,6 +651,44 @@ vkprofiles graph \
 
 The complete `profiles/vkprofiles_graph.json` graph file also transforms the Android profiles, and generates the Vulkan Profiles schema, the Vulkan Profiles API library and the Vulkan Profiles documentation of the Vulkan Profiles repository.
 
+### Conditional capabilities with the `depends` condition
+
+Some Vulkan capabilities depend on others. The Vulkan specification defines, for the limits of an optional feature, the value required when the feature is supported and the value required when it isn't: a device supporting `geometryShader` reports at least 32 `maxGeometryShaderInvocations`, and a device not supporting it reports 0. Similarly, Vulkan 1.4 requires `shaderSignedZeroInfNanPreserveFloat16` when `shaderFloat16` is supported, and the Roadmap 2026 profile requires `pipelineProtectedAccess` when `protectedMemory` is supported.
+
+The profiles schema 0.8.3 expresses these dependencies with the `depends` condition of capability blocks: the requirements of a capability block with a `depends` condition only apply to the devices satisfying the condition, which uses the `vk.xml` `depends` expression syntax (`+` for AND, `,` for OR, `!` for NOT and parentheses). The Vulkan Profiles API library and the Profiles layer evaluate the condition on the physical device. See [Capability block conditions](https://github.com/KhronosGroup/Vulkan-Profiles/blob/main/OVERVIEW.md#capability-block-conditions) for the schema details.
+
+**A profile only lists a dependency when the profile doesn't satisfy it.** When a profile requires `geometryShader`, every device supporting the profile supports geometry shaders: the profile requires the geometry shader limits unconditionally, with no `depends` condition. When a profile doesn't require `geometryShader`, a device supporting the profile may or may not support geometry shaders: the profile requires the limits of the devices not supporting geometry shaders unconditionally, and the limits of the devices supporting them in a capability block with the `geometryShader` condition:
+
+```json
+"capabilities": {
+    "baseline": {
+        "properties": {
+            "VkPhysicalDeviceProperties": {
+                "limits": {
+                    "maxGeometryShaderInvocations": 0
+                }
+            }
+        }
+    },
+    "geometry": {
+        "depends": "VkPhysicalDeviceFeatures::geometryShader",
+        "properties": {
+            "VkPhysicalDeviceProperties": {
+                "limits": {
+                    "maxGeometryShaderInvocations": 32
+                }
+            }
+        }
+    }
+}
+```
+
+`vkprofiles transform --pull requirements depends` creates these capability blocks from the unconditional capability blocks of a profile. A property of an unconditional capability block which contradicts the value of the devices not supporting a capability the profile doesn't require, such as a `maxGeometryShaderInvocations` of 32 in a profile not requiring `geometryShader`, is moved into a capability block with a `depends` condition on that capability, one capability block per condition, and the unconditional property is set to the value of the devices not supporting the capability. That value is the Vulkan specification "Unsupported Limit" when it defines one, e.g. 0 for `maxGeometryShaderInvocations`, or otherwise the value of an unsupported limit of that limit type, e.g. `VK_FALSE` for a `max` `VkBool32` limit such as `shaderSignedZeroInfNanPreserveFloat16`. The properties set to that value, the capabilities the profile doesn't set and the features are left unchanged: they are unconditional requirements of the profile. The `depends` analysis check of `vkprofiles validate` reports the properties `--pull depends` moves.
+
+`vkprofiles transform --strip depends` instead removes the dependencies the profile doesn't satisfy: the capability blocks with a `depends` condition the profile doesn't satisfy are removed, and the features and properties whose Vulkan core requirement depends on a condition the profile doesn't satisfy are set to the value of the devices not satisfying it, e.g. `maxGeometryShaderInvocations` to 0 and `shaderInt64` to `VK_FALSE` when the profile requires neither `shaderSharedInt64Atomics` nor `shaderBufferInt64Atomics`. The members without such a value are removed. The stripped profile only requires what every device supporting the profile supports, whatever its optional features.
+
+The dependencies used by `--pull depends`, `--strip depends` and `vkprofiles validate --analyse depends` are the conditions of the Vulkan core requirements, from `vk.xml` and the VulkanObject workarounds of the Vulkan Profiles Tools. The dependencies between features that the Vulkan specification only describes in valid usage statements, e.g. a feature that can only be enabled with another feature, are not handled: profiles relying on them need capability blocks with a `depends` condition written by hand.
+
 ### Creating a Vulkan Profiles JSON files manually
 
 The Vulkan Profiles schema is a JSON file generated using the `vk.xml` file. For each Vulkan Header revision, we can generate a Vulkan Profiles schema that is updated on the Khronos Vulkan Schema page and Khronos Schema git repository. Generating a new Vulkan Profiles schema may be necessary to leverage Vulkan capabilities introduced with a new Vulkan Header revision.
@@ -604,7 +754,7 @@ WARNING: Core structure 'VkPhysicalDeviceVulkan13Features' requires Vulkan 1.3 b
 WARNING: Member 'runtimeDescriptorArray' in structure 'VkPhysicalDeviceVulkan12Features' (value: True) has mismatching value with member 'runtimeDescriptorArray' in aliased structure 'VkPhysicalDeviceDescriptorIndexingFeatures' (value: False) in profile 'VP_EXAMPLE_engine_bindless'
 ```
 
-The static analysis issues are reported as warnings and don't change the `vkprofiles validate` exit code, so its output must be reviewed.
+Most static analysis issues are reported as warnings and don't change the `vkprofiles validate` exit code, so its output must be reviewed. The issues that make a profile wrong rather than questionable are reported as errors and make `vkprofiles validate` fail: an extension structure whose extension the profile doesn't declare, and an instance extension in a capability block with a `depends` condition.
 
 *Example of Vulkan Profiles file:*
 
@@ -981,7 +1131,7 @@ In order to enable support for other language bindings, the library is also avai
 
 The repository also contains a debug version of the Vulkan Profiles API library which allows logging unsupported capabilities of a Vulkan Profile when checking its support on a system.
 
-The profile definitions are enabled depending on the preprocessor definitions coming from the Vulkan headers; thus the application has to make sure to configure the right set of preprocessor definitions. As an example, the `VP_ANDROID_baseline_2021` profile depends on the `VK_KHR_android_surface` instance extension; thus in order to use this profile, the application must define `VK_USE_PLATFORM_ANDROID_KHR`.
+The profile definitions are enabled depending on the preprocessor definitions coming from the Vulkan headers; thus the application has to make sure to configure the right set of preprocessor definitions. As an example, the `VP_ANDROID_vulkan_profile_2021` profile depends on the `VK_KHR_android_surface` instance extension; thus in order to use this profile, the application must define `VK_USE_PLATFORM_ANDROID_KHR`.
 
 ### Generating Vulkan Profiles API library
 
@@ -1184,7 +1334,7 @@ For more information on the Vulkan Profiles Library API, have a look at the [API
 
 - It would be nice to be able to emulate with the Vulkan Profiles Layer more precisely the capabilities expressed in a Vulkan Profile by selecting capability blocks individually.
 - It would be convenient to be able to run the `vkprofiles` commands from Vulkan Configurator, to quickly iterate between updating Vulkan Engine profiles and regenerating the Vulkan Profiles API library and Vulkan Profiles documentation.
-- Add dependencies between features and properties: some capabilities change values depending on whether some features or extensions are supported or not. For example, `pointSizeRange` depends on `largePoints`.
+- Handle the dependencies between features that the Vulkan specification only describes in valid usage statements, which `vkprofiles transform --pull depends` and `--strip depends` don't handle (see [Conditional capabilities with the `depends` condition](#conditional-capabilities-with-the-depends-condition)).
 - It would be a good addition to provide a library form of Vulkaninfo so that any Vulkan tool could generate Vulkan Profiles files easily, for example, to integrate the Vulkan capabilities of the system into a crash log.
 
 ## Related documentation

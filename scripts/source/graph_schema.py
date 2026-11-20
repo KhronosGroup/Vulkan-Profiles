@@ -142,7 +142,8 @@ GRAPH_JSON_SCHEMA = {
                 "ignore-extension-versions",
                 "ignore-unsupported",
                 "ignore-subcore",
-                "ignore-unratified"
+                "ignore-unratified",
+                "depends"
             ]
         },
         "strip_bits": {
@@ -151,7 +152,8 @@ GRAPH_JSON_SCHEMA = {
                 "helper-values",
                 "duplication",
                 "promoted-extensions",
-                "unratified"
+                "unratified",
+                "depends"
             ]
         },
         "analyse_bits": {
@@ -161,7 +163,21 @@ GRAPH_JSON_SCHEMA = {
                 "extensions",
                 "aliases",
                 "unratified",
-                "subcore"
+                "subcore",
+                "depends"
+            ]
+        },
+        "workaround_bits": {
+            "type": "string",
+            "enum": [
+                "driver-id",
+                "64-bit-strings",
+                "flags-as-numbers",
+                "enums-as-numbers",
+                "undeclared-extension-structures",
+                "mismatching-aliases",
+                "mismatching-aliases-extra",
+                "unsupported-feature-properties"
             ]
         },
         "common_args": {
@@ -252,6 +268,11 @@ GRAPH_JSON_SCHEMA = {
                     "type": "array",
                     "items": { "$ref": "#/definitions/analyse_bits" }
                 },
+                "apply-workarounds": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/workaround_bits" }
+                },
+                "output": { "type": "string" },
                 "api": { "type": "string", "enum": ["vulkan"] },
                 "verbose": { "type": "boolean" },
                 "quiet": { "type": "boolean" },

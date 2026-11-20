@@ -342,6 +342,26 @@ def is_extension_struct_name(vk: VulkanObject, struct_name: str) -> bool:
     return False
 
 
+def getUndeclaredStructExtension(vk: VulkanObject, struct_name: str, api_version: VK_VERSION, enabled_exts: set[str]) -> str | None:
+    """
+    Returns the extension defining the extension structure struct_name when none of its defining extensions is in
+    enabled_exts or promoted to a Vulkan version up to api_version, or None when the structure is declared.
+    """
+    if not is_extension_struct_name(vk, struct_name):
+        return None
+    def_exts = sorted(getStructDefiningExtensions(vk, struct_name))
+    if not def_exts:
+        return None
+    for ext_name in def_exts:
+        if ext_name in enabled_exts:
+            return None
+        for promoted_target in getExtensionPromotedTo(vk, ext_name):
+            promoted_version = VK_VERSION.from_string(promoted_target)
+            if promoted_version != VK_VERSION.NONE and api_version >= promoted_version:
+                return None
+    return def_exts[0]
+
+
 def getStructCoreVersion(vk: VulkanObject, struct_name: str) -> VK_VERSION:
     """Returns the VK_VERSION where a structure was introduced into core Vulkan."""
     bundle_ver = get_bundle_structure_core_version(struct_name)

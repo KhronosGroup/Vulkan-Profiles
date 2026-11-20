@@ -130,6 +130,53 @@ def collectExtensions(current_version: VK_VERSION, expression_str: str, extensio
     return [] if isinstance(result, bool) else result
 
 
+def tokenizeDependsExpression(expression: str) -> list[str]:
+    """Splits a vk.xml 'depends' expression into symbols ('!' prefix included) and '(', ')', '+', ',' operators."""
+    raw_tokens = re.split(r'([(),+])', expression or '')
+    return [t.strip() for t in raw_tokens if t and t.strip()]
+
+
+def checkDependsExpressionSyntax(expression: str) -> str | None:
+    """
+    Checks the syntax of a vk.xml 'depends' expression: symbols combined with '+' (AND), ',' (OR) and parentheses,
+    where '!' (NOT) may prefix a symbol. Returns an error message or None when the syntax is valid.
+    """
+    tokens = tokenizeDependsExpression(expression)
+    if not tokens:
+        return "the expression is empty"
+
+    depth = 0
+    expect_operand = True
+    for token in tokens:
+        if token == '(':
+            if not expect_operand:
+                return "missing '+' or ',' operator before '('"
+            depth += 1
+        elif token == ')':
+            if expect_operand:
+                return "missing operand before ')'"
+            depth -= 1
+            if depth < 0:
+                return "unbalanced ')'"
+        elif token in ('+', ','):
+            if expect_operand:
+                return f"missing operand before '{token}'"
+            expect_operand = True
+        else:
+            if not expect_operand:
+                return f"missing '+' or ',' operator before '{token}'"
+            symbol = token[1:].strip() if token.startswith('!') else token
+            if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*(::[A-Za-z_][A-Za-z0-9_]*)?', symbol):
+                return f"invalid symbol '{token}'"
+            expect_operand = False
+
+    if expect_operand:
+        return "missing operand at the end of the expression"
+    if depth != 0:
+        return "unbalanced '('"
+    return None
+
+
 def evalExpression(expression: str, is_symbol_enabled: Callable[[str], bool]) -> bool:
     """
     Evaluates a Vulkan XML boolean dependency expression.

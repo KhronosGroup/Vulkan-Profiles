@@ -21,6 +21,7 @@ import sys
 import logging
 import collections
 import copy
+import itertools
 import math
 from pathlib import Path
 
@@ -30,6 +31,7 @@ from source.vulkan_object_utils import (
     getMemberByName,
     getStructCoreVersion,
     getStructDefiningExtensions,
+    evaluateFeatureDepends,
     VK_VERSION
 )
 from source.vulkan_object_version import (
@@ -39,13 +41,19 @@ from source.vulkan_object_version import (
 from source.profiles_json_utils import (
     collect_block_names,
     deep_merge_dict,
-    load_profiles_jsons
+    get_block_depends,
+    load_profiles_jsons,
+    strip_dict_duplication
 )
+from source.transform_pull_required_capabilities import canonicalize_depends, get_depends_block_suffix
 
 
 # Format features structures combined by their feature flags lists, the other VkFormatProperties2 pNext chain
 # structures are combined following the limittype of their members.
 FORMAT_FEATURES_COMBINED_STRUCTS = ['VkFormatProperties', 'VkFormatProperties3', 'VkFormatProperties3KHR']
+
+# The maximum number of 'depends' conditions combined together by an intersection, which combines every set of conditions
+MAX_COMBINED_DEPENDS_CONDITIONS = 8
 
 
 def check_single_profile_files(jsons_dict: dict):
@@ -215,12 +223,119 @@ class VulkanProfilesCombineGenerator:
 
         profile_dict = self.get_profile(profile_config, capabilities_key)
 
+        # The capability blocks with a 'depends' condition are combined by condition, into a block with the same condition
+        dependent_blocks = {}
+        for depends, dependent_caps in self.combine_dependent_capabilities(
+            profile_config.input_jsons, profile_config.input_profile_names, profile_config.api_version, combined_caps
+        ).items():
+            block_name = f"{capabilities_key}_{get_depends_block_suffix(depends)}"
+            dependent_blocks[block_name] = {"depends": depends, **dependent_caps}
+            profile_dict['capabilities'].append(block_name)
+
         if isinstance(profile_file, dict):
             profile_file.setdefault("capabilities", {})[capabilities_key] = combined_caps
+            profile_file["capabilities"].update(dependent_blocks)
             profile_file.setdefault("profiles", {})[profile_config.name] = profile_dict
         else:
             profile_file.add_capabilities(capabilities_key, combined_caps)
+            for block_name, block in dependent_blocks.items():
+                profile_file.add_capabilities(block_name, block)
             profile_file.add_profile(profile_config.name, profile_dict)
+
+    def combine_dependent_capabilities(self, jsons, profile_names, api_version, combined_caps: dict) -> dict[str, dict]:
+        """
+        Combines the capability blocks with a 'depends' condition of the profiles, by condition, following the combine
+        mode. For a condition, the requirements of a profile for the devices satisfying it are its unconditional
+        capability blocks merged with its blocks with that condition, or only its unconditional blocks without such a
+        block. These requirements are combined like the unconditional blocks: the least capable values for an
+        intersection, the most capable values for a union. Returns, by condition, the combined requirements which
+        differ from combined_caps, the combined unconditional capabilities. When combined_caps satisfies a condition,
+        every device supporting the combined profile satisfies it: its requirements are merged into combined_caps.
+        For an intersection, the requirements for the devices satisfying several conditions are also combined, with the
+        conjunction of the conditions, e.g. 'A+B' for the conditions 'A' of a profile and 'B' of another profile.
+        The conditions are compared once their feature structures are canonicalized for api_version.
+        """
+        version = VK_VERSION.from_string('.'.join(str(part) for part in api_version))
+
+        # The unconditional blocks and the blocks by condition of each profile
+        profiles_blocks = []
+        conditions = []
+        for json_data, profile_name in zip(jsons, profile_names):
+            capabilities_dict = json_data.get('capabilities', {})
+            unconditional_blocks = {}
+            dependent_blocks: dict[str, list[str]] = {}
+            for block_name in collect_block_names(json_data['profiles'][profile_name].get('capabilities', [])):
+                block = capabilities_dict.get(block_name)
+                if not isinstance(block, dict):
+                    continue
+                depends = get_block_depends(block)
+                if depends is None:
+                    unconditional_blocks[block_name] = block
+                    continue
+                condition = canonicalize_depends(self.vk, version, depends)
+                dependent_blocks.setdefault(condition, []).append(block_name)
+                if condition not in conditions:
+                    conditions.append(condition)
+            profiles_blocks.append((json_data, unconditional_blocks, dependent_blocks))
+
+        def combine_requirements(condition_set: tuple[str, ...]) -> dict:
+            """Combines the requirements of the profiles for the devices satisfying every condition of condition_set."""
+            condition_jsons = []
+            condition_profile_names = []
+            for index, (json_data, unconditional_blocks, dependent_blocks) in enumerate(profiles_blocks):
+                blocks = {name: copy.deepcopy(block) for name, block in unconditional_blocks.items()}
+                for condition in condition_set:
+                    for block_name in dependent_blocks.get(condition, []):
+                        blocks[block_name] = {key: copy.deepcopy(value) for key, value in json_data['capabilities'][block_name].items() if key != 'depends'}
+                profile_name = f"profile_{index}"
+                condition_jsons.append({'capabilities': blocks, 'profiles': {profile_name: {'capabilities': list(blocks.keys())}}})
+                condition_profile_names.append(profile_name)
+            return self.combine_capabilities(condition_jsons, condition_profile_names, api_version)
+
+        # Each condition on its own
+        dependent_caps_by_set: dict[tuple[str, ...], dict] = {}
+        remaining_conditions = []
+        for condition in conditions:
+            condition_caps = combine_requirements((condition,))
+
+            # Every device supporting the combined profile satisfies a condition its unconditional features satisfy
+            enabled_exts = set(combined_caps.get('extensions', {}).keys())
+            enabled_features = {(struct_name, member_name) for struct_name, members in combined_caps.get('features', {}).items()
+                                for member_name, value in members.items() if value is True}
+            if evaluateFeatureDepends(self.vk, condition, version, enabled_exts, enabled_features):
+                deep_merge_dict(combined_caps, condition_caps)
+                continue
+
+            remaining_conditions.append(condition)
+            strip_dict_duplication(condition_caps, combined_caps, strip_list_elements=True)
+            if condition_caps:
+                dependent_caps_by_set[(condition,)] = condition_caps
+
+        # For an intersection, the devices satisfying several conditions have the least capable requirements of the
+        # profiles for these devices, which may be more capable than the requirements for each condition on its own,
+        # e.g. the requirements of a profile for one condition and of another profile for the other condition. These
+        # requirements are written in a block with the conjunction of the conditions. For a union, the blocks of each
+        # condition already require the most capable values from the devices satisfying several conditions.
+        if self.mode == 'intersection' and len(remaining_conditions) > 1:
+            if len(remaining_conditions) > MAX_COMBINED_DEPENDS_CONDITIONS:
+                logging.warning(f"The {len(remaining_conditions)} 'depends' conditions are not combined together, as there are more than {MAX_COMBINED_DEPENDS_CONDITIONS}: only the requirements for each condition on its own are combined")
+            else:
+                for size in range(2, len(remaining_conditions) + 1):
+                    for condition_set in itertools.combinations(remaining_conditions, size):
+                        set_caps = combine_requirements(condition_set)
+                        # The devices satisfying the conditions also satisfy the blocks of their subsets
+                        reference = copy.deepcopy(combined_caps)
+                        for subset, subset_caps in dependent_caps_by_set.items():
+                            if set(subset) < set(condition_set):
+                                deep_merge_dict(reference, copy.deepcopy(subset_caps))
+                        strip_dict_duplication(set_caps, reference, strip_list_elements=True)
+                        if set_caps:
+                            dependent_caps_by_set[condition_set] = set_caps
+
+        def conjunction(condition_set: tuple[str, ...]) -> str:
+            return '+'.join(f"({condition})" if ',' in condition else condition for condition in condition_set)
+
+        return {conjunction(condition_set): caps for condition_set, caps in dependent_caps_by_set.items()}
 
 
     def combine_capabilities(self, jsons, profile_names, api_version):
@@ -249,6 +364,11 @@ class VulkanProfilesCombineGenerator:
                 if capability_name not in jsons[i].get('capabilities', {}):
                     continue
                 cap = jsons[i]['capabilities'][capability_name]
+
+                # The requirements of a capability block with a 'depends' condition don't apply to every device: they
+                # are combined separately, by condition, by combine_dependent_capabilities()
+                if get_block_depends(cap) is not None:
+                    continue
 
                 if 'extensions' in cap:
                     for extension, spec_ver in cap['extensions'].items():

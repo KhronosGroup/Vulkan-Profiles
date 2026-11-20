@@ -43,6 +43,7 @@ from source.vulkan_object_utils import (
 )
 from source.profiles_json_utils import (
     deep_merge_dict,
+    get_block_depends,
     is_property_satisfied,
     merge_capability_value
 )
@@ -56,6 +57,7 @@ class PullBits(str, Enum):
     IGNORE_UNSUPPORTED = 'ignore-unsupported'                   # Skips pulling default values for feature-dependent properties when feature is unsupported.
     IGNORE_SUBCORE = 'ignore-subcore'                           # Allows 'requirements' pulling to override profile capability values that are below Vulkan core spec requirements.
     IGNORE_UNRATIFIED = 'ignore-unratified'                     # Skips pulling unratified extensions and capability aliases during pull operations.
+    DEPENDS = 'depends'                                         # With 'requirements', extracts the capabilities whose core requirement depends on a capability the profile doesn't require into capability blocks with a 'depends' condition.
 
 
 class StripBits(str, Enum):
@@ -63,6 +65,7 @@ class StripBits(str, Enum):
     DUPLICATION = 'duplication'                    # Removes redundant duplicate features, properties, and extension requirements across inheritance trees and within blocks.
     PROMOTED_EXTENSIONS = 'promoted-extensions'    # Removes extensions that are already promoted to the profile's target core Vulkan version.
     UNRATIFIED = 'unratified'                      # Removes extensions and extension structures that are not ratified for Vulkan.
+    DEPENDS = 'depends'                            # Strips the capabilities whose condition the profile doesn't satisfy, including the capability blocks with a 'depends' condition.
 
 
 class AnalyseBits(str, Enum):
@@ -71,6 +74,18 @@ class AnalyseBits(str, Enum):
     ALIASES = 'aliases'                            # Checks member value consistency across aliased capability structures.
     UNRATIFIED = 'unratified'                      # Checks that all enabled extensions in the profile are ratified for Vulkan.
     SUBCORE_CAPABILITIES = 'subcore'               # Checks for profile capability values (features/properties) below Vulkan core specification baselines.
+    DEPENDS = 'depends'                            # Checks that the capability blocks with a 'depends' condition don't require instance extensions, and that the unconditional properties don't contradict the value of the devices not supporting a capability the profile doesn't require.
+
+
+class WorkaroundBits(str, Enum):
+    DRIVER_ID = 'driver-id'                        # Sets the driverID of the device reports from their driverName, when the device report exporter didn't know the driver ID (e.g. a null or '_KHR' driverID for KosmicKrisp).
+    STRINGS_64_BIT = '64-bit-strings'              # Converts to numbers the 64-bit integer values (VkDeviceSize, uint64_t, int64_t, ...) the device report exporter wrote as strings (e.g. "4096").
+    FLAGS_AS_NUMBERS = 'flags-as-numbers'          # Converts to lists of flag bit names the flags values the device report exporter wrote as numbers or numeric strings (e.g. "0" for an empty list).
+    ENUMS_AS_NUMBERS = 'enums-as-numbers'          # Converts to enum value names the enum values the device report exporter wrote as numbers or numeric strings (e.g. 1000117000 for an extension image layout).
+    UNSUPPORTED_FEATURE_PROPERTIES = 'unsupported-feature-properties'  # Sets the properties of a feature the device doesn't support to the Vulkan core value of the devices not supporting it, when there is one (e.g. 0 for maxGeometryShaderInvocations without geometryShader).
+    MISMATCHING_ALIASES_EXTRA = 'mismatching-aliases-extra'  # Sets the aliased VkBool32 property members with an 'exact' limittype and mismatching values to false (e.g. uniformTexelBufferOffsetSingleTexelAlignment false in VkPhysicalDeviceVulkan13Properties and true in VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT).
+    MISMATCHING_ALIASES = 'mismatching-aliases'      # Sets the aliased property members with mismatching values to their least capable value following their limittype (e.g. false for an integerDotProduct*Accelerated member true in VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR and false in VkPhysicalDeviceVulkan13Properties).
+    UNDECLARED_EXTENSION_STRUCTURES = 'undeclared-extension-structures'  # Removes the extension structures whose extension the capability block doesn't declare (e.g. VkPhysicalDeviceMaintenance7PropertiesKHR without VK_KHR_maintenance7).
 
 
 class CategoryPriority(IntEnum):
@@ -433,7 +448,14 @@ def update_context_from_capabilities(
     context_properties: dict[str, Any],
     context_extensions: set[str]
 ):
-    """Updates accumulated capabilities context with entries from caps_dict."""
+    """
+    Updates accumulated capabilities context with entries from caps_dict.
+    A capability block with a 'depends' condition doesn't update the context: its requirements
+    only apply to the devices satisfying the condition.
+    """
+    if get_block_depends(caps_dict) is not None:
+        return
+
     if "extensions" in caps_dict and isinstance(caps_dict["extensions"], dict):
         context_extensions.update(caps_dict["extensions"].keys())
 

@@ -40,6 +40,7 @@ from source.transform_strip_helper_values import strip_helper_values_profiles_fi
 from source.transform_strip_duplication import strip_duplication_profiles_files
 from source.transform_strip_promoted_extensions import strip_promoted_extensions_profiles_files
 from source.transform_strip_unratified import strip_unratified_extensions_profiles_files
+from source.transform_strip_depends import strip_dependent_capabilities_profiles_files
 from source.transform_sort import sort_profiles_files
 from source.main_validate import main_validate
 
@@ -79,6 +80,9 @@ def transform_profiles_files(
 
     if StripBits.UNRATIFIED in strip_modes:
         strip_unratified_extensions_profiles_files(vk, json_files_dict)
+
+    if StripBits.DEPENDS in strip_modes:
+        strip_dependent_capabilities_profiles_files(vk, json_files_dict)
 
     if sort:
         sort_profiles_files(vk, json_files_dict)

@@ -48,6 +48,7 @@ add_vulkan_python_test(VkProfiles_TestVulkanObjectUtils            test_vulkan_o
 add_vulkan_python_test(VkProfiles_TestVulkanObjectDepends          test_vulkan_object_expression_parsing.py)
 add_vulkan_python_test(VkProfiles_TestVulkanProfilesJson           test_profiles_json_utils.py)
 add_vulkan_python_test(VkProfiles_TestFormatFlagsConverter         test_format_flags.py)
+add_vulkan_python_test(VkProfiles_TestCombineDepends               test_combine_depends.py)
 add_vulkan_python_test(VkProfiles_TestCombineDifference            test_combine_difference.py)
 add_vulkan_python_test(VkProfiles_TestCombineFormatPNext           test_combine_format_pnext.py)
 add_vulkan_python_test(VkProfiles_TestCombineIntersection          test_combine_intersection.py)
@@ -68,6 +69,7 @@ add_vulkan_python_test(VkProfiles_TestTransformPullPromotedExts    test_transfor
 add_vulkan_python_test(VkProfiles_TestTransformPullAliases         test_transform_pull_aliases.py)
 add_vulkan_python_test(VkProfiles_TestTransformPullUnratified      test_transform_pull_unratified.py)
 add_vulkan_python_test(VkProfiles_TestTransformConsolidate         test_transform_consolidate.py)
+add_vulkan_python_test(VkProfiles_TestCapabilityBlockDepends       test_capability_block_depends.py)
 add_vulkan_python_test(VkProfiles_TestTransformStripHelper         test_transform_strip_helper.py)
 add_vulkan_python_test(VkProfiles_TestTransformStripDups           test_transform_strip_duplication.py)
 add_vulkan_python_test(VkProfiles_TestTransformStripFormats        test_transform_strip_formats.py)
@@ -82,6 +84,7 @@ add_vulkan_python_test(VkProfiles_TestValidateSchema               test_validate
 add_vulkan_python_test(VkProfiles_TestProfilesSchema               test_profiles_schema.py)
 add_vulkan_python_test(VkProfiles_TestProfilesDoc                  test_profiles_doc.py)
 add_vulkan_python_test(VkProfiles_TestValidateAnalyse              test_validate_analyse.py)
+add_vulkan_python_test(VkProfiles_TestValidateWorkarounds          test_validate_workarounds.py)
 add_vulkan_python_test(VkProfiles_TestCommandLines                 test_command_lines.py)
 
 # Convert Android Profiles custom target

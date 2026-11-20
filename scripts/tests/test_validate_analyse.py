@@ -104,7 +104,9 @@ class TestAnalyseBits(unittest.TestCase):
         json_files_dict = {"test_profile.json": json.loads(json_text)}
         issues = self.validator.validate_data(json_files_dict, [AnalyseBits.EXTENSIONS])
 
-        self.assertTrue(any("belongs to extension 'VK_KHR_imageless_framebuffer'" in issue for issue in issues))
+        undeclared_issues = [issue for issue in issues if "belongs to extension 'VK_KHR_imageless_framebuffer'" in issue]
+        self.assertEqual(len(undeclared_issues), 1)
+        self.assertEqual(getattr(undeclared_issues[0], "level", None), logging.ERROR)
 
     def test_analyse_aliases(self):
         """
@@ -139,6 +141,37 @@ class TestAnalyseBits(unittest.TestCase):
         issues = self.validator.validate_data(json_files_dict, [AnalyseBits.ALIASES])
 
         self.assertTrue(any("has mismatching value" in issue and "aliased structure" in issue for issue in issues))
+
+    def test_analyse_aliases_enum_and_flags_values(self):
+        """
+        AnalyseBits.ALIASES:
+        Verifies that the enum and flags values are compared by their integer values: an enum value name and its alias,
+        and a flag bit name and its alias, are equal, while different enum values mismatch.
+        """
+        def make_profile(vulkan12_independence: str, khr_independence: str) -> dict:
+            return {"test_profile.json": {
+                "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.3-304.json#",
+                "profiles": {
+                    "VP_TEST_profile": {"version": 1, "api-version": "1.2.0", "capabilities": ["baseline"]}
+                },
+                "capabilities": {
+                    "baseline": {
+                        "properties": {
+                            "VkPhysicalDeviceVulkan12Properties": {"denormBehaviorIndependence": vulkan12_independence},
+                            "VkPhysicalDeviceFloatControlsPropertiesKHR": {"denormBehaviorIndependence": khr_independence},
+                            "VkPhysicalDeviceVulkan11Properties": {"subgroupSupportedStages": ["VK_SHADER_STAGE_COMPUTE_BIT", "VK_SHADER_STAGE_RAYGEN_BIT_KHR"]},
+                            "VkPhysicalDeviceSubgroupProperties": {"supportedStages": ["VK_SHADER_STAGE_RAYGEN_BIT_NV", "VK_SHADER_STAGE_COMPUTE_BIT"]}
+                        }
+                    }
+                }
+            }}
+
+        issues = self.validator.validate_data(make_profile("VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE", "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE_KHR"), [AnalyseBits.ALIASES])
+        self.assertEqual(issues, [])
+
+        issues = self.validator.validate_data(make_profile("VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE", "VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL_KHR"), [AnalyseBits.ALIASES])
+        self.assertEqual(len(issues), 1)
+        self.assertIn("'denormBehaviorIndependence'", issues[0])
 
     def test_analyse_unratified(self):
         """
@@ -216,6 +249,83 @@ class TestAnalyseBits(unittest.TestCase):
         self.assertIsNotNone(feat_issue)
         self.assertIn("is set to false in profile", feat_issue)
         self.assertEqual(getattr(feat_issue, "level", None), logging.INFO)
+
+    def test_analyse_depends(self):
+        """
+        AnalyseBits.DEPENDS:
+        Verifies detection when a capability block with a 'depends' condition requires an instance extension,
+        while its device extensions and the instance extensions of unconditional blocks are not reported.
+        """
+        json_text = """{
+            "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.3-106.json#",
+            "profiles": {
+                "VP_TEST_profile": {
+                    "version": 1,
+                    "api-version": "1.1.0",
+                    "capabilities": ["baseline", "conditional"]
+                }
+            },
+            "capabilities": {
+                "baseline": {
+                    "extensions": {
+                        "VK_KHR_surface": 1
+                    }
+                },
+                "conditional": {
+                    "depends": "VkPhysicalDeviceFeatures::depthClamp",
+                    "extensions": {
+                        "VK_KHR_get_surface_capabilities2": 1,
+                        "VK_KHR_swapchain": 1
+                    }
+                }
+            }
+        }"""
+
+        json_files_dict = {"test_profile.json": json.loads(json_text)}
+        issues = self.validator.validate_data(json_files_dict, [AnalyseBits.DEPENDS])
+
+        self.assertEqual(len(issues), 1)
+        self.assertIn("'conditional'", issues[0])
+        self.assertIn("instance extension 'VK_KHR_get_surface_capabilities2'", issues[0])
+        self.assertEqual(getattr(issues[0], "level", None), logging.ERROR)
+
+    def test_analyse_depends_contradicting_properties(self):
+        """
+        AnalyseBits.DEPENDS:
+        Verifies the detection of the unconditional properties contradicting the value of the devices not supporting
+        a feature the profile doesn't require, e.g. a maxGeometryShaderInvocations of 32 without geometryShader.
+        """
+        def make_profile(limits: dict, features: dict) -> dict:
+            return {"test_profile.json": {
+                "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.3-304.json#",
+                "profiles": {
+                    "VP_TEST_profile": {"version": 1, "api-version": "1.4.304", "capabilities": ["baseline"]}
+                },
+                "capabilities": {
+                    "baseline": {
+                        "features": {"VkPhysicalDeviceFeatures": features},
+                        "properties": {"VkPhysicalDeviceProperties": {"limits": limits}}
+                    }
+                }
+            }}
+
+        issues = self.validator.validate_data(make_profile({"maxGeometryShaderInvocations": 32}, {"depthClamp": True}), [AnalyseBits.DEPENDS])
+        self.assertEqual(len(issues), 1)
+        self.assertIn("'VkPhysicalDeviceLimits::maxGeometryShaderInvocations' (value: 32)", issues[0])
+        self.assertIn("'VkPhysicalDeviceFeatures::geometryShader'", issues[0])
+        self.assertEqual(getattr(issues[0], "level", None), logging.WARNING)
+
+        # The value of the devices not supporting the feature, or a required feature, doesn't contradict anything
+        self.assertEqual(self.validator.validate_data(make_profile({"maxGeometryShaderInvocations": 0}, {"depthClamp": True}), [AnalyseBits.DEPENDS]), [])
+        self.assertEqual(self.validator.validate_data(make_profile({"maxGeometryShaderInvocations": 32}, {"geometryShader": True}), [AnalyseBits.DEPENDS]), [])
+
+        # Without a Vulkan core value for the devices not supporting shaderFloat16, the value of an unsupported
+        # property derived from the limittype isn't checked
+        json_files_dict = make_profile({}, {"depthClamp": True})
+        json_files_dict["test_profile.json"]["capabilities"]["baseline"]["properties"]["VkPhysicalDeviceFloatControlsProperties"] = {
+            "shaderSignedZeroInfNanPreserveFloat16": True
+        }
+        self.assertEqual(self.validator.validate_data(json_files_dict, [AnalyseBits.DEPENDS]), [])
 
 
 if __name__ == '__main__':

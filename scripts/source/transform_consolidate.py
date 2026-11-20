@@ -19,10 +19,14 @@
 # Authors: 
 # - Christophe Riccio <christophe@lunarg.com>
 
+import copy
+
 from source.profiles_json_utils import (
     parse_profile_capabilities,
+    get_block_depends,
     get_topologically_sorted_file_keys,
     collect_required_profiles_capabilities_recursive,
+    collect_required_profiles_dependent_blocks,
     deep_merge_dict
 )
 
@@ -35,13 +39,25 @@ def consolidate_profiles_file(json_files_dict: dict, json_file_data: dict):
         required_profile_names = profile_obj.get("profiles", [])
         consolidated_caps = collect_required_profiles_capabilities_recursive(json_files_dict, required_profile_names)
 
+        # The capability blocks with a 'depends' condition can't be consolidated with the unconditional
+        # requirements: they are kept as separate capability blocks, including the ones of the required profiles.
+        dependent_blocks = []
+        for block_name, block in collect_required_profiles_dependent_blocks(json_files_dict, required_profile_names).items():
+            if block_name not in capabilities_dict:
+                capabilities_dict[block_name] = copy.deepcopy(block)
+            dependent_blocks.append(block_name)
+
         parsed_caps = parse_profile_capabilities(profile_obj.get("capabilities", []))
         optional_blocks = []
 
         for item in parsed_caps:
             if isinstance(item, str):
                 if item in capabilities_dict:
-                    deep_merge_dict(consolidated_caps, capabilities_dict[item])
+                    if get_block_depends(capabilities_dict[item]) is not None:
+                        if item not in dependent_blocks:
+                            dependent_blocks.append(item)
+                    else:
+                        deep_merge_dict(consolidated_caps, capabilities_dict[item])
             elif isinstance(item, list):
                 optional_blocks.append(item)
 
@@ -49,7 +65,7 @@ def consolidate_profiles_file(json_files_dict: dict, json_file_data: dict):
             consolidated_block_name = f"{profile_name}_requirements"
             capabilities_dict[consolidated_block_name] = consolidated_caps
 
-            profile_obj["capabilities"] = [consolidated_block_name] + optional_blocks
+            profile_obj["capabilities"] = [consolidated_block_name] + optional_blocks + dependent_blocks
             profile_obj["profiles"] = []
 
     referenced_blocks = set()

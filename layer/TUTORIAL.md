@@ -104,6 +104,11 @@ If the application requests an unsupported version of the Vulkan API, the Profil
 When a Vulkan extension gets promoted so can the structures it defines. It is invalid for a profile to specify a structure and its promoted version at the same time.
 In this case the Profiles layer will use the promoted version of the structure and emit a warning.
 
+A capability block of a profile may define a `depends` condition, see [Capability block conditions](../OVERVIEW.md#capability-block-conditions).
+The *Profiles layer* loads the capability blocks of a profile without a `depends` condition first, then evaluates the `depends` condition of the other capability blocks against the simulated device: the actual device capabilities overridden by the capability blocks already loaded.
+The Vulkan versions of the condition are evaluated with the simulated API version, the extensions with the simulated device extensions when extensions are simulated, otherwise with the actual device extensions, and the features with the simulated device features.
+A capability block is only loaded when its `depends` condition is satisfied.
+
 ## Layer Options
 
 The options for this layer are specified in `VkLayer_khronos_profiles.json`. The option details are in [profiles_layer.html](https://vulkan.lunarg.com/doc/sdk/latest/windows/profiles_layer.html).

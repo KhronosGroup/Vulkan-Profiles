@@ -11,7 +11,23 @@
 
 # Release Notes
 
-## [Vulkan Profiles Tools 1.4.363](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - December 2026
+## [Vulkan Profiles Tools 1.4.XXX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - December 2026
+
+### Features:
+- Support the `depends` condition of capability blocks of the profiles schema 0.8.3 #1090
+  - The capability block requirements only apply to the devices satisfying the `depends` condition, using the `vk.xml` `depends` expression syntax
+  - Evaluate the `depends` condition on the physical device in the Vulkan Profiles API library and on the simulated device in the Profiles layer
+  - Check the `depends` condition in `vkprofiles validate`, and report the instance extensions of capability blocks with a `depends` condition with `vkprofiles validate --analyse depends`
+  - Keep the capability blocks with a `depends` condition separate in `vkprofiles transform` and `vkprofiles extract`
+  - Extract the properties contradicting the Vulkan core requirements of the devices not supporting a capability the profile doesn't require into capability blocks with a `depends` condition with `vkprofiles transform --pull requirements depends`, used to generate the desktop and Android profiles
+  - Strip the capabilities whose condition the profile doesn't satisfy, including the capability blocks with a `depends` condition, with `vkprofiles transform --strip depends`
+  - Report the properties contradicting the value of the devices not supporting a capability the profile doesn't require with `vkprofiles validate --analyse depends`, and analyse the combined desktop baseline profiles with all the analysis checks before transforming them
+  - Document the `depends` condition, and the checking of the GPUInfo.org device reports, in the Vulkan Profiles Tools whitepaper
+  - Compare the capability blocks with the same `depends` condition with `vkprofiles combine --mode difference`
+  - Combine the capability blocks with a `depends` condition by condition with `vkprofiles combine --mode union` and `--mode intersection`, the intersection also combining the requirements for the devices satisfying several conditions with the conjunction of the conditions
+  - Evaluate a `depends` condition of the Profiles layer naming a structure promoted to a Vulkan version, or the `VkPhysicalDeviceVulkan<major><minor>Features` structure of this version, with the value the profile set in either structure
+  - Require `VP_LUNARG_minimum_requirements_1_4` `pipelineProtectedAccess`, `lineWidthGranularity` and `shaderSignedZeroInfNanPreserveFloat16` with capability blocks with a `depends` condition
+  - List the capability blocks with a `depends` condition, their condition and their requirements in a "Conditional Requirements" section of the `vkprofiles doc` documentation
 
 ### Improvements:
 - Generate `PROFILES_CORE.md`, the documentation of the `VP_LUNARG_minimum_requirements_1_x` profiles of the Vulkan core specification requirements
@@ -28,6 +44,7 @@
 ### Fixes:
 - Fix `vkprofiles validate` exiting with success when a profiles file fails the schema validation: the schema errors are reported at error level and the command fails, also when `--validate` is used by the other commands
 - Fix `vkprofiles min-api-version evaluate` missing schemas when the Khronos-Schemas `vulkan` directory has more than 1,000 files: the schemas are listed with the GitHub Git Trees API and only the newest schema revision of each Vulkan header version is downloaded
+- Fix the Profiles layer not synchronizing the core `VkPhysicalDeviceProtectedMemoryFeatures` and `VkPhysicalDeviceShaderDrawParametersFeatures` with `VkPhysicalDeviceVulkan11Features`, like the structures promoted from an extension
 - Fix `vkprofiles doc` skipping the profiles with alternative capability blocks, such as `VP_KHR_roadmap_2024`, `VP_KHR_roadmap_2026` and `VP_ANDROID_vulkan_profile_2025`: their alternative capability blocks are listed in an "Alternative Requirements" section
 
 ### Profiles:

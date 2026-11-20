@@ -92,10 +92,10 @@ Every `*_args` definition also accepts `verbose` (boolean), `quiet` (boolean), a
 | --- | --- |
 | `api` | string: `vulkan` |
 | `format` | `output_format`: `pretty`, `flatten`, `compact` |
-| `pull` (`transform`) | array of `pull_bits`: `requirements`, `promoted`, `aliases`, `ignore-extension-versions`, `ignore-unsupported`, `ignore-subcore`, `ignore-unratified` |
-| `strip` (`transform`) | array of `strip_bits`: `helper-values`, `duplication`, `promoted-extensions`, `unratified` |
+| `pull` (`transform`) | array of `pull_bits`: `requirements`, `promoted`, `aliases`, `ignore-extension-versions`, `ignore-unsupported`, `ignore-subcore`, `ignore-unratified`, `depends` |
+| `strip` (`transform`) | array of `strip_bits`: `helper-values`, `duplication`, `promoted-extensions`, `unratified`, `depends` |
 | `strip` (`library`) | boolean |
-| `analyse` (`validate`) | array of `analyse_bits`: `api-version`, `extensions`, `aliases`, `unratified`, `subcore` |
+| `analyse` (`validate`) | array of `analyse_bits`: `api-version`, `extensions`, `aliases`, `unratified`, `subcore`, `depends` |
 | `mode` (`combine`) | string: `intersection`, `union`, `difference`, `limittype` |
 | `mode` (`library`) | array of `header-only`, `header+source` |
 | `mode` (`extract`) | string: `reference-required-profiles`, `pull-required-profiles` |
@@ -298,18 +298,49 @@ vkprofiles validate --input path/to/profiles [options]
 * `--input`, `-i`: *(Required)* Path to profile JSON file or directory to validate.
 * `--registry`, `-r`: Path to `vk.xml` (used to generate schema if `--schema` is omitted and required for static analysis checks).
 * `--schema`, `-s`: Path to an explicit JSON schema file (`profiles-*.json`). By default, generates a schema from `vk.xml`.
-* `--analyse [CHECK ...]`: Optional static analysis checks to execute (`api-version`, `extensions`, `aliases`, `unratified`, `subcore`). Values may be comma-separated or space-separated. If specified without values, all checks run.
+* `--analyse [CHECK ...]`: Optional static analysis checks to execute (`api-version`, `extensions`, `aliases`, `unratified`, `subcore`, `depends`). Values may be comma-separated or space-separated. If specified without values, all checks run.
+* `--apply-workarounds [WORKAROUND ...]`: Optional workarounds of known device report issues (`driver-id`, `64-bit-strings`, `flags-as-numbers`, `enums-as-numbers`, `undeclared-extension-structures`, `mismatching-aliases`, `mismatching-aliases-extra`, `unsupported-feature-properties`). Values may be comma-separated or space-separated. If specified without values, all workarounds are applied.
+* `--output`, `-o`: Directory where to write the input profiles files with the workarounds applied. The input profiles files are left unchanged, and the written profiles files are validated and analysed instead. Without `--output`, the workarounds are applied in place to the input profiles files, after the validation and analysis issues of the input profiles files are reported.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
+
+#### Device Report Workarounds (`--apply-workarounds`)
+
+The device reports exported from [GPUInfo.org](https://vulkan.gpuinfo.org) may have issues caused by the exporter rather than by the Vulkan driver. `--apply-workarounds` fixes the known issues and logs each change at the info level, writing the changed files with an indentation of 4 spaces and their original line endings.
+
+* With `--output`, every input profiles file is written to the output directory, with the workarounds applied when needed, and the input profiles files are left unchanged. The output directory then replaces the input directory in the next steps, and the command validates the written files: it exits with a non-zero status only for the issues the workarounds don't fix. A JSON file of the output directory which isn't in the input directory is reported, as it may be a stale output.
+* Without `--output`, the workarounds rewrite the changed input profiles files in place. The command reports the issues found before the workarounds were applied and exits with a non-zero status when a file was invalid: running it again validates the fixed files.
+
+| Workaround Value | Description |
+| --- | --- |
+| `driver-id` | Sets the `driverID` of the property structures from their `driverName` when the exporter didn't know the driver ID, e.g. `VK_DRIVER_ID_MESA_KOSMICKRISP` for `KosmicKrisp`, which the exporter wrote as `null` in `VkPhysicalDeviceVulkan12Properties` and as `"_KHR"` in `VkPhysicalDeviceDriverPropertiesKHR`. Also removes the `_KHR` suffix that the exporter added to the driver IDs without a `_KHR` alias in the Vulkan registry, the driver IDs added after Vulkan 1.2, e.g. `VK_DRIVER_ID_MOLTENVK_KHR` becomes `VK_DRIVER_ID_MOLTENVK`. |
+| `64-bit-strings` | Converts to numbers the 64-bit integer values (`VkDeviceSize`, `VkDeviceAddress`, `uint64_t`, `int64_t`) that the exporter wrote as strings, including in nested structures such as `VkPhysicalDeviceLimits`, e.g. `VkPhysicalDeviceExternalMemoryHostPropertiesEXT::minImportedHostPointerAlignment` written as `"4096"`. |
+| `flags-as-numbers` | Converts to lists of flag bit names the flags values that the exporter wrote as numbers or numeric strings, using the flag bits of the Vulkan registry, e.g. `VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV::extendedSparseImageUsageFlags` written as `"6"` becomes `["VK_IMAGE_USAGE_TRANSFER_DST_BIT", "VK_IMAGE_USAGE_SAMPLED_BIT"]`. A value with bits unknown to the Vulkan registry is left unchanged with a warning. |
+| `enums-as-numbers` | Replaces by their names the enum values that the exporter wrote as numbers or numeric strings, the values defined by extensions, e.g. `1000117000` in `VkPhysicalDeviceHostImageCopyPropertiesEXT::pCopyDstLayouts` becomes `VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL`. A value unknown to the Vulkan registry is left unchanged with a warning. |
+| `undeclared-extension-structures` | Removes the feature and property extension structures of a capability block whose extension the block doesn't declare and which aren't promoted to the API version of the profiles using the block, the structures that `--analyse extensions` reports as errors, e.g. `VkPhysicalDeviceMaintenance7PropertiesKHR` in a device report not listing `VK_KHR_maintenance7`. The exporter writes the property structures of extensions it doesn't know but leaves these extensions out of `extensions`, without their feature structures. This workaround runs first, so the other workarounds don't fix the removed structures. |
+| `mismatching-aliases` | Sets the aliased property members with mismatching values, e.g. `VkPhysicalDeviceVulkan13Properties::integerDotProduct8BitUnsignedAccelerated` and `VkPhysicalDeviceShaderIntegerDotProductPropertiesKHR::integerDotProduct8BitUnsignedAccelerated`, to their least capable value following their `limittype` in `vk.xml`, considering the capability not reliable enough to be supported: `false` for a `max` boolean, the smallest value for a `max` limit, the largest value for a `min` limit, the flag bits set in every member for a `bitmask`, and the intersection for a `range`. The enum and flags values are compared by their integer values. The members with an `exact` or `noauto` limittype, or without limittype, are ignored. This workaround runs last, so that the values are compared once written as expected. |
+| `mismatching-aliases-extra` | Sets to `false` the aliased `VkBool32` property members with an `exact` limittype and mismatching values, which `mismatching-aliases` ignores, e.g. `uniformTexelBufferOffsetSingleTexelAlignment`, `false` in `VkPhysicalDeviceVulkan13Properties` and `true` in `VkPhysicalDeviceTexelBufferAlignmentPropertiesEXT`. An `exact` boolean describes a behavior rather than a limit, so `false` is a guess that the behavior isn't reliable enough to rely on. |
+| `unsupported-feature-properties` | Sets the properties of a feature the device doesn't support to the value that the Vulkan core requirements define for the devices not supporting it, the properties that `--analyse depends` reports, e.g. a `maxGeometryShaderInvocations` of 32 in a device report without `geometryShader` becomes 0. The properties without such a value are left unchanged. This workaround runs after `mismatching-aliases`, so that the aliased properties have a single value. |
+
+With `--output`, `--analyse` runs the static analysis checks on the written files, after the workarounds, which reports the issues that no workaround fixes yet. The `validate_desktop_baseline_*_reports` nodes of `profiles/vkprofiles_graph.json` run every check except `unratified`, since the device reports expose many unratified extensions:
+
+```bash
+vkprofiles validate \
+    --input profiles/LunarG/VP_LUNARG_desktop_baseline_2026 \
+    --output profiles/build/reports/VP_LUNARG_desktop_baseline_2026 \
+    --apply-workarounds \
+    --analyse api-version extensions aliases subcore depends
+```
 
 #### Static Analysis Checks (`--analyse`)
 
 | Check Value | Description |
 | --- | --- |
 | `api-version` | Verifies inherited required profiles and profile API version constraints stay compatible with Vulkan versioning rules. |
-| `extensions` | Checks extension declarations, core structure coverage, and extension-related compatibility against `vk.xml`. |
-| `aliases` | Validates member consistency across aliased capability structures. |
+| `extensions` | Checks extension declarations, core structure coverage, and extension-related compatibility against `vk.xml`. Reports as errors the extension structures whose extension isn't declared in the profile's extensions nor promoted to the profile API version. |
+| `aliases` | Validates member consistency across aliased capability structures. The enum and flags values are compared by their integer values in `vk.xml`, so an enum value name and its alias, e.g. `VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE` and `VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE_KHR`, are equal. |
 | `unratified` | Flags enabled extensions or structures that are not ratified for Vulkan. |
 | `subcore` | Flags profile capability values (features/properties) below the Vulkan core specification requirements for the profile API version. |
+| `depends` | Reports as errors the instance extensions in capability blocks with a `depends` condition: the condition is evaluated on a physical device, so the Vulkan Profiles API library and the Profiles layer ignore these instance extensions. Reports as warnings the unconditional properties which contradict the Vulkan core value of the devices not supporting a capability the profile doesn't require, e.g. a `maxTessellationGenerationLevel` of 64 in a profile not requiring `tessellationShader`, while the devices without `tessellationShader` have the value 0. Only the properties with such a value in the Vulkan core requirements are checked: `vkprofiles transform --pull requirements depends` moves them into capability blocks with a `depends` condition. |
 
 Schema validation always runs by default. Static analysis is enabled only when `--analyse` is supplied.
 
@@ -328,7 +359,7 @@ vkprofiles validate \
 
 ### 3. `schema`
 
-Generates a Vulkan Profiles JSON schema file from `vk.xml`, using the schema 0.8.3. Schema 0.8.3 adds the `depends` condition of capability blocks and deprecates the profile `optionals` list.
+Generates a Vulkan Profiles JSON schema file from `vk.xml`, using the schema 0.8.3. Schema 0.8.3 adds the `depends` condition of capability blocks and deprecates the profile `optionals` list, see [Capability block conditions](../OVERVIEW.md#capability-block-conditions).
 
 ```bash
 vkprofiles schema --registry vk.xml --output path/to/output [options]
@@ -363,14 +394,14 @@ vkprofiles transform --registry vk.xml --input path/to/input_dir --output path/t
 * `--registry`, `-r`: Path to `vk.xml`.
 * `--api`: Target API variant (`vulkan`). Default: `vulkan`.
 * `--format`: Output formatting style (`flatten` or `pretty`). Default: `pretty`.
-* `--pull [OPTION ...]`: Pull capability options: `requirements`, `promoted`, `aliases`, `ignore-extension-versions`, `ignore-unsupported`, `ignore-subcore`, or `ignore-unratified`.
+* `--pull [OPTION ...]`: Pull capability options: `requirements`, `promoted`, `aliases`, `ignore-extension-versions`, `ignore-unsupported`, `ignore-subcore`, `ignore-unratified`, or `depends`.
 * `--consolidate`: Consolidate capabilities.
-* `--strip [OPTION ...]`: Strip options: `helper-values`, `duplication`, `promoted-extensions`, or `unratified`.
+* `--strip [OPTION ...]`: Strip options: `helper-values`, `duplication`, `promoted-extensions`, `unratified`, or `depends`.
 * `--sort`: Sort profile capabilities, including the flag lists. Without `--sort`, the flag lists keep their input order.
 
 #### Transformation Options
 
-Conversion flags are processed in a fixed internal order regardless of the order specified on the command line: `--pull requirements`, `--pull promoted`, `--pull aliases`, `--consolidate`, `--strip helper-values`, `--strip duplication`, `--strip promoted-extensions`, `--strip unratified`, then `--sort`. The `ignore-*` pull values do not run a step on their own; they modify the behavior of the `requirements`, `promoted`, and `aliases` pull steps.
+Conversion flags are processed in a fixed internal order regardless of the order specified on the command line: `--pull requirements`, `--pull promoted`, `--pull aliases`, `--consolidate`, `--strip helper-values`, `--strip duplication`, `--strip promoted-extensions`, `--strip unratified`, `--strip depends`, then `--sort`. The `ignore-*` and `depends` pull values do not run a step on their own; they modify the behavior of the `requirements`, `promoted`, and `aliases` pull steps.
 
 | Option value | Description |
 | --- | --- |
@@ -381,11 +412,13 @@ Conversion flags are processed in a fixed internal order regardless of the order
 | `--pull ignore-unsupported` | Skips pulling default values for feature-dependent properties when the corresponding feature is unsupported. |
 | `--pull ignore-subcore` | Allows `requirements` pulling to override profile capability values that are below Vulkan core specification requirements. |
 | `--pull ignore-unratified` | Skips pulling unratified extensions and capability aliases. |
+| `--pull depends` | With `requirements`, extracts the properties of the unconditional capability blocks which contradict a Vulkan core requirement of the devices not supporting a capability the profile doesn't require into capability blocks with a `depends` condition on that capability, one per condition. E.g. a device without `wideLines` has a `lineWidthGranularity` of 1.0: the `lineWidthGranularity` of 0.5 of a profile not requiring `wideLines` is moved into a block with the `VkPhysicalDeviceFeatures::wideLines` condition, and the unconditional `lineWidthGranularity` is set to 1.0. Without such a Vulkan core value, the value of the devices not supporting the capability is the value of an unsupported property (e.g. `false` for a `max` `VkBool32` property such as `shaderSignedZeroInfNanPreserveFloat16`, which depends on `shaderFloat16`). The features, and the properties which don't contradict such a value, are unconditional requirements of the profile: they are not extracted. |
 | `--consolidate` | Combines capability blocks into a consolidated requirements block per profile. |
 | `--strip helper-values` | Removes non-bit-position bitmask helper values (composites, all-flags, and zero/none constants) from capability blocks. |
 | `--strip duplication` | Removes redundant duplicate features, properties, and extension requirements across inheritance trees and within blocks. |
 | `--strip promoted-extensions` | Removes extensions already promoted to the profile's target core Vulkan version. |
 | `--strip unratified` | Removes extensions and extension structures that are not ratified for Vulkan. |
+| `--strip depends` | Strips the capabilities whose condition the profile doesn't satisfy: removes the capability blocks with a `depends` condition the profile doesn't satisfy, and sets the features and properties whose Vulkan core requirement depends on a condition the profile doesn't satisfy to the value of the devices not satisfying the condition: the Vulkan core value for these devices (e.g. `maxGeometryShaderInvocations` to 0 when the profile doesn't require `geometryShader`), or the value of an unsupported capability (e.g. `shaderInt64` to `false` when the profile doesn't require `shaderSharedInt64Atomics` or `shaderBufferInt64Atomics`, and a `VkBool32` property to `false` with the `max` limit type or `true` with the `min` limit type). The members without such a value (`exact`, `noauto` or implementation-dependent members) are removed. The conditions are the `vk.xml` conditions of the Vulkan core requirements: the dependencies of a feature on another feature described only by the Vulkan specification valid usage are not handled. |
 | `--sort` | Sorts profile capabilities into canonical Vulkan order and sorts the flag lists. |
 
 **Example:**
@@ -399,6 +432,16 @@ vkprofiles transform \
     --strip duplication promoted-extensions \
     --consolidate
 ```
+
+#### Capability blocks with a `depends` condition
+
+A profile only lists a dependency when the profile doesn't satisfy it. When a profile requires `geometryShader`, its geometry shader limits are unconditional requirements. When a profile doesn't require `geometryShader`, a device supporting the profile may not support geometry shaders: the profile requires the limits of the devices not supporting them unconditionally, and the limits of the devices supporting them in a capability block with the `geometryShader` condition, e.g. `maxGeometryShaderInvocations` 0 unconditionally and 32 in a block with the `VkPhysicalDeviceFeatures::geometryShader` condition.
+
+* `--pull requirements depends` extracts these conditional capabilities. A property of an unconditional capability block which contradicts the value of the devices not supporting a capability the profile doesn't require (e.g. a `maxGeometryShaderInvocations` of 32 without `geometryShader`) is moved into a capability block with a `depends` condition on that capability, named `<profile>_depends_<condition>` unless the profile already has a block with an equivalent condition. The unconditional property is set to the value of the devices not supporting the capability: the Vulkan core value of these devices (e.g. 0), or otherwise the value of an unsupported property of that limit type (e.g. `false` for a `max` `VkBool32` property). The features, the properties set to that value and the capabilities the profile doesn't set are left unchanged.
+* `--strip depends` removes these conditional capabilities: the capability blocks with a `depends` condition the profile doesn't satisfy are removed, and the features and properties whose Vulkan core requirement depends on a condition the profile doesn't satisfy are set to the value of the devices not satisfying it, or removed without such a value.
+* `vkprofiles validate --analyse depends` reports the properties `--pull depends` would extract.
+
+The dependencies are the conditions of the Vulkan core requirements, from `vk.xml` and the VulkanObject workarounds of `vulkan_object_data.py`. The dependencies between features that the Vulkan specification only describes in valid usage statements are not handled: they need capability blocks with a `depends` condition written by hand.
 
 ---
 
@@ -439,6 +482,14 @@ vkprofiles combine \
     --profile-stage BETA \
     --profile-api-version 1.4.353
 ```
+
+**Capability blocks with a `depends` condition:** the requirements of an input profile for the devices satisfying a condition are its unconditional capability blocks merged with its blocks with that condition, or only its unconditional blocks without such a block. For each condition, these requirements are combined like the unconditional blocks, the least capable values for `intersection` and the most capable values for `union`, and the values which differ from the combined unconditional block are written to a capability block with the same condition. When the combined unconditional features satisfy the condition, these values are merged into the unconditional block instead.
+
+* `intersection` also combines the requirements for the devices satisfying several conditions, in a block with the conjunction of the conditions, e.g. `A+B` for the condition `A` of a profile and `B` of another profile. Up to 8 conditions are combined together.
+* `union` writes a block for each condition: a device satisfying only one condition doesn't have to satisfy the requirements of the other condition, so the disjunction of the conditions would require too much.
+* `difference` removes from each block with a condition the capabilities common to the blocks of every profile with that condition.
+
+The conditions are compared once their feature structures are canonicalized for the profile API version, e.g. `VkPhysicalDeviceProtectedMemoryFeatures::protectedMemory` is `VkPhysicalDeviceVulkan11Features::protectedMemory` for Vulkan 1.1 and later.
 
 ---
 
@@ -581,7 +632,7 @@ vkprofiles library \
 
 ### 9. `doc`
 
-Generates Markdown documentation from profile JSON files.
+Generates Markdown documentation from profile JSON files. The comparison tables list the requirements of every device supporting a profile. The capability blocks with a `depends` condition are listed in a "Conditional Requirements" section with their condition, as they only apply to the devices satisfying it (see [Capability blocks with a `depends` condition](#capability-blocks-with-a-depends-condition)).
 
 ```bash
 vkprofiles doc --registry vk.xml --input path/to/profiles --output PROFILES.md [options]

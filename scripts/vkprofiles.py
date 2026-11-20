@@ -24,7 +24,7 @@ import argparse
 import sys
 import time
 
-from source.transform_utils import PullBits, StripBits, AnalyseBits
+from source.transform_utils import PullBits, StripBits, AnalyseBits, WorkaroundBits
 from source.main_transform import main_transform, OutputFormatType
 from source.main_schema import main_schema
 from source.main_validate import main_validate
@@ -42,8 +42,11 @@ from source.vulkan_object_utils import setStrictPropertyRequirements
 
 
 class AnalyseAction(argparse.Action):
+    """Parses a list of bits, all the bits of bits_enum when the argument is specified without values."""
+    bits_enum = AnalyseBits
+
     def __call__(self, parser, namespace, values, option_string=None):
-        valid_bits = list(AnalyseBits)
+        valid_bits = list(self.bits_enum)
         if values is None or len(values) == 0:
             setattr(namespace, self.dest, valid_bits)
         else:
@@ -53,12 +56,16 @@ class AnalyseAction(argparse.Action):
                     item = item.strip()
                     if item:
                         try:
-                            bit = AnalyseBits(item)
+                            bit = self.bits_enum(item)
                         except ValueError:
                             parser.error(f"argument {option_string}: invalid choice: '{item}' (choose from {', '.join([b.value for b in valid_bits])})")
                         if bit not in res:
                             res.append(bit)
             setattr(namespace, self.dest, res)
+
+
+class WorkaroundsAction(AnalyseAction):
+    bits_enum = WorkaroundBits
 
 
 class LogTypeAction(argparse.Action):
@@ -162,6 +169,8 @@ def main(argv):
     validate_parser.add_argument('--schema', '-s', action='store', help='Use a profile schema (profiles-*.json). By default, generate a profile schema from vk.xml.')
     validate_parser.add_argument('--input', '-i', action='store', required=True, help='Path to the input profiles files.')
     validate_parser.add_argument('--analyse',  nargs='*', action=AnalyseAction, default=None, metavar='CHECK', help='Static analysis checks to execute (choices: ' + ', '.join([e.value for e in AnalyseBits]) + '). If specified without arguments, all checks are executed.')
+    validate_parser.add_argument('--apply-workarounds',  nargs='*', action=WorkaroundsAction, default=None, metavar='WORKAROUND', help='Workarounds of the device reports issues to apply (choices: ' + ', '.join([e.value for e in WorkaroundBits]) + '). If specified without arguments, all workarounds are applied. Without --output, the workarounds are applied in place to the input profiles files, after reporting the validation and analysis issues.')
+    validate_parser.add_argument('--output', '-o', action='store', help='Directory where to write the input profiles files with the workarounds applied, leaving the input profiles files unchanged. The written profiles files are validated and analysed instead of the input profiles files.')
 
     schema_parser = add_command_parser(subparsers, 'schema', parents=[log_parser], help='Generate a profile json schema file.')
     schema_parser.add_argument('--registry', '-r', action='store', help='Use a specific Vulkan registry file (vk.xml).')
