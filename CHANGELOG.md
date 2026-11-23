@@ -11,7 +11,7 @@
 
 # Release Notes
 
-## [Vulkan Profiles Tools 1.4.XXX](https://github.com/KhronosGroup/Vulkan-Profiles/tree/main) - December 2026
+## [Vulkan Profiles Tools 1.4.370](https://github.com/KhronosGroup/Vulkan-Profiles/tree/sdk-1.4.370.0) - December 2026
 
 ### Features:
 - Support the `depends` condition of capability blocks of the profiles schema 0.8.3 #1090
@@ -58,6 +58,7 @@
 ### Profiles:
 - Add VP_ANDROID_18_requirements profile
 - Add the generated `VP_LUNARG_desktop_baseline_2027` profile, MoltenVK is not supported, macOS support is limited to Mesa Vulkan drivers
+- Replace the `optionals` of the Roadmap profiles with capability blocks with a `depends` condition: `VP_KHR_roadmap_2022` requires `pointSizeGranularity` when `largePoints` is supported and `lineWidthGranularity` when `wideLines` is supported, `VP_KHR_roadmap_2026` requires `pipelineProtectedAccess` when `protectedMemory` is supported
 
 ### Deprecation:
 - The profile `optionals` list is deprecated in the profiles schema 0.8.3, replaced by the capability blocks with a `depends` condition

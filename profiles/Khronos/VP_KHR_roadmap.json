@@ -61,17 +61,21 @@
                 }
             }
         },
-        "vulkan10optionals_roadmap2022": {
-            "features": {
-                "VkPhysicalDeviceFeatures": {
-                    "largePoints": true,
-                    "wideLines": true
-                }
-            },
+        "vulkan10dependent_roadmap2022_largepoints": {
+            "depends": "VkPhysicalDeviceFeatures::largePoints",
             "properties": {
                 "VkPhysicalDeviceProperties": {
                     "limits": {
-                        "pointSizeGranularity": 0.125,
+                        "pointSizeGranularity": 0.125
+                    }
+                }
+            }
+        },
+        "vulkan10dependent_roadmap2022_widelines": {
+            "depends": "VkPhysicalDeviceFeatures::wideLines",
+            "properties": {
+                "VkPhysicalDeviceProperties": {
+                    "limits": {
                         "lineWidthGranularity": 0.5
                     }
                 }
@@ -557,7 +561,7 @@
             ]
         },
         "VP_KHR_roadmap_2022": {
-            "version": 2,
+            "version": 3,
             "api-version": "1.3.204",
             "label": "Khronos Vulkan Roadmap 2022 profile",
             "description": "This roadmap profile is intended to be supported by newer devices shipping in 2022 across mainstream smartphone, tablet, laptops, console and desktop devices.",
@@ -566,10 +570,9 @@
                 "vulkan11requirements_roadmap2022",
                 "vulkan12requirements_roadmap2022",
                 "vulkan13requirements_roadmap2022",
-                "vulkanextensionrequirements_roadmap2022"
-            ],
-            "optionals": [
-                "vulkan10optionals_roadmap2022"
+                "vulkanextensionrequirements_roadmap2022",
+                "vulkan10dependent_roadmap2022_largepoints",
+                "vulkan10dependent_roadmap2022_widelines"
             ]
         }
     },
@@ -588,9 +591,9 @@
     "history": [
         {
             "revision": 14,
-            "date": "2026-11-16",
+            "date": "2026-11-23",
             "author": "Christophe Riccio",
-            "comment": "Require Roadmap 2026 pipelineProtectedAccess when protectedMemory is supported, using a capability block 'depends' condition"
+            "comment": "Replace the deprecated 'optionals' with capability block 'depends' conditions: require Roadmap 2022 pointSizeGranularity when largePoints is supported and lineWidthGranularity when wideLines is supported, and Roadmap 2026 pipelineProtectedAccess when protectedMemory is supported"
         },
         {
             "revision": 13,
