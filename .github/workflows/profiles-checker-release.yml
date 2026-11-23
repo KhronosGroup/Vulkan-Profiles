@@ -87,7 +87,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - uses: android-actions/setup-android@v3
+      - uses: android-actions/setup-android@v4
         with:
           packages: 'platforms;android-35 build-tools;35.0.0 ndk;${{ env.NDK_VERSION }} cmake;3.22.1'
 
