@@ -247,3 +247,14 @@ endif()
 if (BUILD_WHITEPAPER_PDF)
     add_subdirectory(doc)
 endif()
+
+# Lists the repository root Markdown files in the IDE, next to the VpWhitepaperPdf target.
+add_custom_target(VpDocumentation SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/README.md"
+    "${CMAKE_CURRENT_SOURCE_DIR}/OVERVIEW.md"
+    "${CMAKE_CURRENT_SOURCE_DIR}/BUILD.md"
+    "${CMAKE_CURRENT_SOURCE_DIR}/CHANGELOG.md"
+    "${CMAKE_CURRENT_SOURCE_DIR}/CONTRIBUTING.md"
+    "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.md"
+)
+set_target_properties(VpDocumentation PROPERTIES FOLDER "Documentation")
