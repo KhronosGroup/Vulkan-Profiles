@@ -19,9 +19,6 @@
  * - Christophe Riccio <christophe@lunarg.com>
  */
 
-#ifndef VP_USE_OBJECT
-#define VP_USE_OBJECT 1
-#endif
 
 #include "test_vulkan_profiles.hpp"
 #include "mock_vulkan_api.hpp"
@@ -328,7 +325,7 @@ TEST(mocked_api_generated_library, check_support_profile_a) {
     mock.SetDeviceExtensions(mock.vkPhysicalDevice, extensions);
 
     VkBool32 supported = VK_FALSE;
-    result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -382,7 +379,7 @@ TEST(mocked_api_generated_library, check_support_profile_b) {
     mock.SetProperties({VK_STRUCT(props)});
 
     VkBool32 supported = VK_FALSE;
-    result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -438,7 +435,7 @@ TEST(mocked_api_generated_library, check_support_profile_c) {
     mock.SetProperties({VK_STRUCT(props)});
 
     VkBool32 supported = VK_FALSE;
-    result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -513,7 +510,7 @@ TEST(mocked_api_generated_library, check_support_profile_queue_families) {
     }
 
     VkBool32 supported = VK_FALSE;
-    result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -534,7 +531,7 @@ TEST(mocked_api_generated_library, check_support_profile_queue_families) {
     }
 
     supported = VK_FALSE;
-    result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -559,7 +556,7 @@ TEST(mocked_api_generated_library, check_support_profile_queue_families) {
     }
 
     supported = VK_TRUE;
-    result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -892,7 +889,7 @@ TEST(mocked_api_generated_library, check_support_variants_success_2variants) {
     fixProperties(mock);
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -900,7 +897,7 @@ TEST(mocked_api_generated_library, check_support_variants_success_2variants) {
     std::vector<VpBlockProperties> block_properties(10);
     uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
-    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                        &block_property_count, &block_properties[0]);
 
     EXPECT_EQ(result, VK_SUCCESS);
@@ -933,7 +930,7 @@ TEST(mocked_api_generated_library, check_support_variants_extensions_success_1va
     }
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -941,7 +938,7 @@ TEST(mocked_api_generated_library, check_support_variants_extensions_success_1va
     std::vector<VpBlockProperties> block_properties(10);
     uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
-    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                        &block_property_count, &block_properties[0]);
 
     EXPECT_EQ(result, VK_SUCCESS);
@@ -969,7 +966,7 @@ TEST(mocked_api_generated_library, check_support_variants_extensions_fail) {
     }
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -977,7 +974,7 @@ TEST(mocked_api_generated_library, check_support_variants_extensions_fail) {
     std::vector<VpBlockProperties> block_properties(10);
     uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
-    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                        &block_property_count, &block_properties[0]);
 
     EXPECT_EQ(result, VK_SUCCESS);
@@ -1009,7 +1006,7 @@ TEST(mocked_api_generated_library, check_support_variants_features_success_1vari
     }
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -1018,7 +1015,7 @@ TEST(mocked_api_generated_library, check_support_variants_features_success_1vari
     uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
     supported = VK_FALSE;
-    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                        &block_property_count, &block_properties[0]);
 
     EXPECT_EQ(supported, VK_TRUE);
@@ -1050,7 +1047,7 @@ TEST(mocked_api_generated_library, check_support_variants_features_fail) {
     }
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -1059,7 +1056,7 @@ TEST(mocked_api_generated_library, check_support_variants_features_fail) {
     uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
     supported = VK_TRUE;
-    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                        &block_property_count, &block_properties[0]);
 
     EXPECT_EQ(result, VK_SUCCESS);
@@ -1091,7 +1088,7 @@ TEST(mocked_api_generated_library, check_support_variants_properties_success_1va
     }
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -1100,7 +1097,7 @@ TEST(mocked_api_generated_library, check_support_variants_properties_success_1va
     uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
     supported = VK_FALSE;
-    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
         &block_property_count, &block_properties[0]);
 
     EXPECT_EQ(supported, VK_TRUE);
@@ -1135,7 +1132,7 @@ TEST(mocked_api_generated_library, check_support_variants_properties_fail) {
     }
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -1144,7 +1141,7 @@ TEST(mocked_api_generated_library, check_support_variants_properties_fail) {
     uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
     supported = VK_TRUE;
-    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                        &block_property_count, &block_properties[0]);
 
     EXPECT_EQ(result, VK_SUCCESS);
@@ -1173,7 +1170,7 @@ TEST(mocked_api_generated_library, check_support_variants_queue_family_success_2
     mock.AddQueueFamily({VK_STRUCT(props)});
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -1182,7 +1179,7 @@ TEST(mocked_api_generated_library, check_support_variants_queue_family_success_2
     uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
     supported = VK_FALSE;
-    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                        &block_property_count, &block_properties[0]);
 
     EXPECT_EQ(supported, VK_TRUE);
@@ -1213,7 +1210,7 @@ TEST(mocked_api_generated_library, check_support_variants_queue_family_success_1
     mock.AddQueueFamily({VK_STRUCT(props)});
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -1222,7 +1219,7 @@ TEST(mocked_api_generated_library, check_support_variants_queue_family_success_1
     uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
     supported = VK_FALSE;
-    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                        &block_property_count, &block_properties[0]);
 
     EXPECT_EQ(supported, VK_TRUE);
@@ -1253,7 +1250,7 @@ TEST(mocked_api_generated_library, check_support_variants_queue_family_fail) {
     mock.AddQueueFamily({VK_STRUCT(props)});
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -1262,7 +1259,7 @@ TEST(mocked_api_generated_library, check_support_variants_queue_family_fail) {
     uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
     supported = VK_TRUE;
-    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                        &block_property_count, &block_properties[0]);
 
     EXPECT_EQ(result, VK_SUCCESS);
@@ -1293,7 +1290,7 @@ TEST(mocked_api_generated_library, check_support_variants_format_success_1varian
     }
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -1302,7 +1299,7 @@ TEST(mocked_api_generated_library, check_support_variants_format_success_1varian
     uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
     supported = VK_FALSE;
-    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                        &block_property_count, &block_properties[0]);
 
     EXPECT_EQ(supported, VK_TRUE);
@@ -1333,7 +1330,7 @@ TEST(mocked_api_generated_library, check_support_variants_format_fail) {
     }
 
     VkBool32 supported = VK_TRUE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_FALSE);
@@ -1342,7 +1339,7 @@ TEST(mocked_api_generated_library, check_support_variants_format_fail) {
     uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
     supported = VK_TRUE;
-    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                        &block_property_count, &block_properties[0]);
 
     EXPECT_EQ(result, VK_SUCCESS);
@@ -1834,7 +1831,7 @@ TEST(mocked_api_generated_library, check_support_variants_video_profile_success_
     initProfile(mock, profile);
 
     VkBool32 supported = VK_FALSE;
-    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+    VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
     EXPECT_EQ(result, VK_SUCCESS);
     EXPECT_EQ(supported, VK_TRUE);
@@ -1843,7 +1840,7 @@ TEST(mocked_api_generated_library, check_support_variants_video_profile_success_
     uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
     supported = VK_FALSE;
-    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+    result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                        &block_property_count, &block_properties[0]);
 
     EXPECT_EQ(result, VK_SUCCESS);
@@ -1874,7 +1871,7 @@ TEST(mocked_api_generated_library, check_support_variants_video_profile_success_
         mock.RemoveVideoCapabilities(profile_info);
 
         VkBool32 supported = VK_FALSE;
-        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
         EXPECT_EQ(result, VK_SUCCESS);
         EXPECT_EQ(supported, VK_TRUE);
@@ -1883,7 +1880,7 @@ TEST(mocked_api_generated_library, check_support_variants_video_profile_success_
         uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
         supported = VK_FALSE;
-        result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+        result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                            &block_property_count, &block_properties[0]);
 
         EXPECT_EQ(result, VK_SUCCESS);
@@ -1901,7 +1898,7 @@ TEST(mocked_api_generated_library, check_support_variants_video_profile_success_
         mock.RemoveVideoFormats(profile_info);
 
         VkBool32 supported = VK_FALSE;
-        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
         EXPECT_EQ(result, VK_SUCCESS);
         EXPECT_EQ(supported, VK_TRUE);
@@ -1910,7 +1907,7 @@ TEST(mocked_api_generated_library, check_support_variants_video_profile_success_
         uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
         supported = VK_FALSE;
-        result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+        result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                            &block_property_count, &block_properties[0]);
 
         EXPECT_EQ(result, VK_SUCCESS);
@@ -1933,7 +1930,7 @@ TEST(mocked_api_generated_library, check_support_variants_video_profile_fail) {
         mock.ClearProfileAreas(PROFILE_AREA_VIDEO_CAPABILITIES_BIT);
 
         VkBool32 supported = VK_FALSE;
-        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
         EXPECT_EQ(result, VK_SUCCESS);
         EXPECT_EQ(supported, VK_FALSE);
@@ -1942,7 +1939,7 @@ TEST(mocked_api_generated_library, check_support_variants_video_profile_fail) {
         uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
         supported = VK_FALSE;
-        result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+        result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                            &block_property_count, &block_properties[0]);
 
         EXPECT_EQ(result, VK_SUCCESS);
@@ -1960,7 +1957,7 @@ TEST(mocked_api_generated_library, check_support_variants_video_profile_fail) {
         mock.ClearProfileAreas(PROFILE_AREA_VIDEO_FORMATS_BIT);
 
         VkBool32 supported = VK_FALSE;
-        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
         EXPECT_EQ(result, VK_SUCCESS);
         EXPECT_EQ(supported, VK_FALSE);
@@ -1969,7 +1966,7 @@ TEST(mocked_api_generated_library, check_support_variants_video_profile_fail) {
         uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
         supported = VK_FALSE;
-        result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+        result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                            &block_property_count, &block_properties[0]);
 
         EXPECT_EQ(result, VK_SUCCESS);
@@ -2005,7 +2002,7 @@ TEST(mocked_api_generated_library, check_support_wildcard_video_profiles) {
     // No video profiles at all
     {
         VkBool32 supported = VK_FALSE;
-        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
         EXPECT_EQ(result, VK_SUCCESS);
         EXPECT_EQ(supported, VK_FALSE);
@@ -2014,7 +2011,7 @@ TEST(mocked_api_generated_library, check_support_wildcard_video_profiles) {
         uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
         supported = VK_FALSE;
-        result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+        result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                            &block_property_count, &block_properties[0]);
 
         EXPECT_EQ(result, VK_SUCCESS);
@@ -2061,7 +2058,7 @@ TEST(mocked_api_generated_library, check_support_wildcard_video_profiles) {
         mock.AddVideoFormat(h264_decode_profile, {VK_STRUCT(dpb_format)});
 
         VkBool32 supported = VK_FALSE;
-        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
         EXPECT_EQ(result, VK_SUCCESS);
         EXPECT_EQ(supported, VK_FALSE);
@@ -2070,7 +2067,7 @@ TEST(mocked_api_generated_library, check_support_wildcard_video_profiles) {
         uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
         supported = VK_FALSE;
-        result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+        result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                            &block_property_count, &block_properties[0]);
 
         EXPECT_EQ(result, VK_SUCCESS);
@@ -2093,7 +2090,7 @@ TEST(mocked_api_generated_library, check_support_wildcard_video_profiles) {
         mock.AddVideoFormat(h264_decode_profile, {VK_STRUCT(dst_format)});
 
         VkBool32 supported = VK_FALSE;
-        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
         EXPECT_EQ(result, VK_SUCCESS);
         EXPECT_EQ(supported, VK_FALSE);
@@ -2102,7 +2099,7 @@ TEST(mocked_api_generated_library, check_support_wildcard_video_profiles) {
         uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
         supported = VK_FALSE;
-        result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+        result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                            &block_property_count, &block_properties[0]);
 
         EXPECT_EQ(result, VK_SUCCESS);
@@ -2124,7 +2121,7 @@ TEST(mocked_api_generated_library, check_support_wildcard_video_profiles) {
         mock.AddVideoFormat(h264_decode_profile, {VK_STRUCT(dst_format)});
 
         VkBool32 supported = VK_FALSE;
-        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
         EXPECT_EQ(result, VK_SUCCESS);
         EXPECT_EQ(supported, VK_TRUE);
@@ -2149,7 +2146,7 @@ TEST(mocked_api_generated_library, check_support_wildcard_video_profiles) {
         mock.AddVideoCapabilities(h264_decode_profile, {VK_STRUCT(caps), VK_STRUCT(decode_caps), VK_STRUCT(h264_decode_caps)});
 
         VkBool32 supported = VK_FALSE;
-        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
         EXPECT_EQ(result, VK_SUCCESS);
         EXPECT_EQ(supported, VK_FALSE);
@@ -2158,7 +2155,7 @@ TEST(mocked_api_generated_library, check_support_wildcard_video_profiles) {
         uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
         supported = VK_FALSE;
-        result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+        result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                            &block_property_count, &block_properties[0]);
 
         EXPECT_EQ(result, VK_SUCCESS);
@@ -2187,7 +2184,7 @@ TEST(mocked_api_generated_library, check_support_wildcard_video_profiles) {
         mock.AddVideoCapabilities(h264_decode_profile, {VK_STRUCT(caps), VK_STRUCT(decode_caps), VK_STRUCT(h264_decode_caps)});
 
         VkBool32 supported = VK_FALSE;
-        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported);
+        VkResult result = vpGetPhysicalDeviceProfileSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported);
 
         EXPECT_EQ(result, VK_SUCCESS);
         EXPECT_EQ(supported, VK_FALSE);
@@ -2196,7 +2193,7 @@ TEST(mocked_api_generated_library, check_support_wildcard_video_profiles) {
         uint32_t block_property_count = static_cast<uint32_t>(block_properties.size());
 
         supported = VK_FALSE;
-        result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkInstance, mock.vkPhysicalDevice, &profile, &supported,
+        result = vpGetPhysicalDeviceProfileVariantsSupport(mock.functions, mock.vkPhysicalDevice, &profile, &supported,
                                                            &block_property_count, &block_properties[0]);
 
         EXPECT_EQ(result, VK_SUCCESS);

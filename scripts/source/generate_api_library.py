@@ -234,6 +234,10 @@ struct VpFunctions_T {
     PFN_vkGetPhysicalDeviceQueueFamilyProperties2 GetPhysicalDeviceQueueFamilyProperties2 = nullptr;
     PFN_vkCreateInstance CreateInstance = nullptr;
     PFN_vkCreateDevice CreateDevice = nullptr;
+#ifdef VK_KHR_video_queue
+    PFN_vkGetPhysicalDeviceVideoCapabilitiesKHR GetPhysicalDeviceVideoCapabilitiesKHR = nullptr;
+    PFN_vkGetPhysicalDeviceVideoFormatPropertiesKHR GetPhysicalDeviceVideoFormatPropertiesKHR = nullptr;
+#endif  // VK_KHR_video_queue
 
 private:
 #ifndef VK_NO_PROTOTYPES
@@ -275,9 +279,11 @@ typedef struct VpFunctionsCreateInfo
     PFN_vkGetPhysicalDeviceProperties2 GetPhysicalDeviceProperties2 = nullptr;
     PFN_vkGetPhysicalDeviceFormatProperties2 GetPhysicalDeviceFormatProperties2 = nullptr;
     PFN_vkGetPhysicalDeviceQueueFamilyProperties2 GetPhysicalDeviceQueueFamilyProperties2 = nullptr;
+#ifdef VK_KHR_video_queue
+    PFN_vkGetPhysicalDeviceVideoCapabilitiesKHR GetPhysicalDeviceVideoCapabilitiesKHR = nullptr;
+    PFN_vkGetPhysicalDeviceVideoFormatPropertiesKHR GetPhysicalDeviceVideoFormatPropertiesKHR = nullptr;
+#endif  // VK_KHR_video_queue
 } VpFunctionsCreateInfo;
-
-#ifdef VP_USE_OBJECT
 
 VPAPI_ATTR VkResult vpCreateFunctions(
     const VpFunctionsCreateInfo*                pCreateInfo,
@@ -290,78 +296,58 @@ VPAPI_ATTR void vpDestroyFunctions(
     VpFunctions                                 functions,
     const VkAllocationCallbacks*                pAllocator);
 
-#endif//VP_USE_OBJECT
-
 /// Helper function to initialize a VpFunctions instance with global Vulkan functions loaded with GetInstanceProcAddr
 VPAPI_ATTR VkResult vpInitializeGlobalFunctions(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     PFN_vkGetInstanceProcAddr                   GetInstanceProcAddr);
 
 /// Initializes capabilities with instance functions
 VPAPI_ATTR VkResult vpInitializeInstanceFunctions(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     VkInstance                                  instance,
     VpInstanceFunctionsLoadFlags                flags);
 
 // Query the list of available profiles in the library
 VPAPI_ATTR VkResult vpGetProfiles(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     uint32_t*                                   pPropertyCount,
     VpProfileProperties*                        pProperties);
 
 // List the required profiles of a profile
 VPAPI_ATTR VkResult vpGetProfileRequiredProfiles(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     uint32_t*                                   pPropertyCount,
     VpProfileProperties*                        pProperties);
 
 // Query the profile required Vulkan API version, returns 0 on failure
 VPAPI_ATTR uint32_t vpGetProfileAPIVersion(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile);
 
 // List the recommended fallback profiles of a profile
 VPAPI_ATTR VkResult vpGetProfileFallbacks(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     uint32_t*                                   pPropertyCount,
     VpProfileProperties*                        pProperties);
 
 // Query whether the profile has multiple variants. Profiles with multiple variants can only use vpGetInstanceProfileSupport and vpGetPhysicalDeviceProfileSupport capabilities of the library. Other function will return a VK_ERROR_UNKNOWN error
 VPAPI_ATTR VkResult vpHasMultipleVariantsProfile(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     VkBool32*                                   pHasMultipleVariants);
 
 // Check whether a profile is supported at the instance level
 VPAPI_ATTR VkResult vpGetInstanceProfileSupport(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const char*                                 pLayerName,
     const VpProfileProperties*                  pProfile,
     VkBool32*                                   pSupported);
 
 // Check whether a variant of a profile is supported at the instance level and report this list of blocks used to validate the profiles
 VPAPI_ATTR VkResult vpGetInstanceProfileVariantsSupport(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const char*                                 pLayerName,
     const VpProfileProperties*                  pProfile,
     VkBool32*                                   pSupported,
@@ -370,29 +356,21 @@ VPAPI_ATTR VkResult vpGetInstanceProfileVariantsSupport(
 
 // Create a VkInstance with the profile instance extensions enabled
 VPAPI_ATTR VkResult vpCreateInstance(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpInstanceCreateInfo*                 pCreateInfo,
     const VkAllocationCallbacks*                pAllocator,
     VkInstance*                                 pInstance);
 
 // Check whether a profile is supported by the physical device
 VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
-    VkInstance                                  instance,
     VkPhysicalDevice                            physicalDevice,
     const VpProfileProperties*                  pProfile,
     VkBool32*                                   pSupported);
 
 // Check whether a variant of a profile is supported by the physical device and report this list of blocks used to validate the profiles
 VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
-    VkInstance                                  instance,
     VkPhysicalDevice                            physicalDevice,
     const VpProfileProperties*                  pProfile,
     VkBool32*                                   pSupported,
@@ -401,9 +379,7 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
 
 // Create a VkDevice with the profile features and device extensions enabled
 VPAPI_ATTR VkResult vpCreateDevice(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     VkPhysicalDevice                            physicalDevice,
     const VpDeviceCreateInfo*                   pCreateInfo,
     const VkAllocationCallbacks*                pAllocator,
@@ -411,9 +387,7 @@ VPAPI_ATTR VkResult vpCreateDevice(
 
 // Query the list of instance extensions of a profile
 VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t*                                   pPropertyCount,
@@ -421,9 +395,7 @@ VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(
 
 // Query the list of device extensions of a profile
 VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t*                                   pPropertyCount,
@@ -431,18 +403,14 @@ VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(
 
 // Fill the feature structures with the requirements of a profile
 VPAPI_ATTR VkResult vpGetProfileFeatures(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     void*                                       pNext);
 
 // Query the list of feature structure types specified by the profile
 VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t*                                   pStructureTypeCount,
@@ -450,18 +418,14 @@ VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(
 
 // Fill the property structures with the requirements of a profile
 VPAPI_ATTR VkResult vpGetProfileProperties(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     void*                                       pNext);
 
 // Query the list of property structure types specified by the profile
 VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t*                                   pStructureTypeCount,
@@ -469,9 +433,7 @@ VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(
 
 // Fill the queue family property structures with the requirements of a profile
 VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t*                                   pPropertyCount,
@@ -479,9 +441,7 @@ VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(
 
 // Query the list of queue family property structure types specified by the profile
 VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t*                                   pStructureTypeCount,
@@ -489,9 +449,7 @@ VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(
 
 // Query the list of formats with specified requirements by a profile
 VPAPI_ATTR VkResult vpGetProfileFormats(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t*                                   pFormatCount,
@@ -499,9 +457,7 @@ VPAPI_ATTR VkResult vpGetProfileFormats(
 
 // Query the requirements of a format for a profile
 VPAPI_ATTR VkResult vpGetProfileFormatProperties(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     VkFormat                                    format,
@@ -509,9 +465,7 @@ VPAPI_ATTR VkResult vpGetProfileFormatProperties(
 
 // Query the list of format structure types specified by the profile
 VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t*                                   pStructureTypeCount,
@@ -520,9 +474,7 @@ VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(
 #ifdef VK_KHR_video_queue
 // Query the list of video profiles specified by the profile
 VPAPI_ATTR VkResult vpGetProfileVideoProfiles(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t*                                   pVideoProfileCount,
@@ -530,9 +482,7 @@ VPAPI_ATTR VkResult vpGetProfileVideoProfiles(
 
 // Query the video profile info structures for a video profile defined by a profile
 VPAPI_ATTR VkResult vpGetProfileVideoProfileInfo(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t                                    videoProfileIndex,
@@ -540,9 +490,7 @@ VPAPI_ATTR VkResult vpGetProfileVideoProfileInfo(
 
 // Query the list of video profile info structure types specified by the profile for a video profile
 VPAPI_ATTR VkResult vpGetProfileVideoProfileInfoStructureTypes(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t                                    videoProfileIndex,
@@ -551,9 +499,7 @@ VPAPI_ATTR VkResult vpGetProfileVideoProfileInfoStructureTypes(
 
 // Query the video capabilities requirements for a video profile defined by a profile
 VPAPI_ATTR VkResult vpGetProfileVideoCapabilities(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t                                    videoProfileIndex,
@@ -561,9 +507,7 @@ VPAPI_ATTR VkResult vpGetProfileVideoCapabilities(
 
 // Query the list of video capability structure types specified by the profile for a video profile
 VPAPI_ATTR VkResult vpGetProfileVideoCapabilityStructureTypes(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t                                    videoProfileIndex,
@@ -572,9 +516,7 @@ VPAPI_ATTR VkResult vpGetProfileVideoCapabilityStructureTypes(
 
 // Query the video format property requirements for a video profile defined by a profile
 VPAPI_ATTR VkResult vpGetProfileVideoFormatProperties(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t                                    videoProfileIndex,
@@ -583,9 +525,7 @@ VPAPI_ATTR VkResult vpGetProfileVideoFormatProperties(
 
 // Query the list of video format property structure types specified by the profile for a video profile
 VPAPI_ATTR VkResult vpGetProfileVideoFormatStructureTypes(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t                                    videoProfileIndex,
@@ -1053,19 +993,13 @@ enum structure_type {
 };
 
 VPAPI_ATTR VkResult vpGetProfileStructureTypes(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     structure_type                              type,
     uint32_t*                                   pStructureTypeCount,
     VkStructureType*                            pStructureTypes) {
-#ifdef VP_USE_OBJECT
     const VpFunctions_T& vp = functions == nullptr ? VpFunctions_T::Get() : *functions;
-#else
-    const VpFunctions_T& vp = VpFunctions_T::Get();
-#endif//VP_USE_OBJECT
 
     VkResult result_validate = vp.validate(false);
     if (result_validate != VK_SUCCESS) {
@@ -1155,19 +1089,13 @@ enum ExtensionType {
 };
 
 VPAPI_ATTR VkResult vpGetProfileExtensionProperties(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     ExtensionType                               type,
     uint32_t*                                   pPropertyCount,
     VkExtensionProperties*                      pProperties) {
-#ifdef VP_USE_OBJECT
     const VpFunctions_T& vp = functions == nullptr ? VpFunctions_T::Get() : *functions;
-#else
-    const VpFunctions_T& vp = VpFunctions_T::Get();
-#endif//VP_USE_OBJECT
 
     VkResult result_validate = vp.validate(false);
     if (result_validate != VK_SUCCESS) {
@@ -1286,8 +1214,6 @@ VPAPI_ATTR VkResult vpGetProfileVideoProfileDesc(
 '''
 
 PUBLIC_IMPL_BODY = '''
-#ifdef VP_USE_OBJECT
-
 VPAPI_ATTR VkResult vpCreateFunctions(
     const VpFunctionsCreateInfo*                pFunctionsCreateInfo,
     const VkAllocationCallbacks*                pAllocator,
@@ -1318,6 +1244,11 @@ VPAPI_ATTR VkResult vpCreateFunctions(
     VP_COPY_IF_NOT_NULL(CreateInstance);
     VP_COPY_IF_NOT_NULL(CreateDevice);
 
+#ifdef VK_KHR_video_queue
+    VP_COPY_IF_NOT_NULL(GetPhysicalDeviceVideoCapabilitiesKHR);
+    VP_COPY_IF_NOT_NULL(GetPhysicalDeviceVideoFormatPropertiesKHR);
+#endif  // VK_KHR_video_queue
+
 #undef VP_COPY_IF_NOT_NULL
 
     return functions->validate();
@@ -1332,20 +1263,12 @@ VPAPI_ATTR void vpDestroyFunctions(
     delete functions;
 }
 
-#endif//VP_USE_OBJECT
-
 /// Helper function to initialize VpFunctions instance with global Vulkan functions
 VPAPI_ATTR VkResult vpInitializeGlobalFunctions(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     PFN_vkGetInstanceProcAddr                   GetInstanceProcAddr) {
 
-#ifdef VP_USE_OBJECT
     VpFunctions_T& vp = functions == nullptr ? VpFunctions_T::Get() : *functions;
-#else
-    VpFunctions_T& vp = VpFunctions_T::Get();
-#endif//VP_USE_OBJECT
 
     if (GetInstanceProcAddr == nullptr) {
         return VK_ERROR_INITIALIZATION_FAILED;
@@ -1367,16 +1290,10 @@ VPAPI_ATTR VkResult vpInitializeGlobalFunctions(
 
 /// Initializes capabilities with instance functions
 VPAPI_ATTR VkResult vpInitializeInstanceFunctions(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     VkInstance                                  instance,
     VpInstanceFunctionsLoadFlags                flags) {
-#ifdef VP_USE_OBJECT
     VpFunctions_T& vp = functions == nullptr ? VpFunctions_T::Get() : *functions;
-#else
-    VpFunctions_T& vp = VpFunctions_T::Get();
-#endif//VP_USE_OBJECT
 
 #define VP_FETCH_FUNC(memberName, functionNameString) \
     if (((flags & VP_INSTANCE_FUNCTIONS_LOAD_MISSING_ONLY_BIT) && vp.memberName == nullptr) || !(flags & VP_INSTANCE_FUNCTIONS_LOAD_MISSING_ONLY_BIT)) \
@@ -1404,6 +1321,11 @@ VPAPI_ATTR VkResult vpInitializeInstanceFunctions(
     }
 
     VP_FETCH_FUNC(CreateDevice, "vkCreateDevice");
+
+#ifdef VK_KHR_video_queue
+    VP_FETCH_FUNC(GetPhysicalDeviceVideoCapabilitiesKHR, "vkGetPhysicalDeviceVideoCapabilitiesKHR");
+    VP_FETCH_FUNC(GetPhysicalDeviceVideoFormatPropertiesKHR, "vkGetPhysicalDeviceVideoFormatPropertiesKHR");
+#endif  // VK_KHR_video_queue
 #undef VP_FETCH_FUNC
 
     // Validate the instance functions are loaded correctly
@@ -1425,16 +1347,10 @@ VPAPI_ATTR VkResult vpInitializeInstanceFunctions(
 }
 
 VPAPI_ATTR VkResult vpGetProfiles(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     uint32_t*                                   pPropertyCount,
     VpProfileProperties*                        pProperties) {
-#ifdef VP_USE_OBJECT
     const VpFunctions_T& vp = functions == nullptr ? VpFunctions_T::Get() : *functions;
-#else
-    const VpFunctions_T& vp = VpFunctions_T::Get();
-#endif//VP_USE_OBJECT
 
     VkResult result_validate = vp.validate(false);
     if (result_validate != VK_SUCCESS) {
@@ -1459,17 +1375,11 @@ VPAPI_ATTR VkResult vpGetProfiles(
 }
 
 VPAPI_ATTR VkResult vpGetProfileRequiredProfiles(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     uint32_t*                                   pPropertyCount,
     VpProfileProperties*                        pProperties) {
-#ifdef VP_USE_OBJECT
     const VpFunctions_T& vp = functions == nullptr ? VpFunctions_T::Get() : *functions;
-#else
-    const VpFunctions_T& vp = VpFunctions_T::Get();
-#endif//VP_USE_OBJECT
 
     VkResult result_validate = vp.validate(false);
     if (result_validate != VK_SUCCESS) {
@@ -1499,15 +1409,9 @@ VPAPI_ATTR VkResult vpGetProfileRequiredProfiles(
 }
 
 VPAPI_ATTR uint32_t vpGetProfileAPIVersion(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile) {
-#ifdef VP_USE_OBJECT
     const VpFunctions_T& vp = functions == nullptr ? VpFunctions_T::Get() : *functions;
-#else
-    const VpFunctions_T& vp = VpFunctions_T::Get();
-#endif//VP_USE_OBJECT
 
     VkResult result_validate = vp.validate(false);
     if (result_validate != VK_SUCCESS) {
@@ -1535,17 +1439,11 @@ VPAPI_ATTR uint32_t vpGetProfileAPIVersion(
 }
 
 VPAPI_ATTR VkResult vpGetProfileFallbacks(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     uint32_t*                                   pPropertyCount,
     VpProfileProperties*                        pProperties) {
-#ifdef VP_USE_OBJECT
     const VpFunctions_T& vp = functions == nullptr ? VpFunctions_T::Get() : *functions;
-#else
-    const VpFunctions_T& vp = VpFunctions_T::Get();
-#endif//VP_USE_OBJECT
 
     VkResult result_validate = vp.validate(true);
     if (result_validate != VK_SUCCESS) {
@@ -1575,16 +1473,10 @@ VPAPI_ATTR VkResult vpGetProfileFallbacks(
 }
 
 VPAPI_ATTR VkResult vpHasMultipleVariantsProfile(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     VkBool32*                                   pHasMultipleVariants) {
-#ifdef VP_USE_OBJECT
     const VpFunctions_T& vp = functions == nullptr ? VpFunctions_T::Get() : *functions;
-#else
-    const VpFunctions_T& vp = VpFunctions_T::Get();
-#endif//VP_USE_OBJECT
 
     VkResult result_validate = vp.validate(true);
     if (result_validate != VK_SUCCESS) {
@@ -1612,19 +1504,13 @@ VPAPI_ATTR VkResult vpHasMultipleVariantsProfile(
 }
 
 VPAPI_ATTR VkResult vpGetInstanceProfileVariantsSupport(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const char*                         pLayerName,
     const VpProfileProperties*          pProfile,
     VkBool32*                           pSupported,
     uint32_t*                           pPropertyCount,
     VpBlockProperties*                  pProperties) {
-#ifdef VP_USE_OBJECT
     const VpFunctions_T& vp = functions == nullptr ? VpFunctions_T::Get() : *functions;
-#else
-    const VpFunctions_T& vp = VpFunctions_T::Get();
-#endif//VP_USE_OBJECT
 
     VkResult result_validate = vp.validate(false);
     if (result_validate != VK_SUCCESS) {
@@ -1718,17 +1604,11 @@ VPAPI_ATTR VkResult vpGetInstanceProfileVariantsSupport(
 }
 
 VPAPI_ATTR VkResult vpGetInstanceProfileSupport(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const char*                                 pLayerName,
     const VpProfileProperties*                  pProfile,
     VkBool32*                                   pSupported) {
-#ifdef VP_USE_OBJECT
     const VpFunctions_T& vp = functions == nullptr ? VpFunctions_T::Get() : *functions;
-#else
-    const VpFunctions_T& vp = VpFunctions_T::Get();
-#endif//VP_USE_OBJECT
 
     VkResult result_validate = vp.validate(false);
     if (result_validate != VK_SUCCESS) {
@@ -1737,24 +1617,16 @@ VPAPI_ATTR VkResult vpGetInstanceProfileSupport(
 
     uint32_t count = 0;
     return vpGetInstanceProfileVariantsSupport(
-#ifdef VP_USE_OBJECT
         functions,
-#endif//VP_USE_OBJECT
         pLayerName, pProfile, pSupported, &count, nullptr);
 }
 
 VPAPI_ATTR VkResult vpCreateInstance(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpInstanceCreateInfo*                 pCreateInfo,
     const VkAllocationCallbacks*                pAllocator,
     VkInstance*                                 pInstance) {
-#ifdef VP_USE_OBJECT
     const VpFunctions_T& vp = functions == nullptr ? VpFunctions_T::Get() : *functions;
-#else
-    const VpFunctions_T& vp = VpFunctions_T::Get();
-#endif//VP_USE_OBJECT
 
     VkResult result_validate = vp.validate(false);
     if (result_validate != VK_SUCCESS) {
@@ -1808,9 +1680,7 @@ VPAPI_ATTR VkResult vpCreateInstance(
         appInfo = *pCreateInfo->pCreateInfo->pApplicationInfo;
     } else if (!blocks.empty()) {
         appInfo.apiVersion = vpGetProfileAPIVersion(
-#ifdef VP_USE_OBJECT
             functions,
-#endif//VP_USE_OBJECT
             &blocks[0].profiles);
     }
 
@@ -1864,9 +1734,7 @@ VPAPI_ATTR VkResult vpCreateInstance(
         }
 
         result = vpInitializeInstanceFunctions(
-#ifdef VP_USE_OBJECT
             functions,
-#endif//VP_USE_OBJECT
             *pInstance, flags);
     }
 
@@ -1874,20 +1742,13 @@ VPAPI_ATTR VkResult vpCreateInstance(
 }
 
 VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
-    VkInstance                                  instance,
     VkPhysicalDevice                            physicalDevice,
     const VpProfileProperties*                  pProfile,
     VkBool32*                                   pSupported,
     uint32_t*                                   pPropertyCount,
     VpBlockProperties*                          pProperties) {
-#ifdef VP_USE_OBJECT
     const VpFunctions_T& vp = functions == nullptr ? VpFunctions_T::Get() : *functions;
-#else
-    const VpFunctions_T& vp = VpFunctions_T::Get();
-#endif//VP_USE_OBJECT
 
     VkResult result_validate = vp.validate(true);
     if (result_validate != VK_SUCCESS) {
@@ -1982,11 +1843,8 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
     }
 
 #ifdef VK_KHR_video_queue
-    PFN_vkGetInstanceProcAddr gipa = vp.GetInstanceProcAddr;
-    userData.video.pfnGetPhysicalDeviceVideoCapabilitiesKHR =
-        (PFN_vkGetPhysicalDeviceVideoCapabilitiesKHR)gipa(instance, "vkGetPhysicalDeviceVideoCapabilitiesKHR");
-    userData.video.pfnGetPhysicalDeviceVideoFormatPropertiesKHR =
-        (PFN_vkGetPhysicalDeviceVideoFormatPropertiesKHR)gipa(instance, "vkGetPhysicalDeviceVideoFormatPropertiesKHR");
+    userData.video.pfnGetPhysicalDeviceVideoCapabilitiesKHR = vp.GetPhysicalDeviceVideoCapabilitiesKHR;
+    userData.video.pfnGetPhysicalDeviceVideoFormatPropertiesKHR = vp.GetPhysicalDeviceVideoFormatPropertiesKHR;
 #endif  // VK_KHR_video_queue
 
     bool supported = true;
@@ -2315,35 +2173,24 @@ VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileVariantsSupport(
 }
 
 VPAPI_ATTR VkResult vpGetPhysicalDeviceProfileSupport(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
-    VkInstance                                  instance,
     VkPhysicalDevice                            physicalDevice,
     const VpProfileProperties*                  pProfile,
     VkBool32 *pSupported) {
     uint32_t count = 0;
 
     return vpGetPhysicalDeviceProfileVariantsSupport(
-#ifdef VP_USE_OBJECT
         functions,
-#endif//VP_USE_OBJECT
-        instance, physicalDevice, pProfile, pSupported, &count, nullptr);
+        physicalDevice, pProfile, pSupported, &count, nullptr);
 }
 
 VPAPI_ATTR VkResult vpCreateDevice(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     VkPhysicalDevice                            physicalDevice,
     const VpDeviceCreateInfo*                   pCreateInfo,
     const VkAllocationCallbacks*                pAllocator,
     VkDevice*                                   pDevice) {
-#ifdef VP_USE_OBJECT
     const VpFunctions_T& vp = functions == nullptr ? VpFunctions_T::Get() : *functions;
-#else
-    const VpFunctions_T& vp = VpFunctions_T::Get();
-#endif//VP_USE_OBJECT
 
     if (physicalDevice == VK_NULL_HANDLE || pCreateInfo == nullptr || pDevice == nullptr) {
         return vp.CreateDevice(physicalDevice, pCreateInfo == nullptr ? nullptr : pCreateInfo->pCreateInfo, pAllocator, pDevice);
@@ -2489,45 +2336,33 @@ VPAPI_ATTR VkResult vpCreateDevice(
 }
 
 VPAPI_ATTR VkResult vpGetProfileInstanceExtensionProperties(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t*                                   pPropertyCount,
     VkExtensionProperties*                      pProperties) {
     return detail::vpGetProfileExtensionProperties(
-#ifdef VP_USE_OBJECT
         functions,
-#endif//VP_USE_OBJECT
         pProfile, pBlockName, detail::EXTENSION_INSTANCE, pPropertyCount, pProperties);
 }
 
 VPAPI_ATTR VkResult vpGetProfileDeviceExtensionProperties(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t*                                   pPropertyCount,
     VkExtensionProperties*                      pProperties) {
     return detail::vpGetProfileExtensionProperties(
-#ifdef VP_USE_OBJECT
         functions,
-#endif//VP_USE_OBJECT
         pProfile, pBlockName, detail::EXTENSION_DEVICE, pPropertyCount, pProperties);
 }
 
 VPAPI_ATTR VkResult vpGetProfileFeatures(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     void*                                       pNext) {
-#ifdef VP_USE_OBJECT
     (void)functions;
-#endif//VP_USE_OBJECT
 
     VkResult result = pBlockName == nullptr ? VK_SUCCESS : VK_INCOMPLETE;
 
@@ -2566,9 +2401,7 @@ VPAPI_ATTR VkResult vpGetProfileFeatures(
 }
 
 VPAPI_ATTR VkResult vpGetProfileProperties(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     void*                                       pNext) {
@@ -2576,9 +2409,7 @@ VPAPI_ATTR VkResult vpGetProfileProperties(
 
     VkBool32 multiple_variants = VK_FALSE;
     if (vpHasMultipleVariantsProfile(
-#ifdef VP_USE_OBJECT
         functions,
-#endif//VP_USE_OBJECT
         pProfile,
         &multiple_variants) == VK_ERROR_UNKNOWN) {
         return VK_ERROR_UNKNOWN;
@@ -2622,16 +2453,12 @@ VPAPI_ATTR VkResult vpGetProfileProperties(
 }
 
 VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t*                                   pPropertyCount,
     VkQueueFamilyProperties2KHR*                pProperties) {
-#ifdef VP_USE_OBJECT
     (void)functions;
-#endif//VP_USE_OBJECT
 
     if (pPropertyCount == nullptr) return VK_ERROR_UNKNOWN;
 
@@ -2689,16 +2516,12 @@ VPAPI_ATTR VkResult vpGetProfileQueueFamilyProperties(
 }
 
 VPAPI_ATTR VkResult vpGetProfileFormats(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t*                                   pFormatCount,
     VkFormat*                                   pFormats) {
-#ifdef VP_USE_OBJECT
     (void)functions;
-#endif//VP_USE_OBJECT
 
     VkResult result = pBlockName == nullptr ? VK_SUCCESS : VK_INCOMPLETE;
 
@@ -2752,16 +2575,12 @@ VPAPI_ATTR VkResult vpGetProfileFormats(
 }
 
 VPAPI_ATTR VkResult vpGetProfileFormatProperties(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     VkFormat                                    format,
     void*                                       pNext) {
-#ifdef VP_USE_OBJECT
     (void)functions;
-#endif//VP_USE_OBJECT
 
     VkResult result = pBlockName == nullptr ? VK_SUCCESS : VK_INCOMPLETE;
 
@@ -2827,78 +2646,58 @@ VPAPI_ATTR VkResult vpGetProfileFormatProperties(
 }
 
 VPAPI_ATTR VkResult vpGetProfileFeatureStructureTypes(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t*                                   pStructureTypeCount,
     VkStructureType*                            pStructureTypes) {
     return detail::vpGetProfileStructureTypes(
-#ifdef VP_USE_OBJECT
         functions,
-#endif//VP_USE_OBJECT
         pProfile, pBlockName, detail::STRUCTURE_FEATURE, pStructureTypeCount, pStructureTypes);
 }
 
 VPAPI_ATTR VkResult vpGetProfilePropertyStructureTypes(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t*                                   pStructureTypeCount,
     VkStructureType*                            pStructureTypes) {
     return detail::vpGetProfileStructureTypes(
-#ifdef VP_USE_OBJECT
         functions,
-#endif//VP_USE_OBJECT
         pProfile, pBlockName, detail::STRUCTURE_PROPERTY, pStructureTypeCount, pStructureTypes);
 }
 
 VPAPI_ATTR VkResult vpGetProfileQueueFamilyStructureTypes(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t*                                   pStructureTypeCount,
     VkStructureType*                            pStructureTypes) {
     return detail::vpGetProfileStructureTypes(
-#ifdef VP_USE_OBJECT
         functions,
-#endif//VP_USE_OBJECT
         pProfile, pBlockName, detail::STRUCTURE_QUEUE_FAMILY, pStructureTypeCount, pStructureTypes);
 }
 
 VPAPI_ATTR VkResult vpGetProfileFormatStructureTypes(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t*                                   pStructureTypeCount,
     VkStructureType*                            pStructureTypes) {
     return detail::vpGetProfileStructureTypes(
-#ifdef VP_USE_OBJECT
         functions,
-#endif//VP_USE_OBJECT
         pProfile, pBlockName, detail::STRUCTURE_FORMAT, pStructureTypeCount, pStructureTypes);
 }
 
 #ifdef VK_KHR_video_queue
 // Query the list of video profiles specified by the profile
 VPAPI_ATTR VkResult vpGetProfileVideoProfiles(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t*                                   pVideoProfileCount,
     VpVideoProfileProperties*                   pVideoProfiles) {
-#ifdef VP_USE_OBJECT
     (void)functions;
-#endif//VP_USE_OBJECT
     if (pVideoProfileCount == nullptr) return VK_ERROR_UNKNOWN;
 
     VkResult result = pBlockName == nullptr ? VK_SUCCESS : VK_INCOMPLETE;
@@ -2948,16 +2747,12 @@ VPAPI_ATTR VkResult vpGetProfileVideoProfiles(
 }
 
 VPAPI_ATTR VkResult vpGetProfileVideoProfileInfo(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t                                    videoProfileIndex,
     VkVideoProfileInfoKHR*                      pVideoProfileInfo) {
-#ifdef VP_USE_OBJECT
     (void)functions;
-#endif//VP_USE_OBJECT
 
     const detail::VpVideoProfileDesc* pVideoProfileDesc = nullptr;
     VkResult result = detail::vpGetProfileVideoProfileDesc(pProfile, pBlockName, videoProfileIndex, &pVideoProfileDesc);
@@ -2974,16 +2769,12 @@ VPAPI_ATTR VkResult vpGetProfileVideoProfileInfo(
 }
 
 VPAPI_ATTR VkResult vpGetProfileVideoCapabilities(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t                                    videoProfileIndex,
     void*                                       pNext) {
-#ifdef VP_USE_OBJECT
     (void)functions;
-#endif//VP_USE_OBJECT
 
     const detail::VpVideoProfileDesc* pVideoProfileDesc = nullptr;
     VkResult result = detail::vpGetProfileVideoProfileDesc(pProfile, pBlockName, videoProfileIndex, &pVideoProfileDesc);
@@ -3000,17 +2791,13 @@ VPAPI_ATTR VkResult vpGetProfileVideoCapabilities(
 }
 
 VPAPI_ATTR VkResult vpGetProfileVideoFormatProperties(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t                                    videoProfileIndex,
     uint32_t*                                   pPropertyCount,
     VkVideoFormatPropertiesKHR*                 pProperties) {
-#ifdef VP_USE_OBJECT
     (void)functions;
-#endif//VP_USE_OBJECT
 
     const detail::VpVideoProfileDesc* pVideoProfileDesc = nullptr;
     VkResult result = detail::vpGetProfileVideoProfileDesc(pProfile, pBlockName, videoProfileIndex, &pVideoProfileDesc);
@@ -3040,17 +2827,13 @@ VPAPI_ATTR VkResult vpGetProfileVideoFormatProperties(
 }
 
 VPAPI_ATTR VkResult vpGetProfileVideoProfileInfoStructureTypes(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t                                    videoProfileIndex,
     uint32_t*                                   pStructureTypeCount,
     VkStructureType*                            pStructureTypes) {
-#ifdef VP_USE_OBJECT
     (void)functions;
-#endif//VP_USE_OBJECT
 
     const detail::VpVideoProfileDesc* pVideoProfileDesc = nullptr;
     VkResult result = detail::vpGetProfileVideoProfileDesc(pProfile, pBlockName, videoProfileIndex, &pVideoProfileDesc);
@@ -3074,17 +2857,13 @@ VPAPI_ATTR VkResult vpGetProfileVideoProfileInfoStructureTypes(
 }
 
 VPAPI_ATTR VkResult vpGetProfileVideoCapabilityStructureTypes(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t                                    videoProfileIndex,
     uint32_t*                                   pStructureTypeCount,
     VkStructureType*                            pStructureTypes) {
-#ifdef VP_USE_OBJECT
     (void)functions;
-#endif//VP_USE_OBJECT
 
     const detail::VpVideoProfileDesc* pVideoProfileDesc = nullptr;
     VkResult result = detail::vpGetProfileVideoProfileDesc(pProfile, pBlockName, videoProfileIndex, &pVideoProfileDesc);
@@ -3108,17 +2887,13 @@ VPAPI_ATTR VkResult vpGetProfileVideoCapabilityStructureTypes(
 }
 
 VPAPI_ATTR VkResult vpGetProfileVideoFormatStructureTypes(
-#ifdef VP_USE_OBJECT
     VpFunctions                                 functions,
-#endif//VP_USE_OBJECT
     const VpProfileProperties*                  pProfile,
     const char*                                 pBlockName,
     uint32_t                                    videoProfileIndex,
     uint32_t*                                   pStructureTypeCount,
     VkStructureType*                            pStructureTypes) {
-#ifdef VP_USE_OBJECT
     (void)functions;
-#endif//VP_USE_OBJECT
 
     const detail::VpVideoProfileDesc* pVideoProfileDesc = nullptr;
     VkResult result = detail::vpGetProfileVideoProfileDesc(pProfile, pBlockName, videoProfileIndex, &pVideoProfileDesc);

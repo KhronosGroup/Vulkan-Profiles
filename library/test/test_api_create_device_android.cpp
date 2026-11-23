@@ -271,7 +271,7 @@ TEST(library_api, vpCreateDevice) {
     profileInfo.pEnabledFullProfiles = &profile;
 
     VkDevice device = VK_NULL_HANDLE;
-    VkResult res = vpCreateDevice(scaffold.physicalDevice, &profileInfo, nullptr, &device);
+    VkResult res = vpCreateDevice(nullptr, scaffold.physicalDevice, &profileInfo, nullptr, &device);
 #if defined(__ANDROID__)
     EXPECT_TRUE(res == VK_SUCCESS);
     EXPECT_TRUE(device != VK_NULL_HANDLE);
@@ -295,7 +295,7 @@ TEST(library_api, vpGetPhysicalDeviceProfileSupport) {
     VpProfileProperties profile{VP_ANDROID_VULKAN_PROFILE_2021_NAME, VP_ANDROID_VULKAN_PROFILE_2021_SPEC_VERSION};
 
     VkBool32 supported = VK_FALSE;
-    vpGetPhysicalDeviceProfileSupport(scaffold.instance, scaffold.physicalDevice, &profile, &supported);
+    vpGetPhysicalDeviceProfileSupport(nullptr, scaffold.physicalDevice, &profile, &supported);
 
     EXPECT_EQ(VK_TRUE, supported);
 
